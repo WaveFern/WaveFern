@@ -63,3 +63,14 @@ collabDone=function(){const o=cs2.o,op=cs2.op||0,a=ART[o.i],m=S.msgs.find(x=>x.a
 
 /* ===== per-frame hooks ===== */
 {const u0=update;update=function(dt){u0(dt);if(mode=='play'&&S.day==1&&!S.dm1&&S.t>4)firstDMs()}}
+
+/* ===== 2. recording, energy, footsteps ===== */
+/* energy refills slowly while the clock runs (about 36 per full day), never above 100 */
+const clockOn=()=>!PAUSED&&(mode=='play'||mode=='rec'||mode=='drive'||mode=='pc');
+function energyTick(dt){if(!clockOn()||S.energy>=100)return;S.eacc=(S.eacc||0)+dt*.06;if(S.eacc>=1){const k=Math.floor(S.eacc);S.eacc-=k;S.energy=Math.min(100,S.energy+k)}}
+/* one footstep scheduler: steps follow actual movement, never overlap, and fade in so they do not pop */
+const STP={t:.2,last:0,px:0,pz:0};
+function stepSnd(run){if(!FX)return;try{ac();const t=AC.currentTime;if(t-STP.last<.18)return;STP.last=t;const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;f.type='lowpass';f.frequency.value=360+R(0,160);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(run?.3:.22,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.09);s.connect(f);f.connect(g);g.connect(MG);s.start(t,R(0,.5));s.stop(t+.12)}catch(e){}}
+function stepTick(dt,mv){const d=Math.hypot(P.x-STP.px,P.z-STP.pz);STP.px=P.x;STP.pz=P.z;if(!mv||mode!='play'||d<1e-4){STP.t=Math.min(STP.t,.2);return}const sp=d/Math.max(dt,1e-4);STP.t+=dt;if(STP.t>=(sp>5?.27:.4)){STP.t=0;stepSnd(sp>5)}}
+{const u1=update;update=function(dt){u1(dt);energyTick(dt)}}
+{const st=document.createElement('style');st.textContent='.dsel{background:#0d1411;color:inherit;border:2px solid #000;padding:6px 10px;font:inherit}';document.head.appendChild(st)}

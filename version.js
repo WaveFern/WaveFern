@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.0.0';
+const GAME_VERSION='v26.1.0';
 const VERSION_HISTORY=[
+ {v:'v26.1.0',n:'Collab recording costs half the energy of a solo song. The diss track option is now an Off/On dropdown, Off at the start of every session. The recording marker speeds up 15% after each hit (misses do not speed it up). Energy slowly refills during the day. Footsteps use one sound system, so walking diagonally no longer stacks or pops.'},
  {v:'v26.0.0',n:"Artist collabs redone: you pay the artist's fee (shown on a confirm button) to book a session. Meeting in person is a short chat with three reply choices that change the artist's opinion, and that opinion sets the song's quality and streams. Red or blue dots on artist pictures show who really wants a collab. A few artists message you on your first day. Collab songs get one (feat. NAME) tag. Artists understand more slang."},
  {v:'v25.1.0',n:'Settings button removed from the bottom-right corner. The map sits a little lower. New games start with the Charcoal wallpaper.'},
  {v:'v24.4.2',n:'Upstairs stairs now drop down into a cut-out in the floor. The new floor is split into four empty rooms.'},
