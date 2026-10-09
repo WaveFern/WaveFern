@@ -5,7 +5,7 @@ const BI={cars:'Cars',prop:'Property',pets:'Pets',guard:'Bodyguards'},unr=()=>S.
 const mkS=a=>{const g=new THREE.Group();a.forEach(x=>B(g,...x));return g};
 const CARS=[{n:'Pocket Hatch',p:1500,c:'#e6b422',top:11},{n:'Commuter Sedan',p:4000,c:'#3b82f6',top:15},{n:'Trail Pickup',p:7500,c:'#2f8f5a',top:17},{n:'Apex Sports',p:15000,c:'#c0392b',top:29},{n:'Phantom GT',p:40000,c:'#22252b',top:40}];
 //carb
-const PROPS=[['Suburban House',12000],['Hillside Villa',45000],['Penthouse Loft',120000],['Mega Mansion',400000]];
+const PROPS=[['Suburban House',12000],['Hillside Villa',45000],['Penthouse Loft',120000]];
 //hseb
 const PETS=[['Pixel Cat',150],['Good Boy Dog',250],['Polly Parrot',400],['Foxy',900]],PETC=['#e39b5b','#b98a5a','#2ecc71','#e8772e'];
 //petb
