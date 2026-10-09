@@ -27,3 +27,8 @@ function wrR(){if(!document.querySelector('.wrd'))WPK.id=null;const own=GAR.filt
 
 /* v24.4: the garage hides while you are inside the house, so it no longer blocks the studio */
 {const wt6=worldTick;worldTick=function(dt){wt6(dt);GARM.forEach(m=>m.visible=!HIN)}}
+
+/* v24.4.1: a continuous low wall along the front (south) edge of the ground floor, shown while inside the house.
+   The collision there was already solid; this closes the visible opening. */
+const FRW=B(WORLD,16,1.1,.3,'#9aa0a8',8,.55,11.95);
+{const wt7=worldTick;worldTick=function(dt){wt7(dt);FRW.visible=HIN}}
