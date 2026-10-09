@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v24.4.1';
+const GAME_VERSION='v24.4.2';
 const VERSION_HISTORY=[
+ {v:'v24.4.2',n:'Upstairs stairs now drop down into a cut-out in the floor. The new floor is split into four empty rooms.'},
  {v:'v24.4.1',n:'Fixed: the ground floor had a visible opening along the front edge. It is now a continuous low wall while you are inside the house.'},
  {v:'v24.4.0',n:'House tiers: the suburban house is the original four rooms, the Hillside Villa adds two plain rooms on the back, the Penthouse Loft adds a whole new floor (empty, for your own furniture). Upstairs stairs now go down. Removed the Instagrime stories row. The garage hides while you are inside the house. The map thumbnail is smaller and blurs behind the pause menu.'},
  {v:'v24.3.0',n:'Added a third background track to the music rotation.'},
