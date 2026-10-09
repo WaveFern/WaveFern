@@ -121,3 +121,49 @@ function garageSync(){if(!GREF){const c=cols.find(c=>c[0]==17.5&&c[1]==1.5&&c[2]
  const own=!!S.garage,tg=(arr,o)=>{if(!o)return;const k=arr.indexOf(o);if(own&&k<0)arr.push(o);else if(!own&&k>=0)arr.splice(k,1)};tg(cols,GREF.c);tg(INT,GREF.i);tg(POIS,GREF.p);
  GARM.forEach(m=>m.visible=own&&!HIN);if(GPAD)GPAD.visible=own;if(GLBL)GLBL.visible=own&&!HIN}
 {const wt8=worldTick;worldTick=function(dt){wt8(dt);garageSync()}}
+
+/* ===== 8. city: wider roads, junction traffic, more people, solid NPCs and cars ===== */
+/* roads widen to the south (horizontal) and east (vertical) so the house side of every street stays where it was:
+   asphalt 5 -> 6.4 wide, far-side pavement 1.2 -> 1.8 wide. Road centre lines move to +0.7. */
+function roadH(zr,x0,x1){const L=x1-x0,cx=(x0+x1)/2;SB(L,.04,6.4,'#3a3d44',cx,-.03,zr+.7);SB(L,.06,1.2,'#b9b5ab',cx,-.02,zr-3.1);SB(L,.06,1.8,'#b9b5ab',cx,-.02,zr+4.8);for(let x=x0;x<x1;x+=5)SB(2,.02,.16,'#e8d9a0',x,0,zr+.7);ROADS.push([x0,zr-2.5,x1,zr+3.9]);RH.push([zr,x0,x1])}
+function roadV(xr,z0,z1){const L=z1-z0,cz=(z0+z1)/2;SB(6.4,.04,L,'#3a3d44',xr+.7,-.03,cz);SB(1.2,.06,L,'#b9b5ab',xr-3.1,-.02,cz);SB(1.8,.06,L,'#b9b5ab',xr+4.8,-.02,cz);for(let z=z0;z<z1;z+=5)SB(.16,.02,2,'#e8d9a0',xr+.7,0,z);ROADS.push([xr-2.5,z0,xr+3.9,z1]);RVV.push([xr,z0,z1])}
+const onX=(h,v)=>v[0]>=h[1]-.01&&v[0]<=h[2]+.01&&h[0]>=v[1]-.01&&h[0]<=v[2]+.01;
+function finishRoads(){for(let x=-120;x<485;x+=24)if(x<-10||x>70)lamp(x,13.1);const C='#3a3d44';RH.forEach(h=>RVV.forEach(v=>{if(!onX(h,v))return;const X=v[0],Z=h[0];SB(6.4,.04,6.4,C,X+.7,.015,Z+.7);if(v[1]<Z-.1)SB(6.4,.04,1.3,C,X+.7,.015,Z-3.1);if(v[2]>Z+.1)SB(6.4,.04,1.9,C,X+.7,.015,Z+4.8);if(h[1]<X-.1)SB(1.3,.04,6.4,C,X-3.1,.015,Z+.7);if(h[2]>X+.1)SB(1.9,.04,6.4,C,X+4.8,.015,Z+.7)}))}
+/* city towers step back from the wider pavements; tower entrances keep their original ids */
+function tower(x0,z0,x1,z1){const ox=x0,oz=z0;if(x0>=490&&x0%40==14)x0+=2;if(z0==-37)z0=-34;else if(z0==64)z0=66;
+ const w=x1-x0-R(0,5),d=z1-z0-R(0,5),cx=(x0+x1)/2,cz=(z0+z1)/2,h=R(8,36),t=winTex().clone();t.needsUpdate=true;t.repeat.set(Math.max(1,Math.round(w/3)),Math.max(1,Math.round(h/3)));const mat=new THREE.MeshLambertMaterial({color:pick(['#8fa6b8','#a9b7c4','#7b8da0','#b8a99a','#9db4a0','#c4a08a']),map:t,transparent:true}),m=new THREE.Mesh(geo(w,h,d),mat);m.position.set(cx,h/2,cz);WORLD.add(m);SB(2,1.8,.1,'#2a1f1a',cx,.9,cz+d/2+.05);col(cx-w/2,cz-d/2,cx+w/2,cz+d/2);BLD.push([cx-w/2,cz-d/2,cx+w/2,cz+d/2]);CT.push({mat,x0:cx-w/2,x1:cx+w/2,z0:cz-d/2,z1:cz+d/2,h});if(typeof twHook=='function')twHook(ox,oz,cx,cz+d/2,w,h)}
+/* traffic: a road graph (junctions, T-junctions and dead ends); cars keep to their lane, turn at junctions and U-turn only at dead ends */
+const TG2={N:[],E:[]};
+function trafGraph(){const N=new Map(),node=(x,z)=>{const k=x.toFixed(1)+','+z.toFixed(1);if(!N.has(k))N.set(k,{x,z,e:[]});return N.get(k)},link=(a,b)=>{if(a===b)return;const L=Math.hypot(b.x-a.x,b.z-a.z);a.e.push({to:b,ux:(b.x-a.x)/L,uz:(b.z-a.z)/L,len:L});b.e.push({to:a,ux:(a.x-b.x)/L,uz:(a.z-b.z)/L,len:L})};
+ RH.forEach(h=>{const J=RVV.filter(v=>onX(h,v)).map(v=>v[0]),P=[...J.map(x=>x+.7)];[h[1],h[2]].forEach(x=>{if(!J.some(j=>Math.abs(j-x)<.01))P.push(x)});const u=[...new Set(P.map(x=>+x.toFixed(1)))].sort((a,b)=>a-b);for(let i=0;i<u.length-1;i++)link(node(u[i],h[0]+.7),node(u[i+1],h[0]+.7))});
+ RVV.forEach(v=>{const J=RH.filter(h=>onX(h,v)).map(h=>h[0]),P=[...J.map(z=>z+.7)];[v[1],v[2]].forEach(z=>{if(!J.some(j=>Math.abs(j-z)<.01))P.push(z)});const u=[...new Set(P.map(z=>+z.toFixed(1)))].sort((a,b)=>a-b);for(let i=0;i<u.length-1;i++)link(node(v[0]+.7,u[i]),node(v[0]+.7,u[i+1]))});
+ TG2.N=[...N.values()];TG2.E=[];TG2.N.forEach(n=>n.e.forEach(e=>TG2.E.push([n,e])))}
+const LANE=1.6,CCOL=['#e6b422','#3b82f6','#2f8f5a','#c0392b','#e8e8ec','#ff8a30','#8e44ad'];
+function carPos(c){c.x=c.a.x+c.e.ux*c.t+c.e.uz*LANE;c.z=c.a.z+c.e.uz*c.t-c.e.ux*LANE}
+function buildTraffic(){morePeople();trafGraph();const tot=TG2.E.reduce((s,q)=>s+q[1].len,0)/2,n=Math.min(120,Math.round(tot/15));let g=0;
+ while(TRAF.length<n&&g++<n*20){const[a,e]=pick(TG2.E),t=R(0,e.len);if(TRAF.some(o=>o.a===a&&o.e===e&&Math.abs(o.t-t)<9))continue;const m=mkS(carb(RI(0,4),pick(CCOL)));m.scale.setScalar(1.5);m.visible=false;scene.add(m);const c={m,a,e,t,s:0,cr:R(8,13),w:0,dir:0,sp:0,v:0,lo:-1e9,hi:1e9,h:Math.atan2(e.ux,e.uz),f:1};carPos(c);TRAF.push(c)}}
+function cityTraffic(){}
+function trafTick(dt){const pl=mode=='play'||mode=='drive';TRAF.forEach(c=>{if(!c.e)return;let tg=c.cr;
+  TRAF.forEach(o=>{if(o===c||o.a!==c.a||o.e!==c.e)return;const g=o.t-c.t;if(g>0&&g<8)tg=Math.min(tg,g<4.6?0:o.s)});
+  if(pl&&!IN){const dx=P.x-c.x,dz=P.z-c.z,al=dx*c.e.ux+dz*c.e.uz,pp=dx*c.e.uz-dz*c.e.ux;if(al>0&&al<9&&Math.abs(pp)<1.5)tg=al<5?0:Math.min(tg,2.5)}
+  if(c.e.len-c.t<4&&c.w<5){const to=c.e.to;if(TRAF.some(o=>o!==c&&o.e&&o.s>.5&&Math.hypot(o.x-to.x,o.z-to.z)<3.2&&!(o.a===c.a&&o.e===c.e)))tg=0}
+  c.w=tg<.1&&c.s<.5?c.w+dt:0;c.s+=(tg-c.s)*Math.min(1,dt*(tg<c.s?4:1.2));c.t+=c.s*dt;
+  while(c.t>=c.e.len){c.t-=c.e.len;const b=c.e.to,ops=b.e.filter(e=>e.to!==c.a);c.a=b;c.e=ops.length?pick(ops):b.e[0];c.w=0}
+  carPos(c);const th=Math.atan2(c.e.ux,c.e.uz);let d=th-c.h;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;c.h+=d*Math.min(1,dt*6);
+  const m=c.m;if(c.f||!m.visible){c.rx=c.x;c.rz=c.z;c.h=th;c.f=0}else{c.rx+=(c.x-c.rx)*Math.min(1,dt*8);c.rz+=(c.z-c.rz)*Math.min(1,dt*8)}m.position.set(c.rx,0,c.rz);m.rotation.y=c.h;m.visible=Math.abs(c.x-P.x)<50&&Math.abs(c.z-P.z)<50&&!HIN&&!IN})}
+/* the player's car may always drive away from a traffic car, so it can never get boxed in for good */
+function tcB(x0,z0,x,z){return TRAF.some(t=>t.m.visible&&Math.hypot(t.x-x,t.z-z)<2.8&&Math.hypot(t.x-x,t.z-z)<Math.hypot(t.x-x0,t.z-z0))}
+/* more people on every pavement: horizontal walkers reuse the NPC system, vertical-street walkers get their own list */
+const VPED=[];
+function morePeople(){const cfg=()=>({skin:RI(0,5),eyes:RI(0,4),mouth:RI(0,3),hair:RI(0,11),hc:RI(0,11),top:RI(0,4),tc:RI(0,9),pc:RI(0,7),body:Math.random()});
+ RH.forEach(h=>[h[0]-3.1,h[0]+4.8].forEach(z=>{const n=Math.round((h[2]-h[1])/26);for(let i=0;i<n;i++)addNPC(z,R(h[1]+2,h[2]-2),h[1]+1,h[2]-1,R(.8,1.7),Math.random()<.1)}));
+ RVV.forEach(v=>[v[0]-3.1,v[0]+4.8].forEach(x=>{const n=Math.round((v[2]-v[1])/26);for(let i=0;i<n;i++){const o=buildChar(cfg());o.g.visible=false;scene.add(o.g);VPED.push({m:o.g,legs:o.legs,arms:o.arms,x,x0:x,z:R(v[1]+2,v[2]-2),mn:v[1]+1,mx:v[2]-1,dir:Math.random()<.5?1:-1,sp:R(.8,1.7),t:R(0,6)})}}))}
+function pedTick(dt){VPED.forEach(n=>{const dd=Math.hypot(P.x-n.x,P.z-n.z);if(dd>60||HIN||IN){n.m.visible=false;return}n.m.visible=true;n.t+=dt*8;n.z+=n.dir*n.sp*dt;if(n.z>n.mx)n.dir=-1;if(n.z<n.mn)n.dir=1;n.x+=(n.x0-n.x)*Math.min(1,dt*2);n.m.rotation.y=n.dir>0?0:Math.PI;n.m.position.set(n.x,0,n.z);const s=Math.sin(n.t)*.6;n.legs[0].rotation.x=s;n.legs[1].rotation.x=-s;n.arms[0].rotation.x=-s;n.arms[1].rotation.x=s})}
+/* solid people and cars: a move is refused only if it goes further into someone, so you can always step away */
+function dynB(x0,z0,x,z){if(IN||HIN)return false;const R0=.62,ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
+ if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;
+ return TRAF.some(c=>{if(!c.e||!c.m.visible||Math.abs(c.x-x)>4||Math.abs(c.z-z)>4)return false;const dep=(px,pz)=>{const dx=px-c.x,dz=pz-c.z,al=Math.abs(dx*c.e.ux+dz*c.e.uz),pp=Math.abs(dx*c.e.uz-dz*c.e.ux);return Math.min(2.2-al,1.15-pp)};const n=dep(x,z);return n>0&&n>dep(x0,z0)})}
+/* people step around you instead of walking through you (also around your car) */
+function pushPeople(){if(HIN||IN)return;const r=mode=='drive'?1.7:.6;[NPC,VPED].forEach(L=>L.forEach(n=>{if(!n.m.visible)return;const dx=n.x-P.x,dz=n.z-P.z,d=Math.hypot(dx,dz);if(d<r){const k=d>1e-3?r/d:0;n.x=d>1e-3?P.x+dx*k:P.x+r;n.z=d>1e-3?P.z+dz*k:n.z;n.m.position.set(n.x,n.m.position.y,n.z)}}))}
+{const wt9=worldTick;worldTick=function(dt){wt9(dt);trafTick(dt);pedTick(dt);pushPeople()}}
+{const st0=stepTick;stepTick=function(dt,mv){if(!mv)P.sv=3.3;st0(dt,mv)}}
