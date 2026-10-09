@@ -27,8 +27,8 @@ function wrR(){if(!document.querySelector('.wrd'))WPK.id=null;const own=GAR.filt
 
 /* v24.4: the garage hides while you are inside the house, so it no longer blocks the studio */
 /* v25.5: no garage structure until it is bought. Until then the plot is empty: no meshes and no invisible wall. */
-let GARCOL=null;
-{const wt6=worldTick;worldTick=function(dt){wt6(dt);GARM.forEach(m=>m.visible=!!S.garage&&!HIN);if(!GARCOL)GARCOL=cols.find(c=>c[0]==17.5&&c[1]==1.5&&c[2]==27.5&&c[3]==7)||0;if(GARCOL){const on=!!S.garage;GARCOL[0]=on?17.5:-9e3;GARCOL[1]=on?1.5:-9e3;GARCOL[2]=on?27.5:-9e3;GARCOL[3]=on?7:-9e3}}}
+let GARCOL=null,GPOI=null;
+{const wt6=worldTick;worldTick=function(dt){wt6(dt);GARM.forEach(m=>m.visible=!!S.garage&&!HIN);GARM2.forEach(m=>m.visible=!!S.garage);{const gi=POIS.findIndex(q=>q[2]=='Garage');if(!S.garage&&gi>=0)GPOI=POIS.splice(gi,1)[0];else if(S.garage&&gi<0&&GPOI)POIS.push(GPOI)}if(!GARCOL)GARCOL=cols.find(c=>c[0]==17.5&&c[1]==1.5&&c[2]==27.5&&c[3]==7)||0;if(GARCOL){const on=!!S.garage;GARCOL[0]=on?17.5:-9e3;GARCOL[1]=on?1.5:-9e3;GARCOL[2]=on?27.5:-9e3;GARCOL[3]=on?7:-9e3}}}
 
 /* v24.4.1: a continuous low wall along the front (south) edge of the ground floor, shown while inside the house.
    The collision there was already solid; this closes the visible opening. */
@@ -37,3 +37,6 @@ const FRW=B(WORLD,16,1.1,.3,'#9aa0a8',8,.55,11.95);
 /* v25.5: the right-hand (east) wall is hidden while you are inside, which left that side open. A low wall in its place closes it while you can still see in. */
 const ERW=B(WORLD,.3,1.1,12,'#d8c7a6',16.15,.55,6);
 {const wt8=worldTick;worldTick=function(dt){wt8(dt);ERW.visible=HIN}}
+/* v25.8: a proper front door in the front wall, seen from inside (matches the outside door). */
+const FDI=[B(WORLD,1.8,2.3,.14,'#5a3a22',6,1.15,11.74),B(WORLD,.18,2.4,.3,'#d8c7a6',5,1.2,11.75),B(WORLD,.18,2.4,.3,'#d8c7a6',7,1.2,11.75),B(WORLD,2.2,.2,.3,'#d8c7a6',6,2.45,11.75),B(WORLD,.12,.12,.1,'#e6b422',6.6,1.1,11.64)];
+{const wt9=worldTick;worldTick=function(dt){wt9(dt);FDI.forEach(m=>m.visible=HIN)}}
