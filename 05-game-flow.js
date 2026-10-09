@@ -23,33 +23,20 @@ function creatorUI(){
 function st(k,d){const n=NM[k].length;ch[k]=(ch[k]+d+n)%n;refresh();creatorUI()}
 function rnd(){CPK.k=null;ch={skin:RI(0,SKIN.length-1),eyes:RI(0,NM.eyes.length-1),mouth:RI(0,NM.mouth.length-1),hair:RI(0,NM.hair.length-1),hc:RI(0,HAIRC.length-1),top:RI(0,4),tc:RI(0,9),pc:RI(0,PANTC.length-1),body:Math.random()};refresh();creatorUI()}
 function confirmChar(){mode='menu';$('ui').innerHTML=`<div class="box modal"><h2>Welcome home</h2><p>A modest place, <b>$100</b>, and an empty music career.</p><p class=m>① Use the <b>computer</b> in your bedroom to pick an artist name.<br>② Record songs at the <b>microphone</b> in the studio.<br>③ Name &amp; upload them on the computer, then <b>sleep</b> to earn overnight.<br>④ Buy gear upgrades in the Gear shop.</p><button class=go onclick="closeUI()">Let's go</button></div>`}
-function recMenu(keep){if(!keep)DT=null;if(!S.artist)return say('Pick an artist name on the computer first.');if(S.energy<15)return say('Too tired to record. Get some sleep.');
+function recMenu(){if(!S.artist)return say('Pick an artist name on the computer first.');if(S.energy<15)return say('Too tired to record. Get some sleep.');
  mode='menu';$('ui').innerHTML=`<div class="box modal"><h2>Pick a genre</h2><div class=gen>${GEN.map((g,i)=>`<button onclick="startRec(${i})">${esc(g)}${S.hype[g]>1.12?' ▲':S.hype[g]<.92?' ▼':''}</button>`).join('')}</div>${dissHTML()}<p class=m>▲ trending · ▼ cold<br>Hit the green zone 10 times to finish the song. Costs 15 energy.</p><button onclick="closeUI()">Cancel</button></div>`}
-function startRec(i){snd('rec');S.energy-=15;rec={diss:DT,g:GEN[i],t:0,need:30,goal:10,miss:0,pos:0,dir:1,hits:0,cd:0,fl:0,ok:1,spd:.9};P.rot=Math.PI;P.x=12.2;P.z=2.3;closeUI();mode='rec'}
+function startRec(i){snd('rec');S.energy-=15;rec={diss:DT,g:GEN[i],t:0,need:30,goal:10,miss:0,pos:0,dir:1,hits:0,cd:0,fl:0,ok:1};P.rot=Math.PI;P.x=12.2;P.z=2.3;closeUI();mode='rec'}
 const A=['Midnight','Broken','Golden','Neon','Paper','Velvet','Lonely','Electric','Faded','Wild'],Bn=['Dreams','Highway','Heart','Summer','Echoes','City','Rain','Fire','Letters','Static'];
 function finishRec(){chime();const q=Math.round(R(14,30)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.gear.keys||0)*3+(S.gear.drums||0)*3+(S.gear.booth||0)*5+(S.home||0)*3+S.pets.length+mentors()*2+Math.max(0,8-rec.miss)),d={id:S.nid++,title:rec.diss?'No Love For '+rec.diss.split(' ')[0]:pick(A)+' '+pick(Bn),g:rec.g,q,diss:rec.diss};S.drafts.push(d);updateVersion();rec=null;mode='menu';
  $('ui').innerHTML=`<div class="box modal"><h2>Song recorded! 🎵</h2><p class=m>${esc(d.g)} · mix quality ${q}</p><p>Give it a title:</p><input id=tin maxlength=32 value="${esc(d.title)}" onkeydown="if(event.key=='Enter')saveT(${d.id})"><div class=row2><button class=go onclick="saveT(${d.id})">Save to drafts</button></div><p class=m><small>Upload it from the computer. You can still edit the title there.</small></p></div>`;setTimeout(()=>{const i=$('tin');i&&(i.focus(),i.select())},50)}
 function saveT(id){const v=$('tin').value.trim();if(!v)return say('Enter a title.');S.drafts.find(d=>d.id==id).title=v;closeUI();say('Saved "'+v+'" to drafts')}
 function sleepQ(){mode='menu';$('ui').innerHTML=`<div class="box modal"><h2>Go to bed?</h2><p>Day ${S.day} ends. Your uploaded songs earn streams overnight.</p><div class=row2><button class=go onclick="sleepNow(0)">Sleep 💤</button><button onclick="closeUI()">Not yet</button></div></div>`}
 function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class=fade></div>';setTimeout(()=>{
- const before=mentors(),old=S.listeners;const rel=S.songs.filter(x=>x.day==S.day).length;S.interest=Math.min(1,(S.interest||0)*.9+rel*.22);
- settleStreams();const tot=isFinite(S.dayTot)?S.dayTot:0,e=+(tot*.05).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn+=e;S.streams+=tot;S.hist.push({d:S.day,st:tot,e});
+ const before=mentors(),old=S.listeners;let tot=0;
+ const rel=S.songs.filter(x=>x.day==S.day).length;S.interest=Math.min(1,(S.interest||0)*.9+rel*.22);const mI=.3+.7*S.interest,mL=Math.pow(2.2,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/60));S.songs.forEach(s=>{const age=S.day-s.day;let v=s.q*.8*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+.03)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<.02&&age<8)v*=R(2,5);const cap=s.q*s.q*25*Math.pow(2.2,fameLv())-s.streams;v=v||0;v=Math.max(0,Math.min(Math.round(v),cap));s.streams+=v;s.today=v;tot+=v});
+ tot=isFinite(tot)?tot:0;const e=+(tot*.05).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn+=e;S.streams+=tot;S.hist.push({d:S.day,st:tot,e});
  S.listeners=Math.round(S.hist.slice(-30).reduce((a,h)=>a+(h.st||0),0)/3);if(S.cheat)S.listeners=Math.max(S.listeners,1e9);if(!isFinite(S.money))S.money=0;S.followers+=Math.round(tot*.05);genMsgs();
- S.day++;S.t=0;S.dayW=0;S.dayTot=0;S.energy=auto?70:100;GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));updateVersion();
+ S.day++;S.t=0;S.energy=auto?70:100;GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));updateVersion();
  const nm=mentors()>before?MEN[mentors()-1][1]:null;
  $('ui').innerHTML=`<div class="box modal" style="background:#0b0f0d"><h2>☀ Day ${S.day}</h2>${auto?'<p class=m>You passed out at your desk (energy only 70%).</p>':''}<p>Overnight results:</p><div class=cards><div class=card>Streams<b>+${tot.toLocaleString()}</b></div><div class=card>Earned<b>${$$(e)}</b></div><div class=card>Monthly listeners<b>${old} → ${S.listeners}</b></div><div class=card>Interest<b>${Math.round(S.interest*100)}%</b></div></div><p class=m><small>${rel?rel+' new release(s) boosted interest.':'No new releases: interest fades and old songs keep decaying.'}</small></p>${nm?`<p>🌟 New fictional mentor unlocked: <b>${nm}</b> (see Legends)</p>`:''}${!S.songs.length?'<p class=m>Upload a song to start earning!</p>':''}<button class=go onclick="closeUI()">Start the day</button></div>`},950)}
 
-
-/* ---------- streams accrue through the day, paid out on waking ----------
-   The day is 600 clock units: 6:00-20:00 (0-300) counts 1x, 20:00-6:00 (300-600) counts 2x, so nights are faster.
-   Each song's day total is planned once (S.dayW is the weighted progress, 900 = whole day). Streams are added
-   gradually as that progress moves on; money is paid once on waking from S.dayTot. */
-function planSong(s){const P=Math.min(1,(S.dayW||0)/900),p0=P,age=S.day-s.day;const mI=.3+.7*(S.interest||0),mL=fameMult()*(1+Math.min(1,Math.sqrt(S.listeners)/60));
- let v=s.q*.8*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+.03)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<.02&&age<8)v*=R(2,5);
- const cap=s.q*s.q*25*fameMult()-s.streams;v=Math.max(0,Math.min(Math.round((v||0)*(1-p0)),cap));
- s.p0=p0;s.tgt=v;s.acc=0;s.pd=S.day}
-function accrueStreams(){const P=Math.min(1,(S.dayW||0)/900);S.dayTot=S.dayTot||0;
- S.songs.forEach(s=>{if(s.pd!=S.day)planSong(s);const q=s.p0>=1?1:Math.min(1,Math.max(0,(P-s.p0)/(1-s.p0))),d=Math.round(s.tgt*q)-(s.acc||0);
-  if(d>0){s.acc=(s.acc||0)+d;s.streams+=d;s.today=s.acc;S.dayTot+=d}})}
-function settleStreams(){S.dayW=900;accrueStreams()}
-function clockRuns(){return ['play','rec','drive','pc','build','cut'].includes(mode)||(mode=='menu'&&SP!='pause'&&SP!='creator')}
