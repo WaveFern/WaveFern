@@ -13,10 +13,10 @@ const FOOD=[['Sir Burger Double Stack',22,25,'Two patties, melted cheese, crunch
 let IGF=[],PL=[],hold=null,gp={x:4,z:4,r:0,ok:0},ghost=null,GF=null,mouse={x:0,y:0};const RC=new THREE.Raycaster(),PLN=new THREE.Plane(new THREE.Vector3(0,1,0),0);
 const mkF=t=>{const g=new THREE.Group();F[t].b.forEach(a=>B(g,...a));return g};
 const fb=(t,x,z,r)=>{const f=F[t],w=r%2?f.d:f.w,d=r%2?f.w:f.d;return[x-w/2,z-d/2,x+w/2,z+d/2]};
-function inst(k){const a=APPD[k];if(S.money<a.p)return snd('err');S.money=+(S.money-a.p).toFixed(2);S.apps[k]=1;snd('cash');say('Installed '+a.n);pcR()}
-function buyF(t){if(S.money<F[t].p)return snd('err');S.money=+(S.money-F[t].p).toFixed(2);S.inv[t]=(S.inv[t]||0)+1;snd('cash');say(F[t].n+' delivered to storage');pcR()}
-function order(i){const f=FOOD[i];if(S.energy>=100)return say('You are already full of energy.');if(S.money<f[1])return snd('err');S.money=+(S.money-f[1]).toFixed(2);S.energy=Math.min(100,S.energy+f[2]);snd('eat');say('Yum! +'+f[2]+' energy');pcR()}
-function promo(id){const s=S.songs.find(x=>x.id==id);if(S.money<PROMO||s.boost>0)return;S.money=+(S.money-PROMO).toFixed(2);s.boost=3;S.followers+=RI(3,12);snd('cash');say('Promoting "'+s.title+'"');pcR()}
+function inst(k){const a=APPD[k];if(S.money<a.p)return snd('err');S.money=+(S.money-a.p).toFixed(2);S.apps[k]=1;updateVersion();snd('cash');say('Installed '+a.n);pcR()}
+function buyF(t){if(S.money<F[t].p)return snd('err');S.money=+(S.money-F[t].p).toFixed(2);S.inv[t]=(S.inv[t]||0)+1;updateVersion();snd('cash');say(F[t].n+' delivered to storage');pcR()}
+function order(i){const f=FOOD[i];if(S.energy>=100)return say('You are already full of energy.');if(S.money<f[1])return snd('err');S.money=+(S.money-f[1]).toFixed(2);S.energy=Math.min(100,S.energy+f[2]);updateVersion();snd('eat');say('Yum! +'+f[2]+' energy');pcR()}
+function promo(id){const s=S.songs.find(x=>x.id==id);if(S.money<PROMO||s.boost>0)return;S.money=+(S.money-PROMO).toFixed(2);s.boost=3;S.followers+=RI(3,12);updateVersion();snd('cash');say('Promoting "'+s.title+'"');pcR()}
 function buildUI(){const k=Object.keys(S.inv).filter(x=>S.inv[x]>0);$('ui').innerHTML=`<div class=box style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);max-width:94vw"><h3>🛋 Furniture ${hold?'· placing '+F[hold].n:''}</h3><div style="display:flex;gap:6px;flex-wrap:wrap">${k.length?k.map(t=>`<button onclick="holdItem('${t}')">${F[t].n} ×${S.inv[t]}</button>`).join(''):'<span class=m>Storage empty. Buy furniture on Amazoom (computer).</span>'}<button class=go onclick="exitBuild()">Done</button></div><small class=m>Click: place · R: rotate · Right-click: store · Click placed item: move · F/Esc: exit</small></div>`}
 function buildMode(){if(mode=='build')return exitBuild();if(mode!='play')return;mode='build';buildUI()}
 function clrGhost(){if(ghost)scene.remove(ghost);ghost=null;if(GF)GF.visible=false}
