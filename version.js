@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v25.2.1';
+const GAME_VERSION='v25.3.0';
 const VERSION_HISTORY=[
+ {v:'v25.3.0',n:'Fame levels replace the stars. Level is set by monthly listeners: level 1 is 1 to 10 listeners, and each later level needs about 5% more. Bodyguards unlock at the level that matches the old 3-star point. Stream and reach bonuses follow listeners, so they stay balanced.'},
  {v:'v25.2.1',n:'Fixed: diagonal walking no longer stacks footsteps and pops. One walking timer drives the footstep sound, and the step sound fades in.'},
  {v:'v25.2.0',n:'Streams now arrive gradually through the day, faster at night, and are paid out when you wake. The game clock keeps running while you use the computer and menus. Energy slowly regenerates during the day. Collab sessions cost half the energy of a solo recording, and collab songs get a (feat. Name) title. The diss track setting is a dropdown that starts on Off. Each successful hit speeds up the timing bar by 15 percent.'},
  {v:'v25.1.0',n:'Settings button removed from the bottom-right corner. The map sits a little lower. New games start with the Charcoal wallpaper.'},
