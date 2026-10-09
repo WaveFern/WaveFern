@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v25.8.0';
+const GAME_VERSION='v25.9.0';
 const VERSION_HISTORY=[
+ {v:'v25.9.0',n:'Traffic now follows the road grid: cars go straight or turn at junctions (T-junctions included) and turn round at dead ends. Driving is clearly faster than sprinting, and walking eases into sprinting smoothly.'},
  {v:'v25.8.0',n:'A proper front door now shows in the front wall from inside the house. Without a garage there is nothing on its plot: no sign, no floor pad, no locked prompt and no map marker.'},
  {v:'v25.7.0',n:'Artists: you pay the session fee when you confirm a collab (shown before you confirm). In-person meetings open a 3-choice conversation with 1 to 3 exchanges; your answers change how the artist sees you, and that changes the song quality. Red or blue dot on each artist shows if they want to collab or just want filler. On your first day, a few artists send you messages. Messages understand wassup and what\'s good.'},
  {v:'v25.6.0',n:'More pedestrians and cars around the city. You can no longer walk or drive through other people or traffic.'},
