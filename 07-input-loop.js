@@ -12,7 +12,7 @@ function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
  if(clockRuns()){S.t+=dt;S.dayW=(S.dayW||0)+dt*(S.t>300?2:1);accrueStreams();if(S.energy<100){S.eReg=(S.eReg||0)+dt*.08;if(S.eReg>=1){S.eReg-=1;S.energy=Math.min(100,S.energy+1)}}if(S.t>=600)return sleepNow(1)}
  let ix=0,iy=0,mv=0;
  if(mode=='play'){ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
-  if((S.stam??100)<=0){if(!S.exh)say('Out of breath! Walk until you recover.');S.exh=1}else if((S.stam??100)>=30)S.exh=0;const run=keys.shift&&!S.exh&&(S.stam??100)>0&&(ix||iy);S.stam=Math.max(0,Math.min(100,(S.stam??100)+(run?-15:10)*dt));if(ix||iy){const L=Math.hypot(ix,iy),dx=(ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt,dz=(-ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt;mv=1;
+  if((S.stam??100)<=0){if(!S.exh)say('Out of breath! Walk until you recover.');S.exh=1}else if((S.stam??100)>=30)S.exh=0;const run=keys.shift&&!S.exh&&(S.stam??100)>0&&(ix||iy);S.stam=Math.max(0,Math.min(100,(S.stam??100)+(run?-15:10)*dt));P.sv=(P.sv||3.3)+((run?6.5:3.3)-(P.sv||3.3))*Math.min(1,dt*6);if(ix||iy){const L=Math.hypot(ix,iy),dx=(ix+iy)/L/Math.SQRT2*P.sv*dt,dz=(-ix+iy)/L/Math.SQRT2*P.sv*dt;mv=1;
    if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz;P.rot=Math.atan2(dx,dz)}}
  if(mode=='rec')recTick(dt);worldTick(dt);
  if(P.mesh){P.t+=dt*(mv?10:2);const s=mv?.7:.05;if(P.sit&&mode=='play'){P.legs[0].rotation.x=-1.5;P.legs[1].rotation.x=-1.5;P.arms[0].rotation.x=-.6;P.arms[1].rotation.x=-.6}else{P.legs[0].rotation.x=Math.sin(P.t)*s;P.legs[1].rotation.x=-Math.sin(P.t)*s;P.arms[0].rotation.x=-Math.sin(P.t)*s;P.arms[1].rotation.x=Math.sin(P.t)*s}
