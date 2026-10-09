@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v25.5.0';
+const GAME_VERSION='v25.6.0';
 const VERSION_HISTORY=[
+ {v:'v25.6.0',n:'More pedestrians and cars around the city. You can no longer walk or drive through other people or traffic.'},
  {v:'v25.5.0',n:'The garage is not drawn until you buy it, and its wall does not block the plot. The right-hand side of the house is closed with a low wall while you are inside.'},
  {v:'v25.4.1',n:'Fixed: the game failed to start after the walking sound change (a variable name clashed with an existing one).'},
  {v:'v25.4.0',n:'Red dot on the Messages icon while you have unread messages. Upload All uploads every titled draft at once. The artist profile shows your top 5 songs by streams, with Show All to expand, and it updates as streams come in.'},
