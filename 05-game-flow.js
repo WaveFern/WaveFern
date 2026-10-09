@@ -6,7 +6,7 @@ function clk(){const m=S.t<300?360+S.t/300*840:1200+(S.t-300)/300*600;return Str
 const $$=n=>'$'+(+n).toFixed(2);
 function creatorUI(){
  const row=(k,n)=>`<div class=r><span>${n}</span><button onclick="st('${k}',-1)">◀</button><b>${NM[k][ch[k]]}</b><button onclick="st('${k}',1)">▶</button></div>`;
- const sw=(k,n,a)=>`<div class=r><span>${n}</span><div class=sw>${a.map((c,i)=>`<i class="${ch[k]==i?'on':''}" style="background:${c}" onclick="ch['${k}']=${i};refresh();creatorUI()"></i>`).join('')}</div></div>`;
+ const sw=(k,n,a)=>{const presets=a.slice(0,6);const customId='c_'+k;return `<div class=r><span>${n}</span><div class=sw>${presets.map((c,i)=>`<i class="${ch[k]==i?'on':''}" style="background:${c}" onclick="ch['${k}']=${i};ch['${k}_custom']=undefined;refresh();creatorUI()"></i>`).join('')}<input type=color id="${customId}" value="${ch[k+'_custom']||a[ch[k]]||'#000000'}" onchange="ch['${k}_custom']=this.value;refresh();creatorUI()" style="cursor:pointer;width:28px;height:28px;border:2px solid #666;border-radius:3px"></div></div>`};
  $('ui').innerHTML=`<div id=cre class=box><h2>Create your character</h2>${row('hair','Hairstyle')}${sw('hc','Hair colour',HAIRC)}${row('eyes','Eyes')}${row('mouth','Mouth')}${sw('skin','Skin',SKIN)}${row('top','Clothes')}${sw('tc','Top colour',TOPC)}${sw('pc','Trousers',PANTC)}
  <div class=r><span>Body</span><input type=range min=0 max=100 value=${ch.body*100} oninput="ch.body=this.value/100;refresh()" style="padding:0"></div><div class=m style="margin-left:84px;display:flex;justify-content:space-between"><small>Skinny</small><small>Large</small></div>
  <div class=row2><button onclick="rnd()">🎲 Randomize</button><button class=go onclick="confirmChar()">Confirm ✔</button></div></div>`}
