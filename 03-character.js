@@ -4,7 +4,7 @@ TOPC=['#e74c3c','#3498db','#2ecc71','#f1c40f','#9b59b6','#ecf0f1','#2c3e50','#e6
 const NM={eyes:['Dots','Wide','Sleepy','Tall','Shades'],mouth:['Smile','Flat','Open','Smirk'],hair:['Bald','Buzz','Short','Spiky','Mohawk','Long','Bob','Ponytail','Bun','Afro','Pigtails','Quiff'],top:['T-shirt','Hoodie','Jacket','Striped','Tank']};
 let ch={skin:2,eyes:0,mouth:0,hair:2,hc:1,top:0,tc:1,pc:0,body:.4};
 function buildChar(c){
- const g=new THREE.Group(),w=.42+c.body*.5,d=.3+c.body*.28,sk=c.skin_custom||SKIN[c.skin],tc=c.tc_custom||TOPC[c.tc],pc=c.pc_custom||PANTC[c.pc],hc=c.hc_custom||HAIRC[c.hc],T=c.top;
+ const g=new THREE.Group(),w=.42+c.body*.5,d=.3+c.body*.28,sk=SKIN[c.skin],tc=c.tc_custom||TOPC[c.tc],pc=c.pc_custom||PANTC[c.pc],hc=c.hc_custom||HAIRC[c.hc],T=c.top;
  const pv=(x,y,z,p=g)=>{const o=new THREE.Group();o.position.set(x,y,z);p.add(o);return o};
  const sh=new THREE.Mesh(new THREE.CircleGeometry(.42,8),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.3}));sh.rotation.x=-Math.PI/2;sh.position.y=.02;g.add(sh);
  const legs=[-1,1].map(s=>{const p=pv(s*w*.26,.5,0);if(c.bt==2){B(p,w*.44,.34,d*.84,pc,0,-.17,0);B(p,w*.34,.14,d*.7,sk,0,-.37,0);B(p,w*.36,.06,d*.72,dk(pc,.8),0,-.3,0)}else if(c.bt==3){B(p,w*.58,.42,d*.97,pc,0,-.21,0);B(p,w*.6,.05,d*.99,dk(pc,.8),0,-.43,0)}else if(c.bt==1){B(p,w*.42,.24,d*.8,pc,0,-.12,0);B(p,w*.34,.2,d*.7,sk,0,-.34,0);B(p,w*.36,.1,d*.72,'#fff',0,-.42,0)}else B(p,w*.42,.42,d*.8,pc,0,-.21,0);const sc=c.sh>=0?SHC[c.sh]:['#1d1d22',0];if(sc[1])B(p,w*.46,.3,d*.85+.1,sc[0],0,-.36,.05);else B(p,w*.42,.1,d*.8+.1,sc[0],0,-.45,.05);return p});
