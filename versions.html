@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Version history – Fernwave Records</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#2fe68a;--bg:#0c0f0d;--p:#161b18;--t:#e8f3ec;--m:#8aa094;--line:#26302a}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#f4f8f5;--p:#ffffff;--t:#16201a;--m:#56695c;--line:#d5e0d8;--g:#13925a}}
+:root[data-theme="dark"]{--bg:#0c0f0d;--p:#161b18;--t:#e8f3ec;--m:#8aa094;--line:#26302a;--g:#2fe68a}
+html,body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 ui-monospace,Menlo,Consolas,monospace}
+body{padding:16px;box-sizing:border-box}
+main{max-width:640px;margin:0 auto}
+h1,h2{font-family:'Silkscreen',ui-monospace,monospace;margin:0 0 6px}
+h1{font-size:22px;color:var(--g)}
+.sub{color:var(--m);margin:0 0 20px}
+a.back{color:var(--g);text-decoration:none;display:inline-block;margin-bottom:16px}
+ol{list-style:none;margin:0;padding:0}
+li{border-top:1px solid var(--line);padding:12px 0;display:flex;gap:14px;align-items:baseline}
+li:last-child{border-bottom:1px solid var(--line)}
+.v{font-family:'Silkscreen',ui-monospace,monospace;color:var(--g);min-width:86px;font-weight:700}
+.cur{font-size:11px;border:1px solid var(--g);color:var(--g);padding:0 4px;margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">← Back to the game</a>
+  <h1>Version history</h1>
+  <p class="sub">Current version: <b id="cur"></b></p>
+  <ol id="list"></ol>
+</main>
+<script src="version.js"></script>
+<script>
+  document.getElementById('cur').textContent = GAME_VERSION;
+  document.getElementById('list').innerHTML = VERSION_HISTORY.map((e, i) =>
+    `<li><span class="v">${e.v}${i === 0 ? '<span class="cur">current</span>' : ''}</span><span>${e.n}</span></li>`
+  ).join('');
+</script>
+</body>
+</html>
