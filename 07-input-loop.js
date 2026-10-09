@@ -8,6 +8,7 @@ function hit(x,z,r){if(IN?(x<IN.x+.4||x>IN.x+(IN.w||10)-.4||z<320.4||z>320+(IN.d
 let hc='',last=performance.now(),tt=0;const cD=new THREE.Color(0xfff2e0),cN=new THREE.Color(0x5f74c8);
 function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
  if(mode=='pc'&&app==1&&pg=='home'&&tt-PCT>1){PCT=tt;pcR()}
+ if(mode=='play'&&!S.dmSeeded)seedDMs();
  if(clockRuns()){S.t+=dt;S.dayW=(S.dayW||0)+dt*(S.t>300?2:1);accrueStreams();if(S.energy<100){S.eReg=(S.eReg||0)+dt*.08;if(S.eReg>=1){S.eReg-=1;S.energy=Math.min(100,S.energy+1)}}if(S.t>=600)return sleepNow(1)}
  let ix=0,iy=0,mv=0;
  if(mode=='play'){ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
