@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v24.1.0';
+const GAME_VERSION='v24.1.1';
 const VERSION_HISTORY=[
+ {v:'v24.1.1',n:'Fixed: computer could not be opened (syntax error). Fixed Buzz hair showing a front fringe, and Buzz/Short hair showing stray strands by the face.'},
  {v:'v24.1.0',n:'Version code and a full version history page. Settings links to it.'},
  {v:'v24',n:'Upstairs redesign'},
  {v:'v21',n:'Build v21'},
