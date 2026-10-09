@@ -51,11 +51,35 @@ function worldTick(dt){HIN=!IN&&P.x>.2&&P.x<15.8&&P.z>-.3-WGX&&P.z<12.1;HX.visib
  if(mode=='cut'){cs2.t+=dt;cs2.n=(cs2.n||0)+dt;if(cs2.n>.45){cs2.n=0;cs2.k=(cs2.k||0)+1;snd(cs2.k%2?'thunk':'pop');nz(.04,6000,.08,1,'highpass');sfx([262,330,392,523][cs2.k%4],.35,'triangle',.07)}cs2.o.m.position.y=Math.abs(Math.sin(tt*8))*.1;if(cs2.t>=6)collabDone()}}
 function genMsgs(){}
 function nameModal(d,x=''){mode='menu';$('ui').innerHTML=`<div class="box modal"><h2>Song recorded!</h2>${x}<p class=m>${esc(d.g)} · mix quality ${d.q}${d.ft?' · feat. '+esc(d.ft):''}</p><p>Give it a title:</p><input id=tin maxlength=32 value="${esc(d.title)}" onkeydown="if(event.key=='Enter')saveT(${d.id})"><div class=row2><button class=go onclick="saveT(${d.id})">Save to drafts</button></div></div>`;setTimeout(()=>{const i=$('tin');i&&(i.focus(),i.select())},50)}
-function collab(o){if(S.energy<COLLAB_COST)return say('Too tired for a collab session. Get some sleep.');S.energy=+(S.energy-COLLAB_COST).toFixed(1);mode='cut';cs2={o,t:0};P.x=o.x-1.4;P.z=o.z;P.rot=Math.PI/2;say('Studio session with '+o.name+' (fictional)')}
+/* In-person meeting: 1 to 3 short exchanges with three fixed answers (no typing). Each answer moves the artist's opinion
+   according to their personality; that opinion then lifts or lowers the session. */
+let DLG=null;
+const DPERS={hype:{op:["Yo, what's good! You ready to run it up?","Wassup! Okay, pitch me the vibe.","So... you wanna do this or what?"],
+ opts:[["Yo, I'm all in. Let's go!",1],["Wassup, I got fire ideas.",1],["Uhh, I'm kinda nervous, sorry.",-1]],
+ rs:["Ayyy, that's the energy I want!","Love it, we're about to cook.","Nah, don't be nervous, we got this."]},
+ chill:{op:["Hey, what's good? No rush, we vibe first.","Wassup. You been listening to anything good?","Yo, so... you feeling this beat or nah?"],
+ opts:[["LET'S GO, record it right now!",-1],["Just chilling, what's the plan?",0],["Vibes first, no rush. I'm into it.",1]],
+ rs:["Whoa, slow down. Breathe with me.","Cool, we'll figure it out as we go.","Yeah, that's the right energy. Nice."]},
+ blunt:{op:["Alright, what's good? Make it quick.","Wassup. You here for real or just looking?","Talk to me. What are you bringing?"],
+ opts:[["Straight up: I'm here to make a hit.",1],["Whatever you think, man.",-1],["Heard your stuff, I'm a fan.",0]],
+ rs:["Okay, I respect a direct answer.","Mm. Don't just agree with me.","Cool. Fans are nice, but bring talent."]}};
+const clampN=(v,a,b)=>Math.max(a,Math.min(b,v));
+function collab(o){if(S.energy<COLLAB_COST)return say('Too tired for a collab session. Get some sleep.');
+ const pers=DPERS[['hype','chill','blunt'][o.i%3]];DLG={o,pers,n:RI(1,3)};mode='menu';dlgRound(0,0)}
+function dlgRound(k,fx){if(k>=DLG.n)return startCollab(fx);const opts=DLG.pers.opts.map((x,j)=>`<button onclick="dlgPick(${k},${fx},${j})">${esc(x[0])}</button>`).join('');
+ $('ui').innerHTML=`<div class="box modal" style="width:min(460px,94vw)"><h2>${esc(DLG.o.name)} <small class=m>(fictional)</small></h2><p>"${esc(DLG.pers.op[k])}"</p><div style="display:flex;flex-direction:column;gap:6px">${opts}</div><p class=m><small>Exchange ${k+1} of ${DLG.n}. Your answer changes how they see you.</small></p></div>`}
+function dlgPick(k,fx,j){const v=DLG.pers.opts[j][1],id=DLG.o.i;S.artRel=S.artRel||{};S.artRel[id]=clampN((S.artRel[id]||0)+v,-5,5);
+ $('ui').innerHTML=`<div class="box modal" style="width:min(460px,94vw)"><h2>${esc(DLG.o.name)}</h2><p>"${esc(DLG.pers.rs[j])}"</p><button class=go onclick="dlgRound(${k+1},${fx+v})">${k+1>=DLG.n?'Start the session':'Continue'}</button></div>`}
+function startCollab(fx){const o=DLG.o;S.energy=+(S.energy-COLLAB_COST).toFixed(1);
+ const rel=(S.artRel||{})[o.i]||0,qm=1+clampN(fx*.08,-.2,.25)+clampN(rel*.02,-.1,.15);
+ mode='cut';cs2={o,t:0,qm};P.x=o.x-1.4;P.z=o.z;P.rot=Math.PI/2;DLG=null;$('ui').innerHTML='';say('Studio session with '+o.name+' (fictional)')}
+/* the first in-game day: a few artists message you, once per game */
+function seedDMs(){if(S.dmSeeded)return;S.dmSeeded=1;if(S.day!=1||S.msgs.length)return;
+ const idx=ART.map((a,i)=>i).sort(()=>Math.random()-.5).slice(0,3);idx.forEach(i=>newConv(i,1));say(idx.length+' artists sent you a message')}
 const COLLAB_COST=7.5;/* half of the 15 energy a solo recording costs */
 const featTitle=(t,n)=>/\(feat\. /i.test(t)?t:t+' (feat. '+n+')';
-function collabDone(){const o=cs2.o,a=ART[o.i],m=S.msgs.find(x=>x.a===o.i);m.state=3;m.doneDay=S.day;const pp=m.pay||a[3];S.money=+(S.money+pp).toFixed(2);S.earn+=pp;m.log.push({f:'a',t:'Great session! Thanks again.',d:S.day});ART_M=ART_M.filter(x=>x!==o);scene.remove(o.m);
- const d={id:S.nid++,title:featTitle(pick(A)+' '+pick(Bn),a[0]),g:a[1],q:Math.round(R(30,40)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.home||0)*3)+Math.min(25,6+Math.round(a[3]/60)),ft:a[0],fm:1.1+Math.min(.6,a[3]/6000),role:pick(['Featured verse','Co-writer and hook','Producer and beats','Backing vocals'])};S.drafts.push(d);updateVersion();cs2=null;snd('chime');nameModal(d,`<p style="color:var(--g)">Collab done! You earned <b>$${pp}</b>. Fictional in-game event with a stand-in character.</p>`)}
+function collabDone(){const o=cs2.o,a=ART[o.i],m=S.msgs.find(x=>x.a===o.i),qm=cs2.qm||1;m.state=3;m.doneDay=S.day;const pp=m.paid||m.pay||a[3];m.log.push({f:'a',t:'Great session! Thanks again.',d:S.day});ART_M=ART_M.filter(x=>x!==o);scene.remove(o.m);
+ const d={id:S.nid++,title:featTitle(pick(A)+' '+pick(Bn),a[0]),g:a[1],q:Math.round((R(30,40)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.home||0)*3+Math.min(25,6+Math.round(a[3]/60)))*qm),ft:a[0],fm:(1.1+Math.min(.6,a[3]/6000))*qm,role:pick(['Featured verse','Co-writer and hook','Producer and beats','Backing vocals'])};S.drafts.push(d);updateVersion();cs2=null;snd('chime');nameModal(d,`<p style="color:var(--g)">Collab done. The session fee was <b>$${pp}</b>, paid when you confirmed. Fictional in-game event with a stand-in character.</p>`)}
 function shopModal(t,mk,fn){SM={t,mk,fn};mode='menu';smR()}
 function smR(){const o=SM,it=o.mk();$('ui').innerHTML=`<div class="box modal"><h2>${o.t}</h2><p><i>${GR}</i></p><p class=m>Money ${$$(S.money)}</p>${it.map((x,i)=>`<div class=ng><span style="flex:1">${x[0]}<br><small class=m>${x[2]}</small></span><button class=go ${x[2]=='Owned'?'disabled':''} onclick="smC(${i})">${$$(x[1])}</button></div>`).join('')}<button onclick="closeUI()">Leave</button></div>`}
 function smC(i){SM.fn(i);smR()}
