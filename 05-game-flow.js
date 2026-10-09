@@ -44,9 +44,9 @@ function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class
    The day is 600 clock units: 6:00-20:00 (0-300) counts 1x, 20:00-6:00 (300-600) counts 2x, so nights are faster.
    Each song's day total is planned once (S.dayW is the weighted progress, 900 = whole day). Streams are added
    gradually as that progress moves on; money is paid once on waking from S.dayTot. */
-function planSong(s){const P=Math.min(1,(S.dayW||0)/900),p0=P,age=S.day-s.day;const mI=.3+.7*(S.interest||0),mL=Math.pow(2.2,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/60));
+function planSong(s){const P=Math.min(1,(S.dayW||0)/900),p0=P,age=S.day-s.day;const mI=.3+.7*(S.interest||0),mL=fameMult()*(1+Math.min(1,Math.sqrt(S.listeners)/60));
  let v=s.q*.8*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+.03)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<.02&&age<8)v*=R(2,5);
- const cap=s.q*s.q*25*Math.pow(2.2,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round((v||0)*(1-p0)),cap));
+ const cap=s.q*s.q*25*fameMult()-s.streams;v=Math.max(0,Math.min(Math.round((v||0)*(1-p0)),cap));
  s.p0=p0;s.tgt=v;s.acc=0;s.pd=S.day}
 function accrueStreams(){const P=Math.min(1,(S.dayW||0)/900);S.dayTot=S.dayTot||0;
  S.songs.forEach(s=>{if(s.pd!=S.day)planSong(s);const q=s.p0>=1?1:Math.min(1,Math.max(0,(P-s.p0)/(1-s.p0))),d=Math.round(s.tgt*q)-(s.acc||0);
