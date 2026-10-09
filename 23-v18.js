@@ -2,7 +2,7 @@
 let POSE=0,SY=0;
 function SHD(R_,L2){R_('#08080b',6,5,5,5);R_('#08080b',13,5,5,5);R_('#08080b',11,6,2,1);R_('#08080b',5,6,1,1);R_('#08080b',18,6,1,1);R_(L2,7,6,3,3);R_(L2,14,6,3,3);R_(dk(L2,1.9),7,6,3,1);R_(dk(L2,1.9),14,6,3,1);R_('#d6e6ff',7,6,1,1);R_('#d6e6ff',14,6,1,1);R_('#fff',9,8,1,1);R_('#fff',16,8,1,1)}
 function SHD3(h,fr){[-1,1].forEach(s=>{B(h,.22,.17,.03,fr,s*.14,.05,.285);B(h,.17,.12,.03,'#16203a',s*.14,.05,.293);B(h,.06,.03,.03,'#bcd4ff',s*.14-.04,.09,.3);B(h,.025,.03,.42,fr,s*.255,.07,.08)});B(h,.1,.03,.03,fr,0,.08,.288)}
-function fig(x,c,ox,oy){fig0(x,c,ox,oy);if(!POSE)return;const R_=(col,a,b,w,h)=>rc(x,col,ox+a/2,oy+b/2,w/2,h/2),sk=SKIN[c.skin%SKIN.length],lg=c.jk>=0||[1,2,6,8].includes(c.top),A=lg?(c.jk>=0?JKC[c.jk]:TOPC[c.tc%TOPC.length]):sk,up=(X)=>{R_(A,X,7,3,11);R_(A,X==20?19:3,16,2,2);R_(sk,X,4,3,3)};
+function fig(x,c,ox,oy){fig0(x,c,ox,oy);if(!POSE)return;const R_=(col,a,b,w,h)=>rc(x,col,ox+a/2,oy+b/2,w/2,h/2),sk=SKIN[c.skin%SKIN.length],lg=c.jk>=0||[1,2,6,8].includes(c.top),A=lg?(c.jk>=0?JKC[c.jk]:(c.tc_custom||TOPC[c.tc%TOPC.length])):sk,up=(X)=>{R_(A,X,7,3,11);R_(A,X==20?19:3,16,2,2);R_(sk,X,4,3,3)};
  if(POSE==1)up(20);else if(POSE==2){up(20);up(1)}else if(POSE==3){R_(A,20,17,3,6);R_(A,17,23,5,3);R_(sk,16,23,2,2);R_(A,1,17,3,6);R_(A,2,23,5,3);R_(sk,6,23,2,2)}else if(POSE==4){up(20);R_(sk,20,1,1,3);R_(sk,22,1,1,3)}else if(POSE==5){R_(A,20,15,3,8);R_(A,17,12,5,3);R_(sk,14,10,3,3)}}
 function postPic(p){if(PICS[p.id])return PICS[p.id];POSE=(hs(String(p.id)+'pz')%100<40)?1+hs(String(p.id)+'q')%5:0;try{return postPic0(p)}finally{POSE=0}}
 function pcR(){const m=document.querySelector('#pc .mn'),st=m?m.scrollTop:0,a0=app;pcR0();if(st&&a0==app){const n=document.querySelector('#pc .mn');if(n)n.scrollTop=st}}
