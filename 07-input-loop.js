@@ -4,12 +4,10 @@ addEventListener('keydown',e=>{const k=e.key.toLowerCase();
  if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(k=='m'){if(VOL){LAST=VOL;VOL=0}else VOL=LAST||.5;sv()}keys[k]=1;if(k.startsWith('arrow')||k==' ')e.preventDefault();if(k=='f')buildMode();if(k=='n')bigMap();if(k=='r'&&mode=='build')gp.r=(gp.r+1)%4;
  if(mode=='rec'&&(k=='e'||k==' '||k=='enter'))recHit();if(mode=='drive'&&k=='e')exitDrive();if(mode=='play'&&(k=='e'||k==' '||k=='enter')&&near){snd('pop');near.a()}});
 addEventListener('keyup',e=>delete keys[e.key.toLowerCase()]);addEventListener('blur',()=>{for(const k in keys)delete keys[k]});
-function hit(x,z,r){if(IN?(x<IN.x+.4||x>IN.x+(IN.w||10)-.4||z<320.4||z>320+(IN.d||8)-.4):(x<-130||x>690||z<-150||z>130))return 1;return wc.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||dyn.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||NPC.some(n=>n.m.visible&&Math.abs(x-n.x)<.5&&Math.abs(z-n.z)<.5)||TRAF.some(t=>t.m.visible&&Math.abs(x-t.m.position.x)<1.6&&Math.abs(z-t.m.position.z)<1.2)||PL.some(q=>{if(F[q.t].f)return 0;const c=fb(q.t,q.x,q.z,q.r);return x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3]})}
+function hit(x,z,r){if(IN?(x<IN.x+.4||x>IN.x+(IN.w||10)-.4||z<320.4||z>320+(IN.d||8)-.4):(x<-130||x>690||z<-150||z>130))return 1;return wc.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||dyn.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||PL.some(q=>{if(F[q.t].f)return 0;const c=fb(q.t,q.x,q.z,q.r);return x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3]})}
 let hc='',last=performance.now(),tt=0;const cD=new THREE.Color(0xfff2e0),cN=new THREE.Color(0x5f74c8);
 function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
- if(mode=='pc'&&app==1&&pg=='home'&&tt-PCT>1){PCT=tt;pcR()}
- if(mode=='play'&&!S.dmSeeded)seedDMs();
- if(clockRuns()){S.t+=dt;S.dayW=(S.dayW||0)+dt*(S.t>300?2:1);accrueStreams();if(S.energy<100){S.eReg=(S.eReg||0)+dt*.08;if(S.eReg>=1){S.eReg-=1;S.energy=Math.min(100,S.energy+1)}}if(S.t>=600)return sleepNow(1)}
+ if(play){S.t+=dt;if(S.t>=600)return sleepNow(1)}
  let ix=0,iy=0,mv=0;
  if(mode=='play'){ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
   if((S.stam??100)<=0){if(!S.exh)say('Out of breath! Walk until you recover.');S.exh=1}else if((S.stam??100)>=30)S.exh=0;const run=keys.shift&&!S.exh&&(S.stam??100)>0&&(ix||iy);S.stam=Math.max(0,Math.min(100,(S.stam??100)+(run?-15:10)*dt));if(ix||iy){const L=Math.hypot(ix,iy),dx=(ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt,dz=(-ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt;mv=1;
@@ -18,7 +16,7 @@ function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
  if(P.mesh){P.t+=dt*(mv?10:2);const s=mv?.7:.05;if(P.sit&&mode=='play'){P.legs[0].rotation.x=-1.5;P.legs[1].rotation.x=-1.5;P.arms[0].rotation.x=-.6;P.arms[1].rotation.x=-.6}else{P.legs[0].rotation.x=Math.sin(P.t)*s;P.legs[1].rotation.x=-Math.sin(P.t)*s;P.arms[0].rotation.x=-Math.sin(P.t)*s;P.arms[1].rotation.x=Math.sin(P.t)*s}
   if(mode=='rec'||mode=='cut'){P.arms[1].rotation.x=-1+Math.sin(tt*9)*.3;P.arms[0].rotation.x=-.2}
   P.mesh.position.set(P.x,(mv?Math.abs(Math.sin(P.t))*.06:0)+SY,P.z);P.mesh.rotation.y=cr()?Math.PI/4+Math.sin(tt*.8)*.6:P.rot}
- buildTick();walkSound(dt,mv&&!P.sit,!!(keys.shift&&!S.exh&&(S.stam??100)>0));near=null;if(mode=='play'){let b=9;INT.concat(dynInt()).forEach(o=>{const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<o.r&&d<b){b=d;near=o}})}
+ buildTick();fs+=dt;if(mv&&fs>.3){fs=0;snd('step')}near=null;if(mode=='play'){let b=9;INT.concat(dynInt()).forEach(o=>{const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<o.r&&d<b){b=d;near=o}})}
  const f=S.t<240?0:S.t<300?(S.t-240)/60*.5:S.t<330?.5+(S.t-300)/30*.4:.9;amb.intensity=.75-.4*f;amb.color.copy(cD).lerp(cN,f);sun.intensity=.85-.55*f;sun.color.copy(cD).lerp(cN,f);lamps.forEach(l=>l.intensity=.2+.9*f);scene.background.copy(cBD).lerp(cBN,f);
  viewT=IN&&IN.i==7&&mode=='play'?12:cr()||mode=='load'?3.6:mode=='build'?16+WGX*.7:mode=='rec'?5.5:mode=='cut'?4.5:mode=='drive'?11:9;viewH+=(viewT-viewH)*Math.min(1,dt*4);const tx=mode=='build'?8:P.x,tz=mode=='build'?6-WGX/2:P.z;camT.x+=(tx-camT.x)*Math.min(1,dt*6);camT.z+=(tz-camT.z)*Math.min(1,dt*6);
  const a=innerWidth/innerHeight;cam.left=-viewH*a/2;cam.right=viewH*a/2;cam.top=viewH/2;cam.bottom=-viewH/2;cam.updateProjectionMatrix();

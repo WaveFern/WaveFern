@@ -26,14 +26,9 @@ function wrR(){if(!document.querySelector('.wrd'))WPK.id=null;const own=GAR.filt
  $('ui').innerHTML=`<div class="box modal wrd"><div class=wrh><h2>Wardrobe</h2><span class=m>${S.wr.length} pieces owned</span><button onclick="closeUI()" style="margin-left:auto">Close ✕</button></div><div class=wrw>${WSL2.map(t=>{const id=wn[t[0]],g=id&&GM[id];return`<div class="wrs ${g?'on':''}" onclick="WT='${t[0]}';wrR()"><small>${t[1]}</small><b>${g?esc(g.n):'nothing'}</b>${g&&t[0]!='top'?`<i onclick="event.stopPropagation();unq('${t[0]}')">take off</i>`:''}</div>`}).join('')}</div><div class=wrt>${WSL2.map(t=>`<button class="${WT==t[0]?'go':''}" onclick="WT='${t[0]}';wrR()">${t[1]} (${cnt(t[0])})</button>`).join('')}</div><div id=wrg class="thg wrg">${own.map(g=>{const cur=(S.wc||{})[g.id]||g.dc,on=wn[g.slot]==g.id,cu=!WCOL.includes(cur),open=WPK.id==g.id;return`<div class="thc2 ${on?'worn':''}" data-gid="${g.id}"><div class=thp style="--pvb:transparent">${pvc('k:'+g.id+'|'+cur,150)}</div><div class=thn>${esc(g.n)}${on?' <small style="color:#d81b60">· wearing</small>':''}</div><div class=thsw>${WCOL.map(c=>`<i class="${c==cur?'on':''}" style="background:${c}" onclick="wpPick('${g.id}','${c}')"></i>`).join('')}<i class="pen ${cu||open?'on':''}" ${cu?`style="background:${cur}"`:''} title="Custom colour" onclick="wpOpen('${g.id}')">${PEN}</i></div>${open?wpHTML():''}<button class=go onclick="wearG('${g.id}');wrR()">${on?'Wearing ✓':'Wear'}</button></div>`}).join('')||'<p class=m style="grid-column:1/-1">Nothing here yet. Buy clothes on the Threadz website (laptop, Browser). Every piece you own can be recoloured here for free.</p>'}</div></div>`;const g=document.getElementById('wrg');if(g)g.scrollTop=sc}
 
 /* v24.4: the garage hides while you are inside the house, so it no longer blocks the studio */
-/* v25.5: no garage structure until it is bought. Until then the plot is empty: no meshes and no invisible wall. */
-let GARCOL=null;
-{const wt6=worldTick;worldTick=function(dt){wt6(dt);GARM.forEach(m=>m.visible=!!S.garage&&!HIN);if(!GARCOL)GARCOL=cols.find(c=>c[0]==17.5&&c[1]==1.5&&c[2]==27.5&&c[3]==7)||0;if(GARCOL){const on=!!S.garage;GARCOL[0]=on?17.5:-9e3;GARCOL[1]=on?1.5:-9e3;GARCOL[2]=on?27.5:-9e3;GARCOL[3]=on?7:-9e3}}}
+{const wt6=worldTick;worldTick=function(dt){wt6(dt);GARM.forEach(m=>m.visible=!HIN)}}
 
 /* v24.4.1: a continuous low wall along the front (south) edge of the ground floor, shown while inside the house.
    The collision there was already solid; this closes the visible opening. */
 const FRW=B(WORLD,16,1.1,.3,'#9aa0a8',8,.55,11.95);
 {const wt7=worldTick;worldTick=function(dt){wt7(dt);FRW.visible=HIN}}
-/* v25.5: the right-hand (east) wall is hidden while you are inside, which left that side open. A low wall in its place closes it while you can still see in. */
-const ERW=B(WORLD,.3,1.1,12,'#d8c7a6',16.15,.55,6);
-{const wt8=worldTick;worldTick=function(dt){wt8(dt);ERW.visible=HIN}}
