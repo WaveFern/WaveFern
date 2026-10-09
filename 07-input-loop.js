@@ -1,0 +1,30 @@
+/* ---------- input / loop ---------- */
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();
+ if(k=='escape'){if(mode=='pc')closePC();else if(mode=='menu'&&$('stg'))closeSet();else if(mode=='menu'&&$('cre')==null&&!$('tin'))closeUI();else if(mode=='rec'){rec=null;mode='play';say('Session cancelled.')}else if(mode=='build')exitBuild();else if(mode=='play')settings();return}
+ if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(k=='m'){if(VOL){LAST=VOL;VOL=0}else VOL=LAST||.5;sv()}keys[k]=1;if(k.startsWith('arrow')||k==' ')e.preventDefault();if(k=='f')buildMode();if(k=='n')bigMap();if(k=='r'&&mode=='build')gp.r=(gp.r+1)%4;
+ if(mode=='rec'&&(k=='e'||k==' '||k=='enter'))recHit();if(mode=='drive'&&k=='e')exitDrive();if(mode=='play'&&(k=='e'||k==' '||k=='enter')&&near){snd('pop');near.a()}});
+addEventListener('keyup',e=>delete keys[e.key.toLowerCase()]);addEventListener('blur',()=>{for(const k in keys)delete keys[k]});
+function hit(x,z,r){if(IN?(x<IN.x+.4||x>IN.x+(IN.w||10)-.4||z<320.4||z>320+(IN.d||8)-.4):(x<-130||x>690||z<-150||z>130))return 1;return wc.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||dyn.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||PL.some(q=>{if(F[q.t].f)return 0;const c=fb(q.t,q.x,q.z,q.r);return x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3]})}
+let hc='',last=performance.now(),tt=0;const cD=new THREE.Color(0xfff2e0),cN=new THREE.Color(0x5f74c8);
+function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
+ if(play){S.t+=dt;if(S.t>=600)return sleepNow(1)}
+ let ix=0,iy=0,mv=0;
+ if(mode=='play'){ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
+  if((S.stam??100)<=0){if(!S.exh)say('Out of breath! Walk until you recover.');S.exh=1}else if((S.stam??100)>=30)S.exh=0;const run=keys.shift&&!S.exh&&(S.stam??100)>0&&(ix||iy);S.stam=Math.max(0,Math.min(100,(S.stam??100)+(run?-15:10)*dt));if(ix||iy){const L=Math.hypot(ix,iy),dx=(ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt,dz=(-ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt;mv=1;
+   if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz;P.rot=Math.atan2(dx,dz)}}
+ if(mode=='rec')recTick(dt);worldTick(dt);
+ if(P.mesh){P.t+=dt*(mv?10:2);const s=mv?.7:.05;if(P.sit&&mode=='play'){P.legs[0].rotation.x=-1.5;P.legs[1].rotation.x=-1.5;P.arms[0].rotation.x=-.6;P.arms[1].rotation.x=-.6}else{P.legs[0].rotation.x=Math.sin(P.t)*s;P.legs[1].rotation.x=-Math.sin(P.t)*s;P.arms[0].rotation.x=-Math.sin(P.t)*s;P.arms[1].rotation.x=Math.sin(P.t)*s}
+  if(mode=='rec'||mode=='cut'){P.arms[1].rotation.x=-1+Math.sin(tt*9)*.3;P.arms[0].rotation.x=-.2}
+  P.mesh.position.set(P.x,(mv?Math.abs(Math.sin(P.t))*.06:0)+SY,P.z);P.mesh.rotation.y=cr()?Math.PI/4+Math.sin(tt*.8)*.6:P.rot}
+ buildTick();fs+=dt;if(mv&&fs>.3){fs=0;snd('step')}near=null;if(mode=='play'){let b=9;INT.concat(dynInt()).forEach(o=>{const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<o.r&&d<b){b=d;near=o}})}
+ const f=S.t<240?0:S.t<300?(S.t-240)/60*.5:S.t<330?.5+(S.t-300)/30*.4:.9;amb.intensity=.75-.4*f;amb.color.copy(cD).lerp(cN,f);sun.intensity=.85-.55*f;sun.color.copy(cD).lerp(cN,f);lamps.forEach(l=>l.intensity=.2+.9*f);scene.background.copy(cBD).lerp(cBN,f);
+ viewT=IN&&IN.i==7&&mode=='play'?12:cr()||mode=='load'?3.6:mode=='build'?16+WGX*.7:mode=='rec'?5.5:mode=='cut'?4.5:mode=='drive'?11:9;viewH+=(viewT-viewH)*Math.min(1,dt*4);const tx=mode=='build'?8:P.x,tz=mode=='build'?6-WGX/2:P.z;camT.x+=(tx-camT.x)*Math.min(1,dt*6);camT.z+=(tz-camT.z)*Math.min(1,dt*6);
+ const a=innerWidth/innerHeight;cam.left=-viewH*a/2;cam.right=viewH*a/2;cam.top=viewH/2;cam.bottom=-viewH/2;cam.updateProjectionMatrix();
+ cam.position.set(camT.x+16,13,camT.z+16);cam.lookAt(camT.x,.8,camT.z);hud();mmDraw()}
+function hud(){if(cr()){const g='<button class="hb gear px" style="top:10px;right:10px;bottom:auto" onclick="settings()">⚙ Settings</button>';if(hc!=g){hc=g;$('hud').innerHTML=g}return}
+ if(mode=='load'||mode=='pc'){if(hc!=''){hc='';$('hud').innerHTML=''}return}
+ const room=IN?SHOPS[IN.i].name+(IN.i==7?' · Floor '+S.fl+' ('+FLN[S.fl-1]+')':''):(P.x<0||P.x>16||P.z>12||P.z<0)?'Outside':P.x<8?(P.z<6?'Bedroom':'Living room (empty)'):(P.z<6?'Recording studio':'Kitchen (empty)'),late=S.t>420;
+ const h=`<div class="hb tl"><b class=px>Day ${S.day} · ${clk()}</b><span style="color:${S.t>=300?'#9db4ff':'#ffd27a'}"> ${S.t>=300?'Night · sleep at the bed':'Day'}</span><br><b style="color:var(--g)">${$$(S.money)}</b> · ${room}<div class=bar><i style="width:${S.energy}%"></i></div><div class=bar style="height:6px;margin-top:3px"><i style="width:${S.stam??100}%;background:#f5c542"></i></div><small class=m>Energy ${S.energy} · Stamina</small></div><div class="hb tr"><b>${S.artist?esc(S.artist):'No artist yet'}</b><br><small class=m>${S.listeners.toLocaleString()} monthly listeners</small><br><small style="color:#f5c542">Fame ${fameStr()}</small></div>${rec?`<div class="hb modal" style="top:auto;bottom:90px;transform:translateX(-50%);left:50%;width:min(440px,92vw)"><b>Recording ${esc(rec.g)}</b> <small class=m>· ${rec.hits}/${rec.goal} hits · ${rec.miss} misses</small><div class=bar style="width:100%;height:12px"><i style="width:${Math.min(100,rec.hits/rec.goal*100)}%"></i></div><div class=tbar><div class=tg></div><div class=ti style="left:${rec.pos*100}%;background:${rec.fl>0?(rec.ok?'#2fe68a':'#ff4455'):'#fff'}"></div></div><small class=m>${rec.cd>0?'Missed! Steady…':'SPACE / click when the marker is in the green'} · each hit raises the bar, misses cost quality · Esc cancels</small></div>`:''}${near?`<div class="hb pr">[E] ${near.l}</div>`:mode=='drive'?'<div class="hb pr">[E] Exit car · WASD drive</div>':''}<button class="hb gear px" onclick="settings()">⚙ Settings</button><button class="hb gear px" style="right:150px" onclick="buildMode()">🛋 Furniture [F]</button><div class="hb hint">WASD move (Shift run) · E interact · N map · F furniture · M music</div>`;
+ if(h!=hc){hc=h;$('hud').innerHTML=h}}
+function loop(n){const dt=Math.min(.05,(n-last)/1000);last=n;update(dt);renderer.render(scene,cam);requestAnimationFrame(loop)}
+
