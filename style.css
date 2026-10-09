@@ -90,3 +90,6 @@ input[type=range]::-moz-range-thumb{width:8px;height:12px;background:var(--g);bo
 .ndot{position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:#e53935;border:2px solid #000;display:block;pointer-events:none}
 .ico .ndot{left:58px;right:auto;top:0}
 .tb button{position:relative}
+.cav{position:relative;display:inline-block;flex:0 0 auto}.cav img{display:block}
+.cdot{position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;border:2px solid #0b0f0d;display:block;pointer-events:none}
+.cfee{background:#1d2a24;border-bottom:2px solid #f5c542;color:#f5c542;padding:6px 10px;font-size:12px}
