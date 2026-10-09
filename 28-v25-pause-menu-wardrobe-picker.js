@@ -30,5 +30,6 @@ function wrR(){if(!document.querySelector('.wrd'))WPK.id=null;const own=GAR.filt
 
 /* v24.4.1: a continuous low wall along the front (south) edge of the ground floor, shown while inside the house.
    The collision there was already solid; this closes the visible opening. */
-const FRW=B(WORLD,16,1.1,.3,'#9aa0a8',8,.55,11.95);
+/* v26: the front low wall now has a proper front door in the old door gap (x 5 to 7) */
+const FRW=new THREE.Group();WORLD.add(FRW);B(FRW,5,1.1,.3,'#9aa0a8',2.5,.55,11.95);B(FRW,9,1.1,.3,'#9aa0a8',11.5,.55,11.95);B(FRW,1.76,1.05,.12,'#5a3a22',6,.53,11.95);[5.06,6.94].forEach(x=>B(FRW,.12,1.14,.34,'#3a2412',x,.57,11.95));B(FRW,2,.08,.34,'#3a2412',6,1.12,11.95);[5.55,6.45].forEach(x=>B(FRW,.6,.32,.03,'#6b4a2e',x,.72,12.02));B(FRW,.09,.09,.07,'#e6b422',6.7,.55,12.04);
 {const wt7=worldTick;worldTick=function(dt){wt7(dt);FRW.visible=HIN}}

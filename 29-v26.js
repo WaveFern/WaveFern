@@ -109,3 +109,15 @@ let SALL=0;
 PG.home=()=>{const L=S.songs.slice().sort((a,b)=>b.streams-a.streams||b.id-a.id),sh=SALL?L:L.slice(0,5);return`<div class=ban style="display:flex;gap:16px;align-items:center"><img class=pf src="${pfp()}"><div><small class=m>ARTIST</small><h1>${esc(S.artist)}</h1><p>${S.listeners.toLocaleString()} monthly listeners · ${S.followers.toLocaleString()} followers · Fame ${fameStr()}</p></div></div><h3>${SALL?'All songs':'Top songs'} <small class=m>by popularity</small></h3>${L.length?sh.map((s,i)=>row(i+1,s)).join('')+(L.length>5?`<div style="margin-top:8px"><button onclick="SALL=!SALL;pcR()">${SALL?'Show top 5':'Show all ('+L.length+')'}</button></div>`:''):'<p class=m>No releases yet. Record a song in the studio, then upload it from the Upload tab.</p>'}`+albumsHTML()};
 let HRF=0;{const u3=update;update=function(dt){u3(dt);if(mode=='pc'){msgDot();if((HRF+=dt)>2){HRF=0;const ae=document.activeElement;if(app==1&&pg=='home'&&S.artist&&!dg&&!(ae&&/INPUT|TEXTAREA/.test(ae.tagName)))pcR()}}}}
 {const st=document.createElement('style');st.textContent='.udot{position:absolute;top:-3px;left:61px;width:14px;height:14px;border-radius:50%;background:#ff3b5c;border:2px solid #000;box-sizing:border-box;pointer-events:none}';document.head.appendChild(st)}
+
+/* ===== 7. house and garage ===== */
+/* patch the gap in the east (right-hand) low wall at z 9 to 11, which showed while inside the house */
+B(WORLD,.25,.4,2,'#8a8f96',16,.2,10);
+/* the outside front door gets panels, a frame and a handle */
+[5.5,6.5].forEach(x=>{B(HX,.7,.9,.03,'#6b4a2e',x,1.7,12.24);B(HX,.7,.7,.03,'#6b4a2e',x,.6,12.24)});B(HX,.1,.1,.08,'#e6b422',6.75,1.15,12.27);B(HX,2.3,.12,.22,'#3a2412',6,2.45,12.2);
+/* no garage at all until it is bought: no building, pad, sign, collision, door prompt or map marker */
+let GREF=null;
+function garageSync(){if(!GREF){const c=cols.find(c=>c[0]==17.5&&c[1]==1.5&&c[2]==27.5&&c[3]==7),i=INT.find(o=>o.l=='Enter garage'),p=POIS.find(p=>p[2]=='Garage');if(!c||!i)return;GREF={c,i,p}}
+ const own=!!S.garage,tg=(arr,o)=>{if(!o)return;const k=arr.indexOf(o);if(own&&k<0)arr.push(o);else if(!own&&k>=0)arr.splice(k,1)};tg(cols,GREF.c);tg(INT,GREF.i);tg(POIS,GREF.p);
+ GARM.forEach(m=>m.visible=own&&!HIN);if(GPAD)GPAD.visible=own;if(GLBL)GLBL.visible=own&&!HIN}
+{const wt8=worldTick;worldTick=function(dt){wt8(dt);garageSync()}}
