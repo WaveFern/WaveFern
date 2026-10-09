@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.7.1';
+const GAME_VERSION='v26.7.2';
 const VERSION_HISTORY=[
+ {v:'v26.7.2',n:'The custom colour button in the colour pickers now shows a plus icon instead of a pencil.'},
  {v:'v26.7.1',n:'Renamed Fernwave Records, Spotifly and the .fw sites to WaveFern and .wf.'},
  {v:'v26.7.0',n:'The game now pauses automatically when you switch tabs or the window loses focus.'},
  {v:'v26.6.0',n:'City: roads are wider (6.4 m) with a wider far-side pavement, and buildings, junctions and the map follow. Traffic now drives on a road network: cars keep to their lane, turn at crossroads and T-junctions, U-turn only at dead ends, and wait instead of piling up. Many more cars and pedestrians across the whole map. You can no longer walk through people or cars, but you can always step away. Sprinting eases in, and cars are now much faster than running.'},
