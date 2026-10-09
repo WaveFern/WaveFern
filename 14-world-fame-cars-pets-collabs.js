@@ -1,8 +1,7 @@
-const GARM2=[];
 /* ---------- world, fame, cars, pets, collabs ---------- */
 const cBD=new THREE.Color(0x86c5e6),cBN=new THREE.Color(0x0a0f22),wc=[],WORLD=new THREE.Group();scene.add(WORLD);
 let NPC=[],PK=[],FOL=[],ART_M=[],LOTS=[],dr=null,es=0,cs2=null,SM=null;
-const BI={cars:'Cars',prop:'Property',pets:'Pets',guard:'Bodyguards'},unr=()=>S.msgs.filter(m=>m.unread).length;
+const BI={cars:'Cars',prop:'Property',pets:'Pets',guard:'Bodyguards'},unr=()=>S.msgs.filter(m=>m.unread).length,fameLv=()=>FT.filter(t=>fameVal()>=t).length;
 const mkS=a=>{const g=new THREE.Group();a.forEach(x=>B(g,...x));return g};
 const CARS=[{n:'Pocket Hatch',p:1500,c:'#e6b422',top:11},{n:'Commuter Sedan',p:4000,c:'#3b82f6',top:15},{n:'Trail Pickup',p:7500,c:'#2f8f5a',top:17},{n:'Apex Sports',p:15000,c:'#c0392b',top:29},{n:'Phantom GT',p:40000,c:'#22252b',top:40}];
 //carb
@@ -19,10 +18,10 @@ function pfp(c=ch){const k=document.createElement('canvas');k.width=k.height=16;
 function lbl(t,w=3){const c=document.createElement('canvas');c.width=256;c.height=48;const x=c.getContext('2d');x.fillStyle='#000a';x.fillRect(0,0,256,48);x.fillStyle='#fff';x.font='bold 22px monospace';x.textAlign='center';x.fillText(t,128,31);const tx=new THREE.CanvasTexture(c);tx.magFilter=tx.minFilter=THREE.NearestFilter;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,depthTest:false}));s.scale.set(w,w*48/256,1);return s}
 function mkShop(cx,k,name,act,lab){const g=WORLD;B(g,8,3.4,6,k,cx,1.7,8);B(g,8.4,.3,6.4,dk(k,.7),cx,3.55,8);B(g,1.3,2,.1,'#2a1f1a',cx,1,11.03);[-2.6,2.6].forEach(x=>B(g,1.8,1.2,.1,'*bfe3ff',cx+x,1.5,11.03));const l=lbl(name,4.5);l.position.set(cx,3,11.3);g.add(l);col(cx-4,5,cx+4,11.1);INT.push({x:cx,z:12.6,r:1.6,l:lab,a:act})}
 function buildWorld(){const g=WORLD,gr=new THREE.Mesh(geo(260,.2,260),tex('#559a4e','#4a8844',260,260));gr.position.set(8,-.14,6);g.add(gr);
- GARM2.push(B(g,10,.05,6,'#7a8087',21.5,-.01,9));
+ B(g,10,.05,6,'#7a8087',21.5,-.01,9);
  B(g,5,.4,.25,'#8a8f96',2.5,.2,12);B(g,9,.4,.25,'#8a8f96',11.5,.2,12);B(g,.25,.4,9,'#8a8f96',16,.2,4.5);B(g,.25,.4,1,'#8a8f96',16,.2,11.5);
  col(0,-.3,16,.15);col(-.3,0,.15,12);col(0,11.9,16,12.1);col(15.9,0,16.1,12);
- const gl=lbl('GARAGE',2.5);gl.position.set(21.5,1.6,5.4);g.add(gl);GARM2.push(gl);
+ const gl=lbl('GARAGE',2.5);gl.position.set(21.5,1.6,5.4);g.add(gl);
  mkShop(34,'#7b5ea7','JEWELLERY',()=>enterShop(0),'Enter Jewellery');mkShop(44,'#3b82f6','PROPERTY',()=>enterShop(1),'Enter Property office');mkShop(54,'#e6b422','CORNER SHOP',()=>enterShop(2),'Enter Corner shop');
  for(let x=-8;x<70;x+=10)lamp(x,13.1);
  for(let x=0;x<70;x+=14){B(g,1.4,.1,.5,'#8a5a36',x,.4,20.4);B(g,.1,.4,.4,'#333',x-.6,.2,20.4);B(g,.1,.4,.4,'#333',x+.6,.2,20.4)}
@@ -30,14 +29,14 @@ function buildWorld(){const g=WORLD,gr=new THREE.Mesh(geo(260,.2,260),tex('#559a
  for(let i=0;i<26;i++)tr(R(-12,70),R(-14,-3));for(let i=0;i<10;i++)tr(R(-12,-3),R(0,12));for(let i=0;i<18;i++)tr(R(-12,70),R(44,46));for(let i=0;i<12;i++)tr(R(-12,70),R(21,22.5));
  for(let i=0;i<60;i++)B(g,.2,.2,.2,pick(['#ff6ad5','#ffe066','#fff','#ff8a30']),R(-12,70),.1,pick([R(-12,-3),R(44,46)]));
  const c0=B(g,.5,7,.5,'*ffe066',40,3.5,13.2);c0.visible=false}
-function buildNPCs(){for(let i=0;i<22;i++){const c={skin:RI(0,5),eyes:RI(0,4),mouth:RI(0,3),hair:RI(0,11),hc:RI(0,11),top:RI(0,4),tc:RI(0,9),pc:RI(0,7),body:Math.random()},o=buildChar(c),z0=i%2?13.2:19.2;scene.add(o.g);NPC.push({m:o.g,legs:o.legs,arms:o.arms,x:R(-10,66),z:z0,z0,dir:Math.random()<.5?1:-1,sp:R(.9,1.8),t:R(0,6),k:Math.random(),st:0,cool:0,fan:false})}}
+function buildNPCs(){for(let i=0;i<10;i++){const c={skin:RI(0,5),eyes:RI(0,4),mouth:RI(0,3),hair:RI(0,11),hc:RI(0,11),top:RI(0,4),tc:RI(0,9),pc:RI(0,7),body:Math.random()},o=buildChar(c),z0=i%2?13.2:19.2;scene.add(o.g);NPC.push({m:o.g,legs:o.legs,arms:o.arms,x:R(-10,66),z:z0,z0,dir:Math.random()<.5?1:-1,sp:R(.9,1.8),t:R(0,6),k:Math.random(),st:0,cool:0,fan:false})}}
 function parkCars(){fillGarage();PK.forEach(c=>scene.remove(c.m));PK=(S.garage?S.cars:[]).map((i,j)=>{const m=mkS(carb(i)),x=18.6+j*2.1,z=10;m.scale.setScalar(1.5);m.position.set(x,0,z);scene.add(m);return{i,m,x,z,h:0,v:0}})}
 function syncF(){FOL.forEach(f=>scene.remove(f.m));FOL=[];S.pets.forEach((pi,j)=>{const m=mkS(petb(pi));m.scale.setScalar(.7);scene.add(m);FOL.push({m,x:P.x,z:P.z,ox:-.9-j*.5,oz:.8})});for(let j=0;j<S.guards;j++){const o=buildChar({skin:RI(0,5),eyes:4,mouth:1,hair:1,hc:0,top:2,tc:6,pc:4,body:.75});scene.add(o.g);FOL.push({m:o.g,x:P.x,z:P.z,ox:[1.3,-1.3,0][j],oz:[1.2,1.2,2.2][j]})}}
 function buildLots(){LOTS.forEach(m=>scene.remove(m));LOTS=[];for(let j=0;j<S.home;j++){const X=[8,20,34,50][j],m=mkS(hseb(j));m.scale.setScalar(2.4);m.position.set(X,0,40);scene.add(m);const l=lbl('Your '+PROPS[j][0],4);l.position.set(X,4.6,41);scene.add(l);LOTS.push(m,l)}}
 function syncArt(){ART_M.forEach(o=>scene.remove(o.m));ART_M=[];S.msgs.forEach(m=>{if(m.state==1&&m.a!==undefined){const a=ART[m.a],r=buildChar(Object.assign({},a[4])),x=(a[7]?556:(a[2]<=400?19:40))+ART_M.filter(q=>q.loc==a[7]).length*2.4,z=a[7]?26:13.2;r.g.position.set(x,0,z);scene.add(r.g);B(r.g,.2,7,.2,'*ffe066',0,3.5,0);const l=lbl(a[0],3);l.position.set(0,2.5,0);r.g.add(l);ART_M.push({m:r.g,x,z,i:m.a,name:a[0],loc:a[7]})}})}
 function dynInt(){const a=[];PK.forEach(c=>a.push({x:c.x,z:c.z,r:2,l:'Drive '+CARS[c.i].n,a:()=>{dr=c;c.v=0;P.mesh.visible=false;mode='drive'}}));NPC.forEach(n=>{if(n.fan&&n.st==1&&Math.hypot(P.x-n.x,P.z-n.z)<1.9)a.push({x:n.x,z:n.z,r:2,l:'Sign autograph',a:()=>sign(n)})});ART_M.forEach(o=>a.push({x:o.x,z:o.z,r:2,l:'Record with '+o.name,a:()=>collab(o)}));return a}
 function exitDrive(){mode='play';P.mesh.visible=true;for(const o of[[1.6,0],[-1.6,0],[0,1.6],[0,-1.6],[0,3]])if(!hit(dr.x+o[0],dr.z+o[1],.28)){P.x=dr.x+o[0];P.z=dr.z+o[1];break}dr=null}
-function sign(n){n.st=2;n.cool=25;const t=RI(3,12)*Math.max(1,Math.round(fameMult()));S.money=+(S.money+t).toFixed(2);S.fans++;updateVersion();snd('cash');say('Autograph signed! Fan tipped $'+t)}
+function sign(n){n.st=2;n.cool=25;const t=RI(3,12)*Math.max(1,fameLv());S.money=+(S.money+t).toFixed(2);S.fans++;updateVersion();snd('cash');say('Autograph signed! Fan tipped $'+t)}
 function worldTick(dt){HIN=!IN&&P.x>.2&&P.x<15.8&&P.z>-.3-WGX&&P.z<12.1;HX.visible=!(mode=='build'||HIN);IG.forEach((g,i)=>{if(g)g.visible=!!IN&&IN.i==i});KEEP.forEach(k=>k.m.visible=!!IN&&IN.i==k.i);PK.forEach(c=>c.m.visible=!HIN&&!IN);if(P.x>440)fadeT(dt);const play=mode=='play'&&!IN&&(P.x<-1||P.x>17||P.z>13);
  NPC.forEach(n=>{const dd=Math.hypot(P.x-n.x,P.z-n.z);if(dd>60||HIN||IN){n.m.visible=false;if(n.pet)n.pet.visible=false;return}n.m.visible=true;n.t+=dt*8;if(dd<7){if(!n.rl){n.rl=1;n.fan=Math.random()<S.listeners/5e6}}else if(dd>14){n.rl=0;if(n.st==0)n.fan=false}if(n.st==2){n.cool-=dt;if(n.cool<=0)n.st=0}const d=Math.hypot(P.x-n.x,P.z-n.z);let mv=1;
   if(n.fan&&n.st==0&&play&&d<7){if(S.guards&&S.gs=='follow'){if(d<3.2){n.st=2;n.cool=25;say('Your bodyguard politely handled a fan.')}}else n.st=1}
@@ -45,42 +44,16 @@ function worldTick(dt){HIN=!IN&&P.x>.2&&P.x<15.8&&P.z>-.3-WGX&&P.z<12.1;HX.visib
   else{n.x+=n.dir*n.sp*dt;if(n.x>(n.mx??70))n.dir=-1;if(n.x<(n.mn??-12))n.dir=1;n.z+=(n.z0-n.z)*dt*2;n.m.rotation.y=n.dir>0?Math.PI/2:-Math.PI/2}
   n.m.position.set(n.x,0,n.z);const s=mv?Math.sin(n.t)*.6:0;n.legs[0].rotation.x=s;n.legs[1].rotation.x=-s;n.arms[0].rotation.x=-s;n.arms[1].rotation.x=s;if(n.pet){n.pet.visible=true;n.pet.position.set(n.x-n.dir*.9,0,n.z+.5);n.pet.rotation.y=n.dir>0?Math.PI/2:-Math.PI/2}});
  FOL.forEach((f,i)=>{if(f.home){f.m.visible=HIN;return}const tx=P.x+f.ox,tz=P.z+f.oz,d=Math.hypot(tx-f.x,tz-f.z);if(d>.05){const a=Math.atan2(tx-f.x,tz-f.z),sp=Math.min(d*3,5)*dt;f.x+=Math.sin(a)*sp;f.z+=Math.cos(a)*sp;f.m.rotation.y=a}f.m.position.set(f.x,d>.3?Math.abs(Math.sin(tt*6+i))*.08:0,f.z);f.m.visible=mode!='drive'});
- ART_M.forEach(o=>{o.m.rotation.y=Math.atan2(P.x-o.x,P.z-o.z)});KEEP.forEach((k,i)=>{k.arms[1].rotation.x=Math.sin(tt*1.5+i)*.08;k.m.rotation.y=IN?Math.atan2(P.x-k.x,P.z-k.z):0});TRAF.forEach(c=>{let tg=c.sp;const V=c.ax=='v',AL=o=>V?o.z:o.x,LT=o=>V?o.x:o.z;TRAF.forEach(o=>{if(o!==c&&o.dir==c.dir&&(o.ax=='v')==V&&Math.abs(LT(o)-LT(c))<.5){const g=(AL(o)-AL(c))*c.dir;if(g>0&&g<10)tg=Math.min(tg,g<6?0:o.v)}});const g=(AL(P)-AL(c))*c.dir;if(Math.abs(LT(P)-LT(c))<1.6&&g>0&&g<11)tg=g<6?0:Math.min(tg,2.5);c.v+=(tg-c.v)*Math.min(1,dt*(tg<c.v?4:1.2));trafMove(c,dt);c.m.visible=Math.abs(c.x-P.x)<50&&Math.abs(c.z-P.z)<50&&!HIN&&!IN});
- if(mode=='drive'){const C=CARS[dr.i],ac=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0),st=(keys.a||keys.arrowleft?1:0)-(keys.d||keys.arrowright?1:0);const VM=6+C.top*.8;dr.v+=ac*VM*1.8*dt;dr.v*=1-1.4*dt;dr.v=Math.max(-VM*.3,Math.min(VM,dr.v));dr.h+=st*1.9*dt*Math.max(-1,Math.min(1,dr.v/3));
+ ART_M.forEach(o=>{o.m.rotation.y=Math.atan2(P.x-o.x,P.z-o.z)});KEEP.forEach((k,i)=>{k.arms[1].rotation.x=Math.sin(tt*1.5+i)*.08;k.m.rotation.y=IN?Math.atan2(P.x-k.x,P.z-k.z):0});TRAF.forEach(c=>{let tg=c.sp;TRAF.forEach(o=>{if(o!==c&&o.dir==c.dir&&Math.abs(o.z-c.z)<.5){const g=(o.x-c.x)*c.dir;if(g>0&&g<10)tg=Math.min(tg,g<6?0:o.v)}});const g=(P.x-c.x)*c.dir;if(Math.abs(P.z-c.z)<1.6&&g>0&&g<11)tg=g<6?0:Math.min(tg,2.5);c.v+=(tg-c.v)*Math.min(1,dt*(tg<c.v?4:1.2));c.x+=c.dir*c.v*dt;if(c.x>(c.hi??690))c.x=c.lo??-130;if(c.x<(c.lo??-130))c.x=c.hi??690;c.m.position.set(c.x,0,c.z);c.m.visible=Math.abs(c.x-P.x)<50&&Math.abs(c.z-P.z)<50&&!HIN&&!IN});
+ if(mode=='drive'){const C=CARS[dr.i],ac=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0),st=(keys.a||keys.arrowleft?1:0)-(keys.d||keys.arrowright?1:0);dr.v+=ac*C.top*1.0*dt;dr.v*=1-1.4*dt;dr.v=Math.max(-C.top*.25,Math.min(C.top*.55,dr.v));dr.h+=st*1.9*dt*Math.max(-1,Math.min(1,dr.v/3));
   const nx=dr.x+Math.sin(dr.h)*dr.v*dt,nz=dr.z+Math.cos(dr.h)*dr.v*dt;if(!hit(nx,dr.z,1.3)&&!tc(nx,dr.z))dr.x=nx;else dr.v*=.5;if(!hit(dr.x,nz,1.3)&&!tc(dr.x,nz))dr.z=nz;else dr.v*=.5;
   dr.m.position.set(dr.x,0,dr.z);dr.m.rotation.y=dr.h;P.x=dr.x;P.z=dr.z;es+=dt;if(es>.1){es=0;sfx(55+Math.abs(dr.v)*9,.09,'sawtooth',.04,0,0,0)}}
  if(mode=='cut'){cs2.t+=dt;cs2.n=(cs2.n||0)+dt;if(cs2.n>.45){cs2.n=0;cs2.k=(cs2.k||0)+1;snd(cs2.k%2?'thunk':'pop');nz(.04,6000,.08,1,'highpass');sfx([262,330,392,523][cs2.k%4],.35,'triangle',.07)}cs2.o.m.position.y=Math.abs(Math.sin(tt*8))*.1;if(cs2.t>=6)collabDone()}}
 function genMsgs(){}
 function nameModal(d,x=''){mode='menu';$('ui').innerHTML=`<div class="box modal"><h2>Song recorded!</h2>${x}<p class=m>${esc(d.g)} · mix quality ${d.q}${d.ft?' · feat. '+esc(d.ft):''}</p><p>Give it a title:</p><input id=tin maxlength=32 value="${esc(d.title)}" onkeydown="if(event.key=='Enter')saveT(${d.id})"><div class=row2><button class=go onclick="saveT(${d.id})">Save to drafts</button></div></div>`;setTimeout(()=>{const i=$('tin');i&&(i.focus(),i.select())},50)}
-/* In-person meeting: 1 to 3 short exchanges with three fixed answers (no typing). Each answer moves the artist's opinion
-   according to their personality; that opinion then lifts or lowers the session. */
-let DLG=null;
-const DPERS={hype:{op:["Yo, what's good! You ready to run it up?","Wassup! Okay, pitch me the vibe.","So... you wanna do this or what?"],
- opts:[["Yo, I'm all in. Let's go!",1],["Wassup, I got fire ideas.",1],["Uhh, I'm kinda nervous, sorry.",-1]],
- rs:["Ayyy, that's the energy I want!","Love it, we're about to cook.","Nah, don't be nervous, we got this."]},
- chill:{op:["Hey, what's good? No rush, we vibe first.","Wassup. You been listening to anything good?","Yo, so... you feeling this beat or nah?"],
- opts:[["LET'S GO, record it right now!",-1],["Just chilling, what's the plan?",0],["Vibes first, no rush. I'm into it.",1]],
- rs:["Whoa, slow down. Breathe with me.","Cool, we'll figure it out as we go.","Yeah, that's the right energy. Nice."]},
- blunt:{op:["Alright, what's good? Make it quick.","Wassup. You here for real or just looking?","Talk to me. What are you bringing?"],
- opts:[["Straight up: I'm here to make a hit.",1],["Whatever you think, man.",-1],["Heard your stuff, I'm a fan.",0]],
- rs:["Okay, I respect a direct answer.","Mm. Don't just agree with me.","Cool. Fans are nice, but bring talent."]}};
-const clampN=(v,a,b)=>Math.max(a,Math.min(b,v));
-function collab(o){if(S.energy<COLLAB_COST)return say('Too tired for a collab session. Get some sleep.');
- const pers=DPERS[['hype','chill','blunt'][o.i%3]];DLG={o,pers,n:RI(1,3)};mode='menu';dlgRound(0,0)}
-function dlgRound(k,fx){if(k>=DLG.n)return startCollab(fx);const opts=DLG.pers.opts.map((x,j)=>`<button onclick="dlgPick(${k},${fx},${j})">${esc(x[0])}</button>`).join('');
- $('ui').innerHTML=`<div class="box modal" style="width:min(460px,94vw)"><h2>${esc(DLG.o.name)} <small class=m>(fictional)</small></h2><p>"${esc(DLG.pers.op[k])}"</p><div style="display:flex;flex-direction:column;gap:6px">${opts}</div><p class=m><small>Exchange ${k+1} of ${DLG.n}. Your answer changes how they see you.</small></p></div>`}
-function dlgPick(k,fx,j){const v=DLG.pers.opts[j][1],id=DLG.o.i;S.artRel=S.artRel||{};S.artRel[id]=clampN((S.artRel[id]||0)+v,-5,5);
- $('ui').innerHTML=`<div class="box modal" style="width:min(460px,94vw)"><h2>${esc(DLG.o.name)}</h2><p>"${esc(DLG.pers.rs[j])}"</p><button class=go onclick="dlgRound(${k+1},${fx+v})">${k+1>=DLG.n?'Start the session':'Continue'}</button></div>`}
-function startCollab(fx){const o=DLG.o;S.energy=+(S.energy-COLLAB_COST).toFixed(1);
- const rel=(S.artRel||{})[o.i]||0,qm=1+clampN(fx*.08,-.2,.25)+clampN(rel*.02,-.1,.15);
- mode='cut';cs2={o,t:0,qm};P.x=o.x-1.4;P.z=o.z;P.rot=Math.PI/2;DLG=null;$('ui').innerHTML='';say('Studio session with '+o.name+' (fictional)')}
-/* the first in-game day: a few artists message you, once per game */
-function seedDMs(){if(S.dmSeeded)return;S.dmSeeded=1;if(S.day!=1||S.msgs.length)return;
- const idx=ART.map((a,i)=>i).sort(()=>Math.random()-.5).slice(0,3);idx.forEach(i=>newConv(i,1));say(idx.length+' artists sent you a message')}
-const COLLAB_COST=7.5;/* half of the 15 energy a solo recording costs */
-const featTitle=(t,n)=>/\(feat\. /i.test(t)?t:t+' (feat. '+n+')';
-function collabDone(){const o=cs2.o,a=ART[o.i],m=S.msgs.find(x=>x.a===o.i),qm=cs2.qm||1;m.state=3;m.doneDay=S.day;const pp=m.paid||m.pay||a[3];m.log.push({f:'a',t:'Great session! Thanks again.',d:S.day});ART_M=ART_M.filter(x=>x!==o);scene.remove(o.m);
- const d={id:S.nid++,title:featTitle(pick(A)+' '+pick(Bn),a[0]),g:a[1],q:Math.round((R(30,40)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.home||0)*3+Math.min(25,6+Math.round(a[3]/60)))*qm),ft:a[0],fm:(1.1+Math.min(.6,a[3]/6000))*qm,role:pick(['Featured verse','Co-writer and hook','Producer and beats','Backing vocals'])};S.drafts.push(d);updateVersion();cs2=null;snd('chime');nameModal(d,`<p style="color:var(--g)">Collab done. The session fee was <b>$${pp}</b>, paid when you confirmed. Fictional in-game event with a stand-in character.</p>`)}
+function collab(o){mode='cut';cs2={o,t:0};P.x=o.x-1.4;P.z=o.z;P.rot=Math.PI/2;say('Studio session with '+o.name+' (fictional)')}
+function collabDone(){const o=cs2.o,a=ART[o.i],m=S.msgs.find(x=>x.a===o.i);m.state=3;m.doneDay=S.day;const pp=m.pay||a[3];S.money=+(S.money+pp).toFixed(2);S.earn+=pp;m.log.push({f:'a',t:'Great session! Thanks again.',d:S.day});ART_M=ART_M.filter(x=>x!==o);scene.remove(o.m);
+ const d={id:S.nid++,title:pick(A)+' '+pick(Bn),g:a[1],q:Math.round(R(30,40)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.home||0)*3)+Math.min(25,6+Math.round(a[3]/60)),ft:a[0],fm:1.1+Math.min(.6,a[3]/6000),role:pick(['Featured verse','Co-writer and hook','Producer and beats','Backing vocals'])};S.drafts.push(d);updateVersion();cs2=null;snd('chime');nameModal(d,`<p style="color:var(--g)">Collab done! You earned <b>$${pp}</b>. Fictional in-game event with a stand-in character.</p>`)}
 function shopModal(t,mk,fn){SM={t,mk,fn};mode='menu';smR()}
 function smR(){const o=SM,it=o.mk();$('ui').innerHTML=`<div class="box modal"><h2>${o.t}</h2><p><i>${GR}</i></p><p class=m>Money ${$$(S.money)}</p>${it.map((x,i)=>`<div class=ng><span style="flex:1">${x[0]}<br><small class=m>${x[2]}</small></span><button class=go ${x[2]=='Owned'?'disabled':''} onclick="smC(${i})">${$$(x[1])}</button></div>`).join('')}<button onclick="closeUI()">Leave</button></div>`}
 function smC(i){SM.fn(i);smR()}
@@ -94,15 +67,5 @@ PA.msg=()=>`<h1>Messages</h1>${S.msgs.slice().reverse().map(m=>{if(m.a===undefin
 PA.cars=()=>`<h1>Cars</h1><p class=m>Balance ${$$(S.money)}. Cars wait in your garage east of the house. Walk to one and press E.</p><div class=cards>${CARS.map((c,i)=>cardOf('c:'+i,c.n,'Top speed '+c.top*10+' km/h',S.cars.includes(i)?'<small class=m>Owned</small>':`<button class=go ${S.money<c.p?'disabled':''} onclick="book('car',${i})">Book · ${$$(c.p)}</button>`)).join('')}</div>`;
 PA.prop=()=>`<h1>Property</h1><p class=m>Balance ${$$(S.money)}. Each home adds +3 song quality and +10% reach and appears in town.</p><div class=cards>${PROPS.map((c,i)=>cardOf('h:'+i,c[0],'',i<S.home?'<small class=m>Owned</small>':i>S.home?'<small class=m>Buy the previous home first</small>':`<button class=go ${S.money<c[1]?'disabled':''} onclick="book('home',${i})">Book · ${$$(c[1])}</button>`)).join('')}</div>`;
 PA.pets=()=>`<h1>Pets</h1><p class=m>Balance ${$$(S.money)}. Pets follow you and add +1 song quality each (max 3).</p><div class=cards>${PETS.map((c,i)=>cardOf('p:'+i,c[0],'',S.pets.includes(i)?'<small class=m>Adopted</small>':`<button class=go ${S.money<c[1]||S.pets.length>=3?'disabled':''} onclick="book('pet',${i})">Book · ${$$(c[1])}</button>`)).join('')}</div>`;
-PA.guard=()=>{const P2=[800,1800,4000][S.guards],ok=fameLv()>=GUARD_LV;return`<h1>Bodyguards</h1><p class=m>Fame level ${fameLv()}. Hiring unlocks at fame level ${GUARD_LV}. Guards follow you and politely stop fans from crowding you. Hired: ${S.guards}/3</p>${S.guards>=3?'<p class=m>Full crew.</p>':`<button class=go ${!ok||S.money<P2?'disabled':''} onclick="book('guard',0)">Book · ${$$(P2)}</button>${ok?'':'<p class=m>Not famous enough yet.</p>'}`}`};
+PA.guard=()=>{const P2=[800,1800,4000][S.guards],ok=fameLv()>=3;return`<h1>Bodyguards</h1><p class=m>Fame ${'★'.repeat(fameLv())||'none'}. Hiring unlocks at 3 stars. Guards follow you and politely stop fans from crowding you. Hired: ${S.guards}/3</p>${S.guards>=3?'<p class=m>Full crew.</p>':`<button class=go ${!ok||S.money<P2?'disabled':''} onclick="book('guard',0)">Book · ${$$(P2)}</button>${ok?'':'<p class=m>Not famous enough yet.</p>'}`}`};
 function buyX(t,i){const pr={car:()=>CARS[i].p,home:()=>PROPS[i][1],pet:()=>PETS[i][1],guard:()=>[800,1800,4000][S.guards],garage:()=>2500}[t]();if(S.money<pr)return snd('err');S.money=+(S.money-pr).toFixed(2);if(t=='car'){S.cars.push(i);parkCars()}if(t=='home'){S.home++;buildLots()}if(t=='pet'){S.pets.push(i);syncF()}if(t=='guard'){S.guards++;syncF()}if(t=='garage'){S.garage=1;parkCars()}updateVersion();snd('cash');say('Purchased!');if(mode=='pc')pcR()}
-
-/* v25.9: traffic follows the road grid. At every junction (T-junctions too) a car may go straight or turn onto a road that continues that way; at a dead end it turns round. */
-function trafMove(c,dt){const V=c.ax=='v',d=c.dir*c.v*dt,p0=V?c.z:c.x;if(V)c.z+=d;else c.x+=d;const p1=V?c.z:c.x;
- if(!V){const zr=c.z+1.2*c.dir,h=c.rh||RH.find(q=>Math.abs(q[0]-zr)<.3&&c.x>=q[1]-5&&c.x<=q[2]+5);
-  if(h)for(const v of RVV){const X=v[0];if(X<h[1]||X>h[2]||zr<v[1]-.1||zr>v[2]+.1||(p0-X)*(p1-X)>0||p0==X)continue;const o=[];if((h[2]-X)*c.dir>3||(X-h[1])*-c.dir>3)o.push(0,0);if(v[2]>zr+3)o.push(1);if(v[1]<zr-3)o.push(-1);if(!o.length)o.push(2);const k=o[Math.floor(Math.random()*o.length)];if(k==2){c.dir=-c.dir;c.z=zr-1.2*c.dir;c.x=X;c.m.rotation.y=c.dir>0?Math.PI/2:-Math.PI/2}else if(k){c.ax='v';c.rv=v;c.rh=null;c.dir=k;c.x=X+1.2*k;c.z=zr;c.m.rotation.y=k>0?0:Math.PI}break}
-  if(c.rh&&c.ax!='v'&&(c.x>c.rh[2]-2||c.x<c.rh[1]+2)){c.x=Math.max(c.rh[1]+2,Math.min(c.rh[2]-2,c.x));c.dir=-c.dir;c.z=c.rh[0]-1.2*c.dir;c.m.rotation.y=c.dir>0?Math.PI/2:-Math.PI/2}
-  if(c.ax!='v'&&!c.rh){if(c.x>(c.hi??690))c.x=c.lo??-130;if(c.x<(c.lo??-130))c.x=c.hi??690}}
- else{const v=c.rv,xr=v[0];for(const h of RH){const Z=h[0];if(Z<v[1]-.1||Z>v[2]+.1||xr<h[1]||xr>h[2]||(p0-Z)*(p1-Z)>0||p0==Z)continue;const o=[];if((v[2]-Z)*c.dir>3||(Z-v[1])*-c.dir>3)o.push(0,0);if(h[2]>xr+3)o.push(1);if(h[1]<xr-3)o.push(-1);if(!o.length)break;const k=o[Math.floor(Math.random()*o.length)];if(k){c.ax='h';c.rh=h;c.rv=null;c.dir=k;c.z=Z-1.2*k;c.x=xr;c.m.rotation.y=k>0?Math.PI/2:-Math.PI/2}break}
-  if(c.ax=='v'&&(c.z>v[2]-2||c.z<v[1]+2)){c.z=Math.max(v[1]+2,Math.min(v[2]-2,c.z));c.dir=-c.dir;c.x=xr+1.2*c.dir;c.m.rotation.y=c.dir>0?0:Math.PI}}
- c.m.position.set(c.x,0,c.z)}
