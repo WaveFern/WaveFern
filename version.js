@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v25.1.0';
+const GAME_VERSION='v25.2.0';
 const VERSION_HISTORY=[
+ {v:'v25.2.0',n:'Streams now arrive gradually through the day, faster at night, and are paid out when you wake. The game clock keeps running while you use the computer and menus. Energy slowly regenerates during the day. Collab sessions cost half the energy of a solo recording, and collab songs get a (feat. Name) title. The diss track setting is a dropdown that starts on Off. Each successful hit speeds up the timing bar by 15 percent.'},
  {v:'v25.1.0',n:'Settings button removed from the bottom-right corner. The map sits a little lower. New games start with the Charcoal wallpaper.'},
  {v:'v24.4.2',n:'Upstairs stairs now drop down into a cut-out in the floor. The new floor is split into four empty rooms.'},
  {v:'v24.4.1',n:'Fixed: the ground floor had a visible opening along the front edge. It is now a continuous low wall while you are inside the house.'},

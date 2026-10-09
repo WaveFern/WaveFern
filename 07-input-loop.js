@@ -7,7 +7,7 @@ addEventListener('keyup',e=>delete keys[e.key.toLowerCase()]);addEventListener('
 function hit(x,z,r){if(IN?(x<IN.x+.4||x>IN.x+(IN.w||10)-.4||z<320.4||z>320+(IN.d||8)-.4):(x<-130||x>690||z<-150||z>130))return 1;return wc.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||dyn.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||PL.some(q=>{if(F[q.t].f)return 0;const c=fb(q.t,q.x,q.z,q.r);return x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3]})}
 let hc='',last=performance.now(),tt=0;const cD=new THREE.Color(0xfff2e0),cN=new THREE.Color(0x5f74c8);
 function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
- if(play){S.t+=dt;if(S.t>=600)return sleepNow(1)}
+ if(clockRuns()){S.t+=dt;S.dayW=(S.dayW||0)+dt*(S.t>300?2:1);accrueStreams();if(S.energy<100){S.eReg=(S.eReg||0)+dt*.08;if(S.eReg>=1){S.eReg-=1;S.energy=Math.min(100,S.energy+1)}}if(S.t>=600)return sleepNow(1)}
  let ix=0,iy=0,mv=0;
  if(mode=='play'){ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
   if((S.stam??100)<=0){if(!S.exh)say('Out of breath! Walk until you recover.');S.exh=1}else if((S.stam??100)>=30)S.exh=0;const run=keys.shift&&!S.exh&&(S.stam??100)>0&&(ix||iy);S.stam=Math.max(0,Math.min(100,(S.stam??100)+(run?-15:10)*dt));if(ix||iy){const L=Math.hypot(ix,iy),dx=(ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt,dz=(-ix+iy)/L/Math.SQRT2*(run?6.5:3.3)*dt;mv=1;
