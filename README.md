@@ -1,4 +1,4 @@
-# Fernwave Records – Music Career Sim (split version)
+# WaveFern Records – Music Career Sim (split version)
 
 Open `index.html` in a browser (needs internet for Three.js and the font).
 
