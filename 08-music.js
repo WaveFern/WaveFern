@@ -1,5 +1,5 @@
 /* ---------- music ---------- */
-const TR=[{src:window.EMBEDDED_ASSETS.track1,fin:2,fout:3},{src:window.EMBEDDED_ASSETS.track2,fin:2,fout:0},{src:window.EMBEDDED_ASSETS.track3,fin:2,fout:3}];let VOL=.5,FX=.6,LAST=.5,SP='',AC;try{const q=JSON.parse(localStorage.getItem('fw_set'));if(q){VOL=q.VOL;FX=q.FX}}catch(e){}
+const TR=[{src:window.EMBEDDED_ASSETS.track1,fin:2,fout:3},{src:window.EMBEDDED_ASSETS.track2,fin:2,fout:0},{src:window.EMBEDDED_ASSETS.track3,fin:2,fout:3}];let VOL=.5,FX=.6,LAST=.5,SP='',AC,fs=0;try{const q=JSON.parse(localStorage.getItem('fw_set'));if(q){VOL=q.VOL;FX=q.FX}}catch(e){}
 const MU={a:TR.map(t=>{const a=new Audio(t.src);a.preload='auto';a.onended=()=>{MU.pl=0;MU.gap=R(2.5,5)};return a}),cur:-1,pl:0,on:0,gap:1};
 function musicOn(){MU.on=1}['pointerdown','keydown'].forEach(e=>addEventListener(e,musicOn));
 setInterval(()=>{if(!MU.on||MU.hold)return;
