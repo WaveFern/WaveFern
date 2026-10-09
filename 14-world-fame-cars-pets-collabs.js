@@ -1,6 +1,6 @@
 /* ---------- world, fame, cars, pets, collabs ---------- */
 const cBD=new THREE.Color(0x86c5e6),cBN=new THREE.Color(0x0a0f22),wc=[],WORLD=new THREE.Group();scene.add(WORLD);
-let NPC=[],PK=[],FOL=[],ART_M=[],LOTS=[],dr=null,es=0,cs2=null,SM=null;
+let GPAD=null,GLBL=null,NPC=[],PK=[],FOL=[],ART_M=[],LOTS=[],dr=null,es=0,cs2=null,SM=null;
 const BI={cars:'Cars',prop:'Property',pets:'Pets',guard:'Bodyguards'},unr=()=>S.msgs.filter(m=>m.unread).length,fameLv=()=>fameTier();
 const mkS=a=>{const g=new THREE.Group();a.forEach(x=>B(g,...x));return g};
 const CARS=[{n:'Pocket Hatch',p:1500,c:'#e6b422',top:11},{n:'Commuter Sedan',p:4000,c:'#3b82f6',top:15},{n:'Trail Pickup',p:7500,c:'#2f8f5a',top:17},{n:'Apex Sports',p:15000,c:'#c0392b',top:29},{n:'Phantom GT',p:40000,c:'#22252b',top:40}];
@@ -18,10 +18,10 @@ function pfp(c=ch){const k=document.createElement('canvas');k.width=k.height=16;
 function lbl(t,w=3){const c=document.createElement('canvas');c.width=256;c.height=48;const x=c.getContext('2d');x.fillStyle='#000a';x.fillRect(0,0,256,48);x.fillStyle='#fff';x.font='bold 22px monospace';x.textAlign='center';x.fillText(t,128,31);const tx=new THREE.CanvasTexture(c);tx.magFilter=tx.minFilter=THREE.NearestFilter;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,depthTest:false}));s.scale.set(w,w*48/256,1);return s}
 function mkShop(cx,k,name,act,lab){const g=WORLD;B(g,8,3.4,6,k,cx,1.7,8);B(g,8.4,.3,6.4,dk(k,.7),cx,3.55,8);B(g,1.3,2,.1,'#2a1f1a',cx,1,11.03);[-2.6,2.6].forEach(x=>B(g,1.8,1.2,.1,'*bfe3ff',cx+x,1.5,11.03));const l=lbl(name,4.5);l.position.set(cx,3,11.3);g.add(l);col(cx-4,5,cx+4,11.1);INT.push({x:cx,z:12.6,r:1.6,l:lab,a:act})}
 function buildWorld(){const g=WORLD,gr=new THREE.Mesh(geo(260,.2,260),tex('#559a4e','#4a8844',260,260));gr.position.set(8,-.14,6);g.add(gr);
- B(g,10,.05,6,'#7a8087',21.5,-.01,9);
+ GPAD=B(g,10,.05,6,'#7a8087',21.5,-.01,9);
  B(g,5,.4,.25,'#8a8f96',2.5,.2,12);B(g,9,.4,.25,'#8a8f96',11.5,.2,12);B(g,.25,.4,9,'#8a8f96',16,.2,4.5);B(g,.25,.4,1,'#8a8f96',16,.2,11.5);
  col(0,-.3,16,.15);col(-.3,0,.15,12);col(0,11.9,16,12.1);col(15.9,0,16.1,12);
- const gl=lbl('GARAGE',2.5);gl.position.set(21.5,1.6,5.4);g.add(gl);
+ const gl=lbl('GARAGE',2.5);gl.position.set(21.5,1.6,5.4);g.add(gl);GLBL=gl;
  mkShop(34,'#7b5ea7','JEWELLERY',()=>enterShop(0),'Enter Jewellery');mkShop(44,'#3b82f6','PROPERTY',()=>enterShop(1),'Enter Property office');mkShop(54,'#e6b422','CORNER SHOP',()=>enterShop(2),'Enter Corner shop');
  for(let x=-8;x<70;x+=10)lamp(x,13.1);
  for(let x=0;x<70;x+=14){B(g,1.4,.1,.5,'#8a5a36',x,.4,20.4);B(g,.1,.4,.4,'#333',x-.6,.2,20.4);B(g,.1,.4,.4,'#333',x+.6,.2,20.4)}

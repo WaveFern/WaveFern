@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.4.0';
+const GAME_VERSION='v26.5.0';
 const VERSION_HISTORY=[
+ {v:'v26.5.0',n:'House: the gap in the right-hand (east) wall is patched. The front of the house has a proper front door with frame, panels and handle, inside and out. The garage does not exist at all (no building, pad, sign, collision, prompt or map marker) until you buy it.'},
  {v:'v26.4.0',n:'A red dot sits on the Messages icon while you have unread messages and disappears when they are all read. Upload all uploads every titled draft at once. Your artist page shows your top 5 songs by streams, with a Show all button.'},
  {v:'v26.3.0',n:'Fame stars are replaced by fame levels based on monthly listeners. Level 1 is 1 to 10 listeners and each level after is about 5% harder. Every fame reward and unlock (song reach, fan tips, bodyguards, followers) now uses levels, with the same rewards as before.'},
  {v:'v26.2.0',n:"Streams now build up through the day, faster at night, instead of all at once overnight. The day's earnings are paid once when you wake up. The clock keeps running while you use the computer, and the taskbar clock keeps up."},
