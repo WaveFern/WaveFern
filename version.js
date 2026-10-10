@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.19.0';
+const GAME_VERSION='v26.20.0';
 const VERSION_HISTORY=[
+ {v:'v26.20.0',n:'The music streaming app on the computer is called Spotifly again (the game is still WaveFern Records). It has a new logo, a green circle with three black lines on a black tile, on its desktop icon, window, taskbar button, sidebar, setup page and the Spotifly Team messages. The green wallpaper now says spotifly with the logo, and news posts come from Spotifly Music News. Saves are unchanged.'},
  {v:'v26.19.0',n:'Messages has its own look: a coral-to-violet header with its own logo, a dark plum chat list, a warm cream chat with round speech bubbles (white for them, a pink-to-violet gradient for you), rounded-square profile pictures with a colourful ring, a pill-shaped message box and Send button, and a matching window title bar. Everything works the same as before.'},
  {v:'v26.18.0',n:'Polly Parrot now flies instead of walking. It hovers at about head height, bobs up and down, flaps its wings and follows you through the air, tilting forward as it speeds up. At home it flies around and only folds its wings when it settles on a perch, cat tree, bed or bowl. Parrots out with people in the city fly next to them too.'},
  {v:'v26.17.0',n:'Days are longer: a full day now lasts 10 minutes instead of 3, so you can record about 7-8 songs in one day (one song, with all four steps and uploading it, takes a bit over a minute). Daytime and night are both 5 minutes. Energy still refills by the same amount per day, and streams still build up over the whole day, so daily earnings are unchanged.'},
