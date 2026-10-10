@@ -172,3 +172,14 @@ Object.assign(RCT.neu,{chill:['mm ok cool','fair enough'],hype:['okay okay, sure
 Object.assign(RCT.neg,{chill:['eh bit much but alright','hm not really my vibe tbh'],hype:['bro where is the energy?','come on, thats kinda flat'],shy:['oh... okay','thats a bit intense for me'],formal:['I would rather we stay focused.','Thats not really how I work.'],goofy:['wow tough crowd','ok mister serious']});
 Object.assign(MID,{chill:['so what kinda sound are you hearing?','how do you usually start a track?'],hype:['whats the big idea for the drop?!','how loud are we going?'],shy:['do you, um, want me on the hook or a verse?','should i warm up first?'],formal:['How do you want to split the verses?','Got a reference in mind?'],goofy:['should the song be about soup? asking seriously','what if the chorus was just clapping?']});
 Object.assign(READY,{chill:['alright, lets lay it down'],hype:['okay mics on, LETS RECORD!'],shy:['okay... i think im ready'],formal:['Shall we start recording?'],goofy:['to the microphone, onward!']});
+/* ===== newest-activity-first chat list =====
+   each thread keeps m.act (last-activity counter). Old saves: threads get their current list index, so relative order is kept.
+   whenever a thread's log grows (incoming DM, reply, your message) or a thread is new, it gets the next counter and moves to the top. */
+function msgTouch(){const L=S&&S.msgs;if(!Array.isArray(L))return;
+ if(typeof S.actSeq!='number'){S.actSeq=0;L.forEach((m,i)=>{m.act=i+1;m._ll=(m.log||[]).length});S.actSeq=L.length}
+ L.forEach(m=>{const n=(m.log||[]).length;if(typeof m.act!='number'||n>(m._ll||0)){m.act=++S.actSeq}m._ll=n})}
+const msgSorted=()=>{msgTouch();return S.msgs.slice().sort((a,b)=>(a.act||0)-(b.act||0))};
+{const pm=PA.msg;PA.msg=function(){msgTouch();const L=S.msgs;if(!L.some(m=>m.id==S.chat)&&L.length){S.chat=msgSorted().pop().id}
+ /* the renderer lists S.msgs reversed, so hand it the threads sorted oldest -> newest activity */
+ const orig=S.msgs;S.msgs=msgSorted();try{return pm()}finally{S.msgs=orig}}}
+setInterval(()=>{try{msgTouch()}catch(e){}},500);

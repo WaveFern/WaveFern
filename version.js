@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.9.0';
+const GAME_VERSION='v26.10.0';
 const VERSION_HISTORY=[
+ {v:'v26.10.0',n:'Messages: chats with the newest activity are now at the top. A new message or reply moves that chat to the top of the list.'},
  {v:'v26.9.0',n:'Days now last 3 minutes. Monthly listeners are now this month\'s streams divided by a random number (2-5) picked each month (a month is 30 days). The game remembers every day\'s monthly listeners, so the morning screen shows yesterday → today and the change (it no longer shows the same number twice).'},
  {v:'v26.8.2',n:'Fixed a black screen that could stay forever after going to sleep (from day 2 on). Waking up is now protected so a problem in one new-day step can never leave you stuck. If you were stuck, just reload the page.'},
  {v:'v26.8.1',n:'If you tell an artist they hit you up first ("you hit me up", "you dmed me first", "you should pay me"), chats from older versions switch to the artist paying you, and any fee you already paid in that chat is refunded. If you really messaged them first, they will say so and the fee stays.'},
