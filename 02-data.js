@@ -7,6 +7,9 @@ promo:{n:'Promo',d:'More listeners find you',lv:['No promo','Social posters','Pl
 const MEN=[[10,'Michael Jackson','Perfectionism and showmanship: rehearse until it feels effortless.'],[40,'Prince','Own your sound: learn every instrument in the room.'],[120,'Dolly Parton','Write honest songs. A plain story lands harder than a fancy one.'],[400,'Dr. Dre','Obsess over the mix. Details make the record.'],[1000,'Jimi Hendrix','Experiment fearlessly with tone and texture.']];
 const S={day:1,money:100,energy:100,t:0,artist:'',songs:[],drafts:[],gear:{chair:0,mic:0,guitar:0,promo:0},hist:[],followers:0,listeners:0,streams:0,earn:0,hype:{},nid:1,version:1};
 GEN.forEach(g=>S.hype[g]=1);S.apps={};S.inv={};S.ipos={};S.wp=10;Object.assign(S,{stam:100,appt:[],garage:0,cars:[],home:0,pets:[],guards:0,bling:0,interest:0,fans:0,msgs:[{id:0,from:'WaveFern Team',body:'Welcome! Upload songs to build your career. Collaboration invites will show up here once you get famous.',state:9}]});Object.assign(S.gear,{keys:0,drums:0,booth:0,decks:0});
+/* career pacing (v26.16.0: slower start). Was: base .8, interest +.22 per release, listener bonus sqrt/60,
+   old-song floor .03, viral 2% x2-5, $0.05 per stream, artist pays 60% of fee (min $15), collab boost 1.1 + up to .6 */
+const PACE={base:.3,interest:.06,lisBonus:200,floor:.015,viralP:.012,viralMin:1.5,viralMax:3,collabPay:.25,collabMin:8,featBase:1.05,featMax:.3},PAY_RATE=.03;
 const mentors=()=>MEN.filter(m=>S.listeners>=m[0]).length;
 const updateVersion=()=>S.version++;
 

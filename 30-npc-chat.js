@@ -94,7 +94,7 @@ const NPC_BLOCK=['nah, we are done. blocked.','ok that was uncalled for. i am ou
 const NPC_CLAR=['lol sorry, was that a yes or a no?','wait, so are you in or not?','ha, i cant tell if thats a yes. so... are we doing it?','hmm so is that a yes or nah?','say it straight for me, you in or you out?','i lost you for a sec, are we on or not?'];
 
 /* ===== 4. who pays: artist reaches out -> artist pays you; you reach out -> you pay them ===== */
-const payOut=(a,k)=>Math.max(15,Math.round(a[3]*.6*(k||1))),isIn=m=>m&&m.init=='a';
+const payOut=(a,k)=>Math.max(PACE.collabMin,Math.round(a[3]*PACE.collabPay*(k||1))),isIn=m=>m&&m.init=='a';
 const npcFixPay=(t,n)=>t.replace(/my fee is( still)? \$[\d,]+/,(_,s)=>'i will'+(s?' still':'')+' pay you $'+n).replace(/\$[\d,]+ for a session/,'i will pay you $'+n+' for a session').replace(/\s+/g,' ').trim();
 const RB_IN={terms:['love that. i will pay you ${pay} for one {g} session, and my name goes on the track. cool?','nice! ${pay} from me for one session, you get the feature. that work?','sick. i will send you ${pay} for the session. deal?'],
  pay:['i got ${pay} for you for one session, plus the feature.','${pay} from my side for the session. my budget is what it is.','so i pay you ${pay} and we split the song. fair?'],
