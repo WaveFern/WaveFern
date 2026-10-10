@@ -107,6 +107,8 @@ XNEW.ac[8]=(x,c)=>{const{h}=x;[-1,1].forEach(s=>{xt(h,.075,.014,c,s*.13,.04,.3);
 XNEW.ac[9]=(x,c)=>{const{g,w}=x,d=x.d+x.o*2;xb(g,w*.62,.06,d*.75,c,0,1.09,0);xb(g,.22,.22,.012,c,0,.99,d/2+.012,0,0,Math.PI/4);[[-.04,1.02],[.05,.98],[0,.92],[-.05,.95]].forEach(([px,py])=>xb(g,.025,.025,.014,'#f4f4f4',px,py,d/2+.016))};
 
 /* the wrapper: swap new styles for their base before the original builder runs, then draw the new parts */
+/* the plain shoe buildChar puts on each leg pivot (low shoe at y -.45, boot at -.36, both at z .05) */
+const xShoe=l=>l.children.find(m=>m.isMesh&&Math.abs(m.position.z-.05)<1e-6&&(Math.abs(m.position.y+.45)<1e-6||Math.abs(m.position.y+.36)<1e-6));
 const xHead=g=>g.children.find(o=>o.isGroup&&Math.abs(o.position.y-1.4)<1e-6&&o.position.x===0);
 {const bc0=buildChar;buildChar=function(c){
  const sv={top:c.top,jks:c.jks,bt:c.bt,ht:c.ht,ac:c.ac},T=c.top,J=c.jk>=0?c.jks:undefined,Bt=c.bt,Sh=c.shs,Ht=c.ht>=0?c.hts:undefined,Ac=c.ac;
@@ -116,7 +118,7 @@ const xHead=g=>g.children.find(o=>o.isGroup&&Math.abs(o.position.y-1.4)<1e-6&&o.
  if(!(nT||nJ||nB||nS||nH||nA))return r;
  try{const x={g:r.g,legs:r.legs,arms:r.arms,h:xHead(r.g),w:.42+c.body*.5,d:.3+c.body*.28,sk:SKIN[c.skin],c,jk:c.jk>=0,o:c.jk>=0?.045:0};
   if(nT)nT(x,c.tc_custom||TOPC[c.tc]||'#888888');if(nB)nB(x,c.pc_custom||PANTC[c.pc]||'#888888');if(nJ)nJ(x,JKC[c.jk]||'#888888');
-  if(nS){r.legs.forEach(l=>l.remove(l.children[l.children.length-1]));nS(x,(SHC[c.sh]||['#222222'])[0])}
+  if(nS){r.legs.forEach(l=>{const m=xShoe(l);if(m)l.remove(m)});nS(x,(SHC[c.sh]||['#222222'])[0])}
   if(nH&&x.h)nH(x,(HTC[c.ht]||['#888888'])[0]);if(nA)nA(x,c.acc||'#222222')}catch(e){console.warn('clothes',e)}
  return r}}
 
