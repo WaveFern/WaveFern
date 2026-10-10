@@ -83,15 +83,18 @@ function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S
  const cap=s.q*s.q*25*Math.pow(2.2,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round(v||0),cap));s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
 function addSt(s,k){if(k<=0)return;s.acc+=k;s.streams+=k;s.today=(s.today||0)+k;S.streams+=k}
 function streamTick(){if(mode=='sleep'||mode=='load'||mode=='creator')return;S.songs.forEach(s=>{const pv=planOf(s),f=s.p0>=.999?0:Math.max(0,Math.min(1,(prog(S.t)-s.p0)/(1-s.p0)));addSt(s,Math.floor(pv*f)-s.acc)})}
-function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class=fade></div>';setTimeout(()=>{
+function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class=fade></div>';setTimeout(()=>{try{wakeUp(auto)}catch(e){console.error('wake failed',e);if(mode=='sleep'){$('ui').innerHTML='';mode='play'}}},950)}
+/* the wake / new-day step; each side effect is guarded so one error never leaves the screen black */
+function wakeSafe(f,n){try{f()}catch(e){console.error('new-day step failed: '+n,e)}}
+function wakeUp(auto){
  const before=mentors(),old=S.listeners;S.songs.forEach(s=>addSt(s,planOf(s)-s.acc));
  let tot=0;S.songs.forEach(s=>{if(s.pd===S.day)tot+=s.today||0});tot=isFinite(tot)?tot:0;let e=0;
  if(S.paidDay!==S.day){S.paidDay=S.day;e=+(tot*.05).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn+=e;S.hist.push({d:S.day,st:tot,e})}
  const rel=S.songs.filter(x=>x.day==S.day).length;S.interest=Math.min(1,(S.interest||0)*.9+rel*.22);
- S.listeners=Math.round(S.hist.slice(-30).reduce((a,h)=>a+(h.st||0),0)/3);if(S.cheat)S.listeners=Math.max(S.listeners,1e9);if(!isFinite(S.money))S.money=0;S.followers+=Math.round(tot*.05);genMsgs();
- S.day++;S.t=0;S.energy=auto?70:100;S.eacc=0;GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));updateVersion();
+ S.listeners=Math.round(S.hist.slice(-30).reduce((a,h)=>a+(h.st||0),0)/3);if(S.cheat)S.listeners=Math.max(S.listeners,1e9);if(!isFinite(S.money))S.money=0;S.followers+=Math.round(tot*.05);wakeSafe(genMsgs,'messages');
+ S.day++;S.t=0;S.energy=auto?70:100;S.eacc=0;GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));wakeSafe(updateVersion,'version');
  const nm=mentors()>before?MEN[mentors()-1][1]:null;
- $('ui').innerHTML=`<div class="box modal" style="background:#0b0f0d"><h2>☀ Day ${S.day}</h2>${auto?'<p class=m>You passed out (energy only 70%).</p>':''}<p>Yesterday's results, paid now:</p><div class=cards><div class=card>Streams<b>+${tot.toLocaleString()}</b></div><div class=card>Earned<b>${$$(e)}</b></div><div class=card>Monthly listeners<b>${old} → ${S.listeners}</b></div><div class=card>Interest<b>${Math.round(S.interest*100)}%</b></div></div><p class=m><small>${rel?rel+' new release(s) boosted interest.':'No new releases: interest fades and old songs keep decaying.'} Streams build up through the day and faster at night.</small></p>${nm?`<p>🌟 New fictional mentor unlocked: <b>${nm}</b> (see Legends)</p>`:''}${!S.songs.length?'<p class=m>Upload a song to start earning!</p>':''}<button class=go onclick="closeUI()">Start the day</button></div>`},950)}
+ $('ui').innerHTML=`<div class="box modal" style="background:#0b0f0d"><h2>☀ Day ${S.day}</h2>${auto?'<p class=m>You passed out (energy only 70%).</p>':''}<p>Yesterday's results, paid now:</p><div class=cards><div class=card>Streams<b>+${tot.toLocaleString()}</b></div><div class=card>Earned<b>${$$(e)}</b></div><div class=card>Monthly listeners<b>${old} → ${S.listeners}</b></div><div class=card>Interest<b>${Math.round(S.interest*100)}%</b></div></div><p class=m><small>${rel?rel+' new release(s) boosted interest.':'No new releases: interest fades and old songs keep decaying.'} Streams build up through the day and faster at night.</small></p>${nm?`<p>🌟 New fictional mentor unlocked: <b>${nm}</b> (see Legends)</p>`:''}${!S.songs.length?'<p class=m>Upload a song to start earning!</p>':''}<button class=go onclick="closeUI()">Start the day</button></div>`}
 /* the clock keeps running while the computer is open; the taskbar clock follows it */
 {const u2=update;update=function(dt){if(mode=='pc'&&!PAUSED){S.t+=dt;if(S.t>=600){sleepNow(1);return}const tb=document.querySelector('#pc .tb>span:last-child'),tx='Day '+S.day+' · '+clk();if(tb&&tb.textContent!=tx)tb.textContent=tx}u2(dt);streamTick()}}
 

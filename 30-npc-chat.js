@@ -131,10 +131,10 @@ const RB_IN={terms:['love that. i will pay you ${pay} for one {g} session, and m
 {const nc0=newConv;newConv=function(i,q){if(BLKI&&BLKI.has(i))return;const n0=S.nid;nc0(i,q);S.msgs.forEach(m=>{if(m.id>=n0&&m.a!==undefined){m.init='a';m.pay=payOut(ART[m.a])}})}}
 {const fd0=firstDMs;firstDMs=function(){const n0=S.nid;fd0();S.msgs.forEach(m=>{if(m.id>=n0&&m.a!==undefined){m.init='a';m.pay=payOut(ART[m.a])}})}}
 {const sc0=startChat;startChat=function(i){sc0(i);const m=S.msgs[S.msgs.length-1];if(m&&m.a===i)m.init='p'}}
-{const g0=genMsgs;genMsgs=function(){const bl=S.msgs.filter(m=>m.blocked&&m.a!==undefined),snap=S.msgs.map(m=>[m,m.state,m.stage,m.log.length]);
+{const g0=genMsgs;genMsgs=function(){const bl=S.msgs.filter(m=>m.blocked&&m.a!==undefined),snap=S.msgs.filter(m=>m.a!==undefined&&Array.isArray(m.log)).map(m=>[m,m.state,m.stage,m.log.length]);
   bl.forEach(m=>{m.a0=m.a;m.a=undefined});BLKI=new Set(bl.map(m=>m.a0));
   try{g0()}finally{bl.forEach(m=>{m.a=m.a0;delete m.a0});BLKI=null}
-  snap.forEach(([m,st,sg,len])=>{if(m.a===undefined||m.blocked||m.log.length<=len)return;const a=ART[m.a],L=m.log[m.log.length-1];
+  snap.forEach(([m,st,sg,len])=>{if(m.a===undefined||m.blocked||!Array.isArray(m.log)||m.log.length<=len)return;const a=ART[m.a],L=m.log[m.log.length-1];
    if(st==3&&m.state==0&&m.stage==2){m.init='a';m.pay=payOut(a,1.2)}
    if(isIn(m)&&m.state==0&&m.stage>=1)L.t=npcFixPay(L.t,m.pay)})}}
 /* in-person meeting: option text uses the same parser (rude option = they walk out and block you) */
