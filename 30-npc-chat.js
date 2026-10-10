@@ -9,6 +9,8 @@ const NPC_LEX={
   emotive:'yay,yayy,woo,woohoo,wooo,whoop,whoop whoop,hurray,hooray,woot,woot woot,yippee,boom,boomin,hell yes,heck yes,fuck yeah,fucking right,fuck right,fucking a,fuck it lets go,fuck it,damn right,damn straight,hell right,oh hell yeah,oh yeah,oh yes,oh heck yes,omg yes,omg yeah,omg lets go,oh my god yes,ahh yes,aww yes,yes yes yes,yes yes,heck ya,hell ya,hell yea,hells yeah,hell yup,aw yeah,aww yeah,ah yeah,ahh yeah,mmm yeah,mm yeah,hmm yeah,hm yes,why not yeah,sure why not,sure ok,sure okay,sure thing fam,sure lets,okay sure,ok sure,ok yeah,ok yes,ok cool,ok bet,ok lets go,ok lets do it,okay lets do it,okay lets go,okay yeah,okay yes,okay deal,okay then lets go,not bad,not a bad idea,thats not bad,cant say no,cant wait,cant wait for it,i cant wait,i love that,love it,love that,love this idea,love the idea,great idea,good idea,nice idea,smart idea,solid idea,best idea,best idea ever,perfect idea,im excited,so excited,excited,hyped,im hyped,so hyped,stoked,im stoked,thrilled,pumped,im pumped,so pumped,keen,im keen,so keen,well keen,buzzing,im buzzing,eager,im eager,thumbs up,fire emoji',
   positive:'positive,positively,affirmative yes,all good,all good with me,all good lets go,no issue,no issues,no probs,no prob bob,not a problem,zero problems,happy to,im happy to,happy to do it,more than happy,glad to,id love to,i would love to,wanna,i wanna,i wanna do it,i want to,i want in,want in,im keen to,looking forward,looking forward to it,cant wait to,honoured,honored,it would be an honour,it would be an honor,be my guest,go for it man,go right ahead,carry on,proceed,lets proceed,please proceed,works,that works for me,that works great,works like a charm,works well,fits,fits me,suits me,suits me fine,right on time,perfect timing,great timing,good timing'
  },
+ /* "you hit me up first" style claims: player says the artist started the chat, so the artist pays */
+ claim:'you hit me up,you hmu,you dmed me,you dm me first,you messaged me,you messaged me first,you texted me,you texted me first,you reached out,you reached out first,you contacted me,you asked me,you asked me first,you came to me,you slid in my dms,you slid into my dms,you hit my line,you hit my phone,it was you who messaged,it was you who hit me up,you started this,you started it,you pay me,you should pay me,you owe me,you called me,you hit me first',
  no:{
   /* decisive refusals: these win over any yes-word in the same message */
   strong:'hell no,heck no,hell nah,hell naw,hard pass,hard no,big no,no way,no way jose,no chance,not a chance,absolutely not,definitely not,never,over my dead body,zero chance,fuck no,fucking no,nope,not on your life,not in a million years,not in this lifetime,not in your dreams,in your dreams,dream on,keep dreaming,as if,yeah right,yea right,fat chance,when pigs fly',
@@ -72,6 +74,14 @@ function npcIntent(text){const w=npcNorm(text),str=' '+w.join(' ')+' ',sq=w.map(
  if(hit.some(h=>h.k=='no'&&h.s))return{k:'no',why:'strong'};
  if(y&&!n)return{k:'yes'};if(n&&!y)return{k:'no'};
  return{k:hit[hit.length-1].k,why:'last'}}
+/* "you hit me up" claims: you/u/ya + optional filler words + a claim phrase */
+const NPC_CLAIM=[...npcSet(NPC_LEX.claim)].map(p=>npcNorm(p).slice(1).join(' '));
+function npcClaim(text){const w=npcNorm(text).map(x=>/^(u|ya|yu|yo|youu)$/.test(x)?'you':x),str=' '+w.join(' ')+' ';
+ if(/ (didnt|never|not|dont|i) (hit|dm|message|text|reach|contact)/.test(str)&&!/ you (didnt|never)/.test(str)&&!/ it was you /.test(str))return false;
+ if(/ it was you who /.test(str)||/ you were the one who /.test(str))return true;
+ return w.some((x,i)=>x=='you'&&!/^(can|could|will|would|do|did|if)$/.test(w[i-1]||'')&&[0,1,2].some(g=>{const r=' '+w.slice(i+1+g).join(' ')+' ';return NPC_CLAIM.some(c=>r.startsWith(' '+c+' '))&&!w.slice(i+1,i+1+g).some(z=>NPC_NEG.has(z)||z=='didnt')}))}
+const NPC_CLAIM_OK=['my bad, yeah i hit you up first. i got you, ${pay} on me','oh true, that was me lol. ok i pay you ${pay} for the session','ha fair, i slid in first. ${pay} from me then','yeah yeah, i reached out. my bad, ${pay} is on me'],
+ NPC_CLAIM_NO=['nah you hit ME up lol','lol no, you messaged me first. check the chat','haha nice try, you reached out to me','nope, that was all you. my fee stays the same'];
 /* option text from button dialogues goes through the same parser */
 const npcAbusive=t=>npcIntent(t).k=='abuse';
 
@@ -94,8 +104,15 @@ const RB_IN={terms:['love that. i will pay you ${pay} for one {g} session, and m
   if(m.a===undefined)return rp0(m,t);
   if(m.blocked){TY=0;return}
   const R=npcIntent(t);if(R.k=='abuse'){TY=0;npcBlock(m);return}
+  let claimed=0;
+  if(npcClaim(t)&&!m.recv&&m.state!=3){const a=ART[m.a];
+   if(m.init=='p'){m.log.push({f:'a',t:deco(a,pick(NPC_CLAIM_NO)),d:S.day})}
+   else{claimed=1;if(m.state==1&&m.paid){refundM(m);m.state=0;m.stage=2;m.ready=1}
+    if(m.init!='a'){m.init='a';m.pay=payOut(a);m.neg=0;if(m.stage==2&&m.state==0)m.ready=1}
+    const c=ctxOf(m);c.pay=m.pay;m.log.push({f:'a',t:deco(a,fill(pick(NPC_CLAIM_OK),c)),d:S.day});syncArt();updateVersion()}
+   m.unread=1;if(R.k!='yes'){TY=0;return}}
   const n=NZ(t),tg=IR.filter(r=>r[1].test(n)).map(r=>r[0]),has=x=>tg.includes(x),wait=(m.stage>=1&&m.state==0)||m.state==1||m.state==3;
-  if(m.state==3)m.init='p';
+  if(m.state==3&&!claimed)m.init='p';
   /* make sure plain-yes / plain-no style answers reach the old logic as yes / no */
   if(wait){if(R.k=='yes'&&(!has('yes')||has('no')))t='yes';else if(R.k=='no'&&(!has('no')||has('yes')))t='no'}
   /* unclear short answer to a pending question: ask again casually */
