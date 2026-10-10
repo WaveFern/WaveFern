@@ -67,7 +67,7 @@ collabDone=function(){const o=cs2.o,op=cs2.op||0,a=ART[o.i],m=S.msgs.find(x=>x.a
 /* ===== 2. recording, energy, footsteps ===== */
 /* energy refills slowly while the clock runs (about 36 per full day), never above 100 */
 const clockOn=()=>!PAUSED&&(mode=='play'||mode=='rec'||mode=='drive'||mode=='pc');
-function energyTick(dt){if(!clockOn()||S.energy>=100)return;S.eacc=(S.eacc||0)+dt*.06;if(S.eacc>=1){const k=Math.floor(S.eacc);S.eacc-=k;S.energy=Math.min(100,S.energy+k)}}
+function energyTick(dt){if(!clockOn()||S.energy>=100)return;S.eacc=(S.eacc||0)+dt*DAYK*.06;if(S.eacc>=1){const k=Math.floor(S.eacc);S.eacc-=k;S.energy=Math.min(100,S.energy+k)}}
 /* one footstep scheduler: steps follow actual movement, never overlap, and fade in so they do not pop */
 const STP={t:.2,last:0,px:0,pz:0};
 function stepSnd(run){if(!FX)return;try{ac();const t=AC.currentTime;if(t-STP.last<.18)return;STP.last=t;const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;f.type='lowpass';f.frequency.value=360+R(0,160);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(run?.3:.22,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.09);s.connect(f);f.connect(g);g.connect(MG);s.start(t,R(0,.5));s.stop(t+.12)}catch(e){}}
@@ -81,22 +81,27 @@ const prog=t=>{t=Math.max(0,Math.min(600,t));return t<300?t/900:(300+2*(t-300))/
 function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(2.2,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/60));
  let v=s.q*.8*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+.03)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<.02&&age<8)v*=R(2,5);
  const cap=s.q*s.q*25*Math.pow(2.2,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round(v||0),cap));s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
-function addSt(s,k){if(k<=0)return;s.acc+=k;s.streams+=k;s.today=(s.today||0)+k;S.streams+=k}
+/* monthly listeners: month = 30 in-game days; ML = this month's streams / random divisor 2-5 chosen each month */
+const DAYK=600/180;/* a full day (S.t 0..600) now lasts 180 real seconds */
+const curMonth=()=>Math.floor((S.day-1)/30);
+function mlInit(){if(!Array.isArray(S.mlHist))S.mlHist=[];if(S.mlMonth==null||!S.mlDiv){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);const m0=S.mlMonth*30+1;S.monthStreams=(S.hist||[]).filter(h=>h.d>=m0&&h.d<S.day).reduce((a,h)=>a+(h.st||0),0)+S.songs.reduce((a,x)=>a+(x.pd===S.day?x.today||0:0),0)}
+ if(S.mlMonth!==curMonth()){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);S.monthStreams=0}}
+function addSt(s,k){if(k<=0)return;mlInit();S.monthStreams=(S.monthStreams||0)+k;s.acc+=k;s.streams+=k;s.today=(s.today||0)+k;S.streams+=k}
 function streamTick(){if(mode=='sleep'||mode=='load'||mode=='creator')return;S.songs.forEach(s=>{const pv=planOf(s),f=s.p0>=.999?0:Math.max(0,Math.min(1,(prog(S.t)-s.p0)/(1-s.p0)));addSt(s,Math.floor(pv*f)-s.acc)})}
 function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class=fade></div>';setTimeout(()=>{try{wakeUp(auto)}catch(e){console.error('wake failed',e);if(mode=='sleep'){$('ui').innerHTML='';mode='play'}}},950)}
 /* the wake / new-day step; each side effect is guarded so one error never leaves the screen black */
 function wakeSafe(f,n){try{f()}catch(e){console.error('new-day step failed: '+n,e)}}
 function wakeUp(auto){
- const before=mentors(),old=S.listeners;S.songs.forEach(s=>addSt(s,planOf(s)-s.acc));
+ mlInit();const before=mentors(),ph=S.mlHist.filter(h=>h.day<S.day).pop(),old=ph?ph.ml:S.listeners;S.songs.forEach(s=>addSt(s,planOf(s)-s.acc));
  let tot=0;S.songs.forEach(s=>{if(s.pd===S.day)tot+=s.today||0});tot=isFinite(tot)?tot:0;let e=0;
  if(S.paidDay!==S.day){S.paidDay=S.day;e=+(tot*.05).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn+=e;S.hist.push({d:S.day,st:tot,e})}
  const rel=S.songs.filter(x=>x.day==S.day).length;S.interest=Math.min(1,(S.interest||0)*.9+rel*.22);
- S.listeners=Math.round(S.hist.slice(-30).reduce((a,h)=>a+(h.st||0),0)/3);if(S.cheat)S.listeners=Math.max(S.listeners,1e9);if(!isFinite(S.money))S.money=0;S.followers+=Math.round(tot*.05);wakeSafe(genMsgs,'messages');
- S.day++;S.t=0;S.energy=auto?70:100;S.eacc=0;GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));wakeSafe(updateVersion,'version');
+ S.listeners=Math.max(0,Math.floor((S.monthStreams||0)/S.mlDiv));if(S.cheat)S.listeners=Math.max(S.listeners,1e9);S.mlHist=S.mlHist.filter(h=>h.day!==S.day);S.mlHist.push({day:S.day,ml:S.listeners});if(S.mlHist.length>400)S.mlHist=S.mlHist.slice(-400);if(!isFinite(S.money))S.money=0;S.followers+=Math.round(tot*.05);wakeSafe(genMsgs,'messages');
+ S.day++;S.t=0;S.energy=auto?70:100;S.eacc=0;wakeSafe(mlInit,'month');GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));wakeSafe(updateVersion,'version');
  const nm=mentors()>before?MEN[mentors()-1][1]:null;
- $('ui').innerHTML=`<div class="box modal" style="background:#0b0f0d"><h2>☀ Day ${S.day}</h2>${auto?'<p class=m>You passed out (energy only 70%).</p>':''}<p>Yesterday's results, paid now:</p><div class=cards><div class=card>Streams<b>+${tot.toLocaleString()}</b></div><div class=card>Earned<b>${$$(e)}</b></div><div class=card>Monthly listeners<b>${old} → ${S.listeners}</b></div><div class=card>Interest<b>${Math.round(S.interest*100)}%</b></div></div><p class=m><small>${rel?rel+' new release(s) boosted interest.':'No new releases: interest fades and old songs keep decaying.'} Streams build up through the day and faster at night.</small></p>${nm?`<p>🌟 New fictional mentor unlocked: <b>${nm}</b> (see Legends)</p>`:''}${!S.songs.length?'<p class=m>Upload a song to start earning!</p>':''}<button class=go onclick="closeUI()">Start the day</button></div>`}
+ $('ui').innerHTML=`<div class="box modal" style="background:#0b0f0d"><h2>☀ Day ${S.day}</h2>${auto?'<p class=m>You passed out (energy only 70%).</p>':''}<p>Yesterday's results, paid now:</p><div class=cards><div class=card>Streams<b>+${tot.toLocaleString()}</b></div><div class=card>Earned<b>${$$(e)}</b></div><div class=card>Monthly listeners<b>${old.toLocaleString()} → ${S.listeners.toLocaleString()}</b><small>${S.listeners>old?'+'+(S.listeners-old).toLocaleString():S.listeners<old?'-'+(old-S.listeners).toLocaleString():'no change'}</small></div><div class=card>Interest<b>${Math.round(S.interest*100)}%</b></div></div><p class=m><small>${rel?rel+' new release(s) boosted interest.':'No new releases: interest fades and old songs keep decaying.'} Streams build up through the day and faster at night.</small></p>${nm?`<p>🌟 New fictional mentor unlocked: <b>${nm}</b> (see Legends)</p>`:''}${!S.songs.length?'<p class=m>Upload a song to start earning!</p>':''}<button class=go onclick="closeUI()">Start the day</button></div>`}
 /* the clock keeps running while the computer is open; the taskbar clock follows it */
-{const u2=update;update=function(dt){if(mode=='pc'&&!PAUSED){S.t+=dt;if(S.t>=600){sleepNow(1);return}const tb=document.querySelector('#pc .tb>span:last-child'),tx='Day '+S.day+' · '+clk();if(tb&&tb.textContent!=tx)tb.textContent=tx}u2(dt);streamTick()}}
+{const u2=update;update=function(dt){if(mode=='pc'&&!PAUSED){S.t+=dt*DAYK;if(S.t>=600){sleepNow(1);return}const tb=document.querySelector('#pc .tb>span:last-child'),tx='Day '+S.day+' · '+clk();if(tb&&tb.textContent!=tx)tb.textContent=tx}u2(dt);streamTick()}}
 
 /* ===== 5. messages dot, upload all, top songs ===== */
 /* red dot on the Messages desktop icon while any message is unread; kept in sync every frame */
