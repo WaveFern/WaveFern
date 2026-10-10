@@ -84,7 +84,9 @@ function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S
  let v=s.q*PACE.base*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+PACE.floor)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<PACE.viralP&&age<8)v*=R(PACE.viralMin,PACE.viralMax);
  const cap=s.q*s.q*25*Math.pow(FAME_MULT,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round(v||0),cap));s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
 /* monthly listeners: month = 30 in-game days; ML = this month's streams / random divisor 2-5 chosen each month */
-const DAYK=600/180;/* a full day (S.t 0..600) now lasts 180 real seconds */
+/* a full day (S.t 0..600) lasts 600 real seconds (10 minutes). One song (walk to the mic, Beat ~10s, Melody ~25s, Lyrics ~17s, Mix ~9s, walk to the laptop and upload ~20s) takes about 80s of clock time, so 7-8 songs fit in a day.
+   Energy refill (energyTick), the stream trickle (prog(S.t)) and the clock (clk) all run on S.t, so they stay the same per day. */
+const DAYK=600/600;
 const curMonth=()=>Math.floor((S.day-1)/30);
 function mlInit(){if(!Array.isArray(S.mlHist))S.mlHist=[];if(S.mlMonth==null||!S.mlDiv){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);const m0=S.mlMonth*30+1;S.monthStreams=(S.hist||[]).filter(h=>h.d>=m0&&h.d<S.day).reduce((a,h)=>a+(h.st||0),0)+S.songs.reduce((a,x)=>a+(x.pd===S.day?x.today||0:0),0)}
  if(S.mlMonth!==curMonth()){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);S.monthStreams=0}}
