@@ -78,9 +78,11 @@ function stepTick(dt,mv){const d=Math.hypot(P.x-STP.px,P.z-STP.pz);STP.px=P.x;ST
 /* ===== 3. streams through the day, paid once on waking ===== */
 /* each song gets a plan for the day (same formula as the old overnight roll); streams accrue towards it as the clock runs, twice as fast at night */
 const prog=t=>{t=Math.max(0,Math.min(600,t));return t<300?t/900:(300+2*(t-300))/900};
-function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(2.2,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/60));
+/* how much each fame tier multiplies a song's streams (was 2.2, which snowballed: tier 5 by day 30) */
+const FAME_MULT=1.5;
+function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/60));
  let v=s.q*.8*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+.03)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<.02&&age<8)v*=R(2,5);
- const cap=s.q*s.q*25*Math.pow(2.2,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round(v||0),cap));s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
+ const cap=s.q*s.q*25*Math.pow(FAME_MULT,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round(v||0),cap));s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
 /* monthly listeners: month = 30 in-game days; ML = this month's streams / random divisor 2-5 chosen each month */
 const DAYK=600/180;/* a full day (S.t 0..600) now lasts 180 real seconds */
 const curMonth=()=>Math.floor((S.day-1)/30);
