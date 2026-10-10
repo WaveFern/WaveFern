@@ -139,7 +139,7 @@ function cityDetail(){if(CTD.done)return;CTD.done=1;
  /* furniture keeps clear of lamps, doors, gates, parked cars and existing trees */
  const OB=[];for(const k in SBC)SBC[k].forEach(e=>{if(e.nw&&e[3]=='#3a3f47'&&e[1]>2)OB.push([e[4],e[6],1.5]);else if(e[1]>.43&&e[1]<.47&&e[0]>1.69&&e[0]<1.71)OB.push([e[4],e[6],1.6])});
  INT.forEach(q=>{if(outdoor(q.z))OB.push([q.x,q.z,2.4])});CTD.hfp.forEach(f=>OB.push([(f[0]+f[2])/2,f[3]+.6,1.4]));CT.forEach(c=>OB.push([(c.x0+c.x1)/2,c.z1+.5,2]));
- CTD.trees=CTD.tree.map(t=>[WX(t[0]),WZ(t[1])]);CTD.trees.forEach(t=>OB.push([t[0],t[1],1]));
+ (CTD.ob||[]).forEach(o=>OB.push(o));CTD.trees=CTD.tree.map(t=>[WX(t[0]),WZ(t[1])]);CTD.trees.forEach(t=>OB.push([t[0],t[1],1]));
  cdFurniture(RD,OB);sgnFlush();
  /* map areas (layout rectangles, warped) */
  const A=(x0,z0,x1,z1,c)=>CTD.areas.push([WX(x0),WZ(z0),WX(x1),WZ(z1),c]);
