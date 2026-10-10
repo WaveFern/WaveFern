@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.7.4';
+const GAME_VERSION='v26.7.5';
 const VERSION_HISTORY=[
+ {v:'v26.7.5',n:'The inside of the front (south) wall of the house now uses the same colour as the outside walls.'},
  {v:'v26.7.4',n:'Recording: each hit now speeds the bar up by 5% instead of 15%. You get 3 goes per recording and a miss uses one up; run out and the take is scrapped.'},
  {v:'v26.7.3',n:'Loading a save code now fully resets the game first, so nothing from the previous game carries over and missing fields fall back to defaults.'},
  {v:'v26.7.2',n:'The custom colour button in the colour pickers now shows a plus icon instead of a pencil.'},
