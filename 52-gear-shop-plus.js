@@ -55,7 +55,7 @@ const GXM={
  content:l=>{const a=[[.04,1.4,.04,'#222',0,.7,0],[.3,.04,.3,'#222',0,.02,0]];if(l>=1)a.push([.4,.4,.04,'*fff6e0',0,1.45,0]);if(l>=2)a.push([.2,.14,.12,'#111',.3,1.2,0],[.5,.5,.3,'*fff0d8',-.45,1.3,0]);if(l>=3)a.push([1.2,1.4,.04,'#2e8b57',0,.7,-.4]);return a}};
 {const gm2=gm;gm=(k,l)=>GXM[k]?GXM[k](l):gm2(k,l)}
 /* where the new gear goes in the studio: [x, z, rotation, collision box or null] */
-const GXP={phones:[9.45,.5,0,null],iface:[8.75,.55,0,null],monitors:[9.05,.35,0,null],pedals:[14.85,3.15,0,null],bass:[15.35,1.15,0,[15.1,.95,15.6,1.35]],sampler:[9.15,.72,0,null],vocal:[11.5,.75,0,[11.27,.55,11.73,.95]],synth:[8.95,5.2,0,[8.4,4.92,9.5,5.48]],treat:[15.75,.3,0,null],desk:[15.45,3.95,-Math.PI/2,[15.05,3.25,15.9,4.65]],content:[15.3,5.25,-Math.PI/4,[15.05,5,15.55,5.5]]};
+const GXP={phones:[9.45,.5,0,null],iface:[8.75,.55,0,null],monitors:[9.05,.35,0,null],pedals:[14.85,3.15,0,null],bass:[15.35,1.15,0,[15.1,.95,15.6,1.35]],sampler:[9.15,.72,0,null],vocal:[11.5,.75,0,[11.27,.55,11.73,.95]],synth:[8.95,5.2,0,[8.4,4.92,9.5,5.48]],treat:[15.75,.3,0,null],desk:[15.45,3.95,-Math.PI/2,[15.05,3.25,15.9,4.65]],content:[8.4,1.45,Math.PI/4,[8.12,1.2,8.68,1.7]]};
 const GTOP=['phones','iface','monitors','sampler'];/* these sit on the producer table under the window */
 {const bs0=buildStudio;buildStudio=function(){bs0();gfill();if(!studio)return;const g=studio,tbl=GTOP.some(k=>gl(k))||gl('desk')==1;
  if(tbl){B(g,1.4,.06,.7,'#6b4a2e',9.05,.75,.55);[[8.4,.25],[9.7,.25],[8.4,.85],[9.7,.85]].forEach(p=>B(g,.06,.72,.06,'#3a2a1a',p[0],.36,p[1]));dyn.push([8.35,.2,9.75,.9])}
@@ -67,5 +67,5 @@ const GTOP=['phones','iface','monitors','sampler'];/* these sit on the producer 
  if(gl('bass')&&near(15.2,1.6))a.push({x:15.2,z:1.6,r:1.2,l:'Play bass',a:()=>say(pick(['You lock into a groove with the kick drum.','A deep note rattles the window.','You slap a funky line and grin.']))});
  if(gl('synth')&&near(8.95,4.5))a.push({x:8.95,z:4.5,r:1.2,l:'Jam on the synth',a:()=>say(pick(['You twist the filter and the room goes all warm.','An arpeggio loops while you hum a hook.','You find a patch that sounds like the future.']))});
  if(gl('desk')>=2&&near(14.7,3.95))a.push({x:14.7,z:3.95,r:1.2,l:'Check the mix',a:()=>say(pick(['You nudge a fader. Perfect.','The meters dance in the green.','You solo the vocal. Clean.']))});
- if(gl('content')&&near(14.9,4.8))a.push({x:14.9,z:4.8,r:1.1,l:'Film a clip',a:()=>say(pick(['You film a quick studio clip for your fans.','The ring light makes everything look expensive.','One more take... got it.']))})}return a}}
+ if(gl('content')&&near(8.9,2.1))a.push({x:8.9,z:2.1,r:1.1,l:'Film a clip',a:()=>say(pick(['You film a quick studio clip for your fans.','The ring light makes everything look expensive.','One more take... got it.']))})}return a}}
 if(typeof studio!='undefined'&&studio)buildStudio();
