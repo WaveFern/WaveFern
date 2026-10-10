@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.11.0';
+const GAME_VERSION='v26.11.1';
 const VERSION_HISTORY=[
+ {v:'v26.11.1',n:'Fixed: the map, the minimap and the "CITY ... m" road signs measured the distance to the city centre from where it was before the roads got wider. They now use the city centre\'s real position.'},
  {v:'v26.11.0',n:'Roads are twice as wide (10 m instead of 5 m) and pavements are twice as wide on both sides. The whole town and city have been spread out to make room, so houses, shops, towers, trees, street lights, cars, walkers and the map all line up with the new streets. If you load a save and are stuck inside something, you are moved to the nearest free spot.'},
  {v:'v26.10.0',n:'Messages: chats with the newest activity are now at the top. A new message or reply moves that chat to the top of the list.'},
  {v:'v26.9.0',n:'Days now last 3 minutes. Monthly listeners are now this month\'s streams divided by a random number (2-5) picked each month (a month is 30 days). The game remembers every day\'s monthly listeners, so the morning screen shows yesterday → today and the change (it no longer shows the same number twice).'},
