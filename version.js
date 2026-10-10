@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.7.2';
+const GAME_VERSION='v26.7.3';
 const VERSION_HISTORY=[
+ {v:'v26.7.3',n:'Loading a save code now fully resets the game first, so nothing from the previous game carries over and missing fields fall back to defaults.'},
  {v:'v26.7.2',n:'The custom colour button in the colour pickers now shows a plus icon instead of a pencil.'},
  {v:'v26.7.1',n:'Renamed Fernwave Records, Spotifly and the .fw sites to WaveFern and .wf.'},
  {v:'v26.7.0',n:'The game now pauses automatically when you switch tabs or the window loses focus.'},
