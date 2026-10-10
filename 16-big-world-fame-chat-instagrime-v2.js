@@ -1,7 +1,7 @@
 /* ---------- BIG WORLD, fame, chat, instagrime v2 ---------- */
 const FT=[150,600,2500,9000,30000,90000,300000,1e6,5e6,25e6,1e8,1e9],fameVal=()=>S.listeners*(1+.08*(S.bling||0));
 /* fame levels from monthly listeners: level 1 is 1-10 listeners, each next level is about 5% wider (rounded), so thresholds always go up */
-const FLS=[0,1];function fameStart(n){while(FLS.length<=n){const k=FLS.length;FLS.push(FLS[k-1]+Math.round(10*Math.pow(1.05,k-2)))}return FLS[n]}
+const FLS=[0,1];function fameStart(n){while(FLS.length<=n){const k=FLS.length;FLS.push(FLS[k-1]+Math.round(10*Math.pow(1.1,k-2)))}return FLS[n]}
 let FLC=[-1,0],FTLc=null;function fameLevel(L){L=Math.floor(L===undefined?fameVal():L);if(!(L>=1))return 0;if(FLC[0]===L)return FLC[1];let n=1;while(fameStart(n+1)<=L)n++;FLC=[L,n];return n}
 /* the old reward tiers, now expressed as the fame level each one needs */
 const FTL=()=>FTLc||(FTLc=FT.map(t=>fameLevel(t))),fameTier=()=>{const lv=fameLevel();return FTL().filter(l=>lv>=l).length};
