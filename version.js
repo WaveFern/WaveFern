@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.12.0';
+const GAME_VERSION='v26.13.0';
 const VERSION_HISTORY=[
+ {v:'v26.13.0',n:'Haggle with artists in Messages using normal words: type a price ("$200", "2k", "1.5k", "two hundred"), "how about 150", "can you do 300", "meet me in the middle", "go lower", "too much" and so on. Artists counter in steps based on their personality and how well you get on. Each has a secret lowest fee (or highest pay) they will not go past. They turn down silly offers, give a final offer if you keep lowballing, and walk away if you push past it. Whoever was paying before still pays. The price you agree on is shown on the accept button and is charged or paid once.'},
  {v:'v26.12.0',n:'The world map (N) can now zoom from 0.5x to 4x: use the mouse wheel, pinch on a touch screen, the + and - buttons, or the + and - keys. Zooming goes toward your cursor (or the middle for the buttons), and you can drag the map to move around. Markers, names and your position stay in the right place at every zoom. The map remembers your zoom and opens centred on you.'},
  {v:'v26.11.1',n:'Fixed: the map, the minimap and the "CITY ... m" road signs measured the distance to the city centre from where it was before the roads got wider. They now use the city centre\'s real position.'},
  {v:'v26.11.0',n:'Roads are twice as wide (10 m instead of 5 m) and pavements are twice as wide on both sides. The whole town and city have been spread out to make room, so houses, shops, towers, trees, street lights, cars, walkers and the map all line up with the new streets. If you load a save and are stuck inside something, you are moved to the nearest free spot.'},
