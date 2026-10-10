@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.8.0';
+const GAME_VERSION='v26.8.1';
 const VERSION_HISTORY=[
+ {v:'v26.8.1',n:'If you tell an artist they hit you up first ("you hit me up", "you dmed me first", "you should pay me"), chats from older versions switch to the artist paying you, and any fee you already paid in that chat is refunded. If you really messaged them first, they will say so and the fee stays.'},
  {v:'v26.8.0',n:'Artists understand your messages much better: hundreds of new slang words, abbreviations, emoji and music-industry phrases for yes and no, plus swearing at an artist (f off, shut up, insults) makes them block you, while "f--- yeah" still means yes. Artists now chat more casually. If an artist messages you first and you agree, they pay you; if you message them, you pay their fee.'},
  {v:'v26.7.5',n:'The inside of the front (south) wall of the house now uses the same colour as the outside walls.'},
  {v:'v26.7.4',n:'Recording: each hit now speeds the bar up by 5% instead of 15%. You get 3 goes per recording and a miss uses one up; run out and the take is scrapped.'},
