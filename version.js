@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.18.0';
+const GAME_VERSION='v26.19.0';
 const VERSION_HISTORY=[
+ {v:'v26.19.0',n:'Messages has its own look: a coral-to-violet header with its own logo, a dark plum chat list, a warm cream chat with round speech bubbles (white for them, a pink-to-violet gradient for you), rounded-square profile pictures with a colourful ring, a pill-shaped message box and Send button, and a matching window title bar. Everything works the same as before.'},
  {v:'v26.18.0',n:'Polly Parrot now flies instead of walking. It hovers at about head height, bobs up and down, flaps its wings and follows you through the air, tilting forward as it speeds up. At home it flies around and only folds its wings when it settles on a perch, cat tree, bed or bowl. Parrots out with people in the city fly next to them too.'},
  {v:'v26.17.0',n:'Days are longer: a full day now lasts 10 minutes instead of 3, so you can record about 7-8 songs in one day (one song, with all four steps and uploading it, takes a bit over a minute). Daytime and night are both 5 minutes. Energy still refills by the same amount per day, and streams still build up over the whole day, so daily earnings are unchanged.'},
  {v:'v26.16.0',n:'An even slower career, mostly at the start. Each song gets fewer streams (about 40% of before), new releases raise interest more slowly, the monthly-listener stream bonus grows more slowly, old songs fade out more, and viral spikes are rarer (1.2% instead of 2%) and smaller (1.5-3x instead of 2-5x). Streams pay about $0.03 each instead of $0.05. Artists who message you first now pay 25% of their fee (at least $8) instead of 60%, and collab songs get a smaller stream boost. Reaching the same fame levels, monthly listeners and money now takes about 2-3 times as many days. Your first song still gets a few streams and a little money. Saves are unchanged.'},
