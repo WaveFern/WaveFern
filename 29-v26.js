@@ -57,7 +57,7 @@ function meetPick(i){const M=MEET;if(!M||M.k>=M.n)return;const t=M.opts[i][0],p=
 function meetRec(){const M=MEET;if(!M)return;if(S.energy<COLLAB_E){snd('err');return say('Too tired to record, even a collab. Rest and come back.')}S.energy=Math.max(0,+(S.energy-COLLAB_E).toFixed(1));updateVersion();$('ui').innerHTML='';const o=M.o;mode='cut';cs2={o,t:0,op:M.op};P.x=o.x-1.4;P.z=o.z;P.rot=Math.PI/2;MEET=null;say('Recording with '+o.name+' (fictional)')}
 collabDone=function(){const o=cs2.o,op=cs2.op||0,a=ART[o.i],m=S.msgs.find(x=>x.a===o.i);if(o.m.parent)o.m.parent.remove(o.m);if(m){m.state=3;m.doneDay=S.day;m.ready=0;m.paid=0;m.log.push({f:'a',t:deco(a,op>=1?'that session was great, thanks again!':op<=-1?'well, we got a track out of it.':'good session, thanks.'),d:S.day})}ART_M=ART_M.filter(x=>x!==o);
  const q=Math.max(5,Math.round(R(30,40)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.home||0)*3)+Math.min(25,6+Math.round(a[3]/60))+op*4),
- d={id:S.nid++,title:featT(pick(A)+' '+pick(Bn),a[0]),g:a[1],q,ft:a[0],fm:+((1.1+Math.min(.6,a[3]/6000))*(1+op*.12)).toFixed(2),op,role:pick(['Featured verse','Co-writer and hook','Producer and beats','Backing vocals'])};
+ d={id:S.nid++,title:featT(pick(A)+' '+pick(Bn),a[0]),g:a[1],q,ft:a[0],fm:+((PACE.featBase+Math.min(PACE.featMax,a[3]/6000))*(1+op*.12)).toFixed(2),op,role:pick(['Featured verse','Co-writer and hook','Producer and beats','Backing vocals'])};
  S.drafts.push(d);updateVersion();cs2=null;snd('chime');nameModal(d,`<p style="color:var(--g)">Collab with ${esc(a[0])} done. Chemistry: <b>${opLbl(op)}</b>${op>0?' (better quality, more streams)':op<0?' (lower quality, fewer streams)':''}. Fictional in-game event with a stand-in character.</p>`)};
 {const st=document.createElement('style');st.textContent='.pfw{position:relative;display:inline-block;flex-shrink:0;line-height:0}.cdot{position:absolute;top:0;right:0;width:11px;height:11px;border-radius:50%;border:2px solid #0d1411;box-sizing:border-box}.cdot.r{background:#ff3b5c}.cdot.b{background:#3b82f6}.cfm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#16201b;border-top:1px solid #1a2520}.cfm span{flex:1}.mtg{width:min(480px,94vw)}.mth{display:flex;gap:12px;align-items:center}.mth img{width:56px;height:56px;border-radius:50%;image-rendering:pixelated;background:#2a4a38}.mtl{font-size:15px;margin:12px 0}.mto{display:block;width:100%;text-align:left;margin:6px 0}';document.head.appendChild(st)}
 
@@ -80,8 +80,8 @@ function stepTick(dt,mv){const d=Math.hypot(P.x-STP.px,P.z-STP.pz);STP.px=P.x;ST
 const prog=t=>{t=Math.max(0,Math.min(600,t));return t<300?t/900:(300+2*(t-300))/900};
 /* how much each fame tier multiplies a song's streams (was 2.2, which snowballed: tier 5 by day 30) */
 const FAME_MULT=1.5;
-function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/60));
- let v=s.q*.8*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+.03)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<.02&&age<8)v*=R(2,5);
+function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/PACE.lisBonus));
+ let v=s.q*PACE.base*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+PACE.floor)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<PACE.viralP&&age<8)v*=R(PACE.viralMin,PACE.viralMax);
  const cap=s.q*s.q*25*Math.pow(FAME_MULT,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round(v||0),cap));s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
 /* monthly listeners: month = 30 in-game days; ML = this month's streams / random divisor 2-5 chosen each month */
 const DAYK=600/180;/* a full day (S.t 0..600) now lasts 180 real seconds */
@@ -96,8 +96,8 @@ function wakeSafe(f,n){try{f()}catch(e){console.error('new-day step failed: '+n,
 function wakeUp(auto){
  mlInit();const before=mentors(),ph=S.mlHist.filter(h=>h.day<S.day).pop(),old=ph?ph.ml:S.listeners;S.songs.forEach(s=>addSt(s,planOf(s)-s.acc));
  let tot=0;S.songs.forEach(s=>{if(s.pd===S.day)tot+=s.today||0});tot=isFinite(tot)?tot:0;let e=0;
- if(S.paidDay!==S.day){S.paidDay=S.day;e=+(tot*.05).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn+=e;S.hist.push({d:S.day,st:tot,e})}
- const rel=S.songs.filter(x=>x.day==S.day).length;S.interest=Math.min(1,(S.interest||0)*.9+rel*.22);
+ if(S.paidDay!==S.day){S.paidDay=S.day;e=+(tot*PAY_RATE).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn+=e;S.hist.push({d:S.day,st:tot,e})}
+ const rel=S.songs.filter(x=>x.day==S.day).length;S.interest=Math.min(1,(S.interest||0)*.9+rel*PACE.interest);
  S.listeners=Math.max(0,Math.floor((S.monthStreams||0)/S.mlDiv));if(S.cheat)S.listeners=Math.max(S.listeners,1e9);S.mlHist=S.mlHist.filter(h=>h.day!==S.day);S.mlHist.push({day:S.day,ml:S.listeners});if(S.mlHist.length>400)S.mlHist=S.mlHist.slice(-400);if(!isFinite(S.money))S.money=0;S.followers+=Math.round(tot*.05);wakeSafe(genMsgs,'messages');
  S.day++;S.t=0;S.energy=auto?70:100;S.eacc=0;wakeSafe(mlInit,'month');GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));wakeSafe(updateVersion,'version');
  const nm=mentors()>before?MEN[mentors()-1][1]:null;
