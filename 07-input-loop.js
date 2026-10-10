@@ -4,7 +4,7 @@ addEventListener('keydown',e=>{const k=e.key.toLowerCase();
  if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(k=='m'){if(VOL){LAST=VOL;VOL=0}else VOL=LAST||.5;sv()}keys[k]=1;if(k.startsWith('arrow')||k==' ')e.preventDefault();if(k=='f')buildMode();if(k=='n')bigMap();if(k=='r'&&mode=='build')gp.r=(gp.r+1)%4;
  if(mode=='rec'&&(k=='e'||k==' '||k=='enter'))recHit();if(mode=='drive'&&k=='e')exitDrive();if(mode=='play'&&(k=='e'||k==' '||k=='enter')&&near){snd('pop');near.a()}});
 addEventListener('keyup',e=>delete keys[e.key.toLowerCase()]);addEventListener('blur',()=>{for(const k in keys)delete keys[k]});
-function hit(x,z,r){if(IN?(x<IN.x+.4||x>IN.x+(IN.w||10)-.4||z<320.4||z>320+(IN.d||8)-.4):(x<-130||x>690||z<-150||z>130))return 1;return wc.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||dyn.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||PL.some(q=>{if(F[q.t].f)return 0;const c=fb(q.t,q.x,q.z,q.r);return x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3]})}
+function hit(x,z,r){if(IN?(x<IN.x+.4||x>IN.x+(IN.w||10)-.4||z<320.4||z>320+(IN.d||8)-.4):(x<WB[0]||x>WB[1]||z<WB[2]||z>WB[3]))return 1;return wc.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||dyn.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])||PL.some(q=>{if(F[q.t].f)return 0;const c=fb(q.t,q.x,q.z,q.r);return x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3]})}
 let hc='',last=performance.now(),tt=0;const cD=new THREE.Color(0xfff2e0),cN=new THREE.Color(0x5f74c8);
 function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
  if(play){S.t+=dt*(typeof DAYK!='undefined'?DAYK:1);if(S.t>=600)return sleepNow(1)}
