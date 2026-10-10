@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.13.0';
+const GAME_VERSION='v26.14.0';
 const VERSION_HISTORY=[
+ {v:'v26.14.0',n:'Recording a song is now four short minigames instead of one timing bar. 1. Beat: the old bar, now 6 hits. 2. Melody: watch four coloured pads light up with notes, then play the pattern back (keys 1-4 or tap); three patterns of 3, 4 and 5 notes. 3. Lyrics: pick the word that rhymes before the timer runs out (keys 1-3 or tap); four lines. 4. Mix: hold Space or hold click to raise the level and let go to drop it, keeping it inside a moving green band for 6 seconds. How well you do in Melody, Lyrics and Mix now makes up most of the song\'s mix quality instead of a random roll, and the results screen shows your score for each step.'},
  {v:'v26.13.0',n:'Haggle with artists in Messages using normal words: type a price ("$200", "2k", "1.5k", "two hundred"), "how about 150", "can you do 300", "meet me in the middle", "go lower", "too much" and so on. Artists counter in steps based on their personality and how well you get on. Each has a secret lowest fee (or highest pay) they will not go past. They turn down silly offers, give a final offer if you keep lowballing, and walk away if you push past it. Whoever was paying before still pays. The price you agree on is shown on the accept button and is charged or paid once.'},
  {v:'v26.12.0',n:'The world map (N) can now zoom from 0.5x to 4x: use the mouse wheel, pinch on a touch screen, the + and - buttons, or the + and - keys. Zooming goes toward your cursor (or the middle for the buttons), and you can drag the map to move around. Markers, names and your position stay in the right place at every zoom. The map remembers your zoom and opens centred on you.'},
  {v:'v26.11.1',n:'Fixed: the map, the minimap and the "CITY ... m" road signs measured the distance to the city centre from where it was before the roads got wider. They now use the city centre\'s real position.'},
