@@ -11,10 +11,8 @@ function mapZoomAt(f,cx,cy){const M=MAPZ,z=Math.min(M.max,Math.max(M.min,M.z*f))
 function mapCentre(x,z){const M=MAPZ;M.ox=M.W/2-mapSX(x)*M.z;M.oy=M.H/2-mapSZ(z)*M.z;mapClamp()}
 function mapDraw(){const c=$('bm');if(!c)return;const x=c.getContext('2d'),M=MAPZ,k=M.z,sx=v=>mapSX(v)*k+M.ox,sz=v=>mapSZ(v)*k+M.oy,kx=.86*k,kz=1.15*k;
  x.setTransform(1,0,0,1,0,0);x.fillStyle='#1d3a21';x.fillRect(0,0,M.W,M.H);x.fillStyle='#3f7a45';x.fillRect(M.ox,M.oy,M.W*k,M.H*k);
- x.fillStyle='#4aa3df';x.fillRect(sx(LK[0]),sz(LK[1]),(LK[2]-LK[0])*kx,(LK[3]-LK[1])*kz);
- x.fillStyle='#3a3d44';ROADS.forEach(r=>x.fillRect(sx(r[0]),sz(r[1]),Math.max(2,(r[2]-r[0])*kx),Math.max(2,(r[3]-r[1])*kz)));
- x.fillStyle='#d9b88f';const hs=Math.min(4,2*Math.max(1,k));HP.forEach(h=>x.fillRect(sx(h[0])-hs/2,sz(h[1])-hs/2,hs,hs));
- x.fillStyle='#8fa6b8';BLD.forEach(b=>x.fillRect(sx(b[0]),sz(b[1]),(b[2]-b[0])*kx,(b[3]-b[1])*kz));
+ /* parks, water, fields, pavements, roads, centre lines, footprints, trees and road names (38-city-detail.js) */
+ mapPaint(x,sx,sz,kx,kz,false);
  x.font='10px monospace';POIS.forEach(p=>{const X=sx(p[0]),Z=sz(p[1]);if(X<-80||X>M.W+10||Z<-10||Z>M.H+10)return;x.fillStyle=p[3];x.fillRect(X-3,Z-3,6,6);x.fillStyle='#fff';x.fillText(p[2],X+5,Z+3)});
  const PX=sx(P.x),PZ=sz(P.z);x.fillStyle='#fff';x.fillRect(PX-4,PZ-4,8,8);x.strokeStyle='#000';x.strokeRect(PX-4,PZ-4,8,8);
  const zl=$('bmz');if(zl)zl.textContent=(Math.round(k*10)/10)+'x';c.style.cursor=k>1?'grab':'default'}
