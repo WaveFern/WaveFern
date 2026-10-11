@@ -1,4 +1,4 @@
-/* ===== v26.36.0: Park Fields Festival =====
+/* ===== v26.38.0: Park Fields Festival =====
    James's idea: every fortnight a Reading-style festival opens on the field east (right) of Park Avenue.
    - schedule: the festival is on every day that is a multiple of 14 (day 14, 28, ...). The day before, a crew builds it
      (fences going up, half-built stage frames, trucks, cones, workers); the day after, a crew takes it down again.
