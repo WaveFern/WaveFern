@@ -1,6 +1,6 @@
-/* ===== v26.38.0: Park Fields Festival =====
-   James's idea: every fortnight a Reading-style festival opens on the field east (right) of Park Avenue.
-   - schedule: the festival is on every day that is a multiple of 14 (day 14, 28, ...). The day before, a crew builds it
+/* ===== v26.38.0: Park Fields Festival (every 7 days since v26.38.1) =====
+   James's idea: every week (FEST_EVERY days, was every fortnight in v26.38.0) a Reading-style festival opens on the field east (right) of Park Avenue.
+   - schedule: the festival is on every day that is a multiple of FEST_EVERY = 7 (day 7, 14, 21, ...). The day before, a crew builds it
      (fences going up, half-built stage frames, trucks, cones, workers); the day after, a crew takes it down again.
    - the ground (x 216-406, z -122..-4) is about the size of Central Park. Its wild trees are cleared once at boot (before
      the static city boxes are merged); everything else is built only when it is needed, in its own groups, so the field is
@@ -45,11 +45,12 @@ const FGREET={burger:'"Two patties, extra cheese, festival prices. Sorry!"',crep
 const FACTS=['Neon Ferns','Paper Satellites','Velvet Static','Kid Comet','Glass Harbour','Midnight Arcade','Sundown Riot','Honey Static','Polar Youth','Static Bloom','The Night Drives','Lowkey Lights','Saturn Kids','Mint Condition','Wild Signal','Dream Machine','Echo Valley','Coral Coast','Rooftop Radio','The Hollow Hours'];
 
 /* ---- schedule ---- */
-const festPhaseOf=d=>d>0&&d%14==0?'fest':d%14==13?'build':d>14&&d%14==1?'down':null;
-const festNext=d=>Math.ceil((d+(festPhaseOf(d)=='fest'?0:1))/14)*14;
+const FEST_EVERY=7;/* a festival every 7 days (v26.38.1; was 14) */
+const festPhaseOf=d=>d>0&&d%FEST_EVERY==0?'fest':d%FEST_EVERY==FEST_EVERY-1?'build':d>FEST_EVERY&&d%FEST_EVERY==1?'down':null;
+const festNext=d=>Math.ceil((d+(festPhaseOf(d)=='fest'?0:1))/FEST_EVERY)*FEST_EVERY;
 const festPhase=()=>festPhaseOf(S.day);
 /* festival progress for the current (or just finished) festival, saved with the game; old saves just start without it */
-function festS(){const k=Math.round(S.day/14);if(!S.fest||S.fest.k!==k||typeof S.fest.p!='object')S.fest={k,p:{}};return S.fest}
+function festS(){const k=Math.round(S.day/FEST_EVERY);if(!S.fest||S.fest.k!==k||typeof S.fest.p!='object')S.fest={k,p:{}};return S.fest}
 const festLv=()=>{try{return fameLevel()}catch(e){return 0}};
 /* the crowd that turns up for you: grows 5.5% per fame level above the stage's requirement, up to the stage's capacity */
 function festC0(st,song){const lv=festLv(),q=song?song.q||0:0;let c=Math.min(st.cap,st.base*Math.pow(1.055,Math.max(0,lv-st.req)));c*=.9+Math.min(.2,q/400);if(song&&song.ft)c*=1.15;return Math.max(20,Math.round(c))}
@@ -155,7 +156,7 @@ function festBuildFest(){const grp=fGroup('fest'),G=fAll(),Gl=fAll(),{X0,X1,Z0,Z
  /* the gate: two towers and a sign on both sides */
  [GZ-4.9,GZ+4.9].forEach(z=>{fBox(G,1,6,1,'#2b2b33',X0,3,z,0,'#ff6ad5');for(let y=.8;y<6;y+=1.2)fBox(G,1.02,.12,1.02,'#ff6ad5',X0,y,z)});fBox(G,.8,1.6,10.8,'#2b2b33',X0,5.6,GZ);
  FEST.colsF.push([X0-.6,GZ-5.4,X0+.6,GZ-4.4],[X0-.6,GZ+4.4,X0+.6,GZ+5.4]);
- const gt=fSignTex('PARK FIELDS FESTIVAL','4 stages · food · bar · every 14 days','#2b1240','#ffe066',768,160);fPlane(gt,9.6,2,X0-.42,5.6,GZ,-Math.PI/2,grp);fPlane(gt,9.6,2,X0+.42,5.6,GZ,Math.PI/2,grp);
+ const gt=fSignTex('PARK FIELDS FESTIVAL','4 stages · food · bar · every '+FEST_EVERY+' days','#2b1240','#ffe066',768,160);fPlane(gt,9.6,2,X0-.42,5.6,GZ,-Math.PI/2,grp);fPlane(gt,9.6,2,X0+.42,5.6,GZ,Math.PI/2,grp);
  /* info board just inside the gate */
  fBox(G,4.2,2.6,.2,'#2b2b33',220.5,2.1,GZ-6.2);fBox(G,.15,1.2,.15,'#2b2b33',219,.6,GZ-6.2);fBox(G,.15,1.2,.15,'#2b2b33',222,.6,GZ-6.2);FEST.colsF.push([218.3,GZ-6.5,222.7,GZ-5.9]);
  FEST.board=fTex(512,320,()=>{});festBoardDraw();fPlane(FEST.board,4,2.5,220.5,2.1,GZ-6.08,0,grp);
