@@ -121,11 +121,11 @@ const xSlotCol=(c,sl)=>sl=='top'?c.tc_custom||TOPC[c.tc]||'#888888':sl=='jk'?JKC
 /* ---- previews: the shop's flat drawing and the wardrobe's 3D model learn to show prints ---- */
 {const clb2=clb;clb=function(k){const L=clb2(k),[id,col]=String(k).split('|'),g=GM[id],sp=g&&XPD[g.n];if(!sp||!Array.isArray(L))return L;const c=col||g.dc;
  let o=sp.drop?L.filter(a=>!sp.drop(a,c)):L.slice();if(sp.k=='top'||sp.k=='jk')xpPrev(o,sp.k,sp,c);if(sp.pv)o=o.concat(sp.pv(c));return o}}
-/* the flat iso drawing with textured faces (a box's 8th entry: {p: print, col, v, f: 'z' front | 'x' side | 'all'}; colour 'none' draws only the print) */
+/* the flat iso drawing with textured faces (a box's 8th entry: {p: print, col, v, f: 'z' front | 'x' side | 'top' | 'all'}; colour 'none' draws only the print) */
 function xIso(L,sz){const P=(X,Y,Z)=>[(X-Z)*.866,(X+Z)*.5-Y],polys=[];
  L.forEach(a=>{let[w,h,d,c,x,y,z,T]=a;const none=c=='none';c=String(c||'#888').replace(/^[*!~^]/,'');if(c[0]!='#')c='#888888';const x0=x-w/2,x1=x+w/2,y0=y-h/2,y1=y+h/2,z0=z-d/2,z1=z+d/2,k=(x+z)*.5+y*.7+(w+d)*.02,f=T&&(T.f||'z');
   const tex=T&&xpTex(T.p,T.col,T.v).image;
-  if(!none)polys.push({k,c:xlt(c,.14),tx:f=='all'&&tex,sh:1,p:[P(x0,y1,z0),P(x1,y1,z0),P(x1,y1,z1),P(x0,y1,z1)],q:[P(x0,y1,z0),P(x1,y1,z0),P(x0,y1,z1)]});
+  if(!none||f=='top')polys.push({k,c:none?null:xlt(c,.14),tx:(f=='all'||f=='top')&&tex,sh:1,p:[P(x0,y1,z0),P(x1,y1,z0),P(x1,y1,z1),P(x0,y1,z1)],q:[P(x0,y1,z0),P(x1,y1,z0),P(x0,y1,z1)]});
   if(!none||f=='x')polys.push({k:k+.001,c:none?null:dk(c,.82),tx:(f=='x'||f=='all')&&tex,sh:.9,p:[P(x1,y1,z1),P(x1,y1,z0),P(x1,y0,z0),P(x1,y0,z1)],q:[P(x1,y1,z1),P(x1,y1,z0),P(x1,y0,z1)]});
   if(!none||f=='z')polys.push({k:k+.002,c:none?null:dk(c,.64),tx:(f=='z'||f=='all')&&tex,sh:f=='all'?.68:.8,p:[P(x0,y1,z1),P(x1,y1,z1),P(x1,y0,z1),P(x0,y0,z1)],q:[P(x0,y1,z1),P(x1,y1,z1),P(x0,y0,z1)]})});
  let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;polys.forEach(o=>o.p.forEach(v=>{mnx=Math.min(mnx,v[0]);mxx=Math.max(mxx,v[0]);mny=Math.min(mny,v[1]);mxy=Math.max(mxy,v[1])}));
@@ -140,5 +140,5 @@ function xIso(L,sz){const P=(X,Y,Z)=>[(X-Z)*.866,(X+Z)*.5-Y],polys=[];
  if(!L||!L.some(a=>a[7]))return iso0(t,key,sz);let url='';try{url=xIso(L,sz)}catch(e){console.warn('preview',e);return iso0(t,key,sz)}return ISOC[ck]=`<img src="${url}" style="width:${sz}px;height:${sz}px;display:block;margin:0 auto">`}}
 {const pm1=pvModel;pvModel=function(k){if(PVM[k])return PVM[k];const p=String(k).split(':');if(p[0]!='k')return pm1(k);let L;try{L=clb(p.slice(1).join(':'))}catch(e){L=null}if(!L||!L.some(a=>a[7]))return pm1(k);
  const w=new THREE.Group(),g=new THREE.Group();L.forEach(a=>{const[bw,bh,bd,c,x,y,z,T]=a;let m=null;if(c!='none')m=B(g,bw,bh,bd,c,x,y,z);if(!T)return;const f=T.f||'z';
-  if(f=='all'){if(m)m.material=xpSkinMat(T.p,T.col,T.v)}else if(f=='x')xprint(g,T.p,T.col,bd,bh,x+bw/2+.004,y,z,Math.PI/2,T.v);else xprint(g,T.p,T.col,bw,bh,x,y,z+bd/2+.004,0,T.v)});
+  if(f=='all'){if(m)m.material=xpSkinMat(T.p,T.col,T.v)}else if(f=='x')xprint(g,T.p,T.col,bd,bh,x+bw/2+.004,y,z,Math.PI/2,T.v);else if(f=='top')xprint(g,T.p,T.col,bw,bd,x,y+bh/2+.004,z,0,T.v,-Math.PI/2);else xprint(g,T.p,T.col,bw,bh,x,y,z+bd/2+.004,0,T.v)});
  const bb=new THREE.Box3().setFromObject(g),c=bb.getCenter(new THREE.Vector3()),z=bb.getSize(new THREE.Vector3());g.position.sub(c);w.add(g);w.scale.setScalar(1.6/Math.max(z.x,z.y,z.z));return PVM[k]=w}}
