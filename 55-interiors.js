@@ -15,7 +15,7 @@ const IXM={l:null,b:null};
 const ixMat=e=>e?(IXM.b||(IXM.b=new THREE.MeshBasicMaterial({vertexColors:true}))):(IXM.l||(IXM.l=new THREE.MeshLambertMaterial({vertexColors:true})));
 
 /* ---- pixel textures: one 64 px tile = 2 m of floor or 1 m of wall ---- */
-function ixShade(c,f){const k=new THREE.Color(c).multiplyScalar(f);return'#'+k.getHexString()}
+function ixShade(c,f){const k=new THREE.Color(c).multiplyScalar(f);k.r=Math.min(1,k.r);k.g=Math.min(1,k.g);k.b=Math.min(1,k.b);return'#'+k.getHexString()}
 function ixTex(kind,a,b,rx,ry){const cv=document.createElement('canvas');cv.width=cv.height=64;const x=cv.getContext('2d'),r=mb(hs(kind+a+b)),F=(c,X,Y,W,H)=>{x.fillStyle=c;x.fillRect(X,Y,W,H)};F(a,0,0,64,64);
  if(kind=='plank'){for(let row=0;row<4;row++){const y=row*16;let s=-(row*23%40);while(s<64){const L=24+Math.floor(r()*24),c=r()<.5?a:ixShade(a,.9+r()*.16);F(c,s,y,L,16);for(let k=0;k<3;k++)F(ixShade(c,.86),s+2+Math.floor(r()*(L-6)),y+3+Math.floor(r()*10),4+Math.floor(r()*6),1);F(b,s,y,1,16);s+=L}F(b,0,y+15,64,1)}}
  else if(kind=='tile'){for(let i=0;i<2;i++)for(let j=0;j<2;j++)F((i+j)%2?a:b,i*32,j*32,32,32);x.globalAlpha=.25;for(let k=0;k<20;k++)F('#fff',Math.floor(r()*64),Math.floor(r()*64),1,1);x.globalAlpha=1;F(ixShade(b,.8),0,0,64,1);F(ixShade(b,.8),0,32,64,1);F(ixShade(b,.8),0,0,1,64);F(ixShade(b,.8),32,0,1,64)}
@@ -150,7 +150,7 @@ const IXROOMS={
 
 /* ---- tower floors: cornices, floor plaques by the elevator, picture lights ---- */
 {const tb0=twBase;twBase=function(g,o,n,T){tb0(g,o,n,T);try{const wl=T.wl[n],wh=n==T.roof?.9:3.4,L=[],E=[],b=(w,h,d,c,x,y,z)=>(c[0]=='*'?E:L).push([w,h,d,c[0]=='*'?'#'+c.slice(1):c,o+x,y,320+z]);
- if(wh>3){b(22.3,.16,.36,dk(wl,.78),11,wh+.02,-.12);b(.36,.16,16.3,dk(wl,.78),-.12,wh+.02,8);b(22,.05,.06,dk(wl,1.15),11,wh-.12,.03);b(.06,.05,16,dk(wl,1.15),.03,wh-.12,8)}
+ if(wh>3){b(22.3,.16,.36,dk(wl,.78),11,wh+.02,-.12);b(.36,.16,16.3,dk(wl,.78),-.12,wh+.02,8);b(22,.05,.06,ixShade(wl,1.15),11,wh-.12,.03);b(.06,.05,16,ixShade(wl,1.15),.03,wh-.12,8)}
  b(22,.04,.05,dk(wl,.45),11,.19,.07);b(.05,.04,16,dk(wl,.45),.07,.19,8);
  const lamp=(x,z,c)=>{b(.36,.05,.36,'#2a2a2a',x,.03,z);b(.05,1.5,.05,'#2a2a2a',x,.78,z);b(.42,.32,.42,c||'#f0e6d0',x,1.62,z);b(.3,.04,.3,'*fff2c8',x,1.8,z);twc(o,x-.2,z-.2,x+.2,z+.2)};
  if(T.nm=='Skyline Tower'&&n==1){[[8.3,15.1],[13.7,15.1]].forEach(q=>{b(.8,.7,.8,'#5a5f66',q[0],.35,q[1]);b(.84,.06,.84,'#c9a227',q[0],.72,q[1]);b(.9,.9,.9,'#2e7d32',q[0],1.2,q[1]);b(.6,.6,.6,'#43a047',q[0],1.75,q[1]);twc(o,q[0]-.42,q[1]-.42,q[0]+.42,q[1]+.42)});b(2.6,.02,1,'#3a2a1a',11,.012,15.5);b(2.4,.022,.8,'#7a1f3a',11,.016,15.5)}
