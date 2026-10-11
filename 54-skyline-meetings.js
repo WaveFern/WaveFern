@@ -51,7 +51,7 @@ function placeArt(){const n={},t0=TW;ART_M.forEach(o=>{const m=S.msgs.find(x=>x.
    Central Park, outside your house or by the shops) and you can move the meeting from the chat. They really wait there. */
 Object.assign(MEETL,{
  pulse:{n:'Pulse Records HQ, floor 3 (Mixing Suites)',p:'at Pulse Records HQ',t:'at Pulse Records HQ in the city, 3rd floor mixing suites (take the elevator)',tw:1,fl:3,sp:[[8.6,11.6],[13.4,11.6],[11,10.2],[6,12.4],[16,12.4]]},
- cafe:{n:'City Cafe',p:'at the City Cafe',t:'at the City Cafe in the city, inside by the tables',shop:3,sp:[[8.3,4.6],[1.7,4.5],[3.4,6.9]]},
+ cafe:{n:'City Cafe',p:'at the City Cafe',t:'at the City Cafe in the city, inside by the tables',shop:3,sp:[[8.2,4.25],[1.6,4.4],[3.6,6.9]]},
  store:{n:'Music Store',p:'at the Music Store',t:'at the Music Store in the city, inside by the guitars',shop:4,sp:[[7.6,4.5],[3.8,6.7],[6.4,6.7]]},
  radio:{n:'Radio Station',p:'at the Radio Station',t:'at the Radio Station on your street, in the studio',shop:5,sp:[[7.8,5.6],[4.6,6.5],[8.6,4.2]]},
  park:{n:'Central Park',p:'in Central Park',t:'in Central Park, by the square in the middle',out:k=>parkSpot(k)}});
