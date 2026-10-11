@@ -15,9 +15,10 @@ function xpT(x,s,X,Y,px,fk,fill,o){o=o||{};x.save();x.font=xfont(fk,px);x.textAl
  if(o.mw){const m=x.measureText(s).width;if(m>o.mw)x.scale(o.mw/m,1)}x.lineJoin='round';
  if(o.sh){const so=o.so||px*.08;if(o.st){x.lineWidth=o.lw||px*.2;x.strokeStyle=o.sh;x.strokeText(s,so,so)}x.fillStyle=o.sh;x.fillText(s,so,so)}
  if(o.st){x.lineWidth=o.lw||px*.2;x.strokeStyle=o.st;x.strokeText(s,0,0)}x.fillStyle=fill;x.fillText(s,0,0);x.restore()}
-/* text on an arc round cx,cy (top arc, or bottom arc reading left to right with o.down) */
+/* text on an arc round cx,cy (top arc, or bottom arc reading left to right with o.down); o.ma shrinks the text to fit that many radians */
 function xpArc(x,s,cx,cy,r,px,fk,fill,o){o=o||{};x.save();x.font=xfont(fk,px);x.textAlign='center';x.textBaseline='middle';x.lineJoin='round';
- const sp=o.sp||0,ws=[...s].map(q=>x.measureText(q).width),tot=ws.reduce((a,b)=>a+b,0)+sp*(ws.length-1),dn=o.down?-1:1;let a=(o.down?Math.PI/2:-Math.PI/2)-dn*tot/r/2;
+ const sp=o.sp||0,mes=()=>[...s].map(q=>x.measureText(q).width);let ws=mes(),tot=ws.reduce((a,b)=>a+b,0)+sp*(ws.length-1);
+ if(o.ma&&tot>o.ma*r){px*=o.ma*r/tot;x.font=xfont(fk,px);ws=mes();tot=ws.reduce((a,b)=>a+b,0)+sp*(ws.length-1)}const dn=o.down?-1:1;let a=(o.down?Math.PI/2:-Math.PI/2)-dn*tot/r/2;
  [...s].forEach((q,i)=>{a+=dn*ws[i]/2/r;x.save();x.translate(cx+r*Math.cos(a),cy+r*Math.sin(a));x.rotate(a+dn*Math.PI/2);if(o.st){x.lineWidth=o.lw||px*.2;x.strokeStyle=o.st;x.strokeText(q,0,0)}x.fillStyle=fill;x.fillText(q,0,0);x.restore();a+=dn*(ws[i]/2+sp)/r});x.restore()}
 function xpStar(x,cx,cy,R,r,n,fill,rot){x.beginPath();for(let i=0;i<n*2;i++){const a=(rot||-Math.PI/2)+i*Math.PI/n,q=i%2?r:R;x.lineTo(cx+q*Math.cos(a),cy+q*Math.sin(a))}x.closePath();if(fill){x.fillStyle=fill;x.fill()}}
 /* dashed stitching round a rounded rect */
@@ -45,7 +46,7 @@ function xpSkin(gs,c,n,v,shine){const pm=M(c),gm=XMC['!'+c],sm=xpSkinMat(n,c,v,s
 /* ---- placing prints on a torso: u is across (-.5 to .5), v up the body (0 hem, 1 shoulder), pw the width as a share of the torso ---- */
 /* frame of a top or a jacket on the character: width, height, bottom, front z, sleeve face */
 const xpFrame=(x,k)=>k=='jk'?{W:x.w+.08,H:.62,y0:.49,z:x.d/2+.049,sx:.097}:{W:x.w,H:.6,y0:.5,z:x.d/2+.0095,sx:.0905};
-function xpPlace(x,k,sp,c,v){const F=xpFrame(x,k);
+function xpPlace(x,k,sp,c,v){const F=xpFrame(x,k);if(sp.dz)F.z+=sp.dz;
  (sp.f||[]).forEach(([n,u,vv,pw])=>{const w=pw*F.W;xprint(x.g,n,c,w,w*xpAsp(n),u*F.W,F.y0+vv*F.H,F.z,0,v)});
  (sp.b||[]).forEach(([n,u,vv,pw])=>{const w=pw*F.W;xprint(x.g,n,c,w,w*xpAsp(n),-u*F.W,F.y0+vv*F.H,-F.z,Math.PI,v)});
  (sp.s||[]).forEach(([n,y,pw,both])=>(both?[0,1]:[1]).forEach(i=>{const a=x.arms[i],s=i?1:-1;if(a)xprint(a,n,c,pw,pw*xpAsp(n),s*F.sx,-y,0,s*Math.PI/2,v)}))}
