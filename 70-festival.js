@@ -9,19 +9,23 @@
    - four stages, all facing south: 4 Fresh Fern Tent (Fame Level 10, pay x1.25), 3 The Pit (50, x1.5), 2 Riverside Stage
      (80, x1.75), 1 Main Stage (120, x2). Each has a crowd of instanced figures that fans out from the barrier, plus a
      "crowd carpet" of packed heads further back for big crowds, a few flags, and delay/light towers on the big stages.
-   - performing: walk to the steps at the side of a stage you are allowed on, pick one of your released songs and play a
-     ~65 s set. Short crowd minigames (Hype, Drop, Call and response, Lyrics, Hold the note) pop up at random gaps. Doing
-     well brings more fans in (the crowd grows at the back), doing badly makes them leave. Pay = $0.40 x stage
-     multiplier x people in the crowd at the end. The crowd also streams your song afterwards (more monthly listeners
-     tomorrow) and some of them follow you. One set per stage per festival (saved in S.fest).
+   - performing (v26.39.0): you book a time slot (up to 4 in-game hours) on a stage on FestivalApp, a free app on your
+     computer, at least 2 days before the festival, with a setlist of your songs and albums (71-festival-booking.js).
+     On the day you walk to the steps of that stage during your slot and the set plays the setlist song by song. Short
+     crowd minigames (Hype, Drop, Call and response, Lyrics, Hold the note) pop up at random gaps. Doing well brings
+     more fans in (the crowd grows at the back), doing badly makes them leave. After each song you are paid
+     FSONG_PAY ($0.08) x stage multiplier x people in the crowd, and the crowd streams that song (more monthly
+     listeners tomorrow) and some of them follow you. The set ends when the last song ends or the slot is over.
    - during the set the camera stands behind you on the stage and looks out over the crowd (sky dome, haze, tree line,
-     bubbles and light beams; the normal HUD is hidden). Only you are on stage, plus the featured artist if the song is
-     a collab.
+     bubbles and light beams; the normal HUD is hidden). Only you are on stage, plus the featured artist while a collab
+     song plays.
+   - stage roofs, screens, delay towers and mix tents fade out when they hide you from the normal camera, like the
+     city towers do.
    - food and drink: burger van, crepe van, taco van, candyfloss cart, popcorn cart and an open-air bar, about 1.4x the
      usual prices; food gives energy, drinks also refill stamina.
    - the world map, the minimap and the morning card show the festival; the map gets a taxi to the festival gate. */
 const FEST={X0:216,X1:406,Z0:-122,Z1:-4,GZ:-64,ph:null,day:-1,grp:{},cols:[],ints:[],view:null,set:null,crowd:[],walk:[],work:[],lg:null,
- view3:null,acts:{},cleared:0,seen:{},t:0};
+ view3:null,acts:{},cleared:0,seen:{},t:0,fadeU:{}};
 const FPAY=.4;/* dollars per person in the crowd at the end of the set, before the stage multiplier */
 const FSTG=[
  {n:4,name:'Fresh Fern Tent',req:10,mult:1.25,cx:258,zb:-60,w:12,d:8,h:1,H:6,base:160,cap:450,figs:260,area:[246,-50,272,-16],col:'#2fae5a',tent:1},
@@ -71,6 +75,19 @@ const fAll=()=>{const G=xgNew();G.all=1;return G};
 const fBox=(G,w,h,d,c,x,y,z,ry,tc)=>xgBox(G,w,h,d,c,x,y,z,ry,tc);
 /* boxes in a local frame turned by ry; parts [w,h,d,col,lx,ly,lz,topCol] */
 const fObj=(G,x,z,ry,parts)=>pkObj(G,x,z,ry,parts);
+/* fade units (v26.39.0): a stage, a delay tower or a mix tent is merged on its own, with its own transparent materials,
+   so it can fade out when it stands between the player and the normal camera (the same ray test as fadeT for towers).
+   boxes are [x0,z0,x1,z1,top] */
+function festFadeU(kind,boxes){const U={boxes,mats:[],o:1};(FEST.fadeU[kind]=FEST.fadeU[kind]||[]).push(U);return U}
+function festFadeMerge(U,G,Gl,grp){const a=new THREE.MeshLambertMaterial({vertexColors:true,transparent:true});fMerge(G,grp,a);U.mats.push(a);
+ if(Gl){const b=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true});fMerge(Gl,grp,b);U.mats.push(b)}}
+function festFadePlane(U,m){m.material.transparent=true;U.mats.push(m.material);return m}
+function festStageBoxes(s){const{x0,x1,zb,zf,H,w}=s;if(s.tent)return[[x0-.9,zb-.3,x1+.9,zf+.9,H+1.8],[x0-4.1,zf+.5,x0-.7,zf+1.1,3.6]];
+ const sw=Math.min(7,w*.3),sh=sw*.58,top=s.H*.55+sh/2+.3;return[[x0-1.9,zb-.4,x1+1.9,zf+2.1,H+.6],[x0-2.9-sw,zf-.1,x0-2.3,zf+.5,top],[x1+2.3,zf-.1,x1+2.9+sw,zf+.5,top]]}
+function festFade(dt){const L=FEST.fadeU[FEST.ph];if(!L)return;const px=P.x,pz=P.z,on=!FEST.view&&!IN&&!HIN&&mode!='pc';
+ L.forEach(U=>{let tg=1;if(on)for(const b of U.boxes){if(Math.abs((b[0]+b[2])/2-px)>70||Math.abs((b[1]+b[3])/2-pz)>70)continue;let lo=0,hi=1e9;
+   const f=(p,a,c)=>{const t1=(a-p)/16,t2=(c-p)/16;lo=Math.max(lo,Math.min(t1,t2));hi=Math.min(hi,Math.max(t1,t2))};f(px,b[0],b[2]);f(pz,b[1],b[3]);hi=Math.min(hi,(b[4]-1)/13);if(lo<hi){tg=.12;break}}
+  if(U.o===tg)return;U.o+=(tg-U.o)*Math.min(1,dt*6);if(Math.abs(tg-U.o)<.01)U.o=tg;U.mats.forEach(m=>{m.opacity=U.o;m.depthWrite=U.o>.95})})}
 
 /* ---- 1. clear the wild trees off the ground once, before the static boxes are merged ---- */
 function festClear(){if(FEST.cleared)return;FEST.cleared=1;const{X0,X1,Z0,Z1}=FEST,inA=(x,z,m)=>x>X0-m&&x<X1+m&&z>Z0-m&&z<Z1+m;
@@ -161,21 +178,24 @@ function festBuildFest(){const grp=fGroup('fest'),G=fAll(),Gl=fAll(),{X0,X1,Z0,Z
  fBox(G,4.2,2.6,.2,'#2b2b33',220.5,2.1,GZ-6.2);fBox(G,.15,1.2,.15,'#2b2b33',219,.6,GZ-6.2);fBox(G,.15,1.2,.15,'#2b2b33',222,.6,GZ-6.2);FEST.colsF.push([218.3,GZ-6.5,222.7,GZ-5.9]);
  FEST.board=fTex(512,320,()=>{});festBoardDraw();fPlane(FEST.board,4,2.5,220.5,2.1,GZ-6.08,0,grp);
  /* stages */
- FSTG.forEach(s=>{festStageGeo(G,Gl,grp,s,'fest');
+ FSTG.forEach(s=>{const Gs=fAll(),Gsl=fAll(),U=festFadeU('fest',festStageBoxes(s)),fp=(...a)=>festFadePlane(U,fPlane(...a));festStageGeo(Gs,Gsl,grp,s,'fest');
   const bd=fTex(512,256,(x,W,H)=>{const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,dk(s.col,.35));g.addColorStop(1,'#0b0b12');x.fillStyle=g;x.fillRect(0,0,W,H);x.fillStyle=s.col;x.globalAlpha=.25;for(let i=0;i<9;i++){x.beginPath();x.arc(W/2,H*1.1,40+i*34,Math.PI,0);x.lineWidth=8;x.strokeStyle=s.col;x.stroke()}x.globalAlpha=1;
    x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';fFit(x,s.name.toUpperCase(),0,64,W-50);x.fillText(s.name.toUpperCase(),W/2,H*.42);x.font='bold 30px '+FFONT;x.fillStyle=s.col;x.fillText('STAGE '+s.n,W/2,H*.7)});
-  if(!s.tent)fPlane(bd,s.w-1,(s.H-s.h)*.75,s.cx,s.h+(s.H-s.h)*.48,s.zb+.42,0,grp);else fPlane(bd,s.w-.4,s.H*.6,s.cx,s.h+s.H*.38,s.zb+.02,0,grp);
-  const ban=fSignTex('STAGE '+s.n+' · '+s.name.toUpperCase(),null,'#0e0e14',s.col,768,96);if(!s.tent)fPlane(ban,s.w*.8,s.w*.8/8,s.cx,s.H-.25,s.zf+.86,0,grp);
-  else fPlane(ban,s.w*.9,s.w*.9/8,s.cx,s.H+.55,s.zf+.7,0,grp);
-  if(!s.tent){const sw=Math.min(7,s.w*.3),sh=sw*.58;s.scr=fTex(256,148,()=>{});[s.x0-2.6-sw/2,s.x1+2.6+sw/2].forEach(x=>fPlane(s.scr,sw,sh,x,s.H*.55,s.zf+.42,0,grp))}
+  if(!s.tent)fp(bd,s.w-1,(s.H-s.h)*.75,s.cx,s.h+(s.H-s.h)*.48,s.zb+.42,0,grp);else fp(bd,s.w-.4,s.H*.6,s.cx,s.h+s.H*.38,s.zb+.02,0,grp);
+  const ban=fSignTex('STAGE '+s.n+' · '+s.name.toUpperCase(),null,'#0e0e14',s.col,768,96);if(!s.tent)fp(ban,s.w*.8,s.w*.8/8,s.cx,s.H-.25,s.zf+.86,0,grp);
+  else fp(ban,s.w*.9,s.w*.9/8,s.cx,s.H+.55,s.zf+.7,0,grp);
+  s.scr=fTex(256,148,()=>{});
+  if(!s.tent){const sw=Math.min(7,s.w*.3),sh=sw*.58;[s.x0-2.6-sw/2,s.x1+2.6+sw/2].forEach(x=>fp(s.scr,sw,sh,x,s.H*.55,s.zf+.42,0,grp))}
+  else{/* the tent has a small name board on legs at its front left corner */const bx=s.x0-2.4;fBox(Gs,3.4,2,.12,'#1a1a20',bx,2.6,s.zf+.78);fBox(Gs,.14,1.6,.14,'#555a60',bx-1.4,.8,s.zf+.78);fBox(Gs,.14,1.6,.14,'#555a60',bx+1.4,.8,s.zf+.78);fp(s.scr,3.2,1.85,bx,2.6,s.zf+.85,0,grp)}
+  festFadeMerge(U,Gs,Gsl,grp);
   /* colliders: deck and stairs, barrier, screen legs */
-  s.cols=[[s.x0-.7,s.zb-.3,s.x1+.7,s.zf+.75],[s.x1,s.zb+1.1,s.ix-1,s.zb+3.3],[s.x0-4,s.zf+1.55,s.x1+4,s.zf+2.05]];
-  if(s.tw){[[s.cx-s.tw,s.zf+s.tz],[s.cx+s.tw,s.zf+s.tz]].forEach(([x,z])=>{/* delay tower with speakers and lights */
-    for(let y=0;y<10;y+=2.5){fBox(G,.15,2.5,.15,'#c8ccd2',x-.9,y+1.25,z-.9);fBox(G,.15,2.5,.15,'#c8ccd2',x+.9,y+1.25,z-.9);fBox(G,.15,2.5,.15,'#c8ccd2',x-.9,y+1.25,z+.9);fBox(G,.15,2.5,.15,'#c8ccd2',x+.9,y+1.25,z+.9);fBox(G,1.95,.1,1.95,'#aeb4ba',x,y+2.5,z)}
-    fBox(G,1.4,2.2,1.2,'#141418',x,7.5,z+1.2);fBox(G,2.6,.2,2.6,'#2b2b33',x,10.1,z);[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(q=>fBox(Gl,.35,.35,.35,'#fff6d0',x+q[0]*1,10.4,z+q[1]*1));s.cols.push([x-1.1,z-1.1,x+1.1,z+1.1])});
+  s.cols=[[s.x0-.7,s.zb-.3,s.x1+.7,s.zf+.75],[s.x1,s.zb+1.1,s.ix-1,s.zb+3.3],[s.x0-4,s.zf+1.55,s.x1+4,s.zf+2.05]];if(s.tent)s.cols.push([s.x0-4,s.zf+.6,s.x0-.8,s.zf+.95]);
+  if(s.tw){[[s.cx-s.tw,s.zf+s.tz],[s.cx+s.tw,s.zf+s.tz]].forEach(([x,z])=>{/* delay tower with speakers and lights */const Gt=fAll(),Ut=festFadeU('fest',[[x-1.1,z-1.1,x+1.1,z+1.9,10.6]]);
+    for(let y=0;y<10;y+=2.5){fBox(Gt,.15,2.5,.15,'#c8ccd2',x-.9,y+1.25,z-.9);fBox(Gt,.15,2.5,.15,'#c8ccd2',x+.9,y+1.25,z-.9);fBox(Gt,.15,2.5,.15,'#c8ccd2',x-.9,y+1.25,z+.9);fBox(Gt,.15,2.5,.15,'#c8ccd2',x+.9,y+1.25,z+.9);fBox(Gt,1.95,.1,1.95,'#aeb4ba',x,y+2.5,z)}
+    fBox(Gt,1.4,2.2,1.2,'#141418',x,7.5,z+1.2);fBox(Gt,2.6,.2,2.6,'#2b2b33',x,10.1,z);[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(q=>fBox(Gt,.35,.35,.35,'#fff6d0',x+q[0]*1,10.4,z+q[1]*1));festFadeMerge(Ut,Gt,null,grp);s.cols.push([x-1.1,z-1.1,x+1.1,z+1.1])});
    /* front-of-house mix tent */
-   const fz=s.zf+s.tz-4;fBox(G,7,.4,4.4,'#2b2b33',s.cx,3.2,fz);[[-3.3,-2],[3.3,-2],[-3.3,2],[3.3,2]].forEach(q=>fBox(G,.12,3,.12,'#cccccc',s.cx+q[0],1.5,fz+q[1]));fBox(G,4,1,1.2,'#1c1c22',s.cx,.5,fz,0,'#3a3a44');fBox(G,7.2,1,4.6,'#2b2b33',s.cx,.5,fz);
-   s.cols.push([s.cx-3.6,fz-2.3,s.cx+3.6,fz+2.3])}
+   const fz=s.zf+s.tz-4,Gf=fAll(),Uf=festFadeU('fest',[[s.cx-3.7,fz-2.4,s.cx+3.7,fz+2.4,3.5]]);fBox(Gf,7,.4,4.4,'#2b2b33',s.cx,3.2,fz);[[-3.3,-2],[3.3,-2],[-3.3,2],[3.3,2]].forEach(q=>fBox(Gf,.12,3,.12,'#cccccc',s.cx+q[0],1.5,fz+q[1]));fBox(Gf,4,1,1.2,'#1c1c22',s.cx,.5,fz,0,'#3a3a44');fBox(Gf,7.2,1,4.6,'#2b2b33',s.cx,.5,fz);
+   festFadeMerge(Uf,Gf,null,grp);s.cols.push([s.cx-3.6,fz-2.3,s.cx+3.6,fz+2.3])}
   /* the stairs label */
   const L=lbl('Stage '+s.n+' · '+s.name+' · Fame Lv '+s.req,6);L.position.set(s.ix,3.2,s.iz);FEST.lg.add(L);FEST.colsF.push(...s.cols)});
  /* food, bar, portaloos, bins, picnic tables, flags along the concourse, mobile light towers */
@@ -194,14 +214,20 @@ function festBuildFest(){const grp=fGroup('fest'),G=fAll(),Gl=fAll(),{X0,X1,Z0,Z
 /* ---- 4. the information board: today's line-up and what you can play ---- */
 function festBoardDraw(){const t=FEST.board;if(!t)return;const x=t.userData.x,W=512,H=320,lv=festLv(),F=festS();x.fillStyle='#14121c';x.fillRect(0,0,W,H);x.fillStyle='#ffe066';x.textAlign='left';x.textBaseline='alphabetic';
  x.font='bold 30px '+FFONT;x.fillText('LINE-UP · DAY '+S.day,18,40);x.font='bold 19px '+FFONT;
- FSTG.slice().reverse().forEach((s,i)=>{const y=86+i*56,p=F.p[s.n];x.fillStyle=s.col;x.fillRect(18,y-22,10,40);x.fillStyle='#fff';x.fillText('Stage '+s.n+' · '+s.name,38,y-4);x.font='15px '+FFONT;x.fillStyle='#c8c8d8';
-  x.fillText(p?'You played: '+p.c.toLocaleString()+' people, $'+p.pay.toFixed(2):lv>=s.req?'Open to you · pay x'+s.mult+' · now: '+festAct(s):'Fame Level '+s.req+' needed · pay x'+s.mult,38,y+16);x.font='bold 19px '+FFONT});
+ const k=festSlotAt(),m=festMins();
+ FSTG.slice().reverse().forEach((s,i)=>{const y=86+i*56,p=F.p[s.n],bk=festBkOn(S.day,s.n),a=festAct(s),nk=k<0?(m<FSLOT[0][0]?0:-1):k+1<FSLOT.length?k+1:-1,na=nk>=0?festSlotAct(S.day,s.n,nk):null;
+  x.fillStyle=s.col;x.fillRect(18,y-22,10,40);x.fillStyle='#fff';x.fillText('Stage '+s.n+' · '+s.name,38,y-4);x.font='15px '+FFONT;x.fillStyle='#c8c8d8';
+  const t2=p?'You played '+(p.n||1)+' song'+((p.n||1)==1?'':'s')+' to '+p.c.toLocaleString()+' people, $'+p.pay.toFixed(2):bk&&!bk.st?'YOU play at '+fHM(FSLOT[bk.slot][0])+(a?' · now: '+a:''):
+   (a?'Now: '+a:'Quiet')+(na?' · '+fHM(FSLOT[nk][0])+' '+(na.you?'YOU':na.name):'');
+  fFit(x,t2,0,15,W-56);x.fillText(t2,38,y+16);x.font='bold 19px '+FFONT});
+ x.font='13px '+FFONT;x.fillStyle='#ff9ad8';x.fillText('Want a slot? Book on FestivalApp, 2+ days ahead.',18,H-12);
  t.needsUpdate=true}
-/* who is on each stage right now (changes every 2 game hours) */
-function festAct(s){if(FEST.set&&FEST.set.st===s)return S.artist||'You';return FACTS[fHash(S.day+':'+s.n+':'+Math.floor((S.t||0)/100))%FACTS.length]}
-function festScreens(){FSTG.forEach(s=>{if(!s.scr)return;const a=festAct(s),k=a+'|'+(FEST.set&&FEST.set.st===s?FEST.set.song.title:'');if(s.scrK===k)return;s.scrK=k;const x=s.scr.userData.x,W=256,H=148;
-  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,dk(s.col,.5));g.addColorStop(1,'#08080c');x.fillStyle=g;x.fillRect(0,0,W,H);x.fillStyle='#ff3b5c';x.fillRect(10,10,52,22);x.fillStyle='#fff';x.font='bold 15px '+FFONT;x.textAlign='left';x.fillText('LIVE',18,27);
-  x.textAlign='center';x.textBaseline='middle';fFit(x,a,0,34,W-24);x.fillText(a,W/2,H*.52);const sub=FEST.set&&FEST.set.st===s?'"'+FEST.set.song.title+'"':s.name;fFit(x,sub,0,16,W-24);x.fillStyle='#ffe066';x.fillText(sub,W/2,H*.8);x.textBaseline='alphabetic';s.scr.needsUpdate=true})}
+/* who is on each stage right now: your set, or the act booked for the current slot (null outside the slots) */
+function festAct(s){if(FEST.set&&FEST.set.st===s)return S.artist||'You';const k=festSlotAt();if(k<0)return null;const a=festSlotAct(S.day,s.n,k);return a.you?S.artist||'You':a.name}
+function festScreens(){FSTG.forEach(s=>{if(!s.scr)return;const a=festAct(s),me=FEST.set&&FEST.set.st===s,k=a+'|'+(me?FEST.set.song.title:'');if(s.scrK===k)return;s.scrK=k;const x=s.scr.userData.x,W=256,H=148;
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,dk(s.col,.5));g.addColorStop(1,'#08080c');x.fillStyle=g;x.fillRect(0,0,W,H);x.fillStyle=a?'#ff3b5c':'#555';x.fillRect(10,10,52,22);x.fillStyle='#fff';x.font='bold 15px '+FFONT;x.textAlign='left';x.fillText(a?'LIVE':'NEXT',18,27);
+  const nk=festSlotAt()<0&&festMins()<FSLOT[0][0]?0:-1,n0=nk>=0?festSlotAct(S.day,s.n,0):null,big=a||(n0?(n0.you?S.artist||'You':n0.name):s.name);
+  x.textAlign='center';x.textBaseline='middle';fFit(x,big,0,34,W-24);x.fillText(big,W/2,H*.52);const sub=me?'"'+FEST.set.song.title+'"':a?s.name:n0?'on at '+fHM(FSLOT[0][0]):'see you next festival';fFit(x,sub,0,16,W-24);x.fillStyle='#ffe066';x.fillText(sub,W/2,H*.8);x.textBaseline='alphabetic';s.scr.needsUpdate=true})}
 
 /* ---- 5. crowds: instanced figures fanned out from the barrier, a carpet of heads behind them, flags ---- */
 const FCR={};
@@ -219,7 +245,7 @@ function festCrowdGeo(){if(FCR.top)return;const mk=(fn)=>{const D=xgNew();D.all=
 const FSHIRT=['#ffffff','#ffffff','#1d1d22','#e03a3a','#2f6fd0','#ffe066','#2fae5a','#ff7ac8','#888888','#ff8a30','#6ad5ff','#b07aff','#f4e1c1','#5a3a24'],FSKIN=['#ffdbac','#f2c09a','#e0a878','#c68642','#8d5524','#5a3a24'];
 function festCrowdBuild(s){festCrowdGeo();const rnd=fRng(fHash('crowd'+s.n)),J=(a)=>(rnd()-.5)*a,[ax0,az0,ax1,az1]=s.area,ox=s.cx,oz=s.oz,f=[],inEx=(x,z,m)=>s.ex.some(e=>x>e[0]-m&&x<e[2]+m&&z>e[1]-m&&z<e[3]+m);
  for(let r=1.2;f.length<s.figs&&r<180;r+=.74*(1+r/45)){const n=Math.max(3,Math.floor(Math.PI*r/(.74*(1+r/45))));for(let k=0;k<n&&f.length<s.figs;k++){const a=(k+.5+J(.5))/n*Math.PI,rr=r+J(.3),x=ox+Math.cos(a)*rr,z=oz+Math.sin(a)*rr;
-  if(x<ax0+.4||x>ax1-.4||z<az0||z>az1-.4||inEx(x,z,.5))continue;f.push({x,z,r:rr,ry:Math.atan2(-(ox-x),-(oz-z))+J(.5),s:.88+rnd()*.2,ph:rnd()*6.28,arm:rnd()<.45?2.6+J(.6):J(.3),up:rnd()})}}
+  if(x<ax0+.4||x>ax1-.4||z<az0||z>az1-.4||inEx(x,z,.5))continue;f.push({x,z,r:rr,ry:Math.atan2(-(ox-x),-(oz-z))+J(.5),s:.88+rnd()*.2,ph:rnd()*6.28,arm:rnd()<.45?2.6+J(.6):J(.3),up:rnd(),dn:(rnd()*4)|0})}}
  f.sort((a,b)=>a.r-b.r);
  /* figures are split into 20 m tiles, each with its own instanced meshes and bounding sphere, so the normal camera
     only draws (and the tick only animates) the tiles in view; inside a tile figures keep the crowd order (nearest first) */
@@ -240,8 +266,8 @@ function festCrowdBuild(s){festCrowdGeo();const rnd=fRng(fHash('crowd'+s.n)),J=(
  for(let k=0;k<nf;k++){const idx=Math.min(f.length-1,Math.floor(f.length*(.12+.8*(k+.5)/nf))),p=f[idx];cr.fl.push({i:idx,x:p.x+.3,z:p.z,ph:rnd()*6,ry:rnd()*6});col.set(['#ff4a6a','#ffe066','#6ad5ff','#b07aff','#2fe68a','#ff8a30','#ffffff','#2f6fd0'][k%8]);cr.flag.setColorAt(k,col)}
  cr.grp.add(cr.flag);cr.carpetY=0;fGroup('fest').add(cr.grp);FEST.crowd.push(cr);s.cr=cr;cr.C=festAmbient(s);festCrowdPose(cr,0,1)}
 /* people at a stage when you are not playing there */
-function festAmbient(s){const r=fRng(fHash('amb'+S.day+':'+s.n))();return Math.round(s.base*(.5+r*.35))}
-const FQ=new THREE.Quaternion(),FQ2=new THREE.Quaternion(),FV=new THREE.Vector3(),FSV=new THREE.Vector3(),FMX=new THREE.Matrix4(),FAX=new THREE.Vector3(1,0,0),FAY=new THREE.Vector3(0,1,0);
+function festAmbient(s){const k=festSlotAt(),r=fRng(fHash('amb'+S.day+':'+s.n+':'+k))();return Math.round(s.base*(.5+r*.35)*(k<0?.2:1))}
+const FQ=new THREE.Quaternion(),FQ2=new THREE.Quaternion(),FV=new THREE.Vector3(),FSV=new THREE.Vector3(),FMX=new THREE.Matrix4(),FAX=new THREE.Vector3(1,0,0),FAY=new THREE.Vector3(0,1,0),FQ3=new THREE.Quaternion(),FAZ=new THREE.Vector3(0,0,1);
 const FFR=new THREE.Frustum(),FPM=new THREE.Matrix4();
 function festCrowdPose(cr,t,force,camr){const f=cr.f,n=Math.min(f.length,Math.max(0,Math.round(cr.C))),hy=cr.hype,live=FEST.set&&FEST.set.st===cr.s,bpm=live?2.1:1.6;
  if(n!==cr.shown){cr.shown=n;force=1;cr.tiles.forEach(T=>{let k=0;while(k<T.ids.length&&T.ids[k]<n)k++;T.k=k;T.top.count=T.skin.count=T.arms.count=k;T.top.visible=T.skin.visible=T.arms.visible=k>0});
@@ -250,9 +276,17 @@ function festCrowdPose(cr,t,force,camr){const f=cr.f,n=Math.min(f.length,Math.ma
  if(cr.carpet&&cr.carpet.visible){const y=Math.max(0,Math.sin(t*bpm*Math.PI))*.05*hy;if(Math.abs(y-cr.carpetY)>.004){cr.carpet.position.y=y;cr.carpetY=y}}
  if(camr){camr.updateMatrixWorld();FPM.multiplyMatrices(camr.projectionMatrix,camr.matrixWorldInverse);FFR.setFromProjectionMatrix(FPM)}
  cr.tiles.forEach(T=>{if(!T.k||!force&&camr&&!FFR.intersectsSphere(T.bs))return;
-  for(let j=0;j<T.k;j++){const p=f[T.ids[j]],jump=Math.max(0,Math.sin(t*bpm*Math.PI+p.ph*(live?.25:1)))*(.04+.22*hy*(p.up<hy?1:.25)),arm=p.up<hy*.9?2.75+Math.sin(t*3+p.ph)*.25:p.arm*(hy>.3?1:.4);
-   FQ.setFromAxisAngle(FAY,p.ry);FSV.set(p.s,p.s,p.s);FV.set(p.x,jump,p.z);FMX.compose(FV,FQ,FSV);T.top.setMatrixAt(j,FMX);T.skin.setMatrixAt(j,FMX);
-   FQ2.setFromAxisAngle(FAX,arm);FQ2.premultiply(FQ);FV.y=jump+1.04*p.s;FMX.compose(FV,FQ2,FSV);T.arms.setMatrixAt(j,FMX)}
+  /* v26.39.0: four dance styles (jumpers, swayers, arm-wavers, head-boppers), all livelier as the hype goes up; the
+     whole crowd jumps together on the beat when it is really going off */
+  for(let j=0;j<T.k;j++){const p=f[T.ids[j]],e=hy*(p.up<hy?1:.35),bt=t*bpm*Math.PI+p.ph*(live?.25:1),bo=Math.sin(bt),dn=p.dn;let jump,ry=p.ry,x=p.x,az=0,
+    arm=p.up<hy*.9?2.75+Math.sin(t*3+p.ph)*.25:p.arm*(hy>.3?1:.4);
+   if(dn==1){const sw=Math.sin(bt*.5);jump=Math.abs(bo)*.05*(.3+e);ry+=sw*.4*(.3+e);x+=sw*.1*e}
+   else if(dn==2){jump=Math.max(0,bo)*(.03+.12*e);if(hy>.3){arm=2.85;az=Math.sin(t*2.2+p.ph)*.55*(.4+e)}}
+   else if(dn==3){jump=Math.max(0,bo)*.05+(hy>.7&&bo>.85?.12:0)}
+   else jump=Math.max(0,bo)*(.04+.26*e);
+   if(hy>.8&&live)jump=Math.max(jump,Math.max(0,Math.sin(t*bpm*Math.PI))*.3);
+   FQ.setFromAxisAngle(FAY,ry);FSV.set(p.s,p.s,p.s);FV.set(x,jump,p.z);FMX.compose(FV,FQ,FSV);T.top.setMatrixAt(j,FMX);T.skin.setMatrixAt(j,FMX);
+   FQ2.setFromAxisAngle(FAX,arm);if(az){FQ3.setFromAxisAngle(FAZ,az);FQ2.premultiply(FQ3)}FQ2.premultiply(FQ);FV.y=jump+1.04*p.s;FMX.compose(FV,FQ2,FSV);T.arms.setMatrixAt(j,FMX)}
   T.top.instanceMatrix.needsUpdate=T.skin.instanceMatrix.needsUpdate=T.arms.instanceMatrix.needsUpdate=true;
   if(force&&T.top.instanceColor)T.top.instanceColor.needsUpdate=T.skin.instanceColor.needsUpdate=T.arms.instanceColor.needsUpdate=true});
  if(cr.flag.count){let k=0;cr.fl.forEach(q=>{if(q.i<n){FQ.setFromAxisAngle(FAY,q.ry+Math.sin(t*1.3+q.ph)*.5);FSV.set(1,1,1);FV.set(q.x,Math.max(0,Math.sin(t*bpm*Math.PI+q.ph))*.15*hy,q.z);FMX.compose(FV,FQ,FSV);cr.flag.setMatrixAt(k++,FMX)}});cr.flag.instanceMatrix.needsUpdate=true}}
@@ -265,7 +299,7 @@ function festWorker(grp,x,z,ry,job){const o=buildChar(Object.assign(fCfg(),{body
  B(o.g,.66,.46,.45,'#ff8c1a',0,.86,0);B(o.g,.67,.06,.46,'#e8e8e8',0,.78,0);B(o.g,.67,.06,.46,'#e8e8e8',0,.98,0);B(o.g,.62,.15,.62,job=='lift'?'#ffffff':'#ffd21a',0,1.77,0);B(o.g,.72,.04,.72,job=='lift'?'#ffffff':'#ffd21a',0,1.7,.04);
  if(job=='hammer')B(o.arms[1],.08,.08,.5,'#6b4a2e',0,-.55,.22);grp.add(o.g);FEST.work.push({o,job,ph:R(0,6)})}
 function festBuildWorks(kind){const grp=fGroup(kind),G=fAll(),Gl=fAll(),{X0,X1,Z0,Z1,GZ}=FEST,rnd=fRng(fHash('works'+kind)),RR=(a,b)=>a+rnd()*(b-a),cols=[];
- FSTG.forEach(s=>festStageGeo(G,Gl,grp,s,kind));
+ FSTG.forEach(s=>{const Gs=fAll(),U=festFadeU(kind,festStageBoxes(s).slice(0,1));festStageGeo(Gs,Gl,grp,s,kind);if(kind=='build'&&s.n==1)U.boxes.push([s.cx-10,s.zf+5,s.cx+12,s.zf+9,4]);festFadeMerge(U,Gs,null,grp)});
  FSTG.forEach(s=>cols.push([s.x0-.7,s.zb-.3,s.x1+.7,s.zf+.75]));
  if(kind=='down')FSTG.forEach(s=>{const[a,b,c,d]=s.area;fBox(G,c-a+4,.01,d-b+3,'#8a8a50',(a+c)/2,.006,(b+d)/2-1);for(let i=0;i<14;i++)xgPrism(G,RR(1.5,4),RR(1.5,4),.012,9,'#7a6038',RR(a,c),.008,RR(b,d))});
  /* fence: on build day it is going up from the gate, on take-down day most panels are stacked */
@@ -314,13 +348,12 @@ function festPoi(){let p=POIS.find(q=>q.fest);if(!p){p=[FEST.X0+14,FEST.GZ-2,'',
 /* one check per frame: did the day change? */
 function festSync(){if(!FEST.lg){FEST.lg=new THREE.Group();scene.add(FEST.lg)}const ph=festPhase();if(ph!==FEST.ph||S.day!==FEST.day){festApply(ph);festNotice()}}
 function festNotice(){if(FEST.seen[S.day]||mode=='load'||mode=='creator'||!S.artist)return;FEST.seen[S.day]=1;const ph=FEST.ph;
- if(ph=='fest')setTimeout(()=>say('🎪 Park Fields Festival is on today, east of Park Avenue! 4 stages, food and a bar.'),1200);
+ if(ph=='fest'){const b=fBk().find(q=>q.day==S.day&&!q.st);setTimeout(()=>say('🎪 Park Fields Festival is on today, east of Park Avenue!'+(b?' You play Stage '+b.n+' at '+fHM(FSLOT[b.slot][0])+'.':' 4 stages, food and a bar.')),1200)}
  else if(ph=='build')setTimeout(()=>say('🚧 A crew is building Park Fields Festival east of Park Avenue. It opens tomorrow (Day '+festNext(S.day)+').'),1200)}
 
 /* ---- 8. interactions ---- */
 function festInts(){const a=[],ph=FEST.ph;if(!ph||IN||HIN)return a;if(P.x<FEST.X0-12||P.x>FEST.X1+6||P.z<FEST.Z0-6||P.z>FEST.Z1+6)return a;
- if(ph=='fest'){const lv=festLv(),F=festS();
-  FSTG.forEach(s=>{const done=F.p[s.n];a.push({x:s.ix,z:s.iz,r:2.2,l:done?'Stage '+s.n+' · already played this festival':lv>=s.req?'Perform on Stage '+s.n+' ('+s.name+')':'Stage '+s.n+' locked · Fame Level '+s.req+' needed',a:()=>festStageMenu(s.n)})});
+ if(ph=='fest'){FSTG.forEach(s=>{a.push({x:s.ix,z:s.iz,r:2.2,l:festStageLabel(s),a:()=>festStageUse(s.n)})});
   FFOOD.forEach(f=>{const[k,name,x,z,fc,,kind]=f;a.push({x:kind=='bar'?x+2.4:x+fc*(kind=='van'?2.4:1.6),z:kind=='van'?z-.3:z,r:kind=='bar'?3:2,l:(kind=='bar'?'Order at ':'Buy at ')+name,a:()=>festShop(k)})});
   a.push({x:220.5,z:FEST.GZ-4.6,r:2,l:'Read the line-up board',a:festInfo})}
  else a.push({x:232,z:FEST.GZ-9.4,r:2.4,l:'Talk to the site manager',a:()=>{snd('pop');say(ph=='build'?'Site manager: "Stages go up today. Gates open tomorrow, Day '+festNext(S.day)+'. Bring your best songs!"':'Site manager: "That\'s a wrap! Taking it all down. Next festival is Day '+festNext(S.day)+'."')}});
@@ -330,30 +363,53 @@ function festShop(k){const f=FFOOD.find(q=>q[0]==k);if(!f)return;GR=f[1]+': '+FG
  shopModal(f[1]+' <small class=m>· festival prices</small>',()=>f[7].map(m=>[m[0],m[1],'+'+m[2]+' energy'+(m[3]?' · refills stamina':'')+' <span style="opacity:.6">· about $'+Math.round(m[1]/1.4)+' in town</span>']),i=>{const m=f[7][i];
   if(S.money<m[1]){snd('err');return say('Not enough money for that.')}if(!m[3]&&S.energy>=100){snd('err');return say('You are already full of energy.')}
   S.money=+(S.money-m[1]).toFixed(2);S.energy=Math.min(100,S.energy+m[2]);if(m[3]){S.stam=100;S.exh=0}updateVersion();snd('eat');say((m[3]?'Refreshing! ':'Yum! ')+m[0]+' · +'+m[2]+' energy')})}
-function festInfo(){snd('pop');mode='menu';const lv=festLv(),F=festS();
- $('ui').innerHTML=`<div class="box modal"><h2>🎪 Park Fields Festival · Day ${S.day}</h2><p class=m>You are Fame Level ${lv}. Play each stage once per festival. Pay is $${FPAY.toFixed(2)} per person in the crowd at the end of your set, times the stage's multiplier.</p>${FSTG.slice().reverse().map(s=>{const p=F.p[s.n],ok=lv>=s.req;
-  return`<div class=ng><span style="flex:1"><b style="color:${s.col}">Stage ${s.n}</b> · ${s.name}<br><small class=m>Fame Level ${s.req} · pay x${s.mult} · ${p?'you played to '+p.c.toLocaleString()+' people for '+$$(p.pay):ok?'expected crowd about '+festC0(s).toLocaleString()+' · on now: '+esc(festAct(s)):'locked'}</small></span><b style="color:${p?'#9db4ff':ok?'#2fe68a':'#ff6a6a'}">${p?'Played':ok?'Open':'🔒'}</b></div>`}).join('')}
+function festInfo(){snd('pop');mode='menu';const lv=festLv(),F=festS(),k=festSlotAt();
+ $('ui').innerHTML=`<div class="box modal"><h2>🎪 Park Fields Festival · Day ${S.day}</h2><p class=m>You are Fame Level ${lv}. ${clk()} now. To play, book a slot on <b>FestivalApp</b> (free, on your computer) at least 2 days before a festival.</p>
+  <div style="max-height:52vh;overflow:auto">${FSTG.slice().reverse().map(s=>{const p=F.p[s.n];
+  return`<div class=ng style="display:block"><b style="color:${s.col}">Stage ${s.n}</b> · ${s.name} <small class=m>· Fame Level ${s.req} · pay x${s.mult}${p?' · you played to '+p.c.toLocaleString()+' people for '+$$(p.pay):''}</small><br>
+   <small>${FSLOT.map((sl,i)=>{const a=festSlotAct(S.day,s.n,i),now=i==k;return`<span style="display:inline-block;margin:2px 10px 0 0;${now?'color:#ffe066;font-weight:bold':a.you?'color:#2fe68a;font-weight:bold':'opacity:.8'}">${fHM(sl[0])} ${esc(a.you?'YOU':a.name)}${now?' (now)':''}</span>`}).join('')}</small></div>`}).join('')}</div>
   <p class=m><small>Food and drinks are about 1.4x the usual price. Performing takes 15 energy.</small></p><button onclick="closeUI()">Close</button></div>`}
 
-/* ---- 9. performing ---- */
-function festStageMenu(n){const s=fStage(n),lv=festLv(),F=festS();
- if(F.p[n]){snd('err');return say('You already played '+s.name+' at this festival. Next festival: Day '+festNext(S.day+1)+'.')}
- if(lv<s.req){snd('err');return say('Security: "Stage '+n+' is for Fame Level '+s.req+' and up." You are Level '+lv+'.')}
- if(!S.songs.length){snd('err');return say('You need at least one released song to perform.')}
- snd('pop');mode='menu';const L=S.songs.slice().sort((a,b)=>b.streams-a.streams).slice(0,20);
- $('ui').innerHTML=`<div class="box modal"><h2>🎤 Stage ${n} · ${s.name}</h2><p class=m>Pay x${s.mult} · expected crowd about ${festC0(s).toLocaleString()} · takes 15 energy (you have ${Math.round(S.energy)})</p><p>Pick a song for your set. Collabs bring the featured artist on stage (and 15% more people).</p>
-  <div style="max-height:44vh;overflow:auto">${L.map(x=>`<div class=ng><span style="flex:1">${esc(x.title)}${x.ft?` <small style="color:#f5c542">feat. ${esc(x.ft)}</small>`:''}<br><small class=m>${esc(x.g)} · quality ${x.q} · ${(x.streams||0).toLocaleString()} streams</small></span><button class=go onclick="festPlay(${n},${x.id})">Play</button></div>`).join('')}</div>
-  <div class=row2><button onclick="closeUI()">Not now</button></div></div>`}
-function festPlay(n,id){const s=fStage(n),song=S.songs.find(x=>x.id==id);if(!s||!song)return;if(S.energy<15){snd('err');return say('Too tired to perform. Grab some food first (15 energy needed).')}
- S.energy-=15;$('ui').innerHTML='';const C0=festC0(s,song);
- FEST.set={st:s,song,C0,C:C0*.45,T:C0*.6,start:Math.round(C0*.45),t:0,dur:65,mg:null,next:R(4,6.5),sc:[],last:'',beat:0,bt:0,fb:null,hype:.45,end:0,peak:0};
- mode='fest';P.x=s.cx-(song.ft?.85:0);P.z=s.zf-1.9;P.rot=0;
- festViewOn(s);snd('whoosh');setTimeout(()=>nz(2.2,900,.16,.6,'bandpass'),200)}
+/* ---- 9. performing a booked set (v26.39.0) ----
+   Walk to the steps of your booked stage during your slot. The set plays the setlist song by song; each song lasts
+   festDur(song) in-game minutes (30-55) and the game clock keeps running at its normal speed, so a full 4-hour slot is
+   about 1.7 real minutes by day and 2.4 after 20:00. After each song you are paid FSONG_PAY x stage multiplier x the
+   people in the crowd, and the crowd streams that song. The set ends when the last song ends, when the slot is over
+   (the last song is paid for the part you played), or when you leave the stage. */
+const FSONG_PAY=.08;
+function festStageUse(n){const s=fStage(n),bk=festBkOn(S.day,n);
+ if(bk&&bk.st==1){snd('pop');return say('You already played '+s.name+' today. Book your next slot on FestivalApp.')}
+ if(!bk||bk.st){snd('pop');const a=festAct(s);return say((a?'On stage now: '+a+'. ':'')+'Want to play '+s.name+'? Book a slot on FestivalApp on your computer, at least 2 days before a festival.')}
+ const m=festMins(),sl=FSLOT[bk.slot];
+ if(m<sl[0]){snd('err');return say('Stage manager: "You\'re on at '+fHM(sl[0])+'. That\'s '+fDurS(sl[0]-m)+' from now. Grab a drink!"')}
+ festStartBooked(bk)}
+function festStartBooked(bk){const s=fStage(bk.n),list=bk.songs.map(id=>S.songs.find(x=>x.id==id)).filter(Boolean);
+ if(!list.length){snd('err');return say('Your setlist is empty (those songs are gone). Edit it on FestivalApp.')}
+ if(S.energy<15){snd('err');return say('Too tired to perform. Grab some food first (15 energy needed).')}
+ S.energy-=15;$('ui').innerHTML='';const C0=festC0(s,list[0]);
+ FEST.set={st:s,bk,list,i:0,song:list[0],sm:0,dur:festDur(list[0]),C0,C:C0*.45,T:C0*.6,start:Math.round(C0*.45),t:0,mg:null,next:R(4,6.5),sc:[],ss:[],last:'',beat:0,bt:0,songT:0,hype:.45,end:0,peak:0,
+  pay:0,str:0,fol:0,done:[],fin:0,m0:festMins()};
+ mode='fest';P.rot=0;festViewOn(s);festSongStart();snd('whoosh');setTimeout(()=>nz(2.2,900,.16,.6,'bandpass'),200)}
+/* the next song in the setlist: the featured artist of a collab comes on for that song only */
+function festSongStart(){const set=FEST.set,s=set.st,song=set.list[set.i];set.song=song;set.sm=0;set.ms0=festMins();set.ss=[];set.songT=0;set.dur=festDur(song);
+ const c=festC0(s,song);set.T=Math.max(c*.15,set.T+(c-set.C0)*.6);set.C0=c;festStagePeople();s.scrK='';festScreens();
+ if(set.i>0){nz(1.8,1000,.14,.5,'bandpass');if(typeof festShout=='function')festShout(pick(['ONE MORE SONG!','TUUUNE!','I LOVE THIS ONE!',(S.artist||'YOU').toUpperCase()+'!']),1)}}
+function festSongDone(fr){const set=FEST.set,s=set.st,song=set.song,c=Math.round(set.C),mean=a=>a.reduce((x,y)=>x+y,0)/a.length,avg=set.ss.length?mean(set.ss):set.sc.length?mean(set.sc):.5,f=fr==null?1:fr;
+ const pay=+(FSONG_PAY*s.mult*c*f).toFixed(2),st=Math.round(c*.1*(.5+avg)*f),fol=Math.round(c*.015*(.5+avg)*f);
+ S.money=+(S.money+pay).toFixed(2);S.earn=(S.earn||0)+pay;S.followers=(S.followers||0)+fol;S.interest=Math.min(1,(S.interest||0)+.004*s.mult*avg*f);
+ /* the crowd streams the song afterwards: counted in today's streams (paid tomorrow morning) and this month's listeners */
+ try{if(typeof planOf=='function')planOf(song);if(typeof mlInit=='function')mlInit();song.streams=(song.streams||0)+st;song.today=(song.today||0)+st;S.streams+=st;S.monthStreams=(S.monthStreams||0)+st}catch(e){console.error('fest streams',e)}
+ set.pay=+(set.pay+pay).toFixed(2);set.str+=st;set.fol+=fol;set.done.push({t:song.title,c,pay,f,sc:Math.round(avg*100)});
+ if(f>=1){snd('cash');nz(1.8,1100,.16,.5,'bandpass');setTimeout(()=>nz(1.4,1600,.1,.6,'bandpass'),300)}}
+/* in-game minutes and real seconds left in the set (setlist or slot, whichever ends first) */
+function festSetLeft(set){let m=set.dur-set.sm;for(let i=set.i+1;i<set.list.length;i++)m+=festDur(set.list[i]);m=Math.min(m,FSLOT[set.bk.slot][1]-festMins());
+ return{m,s:m/((S.t<300?2.8:2)*(typeof DAYK!='undefined'?DAYK:1))}}
 /* the performer, mic stands and the featured artist */
 function festMic(x,y,z,ry){const g=new THREE.Group();B(g,.6,.05,.07,'#1a1a1a',0,.03,0);B(g,.07,.05,.6,'#1a1a1a',0,.03,0);B(g,.06,1.5,.06,'#b8bcc2',0,.76,0);B(g,.05,.05,.46,'#b8bcc2',0,1.5,-.2);B(g,.1,.22,.1,'#111',0,1.52,-.44);B(g,.13,.13,.13,'#9a9a9a',0,1.67,-.44);g.position.set(x,y,z);g.rotation.y=ry||0;return g}
-function festViewOn(s){const v=festView3(),set=FEST.set;FEST.view=s;document.body.classList.add('fston');
- v.stageG.clear();const camX=s.cx-(set.song.ft?0:1.6),mic=x=>{const o=x<camX-.01?.45:-.45;v.stageG.add(festMic(x+o,s.h,s.zf-1.18,Math.atan2(o,.72)))};mic(P.x);
- if(set.song.ft){const a=ART.find(q=>q[0]==set.song.ft),o=buildChar(Object.assign({},a?a[4]:fCfg()));o.g.position.set(s.cx+.85,s.h,s.zf-1.9);v.stageG.add(o.g);mic(s.cx+.85);set.ft=o}
+function festStagePeople(){const v=festView3(),set=FEST.set,s=set.st,ft=set.song.ft;v.stageG.clear();set.ft=null;P.x=s.cx-(ft?.85:0);P.z=s.zf-1.9;
+ const camX=s.cx-(ft?0:1.6),mic=x=>{const o=x<camX-.01?.45:-.45;v.stageG.add(festMic(x+o,s.h,s.zf-1.18,Math.atan2(o,.72)))};mic(P.x);
+ if(ft){const a=ART.find(q=>q[0]==ft),o=buildChar(Object.assign({},a?a[4]:fCfg()));o.g.position.set(s.cx+.85,s.h,s.zf-1.9);v.stageG.add(o.g);mic(s.cx+.85);set.ft=o}}
+function festViewOn(s){const v=festView3(),set=FEST.set;FEST.view=s;document.body.classList.add('fston');v.camX=null;
  v.sky.visible=v.back.visible=v.fx.visible=true;FEST.lg.visible=false;
  /* bubbles in front of the stage, light beams on the truss, the fans' banner */
  const b=v.bub.geometry.attributes.position;for(let i=0;i<b.count;i++)b.setXYZ(i,s.cx+R(-s.w*.9,s.w*.9),R(1.5,s.H+6),s.zf+R(1,s.n<3?60:30));b.needsUpdate=true;
@@ -405,7 +461,7 @@ function festMgPress(p){const set=FEST.set;if(!set||!set.mg||set.mg.sc!=null||se
  else if(m.k=='drop'&&p==-1){m.tries++;const ok=m.pos>m.z0&&m.pos<m.z0+m.zw;if(ok){m.hits++;snd('cash');sfx(60,.25,'sine',.35,35,0,0)}else snd('err');m.fl=ok?.35:-.35;m.z0=R(.15,.7);if(m.tries>=3)festMgDone(m.hits/3)}
  else if(m.k=='call'&&p>=0&&m.ph=='input'){m.lit=p;m.lt=.25;sfx(MG_NOTE[p],.25,'triangle',.12);if(p==m.seq[m.i]){m.i++;m.ok++;if(m.i>=m.seq.length)festMgDone(1)}else{snd('err');festMgDone(m.ok/m.seq.length)}}
  else if(m.k=='lyric'&&p>=0&&!(m.lt>0)){const it=m.items[m.i];m.pk=p;m.lt=.6;if(it.opts[p]==it.right){m.ok++;snd('cash')}else snd('err')}}
-function festMgDone(sc){const set=FEST.set,m=set.mg;if(!m||m.sc!=null)return;m.sc=Math.max(0,Math.min(1,sc));m.fb=1.5;set.sc.push(m.sc);const C0=set.C0;let d;
+function festMgDone(sc){const set=FEST.set,m=set.mg;if(!m||m.sc!=null)return;m.sc=Math.max(0,Math.min(1,sc));m.fb=1.5;set.sc.push(m.sc);if(set.ss)set.ss.push(m.sc);const C0=set.C0;let d;
  if(m.sc>=.75)d=C0*(.1+.12*(m.sc-.75)/.25);else if(m.sc>=.5)d=C0*.04*(m.sc-.5)/.25;else d=-C0*(.05+.12*(.5-m.sc)/.5);
  set.T=Math.max(C0*.15,Math.min(Math.max(C0*1.6,40),set.T+d));m.d=Math.round(d);set.hype=Math.max(.1,Math.min(1,set.hype+(m.sc-.5)*.6));
  if(m.sc>=.5){nz(1.6,1100,.14+.1*m.sc,.5,'bandpass');setTimeout(()=>nz(1.2,1600,.1,.6,'bandpass'),250)}else nz(.8,400,.08,.5,'lowpass')}
@@ -437,28 +493,35 @@ addEventListener('keydown',e=>{if(FEST.set&&FEST.set.end&&e.key=='Escape'){e.sto
 function festHud(){const set=FEST.set;let a=$('fst'),b=$('fcr');if(!set||set.end){if(a)a.remove();if(b)b.remove();const e=$('fend');if(e)e.remove();return}
  if(!a){a=document.createElement('div');a.id='fst';a.className='hb';document.body.appendChild(a);b=document.createElement('div');b.id='fcr';b.className='hb';document.body.appendChild(b);
   const e=document.createElement('button');e.id='fend';e.className='hb';e.textContent='Leave stage (Esc)';e.onclick=()=>festEnd(1);document.body.appendChild(e)}
- const s=set.st,h=`<b class=px style="color:${s.col}">STAGE ${s.n} · ${esc(s.name.toUpperCase())}</b><br><small>Playing "${esc(set.song.title)}"${set.song.ft?' feat. '+esc(set.song.ft):''}</small><div class=bar><i style="width:${Math.min(100,set.t/set.dur*100)}%"></i></div>`;if(a.dataset.h!=h){a.dataset.h=h;a.innerHTML=h}
- const c=Math.round(set.C),dd=c-set.start,g=`<small class=m>CROWD</small><b>${c.toLocaleString()}</b><span class=d style="color:${dd>=0?'#2fe68a':'#ff6a6a'}">${dd>=0?'▲ +':'▼ '}${dd.toLocaleString()}</span><br><small class=m>Pay so far ${$$(FPAY*s.mult*c)}</small>`;if(b.dataset.h!=g){b.dataset.h=g;b.innerHTML=g}}
-function festSetTick(dt){const set=FEST.set,s=set.st;if(set.end)return;set.t+=dt;if(S.t<599)S.t=Math.min(599,S.t+dt*(typeof DAYK!='undefined'?DAYK:1));
- if(set.t<16)set.T=Math.min(set.C0*1.6,set.T+set.C0*.012*dt);
- set.C+=(set.T-set.C)*Math.min(1,dt*1.3);set.peak=Math.max(set.peak,set.C);s.cr.C=set.C;s.cr.hype+=(set.hype-s.cr.hype)*Math.min(1,dt*2);
- if(set.mg)festMgTick(dt);else if(set.t>=set.next&&set.t<set.dur-3)festMgStart();
- if(set.t>=set.dur&&!set.mg)festEnd(0);
+ const s=set.st,nx=set.list[set.i+1],end=FSLOT[set.bk.slot][1],h=`<b class=px style="color:${s.col}">STAGE ${s.n} · ${esc(s.name.toUpperCase())}</b><br><small>Now playing ${set.i+1}/${set.list.length}: <b>"${esc(set.song.title)}"</b>${set.song.ft?' feat. '+esc(set.song.ft):''}</small><div class=bar><i style="width:${Math.min(100,Math.round(set.sm/set.dur*100))}%"></i></div>
+  <small class=m>${fDurS(Math.max(0,set.dur-set.sm))} left · ${nx?'next: "'+esc(nx.title)+'"':'last song!'} · ${clk()} · slot ends ${fHM(end)}</small>`;if(a.dataset.h!=h){a.dataset.h=h;a.innerHTML=h}
+ const c=Math.round(set.C),dd=c-set.start,g=`<small class=m>CROWD</small><b>${c.toLocaleString()}</b><span class=d style="color:${dd>=0?'#2fe68a':'#ff6a6a'}">${dd>=0?'▲ +':'▼ '}${dd.toLocaleString()}</span><br><small class=m>Earned ${$$(set.pay)} · next song pays ${$$(FSONG_PAY*s.mult*c)}</small>`;if(b.dataset.h!=g){b.dataset.h=g;b.innerHTML=g}}
+/* the music under the set: one call per frame, so the audio code can swap it for genre beats. set.song is the song
+   playing, set.songT the seconds since it started, set.hype the crowd's hype (0-1) */
+function festMusic(set,dt){set.songT+=dt;
  /* the beat: kick, snare and hats at about 126 bpm, a chord stab every bar */
  set.bt+=dt;if(set.bt>=.476){set.bt-=.476;set.beat++;const b=set.beat%4;sfx(110,.16,'sine',.32,42,0,0);if(b==1||b==3)nz(.12,1900,.12,1,'bandpass');nz(.03,8000,.05,1,'highpass',.238);
   if(b==0){const r=[[262,330,392],[220,262,330],[175,220,262],[196,247,294]][(set.beat>>2)%4];r.forEach(f=>sfx(f,.4,'sawtooth',.025,0,0,.4))}}}
-function festEnd(quit){const set=FEST.set;if(!set||set.end)return;set.end=1;const s=set.st,frac=Math.min(1,set.t/set.dur),played=quit?frac:1;const m=$('fsg');if(m)m.remove();
- const c=Math.round(set.C),pay=+(FPAY*s.mult*c*(quit?frac:1)).toFixed(2),avg=set.sc.length?set.sc.reduce((a,b)=>a+b,0)/set.sc.length:.5,
-  st=Math.round(c*.5*(.5+avg)*played),fol=Math.round(c*.1*(.5+avg)*played),song=set.song,gain=c-set.start;
- S.money=+(S.money+pay).toFixed(2);S.earn=(S.earn||0)+pay;S.followers=(S.followers||0)+fol;S.interest=Math.min(1,(S.interest||0)+.02*s.mult*avg*played);
- /* the crowd streams the song afterwards: counted in today's streams (paid tomorrow morning) and this month's listeners */
- try{if(typeof planOf=='function')planOf(song);if(typeof mlInit=='function')mlInit();song.streams=(song.streams||0)+st;song.today=(song.today||0)+st;S.streams+=st;S.monthStreams=(S.monthStreams||0)+st}catch(e){console.error('fest streams',e)}
- const F=festS();F.p[s.n]={c,pay,sc:Math.round(avg*100),song:song.title,d:S.day};
- try{(S.igPosts=S.igPosts||[]).push({id:S.nid++,mine:1,u:S.artist,cfg:{...ch},cap:'Played '+s.name+' at Park Fields Festival to '+c.toLocaleString()+' people! 🎪',day:S.day,l:Math.round(c*R(.05,.15))+RI(3,12)})}catch(e){}
- updateVersion();festBoardDraw();chime();snd('cash');
- const lis=Math.round(st/(S.mlDiv||3.5)),grade=avg>=.85?'Legendary set 🔥':avg>=.65?'Great show':avg>=.45?'Decent set':'Tough crowd';mode='menu';
- $('ui').innerHTML=`<div class="box modal"><h2>🎪 ${quit?'You left the stage early':grade}</h2><p class=m>Stage ${s.n} · ${s.name} · "${esc(song.title)}"${set.sc.length?' · '+set.sc.length+' crowd moments, '+Math.round(avg*100)+'% average':''}</p>
-  <div class=cards><div class=card>Crowd<b>${c.toLocaleString()}</b><small>${gain>=0?'+':''}${gain.toLocaleString()} during your set</small></div><div class=card>Paid now<b>${$$(pay)}</b><small>$${FPAY.toFixed(2)} x ${s.mult} x ${c.toLocaleString()}${quit?' x '+Math.round(frac*100)+'%':''}</small></div><div class=card>Streams<b>+${st.toLocaleString()}</b><small>about +${lis.toLocaleString()} monthly listeners tomorrow</small></div><div class=card>Followers<b>+${fol.toLocaleString()}</b></div></div>
+function festSetTick(dt){const set=FEST.set,s=set.st;if(set.end)return;set.t+=dt;if(S.t<599)S.t=Math.min(599,S.t+dt*(typeof DAYK!="undefined"?DAYK:1));if(!set.fin)set.sm=Math.max(0,festMins()-set.ms0);
+ if(set.t<16)set.T=Math.min(set.C0*1.6,set.T+set.C0*.012*dt);
+ set.C+=(set.T-set.C)*Math.min(1,dt*1.3);set.peak=Math.max(set.peak,set.C);s.cr.C=set.C;s.cr.hype+=(set.hype-s.cr.hype)*Math.min(1,dt*2);
+ if(set.mg)festMgTick(dt);else if(!set.fin&&set.t>=set.next&&festSetLeft(set).s>9)festMgStart();
+ const slotEnd=FSLOT[set.bk.slot][1];
+ if(!set.fin&&set.sm>=set.dur){festSongDone();if(set.i+1<set.list.length&&festMins()<slotEnd-1){set.i++;festSongStart()}else set.fin=1}
+ if(!set.fin&&festMins()>=slotEnd){set.fin=2;festSongDone(Math.min(1,set.sm/set.dur))}
+ if(set.fin&&!set.mg)festEnd(0);
+ festMusic(set,dt)}
+function festEnd(quit){const set=FEST.set;if(!set||set.end)return;set.end=1;const s=set.st,m=$('fsg');if(m)m.remove();
+ if(quit&&!set.fin){const fr=Math.min(1,set.sm/set.dur);if(fr>.05)festSongDone(fr)}
+ const c=Math.round(set.C),avg=set.sc.length?set.sc.reduce((a,b)=>a+b,0)/set.sc.length:.5,gain=c-set.start,full=set.done.filter(d=>d.f>=1).length,F=festS();
+ set.bk.st=1;set.bk.res={c,pay:set.pay,n:full,str:set.str};
+ F.p[s.n]={c,pay:set.pay,sc:Math.round(avg*100),song:set.list[0].title,n:full,d:S.day};
+ try{(S.igPosts=S.igPosts||[]).push({id:S.nid++,mine:1,u:S.artist,cfg:{...ch},cap:'Played '+full+' song'+(full==1?'':'s')+' on '+s.name+' at Park Fields Festival to '+c.toLocaleString()+' people! 🎪',day:S.day,l:Math.round(c*R(.05,.15))+RI(3,12)})}catch(e){}
+ updateVersion();festBoardDraw();chime();
+ const lis=Math.round(set.str/(S.mlDiv||3.5)),grade=avg>=.85?'Legendary set 🔥':avg>=.65?'Great show':avg>=.45?'Decent set':'Tough crowd',ttl=quit?'You left the stage early':set.fin==2&&full<set.list.length?'Time\'s up! '+grade:grade;mode='menu';
+ $('ui').innerHTML=`<div class="box modal"><h2>🎪 ${ttl}</h2><p class=m>Stage ${s.n} · ${s.name} · ${full} of ${set.list.length} songs played${set.sc.length?' · '+set.sc.length+' crowd moments, '+Math.round(avg*100)+'% average':''}</p>
+  <div class=cards><div class=card>Crowd<b>${c.toLocaleString()}</b><small>${gain>=0?'+':''}${gain.toLocaleString()} during your set</small></div><div class=card>Paid<b>${$$(set.pay)}</b><small>$${FSONG_PAY.toFixed(2)} x ${s.mult} x crowd, per song</small></div><div class=card>Streams<b>+${set.str.toLocaleString()}</b><small>about +${lis.toLocaleString()} monthly listeners tomorrow</small></div><div class=card>Followers<b>+${set.fol.toLocaleString()}</b></div></div>
+  <div style="max-height:22vh;overflow:auto;margin:6px 0">${set.done.map((d,i)=>`<div class=ng><span style="flex:1">${i+1}. "${esc(d.t)}"${d.f<1?' <small class=m>(cut short, '+Math.round(d.f*100)+'%)</small>':''}</span><small class=m>${d.c.toLocaleString()} people · ${$$(d.pay)}</small></div>`).join('')}</div>
   <div class=row2><button class=go onclick="festLeave()">Leave the stage</button></div></div>`}
 function festLeave(){const set=FEST.set;FEST.set=null;festViewOff();festHud();const s=set&&set.st;if(s){P.x=s.ix;P.z=s.iz+1.2;P.rot=0;camT.x=P.x;camT.z=P.z;s.cr.hype=.4;s.cr.C=festAmbient(s);s.cr.shown=-1}closeUI();festScreens()}
 
@@ -479,11 +542,13 @@ function festTick(dt){festSync();if(FEST.set&&FEST.set.end&&mode=='play')festLea
  else if((ph=='build'||ph=='down')&&FEST.grp[ph]){FEST.grp[ph].visible=near;if(near)(FEST['work_'+ph]||[]).forEach(w=>{const a=w.o.arms,k=t*(w.job=='hammer'?7:3)+w.ph;
    if(w.job=='hammer'){a[1].rotation.x=-1.6+Math.sin(k)*.9;a[0].rotation.x=-.5}else if(w.job=='lift'){a[0].rotation.x=a[1].rotation.x=-2.9+Math.sin(k)*.1}else{a[0].rotation.x=a[1].rotation.x=-1.3;w.o.legs[0].rotation.x=Math.sin(k*2)*.5;w.o.legs[1].rotation.x=-Math.sin(k*2)*.5}})}
  if(FEST.view&&FEST.view3){const v=FEST.view3,s=FEST.view,c=v.cam;festSkyColours(v);v.sky.position.copy(c.position);
-  const sw=Math.sin(t*.37)*.3,px=s.cx-(FEST.set&&FEST.set.song.ft?0:1.6);c.position.set(px+sw,s.h+2.75+Math.sin(t*.5)*.05,s.zf-Math.min(7.4,s.d-1));c.lookAt(s.cx-(FEST.set&&FEST.set.song.ft?0:.6)+sw*.4,s.h+.1,s.zf+30);
+  /* the camera glides sideways when a featured artist comes on or goes off for a collab song */
+  const ft=FEST.set&&FEST.set.song.ft?1:0;v.camX=v.camX==null?ft:v.camX+(ft-v.camX)*Math.min(1,dt*1.5);const sw=Math.sin(t*.37)*.3,px=s.cx-1.6*(1-v.camX);
+  c.position.set(px+sw,s.h+2.75+Math.sin(t*.5)*.05,s.zf-Math.min(7.4,s.d-1));c.lookAt(s.cx-.6*(1-v.camX)+sw*.4,s.h+.1,s.zf+30);
   if(amb.intensity<.6){amb.intensity=.6;amb.color.set('#c8b0ff')}
   const b=v.bub.geometry.attributes.position;for(let i=0;i<b.count;i++){const q=v.bubV[i];let y=b.getY(i)+q[1]*dt,x=b.getX(i)+Math.sin(t*.8+q[3])*.25*dt+q[0]*dt;if(y>s.H+8){y=1.6;x=s.cx+R(-s.w*.9,s.w*.9)}b.setXY(i,x,y)}b.needsUpdate=true;
   v.beams.forEach((m,i)=>{const p=m.userData.ph;m.rotation.set(-1.25+Math.sin(t*.7+p)*.35,0,Math.sin(t*.9+p)*.6);m.material.opacity=(FEST.set?.05+.09*FEST.set.hype:.06)*(.6+.4*Math.sin(t*2+p))})}
- festHud();if(FEST.set&&!FEST.set.end)festMgDraw()}
+ festFade(dt);festHud();if(FEST.set&&!FEST.set.end)festMgDraw()}
 {const u0=update;update=function(dt){u0(dt);try{festTick(dt)}catch(e){if(!FEST.err){FEST.err=1;console.error('festival',e)}}}}
 
 /* ---- 11. maps, taxi, morning card ---- */
@@ -497,5 +562,6 @@ function festTick(dt){festSync();if(FEST.set&&FEST.set.end&&mode=='play')festLea
  else if(ph){FSTG.forEach(s=>{x.strokeStyle='#d0d0d0';x.lineWidth=1;x.strokeRect(sx(s.x0),sz(s.zb),s.w*kx,s.d*kz)});rect(229,GZ-13.4,235,GZ-10.6,'#e8e8ec')}}}
 {const b0=bigMap;bigMap=function(){b0();if(!FEST.ph||!$('bm'))return;const r=document.querySelector('#ui .row2');if(!r)return;const bt=document.createElement('button');bt.textContent=FEST.ph=='fest'?'Taxi to Festival 🎪':'Taxi to Festival';bt.onclick=()=>taxi(FEST.X0-3.5,FEST.GZ);r.insertBefore(bt,r.lastElementChild)}}
 {const w0=wakeUp;wakeUp=function(auto){w0(auto);try{const ph=festPhaseOf(S.day),bx=document.querySelector('#ui .box');if(!ph||!bx)return;const h=bx.querySelector('h2');
- const t=ph=='fest'?'🎪 <b>Park Fields Festival is on today</b>, east of Park Avenue. Play a stage if your fame is high enough (Stage 4 needs Fame Level 10), and grab some food.':ph=='build'?'🚧 A crew is building <b>Park Fields Festival</b> east of Park Avenue. It opens tomorrow.':'🚛 The festival crew is taking Park Fields down today. Next festival: Day '+festNext(S.day)+'.';
+ const bk=fBk().filter(b=>b.day==S.day&&!b.st),mine=bk.map(b=>'Stage '+b.n+' at '+fHM(FSLOT[b.slot][0])).join(' and ');
+ const t=ph=='fest'?'🎪 <b>Park Fields Festival is on today</b>, east of Park Avenue. '+(mine?'<b>You play '+mine+'.</b> Be at the steps of the stage in time!':'Book a slot on FestivalApp (on your computer) at least 2 days before a festival to play. Grab some food.'):ph=='build'?'🚧 A crew is building <b>Park Fields Festival</b> east of Park Avenue. It opens tomorrow.':'🚛 The festival crew is taking Park Fields down today. Next festival: Day '+festNext(S.day)+'.';
  const p=document.createElement('p');p.style.cssText='background:#2b1240;border:2px solid #ff6ad5;padding:6px 8px;margin:6px 0';p.innerHTML=t;h?h.after(p):bx.prepend(p);FEST.seen[S.day]=1}catch(e){}}}
