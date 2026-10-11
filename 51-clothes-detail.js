@@ -5,12 +5,14 @@ const XDN=sl=>{const id=(S.wn||{})[sl],g=id&&GM[id];return g?g.n:''};
 /* pants box per bottom style: width, depth, length below the hip pivot */
 const xLegBox=(bt,w,d)=>({0:[w*.42,d*.8,.42],1:[w*.42,d*.8,.24],2:[w*.44,d*.84,.34],3:[w*.58,d*.97,.42],4:[w*.42,d*.8,.42],5:[w*.42,d*.8,.42],6:[w*.42,d*.8,.24],8:[w*.42,d*.8,.42]})[bt||0];
 
+/* per top style: sleeve length, and styles that draw their own hem or cuffs (later drops add to these) */
+const XTSL=[.25,.5,.5,.3,0,.25,.5,.3,.5,0,.5,.25,.5,.5,.5,.25],XTNOHEM=[6,9,12,14,15],XTNOCUFF=[10,13,14];
 function xDetailTop(x,c){const{g,w,d,arms}=x,T=c.top,tc=c.tc_custom||TOPC[c.tc]||'#888888',t=xtone(tc,.78),z=d/2+.006,jk=c.jk>=0;if(jk)return;
- const sl=[.25,.5,.5,.3,0,.25,.5,.3,.5,0,.5,.25,.5,.5,.5,.25][T]??.25;
+ const sl=XTSL[T]??.25;
  /* side seams, shoulder seams and hem on every top */
- [-1,1].forEach(s=>{xb(g,.008,.56,.014,t,s*(w/2+.004),.8,0);if(T!=4&&T!=9)xb(g,.014,.008,d+.006,t,s*w*.36,1.103,0)});if(![6,9,12,14,15].includes(T))xb(g,w+.008,.025,d+.008,t,0,.525,0);
+ [-1,1].forEach(s=>{xb(g,.008,.56,.014,t,s*(w/2+.004),.8,0);if(T!=4&&T!=9)xb(g,.014,.008,d+.006,t,s*w*.36,1.103,0)});if(!XTNOHEM.includes(T))xb(g,w+.008,.025,d+.008,t,0,.525,0);
  /* sleeve hems and cuffs */
- if(sl>0&&![10,13,14].includes(T))arms.forEach(a=>xb(a,.178,.03,.228,t,0,-sl+.016,0));
+ if(sl>0&&!XTNOCUFF.includes(T))arms.forEach(a=>xb(a,.178,.03,.228,t,0,-sl+.016,0));
  /* crew neck on tees and long sleeves */
  if([0,3,7,8].includes(T)){xb(g,w*.38,.035,.012,t,0,1.08,z);xb(g,w*.38,.012,d*.45,t,0,1.105,0)}
  if(T==1){[-1,1].forEach(s=>{xb(g,.014,.15,.012,'#f4f4f4',s*.05,.98,z+.004);xb(g,.02,.03,.016,'#cfd3d8',s*.05,.9,z+.006);xb(g,.012,.16,.012,t,s*w*.3,.64,d/2+.016,0,0,s*.35)});xb(g,w+.012,.06,d+.012,t,0,.53,0);arms.forEach(a=>xb(a,.18,.06,.23,t,0,-.47,0));xb(g,.012,.2,.24,t,0,1.18,-d/2-.02)}
