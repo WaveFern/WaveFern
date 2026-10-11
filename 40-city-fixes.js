@@ -33,7 +33,7 @@ function xgBox(G,w,h,d,col,x,y,z,ry,tc){const B=xgCell(G,x,z),c=Math.cos(ry||0),
 /* n-sided frustum standing on y0: radius r0 at the bottom, r1 at the top (0 = cone); o: ph (turn), top (cap colour),
    sx/sz (stretch), inv (faces point inwards, for the inside of a basin), cap:false */
 function xgPrism(G,r0,r1,h,n,col,x,y0,z,o){o=o||{};const B=xgCell(G,x,z),ph=o.ph||0,y1=y0+h,sx=o.sx||1,sz=o.sz||1,pt=(r,i,y)=>{const t=ph+i/n*Math.PI*2;return[x+Math.cos(t)*r*sx,y,z+Math.sin(t)*r*sz]};
- for(let i=0;i<n;i++){const a=pt(r0,i,y0),b=pt(r0,i+1,y0),c=pt(r1,i+1,y1),d=pt(r1,i,y1);if(r1<1e-4){o.inv?xgTri(B,a,b,d):xgTri(B,b,a,d)}else xgQuad(B,o.inv?[a,b,c,d]:[b,a,d,c],col)}
+ for(let i=0;i<n;i++){const a=pt(r0,i,y0),b=pt(r0,i+1,y0),c=pt(r1,i+1,y1),d=pt(r1,i,y1);if(r1<1e-4){o.inv?xgTri(B,a,b,d,col):xgTri(B,b,a,d,col)}else xgQuad(B,o.inv?[a,b,c,d]:[b,a,d,c],col)}
  if(r1>1e-4&&o.cap!==false&&!o.inv){const ctr=[x,y1,z];for(let i=0;i<n;i++)xgTri(B,ctr,pt(r1,i+1,y1),pt(r1,i,y1),o.top||col)}}
 /* flat ring (annulus) at height y */
 function xgRing(G,r0,r1,y,n,col,x,z,o){o=o||{};const B=xgCell(G,x,z),ph=o.ph||0,sx=o.sx||1,sz=o.sz||1,pt=(r,i)=>{const t=ph+i/n*Math.PI*2;return[x+Math.cos(t)*r*sx,y,z+Math.sin(t)*r*sz]};
