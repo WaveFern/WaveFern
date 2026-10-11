@@ -4,9 +4,6 @@
 const XDN=sl=>{const id=(S.wn||{})[sl],g=id&&GM[id];return g?g.n:''};
 /* pants box per bottom style: width, depth, length below the hip pivot */
 const xLegBox=(bt,w,d)=>({0:[w*.42,d*.8,.42],1:[w*.42,d*.8,.24],2:[w*.44,d*.84,.34],3:[w*.58,d*.97,.42],4:[w*.42,d*.8,.42],5:[w*.42,d*.8,.42],6:[w*.42,d*.8,.24],8:[w*.42,d*.8,.42]})[bt||0];
-/* a pixel digit (3x5) drawn from boxes, for jersey numbers */
-const XDIG=['111101101101111','010110010010111','111001111100111','111001111001111','101101111001001','111100111001111','111100111101111','111001001001001','111101111101111','111101111001111'];
-function xDigit(g,n,x0,y0,z,px,c,back){const p=XDIG[n];for(let i=0;i<15;i++)if(p[i]=='1'){const cx=i%3,cy=i/3|0;xb(g,px,px,.01,c,x0+(back?-1:1)*(cx-1)*px,y0-(cy-2)*px,z)}}
 
 function xDetailTop(x,c){const{g,w,d,arms}=x,T=c.top,tc=c.tc_custom||TOPC[c.tc]||'#888888',t=xtone(tc,.78),z=d/2+.006,jk=c.jk>=0;if(jk)return;
  const sl=[.25,.5,.5,.3,0,.25,.5,.3,.5,0,.5,.25,.5,.5,.5,.25][T]??.25;
@@ -16,12 +13,10 @@ function xDetailTop(x,c){const{g,w,d,arms}=x,T=c.top,tc=c.tc_custom||TOPC[c.tc]|
  if(sl>0&&![10,13,14].includes(T))arms.forEach(a=>xb(a,.178,.03,.228,t,0,-sl+.016,0));
  /* crew neck on tees and long sleeves */
  if([0,3,7,8].includes(T)){xb(g,w*.38,.035,.012,t,0,1.08,z);xb(g,w*.38,.012,d*.45,t,0,1.105,0)}
- if(T==0&&XDN('top')=='Classic Tee'){xb(g,.07,.022,.01,xlt(tc,.5),-w*.22,.95,z+.002);xb(g,.04,.022,.01,xlt(tc,.5),-w*.22+.035,.972,z+.002)}
  if(T==1){[-1,1].forEach(s=>{xb(g,.014,.15,.012,'#f4f4f4',s*.05,.98,z+.004);xb(g,.02,.03,.016,'#cfd3d8',s*.05,.9,z+.006);xb(g,.012,.16,.012,t,s*w*.3,.64,d/2+.016,0,0,s*.35)});xb(g,w+.012,.06,d+.012,t,0,.53,0);arms.forEach(a=>xb(a,.18,.06,.23,t,0,-.47,0));xb(g,.012,.2,.24,t,0,1.18,-d/2-.02)}
  if(T==2){xb(g,.05,.04,.016,'~#cfd3d8',0,1.06,z+.006);for(let i=0;i<8;i++)xb(g,.03,.008,.014,'#9aa0a6',0,.56+i*.065,z+.004);[-1,1].forEach(s=>xb(g,.13,.012,.012,t,s*w*.28,.66,z))}
- if(T==5){[-1,1].forEach(s=>xb(g,w*.2,.06,.016,'#f4f4f4',s*w*.1,1.06,z+.006,0,0,s*.3));[1.0,.93].forEach(y=>xb(g,.025,.025,.016,'#e8e8e8',0,y,z+.008));xb(g,.035,.045,.012,xcon(tc),-w*.24,.96,z+.002)}
+ if(T==5){[-1,1].forEach(s=>xb(g,w*.2,.06,.016,'#f4f4f4',s*w*.1,1.06,z+.006,0,0,s*.3));[1.0,.93].forEach(y=>xb(g,.025,.025,.016,'#e8e8e8',0,y,z+.008))}
  if(T==6){for(let i=0;i<3;i++){const px=(i-1)*w*.26;for(let j=0;j<5;j++)xb(g,.05,.06,.014,xlt(tc,.12),px+(j%2?.012:-.012),.62+j*.1,z+.002)}arms.forEach(a=>xb(a,.18,.07,.23,t,0,-.465,0))}
- if(T==7){const n=23,bz=-d/2-.008,px=.035;xDigit(g,2,.07,.84,bz,px,'#f4f4f4',1);xDigit(g,3,-.07,.84,bz,px,'#f4f4f4',1);xDigit(g,2,-w*.22-.03,.95,z+.004,.016,'#f4f4f4');xDigit(g,3,-w*.22+.03,.95,z+.004,.016,'#f4f4f4')}
  if(T==8)arms.forEach(a=>xb(a,.18,.05,.23,t,0,-.47,0));
  if(T==9){xb(g,.02,.6,.012,'~#cfd3d8',0,.8,d/2+.034);xb(g,w*.55,.09,d*.8,dk(tc,.85),0,1.12,0);[-1,1].forEach(s=>xb(g,.02,.3,d*.7,t,s*(w/2+.035),.98,0))}}
 
@@ -58,8 +53,8 @@ function xDetailShoes(x,c){const{w,d,legs}=x,sh=c.shs;if(sh>=2)return;const col=
 
 function xDetailHat(x,c){const{h}=x;if(!h||!(c.ht>=0))return;const sy=c.hts!==undefined?c.hts:[0,1,2,0,3,1,2][c.ht]??0;if(sy>=6)return;const k=(HTC[c.ht]||['#888888'])[0],t=xtone(k,.75),con=xcon(k);
  if(sy==0||sy==3){xb(h,.06,.03,.06,k,0,.455,0);xb(h,.012,.012,.645,t,0,.441,0);xb(h,.645,.012,.012,t,0,.441,0);[-1,1].forEach(s=>xs(h,.012,t,s*.2,.4,.22,4));
-  xb(h,.17,.075,.01,sy==3?con:t,0,.37,.322);if(sy==3){xc(h,.045,.045,.006,'~#d4af37',.12,.322,.47,0,0,0,10);xb(h,.3,.05,.012,'#1a1a1a',0,.34,-.326)}else xb(h,.62,.012,.3,t,0,.276,.43)}
- if(sy==1){for(let i=0;i<7;i++)xb(h,.018,.1,.665,t,-.27+i*.09,.27,0);xb(h,.12,.06,.012,con,0,.27,.334)}
+  if(sy==3)xb(h,.3,.05,.012,'#1a1a1a',0,.34,-.326);else xb(h,.62,.012,.3,t,0,.276,.43)}
+ if(sy==1){for(let i=0;i<7;i++)xb(h,.018,.1,.665,t,-.27+i*.09,.27,0)}
  if(sy==2){xb(h,.952,.008,.952,t,0,.322,0);xb(h,.8,.008,.8,t,0,.322,0);[-1,1].forEach(s=>xs(h,.014,'~#cfd3d8',s*.305,.4,0,4))}
  if(sy==4)xb(h,.1,.05,.01,con,0,.3,.325);
  if(sy==5)xb(h,.4,.02,.4,t,.06,.505,.0)}
