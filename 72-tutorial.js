@@ -127,7 +127,7 @@ function tutHint(){const s=TUT[S.tut.i];if(!s)return;const o=tutTgt();if(o)TUTPA
 function tutPoll(){const T=S.tut;if(!T||!T.on||T.i>=TUT.length){tutClr();return tutRender()}
  if(mode=='play'&&keys.shift&&(keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright))T.f.run=1;
  if(mode=='pc'){if(app=='msg')T.f.msg=1;if(app=='fest')T.f.fest=1}
- if($('bm'))T.f.map=1;const sc=$('sc');if(sc&&/^FW1-/.test(sc.value))T.f.code=1;
+ if($('bm'))T.f.map=1;const sc=$('sc');if(sc&&/^FW[12]-/.test(sc.value))T.f.code=1;
  const s=TUT[T.i];if(s.info?T.f.said:s.ok&&s.ok(T.b||{})){tutNext();return}
  const p=TUTPEND;if(p&&p.i==T.i&&Date.now()>=p.at&&tutOK()){TUTPEND=null;if(p.card&&!$('tcard')){tutCard('CHAPTER '+(s.c+1),TCH[s.c].n,TCH[s.c].s);TUTPEND={i:T.i,at:Date.now()+2700}}else tutIntro()}
  tutRender();

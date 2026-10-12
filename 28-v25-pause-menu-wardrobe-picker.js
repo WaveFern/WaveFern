@@ -11,7 +11,7 @@ function resumeGame(){if(!PAUSED)return;mode=PS||'play';PS='';PAUSED=0;MU.hold=0
 const WCOL=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#9b59b6','#f4f4f4','#111111'],B0={t:TOPC.length,j:JKC.length,p:PANTC.length,h:HTC.length,s:SHC.length};let WPK={id:null,h:0,s:1,v:1};
 function addCol(c){if(!/^#[0-9a-f]{6}$/i.test(c))return;let n=0;if(!TOPC.includes(c)){TOPC.push(c);n=1}if(!JKC.includes(c)){JKC.push(c);n=1}if(!PANTC.includes(c)){PANTC.push(c);n=1}if(!HTC.some(x=>x[0]==c&&x[1]=='Custom')){HTC.push([c,'Custom']);n=1}if(!SHC.some(x=>x[0]==c&&x[1]==0&&x[2]=='Custom')){SHC.push([c,0,'Custom'],[c,1,'Custom']);n=1}if(n){S.cpal=S.cpal||[];if(!S.cpal.includes(c))S.cpal.push(c)}}
 {const eq0=equip;equip=function(id,col){addCol(col||GM[id].dc);return eq0(id,col)}
- const lc0=loadCode;loadCode=function(c){try{const d=JSON.parse(decodeURIComponent(escape(atob(c.trim().slice(4)))));TOPC.length=B0.t;JKC.length=B0.j;PANTC.length=B0.p;HTC.length=B0.h;SHC.length=B0.s;S.cpal=[];(d.S.cpal||[]).forEach(addCol)}catch(e){}return lc0(c)}}
+ const lc0=loadCode;loadCode=function(c){try{const d=scDecode(c.trim());TOPC.length=B0.t;JKC.length=B0.j;PANTC.length=B0.p;HTC.length=B0.h;SHC.length=B0.s;S.cpal=[];(d.S.cpal||[]).forEach(addCol)}catch(e){}return lc0(c)}}
 const wpWorn=id=>(S.wn||{})[GM[id].slot]==id;
 function wpPick(id,hex){WPK.id=null;S.wc=S.wc||{};S.wc[id]=hex;if(wpWorn(id)){equip(id,hex);refresh();snd('pop')}wrR()}
 function wpOpen(id){if(WPK.id==id)WPK.id=null;else Object.assign(WPK,hex2hsv((S.wc||{})[id]||GM[id].dc),{id});wrR()}
