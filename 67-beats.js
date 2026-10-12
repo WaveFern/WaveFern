@@ -416,4 +416,4 @@ function beatsSfRows(){if(typeof app=='undefined'||app!=1||pg!='home'||!S.artist
 if(typeof pcR=='function'){const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{beatsSfRows()}catch(e){}return r}}
 
 /* Park Fields Festival: the set's music goes through festMusic(set,dt) (70-festival.js); play the song's own beat instead of the drum loop */
-if(typeof festMusic=='function'){const fm0=festMusic;festMusic=function(set,dt){if(Beats.fest(set)){set.songT=(set.songT||0)+dt;return}return fm0.apply(this,arguments)}}
+if(typeof festMusic=='function'){const fm0=festMusic;festMusic=function(set,dt){Beats.fest(set);set.songT=(set.songT||0)+dt}}
