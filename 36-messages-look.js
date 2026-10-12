@@ -44,6 +44,7 @@
 .msx .schr select:focus,.msx .mloc select:focus{outline:0;border-color:#ff3d8166}
 .msx .schs{border-radius:12px;font-size:13px}.msx .schs.ok{background:#e7f8ef;color:#1d6b47}.msx .schs.no{background:#fff0e6;color:#9a4a1f}
 .msx .schc small,.msx .sch .m{color:#8f7a9a}
+.msx .schc{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.msx .schm summary{color:#8f7a9a;cursor:pointer;font-size:13px;padding:4px 0}.msx .chp.on{background:var(--mx-me);color:#fff}
 .msx .chp{background:#f7eefb;color:var(--mx-ink);border:0;border-radius:999px;box-shadow:none}.msx .chp:hover{background:#efe3f2}
 .msx .schb button{border:0;border-radius:18px;box-shadow:none;background:#efe3f2;color:var(--mx-ink)}
 .msx .schb button.go{background:var(--mx-me);color:#fff;box-shadow:0 2px 6px #ff3d8144}

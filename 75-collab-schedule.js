@@ -94,18 +94,26 @@ function schInit(m){if(SCH.id===m.id&&SCH.day!=null)return;const e=thr(m);let d=
  SCH={id:m.id,day:d==null?S.day+1:d,tm,loc,re:SCH.id===m.id?SCH.re:0,msg:''}}
 function schSet(k,v){SCH[k]=v;SCH.msg='';pcR()}
 function schPick(day,tm,loc){SCH.day=day;SCH.tm=tm;SCH.loc=loc;SCH.msg='';pcR()}
-function schBar(m){schInit(m);const ign=schIgn(m),ev=thr(m),pp=!isInM(m),r=schCheck(m,SCH.day,SCH.tm,SCH.loc,ign);
+function schBar(m){schInit(m);const ign=schIgn(m),pp=!isInM(m),r=schCheck(m,SCH.day,SCH.tm,SCH.loc,ign);
+ /* short day label: Today / Tomorrow / weekday */
+ const dl=d=>d==S.day?'Today':d==S.day+1?'Tomorrow':wdShort(d);
  const days=[];for(let d=S.day;d<S.day+28;d++)days.push(d);
- const dopt=days.map(d=>{const ok=schCheck(m,d,SCH.tm,SCH.loc,ign).ok;return`<option value=${d} ${SCH.day==d?'selected':''}>${ok?'✓':'✗'} ${wdShort(d)} · Day ${d}${d==S.day?' · today':d==S.day+1?' · tomorrow':''}</option>`}).join('');
+ const dopt=days.map(d=>{const ok=schCheck(m,d,SCH.tm,SCH.loc,ign).ok;return`<option value=${d} ${SCH.day==d?'selected':''}>${ok?'✓':'✗'} ${dl(d)} · Day ${d}</option>`}).join('');
  const topt=SCHT.map(t=>{const ok=schCheck(m,SCH.day,t,SCH.loc,ign).ok;return`<option value=${t} ${SCH.tm==t?'selected':''}>${ok?'✓':'✗'} ${fHM(t)}</option>`}).join('');
  const lopt=CMEETK.map(k=>{const ok=schCheck(m,SCH.day,SCH.tm,k,ign).ok,pb=locBan(m.a,k);return`<option value=${k} ${SCH.loc==k?'selected':''}>${pb?'✗ never':ok?'✓':'✗'} ${esc(CLOCS[k])}</option>`}).join('');
- const alts=r.ok?[]:calAlts(m.a,SCH.loc,3,{ign}),opts=(m.opt||[]).filter(o=>o.day>=S.day&&schCheck(m,o.day,o.tm,o.loc,ign).ok).slice(0,3);
- const chips=(r.ok?opts:alts.concat(opts)).filter((o,i,a)=>a.findIndex(q=>q.day==o.day&&q.tm==o.tm&&q.loc==o.loc)==i).slice(0,4).map(o=>`<button class=chp onclick="schPick(${o.day},${o.tm},'${o.loc}')">${esc(slotShort(o))}</button>`).join('');
- const money=pp?`You pay <b>${$$(m.pay)}</b> when the session starts${S.money<m.pay?` · <span style="color:#ff9a6a">you only have ${$$(S.money)}</span>`:''}`:`${esc(ART[m.a][0])} pays you <b>${$$(m.pay)}</b> when the session starts`;
- return`<div class=sch><div class=schh><b>${SCH.re?'Move the session':'Pick a date for the session'}</b><span>${money}</span></div>
-  <div class=schr><label>Day <select onchange="schSet('day',+this.value)">${dopt}</select></label><label>Time <select onchange="schSet('tm',+this.value)">${topt}</select></label><label>Place <select onchange="schSet('loc',this.value)">${lopt}</select></label></div>
-  <div class="schs ${r.ok?'ok':'no'}">${r.ok?'✓ '+esc(ART[m.a][0])+' is free then and so are you: '+esc(calSlotTxt(SCH.day,SCH.tm,SCH.loc)):'✗ '+esc(r.why)}</div>
-  ${SCH.msg?`<div class="schs no">${esc(SCH.msg)}</div>`:''}${chips?`<div class=schc><small>${r.ok?'Their other offers':'Try one of these'}:</small> ${chips}</div>`:''}
+ /* three one-tap slots: the best free ones (or the nearest alternatives when the current pick is not free) */
+ const alts=r.ok?[]:calAlts(m.a,SCH.loc,3,{ign}),opts=(m.opt||[]).filter(o=>o.day>=S.day&&schCheck(m,o.day,o.tm,o.loc,ign).ok);
+ const sugg=(r.ok?opts:alts.concat(opts)).filter((o,i,a)=>a.findIndex(q=>q.day==o.day&&q.tm==o.tm&&q.loc==o.loc)==i).slice(0,3);
+ const chips=sugg.map(o=>{const on=o.day==SCH.day&&o.tm==SCH.tm&&o.loc==SCH.loc;return`<button class="chp${on?' on':''}" onclick="schPick(${o.day},${o.tm},'${o.loc}')">${dl(o.day)} ${fHM(o.tm)} · ${esc(CLOCS[o.loc])}</button>`}).join('');
+ const money=pp?`You pay <b>${$$(m.pay)}</b> on the day${S.money<m.pay?` · <span style="color:#ff9a6a">you have ${$$(S.money)}</span>`:''}`:`${esc(ART[m.a][0])} pays you <b>${$$(m.pay)}</b>`;
+ const status=r.ok?'✓ Free for both of you':'✗ '+esc(r.why);
+ /* the selects sit behind "More options"; open by default when nothing is free and there are no suggestions */
+ const more=SCH.more||(!r.ok&&!chips);
+ return`<div class=sch><div class=schh><b>${SCH.re?'Move the session':'Pick a date'}</b><span>${money}</span></div>
+  <div class="schs ${r.ok?'ok':'no'}">${status}</div>
+  ${SCH.msg?`<div class="schs no">${esc(SCH.msg)}</div>`:''}${chips?`<div class=schc>${chips}</div>`:''}
+  <details class=schm ${more?'open':''} ontoggle="SCH.more=this.open"><summary>More options</summary>
+  <div class=schr><label>Day <select onchange="schSet('day',+this.value)">${dopt}</select></label><label>Time <select onchange="schSet('tm',+this.value)">${topt}</select></label><label>Place <select onchange="schSet('loc',this.value)">${lopt}</select></label></div></details>
   <div class=schb><button class=go onclick="schGo(${m.id})">${SCH.re?'Propose new time':'Propose this time'}</button>${SCH.re?`<button onclick="SCH.re=0;pcR()">Keep the current time</button>`:`<button onclick="unready(${m.id})">Not now</button>`}</div></div>`}
 function schInfoBar(m){const e=thr(m);if(!e)return'';const pp=e.dir=='p',late=absT(e.day,e.s)-calNow()<1440;
  if(m.state==1&&e.st==1)return`<div class=sch><div class=schh><b>${esc(ART[m.a][0])} is waiting for you</b><span>${esc(CLOC[e.loc])} until ${fHM(e.e)} · walk up to them (gold beacon)</span></div></div>`;
@@ -248,4 +256,4 @@ RB_IN.confirm=['deal. i pay you ${pay} on the day. pick a date that works for yo
    if(e&&e.st==0&&v!=e.loc){const r=schCheck(m,e.day,e.s,v,e.id);if(!r.ok){if(!quiet)m.log.push({f:'me',t:'can we meet '+MEETL[v].p+' instead?',d:S.day});schSay(m,r.why,false);return}e.loc=v}}
   sm0(id,v,quiet)}}
 {const st=document.createElement('style');st.textContent=`.sch{padding:8px 12px;background:#16201b;border-top:1px solid #1a2520;color:#e8f4ee}.schh{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;align-items:baseline}.schh span{font-size:13px;opacity:.9}.schr{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}.schr label{display:flex;gap:5px;align-items:center;font-size:13px}.schr select{background:#fff;color:#2a1a2e;border:2px solid #e7a5c9;border-radius:999px;padding:4px 10px;font:inherit;font-size:13px;max-width:210px}
-.schs{font-size:13px;padding:4px 8px;border-radius:4px;margin:4px 0}.schs.ok{background:#14452c;color:#c7ffe0}.schs.no{background:#4a2a12;color:#ffe2c4}.schc{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:4px 0}.chp{border-radius:999px!important;font-size:12px!important;padding:3px 10px!important}.schb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}`;document.head.appendChild(st)}
+.schs{font-size:13px;padding:4px 8px;border-radius:4px;margin:4px 0}.schs.ok{background:#14452c;color:#c7ffe0}.schs.no{background:#4a2a12;color:#ffe2c4}.schc{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:4px 0}.chp{border-radius:999px!important;font-size:12px!important;padding:3px 10px!important}.schb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}.schm{margin:4px 0}.schm summary{cursor:pointer;font-size:13px;opacity:.8;padding:2px 0}.chp.on{outline:2px solid #e7a5c9}`;document.head.appendChild(st)}
