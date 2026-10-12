@@ -55,43 +55,81 @@ function negKind(text,pp){const s=' '+String(text||'').toLowerCase().replace(/[â
  if(pp){if(h(lowerW))return'better';if(h(cheapW))return'good';if(h(higherW))return null}
  else{if(h(higherW)||h(/ (cheap|stingy|tight|peanuts|thats nothing) /))return'better';if(h(/ (too much|thats a lot|generous|a lot of money|so much|great price|good price|fair price|bargain) /))return'good'}
  return null}
-const NEG_P={chill:{lim:.25,pat:4,con:.5},hype:{lim:.2,pat:3,con:.4},shy:{lim:.3,pat:5,con:.6},formal:{lim:.12,pat:2,con:.3},goofy:{lim:.25,pat:3,con:.5}};
-const r5=v=>Math.max(5,Math.round(v/5)*5);
-/* fresh negotiation state for a deal. pp = player pays, base = the artist's opening price, rel = relationship score */
-function negInit(base,pp,pers,rel,rnd){const P=NEG_P[pers]||NEG_P.chill,rb=Math.min(.08,Math.max(0,(rel||0))*.008),j=((rnd==null?Math.random():rnd)-.5)*.06,f=P.lim+rb+j;
- const lim=pp?Math.max(5,Math.ceil(base*(1-f)/5)*5):Math.floor(base*(1+f)/5)*5;return{base,pp:!!pp,lim,A:base,last:null,low:0,rounds:0,fin:0,pat:P.pat+((rel||0)>=8?1:0),con:P.con}}
+/* ===== v26.46: negotiation personalities and flexible counters =====
+   Every artist has a seeded negotiation personality (artX(i).np, see 74-calendar.js): flexible, stubborn, proud, greedy, generous or shrewd.
+   room  = how far from the opening price the artist will really go (drop for a fee the player pays, give for a payment the artist makes).
+           It shrinks with the artist's size (big names move less) and grows a little with the relationship.
+   rate  = the share of the gap between the ask and the player's offer that the artist closes in one counter.
+   pat   = rounds before a final offer; ins = how low an offer can be before it counts as an insult.
+   Counters scale with the size of the gap and with how reasonable the offer is, so a big raise gets a big move and a tiny raise a small one.
+   Offers inside the artist's range are accepted with a chance that grows with how attractive the deal is and with the rounds spent,
+   so deals usually happen but are not guaranteed. Prices round to sensible steps ($1, $5, $10, $25 ...). */
+const NEG_P={
+ flexible:{drop:.38,give:.42,rate:.55,pat:6,ins:.35},
+ stubborn:{drop:.15,give:.14,rate:.2,pat:4,ins:.55},
+ proud:{drop:.22,give:.24,rate:.32,pat:4,ins:.66},
+ greedy:{drop:.18,give:.16,rate:.26,pat:4,ins:.50},
+ generous:{drop:.45,give:.55,rate:.62,pat:7,ins:.25},
+ shrewd:{drop:.28,give:.3,rate:.4,pat:5,ins:.45}};
+const nu=v=>v<30?1:v<120?5:v<500?10:v<2500?25:v<10000?100:v<50000?250:1000,nr=v=>{const k=nu(v);return Math.max(1,Math.round(v/k)*k)};
+const r5=nr;
+/* fresh negotiation state for a deal. pp = player pays, base = the artist's opening price, who = artist index (or a personality name), rel = relationship score */
+function negInit(base,pp,who,rel,rnd){let np='shrewd',big=0;
+ if(typeof who=='number'&&typeof artX=='function'){np=artX(who).np;big=Math.min(1,Math.log10(1+ART[who][2])/8)}else if(typeof who=='string'&&NEG_P[who])np=who;
+ const P=NEG_P[np]||NEG_P.shrewd,fx=1-.45*big,rb=Math.min(.3,Math.max(0,rel||0)*.03),j=((rnd==null?Math.random():rnd)-.5)*.2,room=(pp?P.drop:P.give)*fx*(1+rb)*(1+j);
+ const lim=pp?Math.max(1,Math.ceil(base*(1-room))):Math.floor(base*(1+room));
+ return{base,pp:!!pp,lim,A:base,last:null,first:null,low:0,rounds:0,fin:0,pat:P.pat+((rel||0)>=8?1:0),rate:P.rate*fx*(1+rb/2),ins:P.ins,np}}
 /* one negotiation move. in = {num} or {kind}. returns {k: line key, pay: artist's (new) price, agreed?, walk?, x} and mutates g */
-function negStep(g,inp){const s=g.pp?1:-1,u=p=>s*p,A=g.A,L=g.lim;
- const concede=()=>{const n=g.pp?Math.max(L,r5(A-(A-L)*g.con)):Math.min(L,r5(A+(L-A)*g.con));return u(n)<u(A)?n:L};
- const lowball=()=>{g.low++;if(g.fin||g.low>g.pat){return{k:'walk',walk:1,pay:A}}if(g.low==g.pat){g.fin=1;return{k:'final',pay:A}}return null};
- if(inp.num!=null){const x=inp.num;
-  if(u(x)>=u(A)){g.agreed=A;return{k:x==A?'deal':'over',agreed:1,pay:A,x}}
-  const absurd=x<=0||(g.pp?x<L*.5:x>L*1.6)||x>g.base*20;
-  if(absurd){g.low++;const w=g.fin||g.low>g.pat;if(w)return{k:'walk',walk:1,pay:A,x};if(g.low==g.pat){g.fin=1;return{k:'final',pay:A,x,annoy:1}}return{k:'absurd',pay:A,x,annoy:1}}
+function negStep(g,inp){const s=g.pp?1:-1,u=p=>s*p,A=g.A,L=g.lim,R=Math.random,room=Math.max(1e-9,u(A)-u(L));
+ /* move the ask a share of the way from A towards tgt, always by at least one price step and never past the limit */
+ const mv=(tgt,fr)=>{let n=nr(A-s*Math.abs(A-tgt)*fr);if(u(n)>=u(A))n=A-s*nu(A);if(u(n)<u(L))n=L;return n};
+ const walk=(x)=>({k:'walk',walk:1,pay:A,x}),agree=(p,k,x)=>{g.agreed=p;g.A=p;return{k:k||'deal',agreed:1,pay:p,x}};
+ if(inp.num!=null){const x=inp.num;if(g.first==null)g.first=x;
+  if(u(x)>=u(A))return agree(A,x==A?'deal':'over',x);
+  const ratio=Math.max(0,Math.min(1,g.pp?x/Math.max(1,A):A/Math.max(1,x)));
+  const insult=x<=0||(g.pp?x<L*g.ins:x>L/g.ins)||x>g.base*25;
+  if(insult){g.low++;if(g.fin||g.low>g.pat||(g.np=='proud'&&g.low>=2))return walk(x);return{k:'absurd',pay:A,x,annoy:1}}
   g.last=x;
-  if(u(x)>=u(L)){const gap=Math.abs(A-x);if(g.fin||g.rounds>=1||gap<=Math.max(5,g.base*.08)){g.agreed=x;g.A=x;return{k:'deal',agreed:1,pay:x,x}}
-   g.rounds++;let m=r5((x+A)/2);if(u(m)>=u(A)||u(m)<=u(x))m=Math.round((x+A)/2);g.A=m;return{k:'counter',pay:m,x}}
-  const lb=lowball();if(lb)return Object.assign(lb,{x});g.rounds++;
-  if(A==L)return{k:'limit',pay:A,x};g.A=concede();return{k:'counter',pay:g.A,x}}
- if(inp.kind=='mid'){if(g.last!=null&&u(g.last)<u(A)){let m=Math.round((g.last+A)/2);const m5=Math.round(m/5)*5;if(u(m5)<=u(A)&&u(m5)>=u(L))m=m5;if(u(m)>=u(L)){g.agreed=m;g.A=m;return{k:'mid',agreed:1,pay:m}}g.A=L;g.rounds++;return{k:'limit',pay:L}}
+  if(u(x)>=u(L)){/* inside what they could live with: how attractive is it? */
+   const frac=Math.min(1,(u(x)-u(L))/room),gap=Math.abs(A-x),pAcc=Math.min(1,.2+.85*frac+.14*g.rounds+(g.fin?.5:0)+(gap<=Math.max(1,g.base*.04)?.45:0))*(g.np=='stubborn'?.9:1);
+   if(R()<pAcc)return agree(x,'deal',x);
+   g.rounds++;const close=Math.max(.06,Math.min(.9,g.rate*(.6+.8*R())*(.6+.8*frac)));let n=nr(A-s*gap*close);if(u(n)>=u(A))n=A-s*nu(A);if(u(n)<=u(x))return agree(x,'deal',x);if(u(n)<u(L))n=L;g.A=n;return{k:'counter',pay:n,x}}
+  /* below what they would ever take */
+  g.rounds++;
+  if(A==L||g.fin){g.low++;if(g.fin&&(R()<.6||g.low>g.pat))return walk(x);if(g.low>g.pat)return walk(x);return{k:'limit',pay:A,x}}
+  if(ratio<.6)g.low+=.5;if(g.low>g.pat)return walk(x);
+  if(g.rounds>=g.pat){g.fin=1;const n=mv(L,.5);g.A=n;return{k:'final',pay:n,x}}
+  const close=Math.max(.04,Math.min(.8,g.rate*(.6+.8*R())*Math.pow(Math.max(.15,ratio),1.2)));g.A=mv(x,close);return{k:g.A==L?'limit':'counter',pay:g.A,x}}
+ if(inp.kind=='mid'){if(g.last!=null&&u(g.last)<u(A)){const m=nr((g.last+A)/2);
+   if(u(m)>=u(L)){if(R()<(g.np=='stubborn'?.5:g.np=='greedy'?.6:.85))return agree(m,'mid');g.rounds++;g.A=mv(m,.5);return{k:'counter',pay:g.A,x:g.last}}
+   g.rounds++;g.A=mv(L,.5);return{k:'limit',pay:g.A}}
   inp={kind:'better'}}
- if(inp.kind=='better'){if(A==L||g.fin){const lb=lowball();if(lb)return lb;return{k:'limit',pay:A}}g.rounds++;g.A=concede();return{k:g.A==L?'limit':'down',pay:g.A}}
+ if(inp.kind=='better'){if(A==L||g.fin){g.low++;if(g.low>g.pat)return walk();return{k:'limit',pay:A}}
+  g.rounds++;const stp=Math.max(g.rate*room*(.5+.7*R()),.03*A),n=nr(A-s*stp);g.A=u(n)>=u(A)?A-s*nu(A):u(n)<u(L)?L:n;return{k:g.A==L?'limit':'down',pay:g.A}}
  return null}
 const NEG_L={
- pp:{counter:['hmm ${x} is kinda low. i can do ${pay} tho','cant do ${x} lol. ${pay}?','${x}? nah. meet me at ${pay}','ok ok, ${pay}. thats me being nice'],
+ pp:{counter:['hmm ${x} is kinda low. i can do ${pay} tho','cant do ${x} lol. ${pay}?','${x}? nah. meet me at ${pay}','ok ok, ${pay}. thats me being nice','${x} is not it, but ${pay} could work'],
   down:['fine, i can come down to ${pay}','ok ${pay}, just for you','alright, ${pay}. better?'],
   limit:['${pay} is as low as i go fr','cant go under ${pay}, sorry','${pay} is my floor, take it or leave it?'],
   absurd:['lol ${x}? be serious','${x}?? thats not a real offer','nah ${x} is crazy low, my fee is ${pay}']},
- ap:{counter:['${x} is a stretch for me. i can do ${pay}','cant do ${x} lol. how about ${pay}?','${x}? hmm. ${pay} is what i got'],
+ ap:{counter:['${x} is a stretch for me. i can do ${pay}','cant do ${x} lol. how about ${pay}?','${x}? hmm. ${pay} is what i got','${pay} is where i can get to'],
   down:['ok ok, i can stretch to ${pay}','fine, ${pay}. you drive a hard bargain lol','alright ${pay}, better?'],
   limit:['${pay} is really my ceiling, sorry','cant go higher than ${pay}, promise','${pay} is all my budget, take it or leave it?'],
   absurd:['${x}?? i aint got that kinda money lol','lol ${x}? nah. ${pay} is the offer','${x} is wild, be serious']},
- deal:['bet, ${pay} it is. hit the button when ready','ok deal, ${pay}. we are on','sold, ${pay}. lock it in'],
+ deal:['bet, ${pay} it is. now lets find a day','ok deal, ${pay}. we are on, pick a day that works','sold, ${pay}. lock in a date'],
  over:['ha i only asked ${pay}, lets do that','lol ${pay} is fine, deal'],
  mid:['ok meet in the middle, ${pay}. deal','fair, ${pay} down the middle. we good','alright halfway, ${pay}. done'],
  final:['ok im getting tired of this. ${pay}, final offer','last time: ${pay}. take it or leave it','${pay}. thats final, no more haggling'],
  walk:['nah forget it, this aint working. maybe another time','ok im out, we cant agree on money. no hard feelings','yeah this is going nowhere. lets leave it'],
- locked:['we already said ${pay} lol, deal is a deal','we agreed ${pay} already. hit the button when ready','its ${pay}, we shook on it']};
+ locked:['we already said ${pay} lol, deal is a deal','we agreed ${pay} already. pick a day when ready','its ${pay}, we shook on it']};
+/* a few lines in each personality's own voice (used instead of the generic ones when present) */
+const NEG_LP={
+ proud:{absurd:['do you know who you are talking to? ${x} is an insult','${x}? i dont get out of bed for that. ${pay}','im not a bargain bin artist. ${pay}'],limit:['${pay}. my name is worth that and more','i dont go lower than ${pay}, ever'],walk:['i have heard enough. we are done here','this is disrespectful. i am out']},
+ greedy:{counter:['money talks. ${pay} and we have a deal','${x} wont cut it, ${pay} and thats generous','${pay}. i know what i am worth'],limit:['${pay} or nothing, my time is money','it is ${pay}. i do not do charity']},
+ stubborn:{counter:['no. ${pay}','${pay}, i am not moving much','${x}? ${pay}. thats where i am'],down:['fine. ${pay}. not a cent less','${pay}. that is a favour'],limit:['${pay}. final. i dont repeat myself']},
+ flexible:{counter:['ok i hear you, ${pay} works for me?','${x} is close! can you do ${pay}?','lets meet closer: ${pay}'],down:['sure, ${pay} then, happy to make it work']},
+ generous:{counter:['aw ok, ${pay}? i want this to work for both of us','${x} is fair-ish, how about ${pay}?'],down:['sure thing, ${pay}, no stress']},
+ shrewd:{counter:['i run the numbers: ${pay} makes sense for both of us','${x} undersells it. ${pay} is fair'],limit:['${pay} is where the maths stops working for me']}};
 if(typeof reply=='function'){const rp0=reply;reply=function(m,t){
   if(!m||m.a===undefined||m.blocked||m.recv||!ART[m.a])return rp0(m,t);
   if(m.state!=0||m.stage<1||npcIntent(t).k=='abuse'||npcClaim(t)){delete m.ng;return rp0(m,t)}
@@ -101,12 +139,12 @@ if(typeof reply=='function'){const rp0=reply;reply=function(m,t){
   if(m.stage==1&&(num==null||R.k=='no'))return rp0(m,t);
   if(num==null&&(!k2||k2=='good')){const r=rp0(m,k2=='good'&&m.stage==2&&R.k!='no'?'yes':t);if(m.ng&&m.ready&&m.stage==2)m.ng.agreed=m.pay;return r}
   const a=ART[m.a];if(m.stage==1){m.stage=2}
-  if(!m.ng||m.ng.base==null||m.ng.pp!==pp)m.ng=negInit(m.pay,pp,a[5],m.rel);
+  if(!m.ng||m.ng.base==null||m.ng.pp!==pp)m.ng=negInit(m.pay,pp,m.a,m.rel);
   const g=m.ng,c=ctxOf(m);TY=0;m.rel=(m.rel||0)+1;let o;if(m.ready&&g.agreed==null)g.agreed=m.pay;
   if(g.agreed!=null&&m.ready){m.pay=g.agreed;o={k:'locked',pay:g.agreed,agreed:1}}
   else{g.agreed=null;g.A=m.pay;o=negStep(g,num!=null?{num}:{kind:k2})}
   if(!o)return rp0(m,t);
-  c.pay=o.pay;c.x=o.x;const L=NEG_L[o.k]||NEG_L[pp?'pp':'ap'][o.k];let line=pick(L);
-  if(o.walk){m.stage=0;m.ready=0;m.rel-=3;m.neg=(m.neg||0)+1;delete m.ng}
+  c.pay=o.pay;c.x=o.x;const LP=NEG_LP[g.np]&&NEG_LP[g.np][o.k],L=(LP&&Math.random()<.65?LP:null)||NEG_L[o.k]||NEG_L[pp?'pp':'ap'][o.k];let line=pick(L);
+  if(o.walk){m.stage=0;m.ready=0;m.rel-=3;m.neg=(m.neg||0)+1;m.cool=S.day+4;delete m.ng}
   else{m.pay=o.pay;if(o.agreed){m.ready=1}else m.ready=0;if(o.annoy){m.rel-=1}if(g.low>=2)m.neg=Math.max(m.neg||0,1)}
   m.log.push({f:'a',t:deco(a,fill(line,c)),d:S.day})}}
