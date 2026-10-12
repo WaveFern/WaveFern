@@ -5,12 +5,12 @@
    things a new player can't do yet are info cards. Non-modal: never pauses the clock or blocks input.
    One-time tutorial gift: TUT_GIFT dollars (cheapest gear is $120 headphones, cheapest clothes ~$12). */
 const TUT_GIFT=150;
-const TUT_LAP=/laptop/i,TUT_BED=/^Sleep/,TUT_PC=k=>`[ondblclick^="app='${k}'"],[onclick^="app='${k}'"]`;
+const TUT_LAP=/laptop/i,TUT_BED=/sleep/i,TUT_PC=k=>`[ondblclick^="app='${k}'"],[onclick^="app='${k}'"]`;
 const gearSum=()=>Object.values(S.gear||{}).reduce((a,v)=>a+(+v||0),0);
 const TUT=[
  {n:'Move around',t:'Walk with <b>WASD</b> or the arrow keys. Hold <b>Shift</b> to sprint (it uses stamina). The camera follows you.',
   ok:b=>Math.hypot(P.x-b.x,P.z-b.z)>3&&S.tut.f.run},
- {n:'Days, energy & sleep',info:1,w:TUT_BED,t:'A day lasts <b>12 minutes</b>: 6 of day, 6 of night (top-left shows the day and time). Recording costs <b>energy</b>. At night, sleep in your <b>bed</b> to end the day. Your streams are <b>paid out when you wake up</b>. Stay up past 02:00 and you pass out and wake with less energy.'},
+ {n:'Days, energy & sleep',info:1,w:TUT_BED,t:'A day lasts <b>12 minutes</b>: 6 of day, 6 of night (top-left shows the day and time). Recording costs <b>energy</b>. At night, sleep in your <b>bed</b> to end the day (or earlier, once you are out of energy). Your streams are <b>paid out when you wake up</b>. Stay up past 02:00 and you pass out and wake with less energy.'},
  {n:'Use the laptop',w:TUT_LAP,hl:()=>!S.artist&&app!=1?TUT_PC(1):null,t:'Walk to the <b>laptop</b> and press <b>E</b>. Double-click <b>Spotifly</b> and pick your artist name.',ok:()=>!!S.artist},
  {n:'Record a song',w:/^Record a song/,t:'Go to the <b>mic</b> in the studio, press <b>E</b> and pick a genre (▲ means trending). A session is four quick games: <b>Beat</b> (hit on the beat), <b>Melody</b> (repeat the pads, keys 1-4), <b>Lyrics</b> (pick the rhyme, keys 1-3) and <b>Mix</b> (hold Space to keep the level in the green). It costs 15 energy.',
   sub:()=>mode=='rec'&&rec&&rec.st!=null?'Now playing: <b>'+(MG_N[rec.st]||'')+'</b>':'',ok:b=>S.drafts.length>b.d||S.songs.length>b.s},
@@ -21,7 +21,7 @@ const TUT=[
  {n:'Wear it',w:/wardrobe/i,t:'Walk to the <b>wardrobe</b> in your bedroom, press <b>E</b> and wear what you bought.',ok:()=>S.tut.f.wear||S.tut.wore},
  {n:'Step outside',w:/^Leave home/,t:'Walk out of the <b>front door</b> to the street. Shops, Motors and the Pet Shop are along this road.',ok:()=>!IN&&P.z>12.4},
  {n:'Open the map',t:'Press <b>N</b> for the world map. <b>Scroll</b> or <b>+/-</b> to zoom and drag to move around. The <b>city</b> is far to the east: walk, drive, or take a <b>Taxi</b> from the map for a small fare.',ok:()=>S.tut.f.map},
- {n:'Sleep to end the day',w:TUT_BED,t:'When the top-left says <b>Night</b>, go to bed and press <b>E</b> to sleep. You wake up to your stream payout and full energy.',ok:b=>S.day>b.day},
+ {n:'Sleep to end the day',w:TUT_BED,t:'When the top-left says <b>Night</b>, or once you run out of energy, go to bed and press <b>E</b> to sleep. You wake up to your stream payout and full energy.',ok:b=>S.day>b.day},
  {n:'Cars',info:1,t:'Buy a car at <b>Motors</b> down the street (or the Cars app). Press <b>E</b> next to it to drive. While driving, the <b>speed box</b> at the bottom right sets your speed: type a number or use −/+, hold <b>W</b> to reach it, <b>S</b> brakes. Faster cars cost more.'},
  {n:'Fame levels',info:1,t:'Your <b>Fame Level</b> rises with your monthly listeners. Higher levels unlock better gear, clothes, homes, meetings and festival stages. Shops show the level an item needs.'},
  {n:'Festivals',w:TUT_LAP,hl:()=>app!='fest'?TUT_PC('fest'):null,t:'<b>Park Fields Festival</b> is on every 7th day. Book a slot in <b>FestivalApp</b> on your laptop at least 2 days ahead, build a setlist, then turn up at your stage on time. The smallest stage needs <b>Fame Level 10</b>. Open FestivalApp to have a look.',ok:()=>S.tut.f.fest},
