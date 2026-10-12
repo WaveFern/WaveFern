@@ -31,7 +31,7 @@ const TUT=[
  {c:2,n:'Back it up',hl:()=>$('stg')?'#stg button[onclick*=saveCode]':$('pzm')?'#pzm button[onclick="settings()"]':null,o:'Esc > Settings > Get save code. Keep it safe.',l:['The game autosaves here, but a save code is your backup.','Paste it in any browser to carry on.'],ok:()=>S.tut.f.code}
 ];
 const TUT_CHEER=['Sick!','Now we cooking.','That is the stuff.','Look at you go.','Legend behaviour.','Easy money. Well, $3.'];
-let TUTM=null,TUTK='',TUTMIN=0,TD=null,TUTG=null,TUTPEND=null,TUTPAN=null,TUTEND=0,TUTLI=-1,TUTBUB=null;
+let TUTM=null,TUTK='',TUTMIN=0,TD=null,TUTPEND=null,TUTPAN=null,TUTEND=0,TUTLI=-1,TUTBUB=null;
 /* ----- Big Vee: a 16x16 pixel portrait (same palette family as the game's pfp portraits) ----- */
 let TUTPICD=null;
 function tutPic(){if(TUTPICD)return TUTPICD;const k=document.createElement('canvas');k.width=k.height=16;const x=k.getContext('2d'),f=(c,a,b,w,h)=>{x.fillStyle=c;x.fillRect(a,b,w,h)};
@@ -41,7 +41,6 @@ function tutPic(){if(TUTPICD)return TUTPICD;const k=document.createElement('canv
  f('#0a0d0b',3,6,10,2);f('#0a0d0b',7,5,2,1);f('#5aa8ff',4,6,2,1);f('#5aa8ff',9,6,2,1);
  f('#7a2b2b',5,9,6,2);f('#fff',6,9,4,1);f('#ffd27a',3,9,1,2);
  return TUTPICD=k.toDataURL()}
-const TUT_VEE={hair:5,hc_custom:'#2fe68a',eyes:0,mouth:0,top:2,tc_custom:'#1c6b46',pc:0,skin:3,body:.5};
 /* ----- styles ----- */
 function tutCSS(){if($('tutcss'))return;const s=document.createElement('style');s.id='tutcss';s.textContent=`
 #tqt{position:fixed;right:10px;top:100px;width:min(256px,62vw);z-index:60;background:#0b0f0dd9;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;padding:8px 10px;color:var(--t);font-size:12px;line-height:1.35;animation:tqIn .45s cubic-bezier(.2,1.3,.4,1)}
@@ -62,7 +61,7 @@ function tutCSS(){if($('tutcss'))return;const s=document.createElement('style');
 #trw{position:fixed;z-index:63;pointer-events:none;font:700 15px Silkscreen,ui-monospace,monospace;color:var(--g);text-shadow:2px 2px 0 #000;animation:trwUp 2s ease-out forwards;white-space:nowrap}#trw b{display:block;color:#ffd27a;font-size:11px}
 @keyframes trwUp{0%{transform:translateY(8px) scale(.7);opacity:0}15%{transform:none;opacity:1}100%{transform:translateY(-46px);opacity:0}}
 .tcf{position:fixed;z-index:63;width:7px;height:7px;pointer-events:none;border:1px solid #000;animation:tcf 1.1s ease-out forwards}@keyframes tcf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
-#tbub{position:fixed;z-index:59;pointer-events:none;background:#fff;color:#0a0d0b;border:3px solid #000;padding:3px 8px;font:700 12px ui-monospace,monospace;transform:translate(-50%,-100%);white-space:nowrap}
+#tbub{position:fixed;left:50%;bottom:196px;z-index:59;pointer-events:none;background:#fff;color:#0a0d0b;border:3px solid #000;padding:3px 8px;font:700 12px ui-monospace,monospace;transform:translateX(-50%);white-space:nowrap}
 .tutHL{outline:3px solid #ffd27a!important;outline-offset:2px;animation:tutP 1s infinite alternate;position:relative;z-index:5}@keyframes tutP{from{box-shadow:0 0 0 0 #ffd27a99}to{box-shadow:0 0 0 7px #ffd27a00}}`;document.head.appendChild(s)}
 /* ----- effects ----- */
 function tutBurst(x,y,n=26){const C=['#2fe68a','#ffd27a','#5aa8ff','#ff6ad5','#fff'];for(let i=0;i<n;i++){const e=document.createElement('i');e.className='tcf';const a=Math.random()*6.28,d=40+Math.random()*90;e.style.cssText=`left:${x}px;top:${y}px;background:${C[i%5]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-30}px;--r:${Math.random()*540}deg`;document.body.appendChild(e);setTimeout(()=>e.remove(),1200)}}
@@ -70,13 +69,7 @@ function tutPop(t,sub,x,y){const e=document.createElement('div');e.id='trw';e.st
 function tutTick(){sfx(900+R(0,300),.025,'square',.03,0,0,0)}
 function tutCard(k,t,s){tutCSS();const o=$('tcard');if(o)o.remove();const e=document.createElement('div');e.id='tcard';e.innerHTML=`<small>${k}</small><h2>${t}</h2><p>${s||''}</p>`;document.body.appendChild(e);setTimeout(()=>{if(e.parentNode)e.remove()},3000)}
 function tutOK(){return !PAUSED&&(mode=='play'||mode=='drive')}
-/* ----- guide character in the world ----- */
-function tutGuide(near){if(!TUTG){const r=buildChar(Object.assign({},TUT_VEE));TUTG=r.g;const l=lbl(VEE,3);l.position.set(0,2.5,0);TUTG.add(l);scene.add(TUTG)}
- if(near&&!IN){const o=[[-2.4,-1.6],[2.4,-1.6],[-2.4,1.6],[2.4,1.6],[0,2.6],[0,-2.6],[3.2,0]],out=P.x<0||P.x>16||P.z>12||P.z<0;let q=o[0];for(const c of o){const x=P.x+c[0],z=P.z+c[1];if(!hit(x,z,.4)&&(out||(x>.8&&x<15.2&&z>.8&&z<11.2))){q=c;break}}
-  TUTG.position.set(P.x+q[0],0,P.z+q[1]);const v=new THREE.Vector3(TUTG.position.x,1.2,TUTG.position.z).project(cam);tutBurst((v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,16);snd('pop')}
- TUTG.visible=true}
-function tutGuideOff(){if(TUTG){scene.remove(TUTG);TUTG=null}}
-function tutBub(t,ms=2200){if(!TUTG||!TUTG.visible)return;tutCSS();if(TUTBUB)TUTBUB.e.remove();const e=document.createElement('div');e.id='tbub';e.textContent=t;document.body.appendChild(e);TUTBUB={e,end:Date.now()+ms}}
+function tutBub(t,ms=2200){tutCSS();if(TUTBUB)TUTBUB.e.remove();const e=document.createElement('div');e.id='tbub';e.textContent=VEE+': '+t;document.body.appendChild(e);TUTBUB={e,end:Date.now()+ms}}
 /* ----- dialogue box (typewriter; click / Enter / Space advance; auto-advances so it never blocks) ----- */
 function tutSay(lines,cb){tutCSS();tutSayEnd(1);TD={q:lines.slice(),i:-1,pos:0,full:'',cb,done:0,wait:0};tutLine()}
 function tutSayEnd(quiet){const o=$('tdlg');if(o)o.remove();const d=TD;TD=null;if(!quiet&&d&&d.cb)d.cb()}
@@ -86,7 +79,7 @@ function tutLine(){const d=TD;if(!d)return;d.i++;if(d.i>=d.q.length)return tutSa
 function tutAdv(){if(!TD)return;if(!TD.done){TD.pos=TD.full.length;return}tutLine()}
 addEventListener('keydown',e=>{if(TD&&tutOK()&&(e.key=='Enter'||e.key==' ')&&!/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))tutAdv()});
 setInterval(()=>{try{const el=$('tdlg');
- if(TUTBUB){const g=TUTG;if(Date.now()>TUTBUB.end||!g||!g.visible||mode!='play'){TUTBUB.e.remove();TUTBUB=null}}
+ if(TUTBUB){if(Date.now()>TUTBUB.end||mode!='play'){TUTBUB.e.remove();TUTBUB=null}}
  if(!TD||!el)return;const ok=tutOK();el.style.display=ok?'flex':'none';el.classList.toggle('drv',mode=='drive');if(!ok)return;
  if(!TD.done){TD.pos=Math.min(TD.full.length,TD.pos+1);if(TD.pos%3==1)tutTick();el.querySelector(".td2").textContent=TD.full.slice(0,TD.pos);if(TD.pos>=TD.full.length){TD.done=1;TD.wait=Date.now()+2600+TD.full.length*50;el.querySelector(".td3").style.visibility='visible'}}
  else if(Date.now()>TD.wait)tutLine()}catch(e){}},32);
@@ -103,7 +96,7 @@ function tutEnter(){const T=S.tut,s=TUT[T.i];T.f={};T.b={x:P.x,z:P.z,d:S.drafts.
  if(s){(s.dm||[]).forEach(tutDM);const first=T.i==0||TUT[T.i-1].c!=s.c;let card=0;
   if(first){if(tutOK())tutCard('CHAPTER '+(s.c+1),TCH[s.c].n,TCH[s.c].s);else card=1}
   TUTPEND={i:T.i,card,at:card?0:Date.now()+(first?2700:700)}}}
-function tutIntro(){const T=S.tut,s=TUT[T.i];if(!s)return;const i=T.i,o=tutTgt();tutGuide(true);
+function tutIntro(){const T=S.tut,s=TUT[T.i];if(!s)return;const i=T.i,o=tutTgt();
  if(o){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d>5&&d<90)TUTPAN={x:o.x,z:o.z,t:performance.now()}}
  tutSay(s.l,()=>{if(S.tut&&S.tut.i==i)S.tut.f.said=1})}
 function tutNext(skip){const T=S.tut;if(!T||!T.on)return;const i=T.i,s=TUT[i],last=!TUT[i+1]||TUT[i+1].c!=s.c;
@@ -116,8 +109,8 @@ function tutNext(skip){const T=S.tut;if(!T||!T.on)return;const i=T.i,s=TUT[i],la
   tutBub(TUT_CHEER[i%TUT_CHEER.length])}
  T.i++;if(T.i>=TUT.length){T.i=TUT.length;T.done=1;T.on=0;tutClr();tutRender();tutFinish();return}tutEnter();tutRender()}
 function tutFinish(){tutDM('You finished the bootcamp. Proud of you. Do not let it go to your head. (Let it go to your head a little.)');
- setTimeout(()=>{if(tutOK()){tutGuide(1);tutSay(['That is the basics. Record, release, sleep, spend, grow.','Now go make me famous. I mean, YOU famous. Totally different.'],()=>{tutBurst(innerWidth/2,innerHeight/2,50);setTimeout(tutGuideOff,1500)})}else tutGuideOff()},3200)}
-function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.done=1;tutClr();tutSayEnd(1);tutGuideOff();TUTPEND=null;tutRender();say('Tutorial ended. Restart it from the pause menu (Esc).')}
+ setTimeout(()=>{if(tutOK()){tutSay(['That is the basics. Record, release, sleep, spend, grow.','Now go make me famous. I mean, YOU famous. Totally different.'],()=>{tutBurst(innerWidth/2,innerHeight/2,50)})}},3200)}
+function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.done=1;tutClr();tutSayEnd(1);TUTPEND=null;tutRender();say('Tutorial ended. Restart it from the pause menu (Esc).')}
 function tutClr(){document.querySelectorAll('.tutHL').forEach(e=>e.classList.remove('tutHL'))}
 function tutRender(){let el=$('tqt');const T=S.tut,show=T&&T.on&&!PAUSED&&!/creator|load|sleep|cut|fest/.test(mode);
  if(!show){if(el)el.remove();TUTK='';TUTLI=-1;return}tutCSS();
@@ -130,7 +123,7 @@ function tutRender(){let el=$('tqt');const T=S.tut,show=T&&T.on&&!PAUSED&&!/crea
  el.innerHTML=`<div class=tq1><b>CH ${s.c+1} · ${TCH[s.c].n.toUpperCase()}</b><em>${T.xp||0} XP</em><button title="${TUTMIN?'Expand':'Minimise'}" onclick="TUTMIN^=1;TUTK='';tutRender()">${TUTMIN?'+':'-'}</button><button title="End tutorial" onclick="tutEndAsk()">${TUTEND?'End?':'x'}</button></div><div class=tq2>${s.n}</div>`+
  (TUTMIN?'':`<div class=tq3>${s.o}</div>${sub?`<small>${sub}</small>`:''}<div class=tq4 title="${T.i+1}/${TUT.length}">${pips}</div><div class=tq5><button onclick="tutHint()">💬 Hint</button>${s.info?`<button class=go onclick="tutNext(0)">Got it</button>`:`<button onclick="tutNext(1)">Skip step</button>`}</div>`)}
 function tutEndAsk(){if(TUTEND&&Date.now()<TUTEND){tutEnd();return}TUTEND=Date.now()+3000;TUTK='';tutRender();setTimeout(()=>{TUTEND=0;TUTK='';tutRender()},3100)}
-function tutHint(){const s=TUT[S.tut.i];if(!s)return;const o=tutTgt();tutGuide(true);if(o)TUTPAN={x:o.x,z:o.z,t:performance.now()};tutSay(s.l)}
+function tutHint(){const s=TUT[S.tut.i];if(!s)return;const o=tutTgt();if(o)TUTPAN={x:o.x,z:o.z,t:performance.now()};tutSay(s.l)}
 function tutPoll(){const T=S.tut;if(!T||!T.on||T.i>=TUT.length){tutClr();return tutRender()}
  if(mode=='play'&&keys.shift&&(keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright))T.f.run=1;
  if(mode=='pc'){if(app=='msg')T.f.msg=1;if(app=='fest')T.f.fest=1}
@@ -144,8 +137,6 @@ setInterval(()=>{try{tutPoll()}catch(e){}},250);
 function tutTgt(){const T=S.tut,s=T&&T.on&&TUT[T.i];if(!s||!s.w||mode!='play'||IN)return null;return INT.find(o=>s.w.test(o.l))||null}
 {const u0=update;update=function(dt){u0(dt);try{const o=tutTgt();if(!TUTM&&o){TUTM=new THREE.Mesh(new THREE.ConeGeometry(.4,.8,4),new THREE.MeshBasicMaterial({color:0xffc400,depthTest:false,transparent:true}));TUTM.rotation.x=Math.PI;TUTM.renderOrder=999;scene.add(TUTM)}
  if(TUTM){TUTM.visible=!!o;if(o){TUTM.position.set(o.x,2.1+Math.sin(tt*4)*.18,o.z);TUTM.rotation.y+=dt*2}}
- const g=TUTG;if(g){const T=S.tut;g.visible=!!(T&&(T.on||TD))&&!IN&&mode!='drive'&&Math.hypot(g.position.x-P.x,g.position.z-P.z)<45;if(g.visible){g.rotation.y=Math.atan2(P.x-g.position.x,P.z-g.position.z);g.position.y=TD&&!TD.done?Math.abs(Math.sin(tt*9))*.07:0;
-  if(TUTBUB){const v=new THREE.Vector3(g.position.x,3.1,g.position.z).project(cam);TUTBUB.e.style.left=(v.x+1)/2*innerWidth+'px';TUTBUB.e.style.top=(1-v.y)/2*innerHeight+'px'}}}
  const p=TUTPAN;if(p){const e=(performance.now()-p.t)/1000,L=2.6;if(e>=L||mode!='play'||IN)TUTPAN=null;else{const w=.85*Math.min(1,e/.5,(L-e)/.9),x=camT.x+(p.x-camT.x)*w,z=camT.z+(p.z-camT.z)*w;cam.position.set(x+16,13,z+16);cam.lookAt(x,.8,z)}}}catch(e){}}}
 /* detection wrappers */
 {const b0=buyG;buyG=function(id){const n=S.wr.length;const r=b0.apply(this,arguments);if(S.tut&&S.tut.f&&S.wr.length>n)S.tut.f.buy=1;return r}}
