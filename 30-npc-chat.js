@@ -179,7 +179,7 @@ function msgTouch(){const L=S&&S.msgs;if(!Array.isArray(L))return;
  if(typeof S.actSeq!='number'){S.actSeq=0;L.forEach((m,i)=>{m.act=i+1;m._ll=(m.log||[]).length});S.actSeq=L.length}
  L.forEach(m=>{const n=(m.log||[]).length;if(typeof m.act!='number'||n>(m._ll||0)){m.act=++S.actSeq}m._ll=n})}
 const msgSorted=()=>{msgTouch();return S.msgs.slice().sort((a,b)=>(a.act||0)-(b.act||0))};
-{const pm=PA.msg;PA.msg=function(){msgTouch();const L=S.msgs;if(!L.some(m=>m.id==S.chat)&&L.length){S.chat=msgSorted().pop().id}
+{const pm=PA.msg;PA.msg=function(){msgTouch();const L=S.msgs.filter(m=>!m.hid);if(!L.some(m=>m.id==S.chat)&&L.length){S.chat=msgSorted().filter(m=>!m.hid).pop().id}
  /* the renderer lists S.msgs reversed, so hand it the threads sorted oldest -> newest activity */
  const orig=S.msgs;S.msgs=msgSorted();try{return pm()}finally{S.msgs=orig}}}
 setInterval(()=>{try{msgTouch()}catch(e){}},500);

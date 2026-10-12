@@ -50,6 +50,9 @@ Root: `.chat.msx`. Tokens live on `.chat.msx`:
 - Outgoing bubble `.bb.me`: gradient `#ff6a88 → #8a4dff`, white text, 4px bottom-right corner.
 - Input `.cin`: white bar, `#f7eefb` pill input, gradient `button.go`.
 - Unread badge `.ub`: `#ff4f7b`.
+- Chat list search `.msq` is a translucent pill on the plum sidebar. The "Suggested people" header `.sgh` is amber, with a dashed outline on each suggested row `.cr.sg` and a "Chat" pill `.sgb`, so it reads as a list of people to start a chat with and not as new messages.
+- Chat header actions `.cva` (Pin, Clear chat) are `#f7eefb` pills, 32px tall. The clear confirmation `.msc` is a `#fff0e6` bar with a gradient primary button.
+- Guide topic chips `.gtp` reuse `.chp`. The profile-picture dot `.cdot` shows only while a chat is unread.
 
 Set-a-date panel (`.sch` and its parts, styled under `.msx`):
 
