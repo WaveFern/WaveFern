@@ -4,6 +4,6 @@ const MU={a:TR.map(t=>{const a=new Audio(t.src);a.preload='auto';a.onended=()=>{
 function musicOn(){MU.on=1}['pointerdown','keydown'].forEach(e=>addEventListener(e,musicOn));
 setInterval(()=>{if(!MU.on||MU.hold)return;
  if(MU.pl){const a=MU.a[MU.cur],T=TR[MU.cur],t=a.currentTime,d=a.duration||0;let v=1;
-  if(T.fin&&t<T.fin)v=Math.min(v,t/T.fin);if(T.fout&&d&&t>d-T.fout)v=Math.min(v,(d-t)/T.fout);a.volume=Math.max(0,Math.min(1,v))*VOL}
+  if(T.fin&&t<T.fin)v=Math.min(v,t/T.fin);if(T.fout&&d&&t>d-T.fout)v=Math.min(v,(d-t)/T.fout);a.volume=Math.max(0,Math.min(1,v))*VOL*(window.MU_DIP==null?1:window.MU_DIP)}
  else{MU.gap-=.05;if(MU.gap<=0){const n=MU.cur<0?RI(0,TR.length-1):(MU.cur+1+RI(0,TR.length-2))%TR.length,a=MU.a[n];a.currentTime=0;a.volume=0;MU.cur=n;MU.pl=1;a.play().catch(()=>{MU.pl=0;MU.gap=1})}}},50);
 
