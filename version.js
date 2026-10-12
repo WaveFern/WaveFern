@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.50.0';
+const GAME_VERSION='v26.51.0';
 const VERSION_HISTORY=[
+ {v:'v26.51.0',n:'Shorter save codes. New codes start with FW2- and carry exactly the same game data, so nothing is lost. In test saves they came out 46% shorter early in a career, 62% shorter mid-game and 71% shorter late game. Old FW1- codes still load, the tutorial save-code step accepts both, and the autosave switches to the new format the next time it saves.'},
  {v:'v26.50.0',n:'Messages upgrades. Clear any chat from its header (asks first, deletes the messages for good, and it only comes back if that artist messages you again; chats with a booked collab cannot be cleared). Big Vee is now in Messages from the start, pinned at the top, and you can text him for help: tap a topic or type a question. Pin or unpin any chat. Search chats by name or message text. The dot on a profile picture now only shows while a chat is unread and goes away once you open it. The New button now opens a clearly labelled Suggested people list so it no longer looks like a pile of new DMs. Older saves load as before.'},
  {v:'v26.49.1',n:'Set-a-date panel polish in Messages: clearer "More options" toggle with a chevron, larger tap targets on chips, buttons and pickers, hover and press feedback, and a stacked layout on phone-width screens. Scheduling rules, fees and calendar entries are unchanged.'},
  {v:'v26.49.0',n:'Simpler set-a-date panel for collabs. The best free slot is pre-selected, up to three one-tap suggested slots sit right under the status line, and the day, time and place pickers are behind "More options" (opened by default when nothing is free). Shorter text throughout. Location rules, conflicts, fees and calendar entries work exactly as before.'},
