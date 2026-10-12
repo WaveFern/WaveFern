@@ -1,5 +1,5 @@
 /* ===== v26.39.0: Park Fields Festival bookings (FestivalApp), other acts, crowd shouts and smoke flares =====
-   James: "For the festival you have to book yourself at a stage you desire ... book the time slot 2 days in advance on a
+   Design note: "For the festival you have to book yourself at a stage you desire ... book the time slot 2 days in advance on a
    free app on your computer called FestivalApp ... max 4 in-game hours of songs ... you can perform albums as well."
    - time slots: every stage has 4 slots on a festival day, 10:00-14:00, 14:00-18:00, 18:00-22:00 and 22:00-02:00. NPC
      artists have already taken some of them (big names from ART on stages 1 and 2, made-up acts on 3 and 4); at least
