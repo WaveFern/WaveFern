@@ -27,7 +27,9 @@ function buildStudio(){
  if(G.mic>=2){[10.3,14.2].forEach(x=>{B(g,.4,.6,.35,'#1d1d22',x,.9,.55);B(g,.6,.6,.5,'#333',x,.3,.55)})}
  for(let i=0;i<G.promo;i++)B(g,.8,1.1,.05,['#c8506a','#e6b422','#4aa3df'][i],10.6+i*1.5,1.8,.04);
  if(G.promo>=3)B(g,3,.5,.05,'#2fe68a',13.8,1.2,.04);const K=G.keys,D=G.drums,Bo=G.booth,Dk=G.decks;if(K){B(g,1.1+.15*K,.08,.5,'#222',10.2,.8,4.8);B(g,1+.15*K,.04,.38,'#eee',10.2,.86,4.84);B(g,.08,.8,.08,'#333',9.6,.4,4.8);B(g,.08,.8,.08,'#333',10.8,.4,4.8);if(K>=2)B(g,1.2,.3,.3,'#111',10.2,1.05,4.6);dyn.push([9.6,4.55,10.9,5.05])}if(D){B(g,.6,.5,.4,['#555','#a02020','#2a4a8a','#222'][D],10.8,.35,2.3);B(g,.45,.15,.45,'#ddd',10.2,.75,2);if(D>=2)B(g,.5,.03,.5,'#e6b422',11.5,1.2,2.1);if(D>=3)B(g,.4,.2,.4,'#ddd',11.3,.7,1.8);dyn.push([10.1,1.9,11.5,2.7])}if(Dk){B(g,1.4,.15,.7,'#222',13.8,.75,4.9);B(g,.4,.05,.4,'#ccc',13.4,.84,4.9);B(g,.4,.05,.4,'#ccc',14.2,.84,4.9);B(g,.7,.75,.5,'#333',13.8,.37,4.9);dyn.push([13.1,4.5,14.5,5.3])}for(let i=0;i<Bo;i++)B(g,.9,1.4,.08,['#3a4a5a','#5a3a6a','#2a6a5a'][i],15.2-i*1.1,1.3,.06)}
-const INT=[{x:2.9,z:2.4,r:1.4,l:'Sleep (night only)',a:()=>S.t<300?say('You can only sleep at night. Wait for dusk.'):sleepQ()},{x:6,z:1.9,r:1.3,l:'Use laptop',a:()=>openPC()},
+/* out of energy (less than one recording) lets you sleep before night */
+function bedTired(){return S.energy<(typeof REC_E!='undefined'?REC_E:15)}
+const INT=[{x:2.9,z:2.4,r:1.4,get l(){return S.t>=300?'Sleep':bedTired()?'Out of energy, sleep now':'Sleep (night only)'},a:()=>S.t<300&&!bedTired()?say('You can only sleep at night, or early once you are out of energy. Wait for dusk.'):sleepQ()},{x:6,z:1.9,r:1.3,l:'Use laptop',a:()=>openPC()},
 {x:12.2,z:2.2,r:1.2,l:'Record a song',a:()=>recMenu()},{x:14.2,z:1.9,r:1.2,l:'Play guitar',a:()=>say(['You strum a few chords. Not bad.','A string buzzes. Time for an upgrade?','You noodle a riff and hum along.'][RI(0,2)])},
 {x:13.6,z:3.4,r:1,l:'Sit and think',a:()=>say(['You sit and brainstorm lyrics…','"Everyone starts with nothing." A good mentor-line to remember.'][RI(0,1)])}];
 
