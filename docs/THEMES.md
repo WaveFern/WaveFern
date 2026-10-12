@@ -59,6 +59,9 @@ Set-a-date panel (`.sch` and its parts, styled under `.msx`):
 - `.chp` offer chips: `#f7eefb` pill, hover `#efe3f2`.
 - `.schb` buttons: `#efe3f2` fill; `button.go` is the gradient with a pink glow.
 - `.mloc` (meeting place picker) uses the same select look.
+- Touch targets are at least 32px tall (chips 32px, buttons 36px, selects 34px). Hover lightens the fill, press scales to 97%, focus shows a pink outline.
+- "More options" has a `▸` marker that turns down when open.
+- Under 520px wide the day, time and place pickers stack full width, and the two buttons share a row with "Propose this time" on top.
 
 Outside Messages, the same panel uses the default look in `75-collab-schedule.js` (`#16201b` panel, white selects with `#e7a5c9` border). Do not use that look inside Messages.
 
