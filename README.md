@@ -8,3 +8,5 @@ Open `index.html` in a browser (needs internet for Three.js and the font).
 - `js/27-boot.js` – starts the game
 
 Edit the newest features in `js/25-v21.js` and `js/26-v24-upstairs-redesign.js`.
+
+- `docs/THEMES.md` – theme sheet: colours, fonts, buttons, bubbles and shared classes for every app. Read it before changing any app UI.

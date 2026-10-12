@@ -36,6 +36,17 @@
 .msx .cv>div:last-child{background:#fbeee6!important;color:#8f7a9a!important}
 .win:has(.chat.msx){border-color:#1e1537;box-shadow:6px 6px 0 #8a4dff55}
 .win:has(.chat.msx) .wt{background:linear-gradient(120deg,#ff7a59,#ff3d81 55%,#8a4dff);color:#fff}
-.win:has(.chat.msx) .wt button{background:#ffffff33;border-color:#0000;box-shadow:none;color:#fff}`;document.head.appendChild(st)}
+.win:has(.chat.msx) .wt button{background:#ffffff33;border-color:#0000;box-shadow:none;color:#fff}
+.msx .sch,.msx .mloc{background:#fff;color:var(--mx-ink);border-top:1px solid #f1e3ec;font:14px "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+.msx .schh b{color:var(--mx-ink);font-weight:700}.msx .schh span{color:#8f7a9a;opacity:1}
+.msx .schr label,.msx .mloc span{color:var(--mx-ink);font-weight:600}
+.msx .schr select,.msx .mloc select{background:#f7eefb;color:var(--mx-ink);border:2px solid transparent;border-radius:22px;padding:5px 12px;font:inherit;font-size:13px}
+.msx .schr select:focus,.msx .mloc select:focus{outline:0;border-color:#ff3d8166}
+.msx .schs{border-radius:12px;font-size:13px}.msx .schs.ok{background:#e7f8ef;color:#1d6b47}.msx .schs.no{background:#fff0e6;color:#9a4a1f}
+.msx .schc small,.msx .sch .m{color:#8f7a9a}
+.msx .chp{background:#f7eefb;color:var(--mx-ink);border:0;border-radius:999px;box-shadow:none}.msx .chp:hover{background:#efe3f2}
+.msx .schb button{border:0;border-radius:18px;box-shadow:none;background:#efe3f2;color:var(--mx-ink)}
+.msx .schb button.go{background:var(--mx-me);color:#fff;box-shadow:0 2px 6px #ff3d8144}
+.msx .schb button:disabled{opacity:.5}`;document.head.appendChild(st)}
 {const pm=PA.msg;PA.msg=function(){const h=pm.apply(this,arguments);if(typeof h!='string')return h;
  return h.replace('<div class=chat><div class=cl>','<div class="chat msx"><div class=cl><div class=msxb><span class=msxl></span><span><b>Messages</b><small>Chats with artists</small></span></div>')}}
