@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.44.0';
+const GAME_VERSION='v26.44.1';
 const VERSION_HISTORY=[
+ {v:'v26.44.1',n:'The tutorial no longer puts a Big Vee character in the world (James: just the UI). Big Vee now only appears as his pixel portrait in the dialogue box, the tracker pop-ups and Messages. His cheer after each step is a small pop-up above the dialogue box.'},
  {v:'v26.44.0',n:'The tutorial is now Big Vee\'s Bootcamp (James\'s feedback: it was not in theme and was a wall of text). Big Vee is a washed-up one-hit-wonder turned manager with a pixel portrait, a 3D character who shows up next to you, and a loud green afro. He talks in short typewriter dialogue boxes (click, Enter or Space to speed up; they also advance on their own and never block play), pops up bubbles when you finish things, and DMs you in Messages. The 14 steps are now 3 chapters with title cards: Make your first track, Get heard, Level up. Each step is a mini quest in a compact tracker at the top right with a progress meter, a Hint button and Skip step. Finishing a step plays a chime, confetti and a reward pop-up (+$3 and XP, +$10 per chapter, +$20 at the end; only paid once, replays pay nothing). The camera pans to the thing to do next, with the same bobbing arrow and glow as before. The cars and fame cards are merged into one quick chat, and the days and sleep info moved into the sleep step. The $150 gift, skipping and replay from the pause menu are unchanged.'},
  {v:'v26.43.2',n:'You can now go to bed before 20:00 when you run out of energy (less than the 15 a recording needs). The bed says "Out of energy, sleep now", and you wake up the next morning with the normal payout and full energy, as usual. The tutorial\'s sleep step accepts an early sleep too (James\'s idea).'},
  {v:'v26.43.1',n:'Tutorial fixes: the Spotifly step now shows the real pay per stream ($0.03) instead of $0.05, and the clothes step now highlights the Clothes shortcut in the Browser that opens Threadz.'},
