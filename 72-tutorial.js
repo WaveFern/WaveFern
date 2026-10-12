@@ -1,68 +1,152 @@
-/* ===== v26.43: guided tutorial for new games =====
+/* ===== v26.44: guided tutorial, "Big Vee's Bootcamp" =====
    Offered after character creation on a brand-new game (Start / Skip), replayable from the pause menu.
-   Progress lives in S.tut (travels with the save code). Old saves have no S.tut, so they never see it.
-   Steps advance when the player really does the thing (polled from game state + a few function wrappers);
-   things a new player can't do yet are info cards. Non-modal: never pauses the clock or blocks input.
+   Big Vee (washed-up one-hit wonder turned manager) guides you through 3 chapters of mini quests: pixel-portrait
+   dialogue with typewriter text, DMs in Messages, a compact quest tracker, rewards (small cash + XP), confetti,
+   camera pans and a bobbing arrow. Progress lives in S.tut (travels with the save code). Old saves have no S.tut.
+   Steps advance when the player really does the thing (polled from game state + a few function wrappers).
+   Non-modal: never pauses the clock or blocks input; dialogue auto-advances and click / Enter / Space speeds it up.
    One-time tutorial gift: TUT_GIFT dollars (cheapest gear is $120 headphones, cheapest clothes ~$12). */
-const TUT_GIFT=150;
+const TUT_GIFT=150,TUT_XP=10,TUT_CASH=3,TUT_CH_CASH=10,TUT_END_CASH=20,VEE='Big Vee';
 const TUT_LAP=/laptop/i,TUT_BED=/sleep/i,TUT_PC=k=>`[ondblclick^="app='${k}'"],[onclick^="app='${k}'"]`;
 const gearSum=()=>Object.values(S.gear||{}).reduce((a,v)=>a+(+v||0),0);
+const TCH=[{n:'Make your first track',s:'Studio time'},{n:'Get heard',s:'Gear, drip and DMs'},{n:'Level up',s:'The big leagues'}];
+const MG_TIP=['hit on the beat','repeat the pads, keys 1-4','pick the rhyme, keys 1-3','hold Space to stay in the green'];
 const TUT=[
- {n:'Move around',t:'Walk with <b>WASD</b> or the arrow keys. Hold <b>Shift</b> to sprint (it uses stamina). The camera follows you.',
+ {c:0,n:'Find your feet',o:'Walk around. Hold Shift to sprint.',l:['Yo, new blood! Big Vee. Your manager, hype man and landlord\'s worst nightmare.','Warm up first. WASD to walk, Shift to sprint.'],
   ok:b=>Math.hypot(P.x-b.x,P.z-b.z)>3&&S.tut.f.run},
- {n:'Days, energy & sleep',info:1,w:TUT_BED,t:'A day lasts <b>12 minutes</b>: 6 of day, 6 of night (top-left shows the day and time). Recording costs <b>energy</b>. At night, sleep in your <b>bed</b> to end the day (or earlier, once you are out of energy). Your streams are <b>paid out when you wake up</b>. Stay up past 02:00 and you pass out and wake with less energy.'},
- {n:'Use the laptop',w:TUT_LAP,hl:()=>!S.artist&&app!=1?TUT_PC(1):null,t:'Walk to the <b>laptop</b> and press <b>E</b>. Double-click <b>Spotifly</b> and pick your artist name.',ok:()=>!!S.artist},
- {n:'Record a song',w:/^Record a song/,t:'Go to the <b>mic</b> in the studio, press <b>E</b> and pick a genre (▲ means trending). A session is four quick games: <b>Beat</b> (hit on the beat), <b>Melody</b> (repeat the pads, keys 1-4), <b>Lyrics</b> (pick the rhyme, keys 1-3) and <b>Mix</b> (hold Space to keep the level in the green). It costs 15 energy.',
-  sub:()=>mode=='rec'&&rec&&rec.st!=null?'Now playing: <b>'+(MG_N[rec.st]||'')+'</b>':'',ok:b=>S.drafts.length>b.d||S.songs.length>b.s},
- {n:'Release it on Spotifly',w:TUT_LAP,hl:()=>app!=1?TUT_PC(1):`button[onclick*="pg='upload'"]`,t:'On the laptop open <b>Spotifly → Upload</b> and release your song. Each night it gets <b>streams</b>; you earn <b>$'+PAY_RATE.toFixed(2)+' per stream</b>. <b>Monthly listeners</b> are based on your last 30 days of streams, and they push your fame up. New songs stream best in their first days, so keep releasing.',ok:b=>S.songs.length>b.s},
- {n:'Messages & collabs',w:TUT_LAP,hl:()=>app!='msg'?TUT_PC('msg'):null,t:'Open <b>Messages</b> on the laptop. Artists DM you about <b>collabs</b> (they boost a song). When a price is offered you can <b>haggle</b> in plain words, like "how about 150". If <b>they</b> asked you, they pay you. If <b>you</b> asked them, you pay their fee.',ok:()=>S.tut.f.msg},
- {n:'Buy a gear upgrade',w:TUT_LAP,hl:()=>app!='gear'?TUT_PC('gear'):`button[onclick="buy('phones')"]`,t:'Open the <b>Gearshop</b> on the laptop and buy something cheap, like <b>Headphones ($120)</b>. Better gear means better mix quality and more streams.',ok:b=>gearSum()>b.g},
- {n:'Buy some clothes',w:TUT_LAP,hl:()=>app!='web'?TUT_PC('web'):typeof bw=='undefined'||bw!='clothes'?`[onclick^="bw='clothes'"]`:null,t:'Open the <b>Browser</b> and click <b>Clothes</b> to go to <b>Threadz</b>. Buy any piece of clothing (some cost just $12). Every piece comes in lots of colours.',ok:()=>S.tut.f.buy},
- {n:'Wear it',w:/wardrobe/i,t:'Walk to the <b>wardrobe</b> in your bedroom, press <b>E</b> and wear what you bought.',ok:()=>S.tut.f.wear||S.tut.wore},
- {n:'Step outside',w:/^Leave home/,t:'Walk out of the <b>front door</b> to the street. Shops, Motors and the Pet Shop are along this road.',ok:()=>!IN&&P.z>12.4},
- {n:'Open the map',t:'Press <b>N</b> for the world map. <b>Scroll</b> or <b>+/-</b> to zoom and drag to move around. The <b>city</b> is far to the east: walk, drive, or take a <b>Taxi</b> from the map for a small fare.',ok:()=>S.tut.f.map},
- {n:'Sleep to end the day',w:TUT_BED,t:'When the top-left says <b>Night</b>, or once you run out of energy, go to bed and press <b>E</b> to sleep. You wake up to your stream payout and full energy.',ok:b=>S.day>b.day},
- {n:'Cars',info:1,t:'Buy a car at <b>Motors</b> down the street (or the Cars app). Press <b>E</b> next to it to drive. While driving, the <b>speed box</b> at the bottom right sets your speed: type a number or use −/+, hold <b>W</b> to reach it, <b>S</b> brakes. Faster cars cost more.'},
- {n:'Fame levels',info:1,t:'Your <b>Fame Level</b> rises with your monthly listeners. Higher levels unlock better gear, clothes, homes, meetings and festival stages. Shops show the level an item needs.'},
- {n:'Festivals',w:TUT_LAP,hl:()=>app!='fest'?TUT_PC('fest'):null,t:'<b>Park Fields Festival</b> is on every 7th day. Book a slot in <b>FestivalApp</b> on your laptop at least 2 days ahead, build a setlist, then turn up at your stage on time. The smallest stage needs <b>Fame Level 10</b>. Open FestivalApp to have a look.',ok:()=>S.tut.f.fest},
- {n:'Save your game',hl:()=>$('stg')?'#stg button[onclick*=saveCode]':$('pzm')?'#pzm button[onclick="settings()"]':null,t:'The game autosaves in this browser. To keep a backup, press <b>Esc → Settings → Get save code</b> and keep the code somewhere safe. Paste it there and press Load to continue on any device.',ok:()=>S.tut.f.code}
+ {c:0,n:'Pick a stage name',w:TUT_LAP,hl:()=>!S.artist&&app!=1?TUT_PC(1):null,o:'Laptop (E) > Spotifly: choose your artist name.',l:['Every legend needs a name. Mine was DJ Gravy. Do not ask.','Laptop, then Spotifly. Make it catchy.'],ok:()=>!!S.artist},
+ {c:0,n:'Cut a track',w:/^Record a song/,o:'Mic in the studio (E): pick a genre, beat four mini games.',l:['Studio is through there. Mic, genre, then four quick games.','Arrows mean trending. It costs 15 energy, so do not be precious.'],
+  sub:()=>mode=='rec'&&rec&&rec.st!=null?'Now: '+(MG_N[rec.st]||'')+' ('+(MG_TIP[rec.st]||'')+')':'',ok:b=>S.drafts.length>b.d||S.songs.length>b.s},
+ {c:0,n:'Drop it',w:TUT_LAP,hl:()=>app!=1?TUT_PC(1):`button[onclick*="pg='upload'"]`,o:'Laptop > Spotifly > Upload: release your song.',l:['Do not sit on heat. Spotifly, Upload, done.','Every night it earns $'+PAY_RATE.toFixed(2)+' a stream. Listeners lift your fame, so keep dropping.'],ok:b=>S.songs.length>b.s},
+ {c:1,n:'Check your DMs',w:TUT_LAP,hl:()=>app!='msg'?TUT_PC('msg'):null,o:'Open Messages on the laptop.',dm:['Collabs 101: artists DM you once you are hot. If THEY ask, they pay YOU. If YOU ask, you pay their fee.','Haggle in plain words, like "how about 150". Works more than it should.'],
+  l:['I slid into your DMs. Open Messages on the laptop.'],ok:()=>S.tut.f.msg},
+ {c:1,n:'Upgrade the rig',w:TUT_LAP,hl:()=>app!='gear'?TUT_PC('gear'):`button[onclick="buy('phones')"]`,o:'Gearshop on the laptop: buy something cheap, like Headphones ($120).',l:['Better gear means better mixes and more streams.','That gift cash is burning a hole in your pocket.'],ok:b=>gearSum()>b.g},
+ {c:1,n:'Fresh drip',w:TUT_LAP,hl:()=>app!='web'?TUT_PC('web'):typeof bw=='undefined'||bw!='clothes'?`[onclick^="bw='clothes'"]`:null,o:'Browser > Clothes (Threadz): buy any piece, from $12.',l:['Image is everything. Threadz has a billion colours.'],ok:()=>S.tut.f.buy},
+ {c:1,n:'Put it on',w:/wardrobe/i,o:'Wardrobe in your bedroom (E): wear it.',l:['Do not leave it in the bag, king. Wardrobe, bedroom.'],ok:()=>S.tut.f.wear||S.tut.wore},
+ {c:1,n:'Touch grass',w:/^Leave home/,o:'Walk out the front door.',l:['Time to see the street. Shops, Motors and the Pet Shop are all out there.'],ok:()=>!IN&&P.z>12.4},
+ {c:1,n:'Sleep it off',w:TUT_BED,o:'Go to bed (E) when it is night or you are out of energy.',l:['A day is 12 minutes: 6 light, 6 dark. Recording eats energy.','Sleep and your streams pay out when you wake. Stay up past 02:00 and you pass out.'],ok:b=>S.day>b.day},
+ {c:2,n:'Know your world',o:'Press N for the map. Scroll or +/- to zoom.',l:['Press N for the map. The city is way east: walk, drive, or grab a Taxi from the map.'],ok:()=>S.tut.f.map},
+ {c:2,n:'Wheels and fame',info:1,o:'Listen to Big Vee.',l:['Motors sells cars. Press E by one to drive, set your pace in the speed box, W goes, S brakes.','Fame Level climbs with monthly listeners and unlocks gear, homes and festival stages.']},
+ {c:2,n:'Book a gig',w:TUT_LAP,hl:()=>app!='fest'?TUT_PC('fest'):null,o:'Open FestivalApp on the laptop.',l:['Park Fields Festival runs every 7th day. Book 2+ days ahead; the smallest stage wants Fame Level 10.','Go have a nose in FestivalApp.'],ok:()=>S.tut.f.fest},
+ {c:2,n:'Back it up',hl:()=>$('stg')?'#stg button[onclick*=saveCode]':$('pzm')?'#pzm button[onclick="settings()"]':null,o:'Esc > Settings > Get save code. Keep it safe.',l:['The game autosaves here, but a save code is your backup.','Paste it in any browser to carry on.'],ok:()=>S.tut.f.code}
 ];
-let TUTM=null,TUTK='',TUTW=null,TUTMIN=0;
-function tutCSS(){if($('tutcss'))return;const s=document.createElement('style');s.id='tutcss';s.textContent=`#tut{position:fixed;right:12px;bottom:56px;width:min(310px,calc(100vw - 32px));max-height:50vh;overflow:auto;z-index:60;background:#0d1612ee;border:2px solid #000;box-shadow:0 0 0 2px #2fe68a55,4px 4px 0 #000;color:#e8f5ee;font:13px/1.4 system-ui,sans-serif;padding:10px 12px;border-radius:6px}
-#tut h4{margin:0 0 6px;display:flex;align-items:center;gap:6px;font-size:13px;color:#2fe68a}#tut h4 span{flex:1}#tut h4 button{padding:1px 7px;font-size:12px;min-width:0}
-#tut ol{margin:0;padding:0;list-style:none}#tut li{padding:2px 0;color:#7f948a}#tut li.d{color:#5a8a6e;text-decoration:line-through}#tut li.c{color:#fff;font-weight:700}#tut.drv{bottom:170px}#tut .pb{height:4px;background:#ffffff22;margin:0 0 6px}#tut .pb i{display:block;height:100%;background:#2fe68a}
-#tut .tc{background:#ffffff10;border-left:3px solid #ffd27a;padding:6px 8px;margin:4px 0 6px;font-weight:400;color:#e8f5ee}#tut .tc small{display:block;color:#ffd27a;margin-top:4px}
-#tut .tbn{display:flex;gap:6px;margin-top:6px}#tut .tbn button{flex:1;padding:4px 6px;font-size:12px}
+const TUT_CHEER=['Sick!','Now we cooking.','That is the stuff.','Look at you go.','Legend behaviour.','Easy money. Well, $3.'];
+let TUTM=null,TUTK='',TUTMIN=0,TD=null,TUTG=null,TUTPEND=null,TUTPAN=null,TUTEND=0,TUTLI=-1,TUTBUB=null;
+/* ----- Big Vee: a 16x16 pixel portrait (same palette family as the game's pfp portraits) ----- */
+let TUTPICD=null;
+function tutPic(){if(TUTPICD)return TUTPICD;const k=document.createElement('canvas');k.width=k.height=16;const x=k.getContext('2d'),f=(c,a,b,w,h)=>{x.fillStyle=c;x.fillRect(a,b,w,h)};
+ f('#2a4a38',0,0,16,16);f('#1c6b46',1,13,14,3);f('#e8f3ec',7,13,1,3);f('#ffd27a',5,13,6,1);f('#ffd27a',7,14,2,1);f('#b87444',6,11,4,3);
+ f('#2fe68a',3,0,10,2);f('#2fe68a',2,2,12,3);f('#1fb86c',2,2,1,1);f('#1fb86c',13,3,1,1);f('#1fb86c',4,0,1,1);f('#1fb86c',11,1,1,1);
+ f('#b87444',4,4,8,8);f('#9a5f34',4,11,8,1);
+ f('#0a0d0b',3,6,10,2);f('#0a0d0b',7,5,2,1);f('#5aa8ff',4,6,2,1);f('#5aa8ff',9,6,2,1);
+ f('#7a2b2b',5,9,6,2);f('#fff',6,9,4,1);f('#ffd27a',3,9,1,2);
+ return TUTPICD=k.toDataURL()}
+const TUT_VEE={hair:5,hc_custom:'#2fe68a',eyes:0,mouth:0,top:2,tc_custom:'#1c6b46',pc:0,skin:3,body:.5};
+/* ----- styles ----- */
+function tutCSS(){if($('tutcss'))return;const s=document.createElement('style');s.id='tutcss';s.textContent=`
+#tqt{position:fixed;right:10px;top:100px;width:min(256px,62vw);z-index:60;background:#0b0f0dd9;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;padding:8px 10px;color:var(--t);font-size:12px;line-height:1.35;animation:tqIn .45s cubic-bezier(.2,1.3,.4,1)}
+#tqt.pcm{top:auto;bottom:10px;right:auto;left:10px}#tqt.fh{top:170px}@keyframes tqIn{from{transform:translateX(120%);opacity:0}to{transform:none;opacity:1}}
+#tqt .tq1{display:flex;align-items:center;gap:5px;font-family:Silkscreen,ui-monospace,monospace;font-size:10px;color:#ffd27a;letter-spacing:.5px}#tqt .tq1 b{flex:1;font-weight:400}#tqt .tq1 em{font-style:normal;color:var(--g)}
+#tqt .tq1 button,#tqt .tq5 button{padding:1px 6px;font-size:11px;min-width:0;box-shadow:inset 0 -2px #0007}#tqt .tq2{font:700 14px Silkscreen,ui-monospace,monospace;margin:6px 0 2px;color:#fff}#tqt .tq3{color:#cfe0d6}#tqt small{display:block;color:#ffd27a;margin-top:3px}
+#tqt .tq4{display:flex;gap:2px;margin:7px 0 2px;align-items:center}#tqt .tq4 i{flex:1;height:6px;background:#000;border:1px solid #2a352e}#tqt .tq4 i.d{background:var(--g);border-color:#000}#tqt .tq4 i.c{background:#ffd27a;animation:tutP2 .9s infinite alternate}#tqt .tq4 s{width:4px}@keyframes tutP2{to{opacity:.35}}
+#tqt .tq5{display:flex;gap:6px;margin-top:6px;justify-content:flex-end}
+#tdlg{position:fixed;left:50%;bottom:112px;transform:translateX(-50%);width:min(580px,calc(100vw - 24px));box-sizing:border-box;z-index:61;display:flex;gap:10px;background:#0b0f0df0;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;padding:10px;cursor:pointer;animation:tdIn .25s ease-out}
+@keyframes tdIn{from{transform:translate(-50%,20px);opacity:0}to{transform:translateX(-50%);opacity:1}}
+#tdlg img{width:64px;height:64px;image-rendering:pixelated;border:3px solid #000;box-shadow:0 0 0 2px #2fe68a66;flex:none;background:#2a4a38}
+#tdlg .td1{font-family:Silkscreen,ui-monospace,monospace;color:var(--g);font-size:12px;margin-bottom:3px}#tdlg .td2{font-size:14px;line-height:1.4;min-height:2.8em}#tdlg .td3{position:absolute;right:10px;bottom:5px;color:#ffd27a;font-size:11px;animation:tutP2 .6s infinite alternate}
+#tdlg.drv{left:12px;right:236px;width:auto;transform:none;animation:none}
+@media (max-width:700px){#tqt{top:132px;width:calc(100vw - 132px)}#tqt.pcm{width:min(256px,62vw)}#tdlg.drv{right:12px;left:12px;bottom:200px}#tdlg img{width:48px;height:48px}#tdlg{bottom:104px}#tdlg .td2{font-size:13px}}
+#tcard{position:fixed;left:50%;top:26%;transform:translate(-50%,0);z-index:62;text-align:center;pointer-events:none;background:#0b0f0def;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,0 0 0 3px #2fe68a55,6px 6px 0 #0008;padding:16px 30px;min-width:min(340px,86vw);box-sizing:border-box;animation:tcIn 3s both}
+@keyframes tcIn{0%{transform:translate(-50%,-30px) scale(.9);opacity:0}12%{transform:translate(-50%,0) scale(1);opacity:1}82%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+#tcard small{font:12px Silkscreen,ui-monospace,monospace;color:#ffd27a;letter-spacing:2px}#tcard h2{font-size:22px;margin:6px 0 2px;color:#fff;text-shadow:3px 3px 0 #000}#tcard p{margin:0;color:var(--g)}
+#trw{position:fixed;z-index:63;pointer-events:none;font:700 15px Silkscreen,ui-monospace,monospace;color:var(--g);text-shadow:2px 2px 0 #000;animation:trwUp 2s ease-out forwards;white-space:nowrap}#trw b{display:block;color:#ffd27a;font-size:11px}
+@keyframes trwUp{0%{transform:translateY(8px) scale(.7);opacity:0}15%{transform:none;opacity:1}100%{transform:translateY(-46px);opacity:0}}
+.tcf{position:fixed;z-index:63;width:7px;height:7px;pointer-events:none;border:1px solid #000;animation:tcf 1.1s ease-out forwards}@keyframes tcf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+#tbub{position:fixed;z-index:59;pointer-events:none;background:#fff;color:#0a0d0b;border:3px solid #000;padding:3px 8px;font:700 12px ui-monospace,monospace;transform:translate(-50%,-100%);white-space:nowrap}
 .tutHL{outline:3px solid #ffd27a!important;outline-offset:2px;animation:tutP 1s infinite alternate;position:relative;z-index:5}@keyframes tutP{from{box-shadow:0 0 0 0 #ffd27a99}to{box-shadow:0 0 0 7px #ffd27a00}}`;document.head.appendChild(s)}
-function tutOffer(){mode='menu';$('ui').innerHTML=`<div class="box modal"><h2>Welcome home</h2><p>A modest place, <b>$100</b>, and an empty music career.</p><p class=m>New here? A short tutorial walks you through the game while you play: recording, releasing, collabs, shopping, the city, festivals and saving. It never stops the clock, and you can skip any step.</p><p class=m>🎁 Start it and you get a one-time <b>$${TUT_GIFT} tutorial gift</b> to buy the gear and clothes it asks for.</p><div class=row2><button class=go onclick="closeUI();tutStart()">Start tutorial</button><button onclick="tutSkipAll()">Skip</button></div></div>`}
-function tutSkipAll(){S.tut={on:0,i:0,f:{},skip:1};closeUI();say('No problem. You can start the tutorial any time from the pause menu (Esc).')}
-function tutStart(){const g=S.tut&&S.tut.g;S.tut={on:1,i:0,f:{},b:{},g:g||0};TUTMIN=0;
- if(!g){S.tut.g=1;S.money=+(S.money+TUT_GIFT).toFixed(2);say('🎁 Tutorial gift: +$'+TUT_GIFT+' to spend on your first gear and clothes')}tutEnter()}
-function tutEnter(){const T=S.tut;T.f={};T.b={x:P.x,z:P.z,d:S.drafts.length,s:S.songs.length,g:gearSum(),day:S.day};TUTK=''}
-function tutNext(skip){const T=S.tut;if(!T||!T.on)return;if(!skip&&!TUT[T.i].info)snd('chime');T.i++;if(T.i>=TUT.length){T.i=TUT.length;T.done=1;tutRender();return}tutEnter();tutRender()}
-function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.done=1;tutClr();tutRender()}
+/* ----- effects ----- */
+function tutBurst(x,y,n=26){const C=['#2fe68a','#ffd27a','#5aa8ff','#ff6ad5','#fff'];for(let i=0;i<n;i++){const e=document.createElement('i');e.className='tcf';const a=Math.random()*6.28,d=40+Math.random()*90;e.style.cssText=`left:${x}px;top:${y}px;background:${C[i%5]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-30}px;--r:${Math.random()*540}deg`;document.body.appendChild(e);setTimeout(()=>e.remove(),1200)}}
+function tutPop(t,sub,x,y){const e=document.createElement('div');e.id='trw';e.style.left=x+'px';e.style.top=y+'px';e.innerHTML=t+(sub?`<b>${sub}</b>`:'');document.body.appendChild(e);setTimeout(()=>e.remove(),2000)}
+function tutTick(){sfx(900+R(0,300),.025,'square',.03,0,0,0)}
+function tutCard(k,t,s){tutCSS();const o=$('tcard');if(o)o.remove();const e=document.createElement('div');e.id='tcard';e.innerHTML=`<small>${k}</small><h2>${t}</h2><p>${s||''}</p>`;document.body.appendChild(e);setTimeout(()=>{if(e.parentNode)e.remove()},3000)}
+function tutOK(){return !PAUSED&&(mode=='play'||mode=='drive')}
+/* ----- guide character in the world ----- */
+function tutGuide(near){if(!TUTG){const r=buildChar(Object.assign({},TUT_VEE));TUTG=r.g;const l=lbl(VEE,3);l.position.set(0,2.5,0);TUTG.add(l);scene.add(TUTG)}
+ if(near&&!IN){const o=[[-2.4,-1.6],[2.4,-1.6],[-2.4,1.6],[2.4,1.6],[0,2.6],[0,-2.6],[3.2,0]],out=P.x<0||P.x>16||P.z>12||P.z<0;let q=o[0];for(const c of o){const x=P.x+c[0],z=P.z+c[1];if(!hit(x,z,.4)&&(out||(x>.8&&x<15.2&&z>.8&&z<11.2))){q=c;break}}
+  TUTG.position.set(P.x+q[0],0,P.z+q[1]);const v=new THREE.Vector3(TUTG.position.x,1.2,TUTG.position.z).project(cam);tutBurst((v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,16);snd('pop')}
+ TUTG.visible=true}
+function tutGuideOff(){if(TUTG){scene.remove(TUTG);TUTG=null}}
+function tutBub(t,ms=2200){if(!TUTG||!TUTG.visible)return;tutCSS();if(TUTBUB)TUTBUB.e.remove();const e=document.createElement('div');e.id='tbub';e.textContent=t;document.body.appendChild(e);TUTBUB={e,end:Date.now()+ms}}
+/* ----- dialogue box (typewriter; click / Enter / Space advance; auto-advances so it never blocks) ----- */
+function tutSay(lines,cb){tutCSS();tutSayEnd(1);TD={q:lines.slice(),i:-1,pos:0,full:'',cb,done:0,wait:0};tutLine()}
+function tutSayEnd(quiet){const o=$('tdlg');if(o)o.remove();const d=TD;TD=null;if(!quiet&&d&&d.cb)d.cb()}
+function tutLine(){const d=TD;if(!d)return;d.i++;if(d.i>=d.q.length)return tutSayEnd();d.full=d.q[d.i];d.pos=0;d.done=0;
+ let el=$('tdlg');if(!el){el=document.createElement('div');el.id='tdlg';el.onclick=tutAdv;el.innerHTML=`<img src="${tutPic()}"><div style="flex:1"><div class=td1>${VEE.toUpperCase()}</div><div class=td2></div></div><span class=td3>click &#9660;</span>`;document.body.appendChild(el)}
+ el.querySelector(".td2").textContent='';el.querySelector(".td3").style.visibility='hidden'}
+function tutAdv(){if(!TD)return;if(!TD.done){TD.pos=TD.full.length;return}tutLine()}
+addEventListener('keydown',e=>{if(TD&&tutOK()&&(e.key=='Enter'||e.key==' ')&&!/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))tutAdv()});
+setInterval(()=>{try{const el=$('tdlg');
+ if(TUTBUB){const g=TUTG;if(Date.now()>TUTBUB.end||!g||!g.visible||mode!='play'){TUTBUB.e.remove();TUTBUB=null}}
+ if(!TD||!el)return;const ok=tutOK();el.style.display=ok?'flex':'none';el.classList.toggle('drv',mode=='drive');if(!ok)return;
+ if(!TD.done){TD.pos=Math.min(TD.full.length,TD.pos+1);if(TD.pos%3==1)tutTick();el.querySelector(".td2").textContent=TD.full.slice(0,TD.pos);if(TD.pos>=TD.full.length){TD.done=1;TD.wait=Date.now()+2600+TD.full.length*50;el.querySelector(".td3").style.visibility='visible'}}
+ else if(Date.now()>TD.wait)tutLine()}catch(e){}},32);
+/* ----- DMs from the guide in Messages ----- */
+function tutDM(t){let m=S.msgs.find(x=>x.g);if(!m){m={id:S.nid++,from:VEE,body:t,state:9,g:1,log:[],unread:0};S.msgs.push(m)}
+ if(m.log.some(x=>x.t==t))return;m.log.push({f:'a',t,d:S.day});m.body=t;m.unread=1;say('💬 '+VEE+' sent you a DM')}
+/* ----- flow ----- */
+function tutOffer(){mode='menu';tutCSS();$('ui').innerHTML=`<div class="box modal" style="display:flex;gap:12px;max-width:min(460px,92vw)"><img src="${tutPic()}" style="width:72px;height:72px;image-rendering:pixelated;border:3px solid #000;box-shadow:0 0 0 2px #2fe68a66;align-self:flex-start;flex:none"><div><h2>${VEE} wants a word</h2><p class=m>"Yo! A $100 flat and an empty music career? Say less. I will show you the ropes: 3 short chapters, tiny rewards, zero homework."</p><p class=m>🎁 Start and I will slip you a one-time <b>$${TUT_GIFT}</b> for gear and clothes.</p><div class=row2><button class=go onclick="closeUI();tutStart()">Let's go</button><button onclick="tutSkipAll()">Skip</button></div></div></div>`}
+function tutSkipAll(){S.tut={on:0,i:0,f:{},skip:1};closeUI();say('No problem. Start the tutorial any time from the pause menu (Esc).')}
+function tutStart(){const o=S.tut||{},g=o.g;S.tut={on:1,i:0,f:{},b:{},g:g||0,p:o.p||{},xp:o.xp||0};TUTMIN=0;
+ if(!g){S.tut.g=1;S.money=+(S.money+TUT_GIFT).toFixed(2);say('🎁 Tutorial gift: +$'+TUT_GIFT+' to spend on your first gear and clothes')}
+ tutDM('Yo, it is Big Vee. Welcome to WaveFern! I will pop up with tips and slide the boring bits in here.');tutEnter()}
+function tutEnter(){const T=S.tut,s=TUT[T.i];T.f={};T.b={x:P.x,z:P.z,d:S.drafts.length,s:S.songs.length,g:gearSum(),day:S.day};TUTK='';tutSayEnd(1);TUTEND=0;TUTPEND=null;
+ if(s){(s.dm||[]).forEach(tutDM);const first=T.i==0||TUT[T.i-1].c!=s.c;let card=0;
+  if(first){if(tutOK())tutCard('CHAPTER '+(s.c+1),TCH[s.c].n,TCH[s.c].s);else card=1}
+  TUTPEND={i:T.i,card,at:card?0:Date.now()+(first?2700:700)}}}
+function tutIntro(){const T=S.tut,s=TUT[T.i];if(!s)return;const i=T.i,o=tutTgt();tutGuide(true);
+ if(o){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d>5&&d<90)TUTPAN={x:o.x,z:o.z,t:performance.now()}}
+ tutSay(s.l,()=>{if(S.tut&&S.tut.i==i)S.tut.f.said=1})}
+function tutNext(skip){const T=S.tut;if(!T||!T.on)return;const i=T.i,s=TUT[i],last=!TUT[i+1]||TUT[i+1].c!=s.c;
+ if(!skip){snd('chime');setTimeout(()=>snd('cash'),180);const first=!T.p[i];T.p[i]=1;let cash=0,xp=0;
+  if(first){cash=TUT_CASH;xp=TUT_XP;if(last){cash+=TUT_CH_CASH;xp+=TUT_XP*3}if(i==TUT.length-1){cash+=TUT_END_CASH;xp+=TUT_XP*5}S.money=+(S.money+cash).toFixed(2);T.xp=(T.xp||0)+xp}
+  const el=$('tqt'),r=el?el.getBoundingClientRect():{left:innerWidth-260,top:102,width:250,height:110};
+  tutBurst(r.left+r.width/2,r.top+r.height/2,last?44:26);
+  tutPop('✓ '+s.n,first?'+$'+cash+'  +'+xp+' XP':'',r.left+12,r.top+r.height);
+  if(last)setTimeout(()=>{tutCard('CHAPTER '+(s.c+1)+' COMPLETE',TCH[s.c].n,first?'+$'+(TUT_CH_CASH+(i==TUT.length-1?TUT_END_CASH:0))+' bonus':'');snd('chime')},900);
+  tutBub(TUT_CHEER[i%TUT_CHEER.length])}
+ T.i++;if(T.i>=TUT.length){T.i=TUT.length;T.done=1;T.on=0;tutClr();tutRender();tutFinish();return}tutEnter();tutRender()}
+function tutFinish(){tutDM('You finished the bootcamp. Proud of you. Do not let it go to your head. (Let it go to your head a little.)');
+ setTimeout(()=>{if(tutOK()){tutGuide(1);tutSay(['That is the basics. Record, release, sleep, spend, grow.','Now go make me famous. I mean, YOU famous. Totally different.'],()=>{tutBurst(innerWidth/2,innerHeight/2,50);setTimeout(tutGuideOff,1500)})}else tutGuideOff()},3200)}
+function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.done=1;tutClr();tutSayEnd(1);tutGuideOff();TUTPEND=null;tutRender();say('Tutorial ended. Restart it from the pause menu (Esc).')}
 function tutClr(){document.querySelectorAll('.tutHL').forEach(e=>e.classList.remove('tutHL'))}
-function tutRender(){let el=$('tut');const T=S.tut,show=T&&T.on&&!PAUSED&&!/creator|load|sleep|cut|fest/.test(mode);
- if(!show){if(el)el.remove();TUTK='';return}tutCSS();
- if(!el){el=document.createElement('div');el.id='tut';document.body.appendChild(el)}
- if(T.i>=TUT.length){const k='end';if(TUTK==k)return;TUTK=k;el.innerHTML=`<h4><span>🎓 You're ready!</span></h4><div class=tc>That's the basics: record, release, sleep for payouts, upgrade gear, collab, and grow your fame until you headline the festival. Good luck!</div><div class=tbn><button class=go onclick="tutEnd()">Finish</button></div>`;return}
- const s=TUT[T.i],sub=s.sub?s.sub():'',k=T.i+'|'+TUTMIN+'|'+sub+'|'+(mode=='drive');if(TUTK==k)return;TUTK=k;
- const hd=`<h4><span>🎓 Tutorial · ${T.i+1}/${TUT.length}</span><button title="${TUTMIN?'Expand':'Minimise'}" onclick="TUTMIN^=1;tutRender()">${TUTMIN?'▴':'▾'}</button><button title="End tutorial" onclick="tutEnd()">✕</button></h4>`;
- const card=`<div class=tc>${s.t}${sub?`<small>${sub}</small>`:''}</div><div class=tbn>${s.info?`<button class=go onclick="tutNext(1)">Got it</button>`:`<button onclick="tutNext(1)">Skip step</button>`}</div>`;
- el.classList.toggle('drv',mode=='drive');const pb=`<div class=pb><i style="width:${T.i/TUT.length*100}%"></i></div>`,lo=Math.max(0,T.i-1);
- el.innerHTML=hd+pb+(TUTMIN?`<b>${s.n}</b>`:`<ol>${TUT.slice(lo,T.i+3).map((x,j)=>{const i=lo+j;return`<li class="${i<T.i?'d':i==T.i?'c':''}">${i<T.i?'✓':i==T.i?'▶':'·'} ${x.n}${i==T.i?card:''}</li>`}).join('')}</ol>`)}
+function tutRender(){let el=$('tqt');const T=S.tut,show=T&&T.on&&!PAUSED&&!/creator|load|sleep|cut|fest/.test(mode);
+ if(!show){if(el)el.remove();TUTK='';TUTLI=-1;return}tutCSS();
+ if(T.i>=TUT.length)return;
+ const s=TUT[T.i],sub=s.sub?s.sub():'',pc=mode=='pc',k=T.i+'|'+TUTMIN+'|'+sub+'|'+pc+'|'+TUTEND;if(TUTK==k&&el)return;TUTK=k;
+ const fresh=!el||TUTLI!=T.i;TUTLI=T.i;if(el&&fresh){el.remove();el=null}
+ if(!el){el=document.createElement('div');el.id='tqt';document.body.appendChild(el)}
+ el.classList.toggle("pcm",pc);el.classList.toggle("fh",!!$("fcr"));
+ const pips=TUT.map((x,i)=>(i&&TUT[i-1].c!=x.c?'<s></s>':'')+`<i class="${i<T.i?'d':i==T.i?'c':''}"></i>`).join('');
+ el.innerHTML=`<div class=tq1><b>CH ${s.c+1} · ${TCH[s.c].n.toUpperCase()}</b><em>${T.xp||0} XP</em><button title="${TUTMIN?'Expand':'Minimise'}" onclick="TUTMIN^=1;TUTK='';tutRender()">${TUTMIN?'+':'-'}</button><button title="End tutorial" onclick="tutEndAsk()">${TUTEND?'End?':'x'}</button></div><div class=tq2>${s.n}</div>`+
+ (TUTMIN?'':`<div class=tq3>${s.o}</div>${sub?`<small>${sub}</small>`:''}<div class=tq4 title="${T.i+1}/${TUT.length}">${pips}</div><div class=tq5><button onclick="tutHint()">💬 Hint</button>${s.info?`<button class=go onclick="tutNext(0)">Got it</button>`:`<button onclick="tutNext(1)">Skip step</button>`}</div>`)}
+function tutEndAsk(){if(TUTEND&&Date.now()<TUTEND){tutEnd();return}TUTEND=Date.now()+3000;TUTK='';tutRender();setTimeout(()=>{TUTEND=0;TUTK='';tutRender()},3100)}
+function tutHint(){const s=TUT[S.tut.i];if(!s)return;const o=tutTgt();tutGuide(true);if(o)TUTPAN={x:o.x,z:o.z,t:performance.now()};tutSay(s.l)}
 function tutPoll(){const T=S.tut;if(!T||!T.on||T.i>=TUT.length){tutClr();return tutRender()}
  if(mode=='play'&&keys.shift&&(keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright))T.f.run=1;
  if(mode=='pc'){if(app=='msg')T.f.msg=1;if(app=='fest')T.f.fest=1}
  if($('bm'))T.f.map=1;const sc=$('sc');if(sc&&/^FW1-/.test(sc.value))T.f.code=1;
- const s=TUT[T.i];if(!s.info&&s.ok&&s.ok(T.b||{})){say('✓ '+s.n);tutNext()}
+ const s=TUT[T.i];if(s.info?T.f.said:s.ok&&s.ok(T.b||{})){tutNext();return}
+ const p=TUTPEND;if(p&&p.i==T.i&&Date.now()>=p.at&&tutOK()){TUTPEND=null;if(p.card&&!$('tcard')){tutCard('CHAPTER '+(s.c+1),TCH[s.c].n,TCH[s.c].s);TUTPEND={i:T.i,at:Date.now()+2700}}else tutIntro()}
  tutRender();
- const sel=TUT[T.i]&&TUT[T.i].hl?TUT[T.i].hl():null;document.querySelectorAll('.tutHL').forEach(e=>{if(!sel||!e.matches(sel))e.classList.remove('tutHL')});if(sel)document.querySelectorAll(sel).forEach(e=>e.classList.add('tutHL'))}
+ const sel=s.hl?s.hl():null;document.querySelectorAll('.tutHL').forEach(e=>{if(!sel||!e.matches(sel))e.classList.remove('tutHL')});if(sel)document.querySelectorAll(sel).forEach(e=>e.classList.add('tutHL'))}
 setInterval(()=>{try{tutPoll()}catch(e){}},250);
-/* world marker: a bobbing arrow over the interactable for the current step */
+/* world marker (bobbing arrow), guide idle/facing, bubble, camera pan */
 function tutTgt(){const T=S.tut,s=T&&T.on&&TUT[T.i];if(!s||!s.w||mode!='play'||IN)return null;return INT.find(o=>s.w.test(o.l))||null}
 {const u0=update;update=function(dt){u0(dt);try{const o=tutTgt();if(!TUTM&&o){TUTM=new THREE.Mesh(new THREE.ConeGeometry(.4,.8,4),new THREE.MeshBasicMaterial({color:0xffc400,depthTest:false,transparent:true}));TUTM.rotation.x=Math.PI;TUTM.renderOrder=999;scene.add(TUTM)}
- if(TUTM){TUTM.visible=!!o;if(o){TUTM.position.set(o.x,2.1+Math.sin(tt*4)*.18,o.z);TUTM.rotation.y+=dt*2}}}catch(e){}}}
+ if(TUTM){TUTM.visible=!!o;if(o){TUTM.position.set(o.x,2.1+Math.sin(tt*4)*.18,o.z);TUTM.rotation.y+=dt*2}}
+ const g=TUTG;if(g){const T=S.tut;g.visible=!!(T&&(T.on||TD))&&!IN&&mode!='drive'&&Math.hypot(g.position.x-P.x,g.position.z-P.z)<45;if(g.visible){g.rotation.y=Math.atan2(P.x-g.position.x,P.z-g.position.z);g.position.y=TD&&!TD.done?Math.abs(Math.sin(tt*9))*.07:0;
+  if(TUTBUB){const v=new THREE.Vector3(g.position.x,3.1,g.position.z).project(cam);TUTBUB.e.style.left=(v.x+1)/2*innerWidth+'px';TUTBUB.e.style.top=(1-v.y)/2*innerHeight+'px'}}}
+ const p=TUTPAN;if(p){const e=(performance.now()-p.t)/1000,L=2.6;if(e>=L||mode!='play'||IN)TUTPAN=null;else{const w=.85*Math.min(1,e/.5,(L-e)/.9),x=camT.x+(p.x-camT.x)*w,z=camT.z+(p.z-camT.z)*w;cam.position.set(x+16,13,z+16);cam.lookAt(x,.8,z)}}}catch(e){}}}
 /* detection wrappers */
 {const b0=buyG;buyG=function(id){const n=S.wr.length;const r=b0.apply(this,arguments);if(S.tut&&S.tut.f&&S.wr.length>n)S.tut.f.buy=1;return r}}
 {const w0=wearG;wearG=function(){const r=w0.apply(this,arguments);if(S.tut&&S.tut.f){S.tut.f.wear=1;S.tut.wore=1}return r}}
