@@ -1,7 +1,7 @@
 /* ---------- Threadz shoe wall: Timberland boots and 18 more shoes ----------
    Appended to GAR after the mega drop (older ids never change). Shoe styles 8-27 are drawn by XNEW.sh on each leg pivot
    (the plain base shoe is removed by the new-drop wrapper), with logos as canvas prints from 60-threadz-prints.js.
-   Timberland is the real boot James asked for; every other brand mark here is made up. */
+   Timberland is the real boot; every other brand mark here is made up. */
 [['Timberland Boots',190,8,'#cf9a48',,'street'],['Black Timbs',190,8,'#1f1f22',,'street'],['Olive Timbs',190,8,'#5f6b3a',0,'street'],['Timbs Chukka',160,9,'#cf9a48',,'street'],
  ['Uptown Lows',110,10,'#f4f4f4',,'street'],['Canvas Hi-tops',55,11,'#c0392b',,'vintage'],['Flight Highs',220,12,'#c0392b',1,'sport'],['Cloud Runners',140,13,'#3498db',,'sport'],
  ['Logo Slides',35,14,'#111111',,'street'],['Foam Clogs',45,15,'#2ecc71',,'street'],['Combat Boots',160,16,'#111111',0,'stage'],['Puffy Skate Shoes',80,17,'#2c3e50',,'street'],

@@ -1,5 +1,5 @@
 /* ===== v26.38.0: Park Fields Festival (every 7 days since v26.38.1) =====
-   James's idea: every week (FEST_EVERY days, was every fortnight in v26.38.0) a Reading-style festival opens on the field east (right) of Park Avenue.
+   Every week (FEST_EVERY days, was every fortnight in v26.38.0) a Reading-style festival opens on the field east (right) of Park Avenue.
    - schedule: the festival is on every day that is a multiple of FEST_EVERY = 7 (day 7, 14, 21, ...). The day before, a crew builds it
      (fences going up, half-built stage frames, trucks, cones, workers); the day after, a crew takes it down again.
    - the ground (x 216-406, z -122..-4) is about the size of Central Park. Its wild trees are cleared once at boot (before
