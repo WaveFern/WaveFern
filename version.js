@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.45.1';
+const GAME_VERSION='v26.45.2';
 const VERSION_HISTORY=[
+ {v:'v26.45.2',n:'New browser tab icon: the small pixel wave from the PC Start button, in WaveFern green on a dark rounded tile. No gameplay changes.'},
  {v:'v26.45.1',n:'Removed a stray personal credit from the in-game version history, code comments and notes. No gameplay changes.'},
  {v:'v26.45.0',n:'Outdoor ambience and cars with music. Outside, the world now has sound: it is busiest in the city centre and plaza (cars passing with a Doppler-style pitch and pan, horns, crowd chatter, footsteps), quieter on your home street (a few cars, birds, distant voices), and in Central Park it is birds, wind, far-off traffic and children near the playground. The festival grounds get a muffled crowd on festival days, and the quiet fields are just wind and birds. Nights are quieter, with crickets. It is all synthesised, follows the Effects slider and M, and fades out indoors, in the pause menu, the laptop and sleep screens. About a million cars live in this city: each car that drives past you is a draw, and with probability monthly listeners / 1,000,000 it is blasting one of your own released songs (muffled, bass-heavy, panned and louder as it comes closer). The soundtrack dips by 30% while one passes. Clips you drop in audio/cars/ can also turn up in passing cars (see the README there). The soundtrack itself is unchanged.'},
  {v:'v26.44.2',n:'The festival no longer has a code-made drum-and-chord fallback loop. If the beat engine cannot play a set song it stays silent. The main soundtrack stays track 1, 2 and 3 only and the pause menu stays menu.mp3.'},
