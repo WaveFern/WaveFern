@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.67.0';
+const GAME_VERSION='v26.68.0';
 const VERSION_HISTORY=[
+ {v:'v26.68.0',n:'Billboards are harder to earn and easier to see. Your own name joins the rotation at 10,000 monthly listeners (was 1,000), and roster artists need 5,000 or more (was 120). About 4 in 5 billboards now stand on the left of the road\'s way of travel. Big Vee\'s billboard answer has the new numbers. Saves still load.'},
  {v:'v26.67.0',n:'Famous artists reach out only once you are well known. Artists with 50,000 or more monthly listeners DM you once you have 25,000; Panic Man Dan waits for 5,000. All these thresholds sit at the top of 75-collab-fees-dms.js. Saves still load.'},
  {v:'v26.66.0',n:'Driving is back to the original third-person camera: the first-person car view, the pixel pass, the steering wheel and arm work, and the camera easing are removed, and the city merge is back to how it was. Economy, minigames, Spotifly delete, Big Vee, Amazoom, height, Panic Man Dan and billboards are unchanged.'},
  {v:'v26.65.0',n:'Buildings are solid volumes from the street and from the car. The city merge had kept only three of each box\'s six faces, which left the back and bottom out; every face is kept now and the merge buffers are sized for them. Driving is smoother: the view eases after the car in position and heading, so small jitter in the car\'s motion does not reach the picture. Saves unchanged.'},
