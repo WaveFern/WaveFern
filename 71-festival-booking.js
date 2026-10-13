@@ -33,7 +33,7 @@ const festBkOn=(day,n)=>fBk().find(b=>b.day==day&&b.n==n&&b.st!=2);
 function festSlotTaken(day,n){const h=FSLOT.map((_,k)=>fRng(fHash('slot'+day+':'+n+':'+k))()),t=h.map(x=>x<.55);if(t.every(Boolean))t[h.indexOf(Math.min(...h))]=false;return t}
 function festSlotAct(day,n,k){const b=festBkOn(day,n);if(b&&b.slot==k)return{you:1,name:S.artist||'You',bk:b};/* names step through the lists from a per-stage start, so a stage never repeats an act on the same day */
  const h=(fRng(fHash('act'+day+':'+n))()*1e6)|0,h2=(fRng(fHash('fill'+day+':'+n))()*1e6)|0;
- if(festSlotTaken(day,n)[k]){if(n<=2&&typeof ART!='undefined'&&ART.length){const i=typeof festNpcArt=='function'?festNpcArt(day,n,k):(h+k*7)%ART.length;if(i>=0)return{name:ART[i][0],art:i,taken:1}}return{name:FACTS[(h+k*5)%FACTS.length],taken:1}}
+ if(festSlotTaken(day,n)[k]){if(n<=2&&typeof ART!='undefined'&&ART.length){const i=(h+k*7)%ART.length;return{name:ART[i][0],art:i,taken:1}}return{name:FACTS[(h+k*5)%FACTS.length],taken:1}}
  return{name:FFILL[(h2+k*3)%FFILL.length],fill:1}}
 /* the next few festival days */
 function festUpcoming(n){const a=[];let d=festNext(S.day);while(a.length<(n||3)){a.push(d);d+=FEST_EVERY}return a}
@@ -45,7 +45,6 @@ function festCanBook(day,n,k){const s=fStage(n),lv=festLv();
  if(festBkOn(day,n))return 'You already have a slot on Stage '+n+' at this festival.';
  if(fBk().some(b=>b.day==day&&b.slot==k&&b.st!=2))return 'You are already playing another stage at that time.';
  if(festSlotTaken(day,n)[k])return 'That slot is taken by '+festSlotAct(day,n,k).name+'.';
- if(typeof calFestCheck=='function'){const c=calFestCheck(day,n,k);if(c)return c}
  return ''}
 /* missed slots, reminders (checked twice a second) */
 function festBkCheck(){if(!S||!S.artist||mode=='load'||mode=='creator')return;const m=festMins();
@@ -92,11 +91,11 @@ function fappFest(){const d=FAPP.d,lv=festLv(),dd=d-S.day;
 function fappPick(d,n,k){const e=festCanBook(d,n,k);if(e)return fappErr(e);FAPP={v:'set',d,n,k,songs:[],edit:0};snd('pop');pcR()}
 function fappEdit(id){const b=fBk().find(x=>x.id==id);if(!b||b.st)return;if(FEST.set&&FEST.set.bk===b)return fappErr('You are playing that set right now!');FAPP={v:'set',d:b.day,n:b.n,k:b.slot,songs:b.songs.filter(i=>S.songs.some(x=>x.id==i)),edit:id};snd('pop');pcR()}
 function fappAdd(id){const s=S.songs.find(x=>x.id==id),L=FAPP.songs;if(!s||!L)return;if(L.includes(id))return fappErr('"'+s.title+'" is already in your setlist.');
- {const ce=typeof calFestFeat=='function'?calFestFeat([id],FAPP.d,FAPP.n,FAPP.k,FAPP.edit?'f'+FAPP.edit:null):'';if(ce)return fappErr(ce)}
+ 
  const t=festSetMins(L)+festDur(s);if(t>FSET_MAX)return fappErr('Adding "'+s.title+'" ('+festDur(s)+' min) would make your set '+fDurS(t)+'. The limit is 4 hours.');L.push(id);FAPP.msg='';snd('pop');pcR()}
 function fappAddAl(id){const a=(S.albums||[]).find(x=>x.id==id),L=FAPP.songs;if(!a||!L)return;const ids=a.songs.filter(i=>S.songs.some(x=>x.id==i)&&!L.includes(i));
  if(!ids.length)return fappErr('All of "'+a.name+'" is already in your setlist.');
- {const ce=typeof calFestFeat=='function'?calFestFeat(ids,FAPP.d,FAPP.n,FAPP.k,FAPP.edit?'f'+FAPP.edit:null):'';if(ce)return fappErr(ce)}const t=festSetMins(L)+festSetMins(ids);
+ const t=festSetMins(L)+festSetMins(ids);
  if(t>FSET_MAX)return fappErr('The album "'+a.name+'" ('+ids.length+' songs, '+fDurS(festSetMins(ids))+') would make your set '+fDurS(t)+'. The limit is 4 hours.');L.push(...ids);FAPP.msg='';snd('pop');pcR()}
 function fappDel(i){FAPP.songs.splice(i,1);FAPP.msg='';pcR()}
 function fappUp(i){const L=FAPP.songs;if(i>0){[L[i-1],L[i]]=[L[i],L[i-1]];pcR()}}
@@ -110,7 +109,7 @@ function fappSet(){const s=fStage(FAPP.n),L=FAPP.songs,tot=festSetMins(L),left=F
   <div><h3 style="margin:4px 0">Your songs</h3><div class=fa-l>${sg.length?sg.map(x=>{const inn=L.includes(x.id),over=!inn&&festDur(x)>left;return`<div class=fa-r style="${inn||over?'opacity:.5':''}"><span style="flex:1">${esc(x.title)}${x.ft?` <small style="color:#f5c542">feat. ${esc(x.ft)}</small>`:''}<br><small class=m>${esc(x.g||'')} · q${x.q||0} · ${festDur(x)} min</small></span><button onclick="fappAdd(${x.id})">${inn?'Added':'+ Add'}</button></div>`}).join(''):'<p class=m>Release some songs first.</p>'}</div>
    ${al.length?`<h3 style="margin:8px 0 4px">Albums</h3><div class=fa-l>${al.map(a=>{const ids=a.songs.filter(i=>S.songs.some(x=>x.id==i));return`<div class=fa-r><span style="flex:1">💿 ${esc(a.name)}<br><small class=m>${ids.length} songs · ${fDurS(festSetMins(ids))}</small></span><button onclick="fappAddAl(${a.id})">+ Album</button></div>`}).join('')}</div>`:''}</div></div>`}
 function fappConfirm(){const L=FAPP.songs;if(!L||!L.length)return fappErr('Add at least one song to your setlist.');const tot=festSetMins(L);if(tot>FSET_MAX)return fappErr('Your setlist is '+fDurS(tot)+'. The limit is 4 hours.');const s=fStage(FAPP.n);
- {const ce=typeof calFestFeat=='function'?calFestFeat(L,FAPP.d,FAPP.n,FAPP.k,FAPP.edit?'f'+FAPP.edit:null):'';if(ce)return fappErr(ce)}
+ 
  if(FAPP.edit){const b=fBk().find(x=>x.id==FAPP.edit);if(!b||b.st)return fappErr('That booking is no longer open.');if(FEST.set&&FEST.set.bk===b)return fappErr('You are playing that set right now!');b.songs=L.slice();say('Setlist saved: '+L.length+' songs, '+fDurS(tot)+'.')}
  else{const e=festCanBook(FAPP.d,FAPP.n,FAPP.k);if(e)return fappErr(e);fBk().push({id:S.nid++,day:FAPP.d,n:FAPP.n,slot:FAPP.k,songs:L.slice(),st:0,bd:S.day});say('🎪 Booked! Stage '+s.n+' ('+s.name+'), Day '+FAPP.d+' at '+fHM(FSLOT[FAPP.k][0])+'. '+L.length+' songs, '+fDurS(tot)+'.')}
  updateVersion();chime();FAPP={v:'home'};pcR();try{festBoardDraw()}catch(e){}}

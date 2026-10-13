@@ -56,7 +56,7 @@ function negKind(text,pp){const s=' '+String(text||'').toLowerCase().replace(/[â
  else{if(h(higherW)||h(/ (cheap|stingy|tight|peanuts|thats nothing) /))return'better';if(h(/ (too much|thats a lot|generous|a lot of money|so much|great price|good price|fair price|bargain) /))return'good'}
  return null}
 /* ===== v26.46: negotiation personalities and flexible counters =====
-   Every artist has a seeded negotiation personality (artX(i).np, see 74-calendar.js): flexible, stubborn, proud, greedy, generous or shrewd.
+   Every artist has a seeded negotiation personality (artNP(i), see 75-collab-fees-dms.js): flexible, stubborn, proud, greedy, generous or shrewd.
    room  = how far from the opening price the artist will really go (drop for a fee the player pays, give for a payment the artist makes).
            It shrinks with the artist's size (big names move less) and grows a little with the relationship.
    rate  = the share of the gap between the ask and the player's offer that the artist closes in one counter.
@@ -75,7 +75,7 @@ const nu=v=>v<30?1:v<120?5:v<500?10:v<2500?25:v<10000?100:v<50000?250:1000,nr=v=
 const r5=nr;
 /* fresh negotiation state for a deal. pp = player pays, base = the artist's opening price, who = artist index (or a personality name), rel = relationship score */
 function negInit(base,pp,who,rel,rnd){let np='shrewd',big=0;
- if(typeof who=='number'&&typeof artX=='function'){np=artX(who).np;big=Math.min(1,Math.log10(1+ART[who][2])/8)}else if(typeof who=='string'&&NEG_P[who])np=who;
+ if(typeof who=='number'&&typeof artNP=='function'){np=artNP(who);big=Math.min(1,Math.log10(1+ART[who][2])/8)}else if(typeof who=='string'&&NEG_P[who])np=who;
  const P=NEG_P[np]||NEG_P.shrewd,fx=1-.45*big,rb=Math.min(.3,Math.max(0,rel||0)*.03),j=((rnd==null?Math.random():rnd)-.5)*.2,room=(pp?P.drop:P.give)*fx*(1+rb)*(1+j);
  const lim=pp?Math.max(1,Math.ceil(base*(1-room))):Math.floor(base*(1+room));
  return{base,pp:!!pp,lim,A:base,last:null,first:null,low:0,rounds:0,fin:0,pat:P.pat+((rel||0)>=8?1:0),rate:P.rate*fx*(1+rb/2),ins:P.ins,np}}
