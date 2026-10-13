@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.69.0';
+const GAME_VERSION='v26.70.0';
 const VERSION_HISTORY=[
+ {v:'v26.70.0',n:'Texting is livelier. Ordinary artists reach out more often, up to three chats a day, and they often send a follow-up message. There are twelve new conversation starters and six new follow-ups. When you send a long message, the reply often builds on it. Saves still load.'},
  {v:'v26.69.0',n:'Amazoom listings have more detail. Each item has a longer description, three feature bullets, the finishes it comes in and a customer review with its star rating. The same item always reads the same way. Buying works as before. Saves still load.'},
  {v:'v26.68.0',n:'Billboards are harder to earn and easier to see. Your own name joins the rotation at 10,000 monthly listeners (was 1,000), and roster artists need 5,000 or more (was 120). About 4 in 5 billboards now stand on the left of the road\'s way of travel. Big Vee\'s billboard answer has the new numbers. Saves still load.'},
  {v:'v26.67.0',n:'Famous artists reach out only once you are well known. Artists with 50,000 or more monthly listeners DM you once you have 25,000; Panic Man Dan waits for 5,000. All these thresholds sit at the top of 75-collab-fees-dms.js. Saves still load.'},
