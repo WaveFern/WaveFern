@@ -266,7 +266,7 @@ function cbV(E,L,t,f,dur,v){const c=E.c,g=c.createGain(),bp=c.createGain();bp.co
    that starts with a Web Audio context. Until a family has loaded, or if the files cannot be fetched (for example
    from a file:// page), the code-made voice for that instrument plays as before. */
 const SMP={},SMP_OF={bass:'bass',round:'bass',upright:'bass',funk:'bass',pluckb:'bass',pick:'bass',acid:'bass',reese:'bass',wob:'bass',
- epiano:'key',piano:'piano',bell:'bell',pbell:'bell',brass:'brass',lead:'lead',pluck:'pluck'};
+ epiano:'key',piano:'piano',bell:'bell',pbell:'bell',brass:'brass',lead:'lead',pluck:'pluck',flute:'flute',strings:'string',super:'synth'};
 const sampled=n=>{const f=SMP_OF[n];return !!(f&&SMP[f]&&SMP[f].length)};
 let smpLoad=null;
 function loadSamples(c){if(smpLoad||!c||typeof fetch!='function')return smpLoad;
