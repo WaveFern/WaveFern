@@ -5,3 +5,5 @@
 # keep the menu music as a normal file so GitHub Pages serves the real mp3 (the deploy workflow does not fetch LFS)
 menu.mp3 -filter -diff -merge binary
 favicon.png -filter -diff -merge binary
+# one-shot samples: plain files so GitHub Pages serves the real mp3 (the deploy workflow does not fetch LFS)
+audio/oneshots/*.mp3 -filter -diff -merge binary
