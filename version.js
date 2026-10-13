@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.74.2';
+const GAME_VERSION='v26.75.0';
 const VERSION_HISTORY=[
+ {v:'v26.75.0',n:'Amazoom models rebuilt: fish tank (open glass-look tank, sand, plants, readable animated fish), wardrobe (clean doors and handles), piano (keys, pedals, music desk), cat tree (rope posts, platforms, house, scratching post, hanging toy)'},
  {v:'v26.74.2',n:'Fixed the colour bug behind the cyan and blue patches: lighter shades of furniture (cream sideboard, pale sofas and beanbags) no longer shift hue. Sofa cushions no longer overlap the arms, so the seam is gone. The beanbag is a stepped cushion, not a block. The fish tank has a lighter hood and a brighter water panel. Saves still load.'},
  {v:'v26.74.1',n:'Two furniture models fixed: the drum kit\'s snare no longer sits inside the bass drum, and the bin is one clean box instead of stacked rings. No other changes. Saves still load.'},
  {v:'v26.74.0',n:'Amazoom furniture previews are drawn at twice the resolution, so the details read. The fish tank is see-through with sand, rocks, two swaying plants, three swimming fish and rising bubbles. The clock pendulum swings and the leaves on the rubber and monstera plants sway, in the shop, in your hand and in the house. Listing text is unchanged. Saves still load.'},
