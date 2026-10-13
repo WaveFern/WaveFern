@@ -11,7 +11,7 @@ lamp:{n:'Floor lamp',p:100,w:.4,d:.4,b:[[.3,.05,.3,'#222',0,.03,0],[.06,1.5,.06,
 dining:{n:'Dining table',p:360,w:1.8,d:1,b:[[1.8,.1,1,'#a06a3c',0,.8,0],[.1,.8,.1,'#6b4a2e',-.8,.4,-.4],[.1,.8,.1,'#6b4a2e',.8,.4,-.4],[.1,.8,.1,'#6b4a2e',-.8,.4,.4],[.1,.8,.1,'#6b4a2e',.8,.4,.4]]}};
 const FOOD=[['Sir Burger Double Stack',22,25,'Two patties, melted cheese, crunchy lettuce',4.6,'3.4K','900+',27,'Best Seller','Meals'],['Slurp Ramen Bowl',18,20,'Rich broth, springy noodles, soft egg',4.5,'1.9K','600+',0,"Goober's Choice",'Meals'],['Sad Salad (With Hope)',14,12,'Mixed greens and one hopeful tomato',3.9,'512','50+',0,'','Meals'],['Bolt Bull Energy Can',12,10,'Tastes like a battery, works like one',4.2,'7.8K','2K+',15,'','Drinks'],['Mega Feast Bento Box',55,50,'Rice, fish, veg and meat. Share? No.',4.7,'890','300+',65,'Best Seller','Meals']];
 let IGF=[],PL=[],hold=null,gp={x:4,z:4,r:0,ok:0},ghost=null,GF=null,mouse={x:0,y:0};const RC=new THREE.Raycaster(),PLN=new THREE.Plane(new THREE.Vector3(0,1,0),0);
-const mkF=t=>{const g=new THREE.Group();F[t].b.forEach(a=>B(g,...a));return g};
+const mkF=t=>{const g=new THREE.Group();F[t].b.forEach(a=>B(g,...a));if(F[t].fx)F[t].fx(g);return g};
 const fb=(t,x,z,r)=>{const f=F[t],w=r%2?f.d:f.w,d=r%2?f.w:f.d;return[x-w/2,z-d/2,x+w/2,z+d/2]};
 function inst(k){const a=APPD[k];if(S.money<a.p)return snd('err');S.money=+(S.money-a.p).toFixed(2);S.apps[k]=1;updateVersion();snd('cash');say('Installed '+a.n);pcR()}
 function buyF(t){if(S.money<F[t].p)return snd('err');S.money=+(S.money-F[t].p).toFixed(2);S.inv[t]=(S.inv[t]||0)+1;updateVersion();snd('cash');say(F[t].n+' delivered to storage');pcR()}

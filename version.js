@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.73.0';
+const GAME_VERSION='v26.74.0';
 const VERSION_HISTORY=[
+ {v:'v26.74.0',n:'Amazoom furniture previews are drawn at twice the resolution, so the details read. The fish tank is see-through with sand, rocks, two swaying plants, three swimming fish and rising bubbles. The clock pendulum swings and the leaves on the rubber and monstera plants sway, in the shop, in your hand and in the house. Listing text is unchanged. Saves still load.'},
  {v:'v26.73.0',n:'Amazoom listings are back to their original text: the extra descriptions, bullets, finishes, reviews and the size, weight and warranty line are gone. The furniture models are chunkier with contrasting details (cushions, handles, drawer fronts, bed posts, piano keys, lamp and clock trim), so they read at the shop preview size. Saves still load.'},
  {v:'v26.72.1',n:'Billboards now stand mostly on the right side of the road, as seen in the direction of travel, so drivers see them. The fame thresholds are unchanged. Saves still load.'},
  {v:'v26.72.0',n:'Amazoom furniture models are more detailed. Every item gets extra parts for its kind: legs and feet, cushions and seams, handles, trim, keys, faces and small props. The shop preview, the item you hold and the one you place in the house all use the new models. Listing text is unchanged. Saves still load.'},
