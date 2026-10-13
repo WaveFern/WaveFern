@@ -2,7 +2,7 @@
 const HAIRC=['#1b1b1f','#4a2c1a','#8b5a2b','#d9a441','#e8d9a0','#c0392b','#e66a9b','#3b82f6','#2ee59d','#8e44ad','#e8e8ec','#ff8a30'],SKIN=['#fddcc0','#f2c09a','#d99a6c','#b57248','#8a5230','#5b3420'],
 TOPC=['#e74c3c','#3498db','#2ecc71','#f1c40f','#9b59b6','#ecf0f1','#2c3e50','#e67e22','#1abc9c','#e84393'],PANTC=['#2c3e50','#34495e','#7f8c8d','#8d6e4a','#1e1e24','#5b7db1','#a04050','#3f6f4a'];
 const NM={eyes:['Dots','Wide','Sleepy','Tall','Shades'],mouth:['Smile','Flat','Open','Smirk'],hair:['Bald','Buzz','Short','Spiky','Mohawk','Long','Bob','Ponytail','Bun','Afro','Pigtails','Quiff'],top:['T-shirt','Hoodie','Jacket','Striped','Tank']};
-let ch={skin:2,eyes:0,mouth:0,hair:2,hc:1,top:0,tc:1,pc:0,body:.4};
+let ch={skin:2,eyes:0,mouth:0,hair:2,hc:1,top:0,tc:1,pc:0,body:.4,hgt:.5};
 function buildChar(c){
  const g=new THREE.Group(),w=.42+c.body*.5,d=.3+c.body*.28,sk=SKIN[c.skin],tc=c.tc_custom||TOPC[c.tc],pc=c.pc_custom||PANTC[c.pc],hc=c.hc_custom||HAIRC[c.hc],T=c.top;
  const pv=(x,y,z,p=g)=>{const o=new THREE.Group();o.position.set(x,y,z);p.add(o);return o};
@@ -53,6 +53,10 @@ function buildChar(c){
  if(c.ht>=0){const hh=HTC[c.ht],sy=c.hts!==undefined?c.hts:[0,1,2,0,3,1,2][c.ht]??0,hk=hh[0];
   if(sy==0){B(h,.64,.16,.64,hk,0,.36,0);B(h,.64,.04,.34,dk(hk,.8),0,.3,.42)}else if(sy==1){B(h,.62,.22,.62,hk,0,.38,0);B(h,.66,.1,.66,dk(hk,.8),0,.27,0)}else if(sy==2){B(h,.6,.16,.6,hk,0,.37,0);B(h,.95,.04,.95,dk(hk,.85),0,.3,0)}else if(sy==3){B(h,.62,.14,.62,hk,0,.36,0);B(h,.6,.03,.38,dk(hk,.7),0,.3,.45)}else if(sy==4){B(h,.64,.08,.64,hk,0,.3,0)}else{B(h,.72,.1,.72,hk,0,.4,0);B(h,.1,.06,.1,dk(hk,.7),.1,.47,0)}}
  if(c.ac>=0){const ak=c.acc||'#222222',ac=c.ac;if(ac==0){B(h,.66,.06,.1,ak,0,.34,0);B(h,.1,.22,.22,ak,-.35,.02,0);B(h,.1,.22,.22,ak,.35,.02,0)}else if(ac==1)SHD3(h,ak);else if(ac==2){B(g,w*.7,.05,.04,ak,0,1.05,d/2+.02);B(g,.08,.1,.03,ak,0,.97,d/2+.03)}else{B(g,w+.05,.14,d+.05,ak,0,1.1,0);B(g,.12,.32,.05,ak,.14,.9,d/2+.04)}}
+ /* v26.59: height. hgt 0 (shortest) to 1 (tallest), .5 is average. Most NPCs land near average (three random draws averaged). */
+ {const hv=c.hgt!=null?c.hgt:c===ch?0.5:(Math.random()+Math.random()+Math.random())/3;g.scale.y=.84+hv*.32}
+ /* a guitar strap across the chest (used by Panic Man Dan), from one shoulder down to the opposite hip */
+ if(c.strap)B(g,.07,.98,.03,'#1a1a1a',0,.82,d/2+.025).rotation.z=-.62;
  return{g,legs,arms}}
 const P={x:4.5,z:3.8,rot:Math.PI/4,mesh:null,legs:[],arms:[],t:0,moving:0};
 function refresh(){const o=buildChar(ch);if(P.mesh)scene.remove(P.mesh);P.mesh=o.g;P.legs=o.legs;P.arms=o.arms;scene.add(o.g)}
