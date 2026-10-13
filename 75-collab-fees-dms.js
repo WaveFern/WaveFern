@@ -30,7 +30,15 @@ function collabFee(i,dir,k){const a=ART[i];if(!a)return 5;const A=a[2],mk=artMK(
 const GENREL=[['Hip-Hop','Rap'],['Pop','R&B','Indie'],['Lo-fi','Electronic','Folk'],['Rock','Country','Folk','Indie'],['R&B','Latin','Pop']];
 /* 0..1: how fast the player is growing (monthly listeners now vs a week ago) and how much interest their releases have */
 function dmMomentum(){const h=S.mlHist||[],cur=h.length?h[h.length-1].ml:S.listeners||0,old=(h.filter(q=>q.day<=S.day-7).pop()||h[0]||{ml:cur}).ml,g=Math.max(0,Math.min(1,((cur+1)/(old+1)-1)));return Math.min(1,g*.7+(S.interest||0)*.3)}
-function dmWeight(i,mo){const a=ART[i],A=a[2],L=Math.max(S.listeners||0,5),d=Math.log10(A/L),M=mo==null?dmMomentum():mo,rep=Math.max(-10,Math.min(15,S.rep||0));let w;
+/* who may reach out at all. All the thresholds for famous artists are here.
+   DM_STAR: artists with at least A monthly listeners only DM a player with at least L monthly listeners.
+   DM_LOCK: named top-tier artists with their own player threshold (monthly listeners). */
+const DM_STAR={A:50000,L:25000},DM_LOCK={'Panic Man Dan':5000};
+function dmGateOK(i){const a=ART[i];if(!a)return false;const L=S.listeners||0;
+ if(a[2]>=DM_STAR.A)return L>=DM_STAR.L;
+ if(DM_LOCK[a[0]]!==undefined)return L>=DM_LOCK[a[0]];
+ return true}
+function dmWeight(i,mo){if(!dmGateOK(i))return 0;const a=ART[i],A=a[2],L=Math.max(S.listeners||0,5),d=Math.log10(A/L),M=mo==null?dmMomentum():mo,rep=Math.max(-10,Math.min(15,S.rep||0));let w;
  if(Math.abs(d)<=.35)w=1;/* similar size: the most common */
  else if(d<0&&d>-.9)w=.7;/* a bit smaller: frequent */
  else if(d>0&&d<=1)w=.3*(1+2*M);/* a bit bigger: occasional, more when you are gaining momentum */
@@ -43,7 +51,7 @@ function dmWeight(i,mo){const a=ART[i],A=a[2],L=Math.max(S.listeners||0,5),d=Mat
  return w*(1+.03*rep)*(a[9]||1)}  /* a[9]: optional per-artist DM weight, 1 = normal */
 /* draw k artists (nobody who already has a thread) in proportion to their weight, with noise so it is never predictable */
 function dmDraw(k){const mo=dmMomentum(),c=ART.map((a,i)=>i).filter(i=>!S.msgs.some(m=>m.a===i)&&!(typeof BLKI!='undefined'&&BLKI&&BLKI.has(i))),out=[];
- const w=c.map(i=>[i,dmWeight(i,mo)*(.5+Math.random())]);
+ const w=c.map(i=>[i,dmWeight(i,mo)*(.5+Math.random())]).filter(q=>q[1]>0);
  while(out.length<k&&w.length){const tot=w.reduce((p,q)=>p+q[1],0);if(tot<=0)break;let r=Math.random()*tot,j=0;for(;j<w.length-1;j++){if(r<w[j][1])break;r-=w[j][1]}out.push(w[j][0]);w.splice(j,1)}
  return out}
 /* how many new DMs today: usually none or one, sometimes two */
