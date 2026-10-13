@@ -68,7 +68,7 @@ function cdHouse(o){const{w,d,h,rf}=o,X=WX(o.cx),Zf=WZ(o.zf);CTD.hfp.push([X-w/2
  for(let x=x0+.3;x<x1-.2;x+=.45){if(Math.abs(x-X)<.75||(gd!=null&&Math.abs(x-gd)<1.3)||Math.random()<.35)continue;SB(.2,.2,.2,Math.random()<.4?pick(GRN):pick(FLW),x,.1,Zf+.27)}}
 
 /* merge boxes [w,h,d,colour,x,y,z] into one geometry (camera-facing faces only, like flushSB) */
-function boxGeo(L){const cc=new THREE.Color(),N=L.length,Pp=new Float32Array(N*36),Nr=new Float32Array(N*36),Cl=new Float32Array(N*36),I=new Uint32Array(N*18);let v=0,ii=0;
+function boxGeo(L){const cc=new THREE.Color(),N=L.length,Pp=new Float32Array(N*72),Nr=new Float32Array(N*72),Cl=new Float32Array(N*72),I=new Uint32Array(N*36);let v=0,ii=0;
  L.forEach((b,n)=>{const j=1+(n*7919%8)*.0004+.0002;cc.set(b[3]);FDV.forEach(f=>{const b0=v/3;f[1].forEach(q=>{Pp[v]=b[4]+q[0]*b[0]*j/2;Pp[v+1]=b[5]+q[1]*b[1]*j/2;Pp[v+2]=b[6]+q[2]*b[2]*j/2;Nr[v]=f[0][0];Nr[v+1]=f[0][1];Nr[v+2]=f[0][2];Cl[v]=cc.r;Cl[v+1]=cc.g;Cl[v+2]=cc.b;v+=3});I.set([b0,b0+1,b0+2,b0,b0+2,b0+3],ii);ii+=6})});
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(Pp,3));g.setAttribute('normal',new THREE.BufferAttribute(Nr,3));g.setAttribute('color',new THREE.BufferAttribute(Cl,3));g.setIndex(new THREE.BufferAttribute(I,1));g.computeBoundingSphere();return g}
 /* tall towers between the camera and you were sliced diagonally by the camera's near plane (-20): push it back */

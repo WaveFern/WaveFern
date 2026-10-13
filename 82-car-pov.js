@@ -68,10 +68,15 @@ function povBuild3D(){
  POV.arms=[arm(),arm()];
 }
 
-/* the car frame: local origin is the driver's seat on the ground, local -z is the bonnet, eye at height 1.2 */
-function povPose(){const h=dr.h,fx=Math.sin(h),fz=Math.cos(h),ex=dr.x+fx*.25,ez=dr.z+fz*.25;
- POV.G.position.set(ex,0,ez);POV.G.rotation.y=h+Math.PI;
- POVC.position.set(ex,1.2,ez);POVC.lookAt(ex+fx*40,1.2,ez+fz*40)}
+/* the car frame: local origin is the driver's seat on the ground, local -z is the bonnet, eye at height 1.2.
+   The view follows the car through a short ease (position and heading), so frame-to-frame jitter in the car's motion does not reach the picture. */
+function povPose(dt){const h=dr.h,fx=Math.sin(h),fz=Math.cos(h),tx=dr.x+fx*.25,tz=dr.z+fz*.25;
+ if(POV.cx===undefined){POV.cx=tx;POV.cz=tz;POV.ch=h}
+ const k=1-Math.exp(-dt*16);POV.cx+=(tx-POV.cx)*k;POV.cz+=(tz-POV.cz)*k;
+ let dh=h-POV.ch;dh=Math.atan2(Math.sin(dh),Math.cos(dh));POV.ch+=dh*k;
+ const ch=POV.ch,cfx=Math.sin(ch),cfz=Math.cos(ch),ex=POV.cx,ez=POV.cz;
+ POV.G.position.set(ex,0,ez);POV.G.rotation.y=ch+Math.PI;
+ POVC.position.set(ex,1.2,ez);POVC.lookAt(ex+cfx*40,1.2,ez+cfz*40)}
 /* steering: proportional to how far A or D is held, smooth, and back to centre when released */
 function povSteer(dt){const st=(keys.a||keys.arrowleft?1:0)-(keys.d||keys.arrowright?1:0),tg=st*POV_LIM;
  POV.ang+=(tg-POV.ang)*(1-Math.exp(-dt*(st?8:5)));POV.wheel.rotation.z=POV.ang}
@@ -91,7 +96,7 @@ function povGauge(){if(!POV.needle)return;const mx=carMax(dr.i)||20,f=Math.min(1
  if(POV.G)POV.G.visible=on;
  if(!on)return r0(sc,c);
  const now=performance.now(),dt=Math.min(.1,(now-(POV.t||now))/1000);POV.t=now;
- povPose();povSteer(dt);povArms();povGauge();
+ povPose(dt);povSteer(dt);povArms();povGauge();
  const W=Math.max(2,Math.round(innerWidth/POV_PX)),H=Math.max(2,Math.round(innerHeight/POV_PX));
  if(!POV_RT)POV_RT=new THREE.WebGLRenderTarget(W,H,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter});
  else if(POV_RT.width!==W||POV_RT.height!==H)POV_RT.setSize(W,H);
