@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.56.0';
+const GAME_VERSION='v26.57.0';
 const VERSION_HISTORY=[
+ {v:'v26.57.0',n:'Big Vee, the guide in Messages, understands more. Typos and slang are tidied up (a word one letter off is corrected), he answers money, listener, fame, day and song questions from your own save, and a short \'why?\' or \'how?\' repeats his last answer. Adds a Spotifly topic for deleting songs. Nothing is saved, so older saves are unchanged.'},
  {v:'v26.56.0',n:'You can delete a song from Spotifly. Open the artist page and press Delete song under it, then confirm. The song leaves your top songs, its album and stops earning. Saves still load.'},
  {v:'v26.55.0',n:'Recording a song now has three minigames: Beat, Lyrics and Mix. The memory one (Melody, watch and repeat the pads) is removed, and song quality is based on Lyrics and Mix. Saves still load.'},
  {v:'v26.54.0',n:'Income rebalance: each stream now pays $0.10 (was $0.03), so a day of about 300 streams pays around $30. Gear costs 20% lower and song pacing a little faster. All tuning sits in one TUNE block in 02-data.js. Saves still load and keep their balances.'},
