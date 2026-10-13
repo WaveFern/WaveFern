@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.54.0';
+const GAME_VERSION='v26.55.0';
 const VERSION_HISTORY=[
+ {v:'v26.55.0',n:'Recording a song now has three minigames: Beat, Lyrics and Mix. The memory one (Melody, watch and repeat the pads) is removed, and song quality is based on Lyrics and Mix. Saves still load.'},
  {v:'v26.54.0',n:'Income rebalance: each stream now pays $0.10 (was $0.03), so a day of about 300 streams pays around $30. Gear costs 20% lower and song pacing a little faster. All tuning sits in one TUNE block in 02-data.js. Saves still load and keep their balances.'},
  {v:'v26.53.1',n:'Kiaan comes up less often in DMs and collab outreach: about a third of a normal artist\'s chance. Everything else about him is the same. Saves are unchanged.'},
  {v:'v26.53.0',n:'New rapper: Kiaan. A new rap artist joins the roster with the same chance as any other artist to DM you for a collab, and the same negotiation, collab and fee rules. Existing saves and save codes still load; the new artist is added at the end of the roster so saved conversations are unchanged.'},
