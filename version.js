@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.71.0';
+const GAME_VERSION='v26.71.1';
 const VERSION_HISTORY=[
+ {v:'v26.71.1',n:'FestivalApp headings now use its condensed poster font, not the game\'s pixel font. No gameplay changes.'},
  {v:'v26.71.0',n:'FestivalApp and the Gear shop each have their own look. FestivalApp is a neon festival poster: caps headings, magenta and lime ticket cards and buttons. The Gear shop is a studio equipment rack: charcoal panels, amber meters and monospace labels. Layout and prices are unchanged. docs/THEMES.md describes both. Saves still load.'},
  {v:'v26.70.0',n:'Texting is livelier. Ordinary artists reach out more often, up to three chats a day, and they often send a follow-up message. There are twelve new conversation starters and six new follow-ups. When you send a long message, the reply often builds on it. Saves still load.'},
  {v:'v26.69.0',n:'Amazoom listings have more detail. Each item has a longer description, three feature bullets, the finishes it comes in and a customer review with its star rating. The same item always reads the same way. Buying works as before. Saves still load.'},
