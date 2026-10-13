@@ -196,3 +196,26 @@ function festBookTick(dt){FBT-=dt;if(FBT<=0){FBT=.5;festBkCheck();festBkChip();i
  if(FEST.ph=='fest'&&FEST.grp.fest&&FEST.grp.fest.visible){festNpcTick(dt,FEST.t);festShoutTick(dt);festFlareSpawnTick(dt)}festFlareTick(dt);
  if(FFL.g)FFL.g.visible=FEST.ph=='fest'}
 {const u0=update;update=function(dt){u0(dt);try{festBookTick(dt)}catch(e){if(!FEST.err2){FEST.err2=1;console.error('festival bookings',e)}}}}
+
+/* ===== v26.71: FestivalApp look: a neon festival poster. Layout rules above stay as they are; this only restyles .fa. */
+{const st=document.createElement('style');st.textContent=`.fa{font-family:Impact,'Haettenschweiler','Arial Narrow Bold',sans-serif;text-transform:uppercase;letter-spacing:.6px;color:#f6f0ff;background:radial-gradient(circle at 92% -8%,#ff2e8838,transparent 45%),radial-gradient(circle at -8% 108%,#c6ff3d26,transparent 40%),#100b1c;padding:14px 14px 16px;border-radius:6px}
+.fa h1{font-size:36px;line-height:1;letter-spacing:2px;margin:0 0 6px;background:linear-gradient(90deg,#ff2e88,#ffb13b 55%,#c6ff3d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.fa h1 img{filter:drop-shadow(0 0 4px #ff2e88)}
+.fa h3{font-size:19px;letter-spacing:1.5px;color:#c6ff3d;border-bottom:2px solid #c6ff3d55;padding-bottom:2px}
+.fa p.m{color:#b9a8dc;font-family:'Arial Narrow',Arial,sans-serif;text-transform:none;font-size:13px;letter-spacing:0}
+.fa .card{background:#1d1435;border:2px dashed #ff2e88;border-radius:6px;box-shadow:0 0 0 3px #100b1c,0 0 0 5px #c6ff3d44;padding:10px 12px}
+.fa button{background:#ff2e88;color:#100b1c;border:0;border-radius:2px;font:inherit;font-weight:700;letter-spacing:1px;padding:6px 12px;cursor:pointer;text-transform:uppercase}
+.fa button:hover{background:#ff58a3}
+.fa button.go{background:#c6ff3d}
+.fa button.go:hover{background:#d8ff6e}
+.fa button[disabled]{background:#3a2f55;color:#8a7db0;opacity:1}
+.fa .fa-err{background:#ff2e88;color:#100b1c;font-weight:700;border-radius:2px;text-transform:none}
+.fa .fa-r{border-bottom:1px dashed #ff2e8866}
+.fa .fa-tot{background:#2a1f44;border-radius:0;height:14px}
+.fa .fa-tot i{background:linear-gradient(90deg,#ff2e88,#ffb13b,#c6ff3d)}
+.fa .fa-c{border-radius:2px;border:2px dashed #ff2e8866;background:#1d1435}
+.fa .fa-c.you{background:#c6ff3d;color:#100b1c;border:2px solid #fff}
+.fa .fa-c.free{background:#ff2e88;color:#100b1c;border:2px solid #100b1c}
+.fa .fa-t{color:#ffb13b;font-size:13px;letter-spacing:1px}
+.fa .fa-h{font-size:13px;letter-spacing:.4px}
+@media (max-width:760px){.fa h1{font-size:28px}}`;document.head.appendChild(st)}

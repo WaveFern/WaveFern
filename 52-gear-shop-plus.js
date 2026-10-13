@@ -40,6 +40,26 @@ PG.shop=()=>{gfill();const q=Object.keys(GQ).reduce((a,k)=>a+gl(k)*GQ[k],0),s=Ob
  return`<h1>Gear shop</h1><p class=m>Balance: <b style="color:var(--g)">${$$(S.money)}</b> · Fame Level ${fameLevel()}</p><p class=m>Your gear adds <b style="color:var(--g)">+${q} quality</b> to every song you record${s?` and <b style="color:var(--g)">+${Math.round(s*100)}%</b> streams`:''}. Some upgrades unlock as your fame grows.</p>${secs.map(([t,ks])=>`<h3 class=gsh>${t}</h3><div class=cards>${ks.map(card).join('')}</div>`).join('')}`};
 {const st=document.createElement('style');st.textContent='.gsh{margin:16px 0 8px;font:700 14px Silkscreen,monospace;letter-spacing:1px;opacity:.85}.gpip{display:inline-flex;gap:3px;vertical-align:middle;margin-left:4px}.gpip i{width:9px;height:9px;border-radius:2px;background:#0005;box-shadow:inset 0 0 0 1px #fff3}.gpip i.on{background:var(--g)}.gsc button[disabled]{opacity:.7}';document.head.appendChild(st)}
 
+/* ===== v26.71: Gear shop look: a studio equipment rack. Charcoal panels, amber meters, monospace labels. Scoped to .gshop. */
+{const st=document.createElement('style');st.textContent=`.gshop{background:#15171b repeating-linear-gradient(0deg,#ffffff03 0 1px,transparent 1px 3px);color:#d9dde3;font-family:'Courier New',ui-monospace,monospace;padding:0 0 14px;border:1px solid #000;border-radius:4px}
+.gshop .gshop-top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px 12px;background:linear-gradient(#2d3138,#1c1f24);border-bottom:3px solid #ffb000;padding:10px 14px;margin:0 0 12px}
+.gshop .gshop-top b{font:700 22px 'Courier New',monospace;letter-spacing:5px;color:#ffb000;text-transform:uppercase;text-shadow:0 0 8px #ffb00066}
+.gshop .gshop-top span{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8d949e}
+.gshop h1{font:700 16px 'Courier New',monospace;letter-spacing:2px;text-transform:uppercase;color:#f1f3f6;margin:0 14px 4px}
+.gshop p{margin:4px 14px;font-size:12px;line-height:1.5;color:#9aa1ab}
+.gshop .gsh{font:700 12px 'Courier New',monospace;letter-spacing:2px;text-transform:uppercase;color:#ffb000;opacity:1;border-left:4px solid #ffb000;padding:3px 0 3px 8px;margin:18px 14px 8px}
+.gshop .cards{padding:0 14px;gap:10px}
+.gshop .gsc{background:linear-gradient(#24272e,#171a1f);border:1px solid #3b4048;border-radius:3px;box-shadow:inset 0 1px 0 #ffffff14,0 2px 0 #000;color:#d9dde3}
+.gshop .gsc b{color:#f1f3f6}
+.gshop .gsc small:not([style]){letter-spacing:.5px;text-transform:uppercase;font-size:10px;color:#8d949e}
+.gshop .gpip i{background:#0b0c0e;box-shadow:inset 0 0 0 1px #000,0 0 0 1px #3b4048}
+.gshop .gpip i.on{background:#ffb000;box-shadow:0 0 6px #ffb000}
+.gshop button{background:#2b2f37;color:#d9dde3;border:1px solid #000;border-radius:2px;font:700 11px 'Courier New',monospace;letter-spacing:1px;text-transform:uppercase;box-shadow:inset 0 -2px 0 #0007}
+.gshop button:hover{background:#363b45}
+.gshop button.go{background:#ffb000;color:#15171b;box-shadow:inset 0 -2px 0 #9a6a00}
+.gshop button.go:hover{background:#ffc233}
+.gshop button[disabled]{opacity:.45}
+.gshop .gsc.gsc-max{border-color:#ffb000}`;document.head.appendChild(st)}
 /* simple shapes for the new gear (hover previews and studio). The studio detail file replaces these with full models. */
 const GXM={
  phones:l=>[[.3,.04,.3,'#333',0,.02,0],[.04,.5,.04,'#333',0,.27,0],[.36,.06,.1,['#666','#222','#c9c3b2','#8a6a3a'][l],0,.55,0],[.1,.22,.18,'#222',-.18,.42,0],[.1,.22,.18,'#222',.18,.42,0]],
