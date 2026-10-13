@@ -1,0 +1,114 @@
+[
+ {
+  "c": "bass",
+  "f": "bass-jacket.mp3",
+  "root": 36,
+  "cents": 10,
+  "dur": 1.463
+ },
+ {
+  "c": "bass",
+  "f": "bass-juah.mp3",
+  "root": 36,
+  "cents": 5,
+  "dur": 5.721
+ },
+ {
+  "c": "bass",
+  "f": "bass-travel.mp3",
+  "root": 36,
+  "cents": -8,
+  "dur": 5.758
+ },
+ {
+  "c": "bass",
+  "f": "bass-kite.mp3",
+  "root": 48,
+  "cents": -6,
+  "dur": 3.029
+ },
+ {
+  "c": "bell",
+  "f": "bell-crimb.mp3",
+  "root": 72,
+  "cents": -4,
+  "dur": 1.261
+ },
+ {
+  "c": "bell",
+  "f": "bell-lid.mp3",
+  "root": 84,
+  "cents": 8,
+  "dur": 0.494
+ },
+ {
+  "c": "brass",
+  "f": "brass-harbor.mp3",
+  "root": 60,
+  "cents": -5,
+  "dur": 2.922
+ },
+ {
+  "c": "brass",
+  "f": "brass-pomade.mp3",
+  "root": 60,
+  "cents": 1,
+  "dur": 6.857
+ },
+ {
+  "c": "brass",
+  "f": "brass-pujox.mp3",
+  "root": 60,
+  "cents": 1,
+  "dur": 1.964
+ },
+ {
+  "c": "brass",
+  "f": "brass-suite.mp3",
+  "root": 60,
+  "cents": 4,
+  "dur": 3.862
+ },
+ {
+  "c": "key",
+  "f": "key-blazz.mp3",
+  "root": 60,
+  "cents": 4,
+  "dur": 3.793
+ },
+ {
+  "c": "key",
+  "f": "key-prenu.mp3",
+  "root": 60,
+  "cents": -2,
+  "dur": 2.741
+ },
+ {
+  "c": "key",
+  "f": "key-samuel.mp3",
+  "root": 72,
+  "cents": -3,
+  "dur": 2.528
+ },
+ {
+  "c": "lead",
+  "f": "lead-lezima.mp3",
+  "root": 60,
+  "cents": 2,
+  "dur": 6.688
+ },
+ {
+  "c": "piano",
+  "f": "piano-clizz.mp3",
+  "root": 60,
+  "cents": 6,
+  "dur": 1.645
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-aro.mp3",
+  "root": 72,
+  "cents": 1,
+  "dur": 0.342
+ }
+]

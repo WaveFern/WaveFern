@@ -1,4 +1,4 @@
-/* ===== v26.39: Beats, a procedural beat engine (Web Audio only, no audio files) =====
+/* ===== v26.39: Beats, a procedural beat engine (Web Audio; drums and most voices are made in code, melodic one-shots can be samples from audio/oneshots) =====
    Every song gets its own beat: the genre gives a list of beat styles (boom bap, trap, drill, house, punk...),
    and a seed from the song (its id, or the seed saved when it was recorded) picks the style, key, scale,
    tempo, chord progression, drum pattern variants, kit tuning and a hook melody. Same song = same beat.
@@ -261,7 +261,24 @@ function b808(E,L,t,f,dur,v,I,x){const c=E.c,o=c.createOscillator(),g=c.createGa
 function cbV(E,L,t,f,dur,v){const c=E.c,g=c.createGain(),bp=c.createGain();bp.connect(g);g.connect(sf(E,'bandpass',Math.round(f*2),2,L.in));
  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*1.5,t+.002);g.gain.setTargetAtTime(0,t+.01,.12);g.gain.setTargetAtTime(0,t+dur,.03);
  [1,1.48].forEach(m=>{const o=c.createOscillator();o.type='square';o.frequency.value=f*m;o.connect(bp);o.start(t);o.stop(t+Math.min(.7,dur+.1))})}
+/* ---------- one-shot samples (audio/oneshots, listed in its manifest.json) ----------
+   Recorded one-shots, each pitched to the note the beat plays. A family (bass, key, brass...) loads on the first beat
+   that starts with a Web Audio context. Until a family has loaded, or if the files cannot be fetched (for example
+   from a file:// page), the code-made voice for that instrument plays as before. */
+const SMP={},SMP_OF={bass:'bass',round:'bass',upright:'bass',funk:'bass',pluckb:'bass',pick:'bass',acid:'bass',reese:'bass',wob:'bass',
+ epiano:'key',piano:'piano',bell:'bell',pbell:'bell',brass:'brass',lead:'lead',pluck:'pluck'};
+const sampled=n=>{const f=SMP_OF[n];return !!(f&&SMP[f]&&SMP[f].length)};
+let smpLoad=null;
+function loadSamples(c){if(smpLoad||!c||typeof fetch!='function')return smpLoad;
+ smpLoad=fetch('audio/oneshots/manifest.json').then(r=>r.ok?r.json():[]).then(list=>Promise.all(list.map(m=>fetch('audio/oneshots/'+m.f).then(r=>r.arrayBuffer()).then(b=>c.decodeAudioData(b)).then(buf=>{(SMP[m.c]=SMP[m.c]||[]).push({buf,root:m.root+(m.cents||0)/100})}).catch(()=>{})))).catch(()=>{});
+ return smpLoad}
+function smpV(E,L,t,m,dur,v,fam){let s=null,bd=1e9;for(const z of SMP[fam]){const d=Math.abs(m-z.root);if(d<bd){bd=d;s=z}}
+ const c=E.c,src=c.createBufferSource(),g=c.createGain(),end=t+dur;
+ src.buffer=s.buf;src.playbackRate.value=Math.pow(2,(m-s.root)/12);
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.9,t+.004);g.gain.setValueAtTime(v*.9,end);g.gain.linearRampToValueAtTime(0,end+.08);
+ src.connect(g);g.connect(L.in);src.start(t);src.stop(end+.1)}
 function note(E,lay,name,t,midi,dur,v,x){const I=INS[name]||INS.sine,L=E.lay[lay],f=mtof(midi);if(!L)return;
+ if(sampled(name)){smpV(E,L,t,midi,dur,v,SMP_OF[name]);return}
  if(I.t=='o')oscV(E,L,t,f,dur,v,I,x);else if(I.t=='fm')fmV(E,L,t,f,dur,v,I);else if(I.t=='ks')ksV(E,L,t,f,dur,v,I);else if(I.t=='808')b808(E,L,t,f,dur,v,Object.assign({},I,x&&x.dr?{dr:x.dr}:{}),x);else cbV(E,L,t,f,dur,v)}
 
 /* ---------- harmony ---------- */
@@ -328,9 +345,9 @@ function mkE(c,dest,P,o){const E={c,P,fbk:{},sd:60/P.bpm/4,nb:noiseBuf(c),I:o.in
  E.dr=c.createGain();E.dr.gain.value=P.mx.dr;E.dr.connect(E.mix);
  let wob=null;if(fx.wob){const l=c.createOscillator();l.frequency.value=.55;wob=c.createGain();wob.gain.value=.0011*fx.wob;l.connect(wob);l.start();E.loops.push(l)}
  E.lay={};const RVS={bs:0,ch:.3,ar:.35,ld:.35};
- for(const k of['bs','ch','ar','ld']){const def=P[k];if(!def)continue;const g=c.createGain(),Id=INS[def.i]||{};g.gain.value=P.mx[k];let inp=g;
-  let lf=null;if(Id.t=='o'){lf=c.createBiquadFilter();lf.type='lowpass';lf.frequency.value=Math.min(15000,Id.lp||6000);lf.Q.value=Id.q||.7;lf.connect(g);inp=lf}
-  if(Id.ds){const w=shaper(c,k=='ld'?6:9,'2x'),lp=c.createBiquadFilter(),h=c.createBiquadFilter(),wg=c.createGain();lp.type='lowpass';lp.frequency.value=3600;h.type='highpass';h.frequency.value=90;wg.gain.value=k=='ld'?.5:.6;w.connect(h);h.connect(lp);lp.connect(wg);wg.connect(g);if(lf){lf.disconnect();lf.connect(w)}else inp=w}
+ for(const k of['bs','ch','ar','ld']){const def=P[k];if(!def)continue;const g=c.createGain(),Id=INS[def.i]||{},smp=sampled(def.i);g.gain.value=P.mx[k];let inp=g;
+  let lf=null;if(Id.t=='o'){lf=c.createBiquadFilter();lf.type='lowpass';lf.frequency.value=smp?15000:Math.min(15000,Id.lp||6000);lf.Q.value=Id.q||.7;lf.connect(g);inp=lf}
+  if(Id.ds&&!smp){const w=shaper(c,k=='ld'?6:9,'2x'),lp=c.createBiquadFilter(),h=c.createBiquadFilter(),wg=c.createGain();lp.type='lowpass';lp.frequency.value=3600;h.type='highpass';h.frequency.value=90;wg.gain.value=k=='ld'?.5:.6;w.connect(h);h.connect(lp);lp.connect(wg);wg.connect(g);if(lf){lf.disconnect();lf.connect(w)}else inp=w}
   if(wob&&k!='bs'){const d=c.createDelay(.05);d.delayTime.value=.006;wob.connect(d.delayTime);d.connect(inp);inp=d}
   g.connect(P.side&&k!='ld'?E.pump:E.mix);if(RVS[k]){const sg=c.createGain();sg.gain.value=RVS[k];g.connect(sg);sg.connect(E.rv)}if(k=='ld'&&E.dl)g.connect(E.dl);E.lay[k]={in:inp,g,f:lf}}
  if(fx.vinyl){const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=vinylBuf(c);s.loop=true;f.type='highpass';f.frequency.value=700;g.gain.value=.22*fx.vinyl;s.connect(f);f.connect(g);g.connect(E.mix);s.start();E.loops.push(s)}
@@ -345,7 +362,7 @@ function outChain(c){const vol=c.createGain(),comp=c.createDynamicsCompressor();
 function ctx(){if(!userOK())return null;let c=null;try{if(typeof ac=='function')c=ac()}catch(e){}
  if(!c){if(G&&G.c.state!='closed')c=G.c;else{const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;try{c=new A()}catch(e){return null}}}
  if(c.state=='suspended')try{c.resume().catch(()=>{})}catch(e){}
- if(!G||G.c!==c)G=outChain(c);return c}
+ if(!G||G.c!==c)G=outChain(c);loadSamples(c);return c}
 const musicVol=()=>(typeof VOL=='number'?VOL:.5)*uvol*BASE;
 const gamePaused=()=>typeof PAUSED!='undefined'&&!!PAUSED;
 function holdBg(on){try{if(typeof MU=='undefined')return;if(on){MU.hold=1;held=1;const a=MU.a&&MU.a[MU.cur];if(MU.pl&&a&&!a.paused)a.pause()}
@@ -385,7 +402,7 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
  playing:()=>!!cur,current:()=>cur?Object.assign(info(cur),{owner:cur.owner,src:cur.src,paused:!!cur.paused,intensity:cur.I}):null,
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
  beat:()=>{const E=cur;if(!E||E.t0==null)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
- bpm:()=>cur?cur.P.bpm:0,_dbg:{STY,INS,KIT},styles:Object.fromEntries(GENRES.map(g=>[g,STY[g].map(s=>s.n)])),genres:GENRES.slice(),render,
+ bpm:()=>cur?cur.P.bpm:0,samples:()=>Object.fromEntries(Object.entries(SMP).map(([k,v])=>[k,v.length])),_dbg:{STY,INS,KIT},styles:Object.fromEntries(GENRES.map(g=>[g,STY[g].map(s=>s.n)])),genres:GENRES.slice(),render,
  /* festival set: called every frame by festMusic; plays the beat of the song on stage (a new beat when the setlist moves on)
     and follows the crowd's hype. Returns false if audio is not available, so the old drum loop can play instead. */
  fest(set){if(!set||!set.song||set._bt==-1)return false;
