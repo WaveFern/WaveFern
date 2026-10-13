@@ -1,80 +1,86 @@
-/* ---------- v26.62: first-person car view ----------
-   While driving you sit in the driver's seat: a windscreen view of the road, A-pillars, a wing mirror on each side,
-   a rear-view mirror, the dashboard and instrument cluster, and a steering wheel with both hands on it that turns with A / D.
-   The car's own body is hidden from inside. The speed box, the target speed and the Exit key work as before.
-   Nothing here is saved. */
-const POV={ang:0,el:null};
+/* ---------- v26.63: first-person car view, built in 3D ----------
+   While driving, the car's interior is real 3D geometry placed in the car's own frame: dashboard, pillars, door trims,
+   a three-spoke steering wheel, instrument cluster with needles, centre console, mirrors, and two arms that reach the wheel.
+   The surfaces are blocky and flat-shaded, with a few small pixel-art canvases (dash panel, screen, dial face).
+   The wheel turns in proportion to A / D and springs back to centre when you let go; the hands ride the rim.
+   The car's own body is hidden from inside. Nothing here is saved. */
+const POV={ang:0,t:0,G:null,wheel:null,needle:null,arms:null};
 const POVC=new THREE.PerspectiveCamera(72,1,.05,600);
-{const st=document.createElement('style');st.textContent=`
-#pov{position:fixed;inset:0;z-index:2;pointer-events:none;display:none}
-#pov svg{width:100%;height:100%;display:block}
-#pov .pw{transform-box:view-box;transform-origin:800px 905px}`;document.head.appendChild(st)}
-function povBuild(){const d=document.createElement('div');d.id='pov';
- const hands=`<g fill="#c08a68" stroke="#7a4d33" stroke-width="3">
-   <path d="M560 640 Q598 620 612 660 L650 830 Q640 860 606 862 Q586 856 580 828 Z"/>
-   <path d="M1040 640 Q1002 620 988 660 L950 830 Q960 860 994 862 Q1014 856 1020 828 Z"/></g>
-   <g fill="#2a2f35"><path d="M575 826 L612 828 L620 905 L580 905 Z"/><path d="M1025 826 L988 828 L980 905 L1020 905 Z"/></g>`;
- d.innerHTML=`<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-  <defs>
-   <linearGradient id=povdash x1=0 y1=0 x2=0 y2=1><stop offset=0 stop-color="#262c33"/><stop offset=1 stop-color="#101418"/></linearGradient>
-   <linearGradient id=povmir x1=0 y1=0 x2=1 y2=1><stop offset=0 stop-color="#8a9aa6"/><stop offset=.5 stop-color="#4b5963"/><stop offset=1 stop-color="#1a2127"/></linearGradient>
-   <linearGradient id=povrim x1=0 y1=0 x2=0 y2=1><stop offset=0 stop-color="#4a525b"/><stop offset=1 stop-color="#1b1f24"/></linearGradient>
-   <radialGradient id=povdial cx=.5 cy=.5 r=.5><stop offset=0 stop-color="#11161b"/><stop offset=1 stop-color="#050607"/></radialGradient>
-  </defs>
-  <!-- frame around the windscreen: the opening lets the 3D road show through -->
-  <path fill="#0b0e11" fill-rule="evenodd" d="M0 0H1600V900H0Z M330 0H1270L1470 610H130Z"/>
-  <!-- A-pillar edges -->
-  <path d="M330 0 L130 610 L100 600 L300 0 Z" fill="#20252b"/><path d="M1270 0 L1470 610 L1500 600 L1300 0 Z" fill="#20252b"/>
-  <!-- side windows: a faint tint over the outside world -->
-  <path d="M0 0 H300 L110 600 H0Z" fill="#ffffff08"/><path d="M1300 0 H1600 V600 H1490Z" fill="#ffffff08"/>
-  <!-- rear-view mirror -->
-  <path d="M1190 6 Q1200 0 1215 0 H1545 Q1562 0 1566 16 L1572 120 Q1572 150 1540 152 H1218 Q1190 150 1190 120Z" fill="#121517"/>
-  <rect x=1212 y=16 width=336 height=118 rx=18 fill="url(#povmir)"/>
-  <path d="M1240 110 L1300 40 L1332 40 L1270 110Z" fill="#ffffff1c"/>
-  <!-- left wing mirror -->
-  <path d="M-10 448 Q40 418 120 430 Q180 436 210 480 L210 590 Q170 620 100 618 L-10 618Z" fill="#14181c" stroke="#2a3036" stroke-width="3"/>
-  <path d="M14 462 Q60 440 118 452 L118 600 Q60 606 14 590Z" fill="url(#povmir)"/>
-  <path d="M30 520 L70 486 L92 486 L50 530Z" fill="#ffffff1a"/>
-  <!-- dashboard -->
-  <path d="M0 640 Q800 596 1600 640 L1600 900 L0 900Z" fill="url(#povdash)"/>
-  <path d="M0 640 Q800 596 1600 640" fill=none stroke="#3b444d" stroke-width=3 />
-  <g fill="#0a0c0e"><circle cx=500 cy=700 r="26"/><circle cx=1100 cy=700 r="26"/></g>
-  <g fill="#2e353c"><circle cx=500 cy=700 r="18"/><circle cx=1100 cy=700 r="18"/></g>
-  <!-- instrument cluster: hood, two dials, a centre screen -->
-  <path d="M560 612 Q800 586 1040 612 L1060 706 Q800 720 540 706Z" fill="#0c0f12"/>
-  <circle cx=640 cy=672 r=68 fill="url(#povdial)" stroke="#2b3238" stroke-width="3"/>
-  <circle cx=960 cy=672 r=68 fill="url(#povdial)" stroke="#2b3238" stroke-width="3"/>
-  <g id=povsp stroke="#e8f3ec" stroke-width=3 fill=none><path d="M600 690 A46 46 0 0 1 680 660" stroke="#2fe68a"/></g>
-  <line x1=640 y1=672 x2=672 y2=630 stroke="#ff5a5a" stroke-width=3 stroke-linecap="round"/>
-  <line x1=960 y1=672 x2=986 y2=634 stroke="#f5c542" stroke-width=3 stroke-linecap="round"/>
-  <rect x=728 y=634 width=144 height=60 rx=8 fill="#0a1510" stroke="#1d3a2b" stroke-width="2"/>
-  <text x=800 y=672 text-anchor=middle font-family="ui-monospace,Menlo,monospace" font-size=20 fill="#2fe68a">FW·DRIVE</text>
-  <!-- air vents and centre console -->
-  <g fill=none stroke="#3a434c" stroke-width=6><circle cx=300 cy=680 r="34"/><circle cx=1300 cy=680 r="34"/></g>
-  <path d="M1190 720 L1420 720 L1420 900 L1200 900Z" fill="#101316" stroke="#2a3138" stroke-width="3"/>
-  <rect x=1222 y=738 width=168 height=92 rx=8 fill="#05070a" stroke="#1f2a33" stroke-width="2"/>
-  <path d="M1244 800 L1270 770 L1298 790 L1330 760 L1366 786" stroke="#2fe68a" stroke-width=3 fill=none opacity=".8"/>
-  <!-- steering wheel: turns with A / D; the hands turn with it -->
-  <g id=povwheel class=pw>
-   <circle cx=800 cy=905 r=262 fill=none stroke="url(#povrim)" stroke-width="44"/>
-   <circle cx=800 cy=905 r=240 fill=none stroke="#3b4148" stroke-width=2 opacity=".7"/>
-   <path d="M560 880 L1040 880 L1040 930 L560 930Z" fill="#171b20"/>
-   <circle cx=800 cy=905 r=86 fill="#15191d" stroke="#2c323a" stroke-width="4"/>
-   <ellipse cx="800" cy="905" rx="42" ry="24" fill="#2a3038" stroke="#6b7480" stroke-width="3"/>
-    <g>${hands}</g>
-  </g>
- </svg>`;
- document.body.appendChild(d);POV.el=d}
-/* the first-person camera: eye height about 1.2 m, just ahead of the car's centre, looking down the bonnet */
-function povPlace(){const h=dr.h,fx=Math.sin(h),fz=Math.cos(h),ex=dr.x+fx*.25,ez=dr.z+fz*.25;
- POVC.position.set(ex,1.2,ez);POVC.lookAt(ex+fx*40,1.0,ez+fz*40)}
-function povTurn(){const steer=(keys.a||keys.arrowleft?1:0)-(keys.d||keys.arrowright?1:0),want=-steer*35;POV.ang+=(want-POV.ang)*.18;
- if(POV.el){const w=POV.el.querySelector('#povwheel');if(w)w.setAttribute('transform',`rotate(${POV.ang.toFixed(1)} 800 905)`)}}
-/* while driving, render from the driver's seat (the car's own body is hidden from inside); otherwise the usual camera */
+const POV_LIM=.9,POV_R=.19,POV_W=[0,1.0,-.55];
+const POV_SKIN='#c08a68',POV_SLEEVE='#2b3138';
+/* small canvases drawn at low resolution and shown with nearest-neighbour filtering, so they read as pixel art */
+function povPix(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t}
+function povMat(tex){return new THREE.MeshLambertMaterial({map:tex})}
+/* a box child of p, centred on x,y,z */
+function povBox(p,w,h,d,col,x,y,z){const m=new THREE.Mesh(geo(w,h,d),M(col));m.position.set(x,y,z);p.add(m);return m}
+/* a thin bar from a to b: unit-length box, stretched and turned every time the ends move */
+function povBar(p,t,col){const m=new THREE.Mesh(new THREE.BoxGeometry(t,t,1),M(col));p.add(m);return m}
+const POV_UP=new THREE.Vector3(0,0,1),POV_D=new THREE.Vector3();
+function povBarSet(m,a,b){POV_D.set(b[0]-a[0],b[1]-a[1],b[2]-a[2]);const L=POV_D.length()||1e-4;m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);m.quaternion.setFromUnitVectors(POV_UP,POV_D.normalize());m.scale.set(1,1,L)}
+
+function povBuild3D(){
+ const G=new THREE.Group();scene.add(G);POV.G=G;
+ /* textures */
+ const dashTex=povPix(64,32,(x)=>{x.fillStyle='#1f252b';x.fillRect(0,0,64,32);
+  for(let i=0;i<7;i++){x.fillStyle=i%3?'#3a434c':'#56616c';x.fillRect(5+i*8,6,5,5)}
+  x.fillStyle='#0b0e11';x.fillRect(10,15,44,9);x.fillStyle='#2fe68a';for(let i=0;i<9;i++)x.fillRect(12+i*4,17+(i*5)%6,2,4);
+  x.fillStyle='#2fe68a';x.fillRect(3,27,2,2);x.fillStyle='#ff5a5a';x.fillRect(59,27,2,2)});
+ const screenTex=povPix(32,24,(x)=>{x.fillStyle='#050a08';x.fillRect(0,0,32,24);
+  [[4,12],[10,7],[16,15],[22,9],[28,11]].forEach(([px,hh])=>{x.fillStyle='#2fe68a';x.fillRect(px,24-hh,3,hh)});
+  x.fillStyle='#8aa094';x.fillRect(3,3,12,2)});
+ const dialTex=povPix(32,32,(x)=>{x.fillStyle='#07090b';x.beginPath();x.arc(16,16,16,0,Math.PI*2);x.fill();
+  x.fillStyle='#8aa094';for(let i=0;i<=8;i++){const a=(135+i*33.75)*Math.PI/180;x.fillRect(16+Math.cos(a)*12-1,16+Math.sin(a)*12-1,2,2)}});
+ /* dashboard and centre console */
+ povBox(G,1.8,.32,.66,'#262c33',0,.86,-.95);
+ const dashFace=new THREE.Mesh(new THREE.PlaneGeometry(1.8,.32),povMat(dashTex));dashFace.position.set(0,.86,-.615);G.add(dashFace);
+ povBox(G,.5,.5,.6,'#1a1e23',.55,.8,-1.0);
+ const scr=new THREE.Mesh(new THREE.PlaneGeometry(.32,.22),povMat(screenTex));scr.position.set(.55,.92,-.694);G.add(scr);
+ for(let i=0;i<4;i++)povBox(G,.05,.03,.02,'#3a434c',.36+i*.12,.7,-.69);
+ povBox(G,.4,.02,.02,'#0a0c0e',.55,.62,-.69);
+ /* instrument cluster: hood, two dials with needles */
+ povBox(G,.74,.22,.14,'#0c0f12',0,1.12,-.7);
+ [-.17,.17].forEach((x,i)=>{const d=new THREE.Mesh(new THREE.PlaneGeometry(.16,.16),povMat(dialTex));d.position.set(x,1.12,-.625);G.add(d);
+  const pv=new THREE.Group();pv.position.set(x,1.12,-.62);G.add(pv);
+  povBox(pv,.012,.07,.004,i?'#f5c542':'#ff5a5a',0,.035,0);
+  if(!i)POV.needle=pv});
+ /* pillars, roof, door trims, rear-view and wing mirrors */
+ povBox(G,1.9,.06,1.9,'#1d2126',0,1.88,-.9);
+ [-1,1].forEach(s=>{povBar(G,.1,'#20252b');povBarSet(G.children[G.children.length-1],[s*.9,1.04,-.66],[s*.8,1.86,-1.0]);
+  povBox(G,.1,.6,1.7,'#2b3138',s*.92,.95,-.9);
+  povBox(G,.12,.1,.14,'#15181c',s*1.02,1.1,-.6);povBox(G,.02,.06,.09,'#9fb0bc',s*1.08,1.1,-.6)});
+ povBox(G,.36,.1,.03,'#15181c',0,1.68,-.82);povBox(G,.32,.07,.01,'#8fa0ab',0,1.68,-.81);
+ /* steering wheel: a rim, three spokes and a hub, all turning on the column */
+ const WH=new THREE.Group();WH.position.set(POV_W[0],POV_W[1],POV_W[2]);G.add(WH);
+ const WS=new THREE.Group();WH.add(WS);POV.wheel=WS;
+ const rim=new THREE.Mesh(new THREE.TorusGeometry(POV_R,.024,8,24),M('#15181c'));WS.add(rim);
+ [90,210,330].forEach(a=>{const r=a*Math.PI/180;povBarSet(povBar(WS,.03,'#23282e'),[0,0,0],[Math.cos(r)*POV_R,Math.sin(r)*POV_R,0])});
+ const hub=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.04,10),M('#2a3038'));hub.rotation.x=Math.PI/2;WS.add(hub);
+ /* arms: upper arm (sleeve), forearm (skin), and a hand block, each rebuilt from its end points every frame */
+ const arm=s=>({up:povBar(G,.11,POV_SLEEVE),fore:povBar(G,.075,POV_SKIN),hand:povBox(G,.085,.07,.09,POV_SKIN,0,0,0),s});
+ POV.arms=[arm(-1),arm(1)];
+}
+
+/* the car frame: local origin is the driver's seat on the ground, local -z is the bonnet, eye at height 1.2 */
+function povPose(){const h=dr.h,fx=Math.sin(h),fz=Math.cos(h),ex=dr.x+fx*.25,ez=dr.z+fz*.25;
+ POV.G.position.set(ex,0,ez);POV.G.rotation.y=h+Math.PI;
+ POVC.position.set(ex,1.2,ez);POVC.lookAt(ex+fx*40,1.2,ez+fz*40)}
+/* steering: proportional to how far A or D is held, smooth, and back to centre when released */
+function povSteer(dt){const st=(keys.a||keys.arrowleft?1:0)-(keys.d||keys.arrowright?1:0),tg=st*POV_LIM;
+ POV.ang+=(tg-POV.ang)*(1-Math.exp(-dt*(st?8:5)));POV.wheel.rotation.z=POV.ang}
+/* the hands sit at 9 and 3 o'clock on the rim, so they move with the wheel; elbows stay low, shoulders fixed */
+function povArms(){const a=POV.ang,W=POV_W,hL=[W[0]-POV_R*Math.cos(a),W[1]-POV_R*Math.sin(a),W[2]+.03],hR=[W[0]+POV_R*Math.cos(a),W[1]+POV_R*Math.sin(a),W[2]+.03];
+ [[hL,-1],[hR,1]].forEach(([h,s],i)=>{const A=POV.arms[i],sh=[s*.22,1.0,.06],el=[s*.3,.76,-.3];
+  povBarSet(A.up,sh,el);povBarSet(A.fore,el,h);A.hand.position.set(h[0],h[1],h[2]);A.hand.rotation.z=a})}
+/* instrument needle: 135 degrees left at zero, 135 right at the car's top speed */
+function povGauge(){if(!POV.needle)return;const mx=carMax(dr.i)||20,f=Math.min(1,wMph(Math.abs(dr.v))/mx);POV.needle.rotation.z=(135-f*270)*Math.PI/180}
+
+/* the renderer hook: while driving, draw from the driver's seat; otherwise the usual camera */
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){
  const on=mode=='drive'&&!!dr&&dr.m&&!PAUSED;
- if(!POV.el&&on)povBuild();
- if(POV.el)POV.el.style.display=on?'block':'none';
+ if(on&&!POV.G)povBuild3D();
+ if(POV.G)POV.G.visible=on;
  if(!on)return r0(sc,c);
+ const now=performance.now(),dt=Math.min(.1,(now-(POV.t||now))/1000);POV.t=now;
+ povPose();povSteer(dt);povArms();povGauge();
  POVC.aspect=innerWidth/innerHeight;POVC.updateProjectionMatrix();
- const vis=dr.m.visible;dr.m.visible=false;povPlace();povTurn();r0(sc,POVC);dr.m.visible=vis}}
+ const vis=dr.m.visible;dr.m.visible=false;r0(sc,POVC);dr.m.visible=vis}}
