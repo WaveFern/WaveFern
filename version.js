@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.63.0';
+const GAME_VERSION='v26.64.0';
 const VERSION_HISTORY=[
+ {v:'v26.64.0',n:'Driving view fixes: the steering wheel is tilted towards the driver and rolls about its column, with a bright marker at 12 o\'clock so the turn reads clearly, and the hands stay on the rim. The cockpit is drawn at a third of the screen resolution and scaled up with nearest-neighbour filtering, so it reads as pixel art. Nothing is saved.'},
  {v:'v26.63.0',n:'Driving rebuilt in 3D. The car interior (dashboard, pillars, door trims, instrument cluster with needles, centre console, mirrors) is real geometry with small pixel-art panels. Two arms reach the wheel and the hands ride the rim. The wheel turns in proportion to A and D and springs back to centre. City buildings keep every wall face, so they are solid from the street and from the car. Nothing is saved, so existing saves are unchanged.'},
  {v:'v26.62.0',n:'Driving is now first person, like sitting in the car: a windscreen view of the road, A-pillars, both wing mirrors and the rear-view mirror, the dashboard with instrument cluster, and a steering wheel with both hands on it that turns with A and D. The car\'s body is hidden from inside. The speed box and Exit key work as before. Nothing is saved, so existing saves are unchanged.'},
  {v:'v26.61.0',n:'Billboards beside the main city roads. They rotate every 10 seconds through the famous roster artists, including Panic Man Dan. Once you reach 1,000 monthly listeners your own name joins the rotation. Big Vee now answers questions about billboards and height. Billboard posts are solid.'},
