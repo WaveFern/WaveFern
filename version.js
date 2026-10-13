@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.60.0';
+const GAME_VERSION='v26.61.0';
 const VERSION_HISTORY=[
+ {v:'v26.61.0',n:'Billboards beside the main city roads. They rotate every 10 seconds through the famous roster artists, including Panic Man Dan. Once you reach 1,000 monthly listeners your own name joins the rotation. Big Vee now answers questions about billboards and height. Billboard posts are solid.'},
  {v:'v26.60.0',n:'New artist: Panic Man Dan, a top-tier rock act with short grey hair, a black tee and a guitar strap, drawn in full colour. He is the shortest character height and only reaches out once you have 5,000 monthly listeners. He joins the end of the roster, so saved conversations are unchanged.'},
  {v:'v26.59.0',n:'Height: character creation has a Height slider from Short to Tall, with Average in the middle. Randomise sets it too. NPCs now vary in height, and most of them are close to average. Saves without a height load as average.'},
  {v:'v26.58.0',n:'Amazoom listings have more detail: each furniture and gear item shows its size, weight, material, assembly time and a 1 year warranty under the description. The same item always shows the same specs.'},
