@@ -199,6 +199,7 @@ function festBookTick(dt){FBT-=dt;if(FBT<=0){FBT=.5;festBkCheck();festBkChip();i
 
 /* ===== v26.71: FestivalApp look: a neon festival poster. Layout rules above stay as they are; this only restyles .fa. */
 {const st=document.createElement('style');st.textContent=`.fa{font-family:Impact,'Haettenschweiler','Arial Narrow Bold',sans-serif;text-transform:uppercase;letter-spacing:.6px;color:#f6f0ff;background:radial-gradient(circle at 92% -8%,#ff2e8838,transparent 45%),radial-gradient(circle at -8% 108%,#c6ff3d26,transparent 40%),#100b1c;padding:14px 14px 16px;border-radius:6px}
+.fa h1,.fa h3{font-family:Impact,'Haettenschweiler','Arial Narrow Bold',sans-serif}
 .fa h1{font-size:36px;line-height:1;letter-spacing:2px;margin:0 0 6px;background:linear-gradient(90deg,#ff2e88,#ffb13b 55%,#c6ff3d);-webkit-background-clip:text;background-clip:text;color:transparent}
 .fa h1 img{filter:drop-shadow(0 0 4px #ff2e88)}
 .fa h3{font-size:19px;letter-spacing:1.5px;color:#c6ff3d;border-bottom:2px solid #c6ff3d55;padding-bottom:2px}
