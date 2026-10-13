@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.65.0';
+const GAME_VERSION='v26.66.0';
 const VERSION_HISTORY=[
+ {v:'v26.66.0',n:'Driving is back to the original third-person camera: the first-person car view, the pixel pass, the steering wheel and arm work, and the camera easing are removed, and the city merge is back to how it was. Economy, minigames, Spotifly delete, Big Vee, Amazoom, height, Panic Man Dan and billboards are unchanged.'},
  {v:'v26.65.0',n:'Buildings are solid volumes from the street and from the car. The city merge had kept only three of each box\'s six faces, which left the back and bottom out; every face is kept now and the merge buffers are sized for them. Driving is smoother: the view eases after the car in position and heading, so small jitter in the car\'s motion does not reach the picture. Saves unchanged.'},
  {v:'v26.64.0',n:'Driving view fixes: the steering wheel is tilted towards the driver and rolls about its column, with a bright marker at 12 o\'clock so the turn reads clearly, and the hands stay on the rim. The cockpit is drawn at a third of the screen resolution and scaled up with nearest-neighbour filtering, so it reads as pixel art. Nothing is saved.'},
  {v:'v26.63.0',n:'Driving rebuilt in 3D. The car interior (dashboard, pillars, door trims, instrument cluster with needles, centre console, mirrors) is real geometry with small pixel-art panels. Two arms reach the wheel and the hands ride the rim. The wheel turns in proportion to A and D and springs back to centre. City buildings keep every wall face, so they are solid from the street and from the car. Nothing is saved, so existing saves are unchanged.'},
