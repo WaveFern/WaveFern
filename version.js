@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.53.1';
+const GAME_VERSION='v26.54.0';
 const VERSION_HISTORY=[
+ {v:'v26.54.0',n:'Income rebalance: each stream now pays $0.10 (was $0.03), so a day of about 300 streams pays around $30. Gear costs 20% lower and song pacing a little faster. All tuning sits in one TUNE block in 02-data.js. Saves still load and keep their balances.'},
  {v:'v26.53.1',n:'Kiaan comes up less often in DMs and collab outreach: about a third of a normal artist\'s chance. Everything else about him is the same. Saves are unchanged.'},
  {v:'v26.53.0',n:'New rapper: Kiaan. A new rap artist joins the roster with the same chance as any other artist to DM you for a collab, and the same negotiation, collab and fee rules. Existing saves and save codes still load; the new artist is added at the end of the roster so saved conversations are unchanged.'},
  {v:'v26.52.0',n:'Calendar and date-arranging removed. The Calendar app, the set-a-date panel, scheduled collabs, no-show and late-cancel fees, artist busy times and place rules are gone. A collab goes back to the instant flow: agree the price in Messages, press Confirm & pay (or Accept & get paid), and the session happens right away. Festival booking stays as it was, it just no longer checks a calendar. Old saves and FW1-/FW2- codes still load. A collab that was scheduled but had not started goes back to agreed terms, with any fee it had taken refunded; a session already under way stays booked; the Calendar app is removed. Kept: the negotiation, the price formula, popularity-based DMs, Messages upgrades and the shorter save codes.'},
