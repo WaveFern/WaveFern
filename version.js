@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.57.0';
+const GAME_VERSION='v26.58.0';
 const VERSION_HISTORY=[
+ {v:'v26.58.0',n:'Amazoom listings have more detail: each furniture and gear item shows its size, weight, material, assembly time and a 1 year warranty under the description. The same item always shows the same specs.'},
  {v:'v26.57.0',n:'Big Vee, the guide in Messages, understands more. Typos and slang are tidied up (a word one letter off is corrected), he answers money, listener, fame, day and song questions from your own save, and a short \'why?\' or \'how?\' repeats his last answer. Adds a Spotifly topic for deleting songs. Nothing is saved, so older saves are unchanged.'},
  {v:'v26.56.0',n:'You can delete a song from Spotifly. Open the artist page and press Delete song under it, then confirm. The song leaves your top songs, its album and stops earning. Saves still load.'},
  {v:'v26.55.0',n:'Recording a song now has three minigames: Beat, Lyrics and Mix. The memory one (Melody, watch and repeat the pads) is removed, and song quality is based on Lyrics and Mix. Saves still load.'},
