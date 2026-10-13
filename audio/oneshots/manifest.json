@@ -1,6 +1,13 @@
 [
  {
   "c": "bass",
+  "f": "bass-brox.mp3",
+  "root": 36,
+  "cents": -4,
+  "dur": 5.755
+ },
+ {
+  "c": "bass",
   "f": "bass-jacket.mp3",
   "root": 36,
   "cents": 10,
@@ -15,10 +22,31 @@
  },
  {
   "c": "bass",
+  "f": "bass-slarm.mp3",
+  "root": 36,
+  "cents": 1,
+  "dur": 5.74
+ },
+ {
+  "c": "bass",
   "f": "bass-travel.mp3",
   "root": 36,
   "cents": -8,
   "dur": 5.758
+ },
+ {
+  "c": "bass",
+  "f": "bass-umbrella.mp3",
+  "root": 36,
+  "cents": 1,
+  "dur": 3.428
+ },
+ {
+  "c": "bass",
+  "f": "bass-elafint.mp3",
+  "root": 48,
+  "cents": 3,
+  "dur": 1.796
  },
  {
   "c": "bass",
@@ -29,6 +57,20 @@
  },
  {
   "c": "bell",
+  "f": "bell-domp.mp3",
+  "root": 60,
+  "cents": 19,
+  "dur": 0.837
+ },
+ {
+  "c": "bell",
+  "f": "bell-tryfo.mp3",
+  "root": 60,
+  "cents": 11,
+  "dur": 1.147
+ },
+ {
+  "c": "bell",
   "f": "bell-crimb.mp3",
   "root": 72,
   "cents": -4,
@@ -36,10 +78,45 @@
  },
  {
   "c": "bell",
+  "f": "bell-dimp.mp3",
+  "root": 72,
+  "cents": 12,
+  "dur": 0.72
+ },
+ {
+  "c": "bell",
+  "f": "bell-kalm.mp3",
+  "root": 72,
+  "cents": 8,
+  "dur": 0.486
+ },
+ {
+  "c": "bell",
   "f": "bell-lid.mp3",
   "root": 84,
   "cents": 8,
   "dur": 0.494
+ },
+ {
+  "c": "bell",
+  "f": "bell-trix.mp3",
+  "root": 84,
+  "cents": 16,
+  "dur": 0.419
+ },
+ {
+  "c": "brass",
+  "f": "brass-blawhi.mp3",
+  "root": 60,
+  "cents": 23,
+  "dur": 3.24
+ },
+ {
+  "c": "brass",
+  "f": "brass-erma.mp3",
+  "root": 60,
+  "cents": 5,
+  "dur": 2.932
  },
  {
   "c": "brass",
@@ -57,6 +134,13 @@
  },
  {
   "c": "brass",
+  "f": "brass-puglo.mp3",
+  "root": 60,
+  "cents": -6,
+  "dur": 5.629
+ },
+ {
+  "c": "brass",
   "f": "brass-pujox.mp3",
   "root": 60,
   "cents": 1,
@@ -70,6 +154,41 @@
   "dur": 3.862
  },
  {
+  "c": "flute",
+  "f": "flute-holland.mp3",
+  "root": 60,
+  "cents": -4,
+  "dur": 2.0
+ },
+ {
+  "c": "flute",
+  "f": "flute-etienti.mp3",
+  "root": 72,
+  "cents": 11,
+  "dur": 1.876
+ },
+ {
+  "c": "flute",
+  "f": "flute-oink.mp3",
+  "root": 72,
+  "cents": 13,
+  "dur": 2.747
+ },
+ {
+  "c": "flute",
+  "f": "flute-pare.mp3",
+  "root": 72,
+  "cents": 15,
+  "dur": 2.874
+ },
+ {
+  "c": "flute",
+  "f": "flute-brie.mp3",
+  "root": 84,
+  "cents": 13,
+  "dur": 2.811
+ },
+ {
   "c": "key",
   "f": "key-blazz.mp3",
   "root": 60,
@@ -78,10 +197,66 @@
  },
  {
   "c": "key",
+  "f": "key-dolap.mp3",
+  "root": 60,
+  "cents": 12,
+  "dur": 3.125
+ },
+ {
+  "c": "key",
+  "f": "key-lolau.mp3",
+  "root": 60,
+  "cents": 0,
+  "dur": 3.089
+ },
+ {
+  "c": "key",
+  "f": "key-mustard.mp3",
+  "root": 60,
+  "cents": 2,
+  "dur": 1.813
+ },
+ {
+  "c": "key",
   "f": "key-prenu.mp3",
   "root": 60,
   "cents": -2,
   "dur": 2.741
+ },
+ {
+  "c": "key",
+  "f": "key-quilt.mp3",
+  "root": 60,
+  "cents": 1,
+  "dur": 2.027
+ },
+ {
+  "c": "key",
+  "f": "key-simone.mp3",
+  "root": 60,
+  "cents": 1,
+  "dur": 2.714
+ },
+ {
+  "c": "key",
+  "f": "key-wib.mp3",
+  "root": 60,
+  "cents": 1,
+  "dur": 1.125
+ },
+ {
+  "c": "key",
+  "f": "key-wuzz.mp3",
+  "root": 60,
+  "cents": -1,
+  "dur": 1.067
+ },
+ {
+  "c": "key",
+  "f": "key-yahweh.mp3",
+  "root": 60,
+  "cents": 0,
+  "dur": 4.861
  },
  {
   "c": "key",
@@ -106,9 +281,79 @@
  },
  {
   "c": "pluck",
+  "f": "pluck-blanch.mp3",
+  "root": 60,
+  "cents": 4,
+  "dur": 1.191
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-delqi.mp3",
+  "root": 60,
+  "cents": -8,
+  "dur": 0.359
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-pond.mp3",
+  "root": 60,
+  "cents": 2,
+  "dur": 0.311
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-tide.mp3",
+  "root": 60,
+  "cents": 2,
+  "dur": 0.385
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-vango.mp3",
+  "root": 60,
+  "cents": 1,
+  "dur": 0.607
+ },
+ {
+  "c": "pluck",
   "f": "pluck-aro.mp3",
   "root": 72,
   "cents": 1,
   "dur": 0.342
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-dof.mp3",
+  "root": 72,
+  "cents": -2,
+  "dur": 0.424
+ },
+ {
+  "c": "string",
+  "f": "string-ighu.mp3",
+  "root": 60,
+  "cents": -9,
+  "dur": 0.541
+ },
+ {
+  "c": "string",
+  "f": "string-orange.mp3",
+  "root": 60,
+  "cents": 6,
+  "dur": 0.36
+ },
+ {
+  "c": "string",
+  "f": "string-jip.mp3",
+  "root": 84,
+  "cents": 2,
+  "dur": 0.395
+ },
+ {
+  "c": "synth",
+  "f": "synth-razzle.mp3",
+  "root": 60,
+  "cents": 1,
+  "dur": 0.744
  }
 ]
