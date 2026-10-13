@@ -37,30 +37,29 @@
 .win:has(.chat.msx){border-color:#1e1537;box-shadow:6px 6px 0 #8a4dff55}
 .win:has(.chat.msx) .wt{background:linear-gradient(120deg,#ff7a59,#ff3d81 55%,#8a4dff);color:#fff}
 .win:has(.chat.msx) .wt button{background:#ffffff33;border-color:#0000;box-shadow:none;color:#fff}
-.msx .sch,.msx .mloc{background:#fff;color:var(--mx-ink);border-top:1px solid #f1e3ec;font:14px "Trebuchet MS","Segoe UI",system-ui,sans-serif}
-.msx .schh b{color:var(--mx-ink);font-weight:700}.msx .schh span{color:#8f7a9a;opacity:1}
-.msx .schr label,.msx .mloc span{color:var(--mx-ink);font-weight:600}
-.msx .schr select,.msx .mloc select{background:#f7eefb;color:var(--mx-ink);border:2px solid transparent;border-radius:22px;padding:6px 12px;font:inherit;font-size:13px;min-height:34px;max-width:100%;cursor:pointer;transition:border-color .15s,background .15s}
-.msx .schr select:hover,.msx .mloc select:hover{background:#efe3f2}
-.msx .schr select:focus,.msx .mloc select:focus{outline:0;border-color:#ff3d81aa}
-.msx .schs{border-radius:12px;font-size:13px;line-height:1.35;padding:6px 10px;margin:6px 0}.msx .schs.ok{background:#e7f8ef;color:#1d6b47}.msx .schs.no{background:#fff0e6;color:#9a4a1f}
-.msx .schc small,.msx .sch .m{color:#8f7a9a}
-.msx .schc{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-.msx .schm{margin:4px 0}.msx .schm summary{color:#8f7a9a;cursor:pointer;font-size:13px;font-weight:600;padding:6px 0;list-style:none;display:flex;align-items:center;gap:6px;user-select:none}
-.msx .schm summary::-webkit-details-marker{display:none}
-.msx .schm summary::before{content:'▸';display:inline-block;transition:transform .15s;color:var(--mx-me,#ff3d81)}
-.msx .schm[open] summary::before{transform:rotate(90deg)}
-.msx .schm summary:hover{color:var(--mx-ink)}
-.msx .schm summary:focus-visible,.msx .schb button:focus-visible,.msx .chp:focus-visible{outline:2px solid #ff3d81aa;outline-offset:2px}
+.msx .mloc{background:#fff;color:var(--mx-ink);border-top:1px solid #f1e3ec;font:14px "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+
+.msx .mloc span{color:var(--mx-ink);font-weight:600}
+.msx .mloc select{background:#f7eefb;color:var(--mx-ink);border:2px solid transparent;border-radius:22px;padding:6px 12px;font:inherit;font-size:13px;min-height:34px;max-width:100%;cursor:pointer;transition:border-color .15s,background .15s}
+.msx .mloc select:hover{background:#efe3f2}
+.msx .mloc select:focus{outline:0;border-color:#ff3d81aa}
+
+
+
+
+
+
+
+.msx .chp:focus-visible{outline:2px solid #ff3d81aa;outline-offset:2px}
 .msx .chp.on{background:var(--mx-me);color:#fff;box-shadow:0 2px 6px #ff3d8133}
 .msx .chp{background:#f7eefb;color:var(--mx-ink);border:0;border-radius:999px;box-shadow:none;min-height:32px;padding:6px 12px;font-size:12px;cursor:pointer;transition:background .15s,transform .1s}
 .msx .chp:hover{background:#efe3f2}.msx .chp:active{transform:scale(.97)}
-.msx .schb{margin-top:8px}
-.msx .schb button{border:0;border-radius:18px;box-shadow:none;background:#efe3f2;color:var(--mx-ink);min-height:36px;padding:6px 16px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,transform .1s,box-shadow .15s}
-.msx .schb button:hover{background:#e4d3ea}.msx .schb button:active{transform:scale(.97)}
-.msx .schb button.go{background:var(--mx-me);color:#fff;box-shadow:0 2px 6px #ff3d8144}
-.msx .schb button.go:hover{background:var(--mx-me);filter:brightness(1.07);box-shadow:0 3px 10px #ff3d8166}
-.msx .schb button:disabled{opacity:.5;cursor:not-allowed}
+
+
+
+
+
+
 .msx .msq{padding:8px 12px 6px}.msx .msq input{width:100%;box-sizing:border-box;background:#ffffff1a;color:var(--mx-tx);border:2px solid transparent;border-radius:18px;padding:7px 12px;font:13px "Trebuchet MS",system-ui,sans-serif}.msx .msq input::placeholder{color:var(--mx-mu)}.msx .msq input:focus{outline:0;border-color:#ff3d8188;background:#ffffff26}
 .msx .sgh{padding:10px 14px 6px;color:var(--mx-tx)}.msx .sgh b{display:block;font:700 12px "Trebuchet MS",system-ui,sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:#ffb36b}.msx .sgh small{display:block;color:var(--mx-mu);font-size:12px;line-height:1.35;margin-top:2px}
 .msx .sgh2{padding:10px 14px 2px;font:700 11px "Trebuchet MS",system-ui,sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:var(--mx-mu);border-top:1px solid #ffffff1a;margin-top:6px}
@@ -68,7 +67,6 @@
 .msx .cva{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.msx .cva button{background:#f7eefb;color:var(--mx-ink);border:0;border-radius:18px;box-shadow:none;min-height:32px;padding:5px 12px;font:600 12px "Trebuchet MS",system-ui,sans-serif;cursor:pointer;transition:background .15s,transform .1s}.msx .cva button:hover{background:#efe3f2}.msx .cva button:active{transform:scale(.97)}.msx .cva button:focus-visible{outline:2px solid #ff3d81aa;outline-offset:2px}
 .msx .msc{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;background:#fff0e6;color:var(--mx-ink);border-bottom:1px solid #f6d9c8;font-size:13px}.msx .msc span{flex:1;min-width:180px}.msx .msc button{border:0;border-radius:18px;box-shadow:none;background:#efe3f2;color:var(--mx-ink);min-height:32px;padding:5px 14px;font:600 12px "Trebuchet MS",system-ui,sans-serif;cursor:pointer}.msx .msc button.go{background:var(--mx-me);color:#fff}
 .msx .gtp{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px 2px;background:#fff;border-top:1px solid #f1e3ec}
-@media (max-width:520px){.msx .sch{padding:8px 12px 10px}.msx .schh{gap:4px}.msx .schh span{font-size:12px}.msx .schr{display:grid;grid-template-columns:1fr;gap:8px}.msx .schr label{display:flex;flex-direction:column;align-items:stretch;gap:3px;font-size:12px}.msx .schr select{width:100%}.msx .schb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.msx .schb button{width:100%;padding:8px 10px}.msx .schb button.go{grid-column:1/-1;order:-1}}
 `;document.head.appendChild(st)}
 {const pm=PA.msg;PA.msg=function(){const h=pm.apply(this,arguments);if(typeof h!='string')return h;
  return h.replace('<div class=chat><div class=cl>','<div class="chat msx"><div class=cl><div class=msxb><span class=msxl></span><span><b>Messages</b><small>Chats with artists</small></span></div>')}}

@@ -5,8 +5,8 @@ Use this when you add or change UI in any app. It lists the colours, fonts and s
 ## Rules
 
 1. Start from the shared look in `style.css`. Only add a new look when the app is meant to look different (Messages, Amazoom, Instagrime and Threadz already do).
-2. Scope app-specific CSS under the app's root class (`.msx`, `.az`, `.ig`, `.thz`, `.ca`, `.bw`, `.site`). Do not restyle bare `button`, `select` or `.card` from an app file.
-3. A panel that appears inside another app must follow the host app. The set-a-date panel (`.sch`) lives inside Messages, so it is themed under `.msx` in `36-messages-look.js`.
+2. Scope app-specific CSS under the app's root class (`.msx`, `.az`, `.ig`, `.thz`, `.bw`, `.site`). Do not restyle bare `button`, `select` or `.card` from an app file.
+3. A panel that appears inside another app must follow the host app. Messages is themed under `.msx` in `36-messages-look.js`.
 4. Keep the Silkscreen font for headings and `ui-monospace` for body text in the default look. Apps with their own look name their font in their own section.
 5. Bump `GAME_VERSION` and add a `VERSION_HISTORY` entry in `version.js` with every change (patch for fixes, minor for features).
 
@@ -39,7 +39,7 @@ Use this when you add or change UI in any app. It lists the colours, fonts and s
 
 Desktop: wallpaper `#pc` (default `#47b06f`), icons `.ico` (48px pixel art, drop shadow).
 
-## Messages (`36-messages-look.js`, `75-collab-schedule.js`)
+## Messages (`36-messages-look.js`)
 
 Root: `.chat.msx`. Tokens live on `.chat.msx`:
 
@@ -54,19 +54,10 @@ Root: `.chat.msx`. Tokens live on `.chat.msx`:
 - Chat header actions `.cva` (Pin, Clear chat) are `#f7eefb` pills, 32px tall. The clear confirmation `.msc` is a `#fff0e6` bar with a gradient primary button.
 - Guide topic chips `.gtp` reuse `.chp`. The profile-picture dot `.cdot` shows only while a chat is unread.
 
-Set-a-date panel (`.sch` and its parts, styled under `.msx`):
 
-- `.sch` white panel, ink text. `.schh` title is bold, the money line is muted `#8f7a9a`.
-- `.schr` selects: `#f7eefb` pill, no border, pink focus ring `#ff3d8166`.
-- `.schs.ok` `#e7f8ef` / `#1d6b47`. `.schs.no` `#fff0e6` / `#9a4a1f`.
-- `.chp` offer chips: `#f7eefb` pill, hover `#efe3f2`.
-- `.schb` buttons: `#efe3f2` fill; `button.go` is the gradient with a pink glow.
 - `.mloc` (meeting place picker) uses the same select look.
 - Touch targets are at least 32px tall (chips 32px, buttons 36px, selects 34px). Hover lightens the fill, press scales to 97%, focus shows a pink outline.
-- "More options" has a `▸` marker that turns down when open.
-- Under 520px wide the day, time and place pickers stack full width, and the two buttons share a row with "Propose this time" on top.
 
-Outside Messages, the same panel uses the default look in `75-collab-schedule.js` (`#16201b` panel, white selects with `#e7a5c9` border). Do not use that look inside Messages.
 
 ## Spotifly (`37-spotifly.js`, desktop app id `1`)
 
@@ -74,11 +65,6 @@ Outside Messages, the same panel uses the default look in `75-collab-schedule.js
 - Wallpaper: `#47b06f` with the wordmark.
 - Artist sidebar `.sb`, heading `.sfh` (logo at 26px beside the text).
 - Otherwise the shared base.
-
-## App Barn (`store`) and Calendar pricing
-
-- Shared `.card` and `button.go`. Balance line is muted `.m`.
-- Calendar listing shows "Get · Free" (`74-calendar.js`).
 
 ## Amazoom (`amz`)
 
@@ -129,13 +115,6 @@ Site buttons `button.go` take each site's accent.
 - Grid `.thg`: `minmax(190px,1fr)`.
 - Preview box `.thz .m`: `#555`.
 
-## Calendar (`.ca`)
-
-- Accent `#5ad1ff`: selected button, today's border, hover border.
-- Grid `.ca-g` (7 columns). Cells `.ca-c` `#151a17`, 6px radius. Weekday labels `.ca-wh`.
-- Day states: free `.s-free` `#13261b`, busy `.s-busy` `#3a2a12`, off `.s-off` `#3a1717`. Past days are at 55% opacity.
-- Selects and inputs in the bar: `#0d1411` fill, 2px black border.
-
 ## Festival (`fest`, HUD `#fst`, `#fcr`)
 
 - Progress bar uses the shared `.bar`. Day counter `#fcr b` 28px white.
@@ -163,10 +142,6 @@ Site buttons `button.go` take each site's accent.
 - Car speed box `#spdbox`: dark gradient `#141c18 → #090c0b`, 16px radius, 1px `--g` 25% border, 12px text.
 - Tutorial card `#tqt`: uses the `.box` look.
 - Name tags `#ntags`: overlay with no pointer events.
-
-## Shared scheduling bar (`.sch`, outside Messages)
-
-Defined in `75-collab-schedule.js`. Default look: `#16201b` panel, `.schs.ok` `#14452c`, `.schs.no` `#4a2a12`, pill chips `.chp`. Messages overrides it under `.msx`.
 
 ## Adding a new app or panel
 

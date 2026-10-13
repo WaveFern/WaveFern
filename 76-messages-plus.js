@@ -8,13 +8,12 @@ const msVis=()=>S.msgs.filter(m=>!m.hid);
 function msMatch(m,q){if(!q)return true;if(cname(m).toLowerCase().includes(q))return true;return Array.isArray(m.log)&&m.log.some(x=>String(x.t).toLowerCase().includes(q))||(m.a===undefined&&!m.g&&String(m.body||'').toLowerCase().includes(q))}
 function msSearch(v){MSQ=String(v||'');pcR();const i=$('msq');if(i){i.focus();const n=i.value.length;try{i.setSelectionRange(n,n)}catch(e){}}}
 function msPin(id){const m=S.msgs.find(x=>x.id==id);if(!m)return;m.pin=m.pin?0:1;snd('pop');say(m.pin?cname(m)+' pinned to the top.':cname(m)+' unpinned.');pcR()}
-function msClearAsk(id){const m=S.msgs.find(x=>x.id==id);if(!m)return;if(m.a!==undefined&&(m.state==1||m.state==4)){snd('err');return say('You have a collab booked with '+cname(m)+'. Cancel it before clearing the chat.')}MSCF=id;pcR()}
+function msClearAsk(id){const m=S.msgs.find(x=>x.id==id);if(!m)return;if(m.a!==undefined&&m.state==1){snd('err');return say('You have a collab booked with '+cname(m)+'. Cancel it before clearing the chat.')}MSCF=id;pcR()}
 function msClearGo(id){const m=S.msgs.find(x=>x.id==id);MSCF=0;if(!m)return pcR();
- if(m.a!==undefined&&(m.state==1||m.state==4)){snd('err');pcR();return say('You have a collab booked with '+cname(m)+'. Cancel it before clearing the chat.')}
+ if(m.a!==undefined&&m.state==1){snd('err');pcR();return say('You have a collab booked with '+cname(m)+'. Cancel it before clearing the chat.')}
  const nm=cname(m);
  if(m.blocked){m.hid=1;m.unread=0;m.pin=0}/* a blocked chat is only hidden, so that artist stays blocked */
  else S.msgs.splice(S.msgs.indexOf(m),1);
- if(typeof SCH!='undefined'&&SCH&&SCH.id===m.id){SCH.id=null;SCH.re=0;SCH.cx=0}
  if(S.chat==id){const v=msVis();S.chat=v.length?msgSorted().filter(x=>!x.hid).pop().id:0}
  snd('pop');say('Chat with '+nm+' cleared.');pcR()}
 {const oc=openChat;openChat=function(id){MSCF=0;const m=S.msgs.find(x=>x.id==id);if(!m)return pcR();oc(id)}}
@@ -24,13 +23,13 @@ const VEE_TOPICS=[
  ['Controls',/control|move|walk|sprint|run|key|button|interact|how do i (play|start)/,'WASD to walk, Shift to sprint, E to use whatever you are standing at (laptop, mic, bed, wardrobe, doors). Esc opens the pause menu. N opens the map.'],
  ['Make a track',/record|studio|mic\b|track|song|genre|mini ?game|beat|make (music|a song)|first song/,'The studio is in your house. Press E at the mic, pick a genre, then beat four quick mini games. A session costs 15 energy. Good gear and good scores make a better song.'],
  ['Upload & money',/upload|stream|earn|money|cash|paid|income|broke|rich|spotifly|release|drop it/,'Laptop, then Spotifly, then Upload to release a draft. Every night each song earns $'+PAY_RATE.toFixed(2)+' a stream, paid when you wake up. More listeners means more fame, so keep dropping.'],
- ['Collabs',/collab|feature|feat|dm|artist|fee|haggle|negoti|price|book|date|meet|beacon|schedule/,'If THEY ask, they pay YOU. If YOU ask, you pay their fee. Haggle in plain words like "how about 150". Once you agree, pick a day, time and place, then walk up to them at the gold beacon when it starts.'],
+ ['Collabs',/collab|feature|feat|dm|artist|fee|haggle|negoti|price|book|date|meet|beacon|schedule/,'If THEY ask, they pay YOU. If YOU ask, you pay their fee. Haggle in plain words like "how about 150". Once you agree on a price, press Confirm and pay in the chat. The session starts right away: walk up to them at the gold beacon.'],
  ['Using Messages',/pin|clear|delete|search|suggest|new chat|unpin|messages/,'Press New to see suggested people, they are not new DMs. Open a chat and use Pin to keep it on top or Clear chat to delete it. A cleared chat only comes back if that artist messages you again. The search box finds chats by name or message text.'],
  ['Gear',/gear|equipment|headphone|upgrade|mixer|speaker|rig/,'Gearshop on the laptop. Better gear means better mixes and more streams. Start cheap, like Headphones.'],
  ['Clothes',/cloth|drip|outfit|wear|wardrobe|threadz|shoe|hat|hair/,'Browser, then Clothes (Threadz) to buy pieces. Put them on at the Wardrobe in your bedroom (E).'],
  ['Sleep & energy',/sleep|energy|tired|bed|night|day|pass(ed)? out|time/,'A day is 12 minutes: 6 light, 6 dark. Recording eats energy. Go to bed (E) and your streams pay out when you wake. Stay up past 02:00 and you pass out.'],
  ['Map & cars',/map|travel|city|drive|car|motors|taxi|zoom|where/,'Press N for the map, scroll or +/- to zoom. The city is way east: walk, drive, or grab a Taxi from the map. Motors sells cars: press E by one to drive, W goes, S brakes.'],
- ['Festivals',/festival|gig|stage|fields|perform|book a/,'FestivalApp on the laptop. Park Fields Festival runs every 7th day. Book 2+ days ahead; the smallest stage wants Fame Level 10. Your bookings show in the Calendar app.'],
+ ['Festivals',/festival|gig|stage|fields|perform|book a/,'FestivalApp on the laptop. Park Fields Festival runs every 7th day. Book 2+ days ahead; the smallest stage wants Fame Level 10. Booked sets are listed in FestivalApp.'],
  ['Fame',/fame|level|listener|follower|famous|popular/,'Fame Level climbs with monthly listeners and unlocks gear, homes and festival stages.'],
  ['Saving',/sav(e|ing)|load|backup|code|progress|lost/,'The game autosaves in your browser. For a backup: Esc, Settings, Get save code. Paste it into any browser to carry on.']
 ];
