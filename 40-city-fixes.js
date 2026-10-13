@@ -16,7 +16,8 @@
    this file, the fountains (41-fountains.js) and the park (42-central-park.js). */
 
 /* ---- merged static geometry ---- */
-const XV=[.62,.47,.62];/* unit vector towards the camera: faces turned away from it are never seen, so they are dropped */
+/* v26.63: was the isometric camera direction, which dropped every face turned away from it (so the walls seen from a car were missing and buildings looked flat). A zero vector keeps every face, so buildings are solid from any side. */
+const XV=[0,0,0];
 const XC=new THREE.Color();
 function xgNew(){return{c:{}}}
 function xgCell(G,x,z){const k=Math.floor(x/60)+','+Math.floor(z/60);return G.c[k]||(G.c[k]={P:[],N:[],C:[],I:[]})}

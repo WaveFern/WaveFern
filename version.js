@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.62.0';
+const GAME_VERSION='v26.63.0';
 const VERSION_HISTORY=[
+ {v:'v26.63.0',n:'Driving rebuilt in 3D. The car interior (dashboard, pillars, door trims, instrument cluster with needles, centre console, mirrors) is real geometry with small pixel-art panels. Two arms reach the wheel and the hands ride the rim. The wheel turns in proportion to A and D and springs back to centre. City buildings keep every wall face, so they are solid from the street and from the car. Nothing is saved, so existing saves are unchanged.'},
  {v:'v26.62.0',n:'Driving is now first person, like sitting in the car: a windscreen view of the road, A-pillars, both wing mirrors and the rear-view mirror, the dashboard with instrument cluster, and a steering wheel with both hands on it that turns with A and D. The car\'s body is hidden from inside. The speed box and Exit key work as before. Nothing is saved, so existing saves are unchanged.'},
  {v:'v26.61.0',n:'Billboards beside the main city roads. They rotate every 10 seconds through the famous roster artists, including Panic Man Dan. Once you reach 1,000 monthly listeners your own name joins the rotation. Big Vee now answers questions about billboards and height. Billboard posts are solid.'},
  {v:'v26.60.0',n:'New artist: Panic Man Dan, a top-tier rock act with short grey hair, a black tee and a guitar strap, drawn in full colour. He is the shortest character height and only reaches out once you have 5,000 monthly listeners. He joins the end of the roster, so saved conversations are unchanged.'},
