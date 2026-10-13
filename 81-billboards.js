@@ -1,9 +1,9 @@
 /* ---------- v26.61: billboards (v26.68: higher bars, most on the left) ----------
    Billboards stand beside the main city roads. They rotate every 10 seconds through roster artists with
    ROSTER_LIS+ monthly listeners (the famous ones, Panic Man Dan included). Once you reach PLAYER_LIS monthly
-   listeners, your own name joins the rotation. Most sit on the left of the road's way of travel (about 4 in 5).
+   listeners, your own name joins the rotation. Most sit on the right of the road's way of travel (about 4 in 5).
    The ad is drawn on a canvas, so nothing here is saved. */
-const BB={MAX:6,ROAD_MIN:40,ROSTER_LIS:5000,PLAYER_LIS:10000,LEFT_EVERY:5,EVERY:10,list:[],t:0,k:0,mine:false};
+const BB={MAX:6,ROAD_MIN:40,ROSTER_LIS:5000,PLAYER_LIS:10000,OTHER_EVERY:5,EVERY:10,list:[],t:0,k:0,mine:false};
 /* the road helpers record each road segment as the city is built, so billboards can sit beside the longest ones */
 const BB_ROADS=[];
 {const h0=roadH;roadH=function(zr,x0,x1){BB_ROADS.push({h:1,zr,x0,x1});return h0.apply(this,arguments)}}
@@ -34,14 +34,14 @@ function bbSpot(r,f,sd){let x,z,th;
  else{z=r.z0+(r.z1-r.z0)*f;x=r.xr+sd*7.6;th=sd>0?-Math.PI/2:Math.PI/2}
  return{x,z,th}}
 /* the billboards go beside the longest roads, once per city build.
-   A road runs towards +x (east-west roads) or +z (north-south roads). The left of that way of travel is -z or +x,
-   so the left side is sd -1 for east-west and +1 for north-south. Most spots take the left side (every fifth one
-   goes right), so drivers heading the usual way see them. Falls back to the other side when a spot is blocked. */
+   A road runs towards +x (east-west roads) or +z (north-south roads). The right of that way of travel is +z or -x,
+   so the right side is sd +1 for east-west and -1 for north-south. Most spots take the right side (every fifth one
+   goes left), so drivers heading the usual way see them. Falls back to the other side when a spot is blocked. */
 function bbPlace(){const len=r=>r.h?r.x1-r.x0:r.z1-r.z0;
  const roads=BB_ROADS.filter(r=>len(r)>=BB.ROAD_MIN).sort((a,b)=>len(b)-len(a)).slice(0,8),spots=[];let n=0;
  for(const r of roads)for(const f of[.35,.7]){
   if(spots.length>=BB.MAX)break;
-  const L=r.h?-1:1,left=n++%BB.LEFT_EVERY!=BB.LEFT_EVERY-1,order=left?[L,-L]:[-L,L];
+  const R=r.h?1:-1,right=n++%BB.OTHER_EVERY!=BB.OTHER_EVERY-1,order=right?[R,-R]:[-R,R];
   for(const sd of order){const p=bbSpot(r,f,sd);
    if(hit(p.x,p.z,1.2)||spots.some(q=>Math.hypot(q.x-p.x,q.z-p.z)<25))continue;
    spots.push(p);break}}

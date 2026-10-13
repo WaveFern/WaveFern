@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.72.0';
+const GAME_VERSION='v26.72.1';
 const VERSION_HISTORY=[
+ {v:'v26.72.1',n:'Billboards now stand mostly on the right side of the road, as seen in the direction of travel, so drivers see them. The fame thresholds are unchanged. Saves still load.'},
  {v:'v26.72.0',n:'Amazoom furniture models are more detailed. Every item gets extra parts for its kind: legs and feet, cushions and seams, handles, trim, keys, faces and small props. The shop preview, the item you hold and the one you place in the house all use the new models. Listing text is unchanged. Saves still load.'},
  {v:'v26.71.1',n:'FestivalApp headings now use its condensed poster font, not the game\'s pixel font. No gameplay changes.'},
  {v:'v26.71.0',n:'FestivalApp and the Gear shop each have their own look. FestivalApp is a neon festival poster: caps headings, magenta and lime ticket cards and buttons. The Gear shop is a studio equipment rack: charcoal panels, amber meters and monospace labels. Layout and prices are unchanged. docs/THEMES.md describes both. Saves still load.'},
