@@ -4,7 +4,7 @@ Use this when you add or change UI in any app. It lists the colours, fonts and s
 
 ## Rules
 
-1. Start from the shared look in `style.css`. Only add a new look when the app is meant to look different (Messages, Amazoom, Instagrime and Threadz already do).
+1. Start from the shared look in `style.css`. Only add a new look when the app is meant to look different (Messages, Amazoom, Instagrime, Threadz, FestivalApp and the Gear shop already do).
 2. Scope app-specific CSS under the app's root class (`.msx`, `.az`, `.ig`, `.thz`, `.bw`, `.site`). Do not restyle bare `button`, `select` or `.card` from an app file.
 3. A panel that appears inside another app must follow the host app. Messages is themed under `.msx` in `36-messages-look.js`.
 4. Keep the Silkscreen font for headings and `ui-monospace` for body text in the default look. Apps with their own look name their font in their own section.
@@ -115,11 +115,19 @@ Site buttons `button.go` take each site's accent.
 - Grid `.thg`: `minmax(190px,1fr)`.
 - Preview box `.thz .m`: `#555`.
 
-## Festival (`fest`, HUD `#fst`, `#fcr`)
+## Festival (`fest`, HUD `#fst`, `#fcr`, FestivalApp root `.fa`)
 
-- Progress bar uses the shared `.bar`. Day counter `#fcr b` 28px white.
-- Error box `.fa-err`: `#5a1a1a` with white text.
-- Booking grid `.fa-grid` with bold `.fa-t` headers.
+Look: a neon festival poster. Near-black plum `#100b1c` with soft magenta and lime glows in the corners.
+
+- Font: Impact (fallback Haettenschweiler, Arial Narrow Bold), all caps, 0.6px tracking. Body notes in Arial Narrow, not caps.
+- Title `.fa h1`: 36px, a magenta-to-amber-to-lime gradient fill. Section heads `.fa h3`: 19px lime `#c6ff3d` with a thin lime rule.
+- Cards `.fa .card`: `#1d1435` with a 2px dashed magenta `#ff2e88` border (a ticket stub) and a lime outer ring.
+- Buttons: magenta `#ff2e88` with dark `#100b1c` text. `button.go` is lime `#c6ff3d`. Disabled is `#3a2f55`.
+- Errors `.fa-err`: magenta fill, dark text.
+- Setlist bar `.fa-tot`: magenta-to-lime gradient. Rows `.fa-r` have dashed rules.
+- Slots `.fa-c`: dashed borders. `.you` (your slot) is lime with a white border; `.free` is magenta.
+- Booking grid `.fa-grid` with amber `.fa-t` headers (13px, 1px tracking).
+- Progress bar in the HUD uses the shared `.bar`. Day counter `#fcr b` 28px white.
 
 ## Studio minigames (`#mg`)
 
@@ -130,10 +138,18 @@ Site buttons `button.go` take each site's accent.
 - Play button `.bpl`: 24px circle, `#1db954` fill, black text. Active row `.sr.bon` tint `#1db95422`.
 - Timeline `.tbar` uses `--g` for the moving bar.
 
-## Gear shop and clothes picker
+## Gear shop (`.gshop`) and clothes picker
 
-- Section header `.gsh`: 14px Silkscreen, 85% opacity.
-- Quality pips `.gpip i.on`: `--g`.
+Look: a studio equipment rack. Charcoal panels with a faint scan-line texture, amber meters, monospace labels. Nothing here uses the Silkscreen headings.
+
+- Root `.gshop`: `#15171b` with a 1px black border and 4px corners. Font: Courier New (fallback ui-monospace), not caps for body text.
+- Rack header `.gshop-top`: dark steel gradient, 3px amber `#ffb000` bottom rule, "GEARHOUSE" in 22px amber with 5px tracking and a soft glow.
+- Title `.gshop h1`: 16px, caps, light grey `#f1f3f6`.
+- Section headers `.gsh`: 12px caps amber with a 4px amber left bar.
+- Module cards `.gsc`: dark gradient `#24272e → #171a1f`, 1px `#3b4048` border, 3px radius and a bottom shadow, so each looks like a rack unit. Small text is 10px caps grey `#8d949e`.
+- Quality pips `.gpip i.on`: amber `#ffb000` with a glow. Empty pips are black.
+- Buttons: steel `#2b2f37` with a black border. `button.go` is amber `#ffb000` with dark text. Disabled is 45% opacity.
+- Clothes picker `.wrs` keeps the shared look.
 - Swatches `.asw` (24px, 2px black border, `--g` outline when selected).
 - Wardrobe picker `.wrs`: `#1d2a24`; selected border `#ff3d81`.
 
