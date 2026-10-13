@@ -74,6 +74,10 @@ Root: `.chat.msx`. Tokens live on `.chat.msx`:
 - Buttons `.azbtn`: `#ffd814` pill, `#f7ca00` hover, grey when disabled.
 - Product cards `.azc`: white, 1px `#e7e7e7` border, 6px radius. Price `.azp` 28px. Muted `.g` `#565959`.
 - Badges `.bd`: `#232f3e`; `.bd.bs` `#c45500`.
+- Furniture preview models (`79-amazoom-detail.js`, `AZX`): built from clean boxes in the item's own space, drawn at 128 px on the card. Keep parts at least 0.04 across so they stay readable, and do not stack coplanar slabs.
+  - Fish tank (`aqu`): wood cabinet `#3a2a1c` with two doors and gold handles; grey `#8a8f99` frame posts and floor plate; blue `#1f6e9c` backdrop; sand `#e8cc8e`; animated fish, plants and bubbles added by `AZXFX.aqu`.
+  - Wardrobe (`ward`) and upright piano (`pno`): solid bodies with inset door panels, gold handles, white and black keys and gold pedals.
+  - Cat tree (`cattree`, pet catalogue in `22-v8-clothes-wardrobe-big-catalogues-pixel.js`): tan `#c9955f` and `#9c7140` rope-wrapped posts, platforms, a house with a doorway, a sisal scratching post, and a red toy hung on a string.
 
 ## Goober Eats (`eats`)
 
