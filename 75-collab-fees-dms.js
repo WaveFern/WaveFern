@@ -40,7 +40,7 @@ function dmWeight(i,mo){const a=ART[i],A=a[2],L=Math.max(S.listeners||0,5),d=Mat
   const rise=1+Math.min(4,Math.max(0,rep)*.15)+Math.min(3,Math.log10(L+1)*.5)+M*2;w=(d<=2.2?.02:.004*Math.pow(10,-(d-2.2)*.35))*rise}
  /* secondary: genre fit with your recent releases, reputation */
  const rec=(S.songs||[]).slice(-5).map(s=>s.g);if(rec.length){w*=rec.includes(a[1])?1.6:GENREL.some(g=>g.includes(a[1])&&rec.some(r=>g.includes(r)))?1.25:.85}
- return w*(1+.03*rep)}
+ return w*(1+.03*rep)*(a[9]||1)}  /* a[9]: optional per-artist DM weight, 1 = normal */
 /* draw k artists (nobody who already has a thread) in proportion to their weight, with noise so it is never predictable */
 function dmDraw(k){const mo=dmMomentum(),c=ART.map((a,i)=>i).filter(i=>!S.msgs.some(m=>m.a===i)&&!(typeof BLKI!='undefined'&&BLKI&&BLKI.has(i))),out=[];
  const w=c.map(i=>[i,dmWeight(i,mo)*(.5+Math.random())]);
