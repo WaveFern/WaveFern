@@ -1,8 +1,11 @@
 /* ---------- v25: pause menu + menu music, wardrobe colour picker ---------- */
 let PS='',MENUA=null;
 function pauseOverlay(on){let o=document.getElementById('pzo');if(on&&!o){o=document.createElement('div');o.id='pzo';document.body.appendChild(o)}else if(!on&&o)o.remove()}
-function menuMusic(on){if(on){if(!MENUA){MENUA=new Audio('menu.mp3');MENUA.loop=true;MENUA.preload='auto';MENUA.onended=()=>{if(PAUSED){MENUA.currentTime=0;MENUA.play().catch(()=>{})}}}MENUA.volume=Math.max(0,Math.min(1,VOL));MENUA.currentTime=0;MENUA.play().catch(()=>{})}else if(MENUA)MENUA.pause()}
-setInterval(()=>{if(MENUA&&!MENUA.paused)MENUA.volume=Math.max(0,Math.min(1,VOL))},100);
+/* v26.97: Settings can turn off the main menu music and the pause menu music on their own */
+const menuOK=()=>typeof TT!='undefined'&&TT.on?!!OPT.menuMus:!!OPT.pauseMus;
+function menuSync(){if(!PAUSED&&!(typeof TT!='undefined'&&TT.on))return;if(!menuOK()){if(MENUA)MENUA.pause()}else if(!MENUA||MENUA.paused)menuMusic(1)}
+function menuMusic(on){if(on&&!menuOK()){if(MENUA)MENUA.pause();return}if(on){if(!MENUA){MENUA=new Audio('menu.mp3');MENUA.loop=true;MENUA.preload='auto';MENUA.onended=()=>{if(PAUSED){MENUA.currentTime=0;MENUA.play().catch(()=>{})}}}MENUA.volume=Math.max(0,Math.min(1,VOL));MENUA.currentTime=0;MENUA.play().catch(()=>{})}else if(MENUA)MENUA.pause()}
+setInterval(()=>{if(MENUA&&!MENUA.paused&&!menuOK())MENUA.pause();if(MENUA&&!MENUA.paused)MENUA.volume=Math.max(0,Math.min(1,VOL))},100);
 function pauseUI(){$('ui').innerHTML=`<div id=pzm class="box modal pzm"><h2>Paused</h2><p class=m><small>Esc to resume</small></p><button class=go onclick="resumeGame()">Resume</button><button onclick="settings()">Settings</button></div>`}
 function pauseGame(){if(PAUSED)return;PS=mode;PAUSED=1;mode='pause';for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}menuMusic(1);pauseOverlay(1);pauseUI();snd('click')}
 function resumeGame(){if(!PAUSED)return;mode=PS||'play';PS='';PAUSED=0;MU.hold=0;try{const a=MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}catch(e){}menuMusic(0);pauseOverlay(0);$('ui').innerHTML=''}

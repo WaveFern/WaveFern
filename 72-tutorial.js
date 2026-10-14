@@ -28,7 +28,7 @@ const TUT=[
  {c:2,n:'Know your world',o:'Press N for the map. Scroll or +/- to zoom.',l:['Press N for the map. The city is way east: walk, drive, or grab a Taxi from the map.'],ok:()=>S.tut.f.map},
  {c:2,n:'Wheels and fame',info:1,o:'Listen to Big Vee.',l:['Motors sells cars. Press E by one to drive, set your pace in the speed box, W goes, S brakes.','Fame Level climbs with monthly listeners and unlocks gear, homes and festival stages.']},
  {c:2,n:'Book a gig',w:TUT_LAP,hl:()=>app!='fest'?TUT_PC('fest'):null,o:'Open FestivalApp on the laptop.',l:['Park Fields Festival runs every 7th day. Book 2+ days ahead; the smallest stage wants Fame Level 10.','Go have a nose in FestivalApp.'],ok:()=>S.tut.f.fest},
- {c:2,n:'Back it up',hl:()=>$('stg')?'#stg button[onclick*=saveCode]':$('pzm')?'#pzm button[onclick="settings()"]':null,o:'Esc > Settings > Get save code. Keep it safe.',l:['The game autosaves here, but a save code is your backup.','Paste it in any browser to carry on.'],ok:()=>S.tut.f.code}
+ {c:2,n:'Back it up',hl:()=>$('stg')?($('sc')?'#stg button[onclick*=saveCode]':'#stt button[data-t=save]'):$('pzm')?'#pzm button[onclick="settings()"]':null,o:'Esc > Settings > Get save code. Keep it safe.',l:['The game autosaves here, but a save code is your backup.','Paste it in any browser to carry on.'],ok:()=>S.tut.f.code}
 ];
 const TUT_CHEER=['Sick!','Now we cooking.','That is the stuff.','Look at you go.','Legend behaviour.','Easy money. Well, $3.'];
 let TUTM=null,TUTK='',TUTMIN=0,TD=null,TUTPEND=null,TUTPAN=null,TUTEND=0,TUTLI=-1,TUTBUB=null;
