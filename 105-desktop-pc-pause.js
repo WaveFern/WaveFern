@@ -24,11 +24,11 @@ function pcPower(){const pc=document.getElementById('pc');if(!pc)return;const ui
 addEventListener('resize',()=>{try{if(mode=='pc')pcLayout()}catch(e){}});
 /* pause on the computer: keep the PC on screen and put the pause menu over it */
 let PCKEEP=null;
-{const pu0=pauseUI;pauseUI=function(){const ui=$('ui');if(PS=='pc'){const pc=document.getElementById('pc')||PCKEEP;if(pc)PCKEEP=pc;pu0.apply(this,arguments);if(PCKEEP&&ui&&!PCKEEP.parentNode)ui.insertBefore(PCKEEP,ui.firstChild)}else pu0.apply(this,arguments)}
+{const pu0=pauseUI;pauseUI=function(){const ui=$('ui');document.body.classList.toggle('pcpaused',PS=='pc');if(PS=='pc'){const pc=document.getElementById('pc')||PCKEEP;if(pc)PCKEEP=pc;pu0.apply(this,arguments);if(PCKEEP&&ui&&!PCKEEP.parentNode)ui.insertBefore(PCKEEP,ui.firstChild)}else pu0.apply(this,arguments)}
  /* Settings, Stats and the rest wipe the UI; put the computer screen back underneath whenever that happens while paused on the PC */
  const ui=document.getElementById('ui');if(ui)new MutationObserver(()=>{if(PAUSED&&PS=='pc'&&PCKEEP&&!PCKEEP.parentNode)ui.insertBefore(PCKEEP,ui.firstChild)}).observe(ui,{childList:true})}
 
-{const r0=resumeGame;resumeGame=function(){const was=PS=='pc';PCKEEP=null;const r=r0.apply(this,arguments);if(was&&mode=='pc')pcR();return r}}
+{const r0=resumeGame;resumeGame=function(){const was=PS=='pc';PCKEEP=null;document.body.classList.remove('pcpaused');const r=r0.apply(this,arguments);if(was&&mode=='pc')pcR();return r}}
 {const ap=()=>{if(!PAUSED&&mode=='pc')pauseGame()};document.addEventListener('visibilitychange',()=>{if(document.hidden)ap()});addEventListener('blur',ap)}
 {const st=document.createElement('style');st.textContent=`
 body.pcmode #ui{background:
@@ -42,6 +42,7 @@ body.pcmode #pc::after{content:'';position:absolute;left:0;right:0;top:0;bottom:
 body.pcmode .ico{min-height:80px}
 #pcpower{width:22px;height:22px;padding:0;border:2px solid #000;border-radius:0;background:#7a1f1f;color:#fff;cursor:pointer;font-size:0;line-height:0;image-rendering:pixelated}
 #pcpower::before{content:'';display:block;margin:auto;width:8px;height:8px;border:2px solid #ffd0d0;border-top-color:transparent;border-radius:50%}
+body.pcpaused #pc,body.pcpaused #pcpower{filter:blur(6px) saturate(.7) brightness(.45);pointer-events:none}
 #pcpower:hover{background:#b02a2a}
 #pcpower.bez{position:absolute;right:calc(2% + clamp(10px,1.6vw,22px));bottom:5.5%;width:clamp(14px,2.2vw,26px);height:clamp(14px,2.2vw,26px);z-index:3}
 #pcpower.tbp{margin-left:6px;width:26px;height:24px}
