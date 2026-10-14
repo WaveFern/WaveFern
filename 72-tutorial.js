@@ -144,4 +144,4 @@ function tutTgt(){const T=S.tut,s=T&&T.on&&TUT[T.i];if(!s||!s.w||mode!='play'||I
 /* new game: offer the tutorial instead of the old welcome card */
 {const c0=confirmChar;confirmChar=function(){c0.apply(this,arguments);S.tut={on:0,i:0,f:{}};tutOffer()}}
 /* pause menu: replay button */
-{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(m){const b=document.createElement('button');b.textContent='🎓 '+(S.tut&&S.tut.on?'Restart tutorial':'Tutorial');b.onclick=()=>{resumeGame();tutStart()};m.appendChild(b)}}}
+{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(m){const b=document.createElement('button');b.textContent=(S.tut&&S.tut.on?'Restart tutorial':'Tutorial');b.onclick=()=>{resumeGame();tutStart()};m.appendChild(b)}}}
