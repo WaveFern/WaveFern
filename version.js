@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.113.2';
+const GAME_VERSION='v26.114.0';
 const VERSION_HISTORY=[
+ {v:'v26.114.0',n:'New Settings option under Music: Music source. Choose the soundtrack or your own released songs. With My songs on, your top songs (ranked by streams) loop outside the computer, and you pick how many, for example your top 3. With no released songs the soundtrack plays. Saved with your game.'},
  {v:'v26.113.2',n:'The pause menu on the computer now has every button (Resume, Stats, Settings, Tutorial and the rest) and the PC screen stays visible while Settings or Stats are open. The monitor stand is much wider, flat with no shading.'},
  {v:'v26.113.1',n:'Label HQ in the App Barn now says "Sign with labels.". The monitor stand is thicker. Pausing on the computer no longer makes the screen disappear: the PC stays visible with the pause menu over it.'},
  {v:'v26.113.0',n:'Label HQ is coming soon in the App Barn and is removed from every account and save. The monitor stand is a much thicker flat stick with no shading. Song descriptions no longer show the album name and number.'},
