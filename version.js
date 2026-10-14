@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.89.0';
+const GAME_VERSION='v26.90.0';
 const VERSION_HISTORY=[
+ {v:'v26.90.0',n:'Admin panel for the admin account (main menu and pause menu): change your own money, monthly listeners, streams, followers, day and time, unlock gear, apps, furniture, cars, pets, clothes and more, see every player, and send any player a gift of money, streams and monthly listeners with a message. Gifts pop up the next time that player plays and can only be claimed once. Saves still load.'},
  {v:'v26.89.0',n:'Signing in with Google now always wipes the save on this device first, and it is never uploaded. Your account\'s cloud save then loads, or a new game starts if the account has none. Signing out keeps your game on this device as a guest save. Saves still load.'},
  {v:'v26.88.1',n:'A Google account signing in to WaveFern for the very first time now always wipes this device and starts a new game, even when cloud saves are not reachable. Before, the wipe could be skipped if the cloud check failed. Saves still load.'},
  {v:'v26.88.0',n:'Gifts: a signed-in player can now receive a one-time gift. It pops up in game the next time they play, and is saved to their Google account so it is never given twice. First gift: $1,000 from Rowan. Saves still load.'},

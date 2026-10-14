@@ -1,16 +1,38 @@
 rules_version = '2';
-// WaveFern cloud saves: paste this into Firebase console > Firestore Database > Rules, then Publish.
-// Each signed-in player can read and write only their own save at saves/{their uid}. Nothing else is open.
+// WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
+// Saves: each signed-in player can read and write only their own save at saves/{their uid}; the admin can read every save.
+// Gifts: only the admin can create or delete gifts; a player can only read gifts sent to them and mark them claimed.
+// Nothing else is open.
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == 'wE6oPZIHYifrqBFxzpPse6ripGY2';
+    }
+    function isCount(v) {
+      return v is int && v >= 0 && v <= 1000000000000;
+    }
     match /saves/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
       allow create, update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['code', 'day', 'artist', 't'])
         && request.resource.data.code is string && request.resource.data.code.size() < 1000000
         && request.resource.data.day is number
         && request.resource.data.artist is string && request.resource.data.artist.size() < 200
         && request.resource.data.t is number;
+    }
+    match /gifts/{id} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.to == request.auth.uid);
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
+        && request.resource.data.to is string && request.resource.data.to.size() > 0 && request.resource.data.to.size() <= 128
+        && request.resource.data.from is string && request.resource.data.from.size() <= 40
+        && request.resource.data.msg is string && request.resource.data.msg.size() <= 200
+        && isCount(request.resource.data.money) && isCount(request.resource.data.streams) && isCount(request.resource.data.listeners)
+        && request.resource.data.t is number && request.resource.data.claimed == false;
+      allow update: if request.auth != null && resource.data.to == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed'])
+        && request.resource.data.claimed == true;
+      allow delete: if isAdmin();
     }
   }
 }
