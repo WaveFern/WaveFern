@@ -16,27 +16,32 @@ let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
  return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js')]).then(([a,m,f])=>{const app=a.initializeApp(FB_CFG);FBM=m;FBF=f;FBA=m.getAuth(app);FBD=f.getFirestore(app);
-  m.onAuthStateChanged(FBA,usr=>{FBU=usr;CLD.ok=0;CLD.last='';if(usr)csCheck();fbRedraw()});return m.getRedirectResult(FBA).then(fbNew).catch(()=>{})})}
-function fbNew(r){try{if(r&&r.user&&FBM.getAdditionalUserInfo(r)?.isNewUser){CLD.newUser=r.user.uid;if(FBU&&FBU.uid==r.user.uid&&!CLD.ok)csCheck()}}catch(e){}}
-function fbSignIn(){snd('click');fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
- return FBM.signInWithPopup(FBA,p).then(r=>{fbNew(r);say('Signed in as '+(r.user.displayName||r.user.email))},e=>{
-  if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment'))return FBM.signInWithRedirect(FBA,p);
-  if(e&&(e.code=='auth/popup-closed-by-user'||e.code=='auth/cancelled-popup-request'))return;
-  throw e})}).catch(e=>{snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
+  m.onAuthStateChanged(FBA,usr=>{FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()});
+  return m.getRedirectResult(FBA).then(r=>{if(r&&r.user)fbSignedIn(r.user)},()=>{}).finally(()=>{if(CLD.signing&&!wiping){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}if(FBU)csCheck()}})})}
+/* v26.89: signing in always replaces this device's save: the device save is wiped (never uploaded), then the
+   account's cloud save loads, or a new game starts if it has none */
+function fbSignedIn(u){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}if(!csGame()&&!localStorage.getItem('fw_save')){csSetMarkFor(u.uid,0);return csCheck()}csWipe(u.uid,'Signed in as '+(u.displayName||u.email||'Google user'))}
+function csWipe(uid,msg){wiping=true;try{localStorage.removeItem('fw_save');localStorage.setItem('fw_cloud',JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
+const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem('fw_cloud',JSON.stringify({uid,t}))}catch(e){}};
+function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
+ return FBM.signInWithPopup(FBA,p).then(r=>fbSignedIn(r.user),e=>{
+  if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment')){try{sessionStorage.setItem('fw_signing','1')}catch(x){}return FBM.signInWithRedirect(FBA,p)}
+  CLD.signing=0;if(e&&(e.code=='auth/popup-closed-by-user'||e.code=='auth/cancelled-popup-request'))return;
+  throw e})}).catch(e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
 /* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
 function fbSignInAsk(){snd('click');const prev=mode,fresh=prev=='creator'||(prev=='title'&&!TT.game);CLD.pre=prev;
- $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>🔑 Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>If your Google account already has a cloud save, it loads instead of the save on this device. If the account has never been used here, a brand new game starts and this save is wiped. Your save code is your backup.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">📋 Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
+ $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>🔑 Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>Signing in wipes the save on this device. Your Google account's cloud save loads instead, or a brand new game starts if the account has none. Your save code is your backup.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">📋 Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
 function fbCopy(){const t=$('fbsc');t.value=saveCode();t.style.display='block';t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Save code copied'),()=>say('Copy the code from the box'))}catch(e){say('Copy the code from the box')}}
 function fbSignInBack(){const prev=CLD.pre;CLD.pre=null;if(prev=='title'){mode='title';titleUI()}else if(prev=='creator'){mode='creator';creatorUI()}else if(prev=='pause'){mode='pause';pauseUI()}else closeUI()}
 function fbSignInGo(){fbSignInBack();fbSignIn()}
-function fbSignOut(){if(!FBA)return;snd('click');csPush(1).finally(()=>FBM.signOut(FBA).then(()=>say('Signed out. Your save stays on this device.')))}
+function fbSignOut(){if(!FBA)return;snd('click');csPush(1).finally(()=>FBM.signOut(FBA).then(()=>{try{localStorage.removeItem('fw_cloud')}catch(e){}say('Signed out. Your save stays on this device.')}))}
 function fbRedraw(){if(mode=='pause')pauseUI();else if(mode=='title'&&document.getElementById('ttl'))titleUI()}
 
 /* v26.84: cloud saves. Signed-in players keep one save in Firestore at saves/{uid} = {code, day, artist, t}.
    The rules in docs/firestore.rules let each player read and write only their own save.
    v26.87: the cloud save always wins. fw_cloud remembers which cloud save (uid + t) this device last wrote or loaded:
    if the cloud is still that one, this device has the newest game and uploads it; otherwise the cloud save is loaded. */
-const CLD={ok:0,last:'',t:0,err:'',busy:0};
+const CLD={ok:0,last:'',t:0,err:'',busy:0,signing:(()=>{try{return sessionStorage.getItem('fw_signing')?1:0}catch(e){return 0}})()};
 const csMark=()=>{try{return JSON.parse(localStorage.getItem('fw_cloud'))||{}}catch(e){return{}}};
 const csSetMark=t=>{CLD.t=t;try{localStorage.setItem('fw_cloud',JSON.stringify({uid:FBU.uid,t}))}catch(e){}};
 const csRef=()=>FBF.doc(FBD,'saves',FBU.uid);
@@ -45,20 +50,15 @@ const csReady=()=>!document.getElementById('load')&&['title','play','pause'].inc
 function csFail(e){CLD.err=e&&e.code=='permission-denied'?'Cloud saves are not set up yet.':'Cloud save is offline. Your game still saves on this device.';fbRedraw()}
 function csCheck(){const uid=FBU&&FBU.uid;if(!uid)return;
  if(!csReady()&&mode!='creator')return setTimeout(()=>{if(FBU&&FBU.uid==uid&&!CLD.ok)csCheck()},700);
- if(CLD.newUser==uid&&csGame())return csFresh(uid);
+ if(csGame()&&csMark().uid!=uid)return csWipe(uid);
  CLD.err='';FBF.getDoc(csRef()).then(d=>{if(!FBU||FBU.uid!=uid)return;
-  if(!d.exists()){if(csGame()&&csMark().uid!=uid)return csFresh(uid);CLD.ok=1;CLD.t=0;fbRedraw();return csPush(1)}
+  if(!d.exists()){if(csGame()&&csMark().uid!=uid)return csWipe(uid);CLD.ok=1;CLD.t=0;fbRedraw();return csPush(1)}
   const c=d.data(),m=csMark();
   if(csGame()&&m.uid==uid&&m.t==c.t){CLD.ok=1;CLD.t=c.t;fbRedraw();return csPush()}
   if(csGame()&&c.code==saveCode()){CLD.ok=1;CLD.last=c.code;csSetMark(c.t);return fbRedraw()}
   csLoad(c)}).catch(csFail)}
 function csLoad(c){const uid=FBU&&FBU.uid;if(!csReady())return setTimeout(()=>{if(FBU&&FBU.uid==uid)csLoad(c)},700);
  if(mode=='pause')resumeGame();loadCode(c.code);if(!FBU)return;CLD.ok=1;CLD.last=c.code;csSetMark(c.t);autoSave();say('☁ Loaded your cloud save (Day '+c.day+')');fbRedraw()}
-/* v26.86: a Google account signing in for the first time (no cloud save yet) starts a fresh game instead of taking this device's save */
-function csFresh(uid){if(!csReady())return setTimeout(()=>{if(FBU&&FBU.uid==uid&&!CLD.ok)csCheck()},700);
- if(mode=='play')mode='menu';CLD.fresh=uid;
- $('ui').innerHTML=`<div id=csf class="box modal" style="width:min(400px,92vw)"><h2>☁ New Google account</h2><p>This Google account has never been used in WaveFern before, so it starts a <b>brand new game</b>. The save on this device is wiped.</p><p class=m><small>If you copied your save code, you can load it later in Settings.</small></p><button class=go onclick="csFreshGo()">Start new game</button></div>`}
-function csFreshGo(){if(!FBU)return;snd('click');wiping=true;try{localStorage.removeItem('fw_save');localStorage.setItem('fw_cloud',JSON.stringify({uid:FBU.uid,t:0}))}catch(e){}location.reload()}
 function csPush(force){if(!FBU||!CLD.ok||CLD.busy||!FBF||['creator','load'].includes(mode)||(mode=='title'&&!TT.game)||wiping)return Promise.resolve();
  const code=saveCode();if(code==CLD.last&&!force)return Promise.resolve();if(code.length>1e6){CLD.err='Your save is too big for the cloud.';return Promise.resolve()}
  const t=Date.now(),uid=FBU.uid;CLD.busy=1;
@@ -74,7 +74,8 @@ if(FB_ON)fbLoad().catch(()=>{});
 /* v26.87: main menu shown when the site opens: Play, Settings, Google sign-in, profile in the top right.
    The world stays paused behind it; Save & quit in the pause menu comes back here. */
 const TT={on:0,game:0};
-function titleOpen(){TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
+function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionStorage.removeItem('fw_msg');say(m)}}catch(e){}}
+function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
  const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'☁ Cloud save on':'☁ Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><i>👤</i><span><b>Guest</b><small>Saves on this device</small></span></div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN<br>RECORDS</h1><div class=px>Music Career Sim</div>
@@ -93,8 +94,7 @@ function saveQuit(){snd('click');autoSave();TT.game=1;
 /* pause menu: Save & quit, plus who is signed in and the cloud save state */
 {const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='💾 Save & quit';q.onclick=saveQuit;m.appendChild(q);
  if(!FB_ON||!FBU)return;const n=document.createElement('p');n.className='m';n.innerHTML='<small>Signed in as <b></b><br><span></span></small>';n.querySelector('b').textContent=FBU.displayName||FBU.email||'Google user';
- n.querySelector('span').textContent=CLD.err||(CLD.ok?'☁ Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'☁ Checking cloud save…');m.appendChild(n);
- if(CLD.fresh==FBU.uid&&!CLD.ok){const b=document.createElement('button');b.className='go';b.textContent='☁ Start new game for this account';b.onclick=()=>csFresh(FBU.uid);m.appendChild(b)}};
+ n.querySelector('span').textContent=CLD.err||(CLD.ok?'☁ Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'☁ Checking cloud save…');m.appendChild(n);};
  const pg=pauseGame;pauseGame=function(){pg();csPush()}}
 /* browsers block sound until the first click, so start the menu music then */
 addEventListener('pointerdown',()=>{if(TT.on&&MENUA&&MENUA.paused)MENUA.play().catch(()=>{})},{capture:true});
