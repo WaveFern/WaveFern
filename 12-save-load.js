@@ -12,7 +12,7 @@ function loadCode(c){try{c=c.trim();if(c.toLowerCase()=='test'){cheat();return}i
 
 /* autosave: keeps the game in the browser so a refresh doesn't reset it */
 let wiping=false;
-function autoSave(){if(wiping||mode=='creator'||mode=='load')return;try{localStorage.setItem('fw_save',saveCode())}catch(e){}}
+function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{localStorage.setItem('fw_save',saveCode())}catch(e){}}
 function restoreSave(){let c=null;try{c=localStorage.getItem('fw_save')}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;try{localStorage.removeItem('fw_save')}catch(e){}return false}
 setInterval(autoSave,5000);
 addEventListener('pagehide',autoSave);
