@@ -31,7 +31,7 @@ function hovTick(){const i=hovFind();if(i<0)return hovClr();HOVI=i;const b=new T
 function storeKey(){if(mode!='build')return;if(hold){S.inv[hold]++;hold=null;clrGhost();buildUI();snd('pop');return}const i=hovFind();if(i<0)return;const q=PL[i];scene.remove(q.m);PL.splice(i,1);S.inv[q.t]=(S.inv[q.t]||0)+1;hovClr();snd('pop');buildUI()}
 addEventListener('keydown',e=>{if(e.key.toLowerCase()=='e'&&!e.repeat&&!/INPUT|TEXTAREA/.test(e.target.tagName))storeKey()});
 function buildTick(){if(mode!='build'){if(HOVO&&HOVO.visible)hovClr();return}if(hold){if(HOVO&&HOVO.visible)hovClr()}else return hovTick();RC.setFromCamera(mouse,cam);const p=new THREE.Vector3();if(!RC.ray.intersectPlane(PLN,p))return;const f=F[hold],x=Math.round(p.x*2)/2,z=Math.round(p.z*2)/2,c=fb(hold,x,z,gp.r);gp.x=x;gp.z=z;
- let ok=c[0]>=.05&&c[1]>=.05-WGX&&c[2]<=15.95&&c[3]<=11.95;if(ok&&!f.f){const o=r=>c[0]<r[2]&&c[2]>r[0]&&c[1]<r[3]&&c[3]>r[1];ok=!(cols.some(o)||dyn.some(o)||PL.some(q=>!F[q.t].f&&o(fb(q.t,q.x,q.z,q.r)))||o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
+ let ok=c[0]>=-1e-6&&c[1]>=-WGX-1e-6&&c[2]<=16+1e-6&&c[3]<=12+1e-6;if(ok&&!f.f){const o=r=>c[0]<r[2]&&c[2]>r[0]&&c[1]<r[3]&&c[3]>r[1];ok=!(cols.some(o)||dyn.some(o)||PL.some(q=>!F[q.t].f&&o(fb(q.t,q.x,q.z,q.r)))||o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
  gp.ok=ok;ghost.position.set(x,0,z);ghost.rotation.y=gp.r*Math.PI/2;GF.position.set(x,.05,z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.color.set(ok?0x44ff88:0xff4455)}
 addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-e.clientY/innerHeight*2+1});addEventListener('contextmenu',e=>{if(mode=='build')e.preventDefault()});
 addEventListener('mousedown',e=>{if(mode!='build'||e.target.closest('#ui>*,#hud button'))return;

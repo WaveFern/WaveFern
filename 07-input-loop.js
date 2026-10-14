@@ -1,6 +1,6 @@
 /* ---------- input / loop ---------- */
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
- if(k=='escape'){if(mode=='pc')closePC();else if(mode=='menu'&&$('stg'))closeSet();else if(mode=='menu'&&$('cre')==null&&!$('tin'))closeUI();else if(mode=='rec'){rec=null;mode='play';say('Session cancelled.')}else if(mode=='build')exitBuild();else if(mode=='play'||mode=='drive')pauseGame();else if(mode=='pause')resumeGame();return}
+ if(k=='escape'){if(mode=='pc')pauseGame();else if(mode=='menu'&&$('stg'))closeSet();else if(mode=='menu'&&$('cre')==null&&!$('tin'))closeUI();else if(mode=='rec'){rec=null;mode='play';say('Session cancelled.')}else if(mode=='build')exitBuild();else if(mode=='play'||mode=='drive')pauseGame();else if(mode=='pause')resumeGame();return}
  if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(k=='m'){if(VOL){LAST=VOL;VOL=0}else VOL=LAST||.5;sv()}keys[k]=1;if(k.startsWith('arrow')||k==' ')e.preventDefault();if(k=='f')buildMode();if(k=='n')bigMap();if(k=='r'&&mode=='build')gp.r=(gp.r+1)%4;
  if(mode=='rec'&&(k=='e'||k==' '||k=='enter'))recHit();if(mode=='drive'&&k=='e')exitDrive();if(mode=='play'&&(k=='e'||k==' '||k=='enter')&&near){snd('pop');near.a()}});
 addEventListener('keyup',e=>delete keys[e.key.toLowerCase()]);addEventListener('blur',()=>{for(const k in keys)delete keys[k]});
