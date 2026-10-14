@@ -23,15 +23,18 @@ function pcPower(){const pc=document.getElementById('pc');if(!pc)return;const ui
 {const u0=update;update=function(dt){u0(dt);const on=!!document.getElementById('pc');if(document.body.classList.contains('pcmode')!==(on||(PAUSED&&PS=='pc'))&&pcView1())document.body.classList.toggle('pcmode',on||!!(PAUSED&&PS=='pc'));if(!pcView1()&&document.body.classList.contains('pcmode'))document.body.classList.remove('pcmode')}}
 addEventListener('resize',()=>{try{if(mode=='pc')pcLayout()}catch(e){}});
 /* pause on the computer: keep the PC on screen and put the pause menu over it */
-{const pu0=pauseUI;pauseUI=function(){const ui=$('ui');if(PS=='pc'&&ui&&ui.querySelector('#pc')){const o=document.getElementById('pzm');if(o)o.remove();const d=document.createElement('div');d.innerHTML='<div id=pzm class="box modal pzm"><h2>Paused</h2><p class=m><small>Esc to resume</small></p><button class=go onclick="resumeGame()">Resume</button><button onclick="settings()">Settings</button></div>';ui.appendChild(d.firstChild)}else pu0.apply(this,arguments)}}
+let PCKEEP=null;
+{const pu0=pauseUI;pauseUI=function(){const ui=$('ui');if(PS=='pc'){const pc=document.getElementById('pc')||PCKEEP;if(pc)PCKEEP=pc;pu0.apply(this,arguments);if(PCKEEP&&ui&&!PCKEEP.parentNode)ui.insertBefore(PCKEEP,ui.firstChild)}else pu0.apply(this,arguments)}
+ /* Settings, Stats and the rest wipe the UI; put the computer screen back underneath whenever that happens while paused on the PC */
+ const ui=document.getElementById('ui');if(ui)new MutationObserver(()=>{if(PAUSED&&PS=='pc'&&PCKEEP&&!PCKEEP.parentNode)ui.insertBefore(PCKEEP,ui.firstChild)}).observe(ui,{childList:true})}
 
-{const r0=resumeGame;resumeGame=function(){const was=PS=='pc';const r=r0.apply(this,arguments);if(was&&mode=='pc')pcR();return r}}
+{const r0=resumeGame;resumeGame=function(){const was=PS=='pc';PCKEEP=null;const r=r0.apply(this,arguments);if(was&&mode=='pc')pcR();return r}}
 {const ap=()=>{if(!PAUSED&&mode=='pc')pauseGame()};document.addEventListener('visibilitychange',()=>{if(document.hidden)ap()});addEventListener('blur',ap)}
 {const st=document.createElement('style');st.textContent=`
 body.pcmode #ui{background:
  linear-gradient(#0003 0 0) 0 0/100% 100% no-repeat,
  linear-gradient(#d9ccb2 0,#cdbea3 82%,#7b5231 82%,#5e3d22 100%);image-rendering:pixelated}
-body.pcmode #ui::before{content:'';position:absolute;left:50%;bottom:0;width:clamp(48px,8vw,104px);height:5.5%;transform:translateX(-50%);background:#33363c}
+body.pcmode #ui::before{content:'';position:absolute;left:50%;bottom:0;width:clamp(90px,15vw,200px);height:5.5%;transform:translateX(-50%);background:#33363c}
 body.pcmode #ui::after{display:none}
 body.pcmode #pc{inset:1.2% 2% 5.5% 2%;border:clamp(6px,.9vw,12px) solid #1d1f24;border-bottom-width:clamp(16px,2.4vw,30px);border-radius:0;overflow:hidden;
  box-shadow:inset 0 0 0 4px #000;clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px))}

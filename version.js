@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.113.1';
+const GAME_VERSION='v26.113.2';
 const VERSION_HISTORY=[
+ {v:'v26.113.2',n:'The pause menu on the computer now has every button (Resume, Stats, Settings, Tutorial and the rest) and the PC screen stays visible while Settings or Stats are open. The monitor stand is much wider, flat with no shading.'},
  {v:'v26.113.1',n:'Label HQ in the App Barn now says "Sign with labels.". The monitor stand is thicker. Pausing on the computer no longer makes the screen disappear: the PC stays visible with the pause menu over it.'},
  {v:'v26.113.0',n:'Label HQ is coming soon in the App Barn and is removed from every account and save. The monitor stand is a much thicker flat stick with no shading. Song descriptions no longer show the album name and number.'},
  {v:'v26.112.0',n:'PC and Label HQ. The monitor power button sits on the bottom right of the frame, the walls lose their outline, the stand is just a stick, and the power button hides when First-person monitor is off. Drag on the desktop to draw selection squares, just for show. Label HQ always shows its username and password sign-in, and has its own navy and gold look.'},
