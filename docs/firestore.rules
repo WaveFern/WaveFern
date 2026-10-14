@@ -1,0 +1,16 @@
+rules_version = '2';
+// WaveFern cloud saves: paste this into Firebase console > Firestore Database > Rules, then Publish.
+// Each signed-in player can read and write only their own save at saves/{their uid}. Nothing else is open.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /saves/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['code', 'day', 'artist', 't'])
+        && request.resource.data.code is string && request.resource.data.code.size() < 1000000
+        && request.resource.data.day is number
+        && request.resource.data.artist is string && request.resource.data.artist.size() < 200
+        && request.resource.data.t is number;
+    }
+  }
+}
