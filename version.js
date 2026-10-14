@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.85.0';
+const GAME_VERSION='v26.86.0';
 const VERSION_HISTORY=[
+ {v:'v26.86.0',n:'Signing in with a Google account that has never been used in WaveFern now starts a brand new game: a notice explains it, then this device\'s save is wiped and you make a new character. Copy your save code first if you want to keep it (the sign-in notice has a button). Accounts that already have a cloud save work as before. Saves still load.'},
  {v:'v26.85.0',n:'Before Google sign-in, the game now shows a notice telling you to copy your save code and keep it safe, with a Copy save code button, since picking a cloud save can replace the save on this device. Saves still load.'},
  {v:'v26.84.0',n:'Cloud saves: sign in with Google (pause menu, or the character screen on a new device) and your game saves to your Google account, so you can carry on from any device without sharing save codes. If two devices have different saves, the game asks which one to keep. Playing without signing in works as before, and save codes still work. Saves still load.'},
  {v:'v26.83.1',n:'Google sign-in is now switched on: press Esc and pick Sign in with Google in the pause menu. Signing in is still optional and saves still stay in this browser. Saves still load.'},
