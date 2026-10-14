@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.87.0';
+const GAME_VERSION='v26.88.0';
 const VERSION_HISTORY=[
+ {v:'v26.88.0',n:'Gifts: a signed-in player can now receive a one-time gift. It pops up in game the next time they play, and is saved to their Google account so it is never given twice. First gift: $1,000 from Rowan. Saves still load.'},
  {v:'v26.87.0',n:'Main menu: the game now opens on a menu with Play, Settings and Sign in with Google, and your profile in the top right. When you are signed in, your cloud save always loads by itself, with no question. The pause menu has a new Save & quit button that saves to your Google account straight away and goes back to the menu. Saves still load.'},
  {v:'v26.86.1',n:'The game loads much faster. The music tracks no longer have to download before the game can start (they load on your first click or key), and the loading screen goes away as soon as the world is ready instead of counting up for another two seconds. Saves still load.'},
  {v:'v26.86.0',n:'Signing in with a Google account that has never been used in WaveFern now starts a brand new game: a notice explains it, then this device\'s save is wiped and you make a new character. Copy your save code first if you want to keep it (the sign-in notice has a button). Accounts that already have a cloud save work as before. Saves still load.'},
