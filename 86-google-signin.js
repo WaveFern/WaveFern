@@ -22,6 +22,12 @@ function fbSignIn(){snd('click');fbLoad().then(()=>{const p=new FBM.GoogleAuthPr
   if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment'))return FBM.signInWithRedirect(FBA,p);
   if(e&&(e.code=='auth/popup-closed-by-user'||e.code=='auth/cancelled-popup-request'))return;
   throw e})}).catch(e=>{snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
+/* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
+function fbSignInAsk(){snd('click');const prev=mode,fresh=prev=='creator';CLD.pre=prev;
+ $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>🔑 Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>If your Google account already has a cloud save, the game asks which save to keep, and the other one is replaced. Your save code is your backup.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">📋 Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
+function fbCopy(){const t=$('fbsc');t.value=saveCode();t.style.display='block';t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Save code copied'),()=>say('Copy the code from the box'))}catch(e){say('Copy the code from the box')}}
+function fbSignInBack(){const prev=CLD.pre;CLD.pre=null;if(prev=='creator'){mode='creator';creatorUI()}else if(prev=='pause'){mode='pause';pauseUI()}else closeUI()}
+function fbSignInGo(){fbSignInBack();fbSignIn()}
 function fbSignOut(){if(!FBA)return;snd('click');csPush(1).finally(()=>FBM.signOut(FBA).then(()=>say('Signed out. Your save stays on this device.')))}
 function fbRedraw(){if(mode=='pause')pauseUI();else if(mode=='creator'&&document.getElementById('cre'))creatorUI()}
 
@@ -67,10 +73,10 @@ if(FB_ON)fbLoad().catch(()=>{});
   n.querySelector('span').textContent=CLD.err||(CLD.ok?'☁ Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'☁ Checking cloud save…');
   const b=document.createElement('button');b.textContent='Sign out';b.onclick=fbSignOut;d.append(n,b);
   if(CLD.ask&&!CLD.ok){const q=document.createElement('button');q.className='go';q.textContent='☁ Choose which save to keep';q.onclick=()=>csAsk(CLD.ask.c,CLD.ask.fresh);d.insertBefore(q,b)}}
- else{const b=document.createElement('button');b.textContent='🔑 Sign in with Google';b.onclick=fbSignIn;const n=document.createElement('p');n.className='m';n.innerHTML='<small>Sign in to keep your save in the cloud and play on any device.</small>';d.append(b,n)}
+ else{const b=document.createElement('button');b.textContent='🔑 Sign in with Google';b.onclick=fbSignInAsk;const n=document.createElement('p');n.className='m';n.innerHTML='<small>Sign in to keep your save in the cloud and play on any device.</small>';d.append(b,n)}
  m.appendChild(d)};
  const pg=pauseGame;pauseGame=function(){pg();csPush()};
  const c0=creatorUI;creatorUI=function(){c0();const cr=$('cre');if(!cr||!FB_ON)return;const d=document.createElement('div');d.className='m';d.style.cssText='margin-top:10px;text-align:center';
   if(FBU){d.innerHTML='<small></small>';d.firstChild.textContent=CLD.err||(CLD.ok?'☁ Signed in. This new game will save to the cloud.':'☁ Checking cloud save…')}
-  else{d.innerHTML='<small>Played before on another device?</small><br>';const b=document.createElement('button');b.textContent='🔑 Sign in with Google';b.style.marginTop='6px';b.onclick=fbSignIn;d.appendChild(b)}
+  else{d.innerHTML='<small>Played before on another device?</small><br>';const b=document.createElement('button');b.textContent='🔑 Sign in with Google';b.style.marginTop='6px';b.onclick=fbSignInAsk;d.appendChild(b)}
   cr.appendChild(d)}}
