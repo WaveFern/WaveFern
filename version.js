@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.113.0';
+const GAME_VERSION='v26.113.1';
 const VERSION_HISTORY=[
+ {v:'v26.113.1',n:'Label HQ in the App Barn now says "Sign with labels.". The monitor stand is thicker. Pausing on the computer no longer makes the screen disappear: the PC stays visible with the pause menu over it.'},
  {v:'v26.113.0',n:'Label HQ is coming soon in the App Barn and is removed from every account and save. The monitor stand is a much thicker flat stick with no shading. Song descriptions no longer show the album name and number.'},
  {v:'v26.112.0',n:'PC and Label HQ. The monitor power button sits on the bottom right of the frame, the walls lose their outline, the stand is just a stick, and the power button hides when First-person monitor is off. Drag on the desktop to draw selection squares, just for show. Label HQ always shows its username and password sign-in, and has its own navy and gold look.'},
  {v:'v26.111.0',n:'PC monitor tweaks. The first-person monitor shows much less wall and stand, and the walls and monitor frame are pixelated like the rest of the game. New Settings > Game option, First-person monitor, switches back to the full screen computer. Esc now opens the pause menu on the computer, the Pause button is gone, and a power button on the bottom of the monitor frame leaves the PC instantly. Furniture can now be placed touching the walls (not inside them). Albums no longer show the percentage boost text; the boost just happens.'},
