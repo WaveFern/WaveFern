@@ -74,13 +74,13 @@ function sfBig(){const c=sfCur();if(c&&sfIsSong(c))return sfToggle();const L=sfO
 const sfAcc=()=>{let h=0;for(const c of String(S.artist||''))h=(h*31+c.charCodeAt(0))>>>0;return['#5a1414','#14385a','#3a145a','#14503a','#5a3a14','#5a1446'][h%6]};
 function sfRow(s,i,c){const on=!!(c&&c.src===s),pl=on&&!c.held,f=sfAlbumOf(s.id),lk=typeof luckTag=='function'?luckTag(s):'';
  return`<div class="sfr${on?' on':''}" ondblclick="sfPlayId(${s.id})"><span class=sfn><b>${on?(pl?'<i class=sfeq><i></i><i></i><i></i></i>':i):i}</b><button class=sfnb title="${pl?'Pause':'Play'}" aria-label="${pl?'Pause':'Play'} ${esc(s.title)}" onclick="sfPlayId(${s.id})">${sfIco(pl?'pause':'play')}</button></span>
- <img class=sfrc src="${sfCover(s)}" alt=""><span class=sft><b>${esc(s.title)}${lk}</b><small>${esc(s.g||'')}${f?` · <span class=sfab title="Album boost on this song's streams">${esc(f.a.name)} #${f.i+1} ${sfPct(sfAlbBoost(f.a,f.i))}</span>`:''} · +${(s.today||0).toLocaleString()} today</small></span>
+ <img class=sfrc src="${sfCover(s)}" alt=""><span class=sft><b>${esc(s.title)}${lk}</b><small>${esc(s.g||'')}${f?` · <span class=sfab title="Album boost on this song's streams">${esc(f.a.name)} #${f.i+1}</span>`:''} · +${(s.today||0).toLocaleString()} today</small></span>
  <span class=sfs>${s.streams.toLocaleString()}</span><span class=sfd>${sfTime(sfDur(s))}</span>${typeof sfBin=='function'?sfBin(s):''}</div>`}
 function sfDisco(){const A=S.albums||[];if(!A.length)return'';return`<h2 class=sfh2>Discography</h2>${A.slice().reverse().map(a=>{const q=aStats(a);
  return`<div class=sfal><img class=cov src="${cover(a)}" alt=""><div class=sfai><small class=m>Album · Day ${a.day} · ${q.ss.length} songs</small><b class=sfan>${esc(a.name)}</b>
- ${q.ss.map((x,i)=>`<div class=sfat><span class=m>${i+1}</span><span class=sfatt>${esc(x.title)}</span><span class=sfab>${sfPct(sfAlbBoost(a,a.songs.indexOf(x.id)))}</span><span class=m>${x.streams.toLocaleString()}</span></div>`).join('')}
+ ${q.ss.map((x,i)=>`<div class=sfat><span class=m>${i+1}</span><span class=sfatt>${esc(x.title)}</span><span class=m>${x.streams.toLocaleString()}</span></div>`).join('')}
  <small class=m>${q.st.toLocaleString()} streams · ${$$(q.earn)} earned · Collaborators: ${Object.keys(q.cl).length?Object.keys(q.cl).map(n=>esc(n)).join(', '):'none'}</small></div></div>`}).join('')}
- <p class=m><small>Albums boost their songs' streams: track 1 gets ${sfPct(ALB_BOOST.first)}, the other tracks ${sfPct(ALB_BOOST.rest)}, and up to double that in the first ${ALB_BOOST.newDays} days after release.</small></p>`}
+ `}
 PG.home=()=>{const L=sfOrder(),sh=SALL?L:L.slice(0,5),c=sfCur(),pl=!!(c&&sfIsSong(c)&&!c.held);
  return`<div class=sfhd style="--acc:${sfAcc()}"><img class=sfart src="${pfp()}" alt=""><div class=sfhi><h1 class=sfnm>${esc(S.artist)}</h1>
  <div class=sfver>${sfIco('ver','sfvi')}<b>Verified by Spotifly</b></div><p class=sfml>${S.listeners.toLocaleString()} monthly listeners</p></div></div>
@@ -90,7 +90,7 @@ PG.home=()=>{const L=sfOrder(),sh=SALL?L:L.slice(0,5),c=sfCur(),pl=!!(c&&sfIsSon
  ${sfDisco()}</div>`};
 /* keep the "upload a picture" buttons under the monthly listeners line (84-pixel-pictures.js) */
 {const h0=PG.home;PG.home=function(){const h=h0.apply(this,arguments);return S.artist&&typeof pxBtns=='function'?h.replace(/(monthly listeners[^<]*<\/p>)/,'$1'+pxBtns('sp')):h}}
-{const a0=PG.albums;if(a0)PG.albums=function(){const h=a0.apply(this,arguments),k=h.lastIndexOf('<button class=go onclick="mkAlbum()">'),n=`<p class=m><small>Your album boosts its songs' streams. Track 1 gets the biggest boost (${sfPct(ALB_BOOST.first)}), every other track ${sfPct(ALB_BOOST.rest)}, doubled in the first ${ALB_BOOST.newDays} days. Put your strongest song first.</small></p>`;return k<0?h+n:h.slice(0,k)+n+h.slice(k)}}
+{const a0=PG.albums;if(a0)PG.albums=function(){const h=a0.apply(this,arguments),k=h.lastIndexOf('<button class=go onclick="mkAlbum()">'),n='';return k<0?h+n:h.slice(0,k)+n+h.slice(k)}}
 
 /* ---------- Now playing panel and player bar (on every Spotifly page) ---------- */
 function sfInfo(c){const s=c.src,song=sfIsSong(c),f=song?sfAlbumOf(s.id):null;
