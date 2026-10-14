@@ -18,7 +18,7 @@ const SHOPX={
   win:(X,z,x0,x1,w)=>{/* house listings on display boards */w.forEach((u,k)=>{SB(.42,.56,.03,'#f8f8f6',u,1.4,z+.1);SB(.32,.2,.02,['#d9b88f','#cfd8dc','#e8c4c4','#f2e6d0'][k%4],u,1.45,z+.12);SB(.36,.12,.02,['#6b4a2e','#455a64','#8d2d2d','#5a3a22'][k%4],u,1.6,z+.12);SB(.36,.06,.02,'#22324a',u,1.2,z+.12)})},
   extra:(X,z,H)=>{/* a for sale sign by the door and a brass plaque */
    SB(.08,1.3,.08,'#efebe2',X+3.6,.65,z+.95);SB(.9,.08,.08,'#efebe2',X+3.2,1.3,z+.95);SB(.7,.5,.04,'#22324a',X+3.2,1,z+.97);SB(.56,.14,.03,'#ffffff',X+3.2,1.06,z+1);SB(.56,.06,.03,'#e6b422',X+3.2,.86,z+1);
-   SB(.3,.2,.03,'#c9a227',X+1.1,1.6,z+.06)}},
+   SB(.14,.24,.02,'#c9a227',X+1.01,1.6,z+.19)}},
  54:{n:'CORNER SHOP',h:3.9,wall:'#c7ad84',band:'#b99e75',trim:'#efe9dc',fas:'#2f5a3a',txt:'#f4e8c8',door:'#2f5a3a',glass:'#a9c4cc',sill:'#efe9dc',brick:1,awn:['#2f5a3a','#efe9dc'],
   win:(X,z,x0,x1,w)=>{/* stacked tins, cereal boxes and bottles */for(let r=0;r<2;r++)w.forEach((u,k)=>{SB(.16,.22,.12,['#c0392b','#e6b422','#2d6a9a','#2e8b57','#e67e22'][(k+r*2)%5],u-.1,.9+r*.4,z+.12);SB(.1,.26,.1,['#2e8b57','#c0392b','#e6b422'][(k+r)%3],u+.12,.92+r*.4,z+.12)});SB(x1-x0-.1,.04,.22,'#d8cfb8',(x0+x1)/2,.78,z+.12);SB(x1-x0-.1,.04,.22,'#d8cfb8',(x0+x1)/2,1.18,z+.12)},
   extra:(X,z,H)=>{/* fruit and veg stand, ice cream freezer, newspapers, a chalk board, a post box */
@@ -51,7 +51,7 @@ const SHOPX={
 {const m0=mkShop;mkShop=function(cx,k,name,act,lab){if(!SHOPX[cx])return m0(cx,k,name,act,lab);col(cx-4,5,cx+4,11.1);INT.push({x:cx,z:12.6,r:1.6,l:lab,a:act});SHOPX[cx].on=1}}
 function stShop(cx,D){const X=WX(cx),z=11,H=D.h,w=D.wall,tr=D.trim;
  /* body, plinth, string courses (brick/render bands), corner pilasters, cornice and parapet */
- SB(8,H,6,w,X,H/2,8);SB(8.12,.3,6.12,dk(w,.72),X,.15,8);
+ SB(8,H,6,w,X,H/2,8);/* plinth: around the sides and back, and across the front either side of the doorway only */SB(8.12,.3,6,dk(w,.72),X,.15,7.94);[-1,1].forEach(s=>SB(2.9,.3,.12,dk(w,.72),X+s*2.61,.15,z));
  for(let y=.45,i=0;y<H-.3;y+=D.brick?.3:.6,i++)if(i%2)SB(8.02,D.brick?.3:.6,.02,D.band,X,y+(D.brick?.15:.3),z+.005);
  if(D.brick)for(let y=.45,i=0;y<H-.3;y+=.3,i++)SB(.02,.3,6.02,i%2?D.band:dk(w,.94),X+4.005,y+.15,8);
  [-3.92,3.92].forEach(x=>SB(.26,H,.18,tr,X+x,H/2,z+.07));SB(.26,H,.26,tr,X+3.92,H/2,5.1);
@@ -65,12 +65,16 @@ function stShop(cx,D){const X=WX(cx),z=11,H=D.h,w=D.wall,tr=D.trim;
   SB(L+.08,.08,.1,tr,m,2.28,z+.06);SB(.08,1.7,.1,tr,a,1.43,z+.06);SB(.08,1.7,.1,tr,b,1.43,z+.06);SB(.05,1.65,.08,tr,m,1.43,z+.05);SB(L,.05,.08,tr,m,1.95,z+.05);
   if(D.bars)for(let x=a+.2;x<b;x+=.25)SB(.03,1.6,.03,'#2a2a2a',x,1.43,z+.08);
   const pts=[];for(let u=a+.3;u<b-.2;u+=.45)pts.push(u);D.win(X,z,a,b,pts)});
- SB(2.1,2.45,.06,tr,X,1.23,z+.03);SB(1.7,2.25,.05,'#222226',X,1.13,z+.035);SB(1.1,2.1,.06,D.door,X,1.05,z+.06);SB(.7,.9,.02,D.glass,X,1.45,z+.09);SB(.06,.24,.05,'#c9a227',X+.4,1,z+.11);SB(1,.06,.04,dk(D.door,.7),X,.35,z+.09);
+ /* doorway: each layer sits clearly in front of the one behind it (no shared faces), so nothing flickers through the wall:
+    dark reveal 11.02-11.05, door 11.06-11.11, door glass and kick plate 11.11-11.14, handle to 11.17, jambs and lintel out to 11.18 */
+ SB(1.84,2.32,.03,'#222226',X,1.26,z+.035);SB(1.2,2.15,.05,D.door,X,1.175,z+.085);SB(.72,.9,.03,D.glass,X,1.5,z+.125);SB(.86,1.02,.02,dk(D.door,.8),X,1.5,z+.12);
+ SB(1,.1,.03,dk(D.door,.7),X,.36,z+.125);SB(.06,.26,.06,'#c9a227',X+.42,1.05,z+.14);
+ [-1,1].forEach(s=>SB(.2,2.42,.18,tr,X+s*1.01,1.31,z+.09));SB(2.22,.18,.18,tr,X,2.43,z+.09);
  SB(2.2,.1,.6,'#9a9a98',X,.05,z+.3);
  SB(8,.66,.14,D.fas,X,2.72,z+.07);SB(8.04,.05,.18,tr,X,3.06,z+.09);SB(8.04,.05,.18,tr,X,2.38,z+.09);
  [-2.3,2.3].forEach(x=>{SB(.05,.05,.35,'#2a2a2a',X+x,3.3,z+.17);SB(.24,.1,.2,'#2a2a2a',X+x,3.25,z+.34);SB(.16,.04,.14,'#ffe9a8',X+x,3.19,z+.34)});
  /* the door number and a timber skirt where the shop has one */
- SB(.16,.14,.02,'#e6e1d6',X+.85,2.1,z+.04);if(D.timber)for(let x=-3.6;x<=3.6;x+=.3)SB(.26,.55,.03,D.timber,X+x,.28,z+.105);
+ SB(.2,.12,.02,'#e6e1d6',X,2.43,z+.19);if(D.timber)for(let x=-3.6;x<=3.6;x+=.3)if(Math.abs(x)>1.2)SB(.26,.55,.03,D.timber,X+x,.28,z+.115);
  /* awnings over the windows */
  if(D.awn)W.forEach(([a,b])=>{const m=(a+b)/2,L=b-a+.2;SB(L,.06,.9,D.awn[0],m,2.36,z+.5);for(let x=a-.1,i=0;x<b+.05;x+=.5,i++)SB(Math.min(.5,b+.1-x),.24,.04,D.awn[i%2],x+Math.min(.5,b+.1-x)/2,2.22,z+.95);SB(.04,.5,.04,'#555',a,2.15,z+.5);SB(.04,.5,.04,'#555',b,2.15,z+.5)});
  /* upper floor: sash windows with sills and lintels on the front, flower boxes */
