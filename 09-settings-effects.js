@@ -22,6 +22,15 @@ function stTrack(i){OPT.tracks[i]=OPT.tracks[i]?0:1;svOpt();if(!OPT.tracks[i]&&M
 /* fade the soundtrack track out over a moment and let the next one (if any is on) start */
 function musSkip(){const a=MU.a[MU.cur];if(!MU.pl||!a||MU.hold)return;MU.pl=0;MU.gap=.6;let v=a.volume;const f=setInterval(()=>{v-=.08;if(v<=0||a.paused){clearInterval(f);a.pause();return}a.volume=Math.max(0,v)},40)}
 function stReset(){OPT=JSON.parse(JSON.stringify(OPT_DEF));svOpt();VOL=.5;FX=.6;LAST=.5;sv();menuSync();document.body.classList.remove('notags');say('Settings reset')}
+/* v26.99.0: Preview plays 5 seconds from the middle of a soundtrack track; the soundtrack or menu music pauses meanwhile and comes back after */
+let PRV=null;
+function stPrevStop(){const q=PRV;if(!q)return;PRV=null;clearInterval(q.iv);try{q.a.pause()}catch(e){}
+ if(q.bg){MU.hold=q.hold;if(!MU.hold)q.bg.play().catch(()=>{})}if(q.menu&&PAUSED&&menuOK())MENUA.play().catch(()=>{});stDraw()}
+function stPrev(i){const was=PRV&&PRV.i==i;stPrevStop();if(was)return;if(!VOL){say('Music volume is at 0');return}
+ const a=new Audio(TR[i].src),q={i,a,t:0,hold:MU.hold};const bg=MU.a[MU.cur];if(MU.pl&&bg&&!bg.paused){q.bg=bg;bg.pause();MU.hold=1}if(MENUA&&!MENUA.paused){q.menu=1;MENUA.pause()}
+ PRV=q;a.volume=0;a.preload='auto';a.addEventListener('loadedmetadata',()=>{if(PRV!==q)return;try{a.currentTime=(a.duration||0)/2}catch(e){}a.play().then(()=>{q.on=1}).catch(()=>stPrevStop())},{once:true});
+ /* fade in over 0.4 s, out over the last 0.6 s of the 5 */
+ q.iv=setInterval(()=>{if(!q.on)return;q.t+=.05;const v=Math.min(1,q.t/.4,Math.max(0,(5-q.t)/.6));a.volume=Math.max(0,Math.min(1,v*VOL));if(q.t>=5)stPrevStop()},50);stDraw()}
 function stBody(){const T=STAB;
  if(T=='sound')return stSl('Music',VOL,"VOL=this.value/100;if(VOL)LAST=VOL;sv()")+stSl('Effects',FX,"FX=this.value/100;sv()","onchange=\"snd('ping')\"")+stSl('Ambience',OPT.amb,"OPT.amb=this.value/100;svOpt()")
   +`<p class=m><small>Music is the soundtrack and menu music. Effects covers clicks and chimes. Ambience is the city outside: traffic, birds and people. Press M to mute music.</small></p>`
@@ -29,7 +38,7 @@ function stBody(){const T=STAB;
  if(T=='music'){const a=MU.a[MU.cur],now=MU.pl&&a&&!a.paused&&!MU.hold?TRN[MU.cur]:'Nothing';
   return stTog('Main menu music',OPT.menuMus,"stOpt('menuMus')")+stTog('Pause menu music',OPT.pauseMus,"stOpt('pauseMus')")
   +`<h3 style="margin-top:12px">Soundtrack</h3><p class=m><small>Turn off any track you do not want to hear while you play. With every track off the game is quiet between your own songs.</small></p>`
-  +TRN.map((n,i)=>stTog(n,OPT.tracks[i],'stTrack('+i+')')).join('')
+  +TRN.map((n,i)=>`<div class=so><span>${n}</span><button onclick="stPrev(${i})">${PRV&&PRV.i==i?'Stop':'Preview'}</button><button class="${OPT.tracks[i]?'go':''}" onclick="stTrack(${i});stDraw()">${OPT.tracks[i]?'On':'Off'}</button></div>`).join('')
   +`<div class=so><span>Order</span><button onclick="stOpt('order',OPT.order=='order'?'shuffle':'order');stDraw()">${OPT.order=='order'?'In order':'Shuffle'}</button></div>`
   +`<div class=so><span>Now playing<small class=m>${now}</small></span><button onclick="musSkip();setTimeout(stDraw,700)" ${now=='Nothing'?'disabled':''}>Skip</button></div>`}
  if(T=='game')return stTog('Name tags',OPT.tags,"stOpt('tags')",'Names above people')+`<p class=m><small>Esc pauses and closes menus. Version ${GAME_VERSION} · <a href="versions.html" target="_blank" style="color:var(--g)">Version history</a></small></p><div class=row2><button onclick="stReset();stDraw()">Reset settings</button></div>`;
@@ -37,4 +46,4 @@ function stBody(){const T=STAB;
 function stDraw(){const b=$('stb'),t=$('stt');if(!b)return;const y=b.scrollTop;b.innerHTML=stBody();b.scrollTop=y;t.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.t==STAB))}
 function settings(){if(mode!='play'&&mode!='creator'&&mode!='pause')return;SP=mode;mode='menu';$('ui').innerHTML=`<div id=stg class="box modal" style="width:min(440px,92vw)"><h2>Settings</h2><div id=stt>${[['sound','Sound'],['music','Music'],['game','Game'],['save','Save']].map(([k,l])=>`<button data-t=${k} onclick="STAB='${k}';stDraw()">${l}</button>`).join('')}</div><div id=stb></div><div class=row2><button class=go onclick="closeSet()">Back</button></div></div>`;stDraw()}
 try{document.body.classList.toggle('notags',!OPT.tags)}catch(e){}
-function closeSet(){mode=SP;SP='';if(mode=='creator')creatorUI();else if(mode=='pause')pauseUI();else $('ui').innerHTML=''}
+function closeSet(){stPrevStop();mode=SP;SP='';if(mode=='creator')creatorUI();else if(mode=='pause')pauseUI();else $('ui').innerHTML=''}
