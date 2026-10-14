@@ -385,8 +385,8 @@ function resume(E){if(!E.paused)return;E.paused=0;const c=E.c,now=c.currentTime;
  const g=E.out.gain;g.cancelScheduledValues(now);g.setValueAtTime(0,now);g.linearRampToValueAtTime(E.gv||1,now+.2)}
 function tick(){const E=cur;if(!E){clearInterval(timer);timer=0;return}const c=E.c;
  if(c.state=='closed'){cur=null;holdBg(0);return}
- const hide=gamePaused()||document.hidden;if(hide&&!E.paused)pause(E);else if(!hide&&E.paused)resume(E);
- if(!E.paused&&E.alive&&(E.wd=(E.wd||0)+1)%6==0){let ok=1;try{ok=E.alive()}catch(e){ok=0}if(!ok){stop(.6);return}}
+ const hide=gamePaused()||document.hidden||!!E.up;if(hide&&!E.paused)pause(E);else if(!hide&&E.paused)resume(E);
+ if((!E.paused||E.up)&&E.alive&&(E.wd=(E.wd||0)+1)%6==0){let ok=1;try{ok=E.alive()}catch(e){ok=0}if(!ok){stop(.6);return}}
  const v=musicVol();if(Math.abs(v-E.vv)>.001){E.vv=v;G.vol.gain.setTargetAtTime(v,c.currentTime,.05)}
  if(!held||(typeof MU!='undefined'&&!MU.hold))holdBg(1);else if(typeof MU!='undefined'&&MU.pl){const a=MU.a&&MU.a[MU.cur];if(a&&!a.paused)a.pause()}
  if(E.paused||c.state!='running')return;const now=c.currentTime;
@@ -401,7 +401,10 @@ function render(src,secs,o){o=o||{};const P=plan(src),sr=o.sampleRate||44100,OC=
  out.vol.gain.value=(o.vol!=null?o.vol:.5)*BASE;const E=mkE(c,out.vol,P,o);E.t0=.02;if(o.solo){if(o.solo!='dr')E.dr.gain.value=0;for(const k in E.lay)if(k!=o.solo)E.lay[k].g.gain.value=0}for(let n=0;stepTime(E,n)<secs;n++)sched(E,n,stepTime(E,n));return c.startRendering()}
 
 return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,+x||0))},setVolume:x=>{uvol=Math.max(0,Math.min(1,+x||0))},
- playing:()=>!!cur,current:()=>cur?Object.assign(info(cur),{owner:cur.owner,src:cur.src,paused:!!cur.paused,intensity:cur.I}):null,
+ playing:()=>!!cur,current:()=>cur?Object.assign(info(cur),{owner:cur.owner,src:cur.src,paused:!!cur.paused,held:!!cur.up,intensity:cur.I}):null,
+ /* v26.105: the player's own pause (Spotifly's pause buttons). hold(true) pauses the beat where it is, hold(false) carries on from there.
+    The game's pause menu and a hidden tab still pause it on their own. songBeats() = quarter notes in one play-through of a song. */
+ hold:on=>{if(cur){cur.up=!!on;tick()}},songBeats:()=>FORMS.song.reduce((a,s)=>a+s[1],0)*4,
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
  beat:()=>{const E=cur;if(!E||E.t0==null)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
  bpm:()=>cur?cur.P.bpm:0,samples:()=>Object.fromEntries(Object.entries(SMP).map(([k,v])=>[k,v.length])),_dbg:{STY,INS,KIT},styles:Object.fromEntries(GENRES.map(g=>[g,STY[g].map(s=>s.n)])),genres:GENRES.slice(),render,
