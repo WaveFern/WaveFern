@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.78.0';
+const GAME_VERSION='v26.79.0';
 const VERSION_HISTORY=[
+ {v:'v26.79.0',n:'Song performance: higher quality songs stream clearly better, and collabs get a bigger boost the more popular the collaborator and the better the song. Each release has about an 8% chance to be a 🔥 HIT (3 to 6 times its normal streams; better songs hit more often) and a very rare chance to go 🚀 VIRAL (at most 0.3%, for the best songs): at least 5,000,000 streams plus a big extra based on your monthly listeners, over two weeks. You get a pop-up, a Spotifly Team message and a tag on the song. Saves still load.'},
  {v:'v26.78.0',n:'Spotifly: Delete song is now a bin icon on the song\'s own row (it still asks first). You can play unreleased drafts on the Upload tab before you upload them. Playing a draft does not count streams or earnings. Saves still load.'},
  {v:'v26.77.0',n:'More beat samples: 35 more recorded one-shots join the beats. Flutes, strings and a synth are new sounds for melodies and chords, and the bass, bell, brass, key and pluck sounds are wider. Each sample is pitched to the song\'s key. Drums and the main soundtrack are unchanged. Saves still load.'},
  {v:'v26.76.0',n:'Beats use real recorded one-shots: bass, bell, brass, keys, lead, piano and pluck sounds are pitched to each song\'s key for basslines, chords and hook melodies. Drums and the main soundtrack are unchanged. Until the samples load, the old synth sounds play. Saves still load.'},

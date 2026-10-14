@@ -89,9 +89,25 @@ function stepTick(dt,mv){const d=Math.hypot(P.x-STP.px,P.z-STP.pz);STP.px=P.x;ST
 const prog=t=>{t=Math.max(0,Math.min(600,t));return t<300?t/900:(300+2*(t-300))/900};
 /* how much each fame tier multiplies a song's streams (was 2.2, which snowballed: tier 5 by day 30) */
 const FAME_MULT=1.5;
-function planOf(s){if(s.pd===S.day)return s.pv;const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/PACE.lisBonus));
- let v=s.q*PACE.base*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+PACE.floor)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*(s.ft?(s.fm||1.4):1)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<PACE.viralP&&age<8)v*=R(PACE.viralMin,PACE.viralMax);
- const cap=s.q*s.q*25*Math.pow(FAME_MULT,fameLv())-s.streams;v=Math.max(0,Math.min(Math.round(v||0),cap));s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
+/* v26.79: quality, collab, hit and viral (knobs in PERF, 02-data.js) */
+const qualF=s=>Math.max(PERF.qMin,Math.min(PERF.qMax,Math.pow(Math.max(1,s.q||1)/PERF.qRef,PERF.qPow)));
+const collabF=s=>s.ft?Math.pow(s.fm||1.4,PERF.collabPow)*(1+PERF.collabQ*Math.min(1.5,(s.q||0)/100)):1;
+const hitChance=q=>PERF.hitP*Math.max(PERF.hitQMin,Math.min(PERF.hitQMax,(q||0)/PERF.hitQRef));
+const viralChance=q=>PERF.viralP*Math.pow(Math.max(0,Math.min(1,(q||0)/PERF.viralQBest)),PERF.viralQPow);
+/* lk: 0 normal, 'h' hit, 'v' viral. Rolled once, on the release day; songs from older saves stay normal. */
+function rollLuck(s){if(s.lk!==undefined)return;if(S.day-s.day>0){s.lk=0;return}
+ if(Math.random()<viralChance(s.q)){s.lk='v';s.vr=Math.round(PERF.viralMin+(S.listeners||0)*R(PERF.viralLisMin,PERF.viralLisMax));s.vt=s.vr}
+ else if(Math.random()<hitChance(s.q)){s.lk='h';s.hm=+R(PERF.hitMin,PERF.hitMax).toFixed(2)}else s.lk=0;
+ if(s.lk)luckNote(s)}
+function luckNote(s){const v=s.lk=='v',t=v?'🚀 "'+s.title+'" is going VIRAL! Millions of streams are on the way.':'🔥 "'+s.title+'" is a HIT! It is streaming far better than your other songs.';
+ try{say(t)}catch(e){}try{snd('chime')}catch(e){}if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'Spotifly Team',body:v?'Your song "'+s.title+'" has gone viral. It is on every playlist and will pull in at least '+PERF.viralMin.toLocaleString()+' streams over the next two weeks.':'Your song "'+s.title+'" is a hit. Listeners are playing it on repeat, so it will keep streaming several times better than usual.',state:9,unread:1,day:S.day})}
+const luckTag=s=>s.lk=='v'?' 🚀 VIRAL':s.lk=='h'?' 🔥 HIT':'';
+const songCap=s=>s.q*s.q*25*Math.pow(FAME_MULT,fameLv())*(s.lk=='h'?s.hm||1:1)-(s.streams-(s.lk=='v'?(s.vt||0)-(s.vr||0):0));
+function planOf(s){if(s.pd===S.day)return s.pv;rollLuck(s);const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/PACE.lisBonus));
+ let v=s.q*PACE.base*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+PACE.floor)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*qualF(s)*collabF(s)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<PACE.viralP&&age<8)v*=R(PACE.viralMin,PACE.viralMax);if(s.lk=='h')v*=s.hm||1;
+ v=Math.max(0,Math.min(Math.round(v||0),songCap(s)));
+ s.vx=0;if(s.lk=='v'&&s.vr>0){const x=age>=PERF.viralDays-1||s.vr<1000?s.vr:Math.round(s.vr*PERF.viralShare);s.vr-=x;s.vx=x;v+=x}
+ s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
 /* monthly listeners: month = 30 in-game days; ML = this month's streams / random divisor 2-5 chosen each month */
 /* a full day (S.t 0..600) lasts 720 real seconds (12 minutes; was 10 before v26.29). One song (walk to the mic, Beat ~10s, Melody ~25s, Lyrics ~17s, Mix ~9s, walk to the laptop and upload ~20s) takes about 80 real seconds, so about 9 songs fit in a day.
    Energy refill (energyTick), the stream trickle (prog(S.t)) and the clock (clk) all run on S.t, so they stay the same per day. */
