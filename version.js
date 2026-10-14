@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.106.1';
+const GAME_VERSION='v26.106.2';
 const VERSION_HISTORY=[
+ {v:'v26.106.2',n:'Songs are audible again. The Spotifly mute/volume stayed stuck after you left Spotifly (so songs in the studio and at the festival played silently), and a soundtrack volume of 0 (the M key) also silenced every song. Now only Spotifly\'s own player uses its volume, and songs always play even with the soundtrack muted.'},
  {v:'v26.106.1',n:'Update notice fix: if you close the notice it comes back after 5 minutes while the game is still out of date, and if pressing Update does not land on the new version the notice says so and offers a stronger Retry. Saves still load.'},
  {v:'v26.106.0',n:'Furniture storing is now the E key instead of right-click. In furniture mode, hover a placed item to see a yellow outline around it, then press E to store it (or press E while holding an item to put it back in storage).'},
  {v:'v26.105.0',n:'Spotifly looks like a real artist page. A big header with your name, Verified by Spotifly and your monthly listeners, a big play button and shuffle, and a numbered Popular list with each song\'s cover, streams and length (See more shows the rest). A Now playing panel on the right and a player bar along the bottom show the song that is playing, and both have a pause button that really pauses it, plus previous, next, shuffle, repeat and volume. When a song ends the next one plays. Albums now boost their songs\' streams: track 1 gets +60%, every other track +25%, and double that in the first two weeks after release. Saves still load.'},

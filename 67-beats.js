@@ -365,7 +365,7 @@ function ctx(){if(!userOK())return null;let c=null;try{if(typeof ac=='function')
  if(!c){if(G&&G.c.state!='closed')c=G.c;else{const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;try{c=new A()}catch(e){return null}}}
  if(c.state=='suspended')try{c.resume().catch(()=>{})}catch(e){}
  if(!G||G.c!==c)G=outChain(c);loadSamples(c);return c}
-const musicVol=()=>(typeof VOL=='number'?VOL:.5)*uvol*BASE;
+const musicVol=()=>((typeof VOL=='number'&&VOL>0?VOL:.5))*uvol*BASE;
 const gamePaused=()=>typeof PAUSED!='undefined'&&!!PAUSED;
 function holdBg(on){try{if(typeof MU=='undefined')return;if(on){MU.hold=1;held=1;const a=MU.a&&MU.a[MU.cur];if(MU.pl&&a&&!a.paused)a.pause()}
  else if(held){held=0;if(!gamePaused()){MU.hold=0;const a=MU.a&&MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}}}catch(e){}}
@@ -374,7 +374,7 @@ function restorePads(){try{if(savedPads&&typeof MG_NOTE!='undefined')savedPads.f
 function info(E){const P=E.P;return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}}
 function end(E,fade){if(!E||E.dead)return;E.dead=1;const c=E.c,now=c.currentTime,f=Math.max(.02,fade==null?.4:fade);try{const g=E.out.gain;g.cancelScheduledValues(now);g.setValueAtTime(g.value,now);g.linearRampToValueAtTime(0,now+f)}catch(e){}
  setTimeout(()=>{try{E.out.disconnect()}catch(e){}E.loops.forEach(l=>{try{l.stop()}catch(e){}})},f*1000+120);if(E.pads)restorePads();try{E.onstop&&E.onstop()}catch(e){}}
-function play(src,o){o=o||{};let P;try{P=plan(src)}catch(e){console.error('beats plan',e);return null}const c=ctx();if(!c)return null;
+function play(src,o){o=o||{};if(o.owner=='sf')uvol=(typeof S=='object'&&S&&S.sfVol!=null)?Math.max(0,Math.min(1,+S.sfVol||0)):1;else if(o.owner!='car')uvol=1;let P;try{P=plan(src)}catch(e){console.error('beats plan',e);return null}const c=ctx();if(!c)return null;
  if(cur){end(cur,.25);cur=null}
  let E;try{E=mkE(c,G.vol,P,Object.assign({src},o))}catch(e){console.error('beats',e);return null}
  const now=c.currentTime;E.t0=now+.08;E.next=E.t0;E.out.gain.setValueAtTime(0,now);E.gv=o.vol!=null?o.vol:1;E.out.gain.linearRampToValueAtTime(E.gv,now+(o.fadeIn||.06));
