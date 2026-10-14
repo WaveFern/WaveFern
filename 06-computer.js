@@ -2,7 +2,7 @@
 const CUR=`url("data:image/svg+xml,${encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='22' height='26' viewBox='0 0 11 13'><path d='M.5.5v10l3-2.8 2 4.6 2-.9-2-4.5h4z' fill='white' stroke='black'/></svg>")}") 0 0,default`;
 function openPC(){mode='pc';OA=[];app=0;smo=0;wpo=null;pg='home';pcR()}
 function closePC(){closeUI()}
-const row=(i,s,x='')=>`<div class="sr${x?' sd':''}"><span class=m>${i}</span><b>${esc(s.title)}<br><small class=m>${esc(s.g)} · Day ${s.day}</small></b><span>${s.streams.toLocaleString()} streams</span><span class=m>+${s.today||0}</span>${x}</div>`;
+const row=(i,s,x='')=>`<div class="sr${x?' sd':''}"><span class=m>${i}</span><b>${esc(s.title)}${typeof luckTag=='function'?luckTag(s):''}<br><small class=m>${esc(s.g)} · Day ${s.day}</small></b><span>${s.streams.toLocaleString()} streams</span><span class=m>+${s.today||0}</span>${x}</div>`;
 const PG={
 setup:()=>`<h1 class=sfh><img src="${IC.fw}" alt="">Welcome to Spotifly</h1><p class=m>Streaming for independent artists. Choose your artist name to create your profile.</p><div class=ng><input id=an maxlength=24 placeholder="Artist name"><button class=go onclick="setA()">Create profile</button></div>`,
 home:()=>`<div class=ban style="display:flex;gap:16px;align-items:center"><img class=pf src="${pfp()}"><div><small class=m>ARTIST</small><h1>${esc(S.artist)}</h1><p>${S.listeners.toLocaleString()} monthly listeners · ${S.followers.toLocaleString()} followers</p></div></div><h3>Released music</h3>${S.songs.length?S.songs.slice().reverse().map((s,i)=>row(S.songs.length-i,s)).join(''):'<p class=m>No releases yet. Record a song in the studio, then upload it from the Upload tab.</p>'}`,
