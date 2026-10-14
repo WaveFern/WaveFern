@@ -35,8 +35,8 @@ function mgMixTick(dt){const x=rec.x,hold=keys[' ']||keys.e||keys.enter||MGH;x.t
  x.c=Math.max(.15,Math.min(.85,.5+.28*Math.sin(x.t*.9)+.1*Math.sin(x.t*2.2+1)));if(Math.abs(x.lv-x.c)<.1)x.in+=dt;
  if(x.t>=x.dur){rec.sc.x=Math.min(1,x.in/x.dur*1.15);mgStage(3)}}
 
-function mgFinish(){chime();const sc=rec.sc,l=sc.l||0,x=sc.x||0,avg=(l+x)/2,q=Math.round(R(8,14)+avg*16+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.gear.keys||0)*3+(S.gear.drums||0)*3+(S.gear.booth||0)*5+(S.home||0)*3+S.pets.length+mentors()*2+Math.max(0,8-rec.miss)),
- d={id:S.nid++,title:rec.diss?'No Love For '+rec.diss.split(' ')[0]:pick(A)+' '+pick(Bn),g:rec.g,q,diss:rec.diss};S.drafts.push(d);updateVersion();const miss=rec.miss;rec=null;mode='menu';mgDraw();
+function mgFinish(){chime();const sc=rec.sc,l=sc.l||0,x=sc.x||0,avg=(l+x)/2,q=Math.max(3,Math.round(expF()*(R(8,14)+avg*16+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.gear.keys||0)*3+(S.gear.drums||0)*3+(S.gear.booth||0)*5+(S.home||0)*3+S.pets.length+mentors()*2+Math.max(0,8-rec.miss)))),
+ d={id:S.nid++,title:rec.diss?'No Love For '+rec.diss.split(' ')[0]:pick(A)+' '+pick(Bn),g:rec.g,q,diss:rec.diss};S.drafts.push(d);S.made=Math.max(S.made||0,S.songs.length+S.drafts.length-1)+1;updateVersion();const miss=rec.miss;rec=null;mode='menu';mgDraw();
  const pc=v=>Math.round(v*100)+'%',grade=avg>=.9?'Studio magic ✨':avg>=.7?'Solid session':avg>=.45?'Rough around the edges':'Messy take';
  $('ui').innerHTML=`<div class="box modal"><h2>Song recorded! 🎵</h2><p class=m>${esc(d.g)} · mix quality ${q} · ${grade}</p><div class=cards><div class=card>Beat<b>${miss?miss+' miss'+(miss>1?'es':''):'Clean'}</b></div><div class=card>Lyrics<b>${pc(l)}</b></div><div class=card>Mix<b>${pc(x)}</b></div></div><p>Give it a title:</p><input id=tin maxlength=32 value="${esc(d.title)}" onkeydown="if(event.key=='Enter')saveT(${d.id})"><div class=row2><button class=go onclick="saveT(${d.id})">Save to drafts</button></div><p class=m><small>Upload it from the computer. You can still edit the title there.</small></p></div>`;setTimeout(()=>{const i=$('tin');i&&(i.focus(),i.select())},50)}
 

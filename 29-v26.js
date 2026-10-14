@@ -65,9 +65,9 @@ function meetPick(i){const M=MEET;if(!M||M.k>=M.n)return;const t=M.opts[i][0],p=
  d=Math.max(-2,Math.min(2,d));M.op=Math.max(-3,Math.min(3,M.op+d));M.k++;M.line=pick(RCT[d>0?'pos':d<0?'neg':'neu'][p])+' '+pick(M.k<M.n?MID[p]:READY[p]);M.opts=mtOpts();snd(d>0?'ping':d<0?'err':'pop');meetR()}
 function meetRec(){const M=MEET;if(!M)return;if(S.energy<COLLAB_E){snd('err');return say('Too tired to record, even a collab. Rest and come back.')}S.energy=Math.max(0,+(S.energy-COLLAB_E).toFixed(1));updateVersion();$('ui').innerHTML='';const o=M.o;mode='cut';cs2={o,t:0,op:M.op};P.x=o.x-1.4;P.z=o.z;P.rot=Math.PI/2;MEET=null;say('Recording with '+o.name+' (fictional)')}
 collabDone=function(){const o=cs2.o,op=cs2.op||0,a=ART[o.i],m=S.msgs.find(x=>x.a===o.i);if(o.m.parent)o.m.parent.remove(o.m);if(m){m.state=3;m.doneDay=S.day;m.ready=0;m.paid=0;m.log.push({f:'a',t:deco(a,op>=1?'that session was great, thanks again!':op<=-1?'well, we got a track out of it.':'good session, thanks.'),d:S.day})}ART_M=ART_M.filter(x=>x!==o);
- const q=Math.max(5,Math.round(R(30,40)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.home||0)*3)+Math.min(25,6+Math.round(a[3]/60))+op*4),
+ const E=expF(),q=Math.max(5,Math.round((R(30,40)+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.home||0)*3)*E)+Math.round(Math.min(25,6+Math.round(a[3]/60))*(.5+.5*E))+op*4),
  d={id:S.nid++,title:featT(pick(A)+' '+pick(Bn),a[0]),g:a[1],q,ft:a[0],fm:+((PACE.featBase+Math.min(PACE.featMax,a[3]/6000))*(1+op*.12)).toFixed(2),op,role:pick(['Featured verse','Co-writer and hook','Producer and beats','Backing vocals'])};
- S.drafts.push(d);updateVersion();cs2=null;snd('chime');nameModal(d,`<p style="color:var(--g)">Collab with ${esc(a[0])} done. Chemistry: <b>${opLbl(op)}</b>${op>0?' (better quality, more streams)':op<0?' (lower quality, fewer streams)':''}. Fictional in-game event with a stand-in character.</p>`)};
+ S.drafts.push(d);S.made=Math.max(S.made||0,S.songs.length+S.drafts.length-1)+1;updateVersion();cs2=null;snd('chime');nameModal(d,`<p style="color:var(--g)">Collab with ${esc(a[0])} done. Chemistry: <b>${opLbl(op)}</b>${op>0?' (better quality, more streams)':op<0?' (lower quality, fewer streams)':''}. Fictional in-game event with a stand-in character.</p>`)};
 {const st=document.createElement('style');st.textContent='.pfw{position:relative;display:inline-block;flex-shrink:0;line-height:0}.cdot{position:absolute;top:0;right:0;width:11px;height:11px;border-radius:50%;border:2px solid #0d1411;box-sizing:border-box}.cdot.r{background:#ff3b5c}.cdot.b{background:#3b82f6}.cfm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#16201b;border-top:1px solid #1a2520}.cfm span{flex:1}.mtg{width:min(480px,94vw)}.mth{display:flex;gap:12px;align-items:center}.mth img{width:56px;height:56px;border-radius:50%;image-rendering:pixelated;background:#2a4a38}.mtl{font-size:15px;margin:12px 0}.mto{display:block;width:100%;text-align:left;margin:6px 0}';document.head.appendChild(st)}
 
 /* ===== per-frame hooks ===== */
@@ -90,6 +90,8 @@ const prog=t=>{t=Math.max(0,Math.min(600,t));return t<300?t/900:(300+2*(t-300))/
 /* how much each fame tier multiplies a song's streams (was 2.2, which snowballed: tier 5 by day 30) */
 const FAME_MULT=1.5;
 /* v26.79: quality, collab, hit and viral (knobs in PERF, 02-data.js) */
+const expXp=()=>Math.max(S.made||0,(S.songs||[]).length+(S.drafts||[]).length)+mentors()*PERF.expMentor+fameLv()*PERF.expFame;
+const expF=()=>PERF.expMin+(1-PERF.expMin)*(1-Math.exp(-expXp()/PERF.expScale));
 const qualF=s=>Math.max(PERF.qMin,Math.min(PERF.qMax,Math.pow(Math.max(1,s.q||1)/PERF.qRef,PERF.qPow)));
 const collabF=s=>s.ft?Math.pow(s.fm||1.4,PERF.collabPow)*(1+PERF.collabQ*Math.min(1.5,(s.q||0)/100)):1;
 const hitChance=q=>PERF.hitP*Math.max(PERF.hitQMin,Math.min(PERF.hitQMax,(q||0)/PERF.hitQRef));

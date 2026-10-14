@@ -15,6 +15,10 @@ GEN.forEach(g=>S.hype[g]=1);S.apps={};S.inv={};S.ipos={};S.wp=10;Object.assign(S
 /* career pacing (v26.16.0: slower start). Was: base .8, interest +.22 per release, listener bonus sqrt/60,
    old-song floor .03, viral 2% x2-5, $0.05 per stream, artist pays 60% of fee (min $15), collab boost 1.1 + up to .6 */
 const PACE={base:.36,interest:.06,lisBonus:200,floor:.015,viralP:.012,viralMin:1.5,viralMax:3,collabPay:.25,collabMin:8,featBase:1.05,featMax:.3},PAY_RATE=TUNE.payRate;
+/* experience (v26.108): every song you record has its quality multiplied by expMin..1. The multiplier climbs along 1 - e^(-xp/expScale),
+   where xp = songs you have recorded + expMentor per mentor unlocked + expFame per fame level. A new player records at 30% of their
+   gear-and-skill quality; 200 songs gets about 60% of the way up. Collab songs use it too (the artist's own help is only partly scaled).
+   viralP is the chance per release at Q90 or better (0.03%, about 1 in 3,300), falling with the cube of quality below that. */
 /* song performance (v26.79). All the knobs for quality, collabs, hits and viral songs.
    quality: streams also scale by (q/qRef)^qPow, clamped to qMin..qMax (q 50 = x1, q 20 = about x0.48, q 100 = about x1.74).
    collab: a feature multiplies streams by fm^collabPow (fm already holds the collaborator's popularity and your chemistry), then by 1 + collabQ * min(1.5, q/100).
@@ -25,7 +29,7 @@ const PACE={base:.36,interest:.06,lisBonus:200,floor:.015,viralP:.012,viralMin:1
    featured artist's fans (v26.104): every artist has a set monthly-listener count (ART row, a[2]). A collab also earns
      featLis x that artist's listeners per day from their fans, x quality factor, x your chemistry, decaying like any song (x1.5 on release day, x hit size on a hit).
      These streams sit outside the song's normal stream cap, so a feature with a big artist pays off even while you are small. */
-const PERF={qRef:50,qPow:.8,qMin:.3,qMax:2.5,collabPow:2,collabQ:.5,hitP:.08,hitQRef:60,hitQMin:.5,hitQMax:1.6,hitMin:3,hitMax:6,viralP:.003,viralQBest:90,viralQPow:2,viralMin:5e6,viralLisMin:20,viralLisMax:50,viralShare:.3,viralDays:14,featLis:.01};
+const PERF={qRef:50,qPow:.8,qMin:.45,qMax:2.5,collabPow:2,collabQ:.5,hitP:.08,hitQRef:60,hitQMin:.5,hitQMax:1.6,hitMin:3,hitMax:6,viralP:.0003,viralQBest:90,viralQPow:3,viralMin:5e6,viralLisMin:20,viralLisMax:50,viralShare:.3,viralDays:14,featLis:.01,expMin:.3,expScale:200,expMentor:8,expFame:6};
 const mentors=()=>MEN.filter(m=>S.listeners>=m[0]).length;
 const updateVersion=()=>S.version++;
 
