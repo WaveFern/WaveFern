@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.90.1';
+const GAME_VERSION='v26.91.0';
 const VERSION_HISTORY=[
+ {v:'v26.91.0',n:'Taxis are now once a day: pick one place on the map (N), then the taxi can take you back once to where it picked you up. After the ride back there is no taxi until the next day. New in the city: Sal\'s Barbershop, next to the City Cafe or along the same row (look for the barber pole and Barbershop on the map). Talk to Sal to try on any hairstyle on your character before you pay: 12 new detailed barbershop styles (curtains, wolf cut, mullet, pompadour, man bun, box braids, bantu knots, faux hawk, slick back, high top fade, pixie cut, long waves) from $45 to $120, the 20 classic cuts for $20, and a new hair colour for $15. Saves still load.'},
  {v:'v26.90.1',n:'Admin gifts are now one kind at a time: pick money, streams or monthly listeners and type one amount. Saves still load.'},
  {v:'v26.90.0',n:'Admin panel for the admin account (main menu and pause menu): change your own money, monthly listeners, streams, followers, day and time, unlock gear, apps, furniture, cars, pets, clothes and more, see every player, and send any player a gift of money, streams and monthly listeners with a message. Gifts pop up the next time that player plays and can only be claimed once. Saves still load.'},
  {v:'v26.89.0',n:'Signing in with Google now always wipes the save on this device first, and it is never uploaded. Your account\'s cloud save then loads, or a new game starts if the account has none. Signing out keeps your game on this device as a guest save. Saves still load.'},
