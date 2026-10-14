@@ -1,7 +1,7 @@
 /* ---------- music ---------- */
-const TR=[{src:window.EMBEDDED_ASSETS.track1,fin:2,fout:3},{src:window.EMBEDDED_ASSETS.track2,fin:2,fout:0},{src:window.EMBEDDED_ASSETS.track3,fin:2,fout:3}];let VOL=.5,FX=.6,LAST=.5,SP='',AC,fs=0;try{const q=JSON.parse(localStorage.getItem('fw_set'));if(q){VOL=q.VOL;FX=q.FX}}catch(e){}
+const TR=[{src:window.EMBEDDED_ASSETS.track1,fin:2,fout:3},{src:window.EMBEDDED_ASSETS.track2,fin:2,fout:0},{src:window.EMBEDDED_ASSETS.track3,fin:2,fout:3},{src:'audio/box.mp3',fin:2,fout:3},{src:'audio/catch.mp3',fin:2,fout:3}];let VOL=.5,FX=.6,LAST=.5,SP='',AC,fs=0;try{const q=JSON.parse(localStorage.getItem('fw_set'));if(q){VOL=q.VOL;FX=q.FX}}catch(e){}
 /* v26.97: more settings, kept in their own browser key so old fw_set values still load: menu and pause music, which soundtrack tracks play and in what order, ambience level, car radios, footsteps, name tags */
-const OPT_DEF={menuMus:1,pauseMus:1,tracks:[1,1,1],order:'shuffle',amb:1,cars:1,steps:1,tags:1};let OPT=JSON.parse(JSON.stringify(OPT_DEF));
+const OPT_DEF={menuMus:1,pauseMus:1,tracks:[1,1,1,1,1],order:'shuffle',amb:1,cars:1,steps:1,tags:1};let OPT=JSON.parse(JSON.stringify(OPT_DEF));
 try{const q=JSON.parse(localStorage.getItem('fw_opt'));if(q&&typeof q=='object'){for(const k in OPT_DEF)if(q[k]!=null&&typeof q[k]==typeof OPT_DEF[k])OPT[k]=q[k];if(!Array.isArray(OPT.tracks)||OPT.tracks.length!=TR.length)OPT.tracks=TR.map(()=>1)}}catch(e){}
 const svOpt=()=>{try{localStorage.setItem('fw_opt',JSON.stringify(OPT))}catch(e){}};
 /* the next soundtrack track: only tracks left on in Settings, shuffled (never the same one twice when another is on) or in order; -1 when every track is off */

@@ -14,7 +14,7 @@ const snd=n=>SND[n]&&SND[n](),chime=()=>snd('chime');
 setInterval(()=>{if(!MU.on||!FX||mode=='load'||PAUSED)return;if(S.t>=300)[0,.13,.26].forEach(d=>sfx(4200+R(0,300),.05,'sine',.03,0,d,.1));else if(Math.random()<.3)nz(1.4,900+R(0,500),.04,1,'lowpass',0,300)},1400);
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button'))snd('click')});
 /* v26.97: Settings has tabs (Sound, Music, Game, Save) and more options; everything except the volumes lives in OPT (08-music.js) */
-let STAB='sound';const TRN=['Track 1','Track 2','Track 3'];
+let STAB='sound';const TRN=['Track 1','Track 2','Track 3','Box','Catch'];
 const stTog=(l,on,f,n)=>`<div class=so><span>${l}${n?`<small class=m>${n}</small>`:''}</span><button class="${on?'go':''}" onclick="${f};stDraw()">${on?'On':'Off'}</button></div>`;
 const stSl=(l,v,f,c='')=>`<div class=so><span>${l}</span><input type=range min=0 max=100 value=${Math.round(v*100)} oninput="${f}" ${c} style="padding:0"></div>`;
 function stOpt(k,v){OPT[k]=v==null?OPT[k]?0:1:v;svOpt();if(k=='menuMus'||k=='pauseMus')menuSync();if(k=='tags')document.body.classList.toggle('notags',!OPT.tags)}
