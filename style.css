@@ -98,3 +98,4 @@ input[type=range]::-moz-range-thumb{width:8px;height:12px;background:var(--g);bo
 #admp{width:min(560px,94vw);max-height:86vh;overflow:auto}#admp h3{margin-top:14px}#admp input{min-width:0}#admp .r{display:flex;gap:6px;margin:5px 0}#admp .r input{flex:1}#admp>input{width:100%;margin:5px 0}
 #admp .admg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
 #admp .adml{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto}#admp .adml>div{display:flex;align-items:center;gap:8px;justify-content:space-between;border:2px solid #2a352e;padding:6px}#admp .adml small{word-break:break-all}
+#admp select{flex:1;font:inherit;background:#0a0d0b;color:var(--t);border:2px solid #333;padding:7px}
