@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.96.0';
+const GAME_VERSION='v26.96.1';
 const VERSION_HISTORY=[
+ {v:'v26.96.1',n:'The main menu and pause menu are now plain text: no icons or emoji on the buttons, title or cloud save status. Saves still load.'},
  {v:'v26.96.0',n:'Bodyguards decide which fans get to you. With no guards every fan can come up and ask for an autograph, with 1 guard half of them get through, with 2 only 1 in 10, and with 3 nobody. Any fan who gets through might be a fake fan who robs you when you sign: 5% with no guards, 2.5% with 1, 0.5% with 2. Saves still load.'},
  {v:'v26.95.0',n:'Fake fans can only rob you when they ask for an autograph and you sign it, never at random. Bodyguards with you lower the risk: 5% with none, 2.5% with one, 0.5% with two, and with three you can never be robbed. Bodyguards no longer turn fans away, so fans still walk up and ask for autographs. Saves still load.'},
  {v:'v26.94.0',n:'Shop doors on your street no longer flicker or clip into the walls. Every doorway is rebuilt with a proper frame, a dark reveal, the door, its glass, handle and kick plate each set slightly in front of the last, and the base trim and the Pet Shop fence now stop at the doorway instead of running across it. Saves still load.'},

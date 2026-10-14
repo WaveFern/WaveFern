@@ -77,10 +77,10 @@ const TT={on:0,game:0};
 function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionStorage.removeItem('fw_msg');say(m)}}catch(e){}}
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
- const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'☁ Cloud save on':'☁ Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><i>👤</i><span><b>Guest</b><small>Saves on this device</small></span></div>`;
+ const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'Cloud save on':'Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><span><b>Guest</b><small>Saves on this device</small></span></div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN<br>RECORDS</h1><div class=px>Music Career Sim</div>
-  <button class=go onclick="ttPlay()" ${busy?'disabled':''}>${busy?'☁ Loading your save…':TT.game?'▶ Play'+(S.day?' · Day '+S.day:''):'▶ Play · New game'}</button>
-  <button onclick="ttSet()">⚙ Settings</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">🔑 Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div>`}
+  <button class=go onclick="ttPlay()" ${busy?'disabled':''}>${busy?'Loading your save…':TT.game?'Play'+(S.day?' · Day '+S.day:''):'Play · New game'}</button>
+  <button onclick="ttSet()">Settings</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div>`}
 function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;pauseOverlay(0);menuMusic(0);PAUSED=0;PS='';MU.hold=0;try{const a=MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}catch(e){}
  if(TT.game){mode='play';$('ui').innerHTML=''}else{mode='creator';creatorUI()}}
 function ttSet(){mode='pause';settings();SP='title'}
@@ -92,9 +92,9 @@ function saveQuit(){snd('click');autoSave();TT.game=1;
  const cf0=confirmChar;confirmChar=function(){TT.game=1;return cf0.apply(this,arguments)}}
 
 /* pause menu: Save & quit, plus who is signed in and the cloud save state */
-{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='💾 Save & quit';q.onclick=saveQuit;m.appendChild(q);
+{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='Save & quit';q.onclick=saveQuit;m.appendChild(q);
  if(!FB_ON||!FBU)return;const n=document.createElement('p');n.className='m';n.innerHTML='<small>Signed in as <b></b><br><span></span></small>';n.querySelector('b').textContent=FBU.displayName||FBU.email||'Google user';
- n.querySelector('span').textContent=CLD.err||(CLD.ok?'☁ Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'☁ Checking cloud save…');m.appendChild(n);};
+ n.querySelector('span').textContent=CLD.err||(CLD.ok?'Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'Checking cloud save…');m.appendChild(n);};
  const pg=pauseGame;pauseGame=function(){pg();csPush()}}
 /* browsers block sound until the first click, so start the menu music then */
 addEventListener('pointerdown',()=>{if(TT.on&&MENUA&&MENUA.paused)MENUA.play().catch(()=>{})},{capture:true});

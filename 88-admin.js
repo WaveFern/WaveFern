@@ -68,5 +68,5 @@ function admUI(){if(!isAdmin())return;mode=ADM.from=='title'?'title':'pause';con
   <h3>Players</h3>${pl}<h3>Sent gifts</h3>${gl}</div>`;
  if(ADM.gifts==null)admGifts()}
 /* the way in: pause menu and main menu, admin account only */
-{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m||!isAdmin())return;const b=document.createElement('button');b.textContent='🛠 Admin';b.onclick=admOpen;m.appendChild(b)}
- const t0=titleUI;titleUI=function(){t0();if(!isAdmin())return;const m=document.querySelector('#ttl .ttm');if(!m)return;const b=document.createElement('button');b.textContent='🛠 Admin';b.onclick=admOpen;m.appendChild(b)}}
+{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m||!isAdmin())return;const b=document.createElement('button');b.textContent='Admin';b.onclick=admOpen;m.appendChild(b)}
+ const t0=titleUI;titleUI=function(){t0();if(!isAdmin())return;const m=document.querySelector('#ttl .ttm');if(!m)return;const b=document.createElement('button');b.textContent='Admin';b.onclick=admOpen;m.appendChild(b)}}
