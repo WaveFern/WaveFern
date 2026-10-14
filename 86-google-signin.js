@@ -24,7 +24,7 @@ function fbSignIn(){snd('click');fbLoad().then(()=>{const p=new FBM.GoogleAuthPr
   throw e})}).catch(e=>{snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
 /* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
 function fbSignInAsk(){snd('click');const prev=mode,fresh=prev=='creator';CLD.pre=prev;
- $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>🔑 Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>If your Google account already has a cloud save, the game asks which save to keep, and the other one is replaced. Your save code is your backup.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">📋 Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
+ $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>🔑 Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>If your Google account already has a cloud save, the game asks which save to keep. If it has never been used here, a brand new game starts and this save is wiped. Your save code is your backup.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">📋 Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
 function fbCopy(){const t=$('fbsc');t.value=saveCode();t.style.display='block';t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Save code copied'),()=>say('Copy the code from the box'))}catch(e){say('Copy the code from the box')}}
 function fbSignInBack(){const prev=CLD.pre;CLD.pre=null;if(prev=='creator'){mode='creator';creatorUI()}else if(prev=='pause'){mode='pause';pauseUI()}else closeUI()}
 function fbSignInGo(){fbSignInBack();fbSignIn()}
@@ -43,12 +43,17 @@ function csFail(e){CLD.err=e&&e.code=='permission-denied'?'Cloud saves are not s
 function csCheck(){const uid=FBU&&FBU.uid;if(!uid)return;
  if(document.getElementById('load')||!['play','creator','pause'].includes(mode))return setTimeout(()=>{if(FBU&&FBU.uid==uid&&!CLD.ok)csCheck()},1000);
  CLD.err='';FBF.getDoc(csRef()).then(d=>{if(!FBU||FBU.uid!=uid)return;
-  if(!d.exists()){CLD.ok=1;CLD.t=0;fbRedraw();return csPush(1)}
+  if(!d.exists()){if(mode!='creator'&&csMark().uid!=uid)return csFresh(uid);CLD.ok=1;CLD.t=0;fbRedraw();return csPush(1)}
   const c=d.data(),m=csMark();
   if(mode=='creator')return csAsk(c,1);
   if(m.uid==uid&&m.t==c.t){CLD.ok=1;CLD.t=c.t;fbRedraw();return csPush()}
   if(c.code==saveCode()){CLD.ok=1;CLD.last=c.code;csSetMark(c.t);return fbRedraw()}
   csAsk(c,0)}).catch(csFail)}
+/* v26.86: a Google account signing in for the first time (no cloud save yet) starts a fresh game instead of taking this device's save */
+function csFresh(uid){if(!['play','pause'].includes(mode))return setTimeout(()=>{if(FBU&&FBU.uid==uid&&!CLD.ok)csCheck()},1000);
+ if(mode=='play')mode='menu';CLD.ask=0;CLD.fresh=uid;
+ $('ui').innerHTML=`<div id=csf class="box modal" style="width:min(400px,92vw)"><h2>☁ New Google account</h2><p>This Google account has never been used in WaveFern before, so it starts a <b>brand new game</b>. The save on this device is wiped.</p><p class=m><small>If you copied your save code, you can load it later in Settings.</small></p><button class=go onclick="csFreshGo()">Start new game</button></div>`}
+function csFreshGo(){if(!FBU)return;snd('click');wiping=true;try{localStorage.removeItem('fw_save');localStorage.setItem('fw_cloud',JSON.stringify({uid:FBU.uid,t:0}))}catch(e){}location.reload()}
 function csAsk(c,fresh){if(!['play','creator','pause'].includes(mode))return setTimeout(()=>csAsk(c,fresh),1000);
  const prev=mode,when=new Date(c.t).toLocaleString(),who=c.artist?esc(c.artist)+', ':'';CLD.ask={c,prev,fresh};if(prev=='play')mode='menu';
  $('ui').innerHTML=`<div id=csq class="box modal" style="width:min(400px,92vw)"><h2>☁ Cloud save found</h2><p>${who}Day ${c.day}<br><small class=m>saved ${esc(when)}</small></p>${fresh?'':`<p class=m>This device has a different save: ${S.artist?esc(S.artist)+', ':''}Day ${S.day}.</p>`}<div class=row2><button class=go onclick="csPick(1)">Load cloud save</button><button onclick="csPick(0)">${fresh?'Start a new game':'Keep this device'}</button></div><p class=m><small>${fresh?'A new game will replace the cloud save once you start playing.':'The one you don\'t pick is replaced.'}</small></p></div>`}
@@ -72,6 +77,7 @@ if(FB_ON)fbLoad().catch(()=>{});
  if(FBU){const n=document.createElement('p');n.className='m';n.innerHTML='<small>Signed in as <b></b><br><span></span></small>';n.querySelector('b').textContent=FBU.displayName||FBU.email||'Google user';
   n.querySelector('span').textContent=CLD.err||(CLD.ok?'☁ Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'☁ Checking cloud save…');
   const b=document.createElement('button');b.textContent='Sign out';b.onclick=fbSignOut;d.append(n,b);
+  if(CLD.fresh==FBU.uid&&!CLD.ok){const q=document.createElement('button');q.className='go';q.textContent='☁ Start new game for this account';q.onclick=()=>csFresh(FBU.uid);d.insertBefore(q,b)}
   if(CLD.ask&&!CLD.ok){const q=document.createElement('button');q.className='go';q.textContent='☁ Choose which save to keep';q.onclick=()=>csAsk(CLD.ask.c,CLD.ask.fresh);d.insertBefore(q,b)}}
  else{const b=document.createElement('button');b.textContent='🔑 Sign in with Google';b.onclick=fbSignInAsk;const n=document.createElement('p');n.className='m';n.innerHTML='<small>Sign in to keep your save in the cloud and play on any device.</small>';d.append(b,n)}
  m.appendChild(d)};
