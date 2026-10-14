@@ -62,6 +62,8 @@ Root: `.chat.msx`. Tokens live on `.chat.msx`:
 ## Spotifly (`37-spotifly.js`, desktop app id `1`)
 
 - Logo: black tile with green `#1ed760` circle and three black bars (SVG `SFLOGO` in `11-os-v2.js`).
+- Song row `.sr.sd` adds a 36px column for the delete action: a bin icon button `.bin` (muted `--m`, `--t` on hover, 32px touch target). Keep the bin on the row, not under it.
+- Play buttons `.bpl` are the `#1db954` circle (on song rows and on draft rows `.ng .bpl`).
 - Wallpaper: `#47b06f` with the wordmark.
 - Artist sidebar `.sb`, heading `.sfh` (logo at 26px beside the text).
 - Otherwise the shared base.
