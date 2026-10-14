@@ -422,7 +422,7 @@ function festViewOff(){const v=FEST.view3;FEST.view=null;document.body.classList
 function festView3(){if(FEST.view3)return FEST.view3;const v=FEST.view3={cam:new THREE.PerspectiveCamera(55,1,.1,330),stageG:new THREE.Group(),hz:new THREE.Color('#f1dfc0')};scene.add(v.stageG);
  const sg=new THREE.SphereGeometry(300,24,14),cA=[],P0=sg.attributes.position;for(let i=0;i<P0.count;i++)cA.push(1,1,1);sg.setAttribute('color',new THREE.Float32BufferAttribute(cA,3));
  v.sky=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide,fog:false,depthWrite:false}));v.sky.renderOrder=-10;v.sky.frustumCulled=false;v.sky.visible=false;scene.add(v.sky);
- const G=fAll(),rnd=fRng(77),RR=(a,b)=>a+rnd()*(b-a),tree=(x,z,h)=>{const c=pick(['#3d6b3a','#466f3c','#3a5f36','#4d7a40']);xgPrism(G,.3,.25,h*.4,6,'#4a3624',x,0,z);xgPrism(G,h*.32,h*.1,h*.75,7,c,x,h*.3,z)};
+ const G=fAll(),rnd=fRng(77),RR=(a,b)=>a+rnd()*(b-a),tree=(x,z,h)=>blkTree((w,hh,d,c,cx,cy,cz)=>xgBox(G,w,hh,d,c,cx,cy,cz),x,z,h/3.4,1);
  for(let x=140;x<470;x+=RR(2.5,4.5))tree(x,RR(-2,1),RR(8,13));for(let x=150;x<470;x+=RR(5,9))tree(x,RR(10,30),RR(12,18));
  for(let z=-150;z<0;z+=RR(3,5)){tree(RR(410,416),z,RR(8,13));tree(RR(208,212),z,RR(7,11))}for(let x=200;x<420;x+=RR(3,5))tree(x,RR(-132,-128),RR(8,13));
  for(let i=0;i<9;i++)xgPrism(G,RR(40,70),RR(10,25),RR(14,24),10,'#5e8a52',150+i*42,0,RR(60,110));

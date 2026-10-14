@@ -9,3 +9,6 @@ favicon.png -filter -diff -merge binary
 audio/oneshots/*.mp3 -filter -diff -merge binary
 # soundtrack and wallpaper (were base64 in assets.js): plain files so GitHub Pages serves the real files
 assets/* -filter -diff -merge binary
+# new soundtrack tracks: plain files so GitHub Pages serves the real mp3
+audio/box.mp3 -filter -diff -merge binary
+audio/catch.mp3 -filter -diff -merge binary

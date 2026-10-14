@@ -35,17 +35,17 @@ function promo(id){prStart(id,0)}
 {const w0=wakeUp;wakeUp=function(auto){const r=w0.apply(this,arguments);try{prNight()}catch(e){console.error('promo stats',e)}return r}}
 function prNight(){prFill();const y=S.day-1;S.promos.forEach(p=>{if(y<p.d0||y>p.d1+AFTER_DAYS||p.h.some(e=>e[0]==y))return;const s=S.songs.find(x=>x.id==p.s);
  p.h.push([y,s&&s.pd===y?Math.round(s.today||0):0,S.listeners||0,igFol()]);
- if(y==p.d1+AFTER_DAYS&&Array.isArray(S.msgs)){const r=prRes(p),pc=v=>(v>=0?'+':'')+v+'%';
+ if(y==p.d1+AFTER_DAYS&&Array.isArray(S.msgs)){const r=prRes(p),pc=v=>v>=999?'999%+':(v>=0?'+':'')+v+'%';
   S.msgs.push({id:S.nid++,from:'Instagrime Ads',body:'Your '+PROMO_T[p.k].n+' for "'+p.t+'" is over. Song streams per day: '+pc(r.dSt)+' during and '+pc(r.aSt)+' after, compared with before. It brought in about '+fmtN(p.x)+' extra streams. Monthly listeners went from '+p.b.ml.toLocaleString()+' to '+r.aMl.toLocaleString()+'. Full stats are in Instagrime > Account > Promotions.',state:9,unread:1,day:S.day})}})}
 
 /* before / during / after */
-const prAvg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0,pctOf=(a,b)=>b>0?Math.round((a-b)/b*100):0;
+const prAvg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0,pctOf=(a,b)=>b>0?Math.max(-100,Math.min(999,Math.round((a-b)/b*100))):0;
 function prRes(p){const D=p.h.filter(e=>e[0]<=p.d1),A=p.h.filter(e=>e[0]>p.d1),lastD=D[D.length-1],lastA=A[A.length-1];
  const dSt=prAvg(D.map(e=>e[1])),aSt=prAvg(A.map(e=>e[1]));
  return{D,A,dSt0:dSt,aSt0:aSt,dSt:pctOf(dSt,p.b.st),aSt:pctOf(aSt,p.b.st),dMl:lastD?lastD[2]:null,aMl:lastA?lastA[2]:lastD?lastD[2]:p.b.ml,dF:lastD?lastD[3]:null,aF:lastA?lastA[3]:null}}
 function prState(p){if(S.day<=p.d1)return{t:'Running · day '+(S.day-p.d0+1)+' of '+(p.d1-p.d0+1),c:'pm-run'};if(S.day<=p.d1+AFTER_DAYS)return{t:'Finished · tracking after ('+Math.min(AFTER_DAYS,S.day-p.d1-1)+'/'+AFTER_DAYS+' days)',c:'pm-aft'};return{t:'Done',c:'pm-done'}}
 const fmtN=v=>v==null?'–':Math.round(v).toLocaleString('en-US');
-const chg=(v,b)=>{if(v==null||!(b>0))return'';const d=pctOf(v,b);return` <small class="${d>0?'up':d<0?'dn':''}">${d>0?'+':''}${d}%</small>`};
+const chg=(v,b)=>{if(v==null||!(b>0))return'';const d=pctOf(v,b);return` <small class="${d>0?'up':d<0?'dn':''}">${d>=999?'999%+':(d>0?'+':'')+d+'%'}</small>`};
 function prCard(p){const st=prState(p),r=prRes(p),s=S.songs.find(x=>x.id==p.s),T=PROMO_T[p.k],now=st.c=='pm-run'&&s&&s.pd===S.day?Math.round(s.today||0):null;
  const rows=[['Song streams / day',p.b.st,r.D.length?r.dSt0:null,r.A.length?r.aSt0:null],['Monthly listeners',p.b.ml,r.dMl,r.A.length?r.aMl:null],['Followers',p.b.f,r.dF,r.aF]];
  const all=[p.b.st,...p.h.map(e=>e[1]),now||0],mx=Math.max(1,...all),bar=(v,c,l)=>`<i class="${c}" style="height:${Math.max(2,Math.round(v/mx*48))}px" title="${l}: ${fmtN(v)} streams"></i>`;
