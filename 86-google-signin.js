@@ -1,14 +1,15 @@
 /* ---------- v26.83: optional Google sign-in (Firebase Auth) ----------
-   Paste the web app config from the Firebase console (Project settings > Your apps) into FB_CFG.
-   While apiKey is still the placeholder, nothing loads and the pause menu shows no sign-in button.
+   Config is the waveferngame web app from the Firebase console (Project settings > Your apps).
+   If apiKey is ever set back to a PASTE_ placeholder, nothing loads and the pause menu shows no sign-in button.
    Sign-in is optional: saves stay in this browser (fw_save) exactly as before. */
 const FB_CFG={
- apiKey:'PASTE_API_KEY',
- authDomain:'PASTE_PROJECT_ID.firebaseapp.com',
- projectId:'PASTE_PROJECT_ID',
- storageBucket:'PASTE_PROJECT_ID.appspot.com',
- messagingSenderId:'PASTE_SENDER_ID',
- appId:'PASTE_APP_ID'
+ apiKey:'AIzaSyCd1y8e0G6dKn4h4OuUzksePKufyltmvlo',
+ authDomain:'waveferngame.firebaseapp.com',
+ projectId:'waveferngame',
+ storageBucket:'waveferngame.firebasestorage.app',
+ messagingSenderId:'696041816952',
+ appId:'1:696041816952:web:d3ce1fbc7a33e36f8ebe8d',
+ measurementId:'G-4PMWS9D7BV'
 };
 const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey);
 let FBU=null,FBA=null,FBM=null;

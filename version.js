@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.83.0';
+const GAME_VERSION='v26.83.1';
 const VERSION_HISTORY=[
+ {v:'v26.83.1',n:'Google sign-in is now switched on: press Esc and pick Sign in with Google in the pause menu. Signing in is still optional and saves still stay in this browser. Saves still load.'},
  {v:'v26.83.0',n:'Optional Google sign-in: once the game is connected to Firebase, the pause menu (Esc) has a Sign in with Google button and shows who is signed in, with Sign out. Playing without signing in works exactly as before, and saves still stay in this browser. Saves still load.'},
  {v:'v26.82.1',n:'Fixed the computer freezing: one broken chat, app or saved setting could stop Messages opening and make the Start menu do nothing. Now a broken chat is repaired, an app that cannot open shows a short notice or closes on its own, and Start and Shut down always work. The day clock keeps running if one song hits a problem. Saves already stuck like this are repaired when they load. Saves still load.'},
  {v:'v26.82.0',n:'Your own pictures: upload a picture for your Spotifly profile (artist page), your Instagrime profile (Account) or as an Instagrime photo post (Account > Photo post, with your own caption; still one post a day). Every upload is pixelated to match the game: profile pictures become 32x32 and photo posts 48x36, both in 16 colours. Use drawn avatar switches back. Pictures are stored small (under 1.3 KB each) so saves and save codes stay short; your 40 newest photo posts keep their photo. Saves still load.'},
