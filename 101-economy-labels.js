@@ -63,14 +63,12 @@ function lbLegacy(){if(S.label||!S.hq||typeof S.hq!='object')return;if(Object.va
 
 /* Label HQ: locked until signed, login with the label's details */
 {const hq0=PA.hq;PA.hq=function(){
-  if(!S.label)return`<div class=hqx><h1><img src="${IC.hq}" style="width:32px;image-rendering:pixelated;vertical-align:middle"> Label HQ</h1><div class=card><b>🔒 Locked</b><p class=m>Label HQ is only for artists signed to a record label. Labels contact you when your listeners, streams and reputation catch their eye. Sign a deal and the label will send you a username and password.</p></div></div>`;
   const l=lbCur();
-  if(!HQAUTH)return`<div class=hqx><h1><img src="${IC.hq}" style="width:32px;image-rendering:pixelated;vertical-align:middle"> ${esc(l.n)} · Label HQ</h1><div class=card style="max-width:340px"><b>Sign in</b><p class=m>Use the username and password in the welcome message from ${esc(l.n)}.</p><input id=hqu placeholder="Username" autocomplete=off style="width:100%;margin:4px 0"><input id=hqp type=password placeholder="Password" autocomplete=off style="width:100%;margin:4px 0" onkeydown="if(event.key=='Enter')hqLogin()"><button class=go onclick="hqLogin()">Sign in</button>${HQERR?'<p style="color:#e07a7a">Wrong username or password.</p>':''}</div></div>`;
+  if(!S.label||!HQAUTH)return`<div class=hqx><h1><img src="${IC.hq}" style="width:32px;image-rendering:pixelated;vertical-align:middle"> ${l?esc(l.n)+' · ':''}Label HQ</h1><div class=card style="max-width:340px"><b>Sign in</b><p class=m>${l?'Use the username and password in the welcome message from '+esc(l.n)+'.':'Enter the username and password a record label sends you when you sign.'}</p><input id=hqu placeholder="Username" autocomplete=off style="width:100%;margin:4px 0"><input id=hqp type=password placeholder="Password" autocomplete=off style="width:100%;margin:4px 0" onkeydown="if(event.key=='Enter')hqLogin()"><button class=go onclick="hqLogin()">Sign in</button>${HQERR?'<p style="color:#e07a7a">Wrong username or password.</p>':''}</div></div>`;
   HQERR=0;const fee=Math.round(l.adv*UPX.leaveFee);
   const bar=`<div class=card style="margin-bottom:10px"><b>${esc(l.n)}</b> ${lbStars(l.q)}<br><small class=m>They keep ${Math.round(l.cut*100)}% of streaming income · HQ prices ×${(UPX.priceBase+UPX.priceQ*l.q).toFixed(2)} · HQ benefits ×${(UPX.benBase+UPX.benQ*l.q).toFixed(2)} · up to level ${hqMax()}${S.lbPaid?' · paid to label so far $'+Math.round(S.lbPaid).toLocaleString():''}</small><br><button onclick="HQAUTH=false;pcR()">Sign out</button> <button onclick="lbLeave()">${LBLQ?'Click again: leave label ($'+fee.toLocaleString()+' fee)':'Leave label'}</button></div>`;
   return hq0.apply(this,arguments).replace(/(<div class=hqx>)/,'$1'+bar)};}
 {const o0=openPC;openPC=function(){HQAUTH=false;HQERR=0;LBLQ=0;return o0.apply(this,arguments)}}
-{const i0=inst;inst=function(k){if(k=='hq'&&!S.label){snd('err');return say('Label HQ is only for artists signed to a record label.')}return i0.apply(this,arguments)}}
 {const s0=PA.store;PA.store=()=>s0().replace(/(onclick="inst\('hq'\)">)[^<]*</,'$1Label only<')}
 APPD.hq.d='Locked until you sign with a record label. They send you a login. Better labels give a stronger team at higher prices.';
 
@@ -79,3 +77,13 @@ APPD.hq.d='Locked until you sign with a record label. They send you a login. Bet
   if(m&&m.lo&&m.lo.st==0)h=h.replace(/<div class=cin><small[^>]*>Official account\. No replies\.<\/small><\/div>/,`<div class=cin style="gap:8px;padding:8px"><button class=go onclick="lbSign(${m.id})">Sign the deal</button><button onclick="lbDecline(${m.id})">Decline</button></div>`);
   else if(m&&m.lo&&m.lo.st==2)h=h.replace(/Official account\. No replies\./,'You declined this offer.');
   return h}}
+
+/* Label HQ look: its own dark navy and gold boardroom style */
+{const st=document.createElement('style');st.textContent=`.hqx{background:linear-gradient(160deg,#10142a,#1b2140 60%,#14182f);color:#e9e4d2;padding:14px;border-radius:0;border:2px solid #e6b422;box-shadow:inset 0 0 0 2px #0b0e1d;font-family:Georgia,'Times New Roman',serif;min-height:100%}
+.hqx h1{font-variant:small-caps;letter-spacing:2px;color:#e6b422;border-bottom:2px solid #e6b42266;padding-bottom:6px}
+.hqx .card{background:#1d2547;border:1px solid #e6b42288;border-radius:0;box-shadow:3px 3px 0 #0b0e1d}
+.hqx .m,.hqx small.m{color:#aeb4d0}
+.hqx input{background:#0e1124;color:#f4efdc;border:1px solid #e6b422;border-radius:0;padding:6px;font-family:inherit}
+.hqx button{background:#2a3358;color:#f4efdc;border:1px solid #e6b422;border-radius:0;font-family:inherit}
+.hqx button.go{background:#e6b422;color:#14182f;font-weight:bold}
+.hqx button:hover:not([disabled]){filter:brightness(1.2)}`;document.head.appendChild(st)}
