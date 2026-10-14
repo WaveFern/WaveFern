@@ -17,6 +17,8 @@ const rng=seed=>{let a=mix32((seed>>>0)+0x9E3779B9)||1;return()=>{a=a+0x6D2B79F5
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 const SC={min:[0,2,3,5,7,8,10],maj:[0,2,4,5,7,9,11],dor:[0,2,3,5,7,9,10],mix:[0,2,4,5,7,9,10],hmin:[0,2,3,5,7,8,11],phr:[0,1,3,5,7,8,10]};
 const SCN={min:'minor',maj:'major',dor:'dorian',mix:'mixolydian',hmin:'harmonic minor',phr:'phrygian'};
+/* v26.98: songs only use the major and minor scales; the other modes a style lists fold into the nearer of the two */
+const MM={min:'min',maj:'maj',dor:'min',phr:'min',hmin:'min',mix:'maj'};
 const KEYN=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
 const semi=(sc,d)=>{const o=Math.floor(d/7),i=((d%7)+7)%7;return SC[sc][i]+12*o};
 
@@ -168,14 +170,14 @@ function dpat(s){if(PC.has('d'+s))return PC.get('d'+s);const a=[];for(const c of
 function tpat(s){if(PC.has('t'+s))return PC.get('t'+s);const a=new Array(s.length).fill(null);for(let i=0;i<s.length;i++){const c=s[i];if(c=='.'||c=='-')continue;let l=1;while(s[i+l]=='-')l++;a[i]={c,l}}PC.set('t'+s,a);return a}
 
 /* ---------- the plan: everything about a song's beat, worked out from its seed ---------- */
-function seedOf(src){if(src.seed!=null)return typeof src.seed=='number'?src.seed>>>0:hash(src.seed);if(src.bs!=null)return src.bs>>>0;return hash(normG(src.genre||src.g)+'#'+(src.id!=null?src.id:src.title||''))}
+function seedOf(src){if(src.seed!=null)return typeof src.seed=='number'?src.seed>>>0:hash(src.seed);if(src.bs==null&&typeof songSeeds=='function')songSeeds();if(src.bs!=null)return src.bs>>>0;return hash(normG(src.genre||src.g)+'#'+(src.id!=null?src.id:src.title||''))}
 function genMotif(r,d,bars){const out=[];let deg=[0,2,4][r()*3|0];
  for(let b=0;b<bars;b++){const row=new Array(16).fill(null),hits=[];for(let s=0;s<16;s++){const w=s%4==0?1:s%2==0?.6:.28;if(r()<d*w*1.35)hits.push(s)}if(!hits.length)hits.push(0);
   hits.forEach((s,j)=>{const strong=s%4==0;deg+=[-2,-1,-1,0,1,1,2,3,-3][r()*9|0];if(deg>9)deg-=4;if(deg<-3)deg+=4;if(strong&&(deg%2+2)%2)deg+=r()<.5?1:-1;
    const nx=j+1<hits.length?hits[j+1]:16+(r()<.5?2:0);row[s]={d:deg,l:Math.max(1,Math.min(6,nx-s)),v:strong?.95:.75}});out.push(row)}return out}
 function plan(src){if(typeof src=='string')src={genre:src};src=src||{};const genre=normG(src.genre||src.g),seed=seedOf(src),r=rng(seed^0x5bd1e995),L=STY[genre];
  const pk=a=>Array.isArray(a)?a[r()*a.length|0]:a,si=src.style!=null?((src.style%L.length)+L.length)%L.length:r()*L.length|0,st=L[si];
- const bpm=Math.round(st.bpm[0]+r()*(st.bpm[1]-st.bpm[0])),key=r()*12|0,sc=pk(st.sc),fam=sc=='maj'||sc=='mix'?'maj':'min';
+ const bpm=Math.round(st.bpm[0]+r()*(st.bpm[1]-st.bpm[0])),key=r()*12|0,sc=MM[pk(st.sc)]||'min',fam=sc=='maj'||sc=='mix'?'maj':'min';
  let prs=st.pr?pk(st.pr):fam=='maj'?'maj':'min';if(typeof prs=='string')prs=PR[prs]||PR[fam];const prog=pk(prs);
  /* kit: copy and nudge */
  const kb=KIT[st.kit]||KIT.dusty,kit={};for(const p in kb){kit[p]={};for(const q in kb[p])kit[p][q]=kb[p][q]*(q=='v'?1:.9+r()*.2)}
@@ -411,6 +413,16 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
 })();
 
 /* ---------- hooks into the game ---------- */
+/* v26.98: every new song gets its own random beat seed (bs), so no two songs share a beat, collabs included.
+   Before, a song without a recorded seed (collabs, gifts...) took its beat from its genre and id, and ids count up from the
+   same number in every save, so two players' first collab with the same artist was the exact same song.
+   S.bsFrom is the song id this started at: older songs without a seed keep their old beat, newer ones get a fresh seed. */
+function newBeatSeed(){const used=new Set();[S.songs,S.drafts].forEach(L=>(L||[]).forEach(x=>{if(x&&x.bs!=null)used.add(x.bs>>>0)}));
+ let b;do{b=(Math.random()*4294967296)>>>0;try{if(window.crypto&&crypto.getRandomValues)b=crypto.getRandomValues(new Uint32Array(1))[0]}catch(e){}}while(!b||used.has(b));return b}
+function songSeeds(){try{if(typeof S=='undefined'||!S||S.nid==null)return;if(S.bsFrom==null)S.bsFrom=S.nid;
+ const D=S.drafts||[];[D,S.songs||[]].forEach(L=>L.forEach(x=>{if(!x||x.bs!=null||x.id==null||x.id<S.bsFrom)return;const d=L!==D&&D.find(q=>q.id==x.id);x.bs=d&&d.bs!=null?d.bs:newBeatSeed()}))}catch(e){}}
+if(typeof loadCode=='function'){const lc0=loadCode;loadCode=function(){const r=lc0.apply(this,arguments);songSeeds();return r}}
+setInterval(songSeeds,500);
 /* recording: the song's beat plays under all four steps; the Beat bar sweeps in time with it */
 if(typeof startRec=='function'){const s0=startRec;startRec=function(i){s0.apply(this,arguments);try{if(rec&&mode=='rec'){rec.bs=(Math.random()*4294967296)>>>0;
  rec.bp=!!Beats.play({genre:rec.g,seed:rec.bs},{owner:'rec',form:'rec',intensity:.8,pads:1,alive:()=>!!rec&&mode=='rec'})}}catch(e){console.error('beats rec',e)}}}
