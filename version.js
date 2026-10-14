@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.97.0';
+const GAME_VERSION='v26.98.0';
 const VERSION_HISTORY=[
+ {v:'v26.98.0',n:'Every new song now gets its own beat, so no two songs sound the same. Collabs used to pick their beat from the artist\'s genre and the song number, so two players collabing with the same artist could get the exact same song; now each one is different. Songs only use the major and minor scales. Songs you already made keep their beat, though a few that used other scales now play in major or minor. Saves still load.'},
  {v:'v26.97.0',n:'Settings has more depth, split into Sound, Music, Game and Save tabs. You can turn the main menu music and the pause menu music off on their own, pick which of the three soundtrack tracks play, play them shuffled or in order, and skip the track that is playing. There is also an Ambience volume for the city sounds, and switches for footsteps, music from passing cars and name tags above people, plus Reset settings. Settings are remembered in this browser. Saves still load.'},
  {v:'v26.96.1',n:'The main menu and pause menu are now plain text: no icons or emoji on the buttons, title or cloud save status. Saves still load.'},
  {v:'v26.96.0',n:'Bodyguards decide which fans get to you. With no guards every fan can come up and ask for an autograph, with 1 guard half of them get through, with 2 only 1 in 10, and with 3 nobody. Any fan who gets through might be a fake fan who robs you when you sign: 5% with no guards, 2.5% with 1, 0.5% with 2. Saves still load.'},
