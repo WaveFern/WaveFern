@@ -38,9 +38,11 @@ const ADMA={
 function admClose(){if(ADM.from=='title')ttPlay();else resumeGame()}
 function adm(k){if(!isAdmin()||!admGame())return;try{const r=ADMA[k]();if(r)admDone(r)}catch(e){console.error(e);say('That did not work.')}}
 /* gifts and players (Firestore; the rules refuse these for anyone but the admin) */
-function admSend(){if(!isAdmin()||!FBF)return;const to=admV('gu'),g={to,from:admV('gf').slice(0,40)||'WaveFern',msg:admV('gm').slice(0,200),money:gNum(admV('g$')),streams:gNum(admV('gs')),listeners:gNum(admV('gl')),t:Date.now(),claimed:false};
+function admSend(){if(!isAdmin()||!FBF)return;const to=admV('gu'),k=admV('gk'),amt=gNum(admV('ga'));ADM.gk=k;
+ /* one gift = one kind: money OR streams OR monthly listeners */
+ const g={to,from:admV('gf').slice(0,40)||'WaveFern',msg:admV('gm').slice(0,200),money:k=='money'?amt:0,streams:k=='streams'?amt:0,listeners:k=='listeners'?amt:0,t:Date.now(),claimed:false};
  if(!/^[A-Za-z0-9]{10,128}$/.test(to)){ADM.msg='Paste a valid user ID first.';return admUI()}
- if(!g.money&&!g.streams&&!g.listeners){ADM.msg='Add some money, streams or monthly listeners.';return admUI()}
+ if(!amt){ADM.msg='Enter an amount.';return admUI()}
  ADM.msg='Sending…';admUI();FBF.addDoc(FBF.collection(FBD,'gifts'),g).then(()=>{snd('chime');ADM.msg='✓ Gift sent. They get it next time they play.';ADM.gifts=null;admUI();admGifts()},e=>{ADM.msg=e&&e.code=='permission-denied'?'Not allowed: publish the new Firestore rules first.':'Could not send the gift. Try again.';admUI()})}
 function admPlayers(){if(!isAdmin()||!FBF)return;ADM.players='…';admUI();
  FBF.getDocs(FBF.query(FBF.collection(FBD,'saves'),FBF.orderBy('t','desc'),FBF.limit(100))).then(r=>{ADM.players=r.docs.map(d=>({uid:d.id,artist:d.data().artist,day:d.data().day,t:d.data().t}));admUI()},e=>{ADM.players=e&&e.code=='permission-denied'?'Not allowed: publish the new Firestore rules first.':'Could not load players.';admUI()})}
@@ -60,7 +62,7 @@ function admUI(){if(!isAdmin())return;mode=ADM.from=='title'?'title':'pause';con
  const gl=ADM.gifts==null?'':typeof ADM.gifts=='string'?`<p class=m><small>${esc(ADM.gifts)}</small></p>`:`<div class=adml>${ADM.gifts.map(g=>`<div><span>${g.claimed?'✓ claimed':'⏳ waiting'} · ${esc(g.from)} → <small class=m>${esc(g.to)}</small><br><small>${[g.money?'$'+n(g.money):'',g.streams?n(g.streams)+' streams':'',g.listeners?n(g.listeners)+' listeners':''].filter(Boolean).join(' · ')}</small></span>${g.claimed?'':`<button onclick="admDel('${esc(g.id)}')">Delete</button>`}</div>`).join('')||'<small class=m>No gifts sent yet.</small>'}</div>`;
  $('ui').innerHTML=`<div id=admp class="box modal"><div class=wrh><h2>🛠 Admin</h2><button onclick="admBack()" style="margin-left:auto">Back</button></div>${own}
   <h3>Send a gift</h3><input id=gu placeholder="User ID (from the Players list, or Firebase > Authentication > Users)">
-  <div class=r><input id=g$ type=number min=0 placeholder="Money"><input id=gs type=number min=0 placeholder="Streams"><input id=gl type=number min=0 placeholder="Monthly listeners"></div>
+  <div class=r><select id=gk>${[['money','💵 Money'],['streams','▶ Streams'],['listeners','🎧 Monthly listeners']].map(([v,t])=>`<option value=${v} ${(ADM.gk||'money')==v?'selected':''}>${t}</option>`).join('')}</select><input id=ga type=number min=1 placeholder="Amount"></div>
   <div class=r><input id=gf maxlength=40 placeholder="From (name shown in the popup)"></div><input id=gm maxlength=200 placeholder="Message (optional)">
   <button class=go onclick="admSend()" style="width:100%;margin-top:6px">🎁 Send gift</button>${ADM.msg?`<p class=m><small>${esc(ADM.msg)}</small></p>`:''}
   <h3>Players</h3>${pl}<h3>Sent gifts</h3>${gl}</div>`;
