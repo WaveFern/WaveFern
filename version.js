@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.102.0';
+const GAME_VERSION='v26.103.0';
 const VERSION_HISTORY=[
+ {v:'v26.103.0',n:'Weather. Each day now has its own weather, kept in your save so a reload never changes it. 9 days in 10 are sunny; the rest bring rain, fog or a thunderstorm with lightning. Bad weather dims and greys the light outside and you hear the rain, but it stays out of your house: walk inside and the light is back to normal, the rain only falls on the land around the house (and stops on the roof when you are outside), and the fog drifts over the ground but not through your rooms. Shops and other interiors stay dry. The weather shows next to the time of day. Saves still load.'},
  {v:'v26.102.0',n:'Create album now picks songs like a festival setlist: your track list on the left (move songs up or down, or remove them) and your unused songs on the right with + Add, in Spotifly colours. There is no limit on how many songs an album has, and + Add all adds every unused song. Collab titles no longer show "feat." twice, and the face-on-cover checkbox sits next to its text. Saves still load.'},
  {v:'v26.101.1',n:'The game now checks for a new version every 30 seconds instead of every minute, so the update notice shows up sooner. Saves still load.'},
  {v:'v26.101.0',n:'The Suburban House is no longer for sale on the Property website. It is the house you start in, so buying it cost $12,000 and gave you nothing. You can book the Hillside Villa straight away, and an old booking for the Suburban House is cancelled without charging you. Saves still load.'},
