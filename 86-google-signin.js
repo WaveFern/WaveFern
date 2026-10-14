@@ -16,9 +16,10 @@ let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
  return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js')]).then(([a,m,f])=>{const app=a.initializeApp(FB_CFG);FBM=m;FBF=f;FBA=m.getAuth(app);FBD=f.getFirestore(app);
-  m.onAuthStateChanged(FBA,usr=>{FBU=usr;CLD.ok=0;CLD.last='';if(usr)csCheck();fbRedraw()});return m.getRedirectResult(FBA).catch(()=>{})})}
+  m.onAuthStateChanged(FBA,usr=>{FBU=usr;CLD.ok=0;CLD.last='';if(usr)csCheck();fbRedraw()});return m.getRedirectResult(FBA).then(fbNew).catch(()=>{})})}
+function fbNew(r){try{if(r&&r.user&&FBM.getAdditionalUserInfo(r)?.isNewUser){CLD.newUser=r.user.uid;if(FBU&&FBU.uid==r.user.uid&&!CLD.ok)csCheck()}}catch(e){}}
 function fbSignIn(){snd('click');fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
- return FBM.signInWithPopup(FBA,p).then(r=>say('Signed in as '+(r.user.displayName||r.user.email)),e=>{
+ return FBM.signInWithPopup(FBA,p).then(r=>{fbNew(r);say('Signed in as '+(r.user.displayName||r.user.email))},e=>{
   if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment'))return FBM.signInWithRedirect(FBA,p);
   if(e&&(e.code=='auth/popup-closed-by-user'||e.code=='auth/cancelled-popup-request'))return;
   throw e})}).catch(e=>{snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
@@ -44,6 +45,7 @@ const csReady=()=>!document.getElementById('load')&&['title','play','pause'].inc
 function csFail(e){CLD.err=e&&e.code=='permission-denied'?'Cloud saves are not set up yet.':'Cloud save is offline. Your game still saves on this device.';fbRedraw()}
 function csCheck(){const uid=FBU&&FBU.uid;if(!uid)return;
  if(!csReady()&&mode!='creator')return setTimeout(()=>{if(FBU&&FBU.uid==uid&&!CLD.ok)csCheck()},700);
+ if(CLD.newUser==uid&&csGame())return csFresh(uid);
  CLD.err='';FBF.getDoc(csRef()).then(d=>{if(!FBU||FBU.uid!=uid)return;
   if(!d.exists()){if(csGame()&&csMark().uid!=uid)return csFresh(uid);CLD.ok=1;CLD.t=0;fbRedraw();return csPush(1)}
   const c=d.data(),m=csMark();
