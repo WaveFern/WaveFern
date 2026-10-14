@@ -1,7 +1,8 @@
 /* ---------- music ---------- */
 const TR=[{src:window.EMBEDDED_ASSETS.track1,fin:2,fout:3},{src:window.EMBEDDED_ASSETS.track2,fin:2,fout:0},{src:window.EMBEDDED_ASSETS.track3,fin:2,fout:3}];let VOL=.5,FX=.6,LAST=.5,SP='',AC,fs=0;try{const q=JSON.parse(localStorage.getItem('fw_set'));if(q){VOL=q.VOL;FX=q.FX}}catch(e){}
-const MU={a:TR.map(t=>{const a=new Audio(t.src);a.preload='auto';a.onended=()=>{MU.pl=0;MU.gap=R(2.5,5)};return a}),cur:-1,pl:0,on:0,gap:1};
-function musicOn(){MU.on=1}['pointerdown','keydown'].forEach(e=>addEventListener(e,musicOn));
+const MU={a:TR.map(t=>{const a=new Audio(t.src);a.preload='none';a.onended=()=>{MU.pl=0;MU.gap=R(2.5,5)};return a}),cur:-1,pl:0,on:0,gap:1};
+/* the tracks only start buffering on the first click or key (music cannot play before that anyway), so they do not compete with the game files while it loads */
+function musicOn(){if(!MU.on)MU.a.forEach(a=>{a.preload='auto';try{a.load()}catch(e){}});MU.on=1}['pointerdown','keydown'].forEach(e=>addEventListener(e,musicOn));
 setInterval(()=>{if(!MU.on||MU.hold)return;
  if(MU.pl){const a=MU.a[MU.cur],T=TR[MU.cur],t=a.currentTime,d=a.duration||0;let v=1;
   if(T.fin&&t<T.fin)v=Math.min(v,t/T.fin);if(T.fout&&d&&t>d-T.fout)v=Math.min(v,(d-t)/T.fout);a.volume=Math.max(0,Math.min(1,v))*VOL*(window.MU_DIP==null?1:window.MU_DIP)}
