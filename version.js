@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.79.0';
+const GAME_VERSION='v26.80.0';
 const VERSION_HISTORY=[
+ {v:'v26.80.0',n:'More to spend on later in your career: a free Label HQ app in the App Barn lets you hire a manager (+10% streams per level), a producer (+4 song quality), a PR team (cheaper, longer promotions), marketing (+20% hit chance) and build out your studio (+5 song quality). Each has four levels from $5,000 to $30,000,000 that unlock with fame. The Apex Sports now costs $25,000, the Phantom GT $90,000, the Hillside Villa $75,000 and the Penthouse Loft $250,000. Early prices are unchanged and anything you already own stays yours. Saves still load.'},
  {v:'v26.79.0',n:'Song performance: higher quality songs stream clearly better, and collabs get a bigger boost the more popular the collaborator and the better the song. Each release has about an 8% chance to be a 🔥 HIT (3 to 6 times its normal streams; better songs hit more often) and a very rare chance to go 🚀 VIRAL (at most 0.3%, for the best songs): at least 5,000,000 streams plus a big extra based on your monthly listeners, over two weeks. You get a pop-up, a Spotifly Team message and a tag on the song. Saves still load.'},
  {v:'v26.78.0',n:'Spotifly: Delete song is now a bin icon on the song\'s own row (it still asks first). You can play unreleased drafts on the Upload tab before you upload them. Playing a draft does not count streams or earnings. Saves still load.'},
  {v:'v26.77.0',n:'More beat samples: 35 more recorded one-shots join the beats. Flutes, strings and a synth are new sounds for melodies and chords, and the bass, bell, brass, key and pluck sounds are wider. Each sample is pitched to the song\'s key. Drums and the main soundtrack are unchanged. Saves still load.'},
