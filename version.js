@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.101.0';
+const GAME_VERSION='v26.101.1';
 const VERSION_HISTORY=[
+ {v:'v26.101.1',n:'The game now checks for a new version every 30 seconds instead of every minute, so the update notice shows up sooner. Saves still load.'},
  {v:'v26.101.0',n:'The Suburban House is no longer for sale on the Property website. It is the house you start in, so buying it cost $12,000 and gave you nothing. You can book the Hillside Villa straight away, and an old booking for the Suburban House is cancelled without charging you. Saves still load.'},
  {v:'v26.100.0',n:'When a new version of the game is out, a small notice pops up at the top of the screen. Press Update to save your game (and to the cloud if you are signed in) and refresh into the newest version, or press the cross to keep playing. Saves still load.'},
  {v:'v26.99.0',n:'Each soundtrack track in Settings > Music has a Preview button. It plays 5 seconds from the middle of the track (a 1 minute track starts at 30 seconds), pausing the menu music or soundtrack meanwhile, which comes back after. Press it again to stop early. Saves still load.'},
