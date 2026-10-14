@@ -114,7 +114,7 @@ function ambTick(out){
  const want=out&&userOn()&&typeof FX=='number'&&FX>0&&VOL>0;
  if(!A){if(!want)return;try{build()}catch(e){A=null;return}}
  const c=A.c,t=c.currentTime,Z=zoneAt(P.x,P.z),L=Z.L,dt=.1;
- const lvl=want?(mode=='drive'?.6:1)*.6:0;A.tm+=dt;
+ const lvl=want?(mode=='drive'?.6:1)*.6*(typeof OPT=='object'&&OPT.amb!=null?OPT.amb:1):0;A.tm+=dt;
  A.mg.gain.setTargetAtTime(lvl,t,lvl?.6:.25);
  if(lvl>0){attach(true);MG.gain.value=FX;A.quietT=0}else if(A.on){A.quietT=(A.quietT||0)+dt;if(A.quietT>2.5)attach(false);}
  if(!A.on||lvl==0&&A.quietT>0.5)return;
@@ -154,7 +154,7 @@ function ambTick(out){
 /* ---------------- passing cars with music ---------------- */
 function loadManifest(){if(man||manBusy)return;manBusy=1;try{fetch('audio/cars/manifest.json',{cache:'no-cache'}).then(r=>r&&r.ok?r.json():[]).then(j=>{man=(Array.isArray(j)?j:[]).map(x=>typeof x=='string'?x:x&&(x.file||x.src||x.name||x.url)).filter(x=>typeof x=='string'&&/\.(ogg|mp3|m4a|wav|opus)$/i.test(x));manBusy=0}).catch(()=>{man=[];manBusy=0})}catch(e){man=[];manBusy=0}}
 function loadClip(f,cb){if(clipBuf[f]){cb(clipBuf[f]);return}if(clipBuf[f+'?'])return;clipBuf[f+'?']=1;try{fetch('audio/cars/'+encodeURIComponent(f).replace(/%2F/g,'/')).then(r=>r.ok?r.arrayBuffer():null).then(b=>b&&AC?AC.decodeAudioData(b):null).then(d=>{if(d)clipBuf[f]=d}).catch(()=>{})}catch(e){}}
-function eligible(){try{return MU.on&&userOn()&&(mode=='play'||mode=='drive')&&!PAUSED&&!document.hidden&&!(FEST&&(FEST.view||FEST.set))&&!Beats.playing()&&!(typeof VOL=='number'&&VOL<=0)}catch(e){return false}}
+function eligible(){try{return (typeof OPT!='object'||OPT.cars)&&MU.on&&userOn()&&(mode=='play'||mode=='drive')&&!PAUSED&&!document.hidden&&!(FEST&&(FEST.view||FEST.set))&&!Beats.playing()&&!(typeof VOL=='number'&&VOL<=0)}catch(e){return false}}
 function takeBg(){try{const a=MU.a[MU.cur];if(MU.pl&&a){MC.pl=1;MU.pl=0;a.play().catch(()=>{})}}catch(e){}}
 function giveBg(m){try{if(m&&m.pl){m.pl=0;const a=MU.a[MU.cur];if(a&&!a.ended&&!a.paused)MU.pl=1}}catch(e){}}
 function startSong(c){const songs=S.songs||[];if(!songs.length)return false;const sg=songs[Math.random()*songs.length|0];
