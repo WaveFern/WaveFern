@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.106.2';
+const GAME_VERSION='v26.107.0';
 const VERSION_HISTORY=[
+ {v:'v26.107.0',n:'The furniture that comes with the house (bed, bedside table, desk + laptop and bedroom rug) can now be moved and stored like any other piece: hover it for the yellow outline, press E to store it, or click it to pick it up and move it. Sleeping follows the bed and the laptop follows the desk, so put them back before you need them. Old saves load as before.'},
  {v:'v26.106.2',n:'Songs are audible again. The Spotifly mute/volume stayed stuck after you left Spotifly (so songs in the studio and at the festival played silently), and a soundtrack volume of 0 (the M key) also silenced every song. Now only Spotifly\'s own player uses its volume, and songs always play even with the soundtrack muted.'},
  {v:'v26.106.1',n:'Update notice fix: if you close the notice it comes back after 5 minutes while the game is still out of date, and if pressing Update does not land on the new version the notice says so and offers a stronger Retry. Saves still load.'},
  {v:'v26.106.0',n:'Furniture storing is now the E key instead of right-click. In furniture mode, hover a placed item to see a yellow outline around it, then press E to store it (or press E while holding an item to put it back in storage).'},
