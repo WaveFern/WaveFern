@@ -16,48 +16,12 @@ const sfPick=(L,i)=>L[((i%L.length)+L.length)%L.length];
 
 /* ---------- 1. street shop fronts ---------- (shop body: x cx-4..cx+4, z 5..11, 3.4 tall; front face z 11, door at cx) */
 const SFRONT={
- 34:(X,z)=>{/* Jewellery: marble pilasters, gold bands, velvet window displays, a giant gem on the roof */
-  [-4,-1.05,1.05,4].forEach(x=>{SF(.4,3.4,.22,'#e8e2ec',X+x,1.7,z+.1);SF(.5,.16,.3,'#c9a227',X+x,3.3,z+.12);SF(.5,.2,.3,'#c9a227',X+x,.1,z+.12)});
-  SF(8.2,.14,.2,'#c9a227',X,3.05,z+.1);SF(8.3,.22,.24,'#e8e2ec',X,3.45,z+.1);SF(1.5,.12,.2,'#c9a227',X,2.06,z+.1);SF(.12,2,.14,'#c9a227',X-.7,1,z+.08);SF(.12,2,.14,'#c9a227',X+.7,1,z+.08);
-  [-2.6,2.6].forEach(x=>{SF(1.6,.12,.3,'#5a1f3a',X+x,1.02,z+.2);[[-.5,'#e8e8f0'],[0,'#e6b422'],[.5,'#e84a8a']].forEach(q=>{SF(.18,.3,.16,'#2a1f36',X+x+q[0],1.22,z+.2);SF(.12,.1,.12,q[1],X+x+q[0],1.42,z+.2)})});
-  SF(1,.5,1,'#c9a227',X,3.95,8);SF(1.2,.3,1.2,'#7fe3ff',X,4.35,8);SF(.8,.3,.8,'#b8f0ff',X,4.65,8);SF(.4,.2,.4,'#e8fbff',X,4.88,8);SF(.2,.1,.2,'#ffffff',X+.2,4.95,7.9);
-  [-3.6,3.6].forEach(x=>{SF(.5,.5,.5,'#2a1f36',X+x,.25,z+.6);SF(.5,.5,.5,'#2e7d32',X+x,.85,z+.6);SF(.36,.36,.36,'#388e3c',X+x,1.3,z+.6);SF(.2,.2,.2,'#43a047',X+x,1.6,z+.6)});
-  SF(2.2,.03,1.4,'#5a1f3a',X,.015,z+.75)},
- 44:(X,z)=>{/* Property: navy panelling, listing boards in the windows, a little house on the roof, a for sale sign */
-  SF(8.1,.6,.14,'#2f4a6e',X,.3,z+.07);SF(8.2,.18,.22,'#f4f6f8',X,3.3,z+.1);for(let x=-3.5;x<=3.5;x+=1)SF(.06,.6,.16,'#24395a',X+x,.3,z+.09);
-  [-2.6,2.6].forEach(x=>{[-.45,.45].forEach((o,k)=>{SF(.7,.6,.04,'#f8f8f8',X+x+o,1.5,z+.12);SF(.5,.22,.03,k?'#d9b88f':'#e8c4c4',X+x+o,1.46,z+.15);SF(.56,.14,.03,k?'#6b4a2e':'#c0392b',X+x+o,1.62,z+.15);SF(.6,.08,.03,'#2f4a6e',X+x+o,1.26,z+.15)})});
-  SF(2,1,1.6,'#f2e6d0',X+2.4,4.2,7.6);SF(2.3,.25,1.9,'#c0392b',X+2.4,4.8,7.6);SF(1.6,.25,1.4,'#a02a20',X+2.4,5.05,7.6);SF(.4,.6,.04,'#5a3a22',X+2.4,4,8.42);SF(.36,.3,.04,'#bfe3ff',X+1.85,4.3,8.42);SF(.2,.5,.2,'#8a8f96',X+3,5.2,7.4);
-  SF(.08,1.2,.08,'#f4f4f4',X+3.6,.6,z+.9);SF(.9,.08,.08,'#f4f4f4',X+3.25,1.2,z+.9);SF(.6,.45,.04,'#c0392b',X+3.2,.92,z+.92);SF(.5,.12,.03,'#ffffff',X+3.2,.98,z+.95)},
- 54:(X,z)=>{/* Corner shop: brick base, fruit and veg crates, a news stand and an ice cream freezer out front */
-  for(let r=0;r<4;r++)for(let k=0;k<10;k++)SF(.74,.18,.14,(r+k)%3?'#a8553a':'#93482f',X-3.6+k*.8+(r%2?.4:0),.12+r*.2,z+.07);SF(8.1,.08,.18,'#7a3a24',X,.84,z+.09);
-  SF(1.8,.3,.7,'#8a5a36',X-2.6,.7,z+.55);[[-.6,'#e74c3c'],[-.2,'#2ecc71'],[.2,'#f1c40f'],[.6,'#e67e22']].forEach(q=>{SF(.36,.3,.6,'#6b4a2e',X-2.6+q[0],.95,z+.55);for(let j=0;j<3;j++)SF(.12,.12,.12,q[1],X-2.6+q[0]+(j-1)*.1,1.15,z+.45+j*.1)});SF(.1,.6,.1,'#6b4a2e',X-3.4,.3,z+.8);SF(.1,.6,.1,'#6b4a2e',X-1.8,.3,z+.8);
-  SF(.9,1,.6,'#f4f4f4',X+2.6,.5,z+.45);SF(.9,.12,.6,'#3498db',X+2.6,1.06,z+.45);SF(.6,.3,.02,'#ffb0d0',X+2.6,.6,z+.76);SF(.5,.08,.02,'#ffffff',X+2.6,.88,z+.76);
-  SF(.6,.9,.4,'#2d5a8d',X+3.6,.45,z+.4);for(let j=0;j<3;j++)SF(.5,.04,.32,['#f4f4f4','#e8e0c8','#f4f4f4'][j],X+3.6,.95+j*.06,z+.4);
-  SF(.7,.8,.06,'#20302a',X-1.4,.4,z+1.1);SF(.6,.6,.02,'#2f4a3a',X-1.4,.45,z+1.14);for(let j=0;j<3;j++)SF(.4,.03,.01,'#e8e8e0',X-1.4,.6-j*.12,z+1.15)},
- 64:(X,z)=>{/* Radio: acoustic-panel facade, ON AIR light, sound wave stripes, a lattice antenna mast with a red light and a dish */
-  for(let k=0;k<8;k++)SF(.9,3,.06,k%2?'#4fb8e0':'#6ad5ff',X-3.5+k,1.7,z+.03);SF(8.2,.2,.22,'#1d3a4a',X,3.3,z+.1);SF(1.4,.36,.12,'#d0202a',X,2.4,z+.12);SF(1.1,.18,.04,'#ffd0d0',X,2.4,z+.19);
-  [-2.6,2.6].forEach(x=>[.3,.55,.8,.55,.3].forEach((h,j)=>SF(.12,h,.04,'#ffffff',X+x-.5+j*.25,2.75,z+.12)));
-  const mx=X-2.2,mz=7;for(let k=0;k<6;k++){const y=3.7+k*.7,w=.6-k*.07;[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(q=>SF(.06,.7,.06,'#c0c4c8',mx+q[0]*w/2,y+.35,mz+q[1]*w/2));SF(w,.05,.05,'#9aa0a6',mx,y,mz-w/2);SF(.05,.05,w,'#9aa0a6',mx+w/2,y,mz)}
-  SF(.18,.18,.18,'#ff3030',mx,8,mz);SF(.06,.6,.06,'#9aa0a6',mx,7.6,mz);SF(1,1,.12,'#e8e8ec',X+2.2,4.3,7.6);SF(.14,.14,.4,'#9aa0a6',X+2.2,4.3,7.85);SF(.3,.6,.3,'#8a8f96',X+2.2,3.7,7.4)},
  '-20':(X,z)=>{/* Motors: a glass showroom front with chrome fins, flags, a tyre stack and a show car on a turntable */
   SF(7.6,2.4,.06,'#9ad0f0',X,1.4,z+.06);for(let x=-3.6;x<=3.7;x+=1.2)SF(.1,2.4,.12,'#cfd3d8',X+x,1.4,z+.1);SF(8.2,.25,.25,'#cfd3d8',X,2.75,z+.12);SF(8.4,.4,.3,'#1d4f9a',X,3.2,z+.14);SF(1.4,1.9,.08,'#2a2d33',X,.95,z+.1);
   for(let k=0;k<9;k++)SF(.4,.4,.04,sfPick(['#e03a3a','#ffe066','#3b82f6','#2ecc71'],k),X-3.6+k*.9,3.6,z+.4);SF(8,.03,.03,'#555',X,3.75,z+.4);
   [-3.9,3.9].forEach(x=>{SF(.08,3,.08,'#cfd3d8',X+x,1.5,z+.9);SF(.6,.9,.03,'#3b82f6',X+x+(x<0?.34:-.34),2.5,z+.9)});
   for(let j=0;j<4;j++)SF(.7,.22,.7,'#1a1a1a',X+3.1,.11+j*.23,z+.6);SF(.36,.92,.36,'#555',X+3.1,.46,z+.6);
-  SF(2.6,.12,2.6,'#cfd3d8',X+5.8,.06,8.6)},
- '-32':(X,z)=>{/* Pet Shop: wood cladding, a paw print sign, a fish tank in the window, a kennel and bowls, a giant bone on the roof */
-  for(let k=0;k<17;k++)SF(.46,3.2,.06,k%2?'#e6b422':'#d9a41a',X-3.7+k*.46,1.6,z+.03);SF(8.2,.22,.22,'#8a5a36',X,3.3,z+.1);
-  SF(.8,.7,.06,'#ffffff',X,2.55,z+.12);SF(.34,.3,.03,'#6b4a2e',X,2.48,z+.16);[[-.24,.2],[-.08,.3],[.08,.3],[.24,.2]].forEach(q=>SF(.12,.12,.03,'#6b4a2e',X+q[0],2.48+q[1],z+.16));
-  SF(1.4,.7,.3,'#1d3a4a',X-2.6,1.3,z+.24);SF(1.3,.6,.04,'#4ab0d9',X-2.6,1.32,z+.4);[[-.3,'#ff8a30'],[.2,'#ffe066'],[.45,'#e84a8a']].forEach((q,j)=>SF(.14,.08,.02,q[1],X-2.6+q[0],1.2+j*.12,z+.43));SF(1.3,.06,.04,'#e8d9a0',X-2.6,1.04,z+.42);
-  SF(1.2,.8,1,'#c0392b',X+2.7,.4,z+.7);SF(1.3,.2,1.1,'#8a2a20',X+2.7,.9,z+.7);SF(1,.2,.9,'#a02a20',X+2.7,1.08,z+.7);SF(.5,.5,.04,'#2a1f1a',X+2.7,.3,z+1.21);SF(.3,.08,.3,'#3b82f6',X+1.7,.04,z+1.1);SF(.3,.08,.3,'#e84a4a',X+1.3,.04,z+1.1);
-  SF(2.2,.4,.5,'#f4f1ea',X,3.9,8);[-1,1].forEach(s=>{SF(.5,.55,.55,'#f4f1ea',X+s*1.1,3.92,7.85);SF(.5,.55,.55,'#f4f1ea',X+s*1.1,3.92,8.25)})},
- '-44':(X,z)=>{/* Security: dark steel panels, a shield emblem, cameras, floodlights, bollards and a barrier arm */
-  for(let k=0;k<4;k++)SF(1.9,3.2,.06,k%2?'#2a2a32':'#33333d',X-2.85+k*1.9,1.6,z+.03);SF(8.2,.25,.24,'#1a1a20',X,3.3,z+.1);SF(8.1,.06,.08,'#e6b422',X,.4,z+.08);
-  SF(.8,.9,.08,'#e6b422',X,2.55,z+.1);SF(.6,.7,.04,'#1d4f9a',X,2.58,z+.15);SF(.3,.3,.03,'#e6b422',X,2.6,z+.18);
-  [-3.9,3.9].forEach(x=>{SF(.12,.12,.4,'#555',X+x,3.1,z+.25);SF(.24,.2,.36,'#e8e8ec',X+x,3.05,z+.5);SF(.12,.1,.04,'#111',X+x,3.03,z+.7);SF(.05,.05,.05,'#ff3030',X+x+.08,3.12,z+.69)});
-  [-1.6,1.6].forEach(x=>{SF(.5,.14,.2,'#555',X+x,3.05,z+.15);SF(.6,.3,.3,'#ffe9a8',X+x,2.9,z+.35)});
-  [-3.4,-2.2,2.2,3.4].forEach(x=>{SF(.26,.8,.26,'#2a2a32',X+x,.4,z+1.1);SF(.28,.1,.28,'#e6b422',X+x,.6,z+1.1)});
-  SF(.4,1,.4,'#e6b422',X+4.4,.5,z+.6);SF(.3,.3,.3,'#1a1a20',X+4.4,1.1,z+.6);SF(3.2,.12,.12,'#ffffff',X+6,.95,z+.6);for(let k=0;k<5;k++)SF(.3,.13,.13,'#e03a3a',X+4.9+k*.6,.95,z+.6);SF(.1,.6,.1,'#555',X+7.5,.3,z+.6)}};
+  SF(2.6,.12,2.6,'#cfd3d8',X+5.8,.06,8.6)}};
 {const c0=cdShop;cdShop=function(s){c0(s);try{const f=SFRONT[String(s.cx)];if(f)f(WX(s.cx),11.03)}catch(e){console.error('shop front',s.cx,e)}}}
 /* the show car outside Motors (a real car model, on the turntable) */
 {const f0=flushSB;flushSB=function(){f0();try{if(SFCAR)return;const X=WX(-20)+5.8,m=mkS(carb(3,'#e03a3a'));m.scale.setScalar(1.3);m.position.set(X,.12,8.6);m.rotation.y=-.6;scene.add(m);SFCAR=m;col(X-1.4,7.2,X+1.4,10)}catch(e){console.error('show car',e)}}}
