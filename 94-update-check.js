@@ -1,5 +1,5 @@
 /* ---------- update notice ----------
-   Every minute (and when the tab comes back into view) checks version.js on the server.
+   Every 30 seconds (and when the tab comes back into view) checks version.js on the server.
    If GAME_VERSION there differs from the running one, a small notice offers to update.
    Update saves the game (and to the cloud when signed in), refreshes the cached game files, then reloads. */
 const UPD={seen:null,busy:0};
@@ -18,5 +18,5 @@ function updGo(){if(UPD.busy)return;UPD.busy=1;const b=document.getElementById('
  const files=[location.pathname,...[...document.querySelectorAll('script[src],link[rel=stylesheet][href]')].map(e=>e.src||e.href).filter(u=>u.startsWith(location.origin))];
  const fresh=wait(Promise.all(files.map(u=>fetch(u,{cache:'reload'}).catch(()=>{}))),6000);
  Promise.all([cloud,fresh]).then(()=>{if(b)b.textContent='Updating…';location.reload()})}
-setTimeout(updCheck,15000);setInterval(updCheck,60000);
+setTimeout(updCheck,5000);setInterval(updCheck,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)updCheck()});
