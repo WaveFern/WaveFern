@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.82.1';
+const GAME_VERSION='v26.83.0';
 const VERSION_HISTORY=[
+ {v:'v26.83.0',n:'Optional Google sign-in: once the game is connected to Firebase, the pause menu (Esc) has a Sign in with Google button and shows who is signed in, with Sign out. Playing without signing in works exactly as before, and saves still stay in this browser. Saves still load.'},
  {v:'v26.82.1',n:'Fixed the computer freezing: one broken chat, app or saved setting could stop Messages opening and make the Start menu do nothing. Now a broken chat is repaired, an app that cannot open shows a short notice or closes on its own, and Start and Shut down always work. The day clock keeps running if one song hits a problem. Saves already stuck like this are repaired when they load. Saves still load.'},
  {v:'v26.82.0',n:'Your own pictures: upload a picture for your Spotifly profile (artist page), your Instagrime profile (Account) or as an Instagrime photo post (Account > Photo post, with your own caption; still one post a day). Every upload is pixelated to match the game: profile pictures become 32x32 and photo posts 48x36, both in 16 colours. Use drawn avatar switches back. Pictures are stored small (under 1.3 KB each) so saves and save codes stay short; your 40 newest photo posts keep their photo. Saves still load.'},
  {v:'v26.81.0',n:'Promotions reworked: Instagrime > Account > Promotions has three packages. Boost (1.5x streams for 3 days), Campaign (2x for 5 days) and Blitz (3x for 7 days). The price follows your monthly listeners: $40 + $0.002, $150 + $0.006 and $600 + $0.015 per monthly listener, so the bigger you are the more it costs. A promotion starts straight away and brings followers. Each promotion shows its stats before, during and after (song streams per day, monthly listeners, followers), a daily chart and the extra streams it brought in, and you get a message when it is over. Saves still load.'},
