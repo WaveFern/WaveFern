@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.83.1';
+const GAME_VERSION='v26.84.0';
 const VERSION_HISTORY=[
+ {v:'v26.84.0',n:'Cloud saves: sign in with Google (pause menu, or the character screen on a new device) and your game saves to your Google account, so you can carry on from any device without sharing save codes. If two devices have different saves, the game asks which one to keep. Playing without signing in works as before, and save codes still work. Saves still load.'},
  {v:'v26.83.1',n:'Google sign-in is now switched on: press Esc and pick Sign in with Google in the pause menu. Signing in is still optional and saves still stay in this browser. Saves still load.'},
  {v:'v26.83.0',n:'Optional Google sign-in: once the game is connected to Firebase, the pause menu (Esc) has a Sign in with Google button and shows who is signed in, with Sign out. Playing without signing in works exactly as before, and saves still stay in this browser. Saves still load.'},
  {v:'v26.82.1',n:'Fixed the computer freezing: one broken chat, app or saved setting could stop Messages opening and make the Start menu do nothing. Now a broken chat is repaired, an app that cannot open shows a short notice or closes on its own, and Start and Shut down always work. The day clock keeps running if one song hits a problem. Saves already stuck like this are repaired when they load. Saves still load.'},
