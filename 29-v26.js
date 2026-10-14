@@ -15,7 +15,7 @@ function unready(id){const m=S.msgs.find(x=>x.id==id);if(m)m.ready=0;pcR()}
 const wantA=i=>hs(ART[i][0])%3!=0,wantC=m=>m.a!==undefined&&m.state!=2&&m.state!=3&&!m.blocked&&!!(m.want||m.stage>=1||m.state==1);
 const pdot=(src,red)=>`<span class=pfw><img src="${src}"><i class="cdot ${red?'r':'b'}" title="${red?'Wants to collab':'Just chatting'}"></i></span>`;
 {const sc0=startChat;startChat=function(i){sc0(i);const m=S.msgs[S.msgs.length-1];if(m&&m.a===i&&wantA(i)){m.want=1;pcR()}}}
-const NL2=q=>ART.map((a,i)=>S.listeners>=a[2]&&!S.msgs.some(m=>m.a===i)&&(!q||a[0].toLowerCase().includes(q))?`<div class="cr sg" onclick="startChat(${i})"><img src="${pf2(a[4])}"><div class=t><b>${esc(a[0])}</b><small>${esc(a[1])} · ${wantA(i)?'open to a collab':'say hi'}</small></div><span class=sgb>Chat</span></div>`:'').join('');
+const NL2=q=>ART.map((a,i)=>S.listeners>=a[2]&&!S.msgs.some(m=>m.a===i)&&(!q||a[0].toLowerCase().includes(q))?`<div class="cr sg" onclick="startChat(${i})"><img src="${pf2(a[4])}"><div class=t><b>${esc(a[0])}</b><small>${esc(a[1])} · ${Math.round(a[2]||0).toLocaleString()} listeners · ${wantA(i)?'open to a collab':'say hi'}</small></div><span class=sgb>Chat</span></div>`:'').join('');
 PA.msg=()=>{const L=S.msgs.filter(m=>!m.hid),cur=L.find(m=>m.id==S.chat)||L[L.length-1]||null;if(cur){S.chat=cur.id;cur.unread=0}const art=!!cur&&cur.a!==undefined,q=MSQ.trim().toLowerCase(),
  bar=art&&!cur.blocked&&cur.state==0&&cur.stage==2&&cur.ready?(cur.init=='a'?`<div class=cfm><span>${esc(ART[cur.a][0])} pays you <b>${$$(cur.pay)}</b> · you have ${$$(S.money)}</span><button class=go onclick="payCollab(${cur.id})">Accept &amp; get paid ${$$(cur.pay)}</button><button onclick="unready(${cur.id})">Not now</button></div>`:`<div class=cfm><span>Collab fee <b>${$$(cur.pay)}</b> · you have ${$$(S.money)}</span><button class=go ${S.money<cur.pay?'disabled':''} onclick="payCollab(${cur.id})">Confirm &amp; pay ${$$(cur.pay)}</button><button onclick="unready(${cur.id})">Not now</button></div>`):'',
  /* pinned chats first, then newest activity; the search box filters by name and message text */
@@ -23,7 +23,7 @@ PA.msg=()=>{const L=S.msgs.filter(m=>!m.hid),cur=L.find(m=>m.id==S.chat)||L[L.le
  sug=ncv||q?NL2(q):'',
  sugBox=ncv||sug?`<div class=sgh><b>Suggested people</b><small>${ncv?'These are not new messages. Tap a name to start a chat with them.':'Not in your chats yet. Tap a name to start a chat.'}</small></div>${sug||`<div class=cr><small>${q?'No suggested people match.':'Nobody new is reachable yet. Grow your listeners.'}</small></div>`}<div class=sgh2>Your chats</div>`:'',
  list=ord.map(m=>`<div class="cr ${cur&&m.id==cur.id?'on':''}" onclick="openChat(${m.id})">${m.a!==undefined&&m.unread?pdot(cpic(m),wantC(m)):`<img src="${cpic(m)}">`}<div class=t><b>${m.pin?'📌 ':''}${esc(cname(m))}</b><small>${m.blocked?'Blocked you':esc(clast(m))}</small></div>${m.unread?'<span class=ub>new</span>':''}</div>`).join('')||`<div class=cr><small>${q?'No chats match your search.':'No chats yet. Press New to see suggested people.'}</small></div>`,
- sub=cur?(!art?(cur.g?'Your manager · legend':'Official'):esc(ART[cur.a][1])+' · '+(ART[cur.a][8]?'fictional in-game stand-in':'fictional artist')):'',
+ sub=cur?(!art?(cur.g?'Your manager · legend':'Official'):esc(ART[cur.a][1])+' · '+Math.round(ART[cur.a][2]||0).toLocaleString()+' monthly listeners · '+(ART[cur.a][8]?'fictional in-game stand-in':'fictional artist')):'',
  pane=cur?`<div class=cvh><img src="${cpic(cur)}"><div><b>${esc(cname(cur))}</b><br><small style="color:#8aa094">${sub}${cur.blocked?' · BLOCKED you':cur.state==1?(cur.recv?' · collab booked, they paid you':' · collab booked, fee paid'):cur.state==2?' · declined':cur.state==3?' · collab done':''}</small></div><div class=cva><button onclick="msPin(${cur.id})">${cur.pin?'Unpin':'📌 Pin'}</button><button onclick="msClearAsk(${cur.id})">Clear chat</button></div></div>
  ${MSCF==cur.id?`<div class=msc><span>Clear this chat? The messages are deleted for good. ${cur.blocked?esc(cname(cur))+' blocked you, so it will not come back.':'It only comes back if '+esc(cname(cur))+' messages you again.'}</span><button class=go onclick="msClearGo(${cur.id})">Clear chat</button><button onclick="MSCF=0;pcR()">Keep it</button></div>`:''}
  <div class=cvb id=cv>${Array.isArray(cur.log)&&(art||cur.g)?cur.log.map(x=>`<div class="bb ${x.f}">${esc(x.t)}<small>Day ${x.d||''}</small></div>`).join(''):`<div class="bb a">${esc(cur.body)}</div>`}${TY==cur.id?'<div class="bb a"><i>typing…</i></div>':''}</div>
@@ -39,7 +39,7 @@ function firstDMs(){S.dm1=1;const pool=ART.map((a,i)=>i).filter(i=>!ART[i][8]&&A
 /* collab songs always carry exactly one "(feat. NAME)" */
 const featT=(t,ft)=>String(t||'').replace(/\s*[([](feat|ft)\.?\s[^)\]]*[)\]]/gi,'').trim().replace(/^$/,'Untitled')+' (feat. '+ft+')';
 {const st0=saveT;saveT=function(id){const d=S.drafts.find(x=>x.id==id),i=$('tin');if(d&&d.ft&&i&&i.value.trim())i.value=featT(i.value,d.ft);st0(id)}
- const up0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id);if(d&&d.ft&&d.title.trim())d.title=featT(d.title,d.ft);up0(id)}}
+ const up0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id);if(d&&d.ft&&d.title.trim())d.title=featT(d.title,d.ft);const op=d&&d.op;up0(id);if(op){const x=S.songs.find(q=>q.id==id);if(x)x.op=op}}}
 /* in-person meeting: three replies per exchange, 1-3 exchanges, each reply moves the artist's opinion */
 const PERS={chill:'laid-back',hype:'high energy',shy:'shy',formal:'professional',goofy:'goofy'};
 const TONE={hype:['Wassup! Let\'s cook something crazy today.','Yooo, finally! I\'ve been hyped for this all week.','Let\'s gooo, this track is gonna slap.','What\'s good! Turn it up, let\'s make noise.'],
@@ -102,10 +102,13 @@ function rollLuck(s){if(s.lk!==undefined)return;if(S.day-s.day>0){s.lk=0;return}
 function luckNote(s){const v=s.lk=='v',t=v?'🚀 "'+s.title+'" is going VIRAL! Millions of streams are on the way.':'🔥 "'+s.title+'" is a HIT! It is streaming far better than your other songs.';
  try{say(t)}catch(e){}try{snd('chime')}catch(e){}if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'Spotifly Team',body:v?'Your song "'+s.title+'" has gone viral. It is on every playlist and will pull in at least '+PERF.viralMin.toLocaleString()+' streams over the next two weeks.':'Your song "'+s.title+'" is a hit. Listeners are playing it on repeat, so it will keep streaming several times better than usual.',state:9,unread:1,day:S.day})}
 const luckTag=s=>s.lk=='v'?' 🚀 VIRAL':s.lk=='h'?' 🔥 HIT':'';
-const songCap=s=>s.q*s.q*25*Math.pow(FAME_MULT,fameLv())*(s.lk=='h'?s.hm||1:1)-(s.streams-(s.lk=='v'?(s.vt||0)-(s.vr||0):0));
+const songCap=s=>s.q*s.q*25*Math.pow(FAME_MULT,fameLv())*(s.lk=='h'?s.hm||1:1)-(s.streams-(s.lk=='v'?(s.vt||0)-(s.vr||0):0)-(s.fs||0));
+/* v26.104: the featured artist's own monthly listeners (looked up by name, so older saves work too) */
+const artLis=s=>{if(!s||!s.ft)return 0;const a=ART.find(x=>x[0]===s.ft);return a?Math.max(0,a[2]||0):0};
 function planOf(s){if(s.pd===S.day)return s.pv;rollLuck(s);const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/PACE.lisBonus));
  let v=s.q*PACE.base*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+PACE.floor)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*qualF(s)*collabF(s)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<PACE.viralP&&age<8)v*=R(PACE.viralMin,PACE.viralMax);if(s.lk=='h')v*=s.hm||1;
  v=Math.max(0,Math.min(Math.round(v||0),songCap(s)));
+ s.fx=0;const AL=artLis(s);if(AL>0){const x=Math.round(AL*PERF.featLis*R(.75,1.25)*(Math.pow(.86,age)+PACE.floor)*qualF(s)*(1+(s.op||0)*.12)*(age==0?1.5:1)*(s.lk=='h'?s.hm||1:1));if(x>0){s.fx=x;s.fs=(s.fs||0)+x;v+=x}}
  s.vx=0;if(s.lk=='v'&&s.vr>0){const x=age>=PERF.viralDays-1||s.vr<1000?s.vr:Math.round(s.vr*PERF.viralShare);s.vr-=x;s.vx=x;v+=x}
  s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
 /* monthly listeners: month = 30 in-game days; ML = this month's streams / random divisor 2-5 chosen each month */

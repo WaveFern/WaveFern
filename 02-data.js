@@ -21,8 +21,11 @@ const PACE={base:.36,interest:.06,lisBonus:200,floor:.015,viralP:.012,viralMin:1
    hit: rolled once when a song is released. Chance hitP * clamp(q/hitQRef, hitQMin, hitQMax) (about 8% on average). A hit gets hitMin..hitMax times its normal streams, for its whole life.
    viral: rolled once on release, very rare. Chance viralP * min(1, q/viralQBest)^viralQPow (0.3% at Q90+, 0.075% at Q45).
      A viral song gets viralMin streams plus monthly listeners x viralLisMin..viralLisMax on top of its normal streams,
-     paid out over viralDays days: viralShare of what is left each day, the rest on the last day. */
-const PERF={qRef:50,qPow:.8,qMin:.3,qMax:2.5,collabPow:2,collabQ:.5,hitP:.08,hitQRef:60,hitQMin:.5,hitQMax:1.6,hitMin:3,hitMax:6,viralP:.003,viralQBest:90,viralQPow:2,viralMin:5e6,viralLisMin:20,viralLisMax:50,viralShare:.3,viralDays:14};
+     paid out over viralDays days: viralShare of what is left each day, the rest on the last day.
+   featured artist's fans (v26.104): every artist has a set monthly-listener count (ART row, a[2]). A collab also earns
+     featLis x that artist's listeners per day from their fans, x quality factor, x your chemistry, decaying like any song (x1.5 on release day, x hit size on a hit).
+     These streams sit outside the song's normal stream cap, so a feature with a big artist pays off even while you are small. */
+const PERF={qRef:50,qPow:.8,qMin:.3,qMax:2.5,collabPow:2,collabQ:.5,hitP:.08,hitQRef:60,hitQMin:.5,hitQMax:1.6,hitMin:3,hitMax:6,viralP:.003,viralQBest:90,viralQPow:2,viralMin:5e6,viralLisMin:20,viralLisMax:50,viralShare:.3,viralDays:14,featLis:.01};
 const mentors=()=>MEN.filter(m=>S.listeners>=m[0]).length;
 const updateVersion=()=>S.version++;
 
