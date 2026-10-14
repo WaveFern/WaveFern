@@ -19,5 +19,6 @@ setInterval(()=>{try{
 }catch(e){}},1000);
 {const sb=stBody;stBody=function(){const h=sb.apply(this,arguments);if(STAB!='music')return h;
  const n=(S.songs||[]).length,src=msrc();
- return`<h3>Music source</h3><div class=so><span>Play<small class=m>${src=='songs'&&!n?'You have no released songs yet, so the soundtrack plays':'Outside the computer'}</small></span><button class="${src=='sound'?'go':''}" onclick="mSetSrc('sound')">Soundtrack</button><button class="${src=='songs'?'go':''}" onclick="mSetSrc('songs')">My songs</button></div>`
- +`<div class=so><span>Top songs to loop<small class=m>Your most streamed songs, played one after another on loop (${n} released)</small></span><input type=number min=1 max=50 value=${mtop()} style="width:70px" onchange="mSetTop(this.value)"></div>`+h}}
+ const k=h.indexOf('<h3 style="margin-top:12px">Soundtrack'),head=k<0?h:h.slice(0,k),sound=k<0?'':h.slice(k);
+ return head+`<h3 style="margin-top:12px">Music source</h3><div class=so><span>Play<small class=m>${src=='songs'&&!n?'You have no released songs yet, so the soundtrack plays':'Outside the computer'}</small></span><select onchange="mSetSrc(this.value)"><option value=sound${src=='sound'?' selected':''}>Soundtrack</option><option value=songs${src=='songs'?' selected':''}>My songs</option></select></div>`
+ +(src=='songs'?`<div class=so><span>Top songs to loop<small class=m>Your most streamed songs, played one after another on loop (${n} released)</small></span><input type=number min=1 max=50 value=${mtop()} style="width:70px" onchange="mSetTop(this.value)"></div>`:sound)}}
