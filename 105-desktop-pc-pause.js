@@ -29,7 +29,7 @@ addEventListener('resize',()=>{try{if(mode=='pc')pcLayout()}catch(e){}});
 body.pcmode #ui{background:
  linear-gradient(#0003 0 0) 0 0/100% 100% no-repeat,
  linear-gradient(#d9ccb2 0,#cdbea3 82%,#7b5231 82%,#5e3d22 100%);image-rendering:pixelated}
-body.pcmode #ui::before{content:'';position:absolute;left:50%;bottom:0;width:clamp(10px,1.4vw,18px);height:5.5%;transform:translateX(-50%);background:linear-gradient(90deg,#2a2c31,#3d4046 50%,#2a2c31)}
+body.pcmode #ui::before{content:'';position:absolute;left:50%;bottom:0;width:clamp(30px,5vw,64px);height:5.5%;transform:translateX(-50%);background:#33363c}
 body.pcmode #ui::after{display:none}
 body.pcmode #pc{inset:1.2% 2% 5.5% 2%;border:clamp(6px,.9vw,12px) solid #1d1f24;border-bottom-width:clamp(16px,2.4vw,30px);border-radius:0;overflow:hidden;
  box-shadow:inset 0 0 0 4px #000;clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px))}
