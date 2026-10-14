@@ -9,3 +9,14 @@ function sfRename(){(S.msgs||[]).forEach(m=>{if(m&&m.from=='WaveFern Team')m.fro
 function delSong(id){const s=S.songs.find(x=>x.id==id);if(!s)return;if(!confirm('Delete "'+s.title+'" from Spotifly? It stops earning and cannot be undone.'))return;
  S.songs=S.songs.filter(x=>x.id!=id);(S.albums||[]).forEach(a=>{if(Array.isArray(a.songs))a.songs=a.songs.filter(q=>q!=id)});
  snd('pop');say('Deleted "'+s.title+'" from Spotifly.');pcR()}
+
+/* v26.78: the delete button is a bin icon on the song's own row (it still asks first). */
+{const st=document.createElement('style');st.textContent='.sr.sd{grid-template-columns:30px 1fr 110px 70px 36px}.bin{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;color:var(--m)}.bin:hover{color:var(--t)}.bin svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.ng .bpl{width:32px;height:32px;padding:0;margin:0;border-radius:50%;border:0;background:#1db954;color:#000;font-size:12px;line-height:32px;cursor:pointer;box-shadow:none;flex:none}.ng .bpl:hover{transform:scale(1.08)}';document.head.appendChild(st)}
+const sfBin=s=>`<button class=bin title="Delete song" aria-label="Delete ${esc(s.title)}" onclick="delSong(${s.id})"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M3.8 4l.8 9.5h6.8l.8-9.5M6.6 6.5v5M9.4 6.5v5"/></svg></button>`;
+
+/* v26.78: unreleased drafts on the Upload tab can be played back. Playing a draft does not count streams or earnings. */
+function sfDraftPlay(id){const d=S.drafts.find(x=>x.id==id);if(!d)return;const c=Beats.current();
+ if(c&&c.owner=='sf'&&c.src===d)Beats.stop(.3);
+ else{const p=Beats.play(d,{owner:'sf',alive:()=>mode=='pc'});if(p&&typeof say=='function')say('Now playing "'+d.title+'" · '+p.style+' · '+p.bpm+' bpm · '+p.key+'. Not released, no streams.')}
+ pcR()}
+const sfDraftBtn=d=>{const c=Beats.current(),on=!!(c&&c.owner=='sf'&&c.src===d);return`<button class=bpl title="${on?'Stop':'Play'} this draft" aria-label="${on?'Stop':'Play'} ${esc(d.title)}" onclick="sfDraftPlay(${d.id})">${on?'❚❚':'▶'}</button>`};
