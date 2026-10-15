@@ -18,8 +18,9 @@ function buyPhone(n){const m=phModel(),g=GPH[n];if(!g||n<=m)return;if(S.money<g[
 /* ---- opening and closing ---- */
 function openPhone(){if(mode!='play')return;mode='phone';PH.app='home';PH.view=null;PH.last=null;phR();try{snd('pop')}catch(e){}}
 function closePhone(){const e=document.getElementById('ph');if(e)e.remove();if(mode=='phone')mode='play'}
-function phApp(a){PH.app=a;PH.view=null;if(a=='ig'){igv='feed'}if(a=='msg'){ncv=false}phR()}
+function phApp(a){if(a=='cam')return openCamera();PH.app=a;PH.view=null;if(a=='ig'){igv='feed'}if(a=='msg'){ncv=false}phR()}
 addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||''))return;const k=e.key.toLowerCase();
+ if(PH.camOn){e.stopImmediatePropagation();e.preventDefault();if(k=='g'||k=='escape')return closeCamera();if((k==' '||k=='enter')&&!e.repeat)return phShoot();PK[k]=1;return}
  if(mode=='phone'&&(k=='escape'||k=='g')){e.stopImmediatePropagation();e.preventDefault();closePhone();return}
  if(k=='g'&&!e.repeat&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&mode=='play'&&typeof S!='undefined'&&S&&!document.getElementById('load')){openPhone()}},true);
 /* handlers inside Messages and Instagrime redraw with pcR(); while the phone is open that draws the phone instead */
@@ -32,7 +33,7 @@ addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test((e.target||{}).ta
 #ph .phn{display:flex;gap:8px;justify-content:center;padding:8px;background:#000}
 #ph .phh{padding:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 #ph .phi{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;box-shadow:none;font-size:12px;color:var(--t,#e8f3ec);position:relative}
-#ph .phi .t{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid #000;overflow:hidden}
+#ph .phi img{width:56px;height:56px;image-rendering:pixelated}#ph .phi .t{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid #000;overflow:hidden}
 #ph .phi .t img{width:36px;height:36px;image-rendering:pixelated}
 #ph .phi .bd{position:absolute;top:-4px;right:6px;background:#e03a3a;color:#fff;border-radius:9px;padding:0 6px;font-size:11px}
 #ph .phc{padding:12px;display:flex;flex-direction:column;gap:10px}#ph .phc select{padding:6px;background:#0a0d0b;color:var(--t,#e8f3ec);border:2px solid #333}
@@ -45,7 +46,7 @@ function phBody(){const m=phModel();
  if(PH.app=='cam')return phCamUI();
  if(PH.app=='pho')return phPhoUI();
  const un=(S.msgs||[]).filter(x=>x.unread).length;
- return`<div class=phh><button class=phi onclick="phApp('msg')"><span class=t style="background:#8a4dff">💬</span>Messages${un?`<span class=bd>${un}</span>`:''}</button><button class=phi onclick="phApp('ig')"><span class=t style="background:#e84393">${typeof IC!='undefined'&&IC.ig?`<img src="${IC.ig}">`:'📸'}</span>Instagrime</button><button class=phi onclick="phApp('cam')"><span class=t style="background:#3a3f45">📷</span>Camera</button><button class=phi onclick="phApp('pho')"><span class=t style="background:#2f8f5a">🖼️</span>Photos</button></div><p class=m style="padding:0 16px"><small>Gphone ${m}${m==8?' (laggy). Upgrade on Amazoom.':''}. Photos ${GPH[m][1]}x${GPH[m][2]}.</small></p>`}
+ return`<div class=phh>${[['msg','Messages',IC.msg,un],['ig','Instagrime',IC.ig,0],['cam','Camera',IC.cam,0],['pho','Photos',IC.pho,0]].map(a=>`<button class=phi onclick="phApp('${a[0]}')"><img src="${a[2]}">${a[1]}${a[3]?`<span class=bd>${a[3]}</span>`:''}</button>`).join('')}</div><p class=m style="padding:0 16px"><small>Gphone ${m}${m==8?' (laggy). Upgrade on Amazoom.':''}. Photos ${GPH[m][1]}x${GPH[m][2]}.</small></p>`}
 function phR(){let e=document.getElementById('ph');if(!e){e=document.createElement('div');e.id='ph';document.body.appendChild(e)}
  const sc=e.querySelector('.phb'),st=sc?sc.scrollTop:0;
  e.innerHTML=phTitle()+`<div class=phb>${phBody()}</div><div class=phn><button onclick="phApp('home')">Home</button><button onclick="closePhone()">Close (G)</button></div>`;
@@ -55,29 +56,50 @@ function phR(){let e=document.getElementById('ph');if(!e){e=document.createEleme
 /* chat replies arrive on timers that only redraw the computer, so the phone's Messages refreshes itself */
 setInterval(()=>{try{if(mode=='phone'&&PH.app=='msg'&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))phR()}catch(e){}},3000);
 setInterval(()=>{try{if(typeof S!='undefined'&&S&&mode=='play'&&!S.phHint&&!document.getElementById('load')){S.phHint=1;say('Press G for your Gphone.')}}catch(e){}},5000);
-/* ---- camera ---- */
-function phCamUI(){const m=phModel(),g=GPH[m],ch2=[],seen=new Set();
+/* ---- camera: a full-screen viewfinder like a phone camera. PHOTO is first person (walk with W/S, turn with A/D, tilt with R/F);
+   SELFIE puts the camera in front of you with the arm out, optionally with a friend standing beside you. Space or Enter (or the shutter) takes the photo. ---- */
+{const px=(r,p)=>{const c=document.createElement('canvas');c.width=r[0].length;c.height=r.length;const x=c.getContext('2d');r.forEach((l,y)=>[...l].forEach((h,i)=>{if(p[h]){x.fillStyle=p[h];x.fillRect(i,y,1,1)}}));return c.toDataURL()};
+ IC.cam=px(['..........','...DDDD...','.DDDDDDDD.','DDDWWWWDDD','DDWBBBBWDD','DDWBLLBWDD','DDWBBBBWDD','DDDWWWWDDD','DDDDDDDDDD','..........'],{D:'#6b7480',W:'#e8f3ec',B:'#1b2733',L:'#7fd0ff'});
+ IC.pho=px(['..........','WWWWWWWWWW','WSSSSSSYSW','WSSSSSSSSW','WSSMSSSSSW','WSMMMSMSSW','WMMMMMMMGW','WGGGGGGGGW','WWWWWWWWWW','..........'],{W:'#e8f3ec',S:'#5ab4f0',Y:'#ffd23f',M:'#4a8f5a',G:'#2fae5a'})}
+const PHC=new THREE.PerspectiveCamera(62,1,.1,600),PK={},CB_L=84,CB_R=150;
+PH.x=0;PH.z=0;PH.yaw=0;PH.pitch=0;PH.fr=null;PH.frWho=-2;
+function openCamera(){const e=document.getElementById('ph');if(e)e.remove();mode='play';PH.camOn=1;PH.x=P.x;PH.z=P.z;PH.yaw=P.rot;PH.pitch=0;PH.busy=0;document.body.classList.add('phcam');phCamR()}
+function closeCamera(back){PH.camOn=0;document.body.classList.remove('phcam');const e=document.getElementById('phcam');if(e)e.remove();if(PH.fr){scene.remove(PH.fr.g);PH.fr=null;PH.frWho=-2}if(P.mesh)P.mesh.visible=true;for(const k in PK)delete PK[k];if(back)openPhone()}
+function phCamR(){let e=document.getElementById('phcam');if(!e){e=document.createElement('div');e.id='phcam';document.body.appendChild(e)}
+ const L=phPhotos(),last=L[L.length-1],g=GPH[phModel()],seen=new Set(),ch2=[];
  (S.msgs||[]).forEach(x=>{if(x.a!==undefined&&!seen.has(x.a)){seen.add(x.a);ch2.push(x.a)}});
  const rest=ART.map((a,i)=>i).filter(i=>!seen.has(i)).sort((a,b)=>ART[a][0].localeCompare(ART[b][0])),opt=i=>`<option value="${i}" ${PH.who==i?'selected':''}>${esc(ART[i][0])}</option>`;
- const last=PH.last&&phPhotos().find(p=>p.id==PH.last);
- return`<div class="phx phc"><div style="display:flex;gap:8px"><button class="${PH.cam=='self'?'go':''}" onclick="PH.cam='self';phR()">Selfie</button><button class="${PH.cam=='land'?'go':''}" onclick="PH.cam='land';phR()">Landscape</button></div>
- ${PH.cam=='self'?`<label class=m>Selfie with <select onchange="PH.who=+this.value;phR()"><option value="-1" ${PH.who<0?'selected':''}>Just me</option>${ch2.length?`<optgroup label="Your chats">${ch2.map(opt).join('')}</optgroup>`:''}<optgroup label="Everyone">${rest.map(opt).join('')}</optgroup></select></label>`:`<p class=m><small>Takes a photo of what is on your screen right now. Close the phone with G to move around, then open it again.</small></p>`}
- <button class=go ${PH.busy?'disabled':''} onclick="phShoot()">${PH.busy?'Focusing…':'📷 Take photo'}</button>
- <small class=m>Gphone ${m}: ${g[1]}x${g[2]} photos${g[3]?', shutter lag '+g[3]+'s':', instant shutter'}.</small>
- ${last?`<img class=phv src="${pxURL(last.c,Math.max(2,Math.floor(400/g[1])))}"><div style="display:flex;gap:8px"><button class=go onclick="phView(${last.id})">Open in Photos</button></div>`:''}</div>`}
+ e.innerHTML=`<div class="pcb pl"><button onclick="closeCamera(1)">✕</button>${PH.cam=='self'?`<select onchange="PH.who=+this.value;this.blur()"><option value="-1" ${PH.who<0?'selected':''}>Just me</option>${ch2.length?`<optgroup label="Your chats">${ch2.map(opt).join('')}</optgroup>`:''}<optgroup label="Everyone">${rest.map(opt).join('')}</optgroup></select>`:''}<small>Gphone ${phModel()}<br>${g[1]}x${g[2]}</small></div>
+ <div class="pcb pr"><button class=pfl title="Flip camera" onclick="PH.cam=PH.cam=='self'?'land':'self';phCamR()">⟲</button><div class=pmd><button class="${PH.cam=='self'?'on':''}" onclick="PH.cam='self';phCamR()">SELFIE</button><button class="${PH.cam=='land'?'on':''}" onclick="PH.cam='land';phCamR()">PHOTO</button></div><button class=psh ${PH.busy?'disabled':''} onclick="phShoot()"><i></i></button>${last?`<img class=pth src="${pxURL(last.c,2)}" onclick="closeCamera();openPhone();phApp('pho')">`:'<span class=pth></span>'}</div><div id=pfla></div>`}
+{const st=document.createElement('style');st.textContent=`body.phcam #hud{display:none}#phcam{position:fixed;inset:0;z-index:70;pointer-events:none;font-family:system-ui,sans-serif}
+#phcam .pcb{position:absolute;top:0;bottom:0;background:#000;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 6px;box-sizing:border-box;color:#fff}
+#phcam .pl{left:0;width:${CB_L}px}#phcam .pr{right:0;width:${CB_R}px}#phcam .pl select{width:74px;font-size:11px;background:#222;color:#fff;border:1px solid #555}#phcam small{color:#aaa;text-align:center;font-size:11px}
+#phcam button{background:none;border:0;box-shadow:none;color:#fff;cursor:pointer}#phcam .pfl{font-size:26px;border:2px solid #fff;border-radius:8px;width:48px;height:36px}
+#phcam .pmd{display:flex;flex-direction:column;gap:22px}#phcam .pmd button{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:2px;font-size:15px;font-weight:600;color:#fff}#phcam .pmd button.on{color:#ffd60a}
+#phcam .psh{width:76px;height:76px;border-radius:50%;background:#fff;border:4px solid #fff!important;padding:0;display:flex;align-items:center;justify-content:center}#phcam .psh i{width:62px;height:62px;border-radius:50%;border:3px solid #000;display:block}#phcam .psh:active i{background:#ddd}#phcam .psh:disabled{opacity:.6}
+#phcam .pth{width:56px;height:56px;border-radius:8px;border:2px solid #fff;object-fit:cover;image-rendering:pixelated;background:#222}#pfla{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s}`;document.head.appendChild(st)}
+/* camera pose: first person for PHOTO, in front of you at arm's length for SELFIE */
+function phFriend(){const w=PH.cam=='self'?PH.who:-1;if(PH.frWho===w)return;if(PH.fr){scene.remove(PH.fr.g);PH.fr=null}PH.frWho=w;if(w>=0){try{const o=buildChar(Object.assign({},ART[w][4]));scene.add(o.g);PH.fr=o}catch(e){console.error('selfie friend',e)}}}
+function phCamPose(){PHC.aspect=innerWidth/innerHeight;PHC.fov=PH.cam=='self'?70:62;PHC.updateProjectionMatrix();const self=PH.cam=='self';if(P.mesh)P.mesh.visible=self;phFriend();
+ if(self){const f=[Math.sin(P.rot),Math.cos(P.rot)],r=[f[1],-f[0]],fo=PH.fr?.38:0;
+  if(PH.fr){PH.fr.g.position.set(P.x+r[0]*.78,0,P.z+r[1]*.78);PH.fr.g.rotation.y=P.rot}
+  try{P.arms[0].rotation.x=-2.5}catch(e){}
+  PHC.position.set(P.x+r[0]*fo+f[0]*1.5,1.75,P.z+r[1]*fo+f[1]*1.5);PHC.lookAt(P.x+r[0]*fo,1.3,P.z+r[1]*fo)}
+ else{PHC.position.set(P.x,1.6,P.z);PHC.lookAt(P.x+Math.sin(PH.yaw)*10,1.6+Math.tan(PH.pitch)*10,P.z+Math.cos(PH.yaw)*10)}}
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(PH.camOn&&sc===scene&&c===cam){try{phCamPose()}catch(e){console.error('camera pose',e)}return r0(sc,PHC)}return r0(sc,c)}}
+{const u0=update;update=function(dt){
+ if(PH.camOn){if(mode!='play')closeCamera();else{for(const k in keys)delete keys[k];
+  if(PH.cam=='land'){const sp=(PK.shift?5:2.6)*dt;if(PK.a||PK.arrowleft)PH.yaw+=1.6*dt;if(PK.d||PK.arrowright)PH.yaw-=1.6*dt;if(PK.r)PH.pitch=Math.min(.6,PH.pitch+.8*dt);if(PK.f)PH.pitch=Math.max(-.6,PH.pitch-.8*dt);
+   const m=(PK.w||PK.arrowup?1:0)-(PK.s||PK.arrowdown?1:0);if(m){const dx=Math.sin(PH.yaw)*m*sp,dz=Math.cos(PH.yaw)*m*sp;if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz}P.rot=PH.yaw}}}
+ return u0(dt)}}
+addEventListener('keyup',e=>{delete PK[e.key.toLowerCase()]});addEventListener('blur',()=>{for(const k in PK)delete PK[k]});
+function phFlash(){const f=document.getElementById('pfla');if(!f)return;f.style.transition='none';f.style.opacity=.9;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .35s';f.style.opacity=0}))}
 function phNew(c,kind,who){const L=phPhotos(),id=(S.phId=(S.phId||0)+1);L.push({id,c,k:kind,w:who||'',d:S.day,gp:phModel()});while(L.length>PH_MAX)L.shift();PH.last=id;return id}
 function phSoften(img){/* low models are blurry and dull */const m=phModel(),b=m<=9?1.6:m<=11?.9:m<=13?.4:0;if(!b)return img;const w=img.width||img.naturalWidth,h=img.height||img.naturalHeight,k=document.createElement('canvas');k.width=w;k.height=h;const x=k.getContext('2d');try{x.filter='blur('+b+'px) brightness('+(m<=9?.9:.97)+')'}catch(e){}x.drawImage(img,0,0,w,h);return k}
-function phShoot(){if(PH.busy)return;const m=phModel(),g=GPH[m];PH.busy=1;phR();
- setTimeout(()=>{try{
-  if(PH.cam=='land'){renderer.render(scene,cam);const c=pxFromImage(phSoften(renderer.domElement),g[1],g[2]);phNew(c,'land','');PH.busy=0;try{snd('pop')}catch(e){}phR()}
-  else phSelfie(PH.who,c=>{phNew(c,'self',PH.who>=0?ART[PH.who][0]:'');PH.busy=0;try{snd('pop')}catch(e){}phR()})
- }catch(e){console.error('photo',e);PH.busy=0;say('The camera glitched. Try again.');phR()}},Math.max(60,g[3]*1000))}
-function phSelfie(who,done){const g=GPH[phModel()],W=192,H=144,k=document.createElement('canvas');k.width=W;k.height=H;const x=k.getContext('2d'),hs=((S.day||1)*37+(who+3)*11)%360;
- const gr=x.createLinearGradient(0,0,0,H);gr.addColorStop(0,'hsl('+hs+',55%,70%)');gr.addColorStop(1,'hsl('+((hs+40)%360)+',45%,45%)');x.fillStyle=gr;x.fillRect(0,0,W,H);x.fillStyle='rgba(0,0,0,.18)';x.fillRect(0,H-26,W,26);
- const srcs=[pf2(ch)];if(who>=0)srcs.push(pf2(ART[who][4]));let n=0;const imgs=[];
- srcs.forEach((u,i)=>{const im=new Image();im.onload=im.onerror=()=>{imgs[i]=im;if(++n==srcs.length){try{x.imageSmoothingEnabled=false;const s=who>=0?88:112;
-   if(who>=0){x.drawImage(imgs[0],14,H-s-8,s,s);if(imgs[1].width)x.drawImage(imgs[1],W-s-14,H-s-8,s,s)}else x.drawImage(imgs[0],(W-s)/2,H-s-8,s,s);
-   done(pxFromImage(phSoften(k),g[1],g[2]))}catch(e){console.error('selfie',e);PH.busy=0;say('The camera glitched. Try again.');phR()}}};im.src=u})}
+function phShoot(){if(PH.busy||!PH.camOn)return;const g=GPH[phModel()];PH.busy=1;phCamR();
+ setTimeout(()=>{try{renderer.render(scene,cam);const cv=renderer.domElement,sx=Math.round(CB_L/innerWidth*cv.width),sw=Math.round((innerWidth-CB_L-CB_R)/innerWidth*cv.width),k=document.createElement('canvas');k.width=sw;k.height=cv.height;k.getContext('2d').drawImage(cv,sx,0,sw,cv.height,0,0,sw,cv.height);
+  const c=pxFromImage(phSoften(k),g[1],g[2]);phNew(c,PH.cam=='self'?'self':'land',PH.cam=='self'&&PH.who>=0?ART[PH.who][0]:'');try{snd('pop')}catch(e){}phFlash()}catch(e){console.error('photo',e);say('The camera glitched. Try again.')}
+  PH.busy=0;if(PH.camOn)phCamR()},Math.max(60,g[3]*1000))}
 /* ---- photos ---- */
 function phPhoUI(){const L=phPhotos().slice().reverse(),m=phModel();
  if(PH.view){const p=L.find(q=>q.id==PH.view);if(p){const w=GPH[p.gp]?GPH[p.gp][1]:48;return`<div class="phx phc"><img class=phv src="${pxURL(p.c,Math.max(2,Math.floor(400/w)))}"><small class=m>${p.k=='self'?(p.w?'Selfie with '+esc(p.w):'Selfie'):'Landscape'} · Day ${p.d} · Gphone ${p.gp}</small><div style="display:flex;gap:8px;flex-wrap:wrap"><button class=go onclick="phPost(${p.id})">Post to Instagrime</button><button onclick="phDel(${p.id})">Delete</button><button onclick="PH.view=null;phR()">Back</button></div></div>`}}
