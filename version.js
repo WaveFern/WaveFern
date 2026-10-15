@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.136.0';
+const GAME_VERSION='v26.136.1';
 const VERSION_HISTORY=[
+ {v:'v26.136.1',n:'Fixed the Gphone not opening: pressing G now opens your phone again. Saves still load.'},
  {v:'v26.136.0',n:'Gphone camera is now a full-screen viewfinder with a shutter button and a PHOTO / SELFIE switch, no grid lines. PHOTO is first person: walk with W and S, turn with A and D, tilt with R and F, and take the shot with the button, Space or Enter. SELFIE puts the camera in front of you with your arm out, alone or with anyone beside you. The phone home screen now uses the same pixel icons as the computer. Press G or Esc to leave the camera. Saves still load.'},
  {v:'v26.135.0',n:'Press G to open your Gphone (not while driving, on the computer, recording or at a festival). You start with a laggy Gphone 8; Gphone 9 to 18 are sold on Amazoom, up to $2,500 for the Gphone 18, with sharper photos and less shutter lag. Apps: Messages, Instagrime, Camera (selfies with anyone, or a photo of the world) and Photos (post any photo to Instagrime). Five new people now ask to collab early and mid game: John Dodds, Sochi Irukwu, Gutch, Billy Butler and Amir Suenu (with a smell cloud). The art gallery curator is now tall and skinny with glasses and salt and pepper curls. Saves still load.'},
  {v:'v26.134.0',n:'Create album: 12 more cover backgrounds (Diagonal, Rings, Zigzag, Stars, Plaid, Waves, Spotlight, Triangles, Bricks, Halftone, Glow, Confetti) and 9 more borders (Black, Film strip, Gold, Dashed, Corners, Rounded, White frame, Checker, Neon). Saves still load.'},
