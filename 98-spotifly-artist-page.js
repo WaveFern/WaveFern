@@ -115,6 +115,15 @@ function sfBar(){const c=sfCur(),I=c?sfInfo(c):null,pl=!!(c&&!c.held),d=c?sfLenB
   document.querySelectorAll('#pc .sfprog>i').forEach(i=>{if(i.style.width!=w)i.style.width=w});document.querySelectorAll('#pc .sfel').forEach(e=>{if(e.textContent!=t)e.textContent=t})}}catch(e){}}}
 
 {const st=document.createElement('style');st.textContent=`
+.win.sfw,.win.sfw *{scrollbar-width:thin;scrollbar-color:#4d4d4d transparent}
+.win.sfw ::-webkit-scrollbar{width:10px;height:10px;background:transparent}
+.win.sfw ::-webkit-scrollbar-track{background:#121212}
+.win.sfw ::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:6px;border:2px solid #121212}
+.win.sfw ::-webkit-scrollbar-thumb:hover,.win.sfw ::-webkit-scrollbar-thumb:active{background:#1db954}
+.win.sfw ::-webkit-scrollbar-button{display:none;width:0;height:0}
+.win.sfw ::-webkit-scrollbar-corner{background:#121212}
+.win.sfw *:hover{scrollbar-color:#1db954 transparent}
+.win.sfw .mn,.win.sfw .sfnp,.win.sfw .sb{overflow-x:hidden!important}
 .win.sfw .wb{min-height:0}.mn.sfm{background:#121212;padding:0!important}
 .sfi{height:14px;width:auto;display:block;image-rendering:pixelated}
 .sfhd{position:relative;height:300px;background:#000;overflow:hidden;display:flex;align-items:flex-end;padding:0 32px 22px}
