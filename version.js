@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.114.2';
+const GAME_VERSION='v26.115.0';
 const VERSION_HISTORY=[
+ {v:'v26.115.0',n:'Signing in with Google no longer wipes your save. If your Google account already has a cloud save, you are asked whether to keep your current career or start a new one (starting new asks you to confirm), and the one you pick is saved to your account. If the account has no cloud save, your current game is uploaded. Saves still load.'},
  {v:'v26.114.2',n:'Settings > Music: Music source is now a dropdown (Soundtrack or My songs) and only shows the options for the one you pick: the track list, order and skip for Soundtrack, or the number of top songs to loop for My songs.'},
  {v:'v26.114.1',n:'Pausing while on the computer now blurs and dims the screen behind the pause menu, like pausing anywhere else.'},
  {v:'v26.114.0',n:'New Settings option under Music: Music source. Choose the soundtrack or your own released songs. With My songs on, your top songs (ranked by streams) loop outside the computer, and you pick how many, for example your top 3. With no released songs the soundtrack plays. Saved with your game.'},
