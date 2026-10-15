@@ -18,8 +18,38 @@ const awSongScore=s=>Math.round((s.q||0)+Math.min(25,5*Math.log10(1+(s.streams||
 const awWait=()=>S.cheat?0:Math.max(0,AW.cool-(S.day-awS().last));
 
 /* ---- the trophy: furniture that is not sold, only won ---- */
-Object.defineProperty(F,'trophy',{value:{n:'Gramophone Trophy',p:0,w:.6,d:.6,b:[[.46,.1,.46,'#2a1f14',0,.05,0],[.38,.06,.38,'#c9a227',0,.13,0],[.1,.34,.1,'#e6c34a',0,.33,0],[.26,.04,.26,'#c9a227',0,.52,0],[.34,.02,.34,'#1a1a1a',0,.55,0],[.04,.06,.04,'#e6c34a',0,.59,0],
- [.1,.1,.1,'#e6c34a',.04,.62,0],[.18,.1,.18,'#f2d466',.1,.7,0],[.28,.1,.28,'#e6c34a',.17,.8,0],[.38,.08,.38,'#f2d466',.24,.9,0],[.26,.04,.26,'#3a2a10',.26,.9,0],[.05,.4,.05,'#c9a227',-.1,.3,.1]]},enumerable:false,writable:true,configurable:true});
+Object.defineProperty(F,'trophy',{value:{n:'Gramophone Trophy',p:0,w:.6,d:.6,b:[[0.58,0.08,0.58,'#1b1410',0,0.04,0],
+ [0.55,0.025,0.55,'#f6d86a',0,0.092,0],
+ [0.5,0.09,0.5,'#3a2a1c',0,0.15,0],
+ [0.46,0.02,0.46,'#e6c34a',0,0.205,0],
+ [0.34,0.07,0.02,'#f6d86a',0,0.15,0.26],
+ [0.22,0.012,0.022,'#6a4a10',0,0.16,0.262],
+ [0.22,0.012,0.022,'#6a4a10',0,0.135,0.262],
+ [0.4,0.06,0.4,'#c9a227',0,0.24,0],
+ [0.05,0.07,0.05,'#f6d86a',0.17,0.25,0.17],
+ [0.05,0.07,0.05,'#f6d86a',-0.17,0.25,0.17],
+ [0.05,0.07,0.05,'#f6d86a',0.17,0.25,-0.17],
+ [0.05,0.07,0.05,'#f6d86a',-0.17,0.25,-0.17],
+ [0.16,0.04,0.16,'#f6d86a',0,0.29,0],
+ [0.1,0.26,0.1,'#e6c34a',0,0.43,0],
+ [0.15,0.1,0.15,'#f6d86a',0,0.4,0],
+ [0.16,0.04,0.16,'#f6d86a',0,0.57,0],
+ [0.38,0.04,0.38,'#c9a227',0,0.61,0],
+ [0.34,0.02,0.34,'#111',0,0.64,0],
+ [0.26,0.022,0.26,'#222',0,0.652,0],
+ [0.1,0.026,0.1,'#c0141c',0,0.664,0],
+ [0.03,0.06,0.03,'#f6d86a',0,0.68,0],
+ [0.04,0.03,0.22,'#e8e8ec',-0.12,0.7,0.08],
+ [0.07,0.04,0.06,'#e8e8ec',-0.12,0.69,0.2],
+ [0.05,0.1,0.05,'#c9a227',-0.12,0.66,-0.05],
+ [0.09,0.09,0.09,'#e6c34a',0.05,0.7,0],
+ [0.14,0.11,0.14,'#f6d86a',0.09,0.78,0],
+ [0.2,0.12,0.2,'#e6c34a',0.14,0.87,0],
+ [0.27,0.12,0.27,'#f6d86a',0.2,0.97,0],
+ [0.35,0.1,0.35,'#e6c34a',0.26,1.06,0],
+ [0.4,0.04,0.4,'#fff2a0',0.27,1.12,0],
+ [0.3,0.04,0.3,'#3a2a10',0.27,1.13,0],
+ [0.05,0.3,0.05,'#c9a227',-0.02,0.45,0]]},enumerable:false,writable:true,configurable:true});
 
 /* ---- the field: you plus four big artists, scores decided up front ---- */
 function awField(song){let me=awSongScore(song);const pool=AW.pool.slice().sort(()=>Math.random()-.5),rv=pool.slice(0,4).map(p=>({n:p[0],t:p[2],sc:Math.round(p[1]+R(-9,9)),you:0}));
@@ -148,12 +178,16 @@ function awShow(F0,song){
  /* audience: full game characters (legs, face, hair) dressed from the game's own wardrobe: tops, jackets, trousers, shoes */
  const FTOP=[0,2,2,3,5,6,7,9],FBT=[0,0,0,3,2],mkAud=(x,z)=>{const cf={skin:Math.floor(rng()*SKIN.length),eyes:Math.floor(rng()*5),mouth:Math.floor(rng()*4),hair:Math.floor(rng()*12),hc:Math.floor(rng()*HAIRC.length),top:pk(FTOP),tc:Math.floor(rng()*TOPC.length),pc:Math.floor(rng()*PANTC.length),bt:pk(FBT),body:rng(),ac:-1};
   if(rng()<.4){cf.jk=Math.floor(rng()*JKC.length);if(rng()<.3)cf.jks=1+Math.floor(rng()*3)}if(rng()<.8&&typeof SHC!='undefined')cf.sh=Math.floor(rng()*SHC.length);
-  const c=buildChar(cf);c.g.position.set(x,-.3,z);c.g.rotation.y=Math.PI;g.add(c.g);c.legs.forEach(l=>l.rotation.x=-1.45);c.ph=rng()*6;c.so=rng();c.seat=[x,z];c.up=0;aud.push(c);return c};
+  const c=buildChar(cf);c.g.position.set(x,0,z);c.g.rotation.y=Math.PI;g.add(c.g);c.cfg=cf;c.ph=rng()*6;c.so=rng();c.seat=[x,z];c.up=0;aud.push(c);return c};
  const zs=[3.2,5.6,8,10.4,12.8,15.2];zs.forEach(z=>{for(let k=0;k<6;k++)[-1,1].forEach(s=>{const x=s*(1.9+k*2.2);seat(x,z);if(!taken.has(sk0([x,z]))&&rng()<.9)mkAud(x,z)})});
  /* named people: you, the rivals, the hosts */
- const mkP=(cfg,x,y,z,ry)=>{const c=buildChar(cfg);c.g.position.set(x,y,z);c.g.rotation.y=ry||0;g.add(c.g);return c},sit=c=>{c.legs.forEach(l=>l.rotation.x=-1.45);c.g.position.y=-.3},stand=c=>{c.legs.forEach(l=>l.rotation.x=0);c.g.position.y=0};
+ const mkP=(cfg,x,y,z,ry)=>{const c=buildChar(cfg);c.cfg=cfg;c.g.position.set(x,y,z);c.g.rotation.y=ry||0;g.add(c.g);return c},/* seated pose: flat thighs resting on the seat, shins hanging down past the front edge (the game's legs are one straight piece, so seated people get their own leg boxes) */
+  setSeat=(c,on)=>{if(!c.sl){const cf=c.cfg||{},w=.42+(cf.body||0)*.5,pc=cf.pc_custom||PANTC[cf.pc]||'#2c3e50',sc=cf.sh>=0&&typeof SHC!='undefined'&&SHC[cf.sh]?SHC[cf.sh][0]:'#1d1d22',sg=new THREE.Group();c.g.add(sg);c.sl=sg;
+    [-1,1].forEach(s=>{const x=s*w*.26,l=cf.bt==2||cf.bt==1?'#e0b890':pc;B(sg,w*.44,.22,.72,pc,x,.51,.26);B(sg,w*.4,.5,.2,cf.bt==1||cf.bt==2?SKIN[cf.skin]||'#d99a6c':pc,x,.15,.52);B(sg,w*.44,.12,.34,sc,x,-.04,.6)})}
+   c.sl.visible=!!on;c.legs.forEach(l=>l.visible=!on);c.sat=on?1:0;c.g.position.y=on?.1:0;if(c.seat)c.g.position.z=c.seat[1]+(on?.15:0)},
+  sit=c=>setSeat(c,1),stand=c=>setSeat(c,0);aud.forEach(c=>setSeat(c,1));
  const people={},ord=F0.field.filter(x=>!x.you);let ri=0;
- F0.field.forEach(x=>{const q=x.you?NS.you:NS.rv[ri++];const c=mkP(x.you?ch:awCfg(x.n),q[0],0,q[1],Math.PI);sit(c);c.seat=q;c.name=x.n;people[x.n+(x.you?'*':'')]=c;x.c=c});
+ F0.field.forEach(x=>{const q=x.you?NS.you:NS.rv[ri++];const c=mkP(x.you?ch:awCfg(x.n),q[0],0,q[1],Math.PI);c.seat=q;sit(c);c.name=x.n;people[x.n+(x.you?'*':'')]=c;x.c=c});
  const hc=AWHOST.map(cf=>buildChar(cf));const host=hc[0],presA=hc[1],presB=hc[2];
  [[host,0,-8.9],[presA,-2.2,-8.6],[presB,2.2,-8.6]].forEach(q=>{q[0].g.position.set(q[1],.8,q[2]);g.add(q[0].g)});presA.g.visible=presB.g.visible=false;
  const oth=[];F0.cats.forEach((ct,k)=>{const c=buildChar(awCfg(ct[1]));c.g.position.set(1.8,.8,-6.2);c.g.visible=false;g.add(c.g);const tr=awTrophy(1.5);const ar=c.arms[1];tr.position.set(ar.position.x,ar.position.y+.45,.05);c.g.add(tr);ar.rotation.x=-3.1;c.up=1;oth.push(c)});
@@ -246,6 +280,10 @@ function awShow(F0,song){
  O.kd=e=>{if(A.end)return;if(A.free)return;if([' ','Enter','ArrowRight'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();adv()}else if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();finish()}};
  addEventListener('keydown',O.kd,true);$c('awcap').onclick=adv;$c('awskip').onclick=()=>finish();
  /* per-frame */
+/* clapping: arms come up in front of the chest and the hands meet and part about three times a second, out of step from person to person; cheering = arms thrown up and waving */
+ const clapArms=(p,k,cheer)=>{const ph=A.t*17+(p.ph||0)*3,m=(Math.sin(ph)+1)/2;
+  if(cheer){const w=Math.sin(A.t*8+p.ph)*.25;p.arms[0].rotation.x=p.arms[1].rotation.x=-2.75+w;p.arms[0].rotation.z=.25+w*.5;p.arms[1].rotation.z=-.25-w*.5;return}
+  const pit=-.35+(-1.05)*Math.min(1,k*1.6),zz=.12+m*.62*Math.min(1,k*1.6);p.arms[0].rotation.x=p.arms[1].rotation.x=pit-m*.12*k;p.arms[0].rotation.z=zz;p.arms[1].rotation.z=-zz};
  O.tick=dt=>{A.t+=dt;A.lt+=dt;const s=S_[A.si];if(!s)return;
   const l=s.lines[A.li];if(l&&!A.end){if(A.typed<l[1].length){A.typed=Math.min(l[1].length,A.typed+dt*46);$c('awtxt').textContent=l[1].slice(0,Math.floor(A.typed))}else{$c('awtxt').textContent=l[1];if(A.hold<0)A.hold=.9+l[1].length*.03;A.hold-=dt;if(A.hold<=0){if(A.li<s.lines.length-1){A.li++;if(s.line)s.line(A.li);awLine()}else A.hold=0}}}
   if(!A.end&&A.li>=s.lines.length-1&&l&&A.typed>=l[1].length&&A.hold<=0&&A.t>=s.min&&!(s.done&&!s.done()))next();
@@ -254,14 +292,14 @@ function awShow(F0,song){
   const u=Math.min(1,A.t/(s.min||5)),sh=s.cam(u,s);A.cam.p=sh.p;A.cam.l=sh.l;const C=O.cam;C.aspect=aspect();C.updateProjectionMatrix();C.position.set(O.ox+sh.p[0],sh.p[1],O.oz+sh.p[2]);C.lookAt(O.ox+sh.l[0],sh.l[1],O.oz+sh.l[2]);
   /* crowd: clap, stand */
   const tc=A.clap,ts=A.stand;A.cl+=(tc-A.cl)*Math.min(1,dt*4);A.st=(A.st||0)+(ts-(A.st||0))*Math.min(1,dt*3);
-  aud.forEach(p=>{const cl=A.cl,sw=Math.sin(A.t*12+p.ph)*.3,up=A.st>.25+p.so*.6;if(up!=!!p.up){p.up=up?1:0;p.legs.forEach(l=>l.rotation.x=up?0:-1.45)}
-   const cheer=A.cheer>0?1:0,hop=up?Math.abs(Math.sin(A.t*(cheer?9:5)+p.ph))*(cheer?.16:.05)*Math.max(.3,cl):0;p.g.position.y=(up?0:-.3)+hop;
-   const raise=cheer?-2.7+sw*.5:-1.25*cl+sw*cl;p.arms[0].rotation.x=p.arms[1].rotation.x=raise;p.arms[0].rotation.z=(cheer?.2:.35)*cl;p.arms[1].rotation.z=-(cheer?.2:.35)*cl;
+  aud.forEach(p=>{const cl=A.cl,up=A.st>.25+p.so*.6;if(up!=!!p.up){p.up=up?1:0;setSeat(p,!up)}
+   const cheer=A.cheer>0?1:0,hop=up?Math.abs(Math.sin(A.t*(cheer?9:5)+p.ph))*(cheer?.16:.05)*Math.max(.3,cl):0;p.g.position.y=(up?0:.1)+hop;
+   clapArms(p,cl,cheer);
    if(A.look){const dx=A.look[0]-p.seat[0],dz=A.look[1]-p.seat[1],ty=Math.atan2(dx,dz),d=ty-p.g.rotation.y;p.g.rotation.y+=Math.atan2(Math.sin(d),Math.cos(d))*Math.min(1,dt*3)*(up?1:.5)}else{const d=Math.PI-p.g.rotation.y;p.g.rotation.y+=Math.atan2(Math.sin(d),Math.cos(d))*Math.min(1,dt*3)}});
   A.cheer=Math.max(0,(A.cheer||0)-dt);
   /* seated people clap too */
-  F0.field.forEach(x=>{const c=x.c;if(c===wc&&A.si>=6)return;if(c.g.position.y<0){const k=A.cl;c.arms[0].rotation.x=c.arms[1].rotation.x=-1.2*k+Math.sin(A.t*12+c.seat[0])*.3*k}});
-  hn.forEach(h=>{if(h.g.visible&&A.si!=8&&!(h===presB&&pt.visible)){const k=A.cl;h.arms[0].rotation.x=h.arms[1].rotation.x=k>.4?-1.2+Math.sin(A.t*12)*.25:0}});
+  F0.field.forEach(x=>{const c=x.c;if(c===wc&&A.si>=6)return;if(c.sat){c.ph=c.ph||c.seat[0];clapArms(c,A.cl,A.cheer>0)}});
+  hn.forEach(h=>{if(h.g.visible&&A.si!=8&&!(h===presB&&pt.visible)){const k=A.cl;if(k>.4)clapArms(h,k,0);else{h.arms[0].rotation.x=h.arms[1].rotation.x=0;h.arms[0].rotation.z=h.arms[1].rotation.z=0}}});
   oth.forEach(c=>{if(c.g.visible)c.arms[1].rotation.x=-3.1});
   /* lights, beams, pillars, flashes, confetti */
   L[1].intensity=2.1+Math.sin(A.t*2)*.25;L[2].intensity=1.3+Math.sin(A.t*3)*.4;L[3].intensity=1.3+Math.cos(A.t*3)*.4;
