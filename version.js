@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.117.1';
+const GAME_VERSION='v26.117.2';
 const VERSION_HISTORY=[
+ {v:'v26.117.2',n:'Removed the one-time update bonus. Nobody loses any listeners or streams they already have.'},
  {v:'v26.117.1',n:'The one-time update bonus (+2,000 monthly listeners, +6,000 streams) now only goes to careers on exactly 767 monthly listeners.'},
  {v:'v26.117.0',n:'Evened out the catalogue: every song now streams in proportion to your monthly listeners, so none sit near zero. Fixed monthly listeners (and fame) dropping while streams are positive: they now use a rolling 30 days and never fall on a day with streams. Existing careers on 767 monthly listeners or fewer get a one-time +2,000 monthly listeners and +6,000 streams shared across their songs.'},
  {v:'v26.116.0',n:'Catalogue halo: when one song takes off, your monthly listeners dig into your older songs too, so your least streamed song no longer sits at a few hundred while your hit has millions. The boost scales with your monthly listeners, song quality and age, so early game is unchanged, and it feeds back into your monthly listeners as the streams roll in.'},
