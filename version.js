@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.115.1';
+const GAME_VERSION='v26.116.0';
 const VERSION_HISTORY=[
+ {v:'v26.116.0',n:'Catalogue halo: when one song takes off, your monthly listeners dig into your older songs too, so your least streamed song no longer sits at a few hundred while your hit has millions. The boost scales with your monthly listeners, song quality and age, so early game is unchanged, and it feeds back into your monthly listeners as the streams roll in.'},
  {v:'v26.115.1',n:'Google sign-in: an account that has played before just loads its saved career. Only a brand new Google account (no cloud save) asks whether to keep your current career or start a new one, and the choice is saved to the account.'},
  {v:'v26.115.0',n:'Signing in with Google no longer wipes your save. If your Google account already has a cloud save, you are asked whether to keep your current career or start a new one (starting new asks you to confirm), and the one you pick is saved to your account. If the account has no cloud save, your current game is uploaded. Saves still load.'},
  {v:'v26.114.2',n:'Settings > Music: Music source is now a dropdown (Soundtrack or My songs) and only shows the options for the one you pick: the track list, order and skip for Soundtrack, or the number of top songs to loop for My songs.'},
