@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.133.0';
+const GAME_VERSION='v26.134.0';
 const VERSION_HISTORY=[
+ {v:'v26.134.0',n:'Create album: 12 more cover backgrounds (Diagonal, Rings, Zigzag, Stars, Plaid, Waves, Spotlight, Triangles, Bricks, Halftone, Glow, Confetti) and 9 more borders (Black, Film strip, Gold, Dashed, Corners, Rounded, White frame, Checker, Neon). Saves still load.'},
  {v:'v26.133.0',n:'Create album is back to how it was, with 20 new cover symbols added (butterfly, anchor, key, umbrella, hourglass, coffee, cherry, mushroom, snowflake, leaf, house, arrow, fish, trophy, bell, lightbulb, paw, balloon, pizza, ring). The extra options from v26.131 are removed. Saves still load.'},
  {v:'v26.132.0',n:'Famous artists now look like their real-life counterparts in blocky pixel form: skin tone, hair style and colour, beards and moustaches, shades or glasses, and signature clothes for about 80 artists (Drake, Kendrick, The Weeknd, Ed Sheeran, Billie Eilish, Taylor Swift, Beyonce and many more) in Messages, collabs and Spotifly Browse. Made-up artists keep their own looks. Facial hair is a new part and shows on pixel portraits and 3D characters. Saves still load.'},
  {v:'v26.131.0',n:'Create album has far more options: random name and title endings (Deluxe, Live, Vol. 2...), release type (Album, EP, Mixtape, Live album and more), genre, mood and format, a liner note, 10 cover art styles with a re-roll button, 12 more colour pairs plus your own colours, filters, 8 borders, stickers, and one-tap track ordering (best first, peak in the middle, newest, A to Z, shuffle...). Albums show their type and note in your discography. Saves still load.'},
