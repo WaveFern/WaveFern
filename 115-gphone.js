@@ -15,12 +15,16 @@ function buyPhone(n){const m=phModel(),g=GPH[n];if(!g||n<=m)return;if(S.money<g[
 {const a0=PA.amz;PA.amz=function(){const h=a0.apply(this,arguments);try{if(typeof h!='string')return h;const m=phModel();
  const cards=Object.keys(GPH).map(Number).filter(n=>n>8).map(n=>{const g=GPH[n];return`<div class=card style="min-width:150px"><b>Gphone ${n}</b><br><small class=m>Photos ${g[1]}x${g[2]}${g[3]?' · shutter lag '+g[3]+'s':' · instant shutter'}</small><div style="margin:6px 0;font-weight:bold">$${g[0].toLocaleString()}</div>${n<=m?`<button disabled>${n==m?'You have this':'Owned model beats it'}</button>`:`<button class=go ${S.money<g[0]?'disabled':''} onclick="buyPhone(${n})">Buy</button>`}</div>`}).join('');
  return h+`<div style="margin-top:12px;padding:10px;background:#fff;color:#111;border-radius:6px"><b style="font-size:16px">Gphones</b> <small>You have a Gphone ${m}. Newer models take sharper photos with less lag.</small><div class=cards style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${cards}</div></div>`}catch(e){console.error('gphone shop',e);return h}}}
+/* ---- gphone.wf: the phone shop in the computer's browser ---- */
+SITE.phones=['gphone.wf','Gphones'];SITES.phones=['ph','GPHONE','Phones for people who take photos. Delivered to your pocket'];
+PA.phones=()=>{const m=phModel();return`<div style="padding:14px"><h1 style="margin:0 0 4px">Gphone</h1><p class=m>You have a <b>Gphone ${m}</b>. Newer models take sharper photos with less shutter lag. Open the phone with G.</p><div class=cards style="display:flex;flex-wrap:wrap;gap:10px">${Object.keys(GPH).map(Number).filter(n=>n>8).map(n=>{const g=GPH[n];return`<div class=card style="min-width:170px"><b style="font-size:16px">Gphone ${n}</b><br><small class=m>Photos ${g[1]}x${g[2]}<br>${g[3]?'Shutter lag '+g[3]+'s':'Instant shutter'}</small><div style="margin:8px 0;font-weight:bold;font-size:18px">$${g[0].toLocaleString()}</div>${n<=m?`<button disabled>${n==m?'You have this':'You have a newer one'}</button>`:`<button class=go ${S.money<g[0]?'disabled':''} onclick="buyPhone(${n})">Buy now</button>`}</div>`}).join('')}</div></div>`};
+{const st=document.createElement('style');st.textContent='.s_ph .sh{background:linear-gradient(120deg,#0c0f0d,#2b3a33);color:#fff}';document.head.appendChild(st)}
 /* ---- opening and closing ---- */
 function openPhone(){if(mode!='play')return;mode='phone';PH.app='home';PH.view=null;PH.last=null;phR();try{snd('pop')}catch(e){}}
 function closePhone(){const e=document.getElementById('ph');if(e)e.remove();if(mode=='phone')mode='play'}
 function phApp(a){if(a=='cam')return openCamera();PH.app=a;PH.view=null;if(a=='ig'){igv='feed'}if(a=='msg'){ncv=false}phR()}
 addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||''))return;const k=e.key.toLowerCase();
- if(PH.camOn){e.stopImmediatePropagation();e.preventDefault();if(k=='g'||k=='escape')return closeCamera();if((k==' '||k=='enter')&&!e.repeat)return phShoot();PHK[k]=1;return}
+ if(PH.camOn){e.stopImmediatePropagation();e.preventDefault();if(k=='g'||k=='escape')return closeCamera();if((k==' '||k=='enter')&&!e.repeat)return phShoot();PHK[k]=1;if(phGV()&&/^(w|a|s|d|shift|arrow(up|down|left|right))$/.test(k))keys[k]=1;return}
  if(mode=='phone'&&(k=='escape'||k=='g')){e.stopImmediatePropagation();e.preventDefault();closePhone();return}
  if(k=='g'&&!e.repeat&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&mode=='play'&&typeof S!='undefined'&&S&&!document.getElementById('load')){openPhone()}},true);
 /* handlers inside Messages and Instagrime redraw with pcR(); while the phone is open that draws the phone instead */
@@ -78,6 +82,7 @@ function phCamR(){let e=document.getElementById('phcam');if(!e){e=document.creat
 #phcam .pcmsh{width:76px;height:76px;border-radius:50%;background:#fff;border:4px solid #fff!important;padding:0;display:flex;align-items:center;justify-content:center}#phcam .pcmsh i{width:62px;height:62px;border-radius:50%;border:3px solid #000;display:block}#phcam .pcmsh:active i{background:#ddd}#phcam .pcmsh:disabled{opacity:.6}
 #phcam .pcmth{width:56px;height:56px;border-radius:8px;border:2px solid #fff;object-fit:cover;image-rendering:pixelated;background:#222}#pcmfla{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s}`;document.head.appendChild(st)}
 /* camera pose: first person for PHOTO, in front of you at arm's length for SELFIE */
+function phFtn(on){try{FTX.L.forEach(F=>F.ps.forEach(q=>{const m=q.pts.material;m.sizeAttenuation=on;m.size=on?.12:2;m.needsUpdate=true}))}catch(e){}}
 function phCamPose(){PHC.aspect=innerWidth/innerHeight;PHC.fov=PH.cam=='self'?70:62;PHC.updateProjectionMatrix();const self=PH.cam=='self';if(P.mesh)P.mesh.visible=self;
  if(self){const o=PH.who>=0?phNear().find(q=>q.i==PH.who):null;let cx,cz,tx,tz;
   if(o){const mx=(P.x+o.x)/2,mz=(P.z+o.z)/2,dx=o.x-P.x,dz=o.z-P.z,L=Math.hypot(dx,dz)||1,nx=dz/L,nz=-dx/L,dist=1.6+L*.9;cx=mx+nx*dist;cz=mz+nz*dist;tx=mx;tz=mz;
@@ -86,11 +91,20 @@ function phCamPose(){PHC.aspect=innerWidth/innerHeight;PHC.fov=PH.cam=='self'?70
   try{P.arms[0].rotation.x=-2.5}catch(e){}
   PHC.position.set(cx,1.75,cz);PHC.lookAt(tx,1.3,tz)}
  else{PHC.position.set(P.x,1.6,P.z);PHC.lookAt(P.x+Math.sin(PH.yaw)*10,1.6+Math.tan(PH.pitch)*10,P.z+Math.cos(PH.yaw)*10)}}
-{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(PH.camOn&&sc===scene&&c===cam){try{phCamPose()}catch(e){console.error('camera pose',e)}return r0(sc,PHC)}return r0(sc,c)}}
+/* inside buildings (and your house) the world is built for the game's own angle, so the camera keeps the game view there */
+const phGV=()=>(typeof IN!='undefined'&&!!IN)||(typeof HIN!='undefined'&&!!HIN);
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(PH.camOn&&sc===scene&&c===cam&&!phGV()){try{phCamPose()}catch(e){console.error('camera pose',e)}
+ if(PH.ftn!==1){phFtn(1);PH.ftn=1}
+ const hid=[];try{if(typeof WTHR!='undefined'&&WTHR){[WTHR.mesh].concat(WTHR.fogs||[]).forEach(m=>{if(m&&m.visible){m.visible=false;hid.push(m)}})}}catch(e){}
+ try{return r0(sc,PHC)}finally{hid.forEach(m=>m.visible=true)}}
+ if(PH.ftn===1){phFtn(0);PH.ftn=0}
+ if(PH.camOn&&P.mesh&&c===cam)P.mesh.visible=true;return r0(sc,c)}}
+/* buildings fade out when they stand between the game camera and you; in the first person view they must stay solid */
+{const f0=fadeT;fadeT=function(dt){if(PH.camOn&&!phGV()){try{CT.forEach(b=>{b.mat.opacity=1;b.mat.depthWrite=true})}catch(e){}return}return f0.apply(this,arguments)}}
 {const u0=update;update=function(dt){
- if(PH.camOn){if(mode!='play')closeCamera();else{for(const k in keys)delete keys[k];
-  if(PH.cam=='land'){const sp=(PHK.shift?5:2.6)*dt;if(PHK.a||PHK.arrowleft)PH.yaw+=1.6*dt;if(PHK.d||PHK.arrowright)PH.yaw-=1.6*dt;if(PHK.r)PH.pitch=Math.min(.6,PH.pitch+.8*dt);if(PHK.f)PH.pitch=Math.max(-.6,PH.pitch-.8*dt);
-   const m=(PHK.w||PHK.arrowup?1:0)-(PHK.s||PHK.arrowdown?1:0);if(m){const dx=Math.sin(PH.yaw)*m*sp,dz=Math.cos(PH.yaw)*m*sp;if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz}P.rot=PH.yaw}}}
+ if(PH.camOn){if(mode!='play')closeCamera();else if(!phGV()){for(const k in keys)delete keys[k];
+  const sp=(PHK.shift?5:2.6)*dt;if(PHK.a||PHK.arrowleft)PH.yaw+=1.6*dt;if(PHK.d||PHK.arrowright)PH.yaw-=1.6*dt;if(PH.cam=='land'){if(PHK.r)PH.pitch=Math.min(.6,PH.pitch+.8*dt);if(PHK.f)PH.pitch=Math.max(-.6,PH.pitch-.8*dt)}
+  const m=(PHK.w||PHK.arrowup?1:0)-(PHK.s||PHK.arrowdown?1:0);if(m){const dx=Math.sin(PH.yaw)*m*sp,dz=Math.cos(PH.yaw)*m*sp;if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz}P.rot=PH.yaw}}
  return u0(dt)}}
 addEventListener('keyup',e=>{delete PHK[e.key.toLowerCase()]});addEventListener('blur',()=>{for(const k in PHK)delete PHK[k]});
 function phFlash(){const f=document.getElementById('pcmfla');if(!f)return;f.style.transition='none';f.style.opacity=.9;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .35s';f.style.opacity=0}))}
