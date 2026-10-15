@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.118.0';
+const GAME_VERSION='v26.119.0';
 const VERSION_HISTORY=[
+ {v:'v26.119.0',n:'Added Google Analytics (anonymous visit and key game event counts, no personal data). A short one-time notice explains it, and Settings > Game has an Analytics on/off switch that is remembered on this device.'},
  {v:'v26.118.0',n:'Catalogue boost catch-up: every existing song gets a one-time jump (about a week of the new catalogue streams at once), paid out immediately with a notification, and todays streams are topped up too. Adds only, nothing is taken away.'},
  {v:'v26.117.2',n:'Removed the one-time update bonus. Nobody loses any listeners or streams they already have.'},
  {v:'v26.117.1',n:'The one-time update bonus (+2,000 monthly listeners, +6,000 streams) now only goes to careers on exactly 767 monthly listeners.'},
