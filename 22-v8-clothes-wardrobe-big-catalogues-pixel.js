@@ -193,7 +193,7 @@ const CSPR=[['.....#.....','.....#.....','....###....','###########','.#########
 ['...........','....###....','..#######..','.####.####.','####...####','.####.####.','..#######..','....###....','...........','...........','...........'],
 ['....###....','...#####...','.##.###.##.','####.#.####','.##.###.##.','...#####...','....###....','.....#.....','.....#.....','...###.....','...........'],
 ['..##.###...','.####.###..','##..###.##.','.....#.....','.....#.....','.....#.....','.....#.....','.....#.....','....###....','...........','...........']];
-const COVC={};
+const COVC={},CSPR2=[];
 function cover(a){const key=[a.pal,a.sym,a.bg,a.brd,a.face,a.face?JSON.stringify(a.cfg||ch):''].join('|');if(COVC[key])return COVC[key];
  const k=document.createElement('canvas');k.width=k.height=96;const x=k.getContext('2d');x.imageSmoothingEnabled=false;x.scale(2,2);
  const c=PALS[(a.pal||0)%PALS.length],f=c[1],b0=c[0],bg=a.bg||0,sy=a.sym==null?0:a.sym,R_=(col,u,v,w,h)=>{x.fillStyle=col;x.fillRect(u,v,w,h)},d1=dk(b0,.7),l1=dk(b0,1.5);
@@ -205,9 +205,9 @@ function cover(a){const key=[a.pal,a.sym,a.bg,a.brd,a.face,a.face?JSON.stringify
  else if(bg==5){for(let i=0;i<48;i+=6){R_(d1,i,0,1,48);R_(d1,0,i,48,1)}}
  else if(bg==6){for(let q=0;q<24;q+=2){const an=q/24*Math.PI*2;for(let r=3;r<36;r++)R_(d1,24+Math.cos(an)*r|0,24+Math.sin(an)*r|0,2,2)}}
  else if(bg==7){R_(l1,0,0,48,28);for(let u=0;u<48;u+=4)R_(d1,u,28,2,20);R_(f,0,28,48,1)}
- const spr=(i,u0,v0,sc,col)=>{CSPR[i-6].forEach((row,r)=>{for(let q=0;q<row.length;q++)if(row[q]=='#')R_(col,u0+q*sc,v0+r*sc,sc,sc)})};
+ const spr=(i,u0,v0,sc,col)=>{(i>=30?CSPR2[i-30]:CSPR[i-6]).forEach((row,r)=>{for(let q=0;q<row.length;q++)if(row[q]=='#')R_(col,u0+q*sc,v0+r*sc,sc,sc)})};
  if(!a.face&&sy<6){x.save();x.scale(2,2);x.fillStyle=f;if(sy==0){for(let y=0;y<24;y++)for(let X=0;X<24;X++)if((X-12)**2+(y-12)**2<64)x.fillRect(X,y,1,1)}else if(sy==1){for(let y=4;y<20;y++)x.fillRect(12-((y-4)>>1),y,y-3,1)}else if(sy==2){for(let y=0;y<16;y++){const m=Math.min(y,15-y);x.fillRect(12-m,4+y,2*m+1,1)}}else if(sy==3){for(let y=2;y<24;y+=4)x.fillRect(0,y,24,2)}else if(sy==4){x.fillRect(10,2,4,20);x.fillRect(2,10,20,4)}else{for(let X=0;X<24;X++)x.fillRect(X,12+Math.round(Math.sin(X/2)*4),1,3)}x.restore()}
- else if(sy>=6&&sy<29){if(a.face){x.globalAlpha=.4;spr(sy,2,2,4,f);x.globalAlpha=1}else{spr(sy,8,8,3,d1);spr(sy,7,7,3,f)}}
+ else if((sy>=6&&sy<29)||(sy>=30&&CSPR2[sy-30])){if(a.face){x.globalAlpha=.4;spr(sy,2,2,4,f);x.globalAlpha=1}else{spr(sy,8,8,3,d1);spr(sy,7,7,3,f)}}
  if(a.face){x.save();x.scale(5,5);const cfg=Object.assign({},a.cfg||ch);fig(x,cfg,-1.2,1.3);x.restore()}
  const br=a.brd||0;if(br==1){R_(f,1,1,46,1);R_(f,1,46,46,1);R_(f,1,1,1,46);R_(f,46,1,1,46)}else if(br==2){R_(f,0,0,48,3);R_(f,0,45,48,3);R_(f,0,0,3,48);R_(f,45,0,3,48)}else if(br==3){R_(f,1,1,46,1);R_(f,1,46,46,1);R_(f,1,1,1,46);R_(f,46,1,1,46);R_(f,4,4,40,1);R_(f,4,43,40,1);R_(f,4,4,1,40);R_(f,43,4,1,40)}else if(br==4){R_('#f4f4f4',0,0,48,4);R_('#f4f4f4',0,0,4,48);R_('#f4f4f4',44,0,4,48);R_('#f4f4f4',0,40,48,8)}
  R_('rgba(255,255,255,.08)',0,0,48,14);R_('rgba(0,0,0,.12)',0,40,48,8);
