@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.138.0';
+const GAME_VERSION='v26.139.0';
 const VERSION_HISTORY=[
+ {v:'v26.139.0',n:'Gphone camera: city buildings, shop fronts and street details now have their back and side faces in the first person view, so they look solid and 3D instead of flat. Saves still load.'},
  {v:'v26.138.0',n:'Gphone camera: buildings no longer fade away in the first person view, fountain sparkles and weather are drawn properly, and inside buildings the camera keeps the normal game view so nothing glitches. You can now walk (W/S) and turn (A/D) while taking selfies. New phone shop website on the computer browser: gphone.wf. Saves still load.'},
  {v:'v26.137.0',n:'Gphone camera: the black bar now sits at the right edge instead of the middle of the screen. Selfies with an artist only work when that artist is standing near you (the dropdown lists the artists close by), and nobody is moved any more: the camera swings round to you both. Saves still load.'},
  {v:'v26.136.1',n:'Fixed the Gphone not opening: pressing G now opens your phone again. Saves still load.'},

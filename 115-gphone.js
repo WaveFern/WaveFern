@@ -91,13 +91,28 @@ function phCamPose(){PHC.aspect=innerWidth/innerHeight;PHC.fov=PH.cam=='self'?70
   try{P.arms[0].rotation.x=-2.5}catch(e){}
   PHC.position.set(cx,1.75,cz);PHC.lookAt(tx,1.3,tz)}
  else{PHC.position.set(P.x,1.6,P.z);PHC.lookAt(P.x+Math.sin(PH.yaw)*10,1.6+Math.tan(PH.pitch)*10,P.z+Math.cos(PH.yaw)*10)}}
+/* The city's street details and tower fronts are merged meshes that only keep the faces the game's own camera can see (+x, +y, +z),
+   so from other angles they look hollow and flat. The first time the camera opens, a copy with the opposite sides (-x, -z) is built;
+   it is only shown in the first person view. */
+function phBacks(){if(PH.bk)return;PH.bk=[];const mats=new Set([SBM]);try{CT.forEach(c=>{if(c.dm)mats.add(c.dm)})}catch(e){}
+ const FA=[[[-1,0,0],[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1]]],[[0,0,-1],[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1]]]];
+ scene.children.slice().forEach(o=>{try{if(!o.isMesh||!mats.has(o.material)||!o.geometry.attributes.color)return;const p=o.geometry.attributes.position.array,cl=o.geometry.attributes.color.array,N=Math.floor(p.length/36);if(!N)return;
+  const P2=new Float32Array(N*24),N2=new Float32Array(N*24),C2=new Float32Array(N*24),I2=new Uint32Array(N*12);let v=0,ii=0;
+  for(let b=0;b<N;b++){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,z0=1e9,z1=-1e9;const o0=b*36;for(let k=0;k<12;k++){const x=p[o0+k*3],y=p[o0+k*3+1],z=p[o0+k*3+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}
+   const cx=(x0+x1)/2,cy=(y0+y1)/2,cz=(z0+z1)/2,hx=(x1-x0)/2,hy=(y1-y0)/2,hz=(z1-z0)/2;
+   FA.forEach(f=>{const b0=v/3;f[1].forEach(q=>{P2[v]=cx+q[0]*hx;P2[v+1]=cy+q[1]*hy;P2[v+2]=cz+q[2]*hz;N2[v]=f[0][0];N2[v+1]=f[0][1];N2[v+2]=f[0][2];C2[v]=cl[o0];C2[v+1]=cl[o0+1];C2[v+2]=cl[o0+2];v+=3});I2.set([b0,b0+1,b0+2,b0,b0+2,b0+3],ii);ii+=6})}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(P2,3));g.setAttribute('normal',new THREE.BufferAttribute(N2,3));g.setAttribute('color',new THREE.BufferAttribute(C2,3));g.setIndex(new THREE.BufferAttribute(I2,1));g.computeBoundingSphere();
+  const m=new THREE.Mesh(g,o.material);m.position.copy(o.position);m.rotation.copy(o.rotation);m.scale.copy(o.scale);m.visible=false;scene.add(m);PH.bk.push(m)}catch(e){console.error('back faces',e)}})}
+function phBacksOn(on){if(!PH.bk||PH.bkOn===on)return;PH.bkOn=on;PH.bk.forEach(m=>m.visible=on)}
 /* inside buildings (and your house) the world is built for the game's own angle, so the camera keeps the game view there */
 const phGV=()=>(typeof IN!='undefined'&&!!IN)||(typeof HIN!='undefined'&&!!HIN);
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(PH.camOn&&sc===scene&&c===cam&&!phGV()){try{phCamPose()}catch(e){console.error('camera pose',e)}
  if(PH.ftn!==1){phFtn(1);PH.ftn=1}
+ phBacks();phBacksOn(true);
  const hid=[];try{if(typeof WTHR!='undefined'&&WTHR){[WTHR.mesh].concat(WTHR.fogs||[]).forEach(m=>{if(m&&m.visible){m.visible=false;hid.push(m)}})}}catch(e){}
  try{return r0(sc,PHC)}finally{hid.forEach(m=>m.visible=true)}}
  if(PH.ftn===1){phFtn(0);PH.ftn=0}
+ phBacksOn(false);
  if(PH.camOn&&P.mesh&&c===cam)P.mesh.visible=true;return r0(sc,c)}}
 /* buildings fade out when they stand between the game camera and you; in the first person view they must stay solid */
 {const f0=fadeT;fadeT=function(dt){if(PH.camOn&&!phGV()){try{CT.forEach(b=>{b.mat.opacity=1;b.mat.depthWrite=true})}catch(e){}return}return f0.apply(this,arguments)}}
