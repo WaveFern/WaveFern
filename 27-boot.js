@@ -4,4 +4,4 @@ buildHouse();buildHouseX();buildWorld();buildHomes();buildInteriors();buildNPCs(
    now the loading screen goes as soon as the first frame has drawn behind it */
 $('lb').style.width='100%';
 /* v26.87: open on the main menu; a save in this browser is loaded behind it */
-requestAnimationFrame(()=>requestAnimationFrame(()=>{$('load').remove();TT.game=restoreSave();titleOpen()}));
+requestAnimationFrame(()=>requestAnimationFrame(()=>{$('load').remove();TT.game=restoreSave();titleOpen();try{if(sessionStorage.getItem('fw_go')){sessionStorage.removeItem('fw_go');ttPlay()}}catch(e){}}));

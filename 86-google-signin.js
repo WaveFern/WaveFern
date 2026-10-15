@@ -1,7 +1,7 @@
 /* ---------- v26.83: optional Google sign-in (Firebase Auth), v26.84: cloud saves ----------
    Config is the waveferngame web app from the Firebase console (Project settings > Your apps).
    If apiKey is ever set back to a PASTE_ placeholder, nothing loads and no sign-in button shows.
-   Sign-in is optional: saves stay in this browser (fw_save) exactly as before. */
+   Sign-in is optional: saves stay in this browser (fw_save_1 / fw_save_2) exactly as before. */
 const FB_CFG={
  apiKey:'AIzaSyCd1y8e0G6dKn4h4OuUzksePKufyltmvlo',
  authDomain:'waveferngame.firebaseapp.com',
@@ -24,9 +24,9 @@ function fbSignedIn(u){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')
 function csAsk(step){const uid=FBU&&FBU.uid;if(!uid)return;if(!CLD.asking){CLD.asking=1;CLD.pre=mode} $('ui').innerHTML=step?`<div class="box modal" style="width:min(420px,92vw)"><h2>Start a new career?</h2><p>This replaces the save on this device with a brand new career, saved to your Google account. This cannot be undone.</p><div class=row2><button class=go onclick="csPick(2)">Yes, start a new career</button><button onclick="csAsk()">Back</button></div></div>`
  :`<div class="box modal" style="width:min(420px,92vw)"><h2>☁ New Google account</h2><p>This Google account has no saved career yet. Start a new career or keep on with your current one?</p><p class=m><small>Either way, the one you choose is saved to your Google account from now on.</small></p><div class=row2><button class=go onclick="csPick(1)">Keep my current career</button><button onclick="csAsk(1)">Start a new career</button></div></div>`}
 function csPick(k){const uid=FBU&&FBU.uid;if(!uid)return;snd('click');CLD.asking=0;
- if(k==2){wiping=true;try{localStorage.removeItem('fw_save');localStorage.setItem('fw_cloud',JSON.stringify({uid,t:0,fresh:1}));sessionStorage.setItem('fw_msg','Starting a new career')}catch(e){}location.reload();return}
+ if(k==2){wiping=true;try{localStorage.removeItem(slotKey());localStorage.setItem('fw_cloud',JSON.stringify({uid,t:0,fresh:1}));sessionStorage.setItem('fw_msg','Starting a new career')}catch(e){}location.reload();return}
  CLD.ok=1;csSetMark(0);fbSignInBack();csPush(1).then(()=>say('☁ Saved to your Google account'));fbRedraw()}
-function csWipe(uid,msg){wiping=true;try{localStorage.removeItem('fw_save');localStorage.setItem('fw_cloud',JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
+function csWipe(uid,msg){wiping=true;try{localStorage.removeItem(slotKey());localStorage.setItem('fw_cloud',JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
 const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem('fw_cloud',JSON.stringify({uid,t}))}catch(e){}};
 function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
  return FBM.signInWithPopup(FBA,p).then(r=>fbSignedIn(r.user),e=>{
@@ -85,10 +85,26 @@ function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in key
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
  const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'Cloud save on':'Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><span><b>Guest</b><small>Saves on this device</small></span></div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN<br>RECORDS</h1><div class=px>Music Career Sim</div>
-  <button class=go onclick="ttPlay()" ${busy?'disabled':''}>${busy?'Loading your save…':TT.game?'Play'+(S.day?' · Day '+S.day:''):'Play · New game'}</button>
+  <button class=go onclick="ttWorlds()" ${busy?'disabled':''}>${busy?'Loading your save…':'Play'}</button>
   <button onclick="ttSet()">Settings</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div>`}
-function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;pauseOverlay(0);menuMusic(0);PAUSED=0;PS='';MU.hold=0;try{const a=MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}catch(e){}
+function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;TT.sel=0;pauseOverlay(0);menuMusic(0);PAUSED=0;PS='';MU.hold=0;try{const a=MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}catch(e){}
  if(TT.game){mode='play';$('ui').innerHTML=''}else{mode='creator';creatorUI()}}
+/* v26.125: career select (two slots, Minecraft style). Switching slot reloads the page into the chosen career so no state leaks between them.
+   Cloud save stays one doc per account and follows the active career. */
+function ttWorlds(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.sel=1;const a=curSlot(),rows=[],free=[];
+ for(let n=1;n<=SLOTS;n++){const i=n==a?(TT.game?{artist:S.artist||'',day:S.day||0}:null):slotInfo(n);if(!i)free.push(n);
+  rows.push(i?`<div class="ttsl${n==a?' on':''}"><div><b>${esc(i.artist||'Unnamed artist')}</b><small>Career ${n} · Day ${i.day||1}${n==a?' · last played':''}</small></div><button class=go onclick="ttSlot(${n})">Play</button><button class=ttdel title="Delete this career" aria-label="Delete career ${n}" onclick="ttDel(${n})">✕</button></div>`
+   :`<div class="ttsl empty"><div><b>Empty slot</b><small>Career ${n}</small></div></div>`)}
+ $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Choose a career</h2>${rows.join('')}<span class=ttnc title="${free.length?'':'Coming soon'}"><button ${free.length?`class=go onclick="ttSlot(${free[0]})"`:'disabled'}>+ New career</button>${free.length?'':'<em>Coming soon</em>'}</span><button onclick="ttBack()">Back</button></div></div>`}
+function ttBack(){snd('click');TT.sel=0;titleUI()}
+function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
+ if(TT.game)autoSave();wiping=true;const i=slotInfo(n);
+ try{localStorage.setItem('fw_slot',n);sessionStorage.setItem('fw_go','1');if(FBU)localStorage.setItem('fw_cloud',JSON.stringify(i?{uid:FBU.uid,t:CLD.t}:{uid:FBU.uid,t:CLD.t,fresh:1}))}catch(e){}
+ location.reload()}
+function ttDel(n){const i=slotInfo(n)||(n==curSlot()&&TT.game?{artist:S.artist}:null);if(!i||!confirm('Delete career '+n+(i.artist?' ('+i.artist+')':'')+'? This cannot be undone.'))return;snd('click');
+ try{localStorage.removeItem(slotKey(n))}catch(e){}
+ if(n==curSlot()){wiping=true;try{if(FBU)localStorage.setItem('fw_cloud',JSON.stringify({uid:FBU.uid,t:CLD.t,fresh:1}))}catch(e){}location.reload()}else ttWorlds()}
+{const t1=titleUI;titleUI=function(){if(TT.sel&&TT.on)return ttWorlds();return t1.apply(this,arguments)}}
 function ttSet(){mode='pause';settings();SP='title'}
 function saveQuit(){snd('click');autoSave();TT.game=1;
  if(FBU&&CLD.ok)csPush(1).then(r=>say(r?'☁ Saved to your Google account':CLD.err||'Saved on this device'));else say(FBU&&CLD.err?CLD.err:'Saved on this device');
