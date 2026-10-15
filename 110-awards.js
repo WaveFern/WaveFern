@@ -1,5 +1,5 @@
 /* ===== v26.120: the Gramophone Awards =====
-   A glitzy awards hall in the city (a free tower on the cafe's row, gold marquee and red carpet out front). You can only go in at
+   A glitzy awards hall in the city (a grand low building at the end of your street with a gold marquee, red carpet and a giant gold gramophone on the roof). You can only go in at
    Fame Level 120. Inside is the reception: red carpet, step-and-repeat banner, champagne, a trophy case and a host with the
    guest list. Check in (once every 30 days) and pick the song you submit, then the ceremony plays as a TV broadcast cutscene:
    host, two other categories, then your category (Song of the Year) with nominees, a drumroll and the envelope. The winner
@@ -29,7 +29,7 @@ function awField(song){const me=awSongScore(song),pool=AW.pool.slice().sort(()=>
 
 /* ---- the building out front, and the reception room ---- */
 const AWD={door:0};
-{const bv=buildVenues;buildVenues=function(){bv();try{SHOPS.push({name:'Gramophone Awards',cx:560,ox:AW.ox,ez:72});AW.i=SHOPS.length-1;
+{const bv=buildVenues;buildVenues=function(){bv();try{SHOPS.push({name:'Gramophone Awards',cx:74,ox:AW.ox,ez:12.9});AW.i=SHOPS.length-1;
  interior(AW.i,['#7a1010','#5a0a0a'],'#1a1020',[],[],{hair:5,hc:0,eyes:0,mouth:3,top:2,tc:1,pc:1,skin:2,body:.4,hgt:.6,ac:-1},'Vivian (guest list)',awTalk);
  ixRoom(AW.i,AW_ROOM);
  const g=new THREE.Mesh(geo(40,.1,30),new THREE.MeshLambertMaterial({color:'#120a14'}));g.position.set(AW.ox+5,-.25,324);WORLD.add(g)}catch(e){console.error('awards room',e)}}}
@@ -49,17 +49,18 @@ const AW_ROOM={fl:['tile','#7a1010','#6a0c0c'],wl:['stripe','#1e1428','#2c1c3c']
   [[3,5.3,'#8a1d4a','#c98b6a'],[3.6,5.6,'#1a1a22','#8a5a3a'],[7.2,4.6,'#1c4a7a','#e0b090'],[7.9,4.4,'#111','#6a4a30'],[2.5,7.4,'#b8860b','#d9a47a']].forEach(q=>{b(.4,.9,.3,q[2],q[0],.45,q[1]);b(.34,.4,.26,q[2],q[0],1.1,q[1]);b(.22,.22,.22,q[3],q[0],1.45,q[1]);b(.24,.08,.24,q[2]=='#111'||q[2]=='#1a1a22'?'#222':'#2a1a1a',q[0],1.58,q[1]);cl(q[0]-.25,q[1]-.25,q[0]+.25,q[1]+.25)});
   ixFrame(b,3.6,1.95,.03,.7,.9,'#c9a227',['#7a1010','#e6c34a','#1a1020']);ixFrame(b,6.4,1.95,.03,.7,.9,'#c9a227',['#1a1020','#e6c34a','#7a1010']);
   ixPlant(b,cl,.8,3.4,.9,'#2a1a38');ixPlant(b,cl,9.3,3.2,.9,'#2a1a38');ixPend(b,3,3.4,'*ffe9b8','#c9a227',2.5);ixPend(b,7,3.4,'*ffe9b8','#c9a227',2.5);ixPend(b,5,6,'*ffe9b8','#c9a227',2.4)}};
-const AWT=[];
-{const h0=twHook;twHook=function(x0,z0,cx,fz,w,h){h0(x0,z0,cx,fz,w,h);const c=CT[CT.length-1];if(c)AWT.push({x0,z0,c})}}
-{const sd0=shopDoors;shopDoors=function(){sd0();const cf=SHOPT.cafe;if(AWD.door||!cf||AW.i==null)return;
- const bt=BARBT.find(q=>q.c.sign=='BARBERSHOP'),rx=bt?(bt.c.x0+bt.c.x1)/2:(cf.x0+cf.x1)/2,L=AWT.filter(q=>q.z0==22&&q.c!==cf&&!q.c.door&&!q.c.sign&&!(q.z0==-37&&[534,574,614].includes(q.x0))).sort((a,b)=>Math.abs((a.c.x0+a.c.x1)/2-rx)-Math.abs((b.c.x0+b.c.x1)/2-rx));
- const c=L.length?L[0].c:null;if(!c)return;AWD.door=1;c.door=1;const cx=(c.x0+c.x1)/2,fz=c.z1;
- for(const q in SBC){const L2=SBC[q];for(let j=L2.length-1;j>=0;j--){const e=L2[j];if(e[3]=='#2a1f1a'&&Math.abs(e[0]-2)<.01&&Math.abs(e[1]-1.8)<.01&&Math.abs(e[4]-cx)<1.5)L2.splice(j,1)}}
- SB(2.2,2.1,.1,'#3a0a10',cx,1.05,fz+.05);SB(.9,1.8,.02,'#e6c34a',cx-.5,1.05,fz+.11);SB(.9,1.8,.02,'#e6c34a',cx+.5,1.05,fz+.11);SB(.04,1.8,.03,'#3a0a10',cx,1.05,fz+.13);c.sign='AWARDS';
- /* marquee: a gold canopy with bulbs, red carpet and stanchions out front, a gold gramophone on top */
- SB(3.4,.18,1.2,'#c9a227',cx,2.45,fz+.6);SB(3.2,.08,1.1,'#7a1010',cx,2.55,fz+.6);for(let k=-6;k<=6;k++)SB(.1,.1,.1,k%2?'#fff3b0':'#ffd24a',cx+k*.26,2.33,fz+1.2);
- SB(2.2,.03,5,'#b01020',cx,.02,fz+3.1);[-1.3,1.3].forEach(s=>{for(let z=fz+1.4;z<fz+5;z+=1.2){SB(.08,.9,.08,'#e6c34a',cx+s,.45,z);SB(.14,.1,.14,'#f6d86a',cx+s,.93,z)}});
- const s=SHOPS[AW.i];s.cx=cx;s.ez=fz+1.6;INT.push({x:cx,z:fz+1.4,r:1.6,l:'Enter Gramophone Awards',a:()=>{if(fameLevel()<AW.need){snd('err');say('Invite only: the Gramophone Awards need Fame Level '+AW.need+'. You are Level '+fameLevel()+'.')}else enterShop(AW.i)}});POIS.push([cx,fz+5,'Gramophone Awards','#ffd24a'])}}
+/* the building itself: a grand low hall at the end of your street (slot 74, built by the street shop builder in 93-street-shops.js) */
+SHOPX[74]={n:'GRAMOPHONE AWARDS',h:5.2,wall:'#efe6d2',band:'#e4d9bf',trim:'#c9a227',fas:'#2a0a12',txt:'#f6d86a',door:'#5a0f1a',glass:'#b9a0c8',sill:'#c9a227',up:1,
+ win:(X,z,x0,x1,w)=>{/* framed gold records and a poster of the trophy */w.forEach((u,k)=>{SB(.42,.5,.03,'#c9a227',u,1.4,z+.1);SB(.32,.4,.02,k%2?'#1a1020':'#7a1010',u,1.4,z+.12);SB(.1,.1,.02,'#f6d86a',u,1.42,z+.13)})},
+ extra:(X,z,H)=>{/* red carpet, gold stanchions and ropes, marquee canopy with bulbs, fluted columns, banners, a giant gold gramophone on the roof, roof lamps */
+  SB(2.2,.03,5,'#b01020',X,.02,z+3.1);SB(2.3,.02,5.1,'#d4a52a',X,.012,z+3.1);[-1.3,1.3].forEach(s=>{for(let q=z+1.4;q<z+5;q+=1.2){SB(.08,.9,.08,'#e6c34a',X+s,.45,q);SB(.14,.1,.14,'#f6d86a',X+s,.93,q);if(q<z+4)SB(.03,.05,1.2,'#8a0f1e',X+s,.8,q+.6)}});
+  SB(3.6,.18,1.4,'#c9a227',X,2.6,z+.7);SB(3.4,.08,1.3,'#7a1010',X,2.7,z+.7);for(let k=-6;k<=6;k++)SB(.1,.1,.1,k%2?'#fff3b0':'#ffd24a',X+k*.28,2.5,z+1.4);
+  [-1.7,1.7].forEach(s=>{SB(.4,2.5,.4,'#f4ecd8',X+s,1.25,z+1.3);SB(.5,.15,.5,'#c9a227',X+s,.08,z+1.3);SB(.5,.15,.5,'#c9a227',X+s,2.45,z+1.3)});
+  [-3.2,3.2].forEach(s=>{SB(.9,2.4,.05,'#2a0a12',X+s,3.8,z+.28);SB(.7,.5,.03,'#c9a227',X+s,4.3,z+.31);SB(.3,1,.03,'#f6d86a',X+s,3.6,z+.31)});
+  const y=H+.7;SB(1.6,.5,1,'#c9a227',X,y-.2,6.8);SB(.2,1.2,.2,'#e6c34a',X,y+.7,6.8);SB(1.4,.12,1.4,'#f6d86a',X,y+1.35,6.8);SB(.3,.3,.3,'#c9a227',X+.3,y+1.6,6.8);SB(.7,.35,.7,'#e6c34a',X+.6,y+1.9,6.8);SB(1.2,.35,1.2,'#f6d86a',X+1,y+2.2,6.8);SB(1.8,.3,1.8,'#fff3b0',X+1.5,y+2.55,6.8);
+  [-3.4,3.4].forEach(s=>{SB(.3,.3,.3,'#2a2a2a',X+s,H+.4,z+.5);SB(.2,.2,.2,'#fff3b0',X+s,H+.65,z+.5)})}};
+{const bv=buildVenues;buildVenues=function(){bv();try{mkShop(74,'#c9a227','AWARDS',()=>{if(fameLevel()<AW.need){snd('err');say('Invite only: the Gramophone Awards need Fame Level '+AW.need+'. You are Level '+fameLevel()+'.')}else enterShop(AW.i)},'Enter Gramophone Awards');POIS.push([74,8,'Gramophone Awards','#ffd24a'])}catch(e){console.error('awards door',e)}}}
+{const pv=buildVenues;buildVenues=function(){pv();try{SHOPS[AW.i].cx=74;SHOPS[AW.i].ez=12.9}catch(e){}}}
 
 /* ---- the guest list desk ---- */
 function awTalk(){if(mode!='play')return;const A=awS(),sg=(S.songs||[]).slice().sort((a,b)=>awSongScore(b)-awSongScore(a)),w=awWait();

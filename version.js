@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.120.0';
+const GAME_VERSION='v26.120.1';
 const VERSION_HISTORY=[
+ {v:'v26.120.1',n:'The Gramophone Awards is now its own grand building at the end of your street (gold marquee, red carpet, columns, a giant gold gramophone on the roof), not a door in a skyscraper.'},
  {v:'v26.120.0',n:'New: the Gramophone Awards hall in the city, open to Fame Level 120 and up. Check in at the reception (red carpet, champagne, trophy case), pick a song to submit, then watch the full broadcast ceremony: host, other categories, your nominees, the drumroll and envelope, and the winner walking up to hold the trophy with everyone clapping. You compete against big names like Drake, Beyonce and Kendrick, and only the best song wins. A win puts a Gramophone Trophy in Storage to place in your house. One ceremony every 30 days.'},
  {v:'v26.119.0',n:'Added Google Analytics (anonymous visit and key game event counts, no personal data). A short one-time notice explains it, and Settings > Game has an Analytics on/off switch that is remembered on this device.'},
  {v:'v26.118.0',n:'Catalogue boost catch-up: every existing song gets a one-time jump (about a week of the new catalogue streams at once), paid out immediately with a notification, and todays streams are topped up too. Adds only, nothing is taken away.'},
