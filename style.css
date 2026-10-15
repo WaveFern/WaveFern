@@ -103,3 +103,13 @@ input[type=range]::-moz-range-thumb{width:8px;height:12px;background:var(--g);bo
 #stg{max-height:90vh;display:flex;flex-direction:column}#stt{display:flex;gap:4px;margin:4px 0 8px}#stt button{flex:1;padding:5px 4px;color:var(--m)}#stt button.on{color:#fff;background:#364439}
 #stb{overflow:auto;min-height:0;padding-right:2px}#stg .so{display:flex;align-items:center;gap:8px;margin:7px 0}#stg .so span{flex:1;color:var(--m)}#stg .so span small{display:block}#stg .so input{flex:1.3}#stg .so button{min-width:92px}
 body.notags #ntags{display:none}
+
+/* v26.125: career select */
+#ttl .ttw{display:flex;flex-direction:column;gap:10px;width:min(420px,92vw)}#ttl .ttw h2{text-align:center;color:var(--g);margin-bottom:4px}
+#ttl .ttsl{display:flex;align-items:center;gap:8px;background:#0b0f0dd9;border:3px solid #000;box-shadow:4px 4px 0 #0008;padding:10px}
+#ttl .ttsl.on{border-color:var(--g)}#ttl .ttsl>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#ttl .ttsl b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ttl .ttsl small{color:var(--m)}#ttl .ttsl.empty{opacity:.55;border-style:dashed}
+#ttl .ttsl button{padding:9px 12px}#ttl .ttdel{padding:9px 10px}
+#ttl .ttnc{position:relative;display:block}#ttl .ttnc button{width:100%;padding:11px}
+#ttl .ttnc em{display:none;position:absolute;left:50%;bottom:calc(100% + 4px);transform:translateX(-50%);background:#000;border:2px solid var(--g);padding:4px 8px;font-style:normal;white-space:nowrap;pointer-events:none}
+#ttl .ttnc:hover em{display:block}

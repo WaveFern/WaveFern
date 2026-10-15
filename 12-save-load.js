@@ -12,9 +12,15 @@ function loadCode(c){try{c=c.trim();if(c.toLowerCase()=='test'){cheat();return}i
 
 /* autosave: keeps the game in the browser so a refresh doesn't reset it */
 let wiping=false;
-function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{localStorage.setItem('fw_save',saveCode())}catch(e){}}
-function restoreSave(){let c=null;try{c=localStorage.getItem('fw_save')}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;try{localStorage.removeItem('fw_save')}catch(e){}return false}
+/* v26.125: two career slots. fw_save_1 / fw_save_2 hold the careers, fw_slot is the active one. The old single fw_save moves into slot 1. */
+const SLOTS=2;
+function curSlot(){try{const n=+localStorage.getItem('fw_slot');return n==2?2:1}catch(e){return 1}}
+function slotKey(n){return'fw_save_'+(n||curSlot())}
+try{const o=localStorage.getItem('fw_save');if(o){if(!localStorage.getItem('fw_save_1'))localStorage.setItem('fw_save_1',o);localStorage.removeItem('fw_save')}}catch(e){}
+function slotInfo(n){try{const c=localStorage.getItem(slotKey(n));if(!c)return null;let a='',d=0;try{const x=scDecode(c).S;a=x.artist||'';d=x.day||0}catch(e){}return{artist:a,day:d}}catch(e){return null}}
+function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{localStorage.setItem(slotKey(),saveCode())}catch(e){}}
+function restoreSave(){let c=null;try{c=localStorage.getItem(slotKey())}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;try{localStorage.removeItem(slotKey())}catch(e){}return false}
 setInterval(autoSave,5000);
 addEventListener('pagehide',autoSave);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave()});
-function wipeSave(){if(!confirm('Wipe your save and start a new game? This cannot be undone.'))return;wiping=true;try{localStorage.removeItem('fw_save')}catch(e){}location.reload()}
+function wipeSave(){if(!confirm('Wipe your save and start a new game? This cannot be undone.'))return;wiping=true;try{localStorage.removeItem(slotKey())}catch(e){}location.reload()}

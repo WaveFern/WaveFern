@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.124.0';
+const GAME_VERSION='v26.125.0';
 const VERSION_HISTORY=[
+ {v:'v26.125.0',n:'Two careers: Play on the main menu now opens a career select screen with two slots (artist name, day, Play and delete). Once both slots are used, New career is greyed out and says Coming soon on hover. Your existing career moves into slot 1 automatically. Cloud save follows the career you last played. Saves still load.'},
  {v:'v26.124.0',n:'The Music source dropdown in Settings now matches the game\'s look: dark field, green pixel arrow and a green focus outline instead of the plain system dropdown. Saves still load.'},
  {v:'v26.123.2',n:'Song name randomiser: swapped the weaker new words for more vivid ones so default titles sound better and repeat less. Saves still load.'},
  {v:'v26.123.1',n:'Sound effects softened so they stay pleasant on repeat: gentler highs, shorter reverb on frequent sounds like clicks and pops, a softer rounded error tone, and tiny pitch variation so repeats do not grate. Saves still load.'},
