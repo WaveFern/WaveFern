@@ -64,27 +64,27 @@ setInterval(()=>{try{if(typeof S!='undefined'&&S&&mode=='play'&&!S.phHint&&!docu
 const PHC=new THREE.PerspectiveCamera(62,1,.1,600),PHK={},CB_L=84,CB_R=150;
 PH.x=0;PH.z=0;PH.yaw=0;PH.pitch=0;PH.fr=null;PH.frWho=-2;
 function openCamera(){const e=document.getElementById('ph');if(e)e.remove();mode='play';PH.camOn=1;PH.x=P.x;PH.z=P.z;PH.yaw=P.rot;PH.pitch=0;PH.busy=0;document.body.classList.add('phcam');phCamR()}
-function closeCamera(back){PH.camOn=0;document.body.classList.remove('phcam');const e=document.getElementById('phcam');if(e)e.remove();if(PH.fr){scene.remove(PH.fr.g);PH.fr=null;PH.frWho=-2}if(P.mesh)P.mesh.visible=true;for(const k in PHK)delete PHK[k];if(back)openPhone()}
+function closeCamera(back){PH.camOn=0;document.body.classList.remove('phcam');const e=document.getElementById('phcam');if(e)e.remove();if(P.mesh)P.mesh.visible=true;for(const k in PHK)delete PHK[k];if(back)openPhone()}
+const phNear=()=>(typeof ART_M!='undefined'?ART_M:[]).filter(o=>o&&o.m&&Math.hypot(P.x-o.x,P.z-o.z)<=6);
 function phCamR(){let e=document.getElementById('phcam');if(!e){e=document.createElement('div');e.id='phcam';document.body.appendChild(e)}
- const L=phPhotos(),last=L[L.length-1],g=GPH[phModel()],seen=new Set(),ch2=[];
- (S.msgs||[]).forEach(x=>{if(x.a!==undefined&&!seen.has(x.a)){seen.add(x.a);ch2.push(x.a)}});
- const rest=ART.map((a,i)=>i).filter(i=>!seen.has(i)).sort((a,b)=>ART[a][0].localeCompare(ART[b][0])),opt=i=>`<option value="${i}" ${PH.who==i?'selected':''}>${esc(ART[i][0])}</option>`;
- e.innerHTML=`<div class="pcb pl"><button onclick="closeCamera(1)">✕</button>${PH.cam=='self'?`<select onchange="PH.who=+this.value;this.blur()"><option value="-1" ${PH.who<0?'selected':''}>Just me</option>${ch2.length?`<optgroup label="Your chats">${ch2.map(opt).join('')}</optgroup>`:''}<optgroup label="Everyone">${rest.map(opt).join('')}</optgroup></select>`:''}<small>Gphone ${phModel()}<br>${g[1]}x${g[2]}</small></div>
- <div class="pcb pr"><button class=pfl title="Flip camera" onclick="PH.cam=PH.cam=='self'?'land':'self';phCamR()">⟲</button><div class=pmd><button class="${PH.cam=='self'?'on':''}" onclick="PH.cam='self';phCamR()">SELFIE</button><button class="${PH.cam=='land'?'on':''}" onclick="PH.cam='land';phCamR()">PHOTO</button></div><button class=psh ${PH.busy?'disabled':''} onclick="phShoot()"><i></i></button>${last?`<img class=pth src="${pxURL(last.c,2)}" onclick="closeCamera();openPhone();phApp('pho')">`:'<span class=pth></span>'}</div><div id=pfla></div>`}
+ const L=phPhotos(),last=L[L.length-1],g=GPH[phModel()],nb=phNear(),opt=o=>`<option value="${o.i}" ${PH.who==o.i?'selected':''}>${esc(ART[o.i][0])}</option>`;
+ e.innerHTML=`<div class="pcmb pcml"><button onclick="closeCamera(1)">✕</button>${PH.cam=='self'?`<select onchange="PH.who=+this.value;this.blur()"><option value="-1" ${PH.who<0?'selected':''}>Just me</option>${nb.map(opt).join('')}</select>${nb.length?'':'<small>Stand next to an artist to take a selfie with them</small>'}`:''}<small>Gphone ${phModel()}<br>${g[1]}x${g[2]}</small></div>
+ <div class="pcmb pcmr"><button class=pcmfl title="Flip camera" onclick="PH.cam=PH.cam=='self'?'land':'self';phCamR()">⟲</button><div class=pcmmd><button class="${PH.cam=='self'?'on':''}" onclick="PH.cam='self';phCamR()">SELFIE</button><button class="${PH.cam=='land'?'on':''}" onclick="PH.cam='land';phCamR()">PHOTO</button></div><button class=pcmsh ${PH.busy?'disabled':''} onclick="phShoot()"><i></i></button>${last?`<img class=pcmth src="${pxURL(last.c,2)}" onclick="closeCamera();openPhone();phApp('pho')">`:'<span class=pcmth></span>'}</div><div id=pcmfla></div>`}
 {const st=document.createElement('style');st.textContent=`body.phcam #hud{display:none}#phcam{position:fixed;inset:0;z-index:70;pointer-events:none;font-family:system-ui,sans-serif}
-#phcam .pcb{position:absolute;top:0;bottom:0;background:#000;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 6px;box-sizing:border-box;color:#fff}
-#phcam .pl{left:0;width:${CB_L}px}#phcam .pr{right:0;width:${CB_R}px}#phcam .pl select{width:74px;font-size:11px;background:#222;color:#fff;border:1px solid #555}#phcam small{color:#aaa;text-align:center;font-size:11px}
-#phcam button{background:none;border:0;box-shadow:none;color:#fff;cursor:pointer}#phcam .pfl{font-size:26px;border:2px solid #fff;border-radius:8px;width:48px;height:36px}
-#phcam .pmd{display:flex;flex-direction:column;gap:22px}#phcam .pmd button{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:2px;font-size:15px;font-weight:600;color:#fff}#phcam .pmd button.on{color:#ffd60a}
-#phcam .psh{width:76px;height:76px;border-radius:50%;background:#fff;border:4px solid #fff!important;padding:0;display:flex;align-items:center;justify-content:center}#phcam .psh i{width:62px;height:62px;border-radius:50%;border:3px solid #000;display:block}#phcam .psh:active i{background:#ddd}#phcam .psh:disabled{opacity:.6}
-#phcam .pth{width:56px;height:56px;border-radius:8px;border:2px solid #fff;object-fit:cover;image-rendering:pixelated;background:#222}#pfla{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s}`;document.head.appendChild(st)}
+#phcam .pcmb{position:absolute;top:0;bottom:0;background:#000;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 6px;box-sizing:border-box;color:#fff}
+#phcam .pcml{left:0;width:${CB_L}px}#phcam .pcmr{right:0;width:${CB_R}px}#phcam .pcml select{width:74px;font-size:11px;background:#222;color:#fff;border:1px solid #555}#phcam small{color:#aaa;text-align:center;font-size:11px}
+#phcam button{background:none;border:0;box-shadow:none;color:#fff;cursor:pointer}#phcam .pcmfl{font-size:26px;border:2px solid #fff;border-radius:8px;width:48px;height:36px}
+#phcam .pcmmd{display:flex;flex-direction:column;gap:22px}#phcam .pcmmd button{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:2px;font-size:15px;font-weight:600;color:#fff}#phcam .pcmmd button.on{color:#ffd60a}
+#phcam .pcmsh{width:76px;height:76px;border-radius:50%;background:#fff;border:4px solid #fff!important;padding:0;display:flex;align-items:center;justify-content:center}#phcam .pcmsh i{width:62px;height:62px;border-radius:50%;border:3px solid #000;display:block}#phcam .pcmsh:active i{background:#ddd}#phcam .pcmsh:disabled{opacity:.6}
+#phcam .pcmth{width:56px;height:56px;border-radius:8px;border:2px solid #fff;object-fit:cover;image-rendering:pixelated;background:#222}#pcmfla{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s}`;document.head.appendChild(st)}
 /* camera pose: first person for PHOTO, in front of you at arm's length for SELFIE */
-function phFriend(){const w=PH.cam=='self'?PH.who:-1;if(PH.frWho===w)return;if(PH.fr){scene.remove(PH.fr.g);PH.fr=null}PH.frWho=w;if(w>=0){try{const o=buildChar(Object.assign({},ART[w][4]));scene.add(o.g);PH.fr=o}catch(e){console.error('selfie friend',e)}}}
-function phCamPose(){PHC.aspect=innerWidth/innerHeight;PHC.fov=PH.cam=='self'?70:62;PHC.updateProjectionMatrix();const self=PH.cam=='self';if(P.mesh)P.mesh.visible=self;phFriend();
- if(self){const f=[Math.sin(P.rot),Math.cos(P.rot)],r=[f[1],-f[0]],fo=PH.fr?.38:0;
-  if(PH.fr){PH.fr.g.position.set(P.x+r[0]*.78,0,P.z+r[1]*.78);PH.fr.g.rotation.y=P.rot}
+function phCamPose(){PHC.aspect=innerWidth/innerHeight;PHC.fov=PH.cam=='self'?70:62;PHC.updateProjectionMatrix();const self=PH.cam=='self';if(P.mesh)P.mesh.visible=self;
+ if(self){const o=PH.who>=0?phNear().find(q=>q.i==PH.who):null;let cx,cz,tx,tz;
+  if(o){const mx=(P.x+o.x)/2,mz=(P.z+o.z)/2,dx=o.x-P.x,dz=o.z-P.z,L=Math.hypot(dx,dz)||1,nx=dz/L,nz=-dx/L,dist=1.6+L*.9;cx=mx+nx*dist;cz=mz+nz*dist;tx=mx;tz=mz;
+   const ry=Math.atan2(cx-P.x,cz-P.z);P.mesh.rotation.y=ry;o.m.rotation.y=Math.atan2(cx-o.x,cz-o.z)}
+  else{const f=[Math.sin(P.rot),Math.cos(P.rot)];cx=P.x+f[0]*1.5;cz=P.z+f[1]*1.5;tx=P.x;tz=P.z;P.mesh.rotation.y=P.rot}
   try{P.arms[0].rotation.x=-2.5}catch(e){}
-  PHC.position.set(P.x+r[0]*fo+f[0]*1.5,1.75,P.z+r[1]*fo+f[1]*1.5);PHC.lookAt(P.x+r[0]*fo,1.3,P.z+r[1]*fo)}
+  PHC.position.set(cx,1.75,cz);PHC.lookAt(tx,1.3,tz)}
  else{PHC.position.set(P.x,1.6,P.z);PHC.lookAt(P.x+Math.sin(PH.yaw)*10,1.6+Math.tan(PH.pitch)*10,P.z+Math.cos(PH.yaw)*10)}}
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(PH.camOn&&sc===scene&&c===cam){try{phCamPose()}catch(e){console.error('camera pose',e)}return r0(sc,PHC)}return r0(sc,c)}}
 {const u0=update;update=function(dt){
@@ -93,7 +93,7 @@ function phCamPose(){PHC.aspect=innerWidth/innerHeight;PHC.fov=PH.cam=='self'?70
    const m=(PHK.w||PHK.arrowup?1:0)-(PHK.s||PHK.arrowdown?1:0);if(m){const dx=Math.sin(PH.yaw)*m*sp,dz=Math.cos(PH.yaw)*m*sp;if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz}P.rot=PH.yaw}}}
  return u0(dt)}}
 addEventListener('keyup',e=>{delete PHK[e.key.toLowerCase()]});addEventListener('blur',()=>{for(const k in PHK)delete PHK[k]});
-function phFlash(){const f=document.getElementById('pfla');if(!f)return;f.style.transition='none';f.style.opacity=.9;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .35s';f.style.opacity=0}))}
+function phFlash(){const f=document.getElementById('pcmfla');if(!f)return;f.style.transition='none';f.style.opacity=.9;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .35s';f.style.opacity=0}))}
 function phNew(c,kind,who){const L=phPhotos(),id=(S.phId=(S.phId||0)+1);L.push({id,c,k:kind,w:who||'',d:S.day,gp:phModel()});while(L.length>PH_MAX)L.shift();PH.last=id;return id}
 function phSoften(img){/* low models are blurry and dull */const m=phModel(),b=m<=9?1.6:m<=11?.9:m<=13?.4:0;if(!b)return img;const w=img.width||img.naturalWidth,h=img.height||img.naturalHeight,k=document.createElement('canvas');k.width=w;k.height=h;const x=k.getContext('2d');try{x.filter='blur('+b+'px) brightness('+(m<=9?.9:.97)+')'}catch(e){}x.drawImage(img,0,0,w,h);return k}
 function phShoot(){if(PH.busy||!PH.camOn)return;const g=GPH[phModel()];PH.busy=1;phCamR();
