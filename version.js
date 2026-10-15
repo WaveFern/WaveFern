@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.121.0';
+const GAME_VERSION='v26.122.0';
 const VERSION_HISTORY=[
+ {v:'v26.122.0',n:'The random song name generator has 100 more words (50 new openers and 50 new endings), so far more unique default titles. Saves still load.'},
  {v:'v26.121.0',n:'Gramophone Awards rebuilt: a much bigger hall in the city (east of Nova Mall, red carpet, columns, giant gold gramophone on the roof, no overlap). The ceremony is now a real 3D pixel-style broadcast with you and the nominees as in-game characters (Drake, Kendrick, Beyonce and others styled like themselves), seated crowd that claps and stands, confetti, and captions that always finish. You walk up yourself if you win. Ceremonies are every 15 days. The test save code can attend every day and always wins.'},
  {v:'v26.120.1',n:'The Gramophone Awards is now its own grand building at the end of your street (gold marquee, red carpet, columns, a giant gold gramophone on the roof), not a door in a skyscraper.'},
  {v:'v26.120.0',n:'New: the Gramophone Awards hall in the city, open to Fame Level 120 and up. Check in at the reception (red carpet, champagne, trophy case), pick a song to submit, then watch the full broadcast ceremony: host, other categories, your nominees, the drumroll and envelope, and the winner walking up to hold the trophy with everyone clapping. You compete against big names like Drake, Beyonce and Kendrick, and only the best song wins. A win puts a Gramophone Trophy in Storage to place in your house. One ceremony every 30 days.'},
