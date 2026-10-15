@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.123.0';
+const GAME_VERSION='v26.123.1';
 const VERSION_HISTORY=[
+ {v:'v26.123.1',n:'Sound effects softened so they stay pleasant on repeat: gentler highs, shorter reverb on frequent sounds like clicks and pops, a softer rounded error tone, and tiny pitch variation so repeats do not grate. Saves still load.'},
  {v:'v26.123.0',n:'Sound effects reworked: softer clicks with no pops, richer layered tones with a gentle filter sweep, smoother reverb tails on pings, chimes, cash and notifications, a two-tone error buzz and a punchier thunk, and more even volume across all effects. Saves still load.'},
  {v:'v26.122.0',n:'The random song name generator has 100 more words (50 new openers and 50 new endings), so far more unique default titles. Saves still load.'},
  {v:'v26.121.0',n:'Gramophone Awards rebuilt: a much bigger hall in the city (east of Nova Mall, red carpet, columns, giant gold gramophone on the roof, no overlap). The ceremony is now a real 3D pixel-style broadcast with you and the nominees as in-game characters (Drake, Kendrick, Beyonce and others styled like themselves), seated crowd that claps and stands, confetti, and captions that always finish. You walk up yourself if you win. Ceremonies are every 15 days. The test save code can attend every day and always wins.'},
