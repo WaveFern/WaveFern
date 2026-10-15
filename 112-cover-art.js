@@ -98,4 +98,4 @@ sfCover=function(s){if(!s)return'';const f=s.id!=null&&S.songs.includes(s)?sfAlb
  let u='';try{u=genCover({seed:cvHash('song|'+(s.id||0)+'|'+(s.g||s.genre||'')),g:s.g||s.genre||'Pop',title:s.title||'',tpl:99,cfg:s.id!=null&&S.songs.includes(s)?ch:null})}catch(e){console.error('cover',e)}
  SPC.set(key,u);return u};
 /* ---- albums with a chosen art style (tpl) use the composed scenes; older ones keep the symbol cover ---- */
-{const c0=cover;cover=function(a){if(a&&a.tpl>0)try{return genCover({seed:a.seed||cvHash('al|'+(a.id!=null?a.id:a.name||'')),tpl:a.tpl,pal:a.pal,cc:a.cc,g:a.ag||'Pop',title:a.name||'',flt:a.flt,brd:a.brd,stk:a.stk,cfg:a.tpl==8||a.tpl==99?(a.cfg||ch):null})}catch(e){console.error('cover',e)}return c0.apply(this,arguments)}}
+{const c0=cover;cover=function(a){if(a&&a.tpl>0)try{return genCover({seed:a.seed||cvHash('al|'+(a.id!=null?a.id:a.name||'')),tpl:a.face?8:a.tpl,pal:a.pal,cc:a.cc,g:a.ag||'Pop',title:a.name||'',flt:a.flt,brd:a.brd,stk:a.stk,cfg:a.face||a.tpl==8||a.tpl==99?(a.cfg||ch):null})}catch(e){console.error('cover',e)}return c0.apply(this,arguments)}}
