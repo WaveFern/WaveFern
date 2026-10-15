@@ -133,16 +133,23 @@ function awShow(F0,song){
  b(2.6,1.5,1.1,'#2a1a38',0,1.55,-8);b(2.8,.12,1.3,GOLD,0,2.35,-8);const gt=awTrophy(.6);gt.position.set(0,1.45,-8.1);g.add(gt);b(.05,.7,.05,'#999',.3,2.7,-8.2);b(.2,.08,.12,'#222',.3,3.05,-8.1);
  [[-12,10],[12,10],[0,18]].forEach(q=>{b(.1,1.6,.1,'#222',q[0],.8,q[1]);b(.8,.6,1.2,'#1c1c24',q[0],1.9,q[1]);b(.4,.3,.5,'#0a0a10',q[0],1.9,q[1]-.8);b(.12,.12,.12,'*ff3030',q[0]+.3,2.25,q[1]-.5)});
  const flashes=[];for(let k=0;k<16;k++){const m=b(.5,.5,.05,'*ffffff',R(-14,14),R(1.8,4),R(8,17));m.visible=false;flashes.push(m)}
+ /* polish: velvet curtains, footlights, aisle lights, flower urns, a gold floor star, an ON AIR sign and exit doors */
+ [-1,1].forEach(s=>{for(let k=0;k<7;k++)b(1.3,23,.7,k%2?'#7a0f1e':'#5a0a16',s*(11.5+k*1.25),11.5,-15.2);b(10,1.2,.8,GOLD,s*16,22.6,-15);b(.6,.6,.3,GOLD2,s*11,22,-14.6);
+  for(let k=0;k<5;k++)b(.5,.5,.5,'*fff0b0',s*(1.5+k*5.6),.95,-4.3);
+  b(1.6,1.4,1.6,'#3a1a48',s*13.6,1.5,-5.6);b(1.8,.12,1.8,GOLD,s*13.6,2.25,-5.6);for(let k=0;k<7;k++)b(.34,.34,.34,['#ff7aa8','#ffffff','#ff9a5a','#ffe27a'][k%4],s*13.6+R(-.5,.5),R(2.4,3.3),-5.6+R(-.5,.5));
+  b(2.2,5.4,.3,'#3a2450',s*36.6,2.7,12);b(1.8,.5,.1,'*37d67a',s*36.4,5.9,12);b(.12,5,.2,GOLD,s*36.5,2.5,10.9)});
+ for(let k=0;k<12;k++)[-1,1].forEach(s=>b(.14,.06,.5,k%2?'*ffd24a':'*ff9a5a',s*1.5,.05,3+k*1.9));
+ {const stg=b(8,.03,8,'#e6c34a',0,.85,-9.6);stg.rotation.y=Math.PI/4;b(5.6,.04,5.6,'#2a1a38',0,.86,-9.6).rotation.y=Math.PI/4}
+ b(3.6,.8,.3,'#b0121a',0,12.2,-14.9);b(3.2,.5,.1,'*ff3030',0,12.2,-14.7);
+ const spot=new THREE.Mesh(new THREE.CylinderGeometry(.5,2.6,12,16,1,true),new THREE.MeshBasicMaterial({color:0xfff2c0,transparent:true,opacity:.13,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));spot.geometry.translate(0,-6,0);spot.position.set(0,13,-8);g.add(spot);
  /* the audience */
- const NS={you:[-4.1,3.2],rv:[[-6.3,3.2],[4.1,3.2],[6.3,3.2],[1.9,3.2]]},taken=new Set([NS.you].concat(NS.rv).map(q=>q.join()));
- const GOWN=['#8a1d4a','#1c4a7a','#111118','#b8860b','#2a6a4a','#5a1d7a','#16161c','#a03040','#d8d0c0','#223a5a'],SKN=SKIN.concat(),HC=['#1b1b1f','#4a2c1a','#8b5a2b','#d9a441','#c0c0c8','#6a2a2a'];
- const aud=[];const seat=(x,z,cl)=>{b(1,.5,.9,'#6a0f1e',x,.25,z);b(1,1,.16,'#6a0f1e',x,.9,z+.5)};
- const mkAud=(x,z)=>{const f=new THREE.Group();f.position.set(x,0,z);f.rotation.y=Math.PI;g.add(f);const col=pk(GOWN),sk=pk(SKN),hc=pk(HC),p={f,ph:rng()*6,arms:[],body:new THREE.Group(),legs:new THREE.Group()};f.add(p.body);f.add(p.legs);
-  b(.74,.8,.42,col,0,1.0,0,p.body);b(.46,.46,.46,sk,0,1.66,0,p.body);b(.52,.16,.52,hc,0,1.92,0,p.body);if(rng()<.4)b(.5,.5,.12,hc,0,1.7,-.26,p.body);b(.36,.1,.04,'#fff',0,1.28,.22,p.body);
-  [-1,1].forEach(s=>{const pv=new THREE.Group();pv.position.set(s*.47,1.35,0);p.body.add(pv);b(.17,.56,.17,col,0,-.28,0,pv);b(.15,.12,.15,sk,0,-.6,0,pv);p.arms.push(pv)});
-  [-1,1].forEach(s=>b(.22,.7,.22,'#16161c',s*.18,.35,0,p.legs));p.legs.visible=false;aud.push(p);return p};
- const zs=[3.2,5.6,8,10.4,12.8,15.2,17.6];zs.forEach(z=>{for(let k=0;k<7;k++)[-1,1].forEach(s=>{const x=s*(1.9+k*2.2);seat(x,z);if(!taken.has(x+','+z)&&!(z>16.5&&k>4))mkAud(x,z)})});
- NS.rv.concat([NS.you]).forEach(q=>seat(q[0],q[1]));
+ const NS={you:[-4.1,3.2],rv:[[-6.3,3.2],[4.1,3.2],[6.3,3.2],[1.9,3.2]]},sk0=q=>q[0].toFixed(1)+','+q[1].toFixed(1),taken=new Set([NS.you].concat(NS.rv).map(sk0));
+ const aud=[],seat=(x,z)=>{b(1,.5,.9,'#6a0f1e',x,.25,z);b(1,1,.16,'#6a0f1e',x,.9,z+.5);b(1.04,.07,.94,GOLD,x,.52,z);b(.1,.5,.1,'#2a1a38',x-.45,.9,z+.55);b(.1,.5,.1,'#2a1a38',x+.45,.9,z+.55)};
+ /* audience: full game characters (legs, face, hair) dressed from the game's own wardrobe: tops, jackets, trousers, shoes */
+ const FTOP=[0,2,2,3,5,6,7,9],FBT=[0,0,0,3,2],mkAud=(x,z)=>{const cf={skin:Math.floor(rng()*SKIN.length),eyes:Math.floor(rng()*5),mouth:Math.floor(rng()*4),hair:Math.floor(rng()*12),hc:Math.floor(rng()*HAIRC.length),top:pk(FTOP),tc:Math.floor(rng()*TOPC.length),pc:Math.floor(rng()*PANTC.length),bt:pk(FBT),body:rng(),ac:-1};
+  if(rng()<.4){cf.jk=Math.floor(rng()*JKC.length);if(rng()<.3)cf.jks=1+Math.floor(rng()*3)}if(rng()<.8&&typeof SHC!='undefined')cf.sh=Math.floor(rng()*SHC.length);
+  const c=buildChar(cf);c.g.position.set(x,-.3,z);c.g.rotation.y=Math.PI;g.add(c.g);c.legs.forEach(l=>l.rotation.x=-1.45);c.ph=rng()*6;c.so=rng();c.seat=[x,z];c.up=0;aud.push(c);return c};
+ const zs=[3.2,5.6,8,10.4,12.8,15.2];zs.forEach(z=>{for(let k=0;k<6;k++)[-1,1].forEach(s=>{const x=s*(1.9+k*2.2);seat(x,z);if(!taken.has(sk0([x,z]))&&rng()<.9)mkAud(x,z)})});
  /* named people: you, the rivals, the hosts */
  const mkP=(cfg,x,y,z,ry)=>{const c=buildChar(cfg);c.g.position.set(x,y,z);c.g.rotation.y=ry||0;g.add(c.g);return c},sit=c=>{c.legs.forEach(l=>l.rotation.x=-1.45);c.g.position.y=-.3},stand=c=>{c.legs.forEach(l=>l.rotation.x=0);c.g.position.y=0};
  const people={},ord=F0.field.filter(x=>!x.you);let ri=0;
@@ -164,7 +171,7 @@ function awShow(F0,song){
   for(let k=0;k<26;k++){x.fillStyle=`rgba(255,220,120,${.04+k%3*.03})`;x.beginPath();x.arc((k*173)%W,(k*97)%H,20+k*4,0,7);x.fill()}x.strokeStyle='#e6c34a';x.lineWidth=6;x.strokeRect(14,14,W-28,H-28);
   x.textAlign='center';lines.forEach(l=>{x.font=(l[3]||'bold ')+l[1]+'px Georgia,serif';let fs=l[1];while(x.measureText(l[0]).width>W-90&&fs>14){fs-=2;x.font=(l[3]||'bold ')+fs+'px Georgia,serif'}x.fillStyle=l[2]||GOLD2;x.fillText(l[0],W/2,l[4]);});tex.needsUpdate=true};
  /* the state machine */
- const A={t:0,si:0,li:0,typed:0,hold:0,clap:0,clapT:0,stand:0,end:false,cl:0,walk:null,cam:{p:[0,5,26],l:[0,5,-9]},fade:1,lastClap:0},NTH=AW.nth();O.A=A;
+ const A={cheer:0,look:null,t:0,si:0,li:0,typed:0,hold:0,clap:0,clapT:0,stand:0,end:false,cl:0,walk:null,cam:{p:[0,5,26],l:[0,5,-9]},fade:1,lastClap:0},NTH=AW.nth();O.A=A;
  const wrap=document.createElement('div');wrap.id='awd';wrap.style.cssText='position:fixed;inset:0;z-index:50;pointer-events:none;font-family:"Silkscreen",ui-monospace,monospace';
  wrap.innerHTML=`<div id=awfade style="position:absolute;inset:0;background:#000;opacity:1;transition:opacity .8s"></div><div style="position:absolute;left:0;right:0;top:0;height:7%;background:#000"></div><div style="position:absolute;left:0;right:0;bottom:0;height:7%;background:#000"></div>
  <div style="position:absolute;left:3%;top:9%;display:flex;gap:10px;align-items:center;font-size:clamp(11px,1.6vw,16px)"><span style="background:#c0141c;color:#fff;padding:3px 8px">LIVE</span><span style="color:#f6d86a;text-shadow:0 0 6px #000">THE ${NTH}TH GRAMOPHONE AWARDS</span></div>
@@ -200,26 +207,43 @@ function awShow(F0,song){
  S_.push({min:5,lines:[[hname[2],'The envelope, please...'],[hname[1],'And the winner is...']],on:()=>{A.clap=0;screen([['AND THE WINNER IS...',64,GOLD2,'bold ',230]],'#2a0a12');for(let i=0;i<24;i++)nz(.09,200+i*10,.35,1,'lowpass',i*.14)},cam:u=>shots.push(u)});
  S_.push({min:4,lines:[['',(you?S_NAME():WIN.n)+'! "'+WIN.t+'"']],on:()=>{A.clap=1;A.stand=1;snd('chime');confetti(240);screen([['SONG OF THE YEAR',34,GOLD2,'bold ',70],[WIN.n.toUpperCase(),84,'#ffffff','bold ',185],['"'+WIN.t+'"',46,GOLD2,'bold ',270]],'#3a0f4f')},cam:u=>(u<.5?shots.crowd(u*2):seatCam(wc.seat,u))});
  function S_NAME(){return S.artist}
- S_.push({min:7.5,lines:[['',you?'Standing ovation as you make your way to the stage.':WIN.n+' makes the long walk up to the stage.']],on:()=>{A.clap=1;A.stand=1;stand(wc);wc.g.rotation.y=Math.PI;const q=wc.seat,P=[[q[0],1.3],[0,1.3],[0,-3.0],[0,-4.9],[1.8,-6.2]];A.walk={P,k:0,d:0,pos:[q[0],q[1]]};if(!A.wp)A.wp=1},
-  tick:dt=>{const w=A.walk;if(!w||w.done)return;let mv=2.7*dt;while(mv>0&&w.k<w.P.length){const t=w.P[w.k],dx=t[0]-w.pos[0],dz=t[1]-w.pos[1],dd=Math.hypot(dx,dz);if(dd<mv){w.pos=[t[0],t[1]];mv-=dd;w.k++}else{w.pos[0]+=dx/dd*mv;w.pos[1]+=dz/dd*mv;wc.g.rotation.y=Math.atan2(dx,dz);mv=0}}
-   if(w.k>=w.P.length){w.done=1;wc.g.rotation.y=0}const z=w.pos[1];wc.g.position.set(w.pos[0],.8*Math.max(0,Math.min(1,(-2.9-z)/1.1)),z);const ph=A.t*9;wc.legs[0].rotation.x=w.done?0:Math.sin(ph)*.6;wc.legs[1].rotation.x=w.done?0:-Math.sin(ph)*.6;wc.arms[0].rotation.x=w.done?0:-Math.sin(ph)*.5;wc.arms[1].rotation.x=w.done?-3.1:Math.sin(ph)*.5;if(w.done)wt.visible=true},
-  done:()=>A.walk&&A.walk.done,cam:u=>{const w=A.walk,p=w?w.pos:[0,0];return{p:[p[0]+3.6,2.8,p[1]-4.6],l:[p[0],1.2,p[1]]}}});
+ /* the walk-up: you get out of your seat and walk to the stage yourself (WASD / arrows), then collect the trophy at the glowing ring */
+ const mk=new THREE.Group();mk.visible=false;g.add(mk);const ring=new THREE.Mesh(new THREE.RingGeometry(.9,1.25,28),new THREE.MeshBasicMaterial({color:0xffe27a,transparent:true,opacity:.85,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.03;mk.add(ring);
+ const arrow=b(.45,.45,.45,'*ffd24a',0,2.8,0,mk);arrow.rotation.z=Math.PI/4;
+ const hint=document.createElement('div');hint.style.cssText='position:absolute;left:50%;bottom:11%;transform:translateX(-50%);max-width:92vw;background:rgba(10,5,18,.92);border:3px solid #c9a227;border-radius:4px;padding:10px 18px;color:#f6d86a;font-size:clamp(12px,1.7vw,17px);text-align:center;display:none';wrap.appendChild(hint);
+ const pt=awTrophy(1.5);pt.visible=false;{const ar=presB.arms[1];pt.position.set(ar.position.x,ar.position.y+.45,.05);presB.g.add(pt)}
+ const CS=[1.8,-6.2],stY=(x,z)=>z<-4.2?.8:Math.abs(x)<2.3?.8*Math.max(0,Math.min(1,(-2.9-z)/1.3)):0;
+ const collect=()=>{const f=A.free;A.free=null;mk.visible=false;hint.style.display='none';pt.visible=false;presB.arms[1].rotation.x=0;presB.g.position.set(2.2,.8,-8.6);presB.g.rotation.y=0;wc.g.position.set(CS[0],.8,CS[1]);wc.g.rotation.y=0;wt.visible=true;wc.arms[1].rotation.x=-3.1;wc.arms[0].rotation.x=0;wc.legs.forEach(l=>l.rotation.x=0);A.cheer=3.5;A.look=null;confetti(220);snd('chime');next()};
+ S_.push({min:7.5,lines:you?[]:[['',WIN.n+' makes the long walk up to the stage.']],on:()=>{A.clap=1;A.stand=1;stand(wc);wc.g.rotation.y=Math.PI;A.cheer=2;const q=wc.seat;
+   if(you){A.free={x:q[0],z:q[1],ek:1};wc.g.position.set(q[0],0,q[1]);presA.g.visible=presB.g.visible=true;host.g.visible=false;presA.g.position.set(-1.4,.8,-8.6);presB.g.position.set(3.4,.8,-6.2);presB.g.rotation.y=-Math.PI/2;presB.arms[1].rotation.x=-3.1;pt.visible=true;mk.position.set(CS[0],.8,CS[1]);mk.visible=true;hint.style.display='block'}
+   else{const P=[[q[0],1.3],[0,1.3],[0,-3.0],[0,-4.9],[1.8,-6.2]];A.walk={P,k:0,d:0,pos:[q[0],q[1]]}}},
+  tick:dt=>{mk.children[1].position.y=2.8+Math.sin(A.t*4)*.25;mk.children[1].rotation.y+=dt*2;mk.children[0].scale.setScalar(1+Math.sin(A.t*5)*.08);
+   const f=A.free;if(f){const kd=k=>keys[k]?1:0;let dx=kd('d')+kd('arrowright')-kd('a')-kd('arrowleft'),dz=kd('s')+kd('arrowdown')-kd('w')-kd('arrowup');const mv=Math.hypot(dx,dz),oz=f.z,sp=(kd('shift')?5.2:3.4)*dt;
+    const bad=(x,z)=>Math.abs(x)>33||z>30||z<-13.4||(z<-4.2&&Math.abs(x)>14)||(z<-4.2&&oz>=-4.2&&Math.abs(x)>2.3)||(z>=-4.2&&oz<-4.2&&Math.abs(x)>2.3)||(z<-7&&z>-9.4&&Math.abs(x)<1.7);
+    if(mv){dx/=mv;dz/=mv;const nx=f.x+dx*sp,nz=f.z+dz*sp;if(!bad(nx,f.z))f.x=nx;if(!bad(f.x,nz))f.z=nz;wc.g.rotation.y=Math.atan2(dx,dz)}
+    const y=stY(f.x,f.z),ph=A.t*10;wc.g.position.set(f.x,y,f.z);wc.legs[0].rotation.x=mv?Math.sin(ph)*.7:0;wc.legs[1].rotation.x=mv?-Math.sin(ph)*.7:0;wc.arms[0].rotation.x=mv?-Math.sin(ph)*.6:-.4;wc.arms[1].rotation.x=mv?Math.sin(ph)*.6:.4;wc.arms[0].rotation.z=.12;wc.arms[1].rotation.z=-.12;
+    A.look=[f.x,f.z];const d=Math.hypot(f.x-CS[0],f.z-CS[1]),near=d<1.8&&y>.7;hint.innerHTML=near?'Press <b>E</b> to collect your trophy':(f.z<-4.2?'Walk to the glowing ring (WASD / arrows)':'Walk up to the stage: use <b>WASD</b> or arrows (hold Shift to hurry), then take the steps in the middle');
+    const ek=keys.e||keys[' ']||keys.enter;if(ek&&!f.ek&&near){collect();return}f.ek=ek?1:0;return}
+   const w=A.walk;if(!w||w.done)return;let mv=2.7*dt;while(mv>0&&w.k<w.P.length){const t=w.P[w.k],dx=t[0]-w.pos[0],dz=t[1]-w.pos[1],dd=Math.hypot(dx,dz);if(dd<mv){w.pos=[t[0],t[1]];mv-=dd;w.k++}else{w.pos[0]+=dx/dd*mv;w.pos[1]+=dz/dd*mv;wc.g.rotation.y=Math.atan2(dx,dz);mv=0}}
+   if(w.k>=w.P.length){w.done=1;wc.g.rotation.y=0}const z=w.pos[1];wc.g.position.set(w.pos[0],.8*Math.max(0,Math.min(1,(-2.9-z)/1.1)),z);const ph=A.t*9;wc.legs[0].rotation.x=w.done?0:Math.sin(ph)*.6;wc.legs[1].rotation.x=w.done?0:-Math.sin(ph)*.6;wc.arms[0].rotation.x=w.done?0:-Math.sin(ph)*.5;wc.arms[1].rotation.x=w.done?-3.1:Math.sin(ph)*.5;if(w.done)wt.visible=true;A.look=[w.pos[0],w.pos[1]]},
+  done:()=>A.walk&&A.walk.done,off:()=>{mk.visible=false;hint.style.display='none';A.look=null},
+  cam:u=>{const f=A.free;if(f){const y=stY(f.x,f.z);return{p:[f.x*.7,2.9+y*.8,f.z+5.2],l:[f.x*.9,1.5+y,f.z-3.4]}}const w=A.walk,p=w?w.pos:[0,0];return{p:[p[0]+3.6,2.8,p[1]-4.6],l:[p[0],1.2,p[1]]}}});
  S_.push({min:12,lines:you?[[S.artist,'Thank you. I... wow. I really did not write a speech.'],[S.artist,'To everyone who streamed, shared and sang along: this one is yours too.'],[hname[1],'Song of the Year. Congratulations!']]:[[WIN.n,pick(['I am honestly speechless. Thank you to my team, my family and the fans.','Wow. Thank you, Gramophone Academy. This means everything.'])],[WIN.n,pick(['This one is for everybody who never stopped believing.','Go home and make something that scares you.'])],[hname[1],'Song of the Year. Congratulations!']],
-  on:()=>{A.clap=1;A.stand=1;presA.g.visible=presB.g.visible=true;presA.g.position.set(-1.4,.8,-8.6);wt.visible=true;wc.arms[1].rotation.x=-3.1;wc.arms[0].rotation.x=0;wc.g.position.set(1.8,.8,-6.2);wc.g.rotation.y=0;confetti(260);snd('chime');screen([['CONGRATULATIONS',70,GOLD2,'bold ',160],[WIN.n.toUpperCase(),70,'#ffffff','bold ',270]],'#3a0f4f')},
+  on:()=>{A.clap=1;A.stand=1;presA.g.visible=presB.g.visible=true;presA.g.position.set(-1.4,.8,-8.6);presB.g.position.set(2.2,.8,-8.6);presB.g.rotation.y=0;pt.visible=false;A.look=null;wt.visible=true;wc.arms[1].rotation.x=-3.1;wc.arms[0].rotation.x=0;wc.g.position.set(1.8,.8,-6.2);wc.g.rotation.y=0;confetti(260);snd('chime');screen([['CONGRATULATIONS',70,GOLD2,'bold ',160],[WIN.n.toUpperCase(),70,'#ffffff','bold ',270]],'#3a0f4f')},
   line:i=>{if(i==1||i==2)confetti(120)},cam:u=>shots.hero(u)});
  S_.push({min:3.4,lines:[['',you?'You slip out through the side door, trophy in hand...':'You slip out through the side door...']],on:()=>{A.clap=.5;A.out=1},cam:u=>shots.wide(1-u)});
  const go=i=>{if(S_[A.si]&&S_[A.si].off)S_[A.si].off();A.si=i;A.t=0;A.li=0;A.typed=0;A.hold=-1;A.lt=0;const s=S_[i];s.on&&s.on();if(s.line)s.line(0);if(s.lines.length){$c('awcap').style.display='block';awLine()}else $c('awcap').style.display='none'};
  const awLine=()=>{const s=S_[A.si],l=s.lines[A.li];if(!l)return;$c('awwho').textContent=l[0]||'';A.typed=0;A.hold=-1};
  const next=()=>{const s=S_[A.si];if(A.si>=S_.length-1)return finish();go(A.si+1)};
  const adv=()=>{if(A.end)return;const s=S_[A.si],l=s.lines[A.li];if(l&&A.typed<l[1].length){A.typed=l[1].length;return}if(A.li<s.lines.length-1){A.li++;if(s.line)s.line(A.li);awLine()}else if(!(s.done&&!s.done())&&A.t>1)next()};
- const finish=()=>{if(A.end)return;A.end=true;const R2=awS();let won=!!WIN.sc&&WIN.you;
+ const finish=()=>{if(A.end)return;A.end=true;A.clap=0;A.free=null;hint.style.display='none';mk.visible=false;const R2=awS();let won=!!WIN.sc&&WIN.you;
   const rows=F0.field.map((x,i)=>`<tr style="${x.you?'color:#7fe3ff;font-weight:bold':''}"><td>${i+1}</td><td>${esc(x.n)}</td><td style="opacity:.8">${esc(x.t)}</td><td align=right>${x.sc}</td></tr>`).join('');
   if(won){S.inv=S.inv||{};S.inv.trophy=(S.inv.trophy||0)+1;R2.wins++}R2.hist.push({day:S.day,won:!!won,w:WIN.n,sc:F0.me,top:WIN.sc});
   const r=$c('awres');r.style.display='flex';$c('awcap').style.display='none';r.innerHTML=`<div style="background:#14091c;border:3px solid #c9a227;border-radius:6px;padding:20px 26px;max-width:min(580px,94vw);color:#fff;text-align:center"><h2 style="color:#f6d86a;margin:0 0 8px">${won?'🏆 YOU WON SONG OF THE YEAR!':'Song of the Year: '+esc(WIN.n)}</h2>
    <p style="margin:4px 0 10px;opacity:.9;font:14px/1.4 ui-monospace,monospace">${won?'A Gramophone Trophy has been added to your Storage. Place it in your house from the Storage menu.':'You were beaten out. A song with better mix quality and more streams gives you a shot next time.'}</p>
    <table style="width:100%;border-collapse:collapse;font:14px ui-monospace,monospace;text-align:left"><tr style="opacity:.6"><td></td><td>Artist</td><td>Song</td><td align=right>Score</td></tr>${rows}</table><button id=awlv class=go style="margin-top:14px;padding:10px 22px;font-size:15px">Leave</button></div>`;
   $c('awlv').onclick=()=>awEnd(won)};
- O.kd=e=>{if(A.end)return;if([' ','Enter','ArrowRight'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();adv()}else if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();finish()}};
+ O.kd=e=>{if(A.end)return;if(A.free)return;if([' ','Enter','ArrowRight'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();adv()}else if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();finish()}};
  addEventListener('keydown',O.kd,true);$c('awcap').onclick=adv;$c('awskip').onclick=()=>finish();
  /* per-frame */
  O.tick=dt=>{A.t+=dt;A.lt+=dt;const s=S_[A.si];if(!s)return;
@@ -230,23 +254,30 @@ function awShow(F0,song){
   const u=Math.min(1,A.t/(s.min||5)),sh=s.cam(u,s);A.cam.p=sh.p;A.cam.l=sh.l;const C=O.cam;C.aspect=aspect();C.updateProjectionMatrix();C.position.set(O.ox+sh.p[0],sh.p[1],O.oz+sh.p[2]);C.lookAt(O.ox+sh.l[0],sh.l[1],O.oz+sh.l[2]);
   /* crowd: clap, stand */
   const tc=A.clap,ts=A.stand;A.cl+=(tc-A.cl)*Math.min(1,dt*4);A.st=(A.st||0)+(ts-(A.st||0))*Math.min(1,dt*3);
-  aud.forEach(p=>{const cl=A.cl,sw=Math.sin(A.t*12+p.ph)*.3;p.arms[0].rotation.x=p.arms[1].rotation.x=-1.25*cl+sw*cl;p.arms[0].rotation.z=.35*cl;p.arms[1].rotation.z=-.35*cl;p.body.position.y=A.st*.35+(cl?Math.abs(Math.sin(A.t*6+p.ph))*.05*cl:0);p.legs.visible=A.st>.5});
+  aud.forEach(p=>{const cl=A.cl,sw=Math.sin(A.t*12+p.ph)*.3,up=A.st>.25+p.so*.6;if(up!=!!p.up){p.up=up?1:0;p.legs.forEach(l=>l.rotation.x=up?0:-1.45)}
+   const cheer=A.cheer>0?1:0,hop=up?Math.abs(Math.sin(A.t*(cheer?9:5)+p.ph))*(cheer?.16:.05)*Math.max(.3,cl):0;p.g.position.y=(up?0:-.3)+hop;
+   const raise=cheer?-2.7+sw*.5:-1.25*cl+sw*cl;p.arms[0].rotation.x=p.arms[1].rotation.x=raise;p.arms[0].rotation.z=(cheer?.2:.35)*cl;p.arms[1].rotation.z=-(cheer?.2:.35)*cl;
+   if(A.look){const dx=A.look[0]-p.seat[0],dz=A.look[1]-p.seat[1],ty=Math.atan2(dx,dz),d=ty-p.g.rotation.y;p.g.rotation.y+=Math.atan2(Math.sin(d),Math.cos(d))*Math.min(1,dt*3)*(up?1:.5)}else{const d=Math.PI-p.g.rotation.y;p.g.rotation.y+=Math.atan2(Math.sin(d),Math.cos(d))*Math.min(1,dt*3)}});
+  A.cheer=Math.max(0,(A.cheer||0)-dt);
   /* seated people clap too */
   F0.field.forEach(x=>{const c=x.c;if(c===wc&&A.si>=6)return;if(c.g.position.y<0){const k=A.cl;c.arms[0].rotation.x=c.arms[1].rotation.x=-1.2*k+Math.sin(A.t*12+c.seat[0])*.3*k}});
-  hn.forEach(h=>{if(h.g.visible&&A.si!=8){const k=A.cl;h.arms[0].rotation.x=h.arms[1].rotation.x=k>.4?-1.2+Math.sin(A.t*12)*.25:0}});
+  hn.forEach(h=>{if(h.g.visible&&A.si!=8&&!(h===presB&&pt.visible)){const k=A.cl;h.arms[0].rotation.x=h.arms[1].rotation.x=k>.4?-1.2+Math.sin(A.t*12)*.25:0}});
   oth.forEach(c=>{if(c.g.visible)c.arms[1].rotation.x=-3.1});
   /* lights, beams, pillars, flashes, confetti */
   L[1].intensity=2.1+Math.sin(A.t*2)*.25;L[2].intensity=1.3+Math.sin(A.t*3)*.4;L[3].intensity=1.3+Math.cos(A.t*3)*.4;
+  {const f=A.free,w=A.walk,tx=f?f.x:w&&!w.done?w.pos[0]:0,tz=f?f.z:w&&!w.done?w.pos[1]:-8;spot.visible=A.si>=5;spot.position.x+=(tx-spot.position.x)*Math.min(1,dt*4);spot.position.z+=(tz-spot.position.z)*Math.min(1,dt*4);spot.position.y=13;spot.lookAt&&0}
   beams.forEach((m,i)=>{m.rotation.z=Math.sin(A.t*.9+i*1.3)*.5;m.rotation.x=Math.cos(A.t*.7+i)*.3});pil.forEach((m,i)=>m.material.color.setHSL((A.t*.15+i*.4)%1,.9,.55));
   flashes.forEach(m=>{m.visible=A.cl>.3&&Math.random()<.08;if(m.visible)m.position.set(R(-14,14),R(1.8,4),R(6,17))});
   for(let i=0;i<NC;i++){const j=i*3;if(cp[j+1]>-40){cp[j]+=cv[j]*dt;cp[j+1]+=cv[j+1]*dt;cp[j+2]+=cv[j+2]*dt;cv[j]+=Math.sin(A.t*3+i)*dt;if(cp[j+1]<0)cp[j+1]=-50}}cg.attributes.position.needsUpdate=true;cg.attributes.color.needsUpdate=true;
   /* applause sound */
-  A.lastClap-=dt;if(A.cl>.2&&A.lastClap<=0){A.lastClap=.07;nz(.06,1800+R(0,2400),.2*A.cl,1,'bandpass')}
+  const ca=O.clapA;if(ca&&!O.clapFail){const v=(typeof FX!='undefined'&&!FX)?0:Math.min(1,A.cl*.85+(A.cheer>0?.15:0));ca.volume=Math.max(0,Math.min(1,v));if(v>.04&&ca.paused)ca.play().catch(()=>{});else if(v<=.03&&!ca.paused)ca.pause()}
+  else{A.lastClap-=dt;if(A.cl>.2&&A.lastClap<=0){A.lastClap=.07;nz(.06,1800+R(0,2400),.2*A.cl,1,'bandpass')}}
   /* fades */
   const f=$c('awfade');if(A.si==0&&A.t<.6)f.style.opacity=1-A.t/.6;else if(A.out)f.style.opacity=Math.min(1,A.t/2.8);else if(!A.end)f.style.opacity=A.si==0?0:f.style.opacity>.05?0:0};
+ try{O.clapA=new Audio('audio/applause.mp3');O.clapA.loop=true;O.clapA.volume=0;O.clapA.onerror=()=>{O.clapFail=1}}catch(e){O.clapFail=1}
  O.res=0;return go
 }
-function awEnd(won){const O=AWC;removeEventListener('keydown',O.kd,true);if(O.wrap)O.wrap.remove();if(O.g)scene.remove(O.g);O.on=0;scene.background=O.bg;if(O.fog!==undefined)scene.fog=O.fog;$('hud').style.display=O.hud;AWP=null;mode='play';
+function awEnd(won){const O=AWC;try{if(O.clapA){O.clapA.pause();O.clapA=null}}catch(e){}removeEventListener('keydown',O.kd,true);if(O.wrap)O.wrap.remove();if(O.g)scene.remove(O.g);O.on=0;scene.background=O.bg;if(O.fog!==undefined)scene.fog=O.fog;$('hud').style.display=O.hud;AWP=null;mode='play';
  try{if(IN)leaveShop()}catch(e){}if(won)say('You won a Gramophone Trophy! It is in Storage.');try{autoSave()}catch(e){}}
 let AWP=null;
 function awRng(s){return()=>(s=Math.imul(s^s>>>15,1|s)+0x6D2B79F5|0,((s^s>>>7)>>>0)/4294967296)}

@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.125.1';
+const GAME_VERSION='v26.126.0';
 const VERSION_HISTORY=[
+ {v:'v26.126.0',n:'Gramophone Awards overhaul: when your song wins you now get up from your seat and walk to the stage yourself (WASD or arrows, take the steps, press E at the glowing ring to collect the trophy from the presenter). The crowd now applauds with a real applause sound loop and cheers, stands and turns to watch you. Fixed two people sharing one chair, and the audience now has legs, faces, hair and outfits from the game\'s own clothes. The hall also gets velvet curtains, footlights, flower urns, aisle lights, a spotlight that follows you and an ON AIR sign. Saves still load.'},
  {v:'v26.125.1',n:'Monthly listeners no longer sit frozen on days with big streams: each day with streams now adds new listeners (a share of the day\'s streams), and new releases give an extra bump based on your interest. Saves still load.'},
  {v:'v26.125.0',n:'Two careers: Play on the main menu now opens a career select screen with two slots (artist name, day, Play and delete). Once both slots are used, New career is greyed out and says Coming soon on hover. Your existing career moves into slot 1 automatically. Cloud save follows the career you last played. Saves still load.'},
  {v:'v26.124.0',n:'The Music source dropdown in Settings now matches the game\'s look: dark field, green pixel arrow and a green focus outline instead of the plain system dropdown. Saves still load.'},
