@@ -1,13 +1,13 @@
 /* ===== v26.120: the Gramophone Awards =====
    A glitzy awards hall in the city (a grand low building at the end of your street with a gold marquee, red carpet and a giant gold gramophone on the roof). You can only go in at
    Fame Level 120. Inside is the reception: red carpet, step-and-repeat banner, champagne, a trophy case and a host with the
-   guest list. Check in (once every 30 days) and pick the song you submit, then the ceremony plays as a TV broadcast cutscene:
+   guest list. Check in (once every 15 days) and pick the song you submit, then the ceremony plays as a TV broadcast cutscene:
    host, two other categories, then your category (Song of the Year) with nominees, a drumroll and the envelope. The winner
    walks up through the applause and holds the trophy up with everybody clapping, then you leave.
    Hard to win: you are up against four of 16 big real-world artists, each with a score that moves a little each year, and your
    score is your submitted song's mix quality plus a bonus for its streams. Only the single highest score wins.
    A win gives you a Gramophone Trophy in Storage (furniture, not sold anywhere) that you can place in your house. S.awd saves it all. */
-const AW={need:120,cool:30,ox:-2400,i:null,
+const AW={need:120,cool:15,ox:-2400,i:null,
  pool:[['Beyoncé',142,'Silver Cathedral'],['Kendrick Lamar',140,'Compton Sonata'],['Drake',138,'Midnight Penthouse'],['Taylor Swift',136,'Glass Autumn'],['Adele',134,'Ten Winters'],['The Weeknd',132,'Neon Confession'],
   ['Bad Bunny',130,'Calor de Medianoche'],['Billie Eilish',128,'Hollow Lullaby'],['Bruno Mars',128,'Velvet Saturday'],['SZA',126,'Good Gravity'],['Travis Scott',124,'Astro Parade'],['Olivia Rodrigo',120,'Locker Room Heart'],
   ['Harry Styles',119,'Sunday Carousel'],['Dua Lipa',118,'Chrome Disco'],['Post Malone',116,'Whiskey Tattoo'],['Ed Sheeran',114,'Small Town Loop']],
@@ -15,20 +15,19 @@ const AW={need:120,cool:30,ox:-2400,i:null,
  host:['Marcus Hale','June Calloway','Dex Okonkwo','Priya Vance'],nth:()=>40+Math.floor(((typeof S!='undefined'&&S.day)||0)/30)};
 const awS=()=>(S.awd=S.awd||{last:-999,wins:0,tries:0,hist:[]});
 const awSongScore=s=>Math.round((s.q||0)+Math.min(25,5*Math.log10(1+(s.streams||0)/1000)));
-const awWait=()=>Math.max(0,AW.cool-(S.day-awS().last));
+const awWait=()=>S.cheat?0:Math.max(0,AW.cool-(S.day-awS().last));
 
 /* ---- the trophy: furniture that is not sold, only won ---- */
 Object.defineProperty(F,'trophy',{value:{n:'Gramophone Trophy',p:0,w:.6,d:.6,b:[[.46,.1,.46,'#2a1f14',0,.05,0],[.38,.06,.38,'#c9a227',0,.13,0],[.1,.34,.1,'#e6c34a',0,.33,0],[.26,.04,.26,'#c9a227',0,.52,0],[.34,.02,.34,'#1a1a1a',0,.55,0],[.04,.06,.04,'#e6c34a',0,.59,0],
  [.1,.1,.1,'#e6c34a',.04,.62,0],[.18,.1,.18,'#f2d466',.1,.7,0],[.28,.1,.28,'#e6c34a',.17,.8,0],[.38,.08,.38,'#f2d466',.24,.9,0],[.26,.04,.26,'#3a2a10',.26,.9,0],[.05,.4,.05,'#c9a227',-.1,.3,.1]]},enumerable:false,writable:true,configurable:true});
 
 /* ---- the field: you plus four big artists, scores decided up front ---- */
-function awField(song){const me=awSongScore(song),pool=AW.pool.slice().sort(()=>Math.random()-.5),rv=pool.slice(0,4).map(p=>({n:p[0],t:p[2],sc:Math.round(p[1]+R(-9,9)),you:0}));
- const f=rv.concat([{n:S.artist,t:song.title,sc:me,you:1}]).sort((a,b)=>b.sc-a.sc);const others=pool.slice(4,10);
+function awField(song){let me=awSongScore(song);const pool=AW.pool.slice().sort(()=>Math.random()-.5),rv=pool.slice(0,4).map(p=>({n:p[0],t:p[2],sc:Math.round(p[1]+R(-9,9)),you:0}));
+ if(S.cheat)me=Math.max(me,...rv.map(r=>r.sc))+5;const f=rv.concat([{n:S.artist,t:song.title,sc:me,you:1}]).sort((a,b)=>b.sc-a.sc);const others=pool.slice(4,10);
  return{field:f,win:f[0],won:!!f[0].you,me,cats:[[pick(['Best New Artist','Best Pop Vocal Album','Best Dance Recording']),others[0][0],others[0][2]],[pick(['Best Rap Performance','Best Rock Song','Album of the Year']),others[1][0],others[1][2]]],
   h:[pick(AW.host),pick(AW.host)]}}
 
 /* ---- the building out front, and the reception room ---- */
-const AWD={door:0};
 {const bv=buildVenues;buildVenues=function(){bv();try{SHOPS.push({name:'Gramophone Awards',cx:74,ox:AW.ox,ez:12.9});AW.i=SHOPS.length-1;
  interior(AW.i,['#7a1010','#5a0a0a'],'#1a1020',[],[],{hair:5,hc:0,eyes:0,mouth:3,top:2,tc:1,pc:1,skin:2,body:.4,hgt:.6,ac:-1},'Vivian (guest list)',awTalk);
  ixRoom(AW.i,AW_ROOM);
@@ -49,18 +48,46 @@ const AW_ROOM={fl:['tile','#7a1010','#6a0c0c'],wl:['stripe','#1e1428','#2c1c3c']
   [[3,5.3,'#8a1d4a','#c98b6a'],[3.6,5.6,'#1a1a22','#8a5a3a'],[7.2,4.6,'#1c4a7a','#e0b090'],[7.9,4.4,'#111','#6a4a30'],[2.5,7.4,'#b8860b','#d9a47a']].forEach(q=>{b(.4,.9,.3,q[2],q[0],.45,q[1]);b(.34,.4,.26,q[2],q[0],1.1,q[1]);b(.22,.22,.22,q[3],q[0],1.45,q[1]);b(.24,.08,.24,q[2]=='#111'||q[2]=='#1a1a22'?'#222':'#2a1a1a',q[0],1.58,q[1]);cl(q[0]-.25,q[1]-.25,q[0]+.25,q[1]+.25)});
   ixFrame(b,3.6,1.95,.03,.7,.9,'#c9a227',['#7a1010','#e6c34a','#1a1020']);ixFrame(b,6.4,1.95,.03,.7,.9,'#c9a227',['#1a1020','#e6c34a','#7a1010']);
   ixPlant(b,cl,.8,3.4,.9,'#2a1a38');ixPlant(b,cl,9.3,3.2,.9,'#2a1a38');ixPend(b,3,3.4,'*ffe9b8','#c9a227',2.5);ixPend(b,7,3.4,'*ffe9b8','#c9a227',2.5);ixPend(b,5,6,'*ffe9b8','#c9a227',2.4)}};
-/* the building itself: a grand low hall at the end of your street (slot 74, built by the street shop builder in 93-street-shops.js) */
-SHOPX[74]={n:'GRAMOPHONE AWARDS',h:5.2,wall:'#efe6d2',band:'#e4d9bf',trim:'#c9a227',fas:'#2a0a12',txt:'#f6d86a',door:'#5a0f1a',glass:'#b9a0c8',sill:'#c9a227',up:1,
- win:(X,z,x0,x1,w)=>{/* framed gold records and a poster of the trophy */w.forEach((u,k)=>{SB(.42,.5,.03,'#c9a227',u,1.4,z+.1);SB(.32,.4,.02,k%2?'#1a1020':'#7a1010',u,1.4,z+.12);SB(.1,.1,.02,'#f6d86a',u,1.42,z+.13)})},
- extra:(X,z,H)=>{/* red carpet, gold stanchions and ropes, marquee canopy with bulbs, fluted columns, banners, a giant gold gramophone on the roof, roof lamps */
-  SB(2.2,.03,5,'#b01020',X,.02,z+3.1);SB(2.3,.02,5.1,'#d4a52a',X,.012,z+3.1);[-1.3,1.3].forEach(s=>{for(let q=z+1.4;q<z+5;q+=1.2){SB(.08,.9,.08,'#e6c34a',X+s,.45,q);SB(.14,.1,.14,'#f6d86a',X+s,.93,q);if(q<z+4)SB(.03,.05,1.2,'#8a0f1e',X+s,.8,q+.6)}});
-  SB(3.6,.18,1.4,'#c9a227',X,2.6,z+.7);SB(3.4,.08,1.3,'#7a1010',X,2.7,z+.7);for(let k=-6;k<=6;k++)SB(.1,.1,.1,k%2?'#fff3b0':'#ffd24a',X+k*.28,2.5,z+1.4);
-  [-1.7,1.7].forEach(s=>{SB(.4,2.5,.4,'#f4ecd8',X+s,1.25,z+1.3);SB(.5,.15,.5,'#c9a227',X+s,.08,z+1.3);SB(.5,.15,.5,'#c9a227',X+s,2.45,z+1.3)});
-  [-3.2,3.2].forEach(s=>{SB(.9,2.4,.05,'#2a0a12',X+s,3.8,z+.28);SB(.7,.5,.03,'#c9a227',X+s,4.3,z+.31);SB(.3,1,.03,'#f6d86a',X+s,3.6,z+.31)});
-  const y=H+.7;SB(1.6,.5,1,'#c9a227',X,y-.2,6.8);SB(.2,1.2,.2,'#e6c34a',X,y+.7,6.8);SB(1.4,.12,1.4,'#f6d86a',X,y+1.35,6.8);SB(.3,.3,.3,'#c9a227',X+.3,y+1.6,6.8);SB(.7,.35,.7,'#e6c34a',X+.6,y+1.9,6.8);SB(1.2,.35,1.2,'#f6d86a',X+1,y+2.2,6.8);SB(1.8,.3,1.8,'#fff3b0',X+1.5,y+2.55,6.8);
-  [-3.4,3.4].forEach(s=>{SB(.3,.3,.3,'#2a2a2a',X+s,H+.4,z+.5);SB(.2,.2,.2,'#fff3b0',X+s,H+.65,z+.5)})}};
-{const bv=buildVenues;buildVenues=function(){bv();try{mkShop(74,'#c9a227','AWARDS',()=>{if(fameLevel()<AW.need){snd('err');say('Invite only: the Gramophone Awards need Fame Level '+AW.need+'. You are Level '+fameLevel()+'.')}else enterShop(AW.i)},'Enter Gramophone Awards');POIS.push([74,8,'Gramophone Awards','#ffd24a'])}catch(e){console.error('awards door',e)}}}
-{const pv=buildVenues;buildVenues=function(){pv();try{SHOPS[AW.i].cx=74;SHOPS[AW.i].ez=12.9}catch(e){}}}
+/* the building: a grand hall in the city, on the empty lot east of Nova Mall, door on the south face (the side the game camera sees)
+   facing the main street. Footprint x 698-736, z -26 to 6; the forecourt (red carpet) runs to the kerb at z 14.9. Built in final world
+   coordinates after the road warp, like the street shops. */
+const AWB={x0:698,x1:736,z0:-26,z1:6,cx:717,on:0};
+function awBuildOut(){if(AWB.on||AW.i==null)return;AWB.on=1;const X=AWB.cx,zf=AWB.z1,H=8.4,W=AWB.x1-AWB.x0,D=AWB.z1-AWB.z0,zc=(AWB.z0+AWB.z1)/2,wall='#eadfc6',trim='#c9a227',gl='#b9a0c8',mar='#6a0f1e';
+ SB(W,H,D,wall,X,H/2,zc);SB(W+.5,.6,D+.5,'#bfae86',X,.3,zc);
+ for(let y=1.6,i=0;y<H-.4;y+=1.4,i++)if(i%2)SB(W+.04,.5,D+.04,'#e0d3b4',X,y,zc);
+ SB(W+.7,.5,D+.7,trim,X,H+.1,zc);SB(W+.3,.7,D+.3,'#f2e8d0',X,H+.7,zc);SB(W+.8,.14,D+.8,'#8e8a84',X,H+1.1,zc);
+ /* steps and the red carpet */
+ for(let k=0;k<3;k++)SB(17-k*.7,.2*(k+1),.8,'#d8ceb6',X,.1*(k+1),zf+.8+(2-k)*.8);
+ SB(3.4,.05,8,'#b01020',X,.04,zf+4.9);SB(3.5,.03,8.1,'#d4a52a',X,.025,zf+4.9);
+ [-1.9,1.9].forEach(sd=>{for(let z=zf+3.6;z<=14.4;z+=1.4){SB(.1,1,.1,'#e6c34a',X+sd,.5,z);SB(.22,.06,.22,'#c9a227',X+sd,.03,z);SB(.16,.12,.16,'#f6d86a',X+sd,1.04,z);if(z<14)SB(.04,.05,1.3,'#8a0f1e',X+sd,.9,z+.7)}});
+ for(let k=0;k<4;k++)SB(.9,.03,.9,k%2?'#f6d86a':'#e6c34a',X,.07,zf+5.4+k*2.3);
+ /* portico: six fluted columns, entablature, stepped pediment, sign */
+ [-9,-6,-3,3,6,9].forEach(o=>{SB(1.2,.35,1.2,'#d8ceb6',X+o,.78,zf+2.2);SB(.85,6.2,.85,'#f4ecd8',X+o,4.1,zf+2.2);[-.3,.3].forEach(q=>SB(.06,6.2,.06,'#d9cfb4',X+o+q,4.1,zf+2.65));SB(1.25,.45,1.25,trim,X+o,7.5,zf+2.2)});
+ SB(22,.9,2.2,'#f4ecd8',X,8.2,zf+1.6);SB(22.4,.2,2.4,trim,X,7.7,zf+1.6);SB(22.4,.2,2.4,trim,X,8.75,zf+1.6);
+ for(let k=0;k<6;k++)SB(21-k*3.4,.55,1.6-k*.1,k%2?'#f4ecd8':'#e8dec4',X,9.2+k*.55,zf+1.5);SB(.5,.5,.5,trim,X,12.6,zf+1.5);
+ [-1,1].forEach(sd=>{SB(.5,.5,.5,trim,X+sd*10.9,9.1,zf+1.5)});
+ SB(2,2,.2,'#2a0a12',X,10.8,zf+2.4);
+ const sg=ixSign('GRAMOPHONE AWARDS','#f6d86a','#2a0a12',14,1.4,{border:'#c9a227',ff:'Georgia,serif'});sg.position.set(X,8.2,zf+2.74);scene.add(sg);
+ const sg2=ixSign('SONG OF THE YEAR · LIVE TONIGHT','#fff3b0','#6a0f1e',10,.7,{border:'#c9a227'});sg2.position.set(X,6.9,zf+2.9);scene.add(sg2);
+ /* the doors */
+ SB(5.2,5.4,.3,'#2a0a12',X,3.3,zf+.05);SB(2.2,4.2,.12,'#7a0f1e',X-1.1,2.8,zf+.22);SB(2.2,4.2,.12,'#7a0f1e',X+1.1,2.8,zf+.22);SB(1.8,2.4,.06,'#e6c34a',X-1.1,3.2,zf+.3);SB(1.8,2.4,.06,'#e6c34a',X+1.1,3.2,zf+.3);SB(1.5,2.1,.04,'#b9a0c8',X-1.1,3.2,zf+.34);SB(1.5,2.1,.04,'#b9a0c8',X+1.1,3.2,zf+.34);SB(.12,.5,.1,'#f6d86a',X-.2,2.5,zf+.35);SB(.12,.5,.1,'#f6d86a',X+.2,2.5,zf+.35);SB(5.4,.3,.5,trim,X,5.9,zf+.3);SB(1.6,.7,.1,'#2a0a12',X,5.2,zf+.3);SB(1.2,.4,.04,'#f6d86a',X,5.2,zf+.36);
+ [-2.9,2.9].forEach(sd=>{SB(.3,.9,.3,'#2a2a2a',X+sd,3.6,zf+.4);SB(.4,.5,.4,'#fff3b0',X+sd,4.3,zf+.4)});
+ /* tall windows with gold frames, banners and corner pilasters on the front */
+ [-1,1].forEach(sd=>{[12.6,15.8].forEach(o=>{const x=X+sd*o;SB(1.8,4,.14,trim,x,3.9,zf+.06);SB(1.5,3.6,.18,gl,x,3.9,zf+.08);SB(.06,3.6,.2,trim,x,3.9,zf+.1);SB(2,.2,.5,'#d8ceb6',x,1.9,zf+.2)});SB(1.3,5.2,.08,mar,X+sd*10.2,4.6,zf+.06);SB(.9,.9,.1,'#e6c34a',X+sd*10.2,5.6,zf+.12);SB(.2,1.2,.1,'#f6d86a',X+sd*10.2,4.4,zf+.12);SB(1.2,.5,.12,'#f6d86a',X+sd*10.2,3.8,zf+.12);SB(1.1,.8,1.1,'#d8ceb6',X+sd*18.5,.7,zf+.5);SB(.9,7.6,.9,'#f4ecd8',X+sd*18.5,4.4,zf+.2)});
+ /* east (visible) and west sides: windows and pilasters; the back wall */
+ [AWB.x1,AWB.x0].forEach((wx,si)=>{const dir=si?-1:1;for(let z=zf-3;z>AWB.z0+2;z-=4.6){SB(.14,4,1.8,trim,wx+dir*.07,3.9,z);SB(.18,3.6,1.5,gl,wx+dir*.09,3.9,z);SB(.5,.2,2,'#d8ceb6',wx+dir*.2,1.9,z);SB(.5,.3,.3,'#d8ceb6',wx+dir*.1,H-.5,z-2.3)}});
+ for(let x=AWB.x0+3;x<AWB.x1-1;x+=4.6){SB(1.8,3.6,.18,gl,x,3.9,AWB.z0-.09);SB(1.9,4,.14,trim,x,3.9,AWB.z0-.07)}
+ /* roof: gold gramophone statue on a pedestal, flag poles, vents */
+ const sx=X,sz=zc+2,y=H+1.2;SB(7,1,7,'#d8ceb6',sx,y+.5,sz);SB(6,.5,6,trim,sx,y+1.2,sz);SB(2.6,.4,2.6,'#2a1f14',sx,y+1.65,sz);SB(2.2,.3,2.2,'#c9a227',sx,y+2,sz);SB(.5,2.2,.5,'#e6c34a',sx,y+3.2,sz);SB(2,.25,2,'#c9a227',sx,y+4.4,sz);SB(1.7,.1,1.7,'#1a1a1a',sx,y+4.6,sz);
+ [[.2,.5,.5,y+4.8],[.7,.7,.8,y+5.3],[1.3,.9,1.1,y+5.9],[2,1.1,1.4,y+6.5],[2.8,1.3,1.7,y+7.1]].forEach(q=>{SB(q[1],.62,q[1],'#e6c34a',sx+q[0]*.45,q[3],sz)});SB(2.1,.4,2.1,'#fff3b0',sx+1.4,y+7.6,sz);SB(1.2,.3,1.2,'#8a6a1a',sx+1.45,y+7.65,sz);
+ [-14,14].forEach(o=>{SB(.14,6,.14,'#cfd3d8',X+o,H+4,zf-2);SB(2,1.2,.05,mar,X+o+(o<0?1:-1),H+6.4,zf-2);SB(.8,.5,.06,'#f6d86a',X+o+(o<0?1:-1),H+6.4,zf-1.95)});
+ SB(2,.8,2,'#9aa0a6',X-6,H+1.6,zc);SB(2.4,.6,1.6,'#c3c7cc',X+8,H+1.5,zc-3);SB(.3,.8,.3,'#5a5f66',X+12,H+1.6,zc+4);
+ /* forecourt: gold lamp posts, planters, a bollard line along the kerb */
+ [-6,6].forEach(o=>{SB(.24,3.6,.24,'#2a2a2a',X+o,1.8,13);SB(.9,.1,.1,'#2a2a2a',X+o,3.6,13);SB(.5,.5,.5,'#fff3b0',X+o,3.9,13);SB(.7,.2,.7,'#c9a227',X+o,.1,13)});
+ [-8.5,8.5,-12,12].forEach((o,i)=>{SB(1.2,.7,1.2,'#8a6a4a',X+o,.35,i<2?8:11);SB(1,.8,1,'#2e7d32',X+o,1.1,i<2?8:11);SB(.7,.5,.7,'#43a047',X+o,1.6,i<2?8:11)});
+ /* the way in and out */
+ col(AWB.x0,AWB.z0,AWB.x1,AWB.z1+.2);const s=SHOPS[AW.i];s.cx=X;s.ez=zf+5.5;INT.push({x:X,z:zf+4.6,r:2,l:'Enter Gramophone Awards',a:()=>{if(fameLevel()<AW.need){snd('err');say('Invite only: the Gramophone Awards need Fame Level '+AW.need+'. You are Level '+fameLevel()+'.')}else enterShop(AW.i)}});POIS.push([X,13,'Gramophone Awards','#ffd24a'])}
+{const f=flushSB;flushSB=function(){warpWorld();try{awBuildOut()}catch(e){console.error('awards building',e)}f()}}
 
 /* ---- the guest list desk ---- */
 function awTalk(){if(mode!='play')return;const A=awS(),sg=(S.songs||[]).slice().sort((a,b)=>awSongScore(b)-awSongScore(a)),w=awWait();
@@ -74,110 +101,155 @@ function awTalk(){if(mode!='play')return;const A=awS(),sg=(S.songs||[]).slice().
   <div class=row2>${sg.length&&!w?'<button class=go onclick="awGo()">Take your seat · Start the ceremony</button>':''}<button onclick="closeUI()">Not now</button></div></div>`}
 function awGo(){const sel=$('awsel'),song=(S.songs||[]).find(s=>s.id==(sel&&sel.value));if(!song||awWait()>0)return;const A=awS();A.last=S.day;A.tries++;closeUI();mode='menu';awPlay(awField(song),song)}
 
-/* ---- the broadcast ---- */
+/* ---- the ceremony: a real 3D hall in the game's own pixel look, filmed by TV cameras ---- */
+const AWC={on:0,cam:null,g:null,ox:4000,oz:4000,hud:'',bg:null,fog:null};
+const AWCF={'Beyoncé':{hair:5,hc:3,top:2,tc:3,pc:4,skin:4,body:.35,eyes:1,mouth:0},'Taylor Swift':{hair:11,hc:3,top:4,tc:0,pc:4,skin:0,body:.3,eyes:1,mouth:0},'Adele':{hair:5,hc:3,top:2,tc:6,pc:4,skin:0,body:.55,eyes:0,mouth:0},
+ 'Bad Bunny':{hair:1,hc:0,top:0,tc:3,pc:1,skin:2,body:.35,eyes:4,mouth:3},'Bruno Mars':{hair:11,hc:0,top:2,tc:3,pc:4,skin:2,body:.35,eyes:0,mouth:3},'SZA':{hair:5,hc:1,top:3,tc:7,pc:5,skin:4,body:.3,eyes:1,mouth:0},
+ 'Travis Scott':{hair:5,hc:1,top:1,tc:4,pc:4,skin:3,body:.45,eyes:0,mouth:1},'Olivia Rodrigo':{hair:5,hc:1,top:4,tc:9,pc:5,skin:2,body:.3,eyes:1,mouth:0},'Harry Styles':{hair:2,hc:1,top:3,tc:0,pc:4,skin:0,body:.3,eyes:0,mouth:3},
+ 'Dua Lipa':{hair:5,hc:0,top:4,tc:6,pc:4,skin:1,body:.3,eyes:1,mouth:0},'Post Malone':{hair:2,hc:2,top:0,tc:5,pc:3,skin:0,body:.55,eyes:2,mouth:1}};
+const awCfg=n=>{const a=typeof ART!='undefined'&&ART.find(q=>q[0]==n);if(a&&a[4])return Object.assign({hgt:.55,ac:-1},a[4]);return Object.assign({hgt:.5,ac:-1,eyes:0,mouth:0,top:2,tc:6,pc:4,skin:2,body:.4,hair:2,hc:1},AWCF[n]||{})};
+const AWHOST=[{hair:2,hc:0,top:2,tc:6,pc:4,skin:2,body:.45,hgt:.6,ac:-1,eyes:0,mouth:0},{hair:5,hc:1,top:4,tc_custom:'#7a1d5a',pc_custom:'#7a1d5a',skin:1,body:.3,hgt:.5,ac:-1,eyes:1,mouth:0},{hair:1,hc:10,top:2,tc:6,pc:4,skin:4,body:.5,hgt:.65,ac:-1,eyes:0,mouth:3},{hair:6,hc:0,top:4,tc_custom:'#1d4a7a',pc_custom:'#1d4a7a',skin:3,body:.3,hgt:.45,ac:-1,eyes:1,mouth:0}];
+function awTrophy(sc){const t=new THREE.Group();F.trophy.b.forEach(p=>B(t,p[0],p[1],p[2],p[3],p[4],p[5],p[6]));t.scale.setScalar(sc||1);return t}
+
+function awShow(F0,song){
+ const WIN=F0.win,YOU=F0.field.find(x=>x.you),O=AWC,g=new THREE.Group();g.position.set(O.ox,0,O.oz);scene.add(g);O.g=g;
+ const b=(w,h,d,c,x,y,z,p)=>B(p||g,w,h,d,c,x,y,z),GOLD='#c9a227',GOLD2='#f6d86a',rng=awRng(1234),pk=a=>a[Math.floor(rng()*a.length)];
+ const aspect=()=>innerWidth/innerHeight;O.cam=new THREE.PerspectiveCamera(46,aspect(),.1,160);
+ /* the hall: dark walls, gold trim, a red carpet aisle, a stage with steps */
+ b(76,.2,64,'#1b0f26',0,-.1,6);b(76,26,.4,'#0e0814',0,13,-16);b(.4,26,64,'#0e0814',-38,13,6);b(.4,26,64,'#0e0814',38,13,6);b(76,.4,64,'#0a0610',0,26,6);b(76,26,.4,'#0e0814',0,13,38);
+ b(2.6,.04,24,'#b01020',0,.02,7.5);b(2.8,.03,24.2,GOLD,0,.015,7.5);
+ b(30,.8,10,'#2a1a38',0,.4,-9.2);b(30.4,.16,10.4,GOLD,0,.78,-9.2);b(26,.04,8,'#3a2450',0,.82,-9.4);b(30.4,.3,.3,GOLD2,0,.7,-4.1);
+ b(4.4,.27,.7,GOLD,0,.135,-3.25);b(4.4,.53,.7,'#e6c34a',0,.265,-3.8);
+ [-1,1].forEach(s=>{b(.4,.9,.4,GOLD2,s*2.4,.45,-3.5)});
+ /* the big screen and LED pillars */
+ const sc=document.createElement('canvas');sc.width=1024;sc.height=430;const tex=new THREE.CanvasTexture(sc);tex.minFilter=THREE.LinearFilter;
+ b(19,8.2,.3,GOLD,0,7.9,-15.5);const scr=new THREE.Mesh(new THREE.PlaneGeometry(18.2,7.4),new THREE.MeshBasicMaterial({map:tex}));scr.position.set(0,7.9,-15.32);g.add(scr);
+ const pil=[];[-14.5,14.5].forEach(x=>{const m=b(1.4,14,.8,'*ffffff',x,7.8,-15);pil.push(m)});
+ [-9,9].forEach(x=>{const t=awTrophy(3.2);t.position.set(x,.84,-11);g.add(t)});
+ /* truss, lights and beams */
+ [[-6,12.5],[-10,13.2],[-2,13.6]].forEach(q=>b(36,.4,.4,GOLD,0,q[1],q[0]));b(.4,.4,16,GOLD,-16,13,-8);b(.4,.4,16,GOLD,16,13,-8);
+ const beams=[];for(let k=0;k<8;k++){const cm=new THREE.Mesh(new THREE.CylinderGeometry(.15,2.1,13,8,1,true),new THREE.MeshBasicMaterial({color:[0xffe9a8,0xff9ad5,0x9ad8ff,0xffe9a8][k%4],transparent:true,opacity:.1,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));cm.geometry.translate(0,-6.5,0);cm.position.set(-15.5+k*4.4,13,-8+(k%2)*3);g.add(cm);beams.push(cm);b(.6,.5,.6,'*fff3b0',cm.position.x,13,cm.position.z)}
+ /* podium, camera crew and a drum of flashbulbs */
+ b(2.6,1.5,1.1,'#2a1a38',0,1.55,-8);b(2.8,.12,1.3,GOLD,0,2.35,-8);const gt=awTrophy(.6);gt.position.set(0,1.45,-8.1);g.add(gt);b(.05,.7,.05,'#999',.3,2.7,-8.2);b(.2,.08,.12,'#222',.3,3.05,-8.1);
+ [[-12,10],[12,10],[0,18]].forEach(q=>{b(.1,1.6,.1,'#222',q[0],.8,q[1]);b(.8,.6,1.2,'#1c1c24',q[0],1.9,q[1]);b(.4,.3,.5,'#0a0a10',q[0],1.9,q[1]-.8);b(.12,.12,.12,'*ff3030',q[0]+.3,2.25,q[1]-.5)});
+ const flashes=[];for(let k=0;k<16;k++){const m=b(.5,.5,.05,'*ffffff',R(-14,14),R(1.8,4),R(8,17));m.visible=false;flashes.push(m)}
+ /* the audience */
+ const NS={you:[-4.1,3.2],rv:[[-6.3,3.2],[4.1,3.2],[6.3,3.2],[1.9,3.2]]},taken=new Set([NS.you].concat(NS.rv).map(q=>q.join()));
+ const GOWN=['#8a1d4a','#1c4a7a','#111118','#b8860b','#2a6a4a','#5a1d7a','#16161c','#a03040','#d8d0c0','#223a5a'],SKN=SKIN.concat(),HC=['#1b1b1f','#4a2c1a','#8b5a2b','#d9a441','#c0c0c8','#6a2a2a'];
+ const aud=[];const seat=(x,z,cl)=>{b(1,.5,.9,'#6a0f1e',x,.25,z);b(1,1,.16,'#6a0f1e',x,.9,z+.5)};
+ const mkAud=(x,z)=>{const f=new THREE.Group();f.position.set(x,0,z);f.rotation.y=Math.PI;g.add(f);const col=pk(GOWN),sk=pk(SKN),hc=pk(HC),p={f,ph:rng()*6,arms:[],body:new THREE.Group(),legs:new THREE.Group()};f.add(p.body);f.add(p.legs);
+  b(.74,.8,.42,col,0,1.0,0,p.body);b(.46,.46,.46,sk,0,1.66,0,p.body);b(.52,.16,.52,hc,0,1.92,0,p.body);if(rng()<.4)b(.5,.5,.12,hc,0,1.7,-.26,p.body);b(.36,.1,.04,'#fff',0,1.28,.22,p.body);
+  [-1,1].forEach(s=>{const pv=new THREE.Group();pv.position.set(s*.47,1.35,0);p.body.add(pv);b(.17,.56,.17,col,0,-.28,0,pv);b(.15,.12,.15,sk,0,-.6,0,pv);p.arms.push(pv)});
+  [-1,1].forEach(s=>b(.22,.7,.22,'#16161c',s*.18,.35,0,p.legs));p.legs.visible=false;aud.push(p);return p};
+ const zs=[3.2,5.6,8,10.4,12.8,15.2,17.6];zs.forEach(z=>{for(let k=0;k<7;k++)[-1,1].forEach(s=>{const x=s*(1.9+k*2.2);seat(x,z);if(!taken.has(x+','+z)&&!(z>16.5&&k>4))mkAud(x,z)})});
+ NS.rv.concat([NS.you]).forEach(q=>seat(q[0],q[1]));
+ /* named people: you, the rivals, the hosts */
+ const mkP=(cfg,x,y,z,ry)=>{const c=buildChar(cfg);c.g.position.set(x,y,z);c.g.rotation.y=ry||0;g.add(c.g);return c},sit=c=>{c.legs.forEach(l=>l.rotation.x=-1.45);c.g.position.y=-.3},stand=c=>{c.legs.forEach(l=>l.rotation.x=0);c.g.position.y=0};
+ const people={},ord=F0.field.filter(x=>!x.you);let ri=0;
+ F0.field.forEach(x=>{const q=x.you?NS.you:NS.rv[ri++];const c=mkP(x.you?ch:awCfg(x.n),q[0],0,q[1],Math.PI);sit(c);c.seat=q;c.name=x.n;people[x.n+(x.you?'*':'')]=c;x.c=c});
+ const hc=AWHOST.map(cf=>buildChar(cf));const host=hc[0],presA=hc[1],presB=hc[2];
+ [[host,0,-8.9],[presA,-2.2,-8.6],[presB,2.2,-8.6]].forEach(q=>{q[0].g.position.set(q[1],.8,q[2]);g.add(q[0].g)});presA.g.visible=presB.g.visible=false;
+ const oth=[];F0.cats.forEach((ct,k)=>{const c=buildChar(awCfg(ct[1]));c.g.position.set(1.8,.8,-6.2);c.g.visible=false;g.add(c.g);const tr=awTrophy(1.5);const ar=c.arms[1];tr.position.set(ar.position.x,ar.position.y+.45,.05);c.g.add(tr);ar.rotation.x=-3.1;c.up=1;oth.push(c)});
+ const wt=awTrophy(1.5),wc=WIN.c;{const ar=wc.arms[1];wt.position.set(ar.position.x,ar.position.y+.45,.05);wt.visible=false;wc.g.add(wt)}
+ /* lights */
+ const L=[new THREE.AmbientLight(0xb8a8d0,1.35),new THREE.PointLight(0xffe8c0,2.1,70,1),new THREE.PointLight(0xff6fb8,1.3,60,1),new THREE.PointLight(0x5fc8ff,1.3,60,1),new THREE.PointLight(0xfff0d0,1,70,1)];
+ L[1].position.set(0,9,-4);L[2].position.set(-12,8,-6);L[3].position.set(12,8,-6);L[4].position.set(0,10,10);L.forEach(l=>g.add(l));
+ /* confetti */
+ const NC=500,cp=new Float32Array(NC*3),cc=new Float32Array(NC*3),cv=new Float32Array(NC*3),cg=new THREE.BufferGeometry();let cn=0;
+ cg.setAttribute('position',new THREE.BufferAttribute(cp,3));cg.setAttribute('color',new THREE.BufferAttribute(cc,3));const pts=new THREE.Points(cg,new THREE.PointsMaterial({size:.32,vertexColors:true,depthWrite:false}));pts.frustumCulled=false;g.add(pts);
+ for(let i=0;i<NC;i++)cp[i*3+1]=-50;
+ const confetti=n=>{for(let k=0;k<n;k++){const i=cn++%NC,c=new THREE.Color(pk(['#ffd24a','#ff5a7a','#7fe3ff','#ffffff','#b58cff','#6dffb0']));cp[i*3]=R(-14,14);cp[i*3+1]=R(11,15);cp[i*3+2]=R(-12,10);cv[i*3]=R(-1,1);cv[i*3+1]=R(-3,-1.3);cv[i*3+2]=R(-1,1);cc[i*3]=c.r;cc[i*3+1]=c.g;cc[i*3+2]=c.b}};
+ /* the screen */
+ const screen=(lines,hue)=>{const x=sc.getContext('2d'),W=1024,H=430,gr=x.createLinearGradient(0,0,W,H);gr.addColorStop(0,'#2a0f3f');gr.addColorStop(1,hue||'#0e1b3a');x.fillStyle=gr;x.fillRect(0,0,W,H);
+  for(let k=0;k<26;k++){x.fillStyle=`rgba(255,220,120,${.04+k%3*.03})`;x.beginPath();x.arc((k*173)%W,(k*97)%H,20+k*4,0,7);x.fill()}x.strokeStyle='#e6c34a';x.lineWidth=6;x.strokeRect(14,14,W-28,H-28);
+  x.textAlign='center';lines.forEach(l=>{x.font=(l[3]||'bold ')+l[1]+'px Georgia,serif';let fs=l[1];while(x.measureText(l[0]).width>W-90&&fs>14){fs-=2;x.font=(l[3]||'bold ')+fs+'px Georgia,serif'}x.fillStyle=l[2]||GOLD2;x.fillText(l[0],W/2,l[4]);});tex.needsUpdate=true};
+ /* the state machine */
+ const A={t:0,si:0,li:0,typed:0,hold:0,clap:0,clapT:0,stand:0,end:false,cl:0,walk:null,cam:{p:[0,5,26],l:[0,5,-9]},fade:1,lastClap:0},NTH=AW.nth();O.A=A;
+ const wrap=document.createElement('div');wrap.id='awd';wrap.style.cssText='position:fixed;inset:0;z-index:50;pointer-events:none;font-family:"Silkscreen",ui-monospace,monospace';
+ wrap.innerHTML=`<div id=awfade style="position:absolute;inset:0;background:#000;opacity:1;transition:opacity .8s"></div><div style="position:absolute;left:0;right:0;top:0;height:7%;background:#000"></div><div style="position:absolute;left:0;right:0;bottom:0;height:7%;background:#000"></div>
+ <div style="position:absolute;left:3%;top:9%;display:flex;gap:10px;align-items:center;font-size:clamp(11px,1.6vw,16px)"><span style="background:#c0141c;color:#fff;padding:3px 8px">LIVE</span><span style="color:#f6d86a;text-shadow:0 0 6px #000">THE ${NTH}TH GRAMOPHONE AWARDS</span></div>
+ <div id=awcap style="position:absolute;left:50%;bottom:10%;transform:translateX(-50%);width:min(860px,92vw);box-sizing:border-box;background:rgba(10,5,18,.9);border:3px solid #c9a227;border-radius:4px;padding:10px 16px;pointer-events:auto;cursor:pointer;display:none"><div id=awwho style="color:#f6d86a;font-size:clamp(11px,1.5vw,15px);margin-bottom:4px"></div><div id=awtxt style="color:#fff;font:600 clamp(14px,2.1vw,22px)/1.35 ui-monospace,Menlo,Consolas,monospace;min-height:1.35em"></div><div style="text-align:right;color:#8a7a50;font-size:11px">click or space ▸</div></div>
+ <button id=awskip style="position:absolute;right:3%;top:9%;pointer-events:auto;opacity:.85">Skip ⏭</button><div id=awres style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78);pointer-events:auto"></div>`;
+ document.body.appendChild(wrap);O.wrap=wrap;
+ const $c=id=>wrap.querySelector('#'+id);
+ /* camera shots */
+ const seatCam=(q,u)=>({p:[q[0]+.5+Math.sin(u*.5)*.2,1.55,q[1]-3.1+u*.08],l:[q[0],1.2,q[1]]});
+ const shots={
+  wide:u=>({p:[0,5.6-u*.4,21-u*1.5],l:[0,5,-9]}),
+  podium:u=>({p:[.4+u*.3,2.7,-1.2-u*.3],l:[0,2.7,-8.2]}),
+  stage:u=>({p:[-3+u*3,3.2,1.5],l:[0,2.6,-8.2]}),
+  push:u=>({p:[0,2.6,1-u*2.4],l:[0,2.8,-8.2]}),
+  crowd:u=>({p:[-4+u*8,2.4,-3.2],l:[0,1.7,10]}),
+  hero:u=>({p:[4.2-u*2.4,2.6,-.2-u*.6],l:[1.8,2.6,-6.4]})};
+ const SH=(f)=>(t,s)=>f(Math.min(1,t/(s.min||6)));
+ const pre=(who,i)=>who?[who,i]:['',i];
+ const hn=[host,presA,presB],hname=F0.h;
+ const you=!!WIN.you,order=F0.field.filter(x=>!x.you).concat([YOU]);
+ const S_=[];
+ S_.push({min:5,lines:[['','Good evening, and welcome to the Gramophone Awards!']],on:()=>{screen([['THE '+NTH+'TH ANNUAL',60,GOLD2,'bold ',110],['GRAMOPHONE',120,'#ffffff','bold ',230],['AWARDS',90,GOLD2,'bold ',330],['Live from the Golden Hall',30,'#cbb','',390]]);A.clap=1;snd('chime');confetti(160)},cam:u=>shots.wide(u)});
+ S_.push({min:6,lines:[[hname[0]+' (host)','Tonight, one song becomes a legend.'],[hname[0]+' (host)','Five nominees. One trophy. Absolutely no pressure.']],on:()=>{A.clap=0;screen([['TONIGHT\'S HOST',44,GOLD2,'bold ',140],[hname[0].toUpperCase(),84,'#ffffff','bold ',250]])},cam:u=>shots.podium(u)});
+ F0.cats.forEach((ct,k)=>S_.push({min:7,lines:[[hname[1]+' & '+hname[0].split(' ')[0],'Presenting '+ct[0]+'. Every nominee was incredible.'],['','And the winner is...'],['',ct[1]+' takes it home for "'+ct[2]+'"!']],
+  on:()=>{A.clap=0;presA.g.visible=presB.g.visible=true;host.g.visible=false;oth.forEach(c=>c.g.visible=false);screen([['NOW PRESENTING',40,GOLD2,'bold ',120],[ct[0].toUpperCase(),70,'#ffffff','bold ',230]]);snd('ping')},
+  line:i=>{if(i==2){oth[k].g.visible=true;screen([['AND THE WINNER IS',38,GOLD2,'bold ',100],[ct[1].toUpperCase(),84,'#ffffff','bold ',230],['"'+ct[2]+'"',40,GOLD2,'bold ',310]]);A.clap=1;confetti(80);snd('chime');O.shot=null}},
+  off:()=>{oth[k].g.visible=false;A.clap=0},cam:u=>A.li>=2?shots.hero(u):shots.stage(u)}));
+ const ni=order.length;
+ S_.push({min:4,lines:[[hname[1],'Song of the Year. The one everybody argues about.'],...order.map((x,i)=>['',(x.you?'Nominated: you, '+x.n+', with "'+x.t+'".':'Nominated: '+x.n+', "'+x.t+'".')])],
+  on:()=>{A.clap=0;presA.g.visible=presB.g.visible=true;host.g.visible=false;screen([['SONG OF THE YEAR',64,GOLD2,'bold ',140],['THE NOMINEES',48,'#ffffff','bold ',230]])},
+  line:i=>{if(i>=1){const x=order[i-1];screen([['SONG OF THE YEAR',34,GOLD2,'bold ',70],[x.n.toUpperCase(),72,x.you?'#7fe3ff':'#ffffff','bold ',185],['"'+x.t+'"',42,GOLD2,'bold ',255],['NOMINEE '+i+' OF '+ni,26,'#bbb','',330]]);A.clap=.6;snd('pop')}},
+  cam:(u,s)=>{const i=A.li;if(i<1)return shots.stage(u);const x=order[i-1];return seatCam(x.c.seat,A.lt||0)}});
+ S_.push({min:5,lines:[[hname[2],'The envelope, please...'],[hname[1],'And the winner is...']],on:()=>{A.clap=0;screen([['AND THE WINNER IS...',64,GOLD2,'bold ',230]],'#2a0a12');for(let i=0;i<24;i++)nz(.09,200+i*10,.35,1,'lowpass',i*.14)},cam:u=>shots.push(u)});
+ S_.push({min:4,lines:[['',(you?S_NAME():WIN.n)+'! "'+WIN.t+'"']],on:()=>{A.clap=1;A.stand=1;snd('chime');confetti(240);screen([['SONG OF THE YEAR',34,GOLD2,'bold ',70],[WIN.n.toUpperCase(),84,'#ffffff','bold ',185],['"'+WIN.t+'"',46,GOLD2,'bold ',270]],'#3a0f4f')},cam:u=>(u<.5?shots.crowd(u*2):seatCam(wc.seat,u))});
+ function S_NAME(){return S.artist}
+ S_.push({min:7.5,lines:[['',you?'Standing ovation as you make your way to the stage.':WIN.n+' makes the long walk up to the stage.']],on:()=>{A.clap=1;A.stand=1;stand(wc);wc.g.rotation.y=Math.PI;const q=wc.seat,P=[[q[0],1.3],[0,1.3],[0,-3.0],[0,-4.9],[1.8,-6.2]];A.walk={P,k:0,d:0,pos:[q[0],q[1]]};if(!A.wp)A.wp=1},
+  tick:dt=>{const w=A.walk;if(!w||w.done)return;let mv=2.7*dt;while(mv>0&&w.k<w.P.length){const t=w.P[w.k],dx=t[0]-w.pos[0],dz=t[1]-w.pos[1],dd=Math.hypot(dx,dz);if(dd<mv){w.pos=[t[0],t[1]];mv-=dd;w.k++}else{w.pos[0]+=dx/dd*mv;w.pos[1]+=dz/dd*mv;wc.g.rotation.y=Math.atan2(dx,dz);mv=0}}
+   if(w.k>=w.P.length){w.done=1;wc.g.rotation.y=0}const z=w.pos[1];wc.g.position.set(w.pos[0],.8*Math.max(0,Math.min(1,(-2.9-z)/1.1)),z);const ph=A.t*9;wc.legs[0].rotation.x=w.done?0:Math.sin(ph)*.6;wc.legs[1].rotation.x=w.done?0:-Math.sin(ph)*.6;wc.arms[0].rotation.x=w.done?0:-Math.sin(ph)*.5;wc.arms[1].rotation.x=w.done?-3.1:Math.sin(ph)*.5;if(w.done)wt.visible=true},
+  done:()=>A.walk&&A.walk.done,cam:u=>{const w=A.walk,p=w?w.pos:[0,0];return{p:[p[0]+3.6,2.8,p[1]-4.6],l:[p[0],1.2,p[1]]}}});
+ S_.push({min:12,lines:you?[[S.artist,'Thank you. I... wow. I really did not write a speech.'],[S.artist,'To everyone who streamed, shared and sang along: this one is yours too.'],[hname[1],'Song of the Year. Congratulations!']]:[[WIN.n,pick(['I am honestly speechless. Thank you to my team, my family and the fans.','Wow. Thank you, Gramophone Academy. This means everything.'])],[WIN.n,pick(['This one is for everybody who never stopped believing.','Go home and make something that scares you.'])],[hname[1],'Song of the Year. Congratulations!']],
+  on:()=>{A.clap=1;A.stand=1;presA.g.visible=presB.g.visible=true;presA.g.position.set(-1.4,.8,-8.6);wt.visible=true;wc.arms[1].rotation.x=-3.1;wc.arms[0].rotation.x=0;wc.g.position.set(1.8,.8,-6.2);wc.g.rotation.y=0;confetti(260);snd('chime');screen([['CONGRATULATIONS',70,GOLD2,'bold ',160],[WIN.n.toUpperCase(),70,'#ffffff','bold ',270]],'#3a0f4f')},
+  line:i=>{if(i==1||i==2)confetti(120)},cam:u=>shots.hero(u)});
+ S_.push({min:3.4,lines:[['',you?'You slip out through the side door, trophy in hand...':'You slip out through the side door...']],on:()=>{A.clap=.5;A.out=1},cam:u=>shots.wide(1-u)});
+ const go=i=>{if(S_[A.si]&&S_[A.si].off)S_[A.si].off();A.si=i;A.t=0;A.li=0;A.typed=0;A.hold=-1;A.lt=0;const s=S_[i];s.on&&s.on();if(s.line)s.line(0);if(s.lines.length){$c('awcap').style.display='block';awLine()}else $c('awcap').style.display='none'};
+ const awLine=()=>{const s=S_[A.si],l=s.lines[A.li];if(!l)return;$c('awwho').textContent=l[0]||'';A.typed=0;A.hold=-1};
+ const next=()=>{const s=S_[A.si];if(A.si>=S_.length-1)return finish();go(A.si+1)};
+ const adv=()=>{if(A.end)return;const s=S_[A.si],l=s.lines[A.li];if(l&&A.typed<l[1].length){A.typed=l[1].length;return}if(A.li<s.lines.length-1){A.li++;if(s.line)s.line(A.li);awLine()}else if(!(s.done&&!s.done())&&A.t>1)next()};
+ const finish=()=>{if(A.end)return;A.end=true;const R2=awS();let won=!!WIN.sc&&WIN.you;
+  const rows=F0.field.map((x,i)=>`<tr style="${x.you?'color:#7fe3ff;font-weight:bold':''}"><td>${i+1}</td><td>${esc(x.n)}</td><td style="opacity:.8">${esc(x.t)}</td><td align=right>${x.sc}</td></tr>`).join('');
+  if(won){S.inv=S.inv||{};S.inv.trophy=(S.inv.trophy||0)+1;R2.wins++}R2.hist.push({day:S.day,won:!!won,w:WIN.n,sc:F0.me,top:WIN.sc});
+  const r=$c('awres');r.style.display='flex';$c('awcap').style.display='none';r.innerHTML=`<div style="background:#14091c;border:3px solid #c9a227;border-radius:6px;padding:20px 26px;max-width:min(580px,94vw);color:#fff;text-align:center"><h2 style="color:#f6d86a;margin:0 0 8px">${won?'🏆 YOU WON SONG OF THE YEAR!':'Song of the Year: '+esc(WIN.n)}</h2>
+   <p style="margin:4px 0 10px;opacity:.9;font:14px/1.4 ui-monospace,monospace">${won?'A Gramophone Trophy has been added to your Storage. Place it in your house from the Storage menu.':'You were beaten out. A song with better mix quality and more streams gives you a shot next time.'}</p>
+   <table style="width:100%;border-collapse:collapse;font:14px ui-monospace,monospace;text-align:left"><tr style="opacity:.6"><td></td><td>Artist</td><td>Song</td><td align=right>Score</td></tr>${rows}</table><button id=awlv class=go style="margin-top:14px;padding:10px 22px;font-size:15px">Leave</button></div>`;
+  $c('awlv').onclick=()=>awEnd(won)};
+ O.kd=e=>{if(A.end)return;if([' ','Enter','ArrowRight'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();adv()}else if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();finish()}};
+ addEventListener('keydown',O.kd,true);$c('awcap').onclick=adv;$c('awskip').onclick=()=>finish();
+ /* per-frame */
+ O.tick=dt=>{A.t+=dt;A.lt+=dt;const s=S_[A.si];if(!s)return;
+  const l=s.lines[A.li];if(l&&!A.end){if(A.typed<l[1].length){A.typed=Math.min(l[1].length,A.typed+dt*46);$c('awtxt').textContent=l[1].slice(0,Math.floor(A.typed))}else{$c('awtxt').textContent=l[1];if(A.hold<0)A.hold=.9+l[1].length*.03;A.hold-=dt;if(A.hold<=0){if(A.li<s.lines.length-1){A.li++;if(s.line)s.line(A.li);awLine()}else A.hold=0}}}
+  if(!A.end&&A.li>=s.lines.length-1&&l&&A.typed>=l[1].length&&A.hold<=0&&A.t>=s.min&&!(s.done&&!s.done()))next();
+  if(s.tick)s.tick(dt);
+  /* camera */
+  const u=Math.min(1,A.t/(s.min||5)),sh=s.cam(u,s);A.cam.p=sh.p;A.cam.l=sh.l;const C=O.cam;C.aspect=aspect();C.updateProjectionMatrix();C.position.set(O.ox+sh.p[0],sh.p[1],O.oz+sh.p[2]);C.lookAt(O.ox+sh.l[0],sh.l[1],O.oz+sh.l[2]);
+  /* crowd: clap, stand */
+  const tc=A.clap,ts=A.stand;A.cl+=(tc-A.cl)*Math.min(1,dt*4);A.st=(A.st||0)+(ts-(A.st||0))*Math.min(1,dt*3);
+  aud.forEach(p=>{const cl=A.cl,sw=Math.sin(A.t*12+p.ph)*.3;p.arms[0].rotation.x=p.arms[1].rotation.x=-1.25*cl+sw*cl;p.arms[0].rotation.z=.35*cl;p.arms[1].rotation.z=-.35*cl;p.body.position.y=A.st*.35+(cl?Math.abs(Math.sin(A.t*6+p.ph))*.05*cl:0);p.legs.visible=A.st>.5});
+  /* seated people clap too */
+  F0.field.forEach(x=>{const c=x.c;if(c===wc&&A.si>=6)return;if(c.g.position.y<0){const k=A.cl;c.arms[0].rotation.x=c.arms[1].rotation.x=-1.2*k+Math.sin(A.t*12+c.seat[0])*.3*k}});
+  hn.forEach(h=>{if(h.g.visible&&A.si!=8){const k=A.cl;h.arms[0].rotation.x=h.arms[1].rotation.x=k>.4?-1.2+Math.sin(A.t*12)*.25:0}});
+  oth.forEach(c=>{if(c.g.visible)c.arms[1].rotation.x=-3.1});
+  /* lights, beams, pillars, flashes, confetti */
+  L[1].intensity=2.1+Math.sin(A.t*2)*.25;L[2].intensity=1.3+Math.sin(A.t*3)*.4;L[3].intensity=1.3+Math.cos(A.t*3)*.4;
+  beams.forEach((m,i)=>{m.rotation.z=Math.sin(A.t*.9+i*1.3)*.5;m.rotation.x=Math.cos(A.t*.7+i)*.3});pil.forEach((m,i)=>m.material.color.setHSL((A.t*.15+i*.4)%1,.9,.55));
+  flashes.forEach(m=>{m.visible=A.cl>.3&&Math.random()<.08;if(m.visible)m.position.set(R(-14,14),R(1.8,4),R(6,17))});
+  for(let i=0;i<NC;i++){const j=i*3;if(cp[j+1]>-40){cp[j]+=cv[j]*dt;cp[j+1]+=cv[j+1]*dt;cp[j+2]+=cv[j+2]*dt;cv[j]+=Math.sin(A.t*3+i)*dt;if(cp[j+1]<0)cp[j+1]=-50}}cg.attributes.position.needsUpdate=true;cg.attributes.color.needsUpdate=true;
+  /* applause sound */
+  A.lastClap-=dt;if(A.cl>.2&&A.lastClap<=0){A.lastClap=.07;nz(.06,1800+R(0,2400),.2*A.cl,1,'bandpass')}
+  /* fades */
+  const f=$c('awfade');if(A.si==0&&A.t<.6)f.style.opacity=1-A.t/.6;else if(A.out)f.style.opacity=Math.min(1,A.t/2.8);else if(!A.end)f.style.opacity=A.si==0?0:f.style.opacity>.05?0:0};
+ O.res=0;return go
+}
+function awEnd(won){const O=AWC;removeEventListener('keydown',O.kd,true);if(O.wrap)O.wrap.remove();if(O.g)scene.remove(O.g);O.on=0;scene.background=O.bg;if(O.fog!==undefined)scene.fog=O.fog;$('hud').style.display=O.hud;AWP=null;mode='play';
+ try{if(IN)leaveShop()}catch(e){}if(won)say('You won a Gramophone Trophy! It is in Storage.');try{autoSave()}catch(e){}}
 let AWP=null;
 function awRng(s){return()=>(s=Math.imul(s^s>>>15,1|s)+0x6D2B79F5|0,((s^s>>>7)>>>0)/4294967296)}
-function awPlay(F0,song){const w=document.createElement('div');w.id='awd';w.style.cssText='position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif';
- w.innerHTML='<canvas width=960 height=540 style="max-width:100vw;max-height:100vh;width:100%;height:100%;object-fit:contain;background:#000"></canvas><button id=awskip style="position:absolute;right:14px;top:12px;padding:8px 14px;opacity:.8">Skip ⏭</button><div id=awres style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72)"></div>';
- document.body.appendChild(w);const cv=w.querySelector('canvas'),c=cv.getContext('2d');
- const face=new Image();try{face.src=pfp()}catch(e){}
- const A={F:F0,song,c,t:0,si:0,face,conf:[],cl:0,lastClap:0,end:false,seed:awRng(7)};AWP=A;
- const YOU=F0.field.find(x=>x.you),WIN=F0.win,rnd=awRng(99),aud=[];
- for(let r=0;r<3;r++)for(let x=18+r*14;x<950;x+=46-r*4)aud.push({x:x+rnd()*6,r,h:rnd(),s:rnd()});
- const GOLD='#e6c34a',TXT=(s,x,y,sz,col,al,f)=>{c.font=(f||'bold ')+sz+'px Georgia,serif';c.textAlign=al||'center';c.fillStyle=col;c.fillText(s,x,y)};
- const grammo=(x,y,s,glow)=>{c.save();c.translate(x,y);c.scale(s,s);if(glow){const g=c.createRadialGradient(10,-48,4,10,-48,70);g.addColorStop(0,'rgba(255,230,120,.7)');g.addColorStop(1,'rgba(255,230,120,0)');c.fillStyle=g;c.fillRect(-70,-120,160,150)}
-  c.fillStyle='#4a3414';c.fillRect(-14,-8,28,8);c.fillStyle='#c9a227';c.fillRect(-11,-12,22,5);c.fillStyle='#e6c34a';c.fillRect(-3,-36,6,26);
-  c.fillStyle='#c9a227';c.fillRect(-12,-40,24,5);c.fillStyle='#1a1a1a';c.beginPath();c.ellipse(0,-41,11,3,0,0,7);c.fill();
-  c.fillStyle='#f2d466';c.beginPath();c.moveTo(-3,-42);c.lineTo(4,-44);c.lineTo(28,-76);c.lineTo(10,-84);c.closePath();c.fill();
-  c.fillStyle='#fff0a0';c.beginPath();c.ellipse(19,-80,13,8,-.55,0,7);c.fill();c.fillStyle='#8a6a1a';c.beginPath();c.ellipse(20,-80,9,5,-.55,0,7);c.fill();c.restore()};
- const person=(x,y,s,o)=>{o=o||{};const ph=o.walk||0,sw=Math.sin(ph)*5*s,suit=o.suit||'#16161c',skin=o.skin||'#d9a47a';c.save();
-  c.fillStyle=suit;if(o.dress){c.fillStyle=o.dress;c.beginPath();c.moveTo(x-9*s,y-62*s);c.lineTo(x+9*s,y-62*s);c.lineTo(x+17*s,y);c.lineTo(x-17*s,y);c.fill()}
-  else{c.fillRect(x-7*s+sw*.6,y-30*s,6*s,30*s);c.fillRect(x+1*s-sw*.6,y-30*s,6*s,30*s);c.fillRect(x-11*s,y-64*s,22*s,36*s);c.fillStyle='#f4f4f4';c.beginPath();c.moveTo(x-4*s,y-64*s);c.lineTo(x+4*s,y-64*s);c.lineTo(x,y-46*s);c.fill();c.fillStyle='#b01020';c.fillRect(x-3*s,y-62*s,6*s,3*s)}
-  c.strokeStyle=o.dress||suit;c.lineWidth=5*s;c.lineCap='round';c.beginPath();c.moveTo(x-10*s,y-60*s);c.lineTo(x-13*s,y-36*s+sw*.4);c.stroke();
-  c.beginPath();c.moveTo(x+10*s,y-60*s);if(o.up){c.lineTo(x+19*s,y-86*s)}else c.lineTo(x+13*s,y-36*s-sw*.4);c.stroke();c.fillStyle=skin;c.beginPath();if(o.up)c.arc(x+19*s,y-88*s,3.2*s,0,7);else c.arc(x+13*s,y-34*s-sw*.4,3*s,0,7);c.fill();
-  if(o.up)grammo(x+19*s,y-86*s+2*s,s*.55,o.glow);
-  c.fillStyle=skin;c.beginPath();c.arc(x,y-76*s,11*s,0,7);c.fill();
-  if(o.you&&face.complete&&face.naturalWidth){c.imageSmoothingEnabled=false;c.save();c.beginPath();c.arc(x,y-76*s,12*s,0,7);c.clip();c.drawImage(face,x-14*s,y-92*s,28*s,28*s);c.restore()}
-  else{c.fillStyle=o.hair||'#2a1a10';c.beginPath();c.arc(x,y-79*s,11.5*s,Math.PI,0);c.fill();if(o.long){c.fillRect(x-11*s,y-80*s,4*s,20*s);c.fillRect(x+7*s,y-80*s,4*s,20*s)}c.fillStyle='#111';c.fillRect(x-5*s,y-77*s,2*s,2*s);c.fillRect(x+3*s,y-77*s,2*s,2*s)}
-  c.restore()};
- const confetti=n=>{for(let i=0;i<n;i++)A.conf.push({x:R(100,860),y:R(-40,-5),vx:R(-30,30),vy:R(60,160),r:R(0,6),c:pick(['#ffd24a','#ff5a7a','#7fe3ff','#fff','#b58cff','#6dffb0'])})};
- const stage=(o)=>{o=o||{};const T=A.t+A.si*3.7,cl=o.clap||0,st=o.stand||0;
-  const bg=c.createLinearGradient(0,0,0,540);bg.addColorStop(0,'#07040d');bg.addColorStop(.6,'#1d1030');bg.addColorStop(1,'#0a0612');c.fillStyle=bg;c.fillRect(0,0,960,540);
-  /* gold truss arches and LED pillars */
-  c.strokeStyle='#8a6a1a';c.lineWidth=5;for(let k=0;k<3;k++){c.beginPath();c.ellipse(480,330,440+k*18,300+k*14,0,Math.PI*1.05,Math.PI*1.95);c.stroke()}
-  [60,900].forEach((x,k)=>{const g=c.createLinearGradient(0,0,0,330);g.addColorStop(0,`hsl(${(T*60+k*140)%360},90%,60%)`);g.addColorStop(1,`hsl(${(T*60+k*140+120)%360},90%,35%)`);c.fillStyle=g;c.fillRect(x-14,60,28,270);c.fillStyle='#c9a227';c.fillRect(x-18,56,36,6)});
-  /* big screen */
-  c.fillStyle='#c9a227';c.fillRect(214,30,532,206);c.fillStyle='#0b0612';c.fillRect(222,38,516,190);if(o.screen)o.screen(222,38,516,190);
-  /* spotlight beams */
-  for(let k=0;k<6;k++){const x0=110+k*148,a=Math.sin(T*.9+k*1.3)*.5,x1=x0+Math.tan(a)*330;c.fillStyle=`rgba(255,${230-k*14},${170+k*12},.085)`;c.beginPath();c.moveTo(x0-6,0);c.lineTo(x0+6,0);c.lineTo(x1+60,335);c.lineTo(x1-60,335);c.fill()}
-  /* stage */
-  c.fillStyle='#1a1226';c.beginPath();c.moveTo(120,320);c.lineTo(840,320);c.lineTo(940,404);c.lineTo(20,404);c.fill();c.fillStyle='#c9a227';c.fillRect(20,402,920,5);c.fillStyle='rgba(255,220,130,.08)';c.fillRect(120,322,720,8);
-  [200,330,480,630,760].forEach(x=>{c.fillStyle='#ffd24a';c.fillRect(x-3,398,6,3)});
-  if(!o.nopod){c.fillStyle='#2a1a38';c.fillRect(436,282,88,52);c.fillStyle='#c9a227';c.fillRect(432,278,96,6);grammo(480,314,.5);c.fillStyle='#999';c.fillRect(493,246,2,34);c.fillRect(488,244,12,4)}
-  if(o.stageDraw)o.stageDraw();
-  /* audience: dark silhouettes, hands up when clapping, standing on ovation */
-  aud.forEach((a,i)=>{const y=438+a.r*40-st*(10+a.r*5),sz=1+a.r*.28,bob=cl?Math.abs(Math.sin(T*9+a.s*6))*3:0,col=`rgb(${14+a.r*5},${9+a.r*4},${22+a.r*6})`;
-   c.fillStyle=col;c.fillRect(a.x-10*sz,y-bob,20*sz,80);c.beginPath();c.arc(a.x,y-9*sz-bob,8*sz,0,7);c.fill();c.fillStyle=`rgba(255,220,170,${.06+a.r*.02})`;c.beginPath();c.arc(a.x-2*sz,y-11*sz-bob,6*sz,0,7);c.fill();
-   if(cl&&a.h<.82){c.fillStyle='#caa27c';const hy=y+6*sz-bob-(st?12:0)+Math.sin(T*10+a.s*7)*4;c.beginPath();c.arc(a.x-4*sz,hy,3*sz,0,7);c.arc(a.x+4*sz,hy,3*sz,0,7);c.fill()}});
-  if(o.you!==false&&o.seatYou){const a=aud.find(q=>q.r==1&&q.x>290)||aud[0];const y=438+40-st*15;c.save();person(a.x,y+34,.8,{you:1,suit:'#16161c'});c.restore()}
-  /* flashbulbs */
-  const fr=awRng(Math.floor(T*10)+A.si*13);for(let k=0;k<(o.flash||5);k++){if(fr()<.5){const fx=fr()*960,fy=380+fr()*140,r=4+fr()*10;const g=c.createRadialGradient(fx,fy,0,fx,fy,r*3);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.fillRect(fx-r*3,fy-r*3,r*6,r*6)}}};
- const lower=(l1,l2,tt)=>{const n=Math.floor((tt||0)*34);c.fillStyle='rgba(8,4,16,.86)';c.fillRect(40,462,880,66);c.fillStyle='#c9a227';c.fillRect(40,462,8,66);TXT(l1.slice(0,n),66,490,24,'#fff','left');if(l2)TXT(l2.slice(0,Math.max(0,n-l1.length)),66,517,17,'#f0d27a','left','')};
- const bug=()=>{c.fillStyle='#c0141c';c.fillRect(24,22,64,24);TXT('LIVE',56,40,16,'#fff');TXT('THE '+AW.nth()+'TH GRAMOPHONE AWARDS',104,40,15,'#f6d86a','left')};
- const scr=(lines,sub)=>(x,y,w,h)=>{const g=c.createLinearGradient(x,y,x+w,y+h);g.addColorStop(0,'#2a0f3f');g.addColorStop(1,'#0e1b3a');c.fillStyle=g;c.fillRect(x,y,w,h);c.save();c.beginPath();c.rect(x,y,w,h);c.clip();for(let k=0;k<14;k++){c.fillStyle=`rgba(255,220,120,${.04+k%3*.02})`;c.beginPath();c.arc(x+(k*83+A.t*20)%w,y+(k*47)%h,20+k*3,0,7);c.fill()}c.restore();
-  lines.forEach((l,k)=>TXT(l[0],x+w/2,y+l[1],l[2],l[3]||'#f6d86a'));if(sub)TXT(sub,x+w/2,y+h-12,14,'#cbb','center','')};
- const tickClap=dt=>{A.lastClap-=dt;if(A.cl>0&&A.lastClap<=0){A.lastClap=.07;nz(.06,1800+R(0,2400),.22*A.cl,1,'bandpass')}};
- const S_=[];
- /* 1: opening */
- S_.push({d:6,on:()=>{snd('chime');A.cl=1},draw:t=>{stage({clap:1,flash:9,nopod:1,screen:scr([['THE '+AW.nth()+'TH ANNUAL',60,22],['GRAMOPHONE',110,44,'#fff'],['AWARDS',150,34]],'Live from the Golden Hall')});if(t<2)confetti(1);
-   lower('Good evening, and welcome to the biggest night in music!','Live from the Golden Hall',Math.max(0,(t-.5)/2.6))}});
- /* 2: host */
- S_.push({d:7,on:()=>{A.cl=0},draw:t=>{stage({flash:3,screen:scr([['TONIGHT\'S HOST',70,20],[F0.h[0].toUpperCase(),120,40,'#fff']],'')});person(480,334,1.1,{suit:'#1a1a2c',hair:'#111'});
-   lower(F0.h[0]+': "Tonight, one song becomes a legend."','"Five nominees. One trophy. Absolutely no pressure."',t/4)}});
- /* 3,4: other categories */
- F0.cats.forEach((ct,k)=>S_.push({d:8,on:()=>{A.cl=0;snd('ping')},draw:t=>{const ph=t<3;stage({clap:t>4.2?1:0,flash:t>4.2?9:3,screen:ph?scr([['NOW PRESENTING',60,18],[ct[0].toUpperCase(),115,34,'#fff']],''):scr([['AND THE WINNER IS',60,18],[ct[1].toUpperCase(),115,36,'#fff'],['"'+ct[2]+'"',160,20]],''),stageDraw:()=>{person(450,334,1,{suit:'#222',hair:'#442'});person(520,334,1,{dress:'#7a1d5a',long:1,hair:'#a24'});if(t>4.2)person(480,396+0,1.35,{suit:'#10303a',up:1,glow:1,hair:'#221'})}});if(t>4.2&&A.conf.length<30)confetti(1);
-   lower(ph?'Presenting '+ct[0]+'...':ct[1]+' takes home '+ct[0]+'!',ph?'The envelope, please.':'"Thank you, thank you, you are all too kind."',(ph?t:t-4.2)/3)}}));
- /* 5: your category intro */
- S_.push({d:9+F0.field.length*2.2,on:()=>{A.cl=0;snd('whoosh')},draw:t=>{const k=Math.min(F0.field.length-1,Math.max(-1,Math.floor((t-3)/2.2))),n=k>=0?F0.field[(k+F0.field.length-1)%F0.field.length]:null;
-   const order=F0.field.slice().sort((a,b)=>a.you?1:b.you?-1:a.n<b.n?-1:1),nm=k>=0?order[Math.min(k,order.length-1)]:null;
-   stage({flash:2,seatYou:1,screen:nm?scr([['SONG OF THE YEAR',50,18],[nm.n.toUpperCase(),105,32,nm.you?'#7fe3ff':'#fff'],['"'+nm.t+'"',148,20],['NOMINEE '+(k+1)+' OF '+order.length,185,13,'#a99']],''):scr([['SONG OF THE YEAR',80,34],['THE NOMINEES',130,22,'#fff']],''),stageDraw:()=>{person(450,334,1,{suit:'#222',hair:'#442'});person(520,334,1,{dress:'#1d4a7a',long:1,hair:'#432'})}});
-   lower(nm?(nm.you?'Nominated: '+nm.n+' — "'+nm.t+'"':'Nominated: '+nm.n+' — "'+nm.t+'"'):F0.h[1]+': "Song of the Year. The one everybody argues about."',nm&&nm.you?'That is YOU. The room applauds.':'The nominees are...',(t-(k>=0?3+k*2.2:0))/2.4)}});
- /* 6: reaction shot */
- S_.push({d:5,on:()=>{A.cl=0;snd('thunk')},draw:t=>{stage({flash:0,seatYou:0});c.fillStyle='rgba(0,0,0,.55)';c.fillRect(0,0,960,540);const g=c.createRadialGradient(480,300,20,480,300,360);g.addColorStop(0,'rgba(255,230,160,.22)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(0,0,960,540);
-   person(480,560+Math.sin(t*3)*3,5.2,{you:1});lower('You grip the armrest. Camera 3 is on you.','Four of the biggest names on Earth are sitting within ten metres.',t/3)}});
- /* 7: envelope + drumroll */
- S_.push({d:5,on:()=>{for(let i=0;i<22;i++)nz(.09,200+i*10,.35,1,'lowpass',i*.15)},draw:t=>{stage({flash:1,screen:scr([['AND THE WINNER IS...',100,30]],''),stageDraw:()=>{person(480,334,1.1,{suit:'#222',hair:'#442'});const ep=Math.min(1,t/1.5);c.fillStyle='#f4f0e0';c.fillRect(498,250-ep*10,26,18);c.fillStyle='#b01020';c.fillRect(498,250-ep*10,26,4)}});
-   const cc=c.createRadialGradient(480,300,50,480,300,480);cc.addColorStop(0,'rgba(0,0,0,0)');cc.addColorStop(1,`rgba(0,0,0,${.2+t*.1})`);c.fillStyle=cc;c.fillRect(0,0,960,540);
-   lower(F0.h[1]+' tears open the envelope...','',t/2)}});
- /* 8: reveal */
- S_.push({d:4,on:()=>{snd('chime');A.cl=1;confetti(120);},draw:t=>{stage({clap:1,flash:9,screen:scr([['SONG OF THE YEAR',45,18],[WIN.n.toUpperCase(),105,36,'#fff'],['"'+WIN.t+'"',150,24]],''),stageDraw:()=>person(480,334,1.1,{suit:'#222',hair:'#442'})});
-   lower(WIN.you?'"...'+S.artist+'! "'+WIN.t+'"!"':'"...'+WIN.n+'! "'+WIN.t+'"!"',WIN.you?'It\'s you. You actually won.':'The hall erupts. You applaud politely.',t/2)}});
- /* 9: the walk up */
- const way=WIN.you?[[260,478],[200,440],[190,398],[420,396],[480,396]]:[[690,478],[760,440],[770,398],[540,396],[480,396]],pp=(u)=>{u=Math.min(1,Math.max(0,u))*(way.length-1);const i=Math.min(way.length-2,Math.floor(u)),f=u-i;return[way[i][0]+(way[i+1][0]-way[i][0])*f,way[i][1]+(way[i+1][1]-way[i][1])*f]};
- S_.push({d:6,on:()=>{A.cl=1},draw:t=>{const p=pp(t/5.2);stage({clap:1,stand:Math.min(1,t/1.2),flash:10,screen:scr([['SONG OF THE YEAR',70,18],[WIN.n.toUpperCase(),125,36,'#fff']],''),stageDraw:()=>{person(450,334,1,{suit:'#222',hair:'#442'});person(520,334,1,{dress:'#1d4a7a',long:1,hair:'#432'})}});
-   if(t<5.4)person(p[0],p[1]+(t<2.2?0:0),1.35,{walk:t*9,you:WIN.you,suit:WIN.you?'#16161c':pick2(WIN.n),hair:'#221'});if(Math.random()<.3)confetti(2);
-   lower(WIN.you?'Standing ovation as you make your way to the stage.':WIN.n+' makes the long walk up to the stage.',F0.h[1]+': "Come on up!"',t/3)}});
- /* 10: trophy up */
- const spk=WIN.you?['Thank you. I... wow. I really did not write a speech.','To everyone who streamed, shared and sang along: this is yours too.']:pick([['I\'m honestly speechless. Thank you to my team, my family and the fans.','This one is for everybody who never stopped believing.'],['Wow. Thank you, Gramophone Academy. This means everything.','Go home and make something that scares you.']]);
- S_.push({d:11,on:()=>{A.cl=1;snd('chime');confetti(80)},draw:t=>{const s=Math.min(2.1,1.35+t*.4);stage({clap:1,stand:1,flash:10,nopod:0,screen:scr([['CONGRATULATIONS',70,28],[WIN.n.toUpperCase(),125,34,'#fff'],['SONG OF THE YEAR',170,16]],''),stageDraw:()=>{c.fillStyle='rgba(255,230,140,.12)';c.beginPath();c.moveTo(480,0);c.lineTo(380,404);c.lineTo(580,404);c.fill();person(480,404,s,{up:1,glow:1,you:WIN.you,suit:WIN.you?'#16161c':pick2(WIN.n),hair:'#221'})}});if(Math.random()<.35)confetti(2);
-   lower(WIN.n+': "'+spk[0]+'"',t>5?'"'+spk[1]+'"':'',t<5?t/4:Math.max(0,(t-5)/4))}});
- /* 11: outro */
- S_.push({d:3.2,on:()=>{A.cl=.6},draw:t=>{stage({clap:1,flash:6,screen:scr([['THANK YOU & GOODNIGHT',100,26]],'')});c.fillStyle=`rgba(0,0,0,${Math.min(1,t/2.6)})`;c.fillRect(0,0,960,540);TXT('You slip out through the side door...',480,280,26,`rgba(246,216,106,${Math.min(1,t/1.6)})`)}});
- function pick2(n){let h=0;for(const ch2 of n)h=(h*31+ch2.charCodeAt(0))%360;return`hsl(${h},35%,16%)`}
- const finish=()=>{if(A.end)return;A.end=true;cancelAnimationFrame(A.raf);const R2=awS();  const rows=F0.field.map((x,i)=>`<tr style="${x.you?'color:#7fe3ff;font-weight:bold':''}"><td>${i+1}</td><td>${esc(x.n)}</td><td style="opacity:.8">${esc(x.t)}</td><td align=right>${x.sc}</td></tr>`).join('');
-  let won=WIN.you;if(won){S.inv=S.inv||{};S.inv.trophy=(S.inv.trophy||0)+1;R2.wins++}R2.hist.push({day:S.day,won:!!won,w:WIN.n,sc:F0.me,top:WIN.sc});
-  const r=document.getElementById('awres');r.style.display='flex';r.innerHTML=`<div style="background:#14091c;border:3px solid #c9a227;border-radius:10px;padding:20px 26px;max-width:min(560px,94vw);color:#fff;font-family:Georgia,serif;text-align:center"><h2 style="color:#f6d86a;margin:0 0 6px">${won?'🏆 YOU WON SONG OF THE YEAR!':'Song of the Year: '+esc(WIN.n)}</h2>
-   <p style="margin:4px 0 10px;opacity:.9">${won?'A Gramophone Trophy has been added to your Storage. Place it in your house from the Storage menu.':'You were beaten out. Better songs (higher mix quality and more streams) will give you a chance next time.'}</p>
-   <table style="width:100%;border-collapse:collapse;font-size:14px;text-align:left"><tr style="opacity:.6"><td></td><td>Artist</td><td>Song</td><td align=right>Score</td></tr>${rows}</table>
-   <button id=awlv style="margin-top:14px;padding:10px 20px;font-size:16px" class=go>Leave</button></div>`;
-  document.getElementById('awlv').onclick=()=>{removeEventListener('keydown',kd,true);w.remove();AWP=null;mode='play';try{if(IN)leaveShop()}catch(e){}if(won)say('You won a Gramophone Trophy! It is in Storage.');try{autoSave()}catch(e){}}};
- const go=i=>{A.si=i;A.t=0;A.conf.length=0;if(S_[i])S_[i].on()};
- const next=()=>{if(A.si>=S_.length-1)finish();else go(A.si+1)};
- const kd=e=>{if(A.end)return;if([' ','Enter','ArrowRight','Escape'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();e.key=='Escape'?finish():next()}};
- addEventListener('keydown',kd,true);cv.onclick=()=>{if(!A.end)next()};w.querySelector('#awskip').onclick=e=>{e.stopPropagation();finish()};
- let last=performance.now();go(0);
- const loop=n=>{if(A.end)return;const dt=Math.min(.1,(n-last)/1000);last=n;A.t+=dt;const sc=S_[A.si];if(A.t>=sc.d)return next(),A.raf=requestAnimationFrame(loop);
-  tickClap(dt);c.clearRect(0,0,960,540);sc.draw(A.t);
-  A.conf.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx+=Math.sin(p.y*.05)*.8;p.r+=dt*6;c.fillStyle=p.c;c.save();c.translate(p.x,p.y);c.rotate(p.r);c.fillRect(-3,-2,6,4);c.restore()});A.conf=A.conf.filter(p=>p.y<560);
-  bug();const f=Math.min(A.t/.5,1);if(f<1&&A.si==0){c.fillStyle=`rgba(0,0,0,${1-f})`;c.fillRect(0,0,960,540)}A.raf=requestAnimationFrame(loop)};
- A.raf=requestAnimationFrame(loop)}
+function awPlay(F0,song){const O=AWC;O.bg=scene.background;O.fog=scene.fog;scene.background=new THREE.Color(0x07040d);scene.fog=null;O.hud=$('hud').style.display;$('hud').style.display='none';mode='cutawd';O.on=1;AWP=1;const go=awShow(F0,song);O.go=go;go(0)}
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(AWC.on&&c===cam&&AWC.cam)return r0(sc,AWC.cam);return r0(sc,c)}}
+{const u0=update;update=function(dt){u0(dt);if(AWC.on&&AWC.tick){try{AWC.tick(dt)}catch(e){console.error('awards show',e);awEnd(false)}}}}
