@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.123.1';
+const GAME_VERSION='v26.123.2';
 const VERSION_HISTORY=[
+ {v:'v26.123.2',n:'Song name randomiser: swapped the weaker new words for more vivid ones so default titles sound better and repeat less. Saves still load.'},
  {v:'v26.123.1',n:'Sound effects softened so they stay pleasant on repeat: gentler highs, shorter reverb on frequent sounds like clicks and pops, a softer rounded error tone, and tiny pitch variation so repeats do not grate. Saves still load.'},
  {v:'v26.123.0',n:'Sound effects reworked: softer clicks with no pops, richer layered tones with a gentle filter sweep, smoother reverb tails on pings, chimes, cash and notifications, a two-tone error buzz and a punchier thunk, and more even volume across all effects. Saves still load.'},
  {v:'v26.122.0',n:'The random song name generator has 100 more words (50 new openers and 50 new endings), so far more unique default titles. Saves still load.'},
