@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.129.0';
+const GAME_VERSION='v26.130.0';
 const VERSION_HISTORY=[
+ {v:'v26.130.0',n:'Song and album cover pictures redrawn: every song now gets a proper pixel scene (sunset skyline, vinyl, flower, mountains, planet, city at night, shapes, portrait of you, synthwave or ocean) in a palette picked from the song, chosen by its genre and title instead of random noise. The same song always gets the same cover. Saves still load.'},
  {v:'v26.129.0',n:'Spotifly Browse artists now lists every artist in the game (Kiaan, Panic Man Dan, Alex Arbuckle, Drake, The Weeknd and the rest) plus over a hundred more famous and made-up artists, and each artist shows their in-game face as their picture. Their songs and albums are made up. Saves still load.'},
  {v:'v26.128.0',n:'Spotifly: new Browse artists page in the sidebar. Search or filter by genre across 26 made-up artists (including Alex Arbuckle and the rivals), open any artist page to see monthly listeners, Popular songs with stream counts, albums and an album view, and play their music with the play, shuffle, next and previous controls. Numbers are fixed for each artist and creep up slowly each day. Saves still load.'},
  {v:'v26.127.0',n:'Gramophone Awards: the crowd now really claps (arms come up and the hands meet and part, out of step from person to person) and throws their arms up and cheers on big moments. Seated people rest their thighs on the seat with their shins hanging down, so legs no longer clip through the chairs. The Gramophone Trophy is far more detailed: stepped marble base with an engraved plate and gold studs, a collared stem, a vinyl record with a red label and tone arm, and a layered golden horn. Saves still load.'},
