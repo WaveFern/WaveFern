@@ -285,7 +285,7 @@ TFB['Skyline Tower']=[
  b(2.2,.08,.7,'#8a5a36',11,.45,9.4);b(.1,.42,.6,'#222',10.1,.21,9.4);b(.1,.42,.6,'#222',11.9,.21,9.4);K.cl(9.9,9.05,12.1,9.75);
  [[17.6,1.3],[20.2,1.3]].forEach(q=>{b(.1,.9,.1,'#c9a227',q[0],.45,q[1]);b(.24,.03,.24,'#c9a227',q[0],.015,q[1]);K.cl(q[0]-.12,q[1]-.12,q[0]+.12,q[1]+.12)});b(2.6,.05,.05,'#a0202a',18.9,.82,1.3);
  b(3.2,1,.9,'#e8e0d0',3.5,.5,13.7);b(3.3,.06,1,'#8a5a36',3.5,1.03,13.7);b(.5,.32,.04,'#111',3,1.24,13.5);b(1,.03,.6,'#f4f4f4',4.2,1.07,13.7);K.cl(1.85,13.2,5.15,14.2);
- twKeep(g,o,3.5,12.5,{hair:17,hc:4,eyes:5,mouth:3,top:2,tc:1,pc:0,skin:2,body:.3},'Odette (curator)',()=>say('Odette: "Every frame here was painted by a different pixel artist. Take your time."'),2.9);
+ twKeep(g,o,3.5,12.5,{hair:15,hc:0,hc_custom:'#5a5b62',eyes:5,mouth:0,top:2,tc:1,pc:0,skin:3,body:.1,hgt:.75},'Odette (curator)',()=>say('Odette: "Every frame here was painted by a different pixel artist. Take your time."'),2.9);
  tfSign(K,'GALLERY 6','#1a1a1a','#f4f2ec',2.2,.36,4.5,2.4,{border:'#1a1a1a',f:'',ff:'Georgia,serif'},0,7.12);
  tfTrack(K,1,8,.9,4);tfTrack(K,14,21,.9,4);tfTrack(K,2,7,7.9,2);tfTrack(K,15,20,7.9,2);tfPlant(K,21.2,15.2,1,'#ffffff');tfPlant(K,8.4,15.2,.8,'#ffffff');K.done()},
 /* 7 Sky Lounge: a long bar with lit bottle shelves, stools, sofas round a fire table, a grand piano, a sunset view */
