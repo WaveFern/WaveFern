@@ -60,7 +60,7 @@ function gpShop(){const m=phModel();
  o=o.replace(/<div class=pnx>[\s\S]*?<\/div><\/div>/,nx?`<div class=pnx onclick="phApp('shop')"><b>Next: Gphone ${m+1} · $${nx[0].toLocaleString()}</b><div class=sub style="color:#8aa094">${esc(GPF[m+1])}. Tap to see every model.</div></div>`:`<div class=pnx onclick="phApp('shop')"><b>You have the best Gphone</b><div class=sub style="color:#8aa094">${gpPct(m)} fan buzz and every app unlocked.</div></div>`);
  return o}}
 /* the Spotifly and Eats screens refresh themselves so stream counts and energy stay live */
-setInterval(()=>{try{if(mode=='phone'&&(PH.app=='sf'||PH.app=='eats')&&!PH.loading&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))phR()}catch(e){}},2000);
+setInterval(()=>{try{if(mode=='phone'&&PH.app=='sf'&&!PH.loading&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))phR()}catch(e){}},2000);
 /* ---- gphone.wf on the computer: same perk list ---- */
 PA.phones=()=>{const m=phModel();return`<div style="padding:14px"><h1 style="margin:0 0 4px">Gphone</h1><p class=m>You have a <b>Gphone ${m}</b>${GP_BUZZ[m]?' ('+gpPct(m)+' fan buzz)':''}. Each model keeps everything from the one before. Open your phone with G, or buy straight from its Store app.</p><div class=cards style="display:flex;flex-wrap:wrap;gap:10px">${Object.keys(GPH).map(Number).filter(n=>n>8).map(n=>{const g=GPH[n];return`<div class=card style="min-width:190px;flex:1"><b style="font-size:16px">Gphone ${n}</b><br><b style="color:var(--g)">${esc(GPF[n])}</b><br><small class=m>Photos ${g[1]}x${g[2]} · ${g[3]?'shutter lag '+g[3]+'s':'instant shutter'}<br>${GP_LAG[n]>100?'Apps load in '+(GP_LAG[n]/1000).toFixed(1)+'s':'Apps open instantly'}</small><div style="margin:8px 0;font-weight:bold;font-size:18px">$${g[0].toLocaleString()}</div>${n<=m?`<button disabled>${n==m?'You have this':'You have a newer one'}</button>`:`<button class=go ${S.money<g[0]?'disabled':''} onclick="buyPhone(${n})">Buy now</button>`}</div>`}).join('')}</div></div>`};
 /* ===== v26.148: Bank, Stats, Maps and Deals removed ===== */
@@ -148,4 +148,66 @@ phR=function(){let e=document.getElementById('ph');if(!e){e=document.createEleme
 #ph .gpfs{padding:8px}#ph .gpfs .fa{padding:10px}#ph .fa-grid{grid-template-columns:1fr 1fr!important;gap:6px}#ph .fa-grid>div:first-child,#ph .fa-grid>.fa-t{display:none}#ph .fa-h{grid-column:1/-1}#ph .fa-two{grid-template-columns:1fr!important}
 #ph .fa img,#ph .ig img{max-width:100%}#ph .phx{overflow-x:hidden}
 #ph .phv{max-height:60vh;object-fit:contain;box-sizing:border-box}
+`;document.head.appendChild(st)}
+/* ===== v41.3: a live phone, Goober Eats in its own look, Spotifly artist page =====
+   - The clock keeps running and you can walk (WASD) with the phone open: the game updates as in play, the phone stays up.
+     If something takes over (sleep, a cutscene, a shop screen) the phone closes. E still only works with the phone away.
+   - Goober Eats uses the computer's white Goober Eats page, sized for the phone (two dishes a row), with your stored food on top.
+   - Spotifly is an artist page: your picture as a big header with your name on it, monthly listeners, Follow, shuffle and play,
+     then Music (Popular songs with play counts), Release (drafts) and Stats tabs. Songs keep playing while the phone is open.
+   PH.sft (tab) and PH.sfF (Follow) are not saved. */
+{const u0=update;update=function(dt){if(mode!='phone')return u0.apply(this,arguments);mode='play';
+ try{return u0.apply(this,arguments)}finally{if(mode=='play')mode='phone';else{const e=document.getElementById('ph');if(e)e.remove()}}}}
+setInterval(()=>{try{if(mode=='phone'){const b=document.querySelector('#ph .phs b');if(b)b.textContent=clk();const t=document.querySelector('#ph .phk .tm');if(t)t.textContent=clk()}}catch(e){}},1000);
+/* Spotifly music keeps playing while the phone is open (it stopped as soon as you left the computer) */
+sfStart=function(s,ids){if(!s)return;if(ids)SPQ.ids=ids;try{Beats.setVolume(S.sfVol==null?1:S.sfVol)}catch(e){}
+ const p=Beats.play(s,{owner:'sf',alive:()=>mode=='pc'||!!document.getElementById('ph')});if(p&&typeof say=='function')say('Now playing "'+s.title+'" · '+p.style+' · '+p.bpm+' bpm · '+p.key);pcR()};
+/* ---- Goober Eats ---- */
+gpEats=function(){const m=phModel(),en=Math.round(S.energy||0),fd=S.fd||{},has=S.apps&&S.apps.eats,st=Object.keys(fd).filter(i=>fd[i]>0&&FOOD[i]);
+ const bag=`<div class=gpbag><b>In your bag</b> <span class=ues>Energy ${en}/100</span>${st.length?st.map(i=>`<div class=gpbr><span><b>${esc(FOOD[i][0])}</b> ×${fd[i]}<br><span class=ues>+${FOOD[i][2]} energy</span></span>${m>=9?`<button class=uebtn ${en>=100?'disabled':''} onclick="gpEat(${i})">Eat</button>`:''}</div>`).join('')+(m>=9?'':'<div class=ues>Eat it at home from Storage, or anywhere with a Gphone 9.</div>'):'<div class=ues>Nothing yet. Orders go to Storage at home.</div>'}</div>`;
+ if(!has)return`<div class="ue gpue"><div class=ueh><b class=uel>Goober Eats</b></div>${bag}<div class=uehero><div><h1>Crave it? Get it.</h1><p>Get the app to order food from your phone.</p></div></div><div style="padding:0 12px"><button class=uebtn ${S.money<APPD.eats.p?'disabled':''} onclick="inst('eats')">Get Goober Eats · ${$$(APPD.eats.p)}</button></div></div>`;
+ let h='';try{h=PA.eats()}catch(e){console.error('phone eats',e)}
+ /* the 3D dish previews only draw while a computer or wardrobe screen is open; the hidden .wrd marker lets them draw here too */
+ return`<i class=wrd style="display:none"></i><div class=gpuew>${h.replace(/<div class=uehero>/,bag+'<div class=uehero>')}</div>`};
+/* ---- Spotifly ---- */
+function gpSfRow(s,i,c){const on=!!(c&&c.src===s),pl=on&&!c.held;return`<div class="gsr${on?' on':''}" onclick="sfPlayId(${s.id})"><span class=gsn>${pl?sfIco('pause'):i}</span><img src="${sfCover(s)}" alt=""><span class=gst><b>${esc(s.title)}</b><small>${(s.streams||0).toLocaleString()}</small></span><span class=gsd>+${gpNum(s.today)}</span></div>`}
+gpSf=function(){if(!S.artist)return`<div class=phs2><div class=pcd><h3>SPOTIFLY</h3><div class=sub>Pick your artist name on the computer first.</div></div></div>`;
+ const t=PH.sft||'music',D=S.drafts||[],L=sfOrder(),c=sfCur(),pl=!!(c&&sfIsSong(c)&&!c.held),bz=gpBuzz(),today=L.reduce((a,x)=>a+(x.today||0),0),ok=D.filter(d=>(d.title||'').trim()).length;
+ const tab=(k,n)=>`<button class="${t==k?'on':''}" onclick="PH.sft='${k}';phR()">${n}</button>`;
+ let body='';
+ if(t=='music')body=`<h3 class=gsh3>Popular</h3>${L.length?L.slice(0,10).map((s,i)=>gpSfRow(s,i+1,c)).join(''):'<p class=gsm>No releases yet. Record a song in the studio, then release it in the Release tab.</p>'}`;
+ else if(t=='rel')body=D.length?D.map(d=>`<div class=gsq><input value="${esc(d.title)}" maxlength=48 oninput="(S.drafts.find(x=>x.id==${d.id})||{}).title=this.value"><button class=gsgo onclick="upl(${d.id})">Release</button></div><div class=gsm style="margin:-2px 0 10px">${esc(d.g)} · Q${d.q}${d.ft?' · feat. '+esc(d.ft):''}</div>`).join('')+(D.length>1?`<button class=gsgo ${ok?'':'disabled'} onclick="uplAll()">Release all (${ok})</button>`:''):'<p class=gsm>No recorded songs. Record one at the microphone in your studio, then release it here.</p>';
+ else body=`<div class=gsg><div><small>Streams today</small><b>${gpNum(today)}</b></div><div><small>Paid tonight</small><b>${$$(today*.05)}</b></div><div><small>Followers</small><b>${gpNum(S.followers)}</b></div><div><small>Total streams</small><b>${gpNum(S.streams)}</b></div></div><p class=gsm>${bz?'Fan buzz from your Gphone '+phModel()+': '+gpPct(phModel())+' on every song\'s daily streams.':'A Gphone 9 or newer adds +2% to +22% to every song\'s daily streams.'}</p>`;
+ return`<div class=gsp style="--acc:${sfAcc()}"><div class=gshd><img src="${pfp()}" alt=""><h1>${esc(S.artist)}</h1></div>
+ <div class=gsa><div><small class=gsm>${(S.listeners||0).toLocaleString()} monthly listeners</small><br><button class="gsfo${PH.sfF?' on':''}" onclick="PH.sfF=!PH.sfF;phR()">${PH.sfF?'Following':'Follow'}</button></div>
+ <span style="flex:1"></span><button class="gssh${SPQ.sh?' on':''}" title="Shuffle" onclick="sfShuf()">${sfIco('shuf')}</button><button class=gspl title="${pl?'Pause':'Play'}" ${L.length?'':'disabled'} onclick="sfBig()">${sfIco(pl?'pause':'play')}</button></div>
+ <div class=gstb>${tab('music','Music')}${tab('rel','Release'+(D.length?' ('+D.length+')':''))}${tab('stats','Stats')}</div><div class=gsb>${body}</div></div>`};
+{const st=document.createElement('style');st.textContent=`
+#ph .gpuew{min-height:100%;background:#fff}#ph .gpuew .ue,#ph .gpue{font-size:13px;min-height:100%;padding-bottom:16px;overflow-x:hidden}
+#ph .ue .ueh{flex-wrap:wrap;gap:8px;padding:10px 12px}#ph .ue .uel{font-size:18px}#ph .ue .ues2,#ph .ue .ues3,#ph .ue .uep{display:none}#ph .ue .uec2{margin-left:auto;font-size:12px}
+#ph .ue .uech{gap:6px;padding:8px 12px}#ph .ue .uech span{padding:5px 10px;font-size:12px}
+#ph .ue .uehero{padding:6px 12px;gap:10px}#ph .ue .uehero h1{font-size:24px}#ph .ue .uehero p{margin:0;font-size:12px}#ph .ue .uepromo{width:auto;flex:1;padding:12px;font-size:13px}
+#ph .ue h2{font-size:18px;margin:14px 12px 8px}
+#ph .ue .uegrid{grid-template-columns:1fr 1fr;gap:12px 10px;padding:0 12px}
+#ph .ue .uei{height:96px}#ph .ue .uei canvas{width:88px!important;height:88px!important}
+#ph .ue .uet{font-size:13px;margin-top:6px}#ph .ue .ues{font-size:11px}#ph .ue .uebtn{width:100%;padding:7px 8px;font-size:12px}#ph .ue .uev{margin-left:0}
+#ph .gpbag{margin:8px 12px;padding:10px 12px;background:#f3f3f3;border-radius:12px}#ph .gpbr{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid #e2e2e2}#ph .gpbr .uebtn{width:auto;margin:0;padding:6px 14px}
+#ph .gsp{min-height:100%;background:var(--bg,#0c0f0d);overflow-x:hidden}
+#ph .gshd{position:relative;height:230px;overflow:hidden;background:var(--acc)}#ph .gshd img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+#ph .gshd:after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 45%,#0c0f0dee)}
+#ph .gshd h1{position:absolute;left:14px;right:14px;bottom:8px;margin:0;z-index:1;font:700 30px/1.05 Silkscreen,ui-monospace,monospace;color:#fff;text-shadow:3px 3px 0 #000;overflow-wrap:anywhere}
+#ph .gsa{display:flex;align-items:center;gap:10px;padding:8px 14px 4px}#ph .gsm{color:var(--m,#8aa094);font-size:12px}
+#ph .gsfo{margin-top:6px;padding:4px 14px;background:transparent;color:var(--t,#e8f3ec);border:2px solid var(--m,#8aa094);border-radius:16px;box-shadow:none;font-size:12px}#ph .gsfo.on{border-color:var(--g,#2fe68a);color:var(--g,#2fe68a)}
+#ph .gssh,#ph .gspl{padding:0;box-shadow:none;display:flex;align-items:center;justify-content:center}#ph .gssh{width:34px;height:34px;background:transparent;border:0;color:var(--m,#8aa094)}#ph .gssh.on{color:var(--g,#2fe68a)}#ph .gssh svg{width:20px;height:20px}
+#ph .gspl{width:52px;height:52px;border-radius:50%;background:var(--g,#2fe68a);border:2px solid #000;color:#04120a;box-shadow:3px 3px 0 #0008}#ph .gspl svg{width:22px;height:22px}#ph .gspl:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #0008}
+#ph .gstb{display:flex;gap:18px;padding:6px 14px 0;border-bottom:2px solid #000}#ph .gstb button{background:none;border:0;box-shadow:none;padding:8px 0;color:var(--m,#8aa094);font:700 12px Silkscreen,ui-monospace,monospace;border-bottom:3px solid transparent;border-radius:0}#ph .gstb button.on{color:var(--t,#e8f3ec);border-bottom-color:var(--g,#2fe68a)}
+#ph .gsb{padding:6px 14px 14px}#ph .gsh3{margin:8px 0 6px;font:700 15px Silkscreen,ui-monospace,monospace;color:var(--t,#e8f3ec)}
+#ph .gsr{display:flex;align-items:center;gap:10px;padding:6px 4px;cursor:pointer}#ph .gsr:hover{background:#ffffff0d}#ph .gsr.on .gst b,#ph .gsr.on .gsn{color:var(--g,#2fe68a)}
+#ph .gsn{width:18px;text-align:center;color:var(--m,#8aa094);flex:none}#ph .gsn svg{width:12px;height:12px}
+#ph .gsr img{width:42px;height:42px;flex:none;border:2px solid #000;image-rendering:pixelated}
+#ph .gst{flex:1;min-width:0}#ph .gst b,#ph .gst small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ph .gst small{color:var(--m,#8aa094)}#ph .gsd{color:var(--m,#8aa094);font-size:11px;flex:none}
+#ph .gsq{display:flex;gap:6px;align-items:center}#ph .gsq input{flex:1;min-width:0;padding:6px}
+#ph .gsgo{background:var(--g,#2fe68a);color:#04120a;font-weight:700;white-space:nowrap}
+#ph .gsg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}#ph .gsg div{background:var(--p,#161b18);border:2px solid #000;padding:8px}#ph .gsg small{display:block;color:var(--m,#8aa094);font-size:11px}#ph .gsg b{font:700 16px Silkscreen,ui-monospace,monospace}
+#ph .phb,#ph .phx{overflow-x:hidden}
 `;document.head.appendChild(st)}
