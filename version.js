@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.139.2';
+const GAME_VERSION='v26.139.3';
 const VERSION_HISTORY=[
+ {v:'v26.139.3',n:'Fixed a new career not appearing in the Choose a career list: it now saves the moment you finish making your character. Saves still load.'},
  {v:'v26.139.2',n:'Fixed careers not saving or overwriting each other: each tab now saves only to its own career slot, a bad load no longer deletes the save, and the old copy is kept as a backup. Backups show under Recovered backups on the Choose a career screen. Saves still load.'},
  {v:'v26.139.1',n:'Fixed music stuttering: the song and beat player now schedules notes further ahead, so short game hitches (busy city, phone camera, weather) no longer make the music skip or lag. Saves still load.'},
  {v:'v26.139.0',n:'Gphone camera: city buildings, shop fronts and street details now have their back and side faces in the first person view, so they look solid and 3D instead of flat. Saves still load.'},
