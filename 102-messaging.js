@@ -76,3 +76,6 @@ function alexDM(){if(!S||!Array.isArray(S.msgs)||S.msgs.some(m=>m.a===ALEX))retu
 {const f0=firstDMs;firstDMs=function(){f0.apply(this,arguments);alexDM()}}
 /* existing saves that already passed their first day: he reaches out within the first week, once */
 {const w0=wakeUp;wakeUp=function(){const r=w0.apply(this,arguments);try{if(S.dm1&&!S.alexDm&&S.day>=2&&S.day<=14&&Array.isArray(S.msgs)&&!S.msgs.some(m=>m.a===ALEX)&&Math.random()<.5){S.alexDm=1;alexDM()}}catch(e){}return r}}
+/* prices artists say in chats get thousands commas ($600000 -> $600,000); runs on new messages and once over old saves */
+const msgComma=t=>String(t).replace(/\$(\d{4,})(?![\d,])/g,(_,n)=>'$'+Number(n).toLocaleString('en-US'));
+{const t0=msgTouch;msgTouch=function(){try{(S&&Array.isArray(S.msgs)?S.msgs:[]).forEach(m=>{const L=m.log;if(!Array.isArray(L))return;for(let i=m._cm||0;i<L.length;i++){const x=L[i];if(x&&x.f!='me'&&typeof x.t=='string'&&x.t.includes('$'))x.t=msgComma(x.t)}m._cm=L.length})}catch(e){}return t0.apply(this,arguments)}}
