@@ -21,7 +21,7 @@ function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.r
 /* v42.7.3: signing in to an account (or out) reloads into that account's own careers on this device, so one account's
    cloud save never lands on another account's or a guest's career. The first time after this update, careers this device
    already synced with the signed-in account move into its slots. */
-const CK=SAVE_PRE+'cloud';
+const CS_KEY=SAVE_PRE+'cloud';
 function csAcct(usr){const id=usr?usr.uid:'';if(id==FW_ACCT)return false;autoSave();
  try{if(id){const p='fw_u_'+id+'_';let m={};try{m=JSON.parse(localStorage.getItem('fw_cloud'))||{}}catch(e){}
    if(!FW_ACCT&&m.uid==id&&!localStorage.getItem(p+'save_1')&&!localStorage.getItem(p+'save_2')){
@@ -37,12 +37,12 @@ function fbSignedIn(u){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')
 function csAsk(){const uid=FBU&&FBU.uid;if(!uid)return;if(!CLD.asking){CLD.asking=1;CLD.pre=mode}let a='';try{a=scDecode(csGuestCode()).S.artist||''}catch(e){}
  $('ui').innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>☁ New Google account</h2><p>This Google account has no career yet. Bring your career from this device${a?' ('+esc(a)+')':''} into it, or start a new one?</p><p class=m><small>Bringing it copies it: the original stays on this device for when you play signed out.</small></p><div class=row2><button class=go onclick="csPick(1)">Bring my career</button><button onclick="csPick(2)">Start a new career</button></div></div>`}
 function csPick(k){const uid=FBU&&FBU.uid;if(!uid)return;snd('click');CLD.asking=0;
- if(k==2){csSetMark(0);try{localStorage.setItem(CK,JSON.stringify({uid,t:0,fresh:1}))}catch(e){}CLD.ok=1;fbSignInBack();return fbRedraw()}
+ if(k==2){csSetMark(0);try{localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0,fresh:1}))}catch(e){}CLD.ok=1;fbSignInBack();return fbRedraw()}
  const c=csGuestCode();if(!c){CLD.ok=1;fbSignInBack();return fbRedraw()}
- wiping=true;try{localStorage.setItem(slotKey(),c);localStorage.setItem(CK,JSON.stringify({uid,t:0}));sessionStorage.setItem('fw_go','1');sessionStorage.setItem('fw_msg','☁ Your career is now on your Google account')}catch(e){wiping=false;return say('No room to copy your career.')}
+ wiping=true;try{localStorage.setItem(slotKey(),c);localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0}));sessionStorage.setItem('fw_go','1');sessionStorage.setItem('fw_msg','☁ Your career is now on your Google account')}catch(e){wiping=false;return say('No room to copy your career.')}
  location.reload()}
-function csWipe(uid,msg){if(!bakKeep(localStorage.getItem(slotKey()),'Kept before a new career started'))return;wiping=true;try{localStorage.removeItem(slotKey());localStorage.setItem(CK,JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
-const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem(CK,JSON.stringify({uid,t}))}catch(e){}};
+function csWipe(uid,msg){if(!bakKeep(localStorage.getItem(slotKey()),'Kept before a new career started'))return;wiping=true;try{localStorage.removeItem(slotKey());localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
+const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem(CS_KEY,JSON.stringify({uid,t}))}catch(e){}};
 function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
  return FBM.signInWithPopup(FBA,p).then(r=>fbSignedIn(r.user),e=>{
   if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment')){try{sessionStorage.setItem('fw_signing','1')}catch(x){}return FBM.signInWithRedirect(FBA,p)}
@@ -62,8 +62,8 @@ function fbRedraw(){if(mode=='pause')pauseUI();else if(mode=='title'&&document.g
    v26.87: the cloud save always wins. fw_cloud remembers which cloud save (uid + t) this device last wrote or loaded:
    if the cloud is still that one, this device has the newest game and uploads it; otherwise the cloud save is loaded. */
 const CLD={ok:0,last:'',t:0,err:'',busy:0,signing:(()=>{try{return sessionStorage.getItem('fw_signing')?1:0}catch(e){return 0}})()};
-const csMark=()=>{try{return JSON.parse(localStorage.getItem(CK))||{}}catch(e){return{}}};
-const csSetMark=t=>{CLD.t=t;try{localStorage.setItem(CK,JSON.stringify({uid:FBU.uid,t}))}catch(e){}};
+const csMark=()=>{try{return JSON.parse(localStorage.getItem(CS_KEY))||{}}catch(e){return{}}};
+const csSetMark=t=>{CLD.t=t;try{localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t}))}catch(e){}};
 const csRef=()=>FBF.doc(FBD,'saves',FBU.uid);
 const csGame=()=>mode=='title'?!!TT.game:mode!='creator';
 const csReady=()=>!document.getElementById('load')&&['title','play','pause'].includes(mode)&&!document.getElementById('fbq');
@@ -125,7 +125,7 @@ function ttRecover(n,t){let b=null;try{b=localStorage.getItem('fw_bak_'+n)}catch
  snd('click');if(t==curSlot()&&TT.game)autoSave();
  let old=null;try{old=localStorage.getItem(slotKey(t))}catch(e){}
  wiping=true;
- try{localStorage.setItem(slotKey(t),b);localStorage.removeItem('fw_bak_'+n);localStorage.removeItem('fw_bakw_'+n);if(old){localStorage.setItem('fw_bak_'+n,old);localStorage.setItem('fw_bakw_'+n,'Replaced by a recovered backup')}localStorage.setItem(SLOT_K,t);sessionStorage.setItem('fw_go','1');if(FBU)localStorage.setItem(CK,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){}
+ try{localStorage.setItem(slotKey(t),b);localStorage.removeItem('fw_bak_'+n);localStorage.removeItem('fw_bakw_'+n);if(old){localStorage.setItem('fw_bak_'+n,old);localStorage.setItem('fw_bakw_'+n,'Replaced by a recovered backup')}localStorage.setItem(SLOT_K,t);sessionStorage.setItem('fw_go','1');if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){}
  location.reload()}
 /* v26.140: drag a recovered backup onto a career slot; an occupied slot asks first and the replaced career becomes a backup */
 function ttRecAsk(n,t){const i=t==curSlot()&&TT.game?{artist:S.artist}:slotInfo(t);if(!i)return ttRecover(n,t);
@@ -139,11 +139,11 @@ document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest(
 function ttBack(){snd('click');TT.sel=0;titleUI()}
 function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
  if(TT.game)autoSave();wiping=true;const i=slotInfo(n);
- try{localStorage.setItem(SLOT_K,n);sessionStorage.setItem('fw_go','1');if(FBU)localStorage.setItem(CK,JSON.stringify(i?{uid:FBU.uid,t:CLD.t}:{uid:FBU.uid,t:CLD.t,fresh:1}))}catch(e){}
+ try{localStorage.setItem(SLOT_K,n);sessionStorage.setItem('fw_go','1');if(FBU)localStorage.setItem(CS_KEY,JSON.stringify(i?{uid:FBU.uid,t:CLD.t}:{uid:FBU.uid,t:CLD.t,fresh:1}))}catch(e){}
  location.reload()}
 function ttDel(n){const i=slotInfo(n)||(n==curSlot()&&TT.game?{artist:S.artist}:null);if(!i||!confirm('Delete career '+n+(i.artist?' ('+i.artist+')':'')+'? This cannot be undone.'))return;snd('click');
  try{localStorage.removeItem(slotKey(n))}catch(e){}
- if(n==curSlot()){wiping=true;try{if(FBU)localStorage.setItem(CK,JSON.stringify({uid:FBU.uid,t:CLD.t,fresh:1}))}catch(e){}location.reload()}else ttWorlds()}
+ if(n==curSlot()){wiping=true;try{if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t,fresh:1}))}catch(e){}location.reload()}else ttWorlds()}
 {const t1=titleUI;titleUI=function(){if(TT.sel&&TT.on)return ttWorlds();return t1.apply(this,arguments)}}
 function ttSet(){mode='pause';settings();SP='title'}
 function saveQuit(){snd('click');autoSave();TT.game=1;
