@@ -7,7 +7,7 @@ const mSongsOn=()=>msrc()=='songs'&&mTopSongs().length>0;
 const MSG={i:0,t:0,id:0,SEC:70};
 {const nt=nextTrack;nextTrack=function(){return mSongsOn()?-1:nt.apply(this,arguments)}}
 function mSetSrc(v){S.musSrc=v;MSG.id=0;if(v=='songs'&&mSongsOn())musSkip();else if(v!='songs'){const c=Beats.current();if(c&&c.owner=='mine')Beats.stop(.6)}
- if(typeof autosave=='function')try{autosave()}catch(e){}stDraw()}
+ if(typeof autoSave=='function')try{autoSave()}catch(e){}stDraw()}
 function mSetTop(v){S.musTop=Math.max(1,Math.min(50,Math.round(+v)||3));MSG.id=0;MSG.i=0;const c=Beats.current();if(c&&c.owner=='mine')Beats.stop(.3);stDraw()}
 setInterval(()=>{try{
  if(!MU.on||!mSongsOn()||(mode!='play'&&mode!='drive'))return;

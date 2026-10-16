@@ -47,7 +47,7 @@ function phTitle(){const a={home:'Home',msg:'Messages',ig:'Instagrime',cam:'Came
 function phBody(){const m=phModel();
  if(PH.app=='msg')return`<div class=phx>${PA.msg()}</div>`;
  if(PH.app=='ig')return`<div class=phx>${PA.ig()}</div>`;
- if(PH.app=='cam')return phCamUI();
+ if(PH.app=='cam'){PH.app='home';setTimeout(openCamera,0)}
  if(PH.app=='pho')return phPhoUI();
  const un=(S.msgs||[]).filter(x=>x.unread).length;
  return`<div class=phh>${[['msg','Messages',IC.msg,un],['ig','Instagrime',IC.ig,0],['cam','Camera',IC.cam,0],['pho','Photos',IC.pho,0]].map(a=>`<button class=phi onclick="phApp('${a[0]}')"><img src="${a[2]}">${a[1]}${a[3]?`<span class=bd>${a[3]}</span>`:''}</button>`).join('')}</div><p class=m style="padding:0 16px"><small>Gphone ${m}${m==8?' (laggy). Upgrade on Amazoom.':''}. Photos ${GPH[m][1]}x${GPH[m][2]}.</small></p>`}
