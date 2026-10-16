@@ -116,7 +116,7 @@ function saveQuit(){snd('click');autoSave();TT.game=1;
  PS='';titleOpen()}
 {const cs0=closeSet;closeSet=function(){cs0();if(mode=='title')titleUI()}
  const lc=loadCode;loadCode=function(c){const t=TT.on;lc(c);if(t&&mode=='play'){TT.game=1;titleOpen()}}
- const cf0=confirmChar;confirmChar=function(){TT.game=1;return cf0.apply(this,arguments)}}
+ const cf0=confirmChar;confirmChar=function(){TT.game=1;const r=cf0.apply(this,arguments);try{autoSave()}catch(e){}return r}}
 
 /* pause menu: Save & quit, plus who is signed in and the cloud save state */
 {const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='Save & quit';q.onclick=saveQuit;m.appendChild(q);
