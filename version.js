@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.141.0';
+const GAME_VERSION='v26.142.0';
 const VERSION_HISTORY=[
+ {v:'v26.142.0',n:'New Next Goal tracker (bottom-left, click to shrink): a ladder of goals from your first song to 100 million listeners, each paying a cash reward with a celebration. Releasing a song now pops up a card with confetti and a quality tag. Existing careers skip goals they already met. Saves still load.'},
  {v:'v26.141.0',n:'The game now fits small and narrow windows better: the top boxes no longer overlap, the phone fills a small screen, and the Amazoom header and computer apps shrink to fit. Saves still load.'},
  {v:'v26.140.0',n:'Made the game easier to find in search engines and AI tools: added a page description, share-link previews, search data, robots.txt, sitemap.xml and llms.txt. Nothing changes in the game itself. Saves still load.'},
  {v:'v26.139.8',n:'Fixed the screen going pitch black on rainy days when a chat or collab menu opened: the weather lighting now fades out smoothly instead of breaking. Saves still load.'},
