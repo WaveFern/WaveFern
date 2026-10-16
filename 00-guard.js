@@ -37,6 +37,6 @@
  }
  window.fwBooted=function(){booted=1;if(bad.length){const b=document.createElement('div');b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#000d;border-top:2px solid #2fe68a;color:#e8f3ec;padding:6px 10px;font:12px ui-monospace,monospace;text-align:center';b.innerHTML='Some game files failed to load ('+bad.map(esc).join(', ')+'), so parts of the game may not work. <button onclick="location.reload()" style="font:inherit;margin-left:6px">Reload</button> <button onclick="this.parentNode.remove()" style="font:inherit">Dismiss</button>';document.body.appendChild(b)}};
  if(!webglOK())addEventListener('DOMContentLoaded',fail);
- addEventListener('load',()=>setTimeout(()=>{if(!booted&&document.getElementById('load'))fail()},4000));
+ addEventListener('load',()=>setTimeout(()=>{if(!booted&&document.getElementById('load')&&(bad.length||errs.length||typeof THREE==='undefined'||!webglOK()))fail()},4000));
  setTimeout(()=>{if(!booted&&document.getElementById('load'))panel('Still loading…','The game is taking much longer than usual to start. This is often a slow connection or a blocked file.',details()+GL,1)},25000);
 })();
