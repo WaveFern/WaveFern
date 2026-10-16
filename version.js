@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.149.0';
+const GAME_VERSION='v26.149.1';
 const VERSION_HISTORY=[
+ {v:'v26.149.1',n:'Fixed save codes coming out invalid after being sent through a chat app like Discord or WhatsApp: new codes (starting FW3-) leave out the characters those apps change, and pasted codes now ignore line breaks, spaces, smart quotes and dashes. Older FW2- and FW1- codes still load. Saves still load.'},
  {v:'v26.149.0',n:'Artists you have already made a collab with can now message you again to ask for another one. Before, their new offer was usually dropped if you had not texted them for a couple of days. Saves still load.'},
  {v:'v26.148.0',n:'The Gphone now looks like a real phone in the game\'s own style: a chunky black-bordered body with side buttons, a notch with a camera, a pixel status bar, blocky app tiles, game-style panels and buttons, and a home bar. Removed the Bank, Stats, Maps and Deals apps: any money in Gphone Bank savings is moved back to your wallet. The phone keeps Messages, Spotifly (release songs), Instagrime, Goober Eats, Gigs, Camera, Photos and the Store, and upgrades still add fan buzz streams. Saves still load.'},
  {v:'v26.147.0',n:'Gphone everyday apps: release your songs from the new Spotifly app (with today\'s streams and earnings live), order food in Goober Eats, book festival gigs in Gigs, and buy your next phone in the Store app, all without walking to the computer. Upgrades now pay off: every model from the Gphone 9 adds fan buzz to every song\'s daily streams (+2% up to +22% on the Gphone 18), the Gphone 9 lets you eat stored food anywhere, the Gphone 12 gives unlimited taxi rides from Maps, and apps open instantly from the Gphone 13. Saves still load.'},
