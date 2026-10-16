@@ -2,7 +2,7 @@
    Loads first. Never lets the loading screen hang silently: a failed script, a startup error,
    missing WebGL or a stuck load shows a clear message with a Reload button. */
 (function(){
- const bad=[],errs=[];let shown=0,booted=0;
+ const bad=[],errs=[],broke=[],seen={};let shown=0,booted=0;
  function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
  function panel(title,msg,hint,cont){
   if(shown)return;shown=1;
@@ -27,6 +27,8 @@
   const t=e.target;
   if(t&&t!==window&&t.tagName==='SCRIPT'){bad.push((t.getAttribute('src')||'script').replace(/^https?:\/\/[^/]+\//,''));return}
   if(e.message&&e.message!=='Script error.')errs.push(e.message+(e.filename?' ('+e.filename.split('/').pop()+':'+e.lineno+')':''));
+  /* v41.1.0: remember which game file threw while loading, so the warning bar can name it */
+  if(!booted&&e.filename&&!/^https?:\/\/(cdn|www\.|apis\.|fonts\.)/.test(e.filename)){const f=e.filename.split('/').pop().split('?')[0];if(f&&broke.indexOf(f)<0)broke.push(f)}
   if(!booted&&/27-boot/.test(e.filename||''))fail();
  },true);
  function fail(){
@@ -35,7 +37,12 @@
   if(typeof THREE==='undefined')return panel('Could not load the game','The 3D library did not download. Check your internet connection and try again.',details());
   panel('Something went wrong while starting','The game hit a problem while loading.',details());
  }
- window.fwBooted=function(){booted=1;if(bad.length){const b=document.createElement('div');b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#000d;border-top:2px solid #2fe68a;color:#e8f3ec;padding:6px 10px;font:12px ui-monospace,monospace;text-align:center';b.innerHTML='Some game files failed to load ('+bad.map(esc).join(', ')+'), so parts of the game may not work. <button onclick="location.reload()" style="font:inherit;margin-left:6px">Reload</button> <button onclick="this.parentNode.remove()" style="font:inherit">Dismiss</button>';document.body.appendChild(b)}};
+ window.fwBooted=function(){booted=1;const parts=bad.concat(broke.filter(f=>bad.indexOf(f)<0));if(parts.length){const b=document.createElement('div');b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#000d;border-top:2px solid #2fe68a;color:#e8f3ec;padding:6px 10px;font:12px ui-monospace,monospace;text-align:center';b.innerHTML='Some game files failed to load ('+parts.map(esc).join(', ')+'), so parts of the game may not work. <button onclick="location.reload()" style="font:inherit;margin-left:6px">Reload</button> <button onclick="this.parentNode.remove()" style="font:inherit">Dismiss</button>';document.body.appendChild(b)}};
+ /* v41.1.0: an error in one part of the game (a frame update, a boot step) is logged once and the rest carries on,
+    instead of freezing the whole game. where = a short label, e.g. 'update' or 'buildCity'. */
+ window.fwSoftErr=function(e,where){const m=(where?where+': ':'')+(e&&e.message||e);if(seen[m])return;seen[m]=1;
+  try{console.error('[WaveFern] '+m,e)}catch(x){}
+  if(!booted&&where&&where!='update'&&where!='render'&&broke.indexOf(where)<0)broke.push(where)};
  if(!webglOK())addEventListener('DOMContentLoaded',fail);
  addEventListener('load',()=>setTimeout(()=>{if(!booted&&document.getElementById('load')&&(bad.length||errs.length||typeof THREE==='undefined'||!webglOK()))fail()},4000));
  setTimeout(()=>{if(!booted&&document.getElementById('load'))panel('Still loading…','The game is taking much longer than usual to start. This is often a slow connection or a blocked file.',details()+GL,1)},25000);
