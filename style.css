@@ -134,3 +134,4 @@ body.notags #ntags{display:none}
  .sr{grid-template-columns:24px 1fr 70px!important}.sr>span:last-child{display:none}
 }
 @media(max-height:560px){.pzm button{margin-top:6px;padding:6px}.modal{max-height:94vh;overflow:auto}#ttl .ttm{gap:6px}#ttl h1{font-size:26px}}
+#ttl .ttsl.drop{border-color:var(--g);background:#14301ad9}#ttl .ttbk{cursor:grab}
