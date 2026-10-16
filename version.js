@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v42.7.5';
+const GAME_VERSION='v42.8.0';
 const VERSION_HISTORY=[
+ {v:'v42.8.0',n:'Pets and bodyguards now find their own way to you: they walk around walls, buildings and furniture instead of through them, and if there is no way through they appear next to you. They face the way they are walking. While you perform on stage at a festival your pets and bodyguards stay out of sight, and they are back by your side when you come off. Saves still load.'},
  {v:'v42.7.5',n:'Gift checks can no longer throw an error if the Google sign-in part of the game fails to load. Saves still load.'},
  {v:'v42.7.4',n:'Fixed the Google account update stopping the game from starting (a name clash broke the sign-in file, so the main menu never appeared). Saves still load.'},
  {v:'v42.7.3',n:'Fixed Aurora Residences looking washed out and almost pure white inside: its floors, walls and furniture were near-white under full-strength room lights. Its colours are now softer and its lights dimmer, so every floor shows its tiles, panels and furniture like the other towers. Saves still load.'},
