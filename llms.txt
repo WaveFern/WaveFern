@@ -1,0 +1,10 @@
+# WaveFern Records
+
+> WaveFern Records is a free browser music career sim. Create a character, record songs and albums in your studio, release them on Spotifly, grow your fame, buy houses, cars and clothes, and explore a big 3D city. Plays in your browser, no download.
+
+WaveFern Records is a fictional browser game built with Three.js (plain JavaScript, no install). Real artists named in-game are inspiration references only, with no affiliation or endorsement.
+
+## Links
+
+- [Play the game](https://wavefern.github.io/WaveFern/): the live game
+- [Version history](https://wavefern.github.io/WaveFern/versions.html): player-facing changelog

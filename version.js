@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.139.8';
+const GAME_VERSION='v26.140.0';
 const VERSION_HISTORY=[
+ {v:'v26.140.0',n:'Made the game easier to find in search engines and AI tools: added a page description, share-link previews, search data, robots.txt, sitemap.xml and llms.txt. Nothing changes in the game itself. Saves still load.'},
  {v:'v26.139.8',n:'Fixed the screen going pitch black on rainy days when a chat or collab menu opened: the weather lighting now fades out smoothly instead of breaking. Saves still load.'},
  {v:'v26.139.7',n:'Faster frame rate: the game no longer wastes time updating the thousands of objects inside hidden shops, floors and far-away parts of the world every frame. Saves still load.'},
  {v:'v26.139.6',n:'Fixed lag in long careers: the game now saves every 30 seconds when idle instead of every 5 (big saves froze the game for a moment each time), and song streams are counted about 8 times a second instead of every frame. It still saves when you close or leave the tab. Saves still load.'},
