@@ -1,4 +1,7 @@
-/* ===== v26.147: Gphone everyday apps and upgrade perks you can feel =====
+/* ===== v26.147-148: Gphone everyday apps, upgrade perks you can feel, and a phone that looks like the game =====
+   v26.148: the phone uses the game's own look (THEMES.md: black borders, hard shadows, Silkscreen, the green palette) inside a
+   phone body with bezel, notch, side buttons and a home bar. The Bank, Stats, Maps and Deals apps from v26.146 are gone:
+   any savings are paid back to your wallet once (S.sav set to 0), and their nightly interest and deal payouts no longer run.
    Adds the things you used to walk to the computer for, on the phone (G):
    - Spotifly: name and release your recorded songs, see today's streams and earnings so far.
    - Goober Eats: order food (it goes to Storage, as on the computer); from the Gphone 9 you can also eat stored food anywhere.
@@ -6,13 +9,12 @@
    - Gphone Store: see what each model gives and buy the next one straight from the phone.
    Upgrade perks (numbers shown on the home screen, the Store and gphone.wf):
    - Fan buzz: every model from the Gphone 9 adds a share to every song's daily streams (GP_BUZZ).
-   - Gphone 12+: unlimited taxi rides from Maps (the world map taxi stays once a day).
-   No new save fields: buzz and taxis read the phone model (S.phone), food uses the existing S.fd storage. */
+   No new save fields: buzz reads the phone model (S.phone), food uses the existing S.fd storage. */
 const GP_BUZZ={8:0,9:.02,10:.04,11:.06,12:.08,13:.10,14:.12,15:.15,16:.17,17:.19,18:.22};
 const gpBuzz=()=>GP_BUZZ[phModel()]||0;
 const gpPct=n=>'+'+Math.round((GP_BUZZ[n]||0)*100)+'% streams';
 /* what's new on each model, shown in the Store, on gphone.wf and on the home screen card */
-const GP_NEW={8:['Messages, Spotifly, Instagrime, Goober Eats, Gigs, Camera'],9:['Eat stored food anywhere','Sharper photos'],10:['Stats app'],11:['Maps app with taxi rides'],12:['Unlimited taxi rides','+1 reputation per artist selfie'],13:['Bank app with nightly savings interest','Apps open instantly'],14:['Bigger photo boost'],15:['Pro camera'],16:['Deals app: $150 a day for a photo post'],17:['Instant shutter','Deals pay $220'],18:['Deals pay $300','Best interest: 1.5% a night']};
+const GP_NEW={8:['Messages, Spotifly, Instagrime, Eats, Gigs, Camera, Photos'],9:['Eat stored food anywhere','Sharper photos'],10:['Faster apps'],11:['Faster apps','Better camera'],12:['+1 reputation per artist selfie'],13:['Apps open instantly'],14:['Bigger photo boost'],15:['Pro camera'],16:['Bigger photo boost'],17:['Instant shutter'],18:['Best camera']};
 Object.keys(GPF).forEach(n=>{GPF[n]=(GP_NEW[n]||[]).concat(GP_BUZZ[n]?[gpPct(n)]:[]).join(' · ')});
 /* ---- fan buzz: more daily streams on every song (same shape as the gear and Label HQ boosts) ---- */
 {const po=planOf;planOf=function(s){const fresh=s&&s.pd!==S.day,v=po.apply(this,arguments);if(!fresh||!(v>0))return v;const m=gpBuzz();if(!(m>0))return v;
@@ -20,23 +22,10 @@ Object.keys(GPF).forEach(n=>{GPF[n]=(GP_NEW[n]||[]).concat(GP_BUZZ[n]?[gpPct(n)]
 /* ---- icons ---- */
 {const px=(r,p)=>{const c=document.createElement('canvas');c.width=r[0].length;c.height=r.length;const x=c.getContext('2d');r.forEach((l,y)=>[...l].forEach((h,i)=>{if(p[h]){x.fillStyle=p[h];x.fillRect(i,y,1,1)}}));return c.toDataURL()};
  IC.gpst=px(['...KKKK...','..KWWWWK..','..KWGGWK..','..KWWWWK..','..KWWWWK..','..KWWWWK..','..KWWWWK..','..KWWWWK..','..KWKKWK..','...KKKK...'],{K:'#0c0f0d',W:'#e8f3ec',G:'#2fe68a'})}
-/* ---- styles (inside the phone only) ---- */
-{const st=document.createElement('style');st.textContent=`
-#ph .gpq{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #ffffff12}#ph .gpq:first-of-type{border-top:0}
-#ph .gpq .n{flex:1;min-width:0}#ph .gpq .n b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ph .gpq .n small{color:#8aa094}
-#ph .gpq input{flex:1;min-width:0;padding:6px 8px;border-radius:10px}
-#ph .gpq button,#ph .pcd button{border-radius:12px;white-space:nowrap}
-#ph .gptg{display:inline-block;background:#2fe68a22;color:var(--g,#2fe68a);border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700}
-#ph .gpen{height:10px;border-radius:5px;background:#ffffff14;overflow:hidden;margin-top:6px}#ph .gpen i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#2fe68a)}
-#ph .gpfs{padding:10px}#ph .gpfs .cards{display:flex!important;flex-direction:column;gap:8px}#ph .gpfs .card{min-width:0!important}#ph .gpfs h1{font-size:18px}
-#ph .gpm{display:flex;flex-direction:column;gap:6px}#ph .gpm .on{border:1px solid var(--g,#2fe68a)}
-#ph .pnx{cursor:pointer}#ph .pnx:hover{filter:brightness(1.15)}
-`;document.head.appendChild(st)}
 /* ---- apps: everyday ones first ---- */
 GP_APPS.splice(0,GP_APPS.length,
- ['msg','Messages',()=>IC.msg,'#7a3df0'],['sf','Spotifly',()=>IC.fw,'#121212'],['ig','Instagrime',()=>IC.ig,'#d6249f'],['eats','Eats',()=>IC.eats,'#8a4a12'],
- ['cam','Camera',()=>IC.cam,'#3a4048'],['pho','Photos',()=>IC.pho,'#1f7a52'],['fest','Gigs',()=>IC.fest||IC.os,'#7a2a4a'],['shop','Store',()=>IC.gpst,'#26302a'],
- ['stat','Stats',()=>IC.stat,'#1d3a5c'],['maps','Maps',()=>IC.maps,'#2b6a4a'],['bank','Bank',()=>IC.bank,'#5b4a1a'],['deal','Deals',()=>IC.deal,'#4a2a6b']);
+ ['msg','Messages',()=>IC.msg,'#3b82f6'],['sf','Spotifly',()=>IC.fw,'#000000'],['ig','Instagrime',()=>IC.ig,'#d6249f'],['eats','Eats',()=>IC.eats,'#c8964a'],
+ ['cam','Camera',()=>IC.cam,'#26302a'],['pho','Photos',()=>IC.pho,'#2a6f97'],['fest','Gigs',()=>IC.fest||IC.os,'#6a3093'],['shop','Store',()=>IC.gpst,'#2fe68a']);
 Object.assign(GP_TITLE,{sf:'Spotifly',eats:'Goober Eats',fest:'Gigs',shop:'Gphone Store'});
 /* ---- Spotifly: release drafts and watch today's streams ---- */
 function gpSf(){if(!S.artist)return`<div class=phs2><div class=pcd><h3>SPOTIFLY</h3><div class=sub>Pick your artist name on the computer first.</div></div></div>`;
@@ -61,16 +50,8 @@ function gpShop(){const m=phModel();
  <div class="gpm">${Object.keys(GPH).map(Number).filter(n=>n>8).map(n=>{const g=GPH[n];return`<div class="pcd ${n==m?'on':''}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Gphone ${n}</b>${n<=m?`<span class=sub>${n==m?'You have this':'Owned'}</span>`:`<button class=go ${S.money<g[0]?'disabled':''} onclick="buyPhone(${n})">${'$'+g[0].toLocaleString()}</button>`}</div><div class=sub style="margin-top:4px">${esc(GPF[n])}</div></div>`}).join('')}</div></div>`}
 /* buying from the phone keeps the phone open on the Store */
 {const b0=buyPhone;buyPhone=function(n){const r=b0.apply(this,arguments);try{if(mode=='phone')phR()}catch(e){}return r}}
-/* ---- Maps: taxi rides; Gphone 12+ rides are unlimited ---- */
-gpMaps=function(){const m=phModel(),seen=new Set(),dest=(SHOPS||[]).filter(s=>typeof s.cx=='number'&&s.name&&!seen.has(s.name)&&seen.add(s.name)).slice(0,14),inside=typeof IN!='undefined'&&IN;
- let T=null;try{T=taxiDay()}catch(e){}const used=m<12&&T&&T.go;
- return`<div class=phs2><div class=pcd><h3>YOU ARE HERE</h3><div class=big style="font-size:18px">${Math.round(P.x)}, ${Math.round(P.z)}</div><div class=pbt><button class=go onclick="gpMap()">Open city map</button></div></div>
- <div class=pcd><h3>TAXI${m>=12?' <span class=gptg>UNLIMITED</span>':''}</h3>${inside?'<div class=sub>Step outside to call a taxi.</div>':used?`<div class=sub>You used today's taxi. Open the city map to ride back. A Gphone 12 gives unlimited rides.</div>`:`${m<12?'<div class=sub>One ride a day. A Gphone 12 gives unlimited rides.</div>':''}${dest.map(s=>{const z=s.ez||12.9,c=Math.round(Math.hypot(P.x-s.cx,P.z-z)*.06);return`<div class=pls><span>${esc(s.name)}</span><button ${S.money<c?'disabled':''} onclick="gpTaxi(${s.cx},${z})">Ride · $${c}</button></div>`}).join('')}`}</div></div>`};
-gpTaxi=function(x,z){if(phModel()<12){closePhone();try{taxi(x,z)}catch(e){console.error(e)}return}
- if(typeof IN!='undefined'&&IN)return;const c=Math.round(Math.hypot(P.x-x,P.z-z)*.06);if(S.money<c){try{snd('err')}catch(e){}return say('Taxi costs $'+c)}
- closePhone();S.money=+(S.money-c).toFixed(2);P.x=x;P.z=z;camT.x=x;camT.z=z;try{closeUI()}catch(e){}try{snd('whoosh')}catch(e){}say('Taxi fare $'+c)};
 /* ---- screens ---- */
-{const b0=phBody;phBody=function(){const a=PH.app;if(PH.loading)return b0.apply(this,arguments);
+{const b0=phBody;phBody=function(){if(['stat','maps','bank','deal'].includes(PH.app))PH.app='home';const a=PH.app;if(PH.loading)return b0.apply(this,arguments);
  if(a=='sf')return`<div class=phx>${gpSf()}</div>`;if(a=='eats')return`<div class=phx>${gpEats()}</div>`;if(a=='fest')return`<div class=phx>${gpFest()}</div>`;if(a=='shop')return`<div class=phx>${gpShop()}</div>`;
  const h=b0.apply(this,arguments);if(a!='home')return h;
  /* home: badge for songs waiting to release, and the upgrade card opens the Store */
@@ -78,9 +59,75 @@ gpTaxi=function(x,z){if(phModel()<12){closePhone();try{taxi(x,z)}catch(e){consol
  if(dr)o=o.replace(/(<img src="[^"]*">)(Spotifly)/,`$1$2<span class=bd>${dr}</span>`);
  o=o.replace(/<div class=pnx>[\s\S]*?<\/div><\/div>/,nx?`<div class=pnx onclick="phApp('shop')"><b>Next: Gphone ${m+1} · $${nx[0].toLocaleString()}</b><div class=sub style="color:#8aa094">${esc(GPF[m+1])}. Tap to see every model.</div></div>`:`<div class=pnx onclick="phApp('shop')"><b>You have the best Gphone</b><div class=sub style="color:#8aa094">${gpPct(m)} fan buzz and every app unlocked.</div></div>`);
  return o}}
-/* Stats: show the fan buzz too */
-{const s0=gpStat;gpStat=function(){const h=s0.apply(this,arguments),b=gpBuzz();return b?h.replace('<div class=pcd><h3>TOP SONGS</h3>',`<div class=pcd><h3>FAN BUZZ</h3><span class=gptg>${gpPct(phModel())}</span> <span class=sub>from your Gphone</span></div><div class=pcd><h3>TOP SONGS</h3>`):h}}
 /* the Spotifly and Eats screens refresh themselves so stream counts and energy stay live */
-setInterval(()=>{try{if(mode=='phone'&&(PH.app=='sf'||PH.app=='eats'||PH.app=='stat')&&!PH.loading&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))phR()}catch(e){}},2000);
+setInterval(()=>{try{if(mode=='phone'&&(PH.app=='sf'||PH.app=='eats')&&!PH.loading&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))phR()}catch(e){}},2000);
 /* ---- gphone.wf on the computer: same perk list ---- */
 PA.phones=()=>{const m=phModel();return`<div style="padding:14px"><h1 style="margin:0 0 4px">Gphone</h1><p class=m>You have a <b>Gphone ${m}</b>${GP_BUZZ[m]?' ('+gpPct(m)+' fan buzz)':''}. Each model keeps everything from the one before. Open your phone with G, or buy straight from its Store app.</p><div class=cards style="display:flex;flex-wrap:wrap;gap:10px">${Object.keys(GPH).map(Number).filter(n=>n>8).map(n=>{const g=GPH[n];return`<div class=card style="min-width:190px;flex:1"><b style="font-size:16px">Gphone ${n}</b><br><b style="color:var(--g)">${esc(GPF[n])}</b><br><small class=m>Photos ${g[1]}x${g[2]} · ${g[3]?'shutter lag '+g[3]+'s':'instant shutter'}<br>${GP_LAG[n]>100?'Apps load in '+(GP_LAG[n]/1000).toFixed(1)+'s':'Apps open instantly'}</small><div style="margin:8px 0;font-weight:bold;font-size:18px">$${g[0].toLocaleString()}</div>${n<=m?`<button disabled>${n==m?'You have this':'You have a newer one'}</button>`:`<button class=go ${S.money<g[0]?'disabled':''} onclick="buyPhone(${n})">Buy now</button>`}</div>`}).join('')}</div></div>`};
+/* ===== v26.148: Bank, Stats, Maps and Deals removed ===== */
+Object.keys(GP_INT).forEach(k=>delete GP_INT[k]);Object.keys(GP_DEAL).forEach(k=>delete GP_DEAL[k]);Object.keys(GP_NEED).forEach(k=>delete GP_NEED[k]);
+/* savings from the old Bank app go back to the wallet, once, whenever a save that still has them is loaded */
+setInterval(()=>{try{if(typeof S!='undefined'&&S&&+S.sav>0){const v=+S.sav;S.sav=0;S.money=+((+S.money||0)+v).toFixed(2);say('Gphone Bank closed: '+$$(v)+' savings moved to your wallet')}}catch(e){}},2000);
+/* ===== v26.148: the phone in the game's own look ===== */
+/* the rounded app-style CSS from 115 and 116 is dropped; the camera viewfinder (#phcam) keeps its own */
+document.querySelectorAll('style').forEach(t=>{if(/^\s*#ph\{/.test(t.textContent))t.remove()});
+{const st=document.createElement('style');st.textContent=`
+#ph{position:fixed;right:18px;bottom:14px;width:min(370px,calc(100vw - 24px));height:min(740px,calc(100vh - 24px));z-index:70;box-sizing:border-box;display:flex;flex-direction:column;
+ background:#1b1f1d;border:3px solid #000;border-radius:30px;padding:12px 9px 14px;box-shadow:inset 0 0 0 3px #364439,inset 0 -5px 0 #0006,6px 6px 0 #0008;
+ color:var(--t,#e8f3ec);font:13px/1.35 ui-monospace,Menlo,Consolas,monospace;animation:phIn .16s steps(4)}
+@keyframes phIn{from{transform:translateY(60px)}to{transform:none}}
+@keyframes phBlink{0%,100%{opacity:.25}50%{opacity:1}}
+#ph .phsb{position:absolute;width:5px;background:#000;border-radius:2px}#ph .phsb.v1{left:-7px;top:110px;height:44px}#ph .phsb.v2{left:-7px;top:164px;height:44px}#ph .phsb.pw{right:-7px;top:140px;height:62px}
+#ph .phscr{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;background:var(--bg,#0c0f0d);border:3px solid #000;border-radius:18px;overflow:hidden}
+#ph .phnt{position:absolute;left:50%;top:5px;transform:translateX(-50%);width:84px;height:18px;background:#000;border-radius:0 0 4px 4px;z-index:3;display:flex;align-items:center;justify-content:center;gap:10px}
+#ph .phnt i{width:8px;height:8px;background:#1d2a3a;border:2px solid #364439;border-radius:50%}#ph .phnt b{width:26px;height:4px;background:#26302a;border-radius:2px}
+#ph .phs{display:flex;justify-content:space-between;align-items:center;padding:6px 14px 6px;font:700 11px Silkscreen,ui-monospace,monospace;color:var(--t,#e8f3ec);background:var(--p,#161b18);border-bottom:2px solid #000;min-height:18px}
+#ph .phs span{display:flex;gap:6px;align-items:center}
+#ph .phs .bat{width:18px;height:9px;border:2px solid var(--t,#e8f3ec);position:relative}#ph .phs .bat:after{content:'';position:absolute;inset:1px;background:var(--g,#2fe68a)}
+#ph .phs .sg{display:inline-flex;gap:1px;align-items:flex-end;height:10px}#ph .phs .sg i{display:block;width:3px;background:var(--t,#e8f3ec)}
+#ph .phw{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
+#ph .phb{flex:1;min-height:0;position:relative;overflow:auto}#ph .phb .phx{position:absolute;inset:0;overflow:auto}
+#ph .phb .chat .cl{width:120px}#ph .phb .ig{max-width:none;border:0;border-radius:0;min-height:100%}
+#ph .pha{display:flex;align-items:center;gap:6px;padding:6px 8px;background:#1b1f1d;border-bottom:2px solid #000}
+#ph .pha h2{margin:0;flex:1;font:700 13px Silkscreen,ui-monospace,monospace;color:var(--g,#2fe68a);text-align:center}
+#ph .pha button{padding:3px 8px;font-size:12px}
+#ph .phh{padding:12px 14px;height:100%;box-sizing:border-box;overflow:auto;background:repeating-linear-gradient(0deg,#0004 0 2px,transparent 2px 22px),repeating-linear-gradient(90deg,#0004 0 2px,transparent 2px 22px),linear-gradient(#1f5a3a,#123222 55%,#0c0f0d)}
+#ph .phk{margin:8px 0 16px;text-align:center}#ph .phk .tm{font:700 42px/1 Silkscreen,ui-monospace,monospace;color:#fff;text-shadow:3px 3px 0 #000}#ph .phk .dt{color:var(--t,#e8f3ec);margin-top:6px;text-shadow:2px 2px 0 #000;font-size:12px}
+#ph .phg2{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 4px}
+#ph .phi{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;box-shadow:none;padding:0;font-size:10px;color:#fff;text-shadow:1px 1px 0 #000;position:relative;cursor:pointer}
+#ph .phi:hover{background:none}#ph .phi .t{width:54px;height:54px;display:flex;align-items:center;justify-content:center;border:2px solid #000;border-radius:8px;box-shadow:inset 0 -4px 0 #0005,3px 3px 0 #0008}
+#ph .phi:hover .t{filter:brightness(1.15)}#ph .phi:active .t{transform:translate(2px,2px);box-shadow:inset 0 -4px 0 #0005,1px 1px 0 #0008}
+#ph .phi .t img{width:36px;height:36px;image-rendering:pixelated}
+#ph .phi .bd{position:absolute;top:-6px;right:2px;left:auto;width:auto;height:auto;line-height:14px;background:#e03a3a;color:#fff;border:2px solid #000;padding:0 4px;font:700 10px Silkscreen,ui-monospace,monospace;text-shadow:none}
+#ph .phn{display:flex;justify-content:center;padding:6px 0 7px;background:var(--bg,#0c0f0d);border-top:2px solid #000}
+#ph .phn button{width:110px;height:7px;padding:0;border:2px solid #000;background:var(--m,#8aa094);box-shadow:none;border-radius:4px;cursor:pointer}#ph .phn button:hover{background:var(--t,#e8f3ec)}
+#ph .phc{padding:10px;display:flex;flex-direction:column;gap:10px}
+#ph .phv{width:100%;image-rendering:pixelated;border:2px solid #000;background:#000}
+#ph .phg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px}#ph .phg img{width:100%;image-rendering:pixelated;border:2px solid #000;cursor:pointer;display:block}
+#ph .phs2{padding:10px;display:flex;flex-direction:column;gap:10px}
+#ph .pcd,#ph .pnx{background:var(--p,#161b18);border:2px solid #000;box-shadow:3px 3px 0 #0008;padding:9px 10px}
+#ph .pcd h3{margin:0 0 6px;font:700 11px Silkscreen,ui-monospace,monospace;color:var(--g,#2fe68a)}
+#ph .pcd .big{font:700 22px Silkscreen,ui-monospace,monospace;color:var(--t,#e8f3ec)}#ph .sub{color:var(--m,#8aa094);font-size:12px}
+#ph .pcd.on{border-color:var(--g,#2fe68a)}
+#ph .prow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#ph .pbt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#ph .pnx{margin-top:18px;border-left:6px solid var(--g,#2fe68a);cursor:pointer}#ph .pnx b{font-family:Silkscreen,ui-monospace,monospace;font-size:12px;color:var(--g,#2fe68a)}#ph .pnx:hover{background:#1c221e}
+#ph .pld{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--m,#8aa094)}
+#ph .pld i{width:18px;height:18px;background:var(--g,#2fe68a);border:2px solid #000;box-shadow:24px 0 0 -2px var(--g,#2fe68a),-24px 0 0 -2px var(--g,#2fe68a);animation:phBlink .5s steps(2) infinite}
+#ph .gpq{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:2px solid #0c0f0d}#ph .gpq:first-of-type{border-top:0}
+#ph .gpq .n{flex:1;min-width:0}#ph .gpq .n b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ph .gpq .n small{color:var(--m,#8aa094)}
+#ph .gpq input{flex:1;min-width:0;padding:5px 6px}#ph .gpq button{white-space:nowrap;padding:4px 8px}
+#ph .gptg{display:inline-block;background:var(--g,#2fe68a);color:#04120a;border:2px solid #000;padding:0 5px;font:700 10px Silkscreen,ui-monospace,monospace}
+#ph .gpen{height:12px;border:2px solid #000;background:#000;margin-top:6px}#ph .gpen i{display:block;height:100%;background:var(--g,#2fe68a)}
+#ph .gpfs{padding:10px}#ph .gpfs .cards{display:flex!important;flex-direction:column;gap:8px}#ph .gpfs .card{min-width:0!important}#ph .gpfs h1{font-size:16px}
+#ph .gpm{display:flex;flex-direction:column;gap:8px}
+@media (max-height:620px){#ph{padding:8px 7px 10px;border-radius:22px}#ph .phk .tm{font-size:32px}}
+`;document.head.appendChild(st)}
+/* status bar: clock left, notch in the middle, signal and battery right */
+phTitle=function(){const m=phModel(),net=m>=15?'5G':m>=11?'4G':m>=9?'LTE':'3G',bars=m>=13?4:m>=10?3:2;return`<div class=phs><b>${clk()}</b><span>${net}<span class=sg>${[3,5,7,9].map((h,i)=>`<i style="height:${h}px;opacity:${i<bars?1:.3}"></i>`).join('')}</span><span class=bat></span></span></div>`};
+/* the phone body: side buttons, bezel, screen with notch, home bar */
+phR=function(){let e=document.getElementById('ph');if(!e){e=document.createElement('div');e.id='ph';document.body.appendChild(e)}
+ const sc=e.querySelector('.phb'),st=sc?sc.scrollTop:0,home=PH.app=='home'&&!PH.loading,an=PH.anim;PH.anim=0;
+ e.innerHTML=`<i class="phsb v1"></i><i class="phsb v2"></i><i class="phsb pw"></i><div class=phscr><div class=phnt><b></b><i></i></div>${phTitle()}<div class=phw>${home?'':`<div class=pha><button onclick="phApp('home')">◀</button><h2>${esc(GP_TITLE[PH.app]||'')}</h2><button onclick="closePhone()">X</button></div>`}<div class=phb>${phBody()}</div></div><div class=phn><button title="Home" onclick="${home?'closePhone()':"phApp('home')"}"></button></div></div>`;
+ const b=e.querySelector('.phb');if(b&&st&&!an)b.scrollTop=st;
+ try{const cv=document.getElementById('cv');if(cv)cv.scrollTop=cv.scrollHeight}catch(x){}
+ try{if(PH.app=='ig'){const u=pxURL(S.pfpIg);if(u){const d=pxDef();e.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===d)i.src=u})}}}catch(x){}};
