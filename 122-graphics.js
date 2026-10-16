@@ -25,7 +25,7 @@ addEventListener('resize',gfxSize);gfxSize();
 const GFA={n:0,sum:0,t0:0,lastDraw:0};
 {const l0=loop;loop=function(n){const c=gfxCur(),cap=+c.fps||0;
   if(cap&&GFA.lastDraw&&n-GFA.lastDraw<1000/cap-3){requestAnimationFrame(loop);return}
-  const gap=GFA.lastDraw?n-GFA.lastDraw:0;GFA.lastDraw=n;gfxAuto(gap,cap);return l0(n)}}
+  const gap=GFA.lastDraw?n-GFA.lastDraw:0;GFA.lastDraw=n;gfxAuto(gap,cap);fpsTick(n);return l0(n)}}
 function gfxAuto(gap,cap){if(GFX.p!='auto'||document.hidden||PAUSED||(mode!='play'&&mode!='drive')){GFA.n=GFA.sum=0;return}
  if(!(gap>0)||gap>250)return;GFA.n++;GFA.sum+=gap;if(GFA.n<240)return;
  const avg=GFA.sum/GFA.n,want=cap?1000/cap:1000/60;GFA.n=GFA.sum=0;
@@ -58,4 +58,12 @@ const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];return`<div class=s
   +gfxRow('Frame rate cap','fps',[[0,'None'],[60,'60'],[30,'30']])
   +gfxRow('Crowds','crowd',[[4,'All'],[2,'Half'],[1,'Few']])
   +gfxRow('Weather effects','wx',[[2,'Full'],[1,'Light'],[0,'Off']])
+  +stTog('FPS counter',GFX.fpsOn,"GFX.fpsOn=GFX.fpsOn?0:1;gfxSv();fpsShow()",'Frames per second, top of the screen')
   +gfxRow('Draw distance','far',[[1,'Normal'],[0,'Near']],'People and cars near the edge of the screen')}}
+
+/* FPS counter (Settings > Graphics, off by default, saved in fw_gfx as fpsOn) */
+const FPSC={n:0,t:0,el:null};
+function fpsShow(){if(!FPSC.el){FPSC.el=document.createElement('div');FPSC.el.style.cssText='position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:50;pointer-events:none;font:bold 12px monospace;color:#9fe39f;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:4px';document.body.appendChild(FPSC.el)}
+ FPSC.el.style.display=GFX.fpsOn?'block':'none';FPSC.n=0;FPSC.t=0}
+function fpsTick(n){if(!GFX.fpsOn)return;if(!FPSC.el)fpsShow();FPSC.n++;if(!FPSC.t)FPSC.t=n;if(n-FPSC.t>=500){FPSC.el.textContent=Math.round(FPSC.n*1000/(n-FPSC.t))+' FPS';FPSC.n=0;FPSC.t=n}}
+if(GFX.fpsOn)fpsShow();
