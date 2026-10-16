@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.143.0';
+const GAME_VERSION='v26.143.1';
 const VERSION_HISTORY=[
+ {v:'v26.143.1',n:'Fixed the startup error screen possibly showing on slow devices that were just taking a while to load: it now only appears when something actually failed, otherwise you get the Keep waiting prompt after 25 seconds. Saves still load.'},
  {v:'v26.143.0',n:'The game no longer hangs silently on the loading screen: if a game file fails to download, WebGL is missing, startup hits an error or loading takes too long, you now get a clear message with a Reload button (and a hint for graphics problems). If a file fails after the game has started, a small warning bar appears. Saves still load.'},
  {v:'v26.141.1',n:'Fixed megastars like The Weeknd messaging small artists for collabs. The bigger an artist is compared to you, the exponentially less likely they are to reach out: artists near your level are the usual offers, and a megastar contacting a small artist is almost impossible, though never completely. Saves still load.'},
  {v:'v26.142.0',n:'New Next Goal tracker (bottom-left, click to shrink): a ladder of goals from your first song to 100 million listeners, each paying a cash reward with a celebration. Releasing a song now pops up a card with confetti and a quality tag. Existing careers skip goals they already met. Saves still load.'},
