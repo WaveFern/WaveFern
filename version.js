@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v40.9.3';
+const GAME_VERSION='v41.0.0';
 const VERSION_HISTORY=[
+ {v:'v41.0.0',n:'The first-person computer monitor no longer squishes Spotifly or other apps: the screen now always keeps a full desktop-size layout and shrinks as a whole to fit the monitor in small, short or narrow windows, and re-fits when you open the computer, resize the window or come back from the pause menu. The right-click wallpaper menu opens where you click. Saves still load.'},
  {v:'v40.9.3',n:'Fixed saves being rejected as invalid once you had met one of the five new collab people: loading a save removed their shoes from the outfit list, so drawing them crashed the load. Those saves load again, and a missing shoe or hat colour no longer stops a character being drawn. Saves still load.'},
  {v:'v40.9.2',n:'Version numbers renumbered so the major number goes up every 10 feature updates instead of everything being v26. Saves still load.'},
  {v:'v40.9.1',n:'Fixed save codes coming out invalid after being sent through a chat app like Discord or WhatsApp: new codes (starting FW3-) leave out the characters those apps change, and pasted codes now ignore line breaks, spaces, smart quotes and dashes. Older FW2- and FW1- codes still load. Saves still load.'},
