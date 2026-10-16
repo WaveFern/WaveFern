@@ -15,11 +15,15 @@ let wiping=false;
 /* v26.125: two career slots. fw_save_1 / fw_save_2 hold the careers, fw_slot is the active one. The old single fw_save moves into slot 1. */
 const SLOTS=2;
 function curSlot(){try{const n=+localStorage.getItem('fw_slot');return n==2?2:1}catch(e){return 1}}
-function slotKey(n){return'fw_save_'+(n||curSlot())}
+const BOOT_SLOT=curSlot();
+/* v26.139.2: a tab saves only to the slot it booted into, so a second tab on the other career can't overwrite it */
+function slotKey(n){return'fw_save_'+(n||BOOT_SLOT)}
 try{const o=localStorage.getItem('fw_save');if(o){if(!localStorage.getItem('fw_save_1'))localStorage.setItem('fw_save_1',o);localStorage.removeItem('fw_save')}}catch(e){}
 function slotInfo(n){try{const c=localStorage.getItem(slotKey(n));if(!c)return null;let a='',d=0;try{const x=scDecode(c).S;a=x.artist||'';d=x.day||0}catch(e){}return{artist:a,day:d}}catch(e){return null}}
-function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{localStorage.setItem(slotKey(),saveCode())}catch(e){}}
-function restoreSave(){let c=null;try{c=localStorage.getItem(slotKey())}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;try{localStorage.removeItem(slotKey())}catch(e){}return false}
+let lastWrote=null;
+/* before overwriting a slot with something this tab did not write, keep the old code as fw_bak_N (recoverable from the career select) */
+function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{const k=slotKey(),c=saveCode(),old=localStorage.getItem(k);if(old&&old!==lastWrote&&old!==c){try{localStorage.setItem('fw_bak_'+BOOT_SLOT,old)}catch(e){}}localStorage.setItem(k,c);lastWrote=c}catch(e){}}
+function restoreSave(){let c=null;try{c=localStorage.getItem(slotKey())}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;try{localStorage.setItem('fw_bak_'+BOOT_SLOT,c)}catch(e){}return false}
 setInterval(autoSave,5000);
 addEventListener('pagehide',autoSave);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave()});
