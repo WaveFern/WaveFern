@@ -5,6 +5,7 @@
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
 const GAME_VERSION='v26.142.0';
 const VERSION_HISTORY=[
+ {v:'v26.141.1',n:'Fixed megastars like The Weeknd messaging small artists for collabs. The bigger an artist is compared to you, the exponentially less likely they are to reach out: artists near your level are the usual offers, and a megastar contacting a small artist is almost impossible, though never completely. Saves still load.'},
  {v:'v26.142.0',n:'New Next Goal tracker (bottom-left, click to shrink): a ladder of goals from your first song to 100 million listeners, each paying a cash reward with a celebration. Releasing a song now pops up a card with confetti and a quality tag. Existing careers skip goals they already met. Saves still load.'},
  {v:'v26.141.0',n:'The game now fits small and narrow windows better: the top boxes no longer overlap, the phone fills a small screen, and the Amazoom header and computer apps shrink to fit. Saves still load.'},
  {v:'v26.140.0',n:'Made the game easier to find in search engines and AI tools: added a page description, share-link previews, search data, robots.txt, sitemap.xml and llms.txt. Nothing changes in the game itself. Saves still load.'},
