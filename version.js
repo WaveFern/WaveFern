@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v42.1.0';
+const GAME_VERSION='v42.2.0';
 const VERSION_HISTORY=[
+ {v:'v42.2.0',n:'New rapper Rowan: a small up-and-coming hype rapper who can DM you for collabs early in your career. Saves still load.'},
  {v:'v42.1.0',n:'On the dev account, the character creator shows a short look code with a Copy button, listing every look option, so new artists can be made to look like your designs. Saves still load.'},
  {v:'v42.0.0',n:'The graphics preset is now a slider: Auto, Low, Medium, High and a new Best, which draws sharper pixels with everything turned up. Saves still load.'},
  {v:'v41.9.1',n:'Prices artists say in Messages now have commas, like $600,000 instead of $600000, including in chats you already have. Saves still load.'},
