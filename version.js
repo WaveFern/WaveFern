@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.144.1';
+const GAME_VERSION='v26.145.0';
 const VERSION_HISTORY=[
+ {v:'v26.145.0',n:'Driving: car hitboxes are smaller and cars now slide along walls instead of getting stuck, and a car trapped inside something is pushed free so reversing always works. The speedometer now matches the game look (blocky green panel, Silkscreen font). Saves still load.'},
  {v:'v26.144.1',n:'Fixed the game failing to load (and filling the console with errors) when the main 3D library download is blocked or down: it now falls back to a second source before giving up. Saves still load.'},
  {v:'v26.144.0',n:'You can now drag a recovered backup onto a career slot on the Choose a career screen. If the slot already has a career it asks before overwriting, and the replaced career is kept as a backup. Pressing Recover still works. Saves still load.'},
  {v:'v26.143.2',n:'Fixed megastars still messaging small artists when only a few artists were left who had not contacted you yet: the unlikely ones were being picked anyway. Now, if only unlikely artists remain, usually nobody messages you that day. Saves still load.'},

@@ -30,24 +30,24 @@ function drvView(){const v=dr?Math.abs(dr.v):0;return 11+Math.max(0,Math.min(6,(
 
 /* ---- the speedometer box ---- */
 {const st=document.createElement('style');st.textContent=`
-#spdbox{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:3;width:212px;padding:12px 14px 12px;border-radius:16px;
- background:linear-gradient(160deg,#141c18f2,#090c0bf2);border:1px solid #2fe68a40;box-shadow:0 10px 28px #000a,inset 0 1px 0 #ffffff14;color:#e8f3ec;font:12px/1.2 ui-monospace,Menlo,Consolas,monospace;
+#spdbox{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:3;width:212px;padding:10px 12px 10px;
+ background:#0b0f0dd9;border:3px solid #000;box-shadow:4px 4px 0 #0008;color:#e8f3ec;font:12px/1.2 ui-monospace,Menlo,Consolas,monospace;
  pointer-events:auto;user-select:none;display:none}
 #spdbox .sg{position:relative;height:114px}
 #spdbox svg{position:absolute;left:0;top:0;width:184px;height:120px;overflow:visible}
 #spdbox .sn{position:absolute;left:0;right:0;top:50px;text-align:center}
-#spdbox .sn b{display:block;font:700 34px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#fff;text-shadow:0 0 14px #2fe68a55}
-#spdbox .sn small{font-size:10px;letter-spacing:3px;color:#8aa094}
+#spdbox .sn b{display:block;font:700 30px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#2fe68a}
+#spdbox .sn small{font:10px Silkscreen,ui-monospace,monospace;letter-spacing:3px;color:#8aa094}
 #spdbox .sc{display:flex;align-items:center;gap:6px;margin-top:10px}
-#spdbox .sl{font-size:10px;letter-spacing:2px;color:#8aa094;flex:1}
-#spdbox button{width:28px;height:28px;border-radius:8px;border:1px solid #2fe68a55;background:#1b2622;color:#2fe68a;font:700 16px/1 ui-monospace,monospace;cursor:pointer;padding:0}
-#spdbox button:hover{background:#24332d}#spdbox button:active{transform:translateY(1px)}
-#spdbox input{width:54px;height:28px;box-sizing:border-box;border-radius:8px;border:1px solid #2fe68a88;background:#050706;color:#fff;text-align:center;font:700 15px ui-monospace,Menlo,monospace;
+#spdbox .sl{font:10px Silkscreen,ui-monospace,monospace;letter-spacing:2px;color:#8aa094;flex:1}
+#spdbox button{width:28px;height:28px;border:2px solid #000;background:#26302a;box-shadow:inset 0 -3px 0 #0006;color:#e8f3ec;font:700 16px/1 ui-monospace,monospace;cursor:pointer;padding:0}
+#spdbox button:hover{background:#364439}#spdbox button:active{transform:translateY(1px)}
+#spdbox input{width:54px;height:28px;box-sizing:border-box;border:2px solid #333;background:#0a0d0b;color:#e8f3ec;text-align:center;font:700 15px ui-monospace,Menlo,monospace;
  user-select:text;-moz-appearance:textfield;appearance:textfield;outline:none}
-#spdbox input:focus{border-color:#2fe68a;box-shadow:0 0 0 3px #2fe68a33}
+#spdbox input:focus{border-color:#2fe68a}
 #spdbox input::-webkit-outer-spin-button,#spdbox input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 #spdbox .sf{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:#8aa094}
-#spdbox .sf b{color:#f5c542;font-weight:700}
+#spdbox .sf b{color:#2fe68a;font-weight:700}
 @media (max-width:1000px){body.spd-on #hud .pr{left:10px;transform:none;bottom:58px;max-width:calc(100vw - 260px)}}
 @media (max-width:420px){#spdbox{width:184px;padding:10px 10px}#spdbox svg{width:164px;height:107px}#spdbox .sg{height:102px}#spdbox .sn{top:44px}#spdbox .sn b{font-size:28px}}`;
  document.head.appendChild(st)}
@@ -57,8 +57,8 @@ function spdBuild(){const d=document.createElement('div');d.id='spdbox';
  const cx=92,cy=76,R=68,a0=-210,a1=30,pt=(a,r)=>[cx+Math.cos(a*Math.PI/180)*r,cy+Math.sin(a*Math.PI/180)*r],arc=(r,f)=>{const[x0,y0]=pt(a0,r),[x1,y1]=pt(a0+(a1-a0)*f,r);return`M${x0.toFixed(1)} ${y0.toFixed(1)}A${r} ${r} 0 ${(a1-a0)*f>180?1:0} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`};
  let ticks='';for(let i=0;i<=12;i++){const a=a0+(a1-a0)*i/12,[x0,y0]=pt(a,R-9),[x1,y1]=pt(a,R-(i%3?4:1));ticks+=`<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${i%3?'#4d5f56':'#8aa094'}" stroke-width="${i%3?1.5:2}"/>`}
  d.innerHTML=`<div class=sg><svg viewBox="0 0 184 120"><defs><linearGradient id=spdgr x1=0 x2=1><stop offset=0 stop-color="#2fe68a"/><stop offset=".7" stop-color="#f5c542"/><stop offset="1" stop-color="#ff5a5a"/></linearGradient></defs>
-  <path d="${arc(R,1)}" fill=none stroke="#ffffff12" stroke-width=8 stroke-linecap=round /><path id=spdarc d="${arc(R,1)}" fill=none stroke="url(#spdgr)" stroke-width=8 stroke-linecap=round pathLength=100 stroke-dasharray="0 100"/>
-  ${ticks}<g id=spdtg><circle r=4 fill="#fff" stroke="#090c0b" stroke-width=2 /></g></svg>
+  <path d="${arc(R,1)}" fill=none stroke="#26302a" stroke-width=8 stroke-linecap=butt /><path id=spdarc d="${arc(R,1)}" fill=none stroke="url(#spdgr)" stroke-width=8 stroke-linecap=butt pathLength=100 stroke-dasharray="0 100"/>
+  ${ticks}<g id=spdtg><circle r=4 fill="#fff" stroke="#000" stroke-width=2 /></g></svg>
   <div class=sn><b id=spdnum>0</b><small>MPH</small></div></div>
   <div class=sc><span class=sl>TARGET</span><button id=spdm title="Slower (5 mph)">−</button><input id=spdin type=number inputmode=numeric min=1 step=1 aria-label="Target speed in mph"><button id=spdp title="Faster (5 mph)">+</button></div>
   <div class=sf><span id=spdcar></span><span>max <b id=spdmx>0</b> mph</span></div>`;
@@ -85,3 +85,18 @@ function spdTick(){const on=mode=='drive'&&!!dr&&!PAUSED;if(!SPD.el){if(!on)retu
 {const u=update;update=function(dt){u(dt);try{spdTick()}catch(e){}}}
 /* the pause menu stops update(), so hide the box when the game pauses */
 {const p0=pauseGame;pauseGame=function(){p0.apply(this,arguments);try{spdTick()}catch(e){}}}
+
+/* ---- v26.145: forgiving car collisions ----
+   Smaller hitbox (was a 2.6 m square), slide along walls instead of braking to a stop, and if the car ever ends up
+   inside a wall or prop it is nudged out to the nearest free spot so reversing always works. */
+const DRV_R=.9;
+function drvFree(x,z){return!hit(x,z,DRV_R)}
+function drvUnstick(){if(drvFree(dr.x,dr.z))return;
+ for(let r=.25;r<=3.5;r+=.25)for(let k=0;k<16;k++){const a=k*Math.PI/8,x=dr.x+Math.cos(a)*r,z=dr.z+Math.sin(a)*r;if(drvFree(x,z)){dr.x=x;dr.z=z;dr.v*=.5;return}}}
+function drvMove(dt){drvUnstick();
+ const ns=Math.max(1,Math.ceil(Math.abs(dr.v)*dt/.4));let bump=0;
+ for(let q=0;q<ns;q++){const sx=Math.sin(dr.h)*dr.v*dt/ns,sz=Math.cos(dr.h)*dr.v*dt/ns,nx=dr.x+sx,nz=dr.z+sz;
+  if(drvFree(nx,dr.z)&&!tcB(dr.x,dr.z,nx,dr.z))dr.x=nx;else if(sx)bump=Math.max(bump,Math.abs(sx)/(Math.abs(sx)+Math.abs(sz)||1));
+  if(drvFree(dr.x,nz)&&!tcB(dr.x,dr.z,dr.x,nz))dr.z=nz;else if(sz)bump=Math.max(bump,Math.abs(sz)/(Math.abs(sx)+Math.abs(sz)||1))}
+ /* only lose speed in proportion to how head-on the hit was, so glancing walls slide */
+ if(bump)dr.v*=1-Math.min(.6,bump*6*dt)}
