@@ -11,22 +11,22 @@ const sprK=v=>Math.max(0,Math.min(1,(v-3.6)/2.6));
 function limSwing(L,ph,m,k){const s=Math.sin(ph),a=.05+(.65+.45*k)*m,b=.05+(.65+.75*k)*m;
  L.legs[0].rotation.x=s*a;L.legs[1].rotation.x=-s*a;L.arms[0].rotation.x=-s*b-.35*k*m;L.arms[1].rotation.x=s*b-.35*k*m}
 /* the player's sprint pose, on top of the normal walk */
-const SPR={lx:null,lz:null,v:0,k:0};
+const SPR129={lx:null,lz:null,v:0,k:0};
 {const u0=update;update=function(dt){u0(dt);try{
  if(!P.mesh||!P.legs||!P.arms||dt<=0)return;const ok=mode=='play'&&!P.sit&&P.mesh.visible;
- let inst=SPR.lx==null?0:Math.hypot(P.x-SPR.lx,P.z-SPR.lz)/dt;if(inst>12)inst=0;/* doors and taxis */SPR.lx=P.x;SPR.lz=P.z;SPR.v+=(Math.min(inst,9)-SPR.v)*Math.min(1,dt*10);
- const tk=ok&&inst>.5?sprK(SPR.v):0;SPR.k+=(tk-SPR.k)*Math.min(1,dt*8);const k=SPR.k;
+ let inst=SPR129.lx==null?0:Math.hypot(P.x-SPR129.lx,P.z-SPR129.lz)/dt;if(inst>12)inst=0;/* doors and taxis */SPR129.lx=P.x;SPR129.lz=P.z;SPR129.v+=(Math.min(inst,9)-SPR129.v)*Math.min(1,dt*10);
+ const tk=ok&&inst>.5?sprK(SPR129.v):0;SPR129.k+=(tk-SPR129.k)*Math.min(1,dt*8);const k=SPR129.k;
  P.mesh.rotation.order='YXZ';
  if(k<.01){if(P.mesh.rotation.x)P.mesh.rotation.x=0;return}
  P.t+=dt*7*k;/* quicker steps */limSwing(P,P.t,1,k);
  P.mesh.rotation.x=.2*k;P.mesh.position.y+=Math.abs(Math.sin(P.t))*.07*k}catch(e){}}}
 /* followers: catch up, teleport when lost, and animate bodyguards */
-const FLW={px:null,pz:null};
+const FLW129={px:null,pz:null};
 function flwSpot(f){const tx=P.x+f.ox,tz=P.z+f.oz;if(typeof hit!='function'||!hit(tx,tz,.25))return[tx,tz];
  for(const o of[[f.ox*.5,f.oz*.5],[0,.8],[.8,0],[-.8,0],[0,-.8]])if(!hit(P.x+o[0],P.z+o[1],.25))return[P.x+o[0],P.z+o[1]];return[P.x,P.z]}
 {const w0=worldTick;worldTick=function(dt){w0(dt);try{
- if(typeof FOL=='undefined'||!FOL.length||dt<=0){FLW.px=P.x;FLW.pz=P.z;return}
- const jump=FLW.px!=null&&Math.hypot(P.x-FLW.px,P.z-FLW.pz)>4;FLW.px=P.x;FLW.pz=P.z;
+ if(typeof FOL=='undefined'||!FOL.length||dt<=0){FLW129.px=P.x;FLW129.pz=P.z;return}
+ const jump=FLW129.px!=null&&Math.hypot(P.x-FLW129.px,P.z-FLW129.pz)>4;FLW129.px=P.x;FLW129.pz=P.z;
  FOL.forEach((f,i)=>{if(f.home||!f.m)return;const g=f.m,L=g.userData.lim,ret=L&&S.gs=='returning';
   const ox=f.x,oz=f.z,tx=P.x+f.ox,tz=P.z+f.oz;let d=Math.hypot(tx-f.x,tz-f.z);
   f.far=d>3?(f.far||0)+dt:0;
