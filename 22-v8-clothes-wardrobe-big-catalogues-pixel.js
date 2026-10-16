@@ -368,7 +368,7 @@ const PETF={petbed:[0,'k','lie'],dogh:[0,'k','lie'],cattree:[0,'k','top'],perch:
 const SEAT=/sofa|armchair|beanbag|couch|chair/i;
 function tvApply(q){if(!q.m||!q.m.children[2])return;if(!q.sm){q.sm=new THREE.MeshBasicMaterial({color:'#14181d'});q.m.children[2].material=q.sm}}
 function tvTick(dt){const t=performance.now()/400;PL.forEach(q=>{if(q.t!='tv')return;tvApply(q);q.sm.color.set(q.on?'hsl('+((t*40+q.x*30)%360|0)+',60%,'+(40+Math.sin(t*3)*12|0)+'%)':'#14181d')});ANX.tvs.forEach(m=>{m.material.color.set(m.on?'hsl('+((t*40)%360|0)+',60%,'+(40+Math.sin(t*3)*12|0)+'%)':'#14181d')})}
-function sitOn(x,z,r){P.sit={x,z};P.rot=r*Math.PI/2;snd('pop');say('You sit down. Press a movement key to stand. Watching TV restores energy.')}
+function sitOn(x,z,r){P.sit={x,z};P.rot=r*Math.PI/2;snd('pop');if(!sitOn.t){sitOn.t=1;say('Press a movement key to stand. Watching TV restores energy.')}}
 const STAIRS=new THREE.Group();scene.add(STAIRS);for(let i=0;i<5;i++){B(STAIRS,.6,.22*(i+1),2.2,i%2?'#9a8a74':'#a89882',3.1-i*.6,.11*(i+1),10.6);B(STAIRS,.06,.8,.06,'#6b4a2e',3.1-i*.6,.22*(i+1)+.4,9.55)}B(STAIRS,3,.06,.06,'#6b4a2e',1.9,1.35,9.55);
 const ANX={idx:null,ints:[],pets:[],tvs:[],lv:-1};
 function goUp(){buildAnnex();enterShop(ANX.idx);IN.w=ANX.W;IN.d=ANX.D;P.x=900+ANX.W-6.4;P.z=320+ANX.D-2.2;P.rot=Math.PI;camT.x=P.x;camT.z=P.z;snd('whoosh');say('Upstairs: a new floor of plain rooms, ready for your furniture.')}

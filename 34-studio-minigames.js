@@ -14,7 +14,9 @@ addEventListener('pointerdown',()=>MGH=1);addEventListener('pointerup',()=>MGH=0
 const mgShuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 
 {const s0=startRec;startRec=function(i){s0(i);if(rec){rec.goal=6;rec.st=0;rec.sc={}}}}
-{const r0=recMenu;recMenu=function(){r0();const u=$('ui');if(u&&u.innerHTML.includes('Hit the green zone 10 times'))u.innerHTML=u.innerHTML.replace('Hit the green zone 10 times to finish the song.','Three steps: Beat (hit the green 6 times), Lyrics (pick the rhyme), Mix (hold the level in the green).')}}
+/* v41.6.0: once you have made 3 songs the how-to text is left out (genre arrows key and mini game rules) */
+const mgNew=()=>((S.songs||[]).length+(S.drafts||[]).length)<3;
+{const r0=recMenu;recMenu=function(){r0();const u=$('ui');if(u&&u.innerHTML.includes('Hit the green zone 10 times'))u.innerHTML=u.innerHTML.replace(/<br>Hit the green zone 10 times to finish the song\. Costs 15 energy\./,mgNew()?'<br>Three steps: Beat (hit the green 6 times), Lyrics (pick the rhyme), Mix (hold the level in the green). Costs 15 energy.':'')}}
 /* the beat bar calls finishRec when its hits are done: move on to the next step instead */
 finishRec=function(){if(!rec)return;if(rec.st===0)return mgStage(1);mgFinish()};
 {const t0=recTick;recTick=function(dt){if(!rec)return;if(!rec.st)return t0(dt);if(rec.wait){rec.wt+=dt;return}if(rec.st==1)mgLyrTick(dt);else if(rec.st==2)mgMixTick(dt)}}
@@ -58,7 +60,7 @@ function mgDraw(){let el=$('mg');const on=mode=='rec'&&rec&&rec.st!=null;documen
  const key=(rec.wait?'w':'')+rec.st+'|'+(rec.l?rec.l.i:'');
  if(key!=MGK){MGK=key;el.className=rec.st?'box':'hb strip';el.style.bottom='';
   if(rec.st==0)el.innerHTML=strip;
-  else if(rec.wait)el.innerHTML=strip+`<b>${MG_N[rec.st]}</b><p class=m style="margin:8px 0">${MG_HOW[rec.st]}</p><button class=go onpointerdown="mgGo()">Start (Space)</button>`;
+  else if(rec.wait)el.innerHTML=strip+`<b>${MG_N[rec.st]}</b>${mgNew()&&MG_HOW[rec.st]?`<p class=m style="margin:8px 0">${MG_HOW[rec.st]}</p>`:''}<button class=go onpointerdown="mgGo()">Start (Space)</button>`;
   else if(rec.st==1){const l=rec.l,it=l.items[l.i];el.innerHTML=strip+`<b>Lyrics</b> <small class=m>· line ${l.i+1}/${l.items.length}</small><div class=m style="margin-top:6px">Finish the bar with a word that rhymes with</div><div class="mgw px">"${esc(it.base)}"</div><div class=mgo>${it.opts.map((o,i)=>`<button onpointerdown="mgPress(${i})">${i+1}. ${esc(o)}</button>`).join('')}</div><div class=bar style="width:100%;height:8px"><i id=mgtm></i></div><small class=m>Keys 1-3 or tap a word</small>`}
   else if(rec.st==2)el.innerHTML=strip+`<b>Mix</b> <small class=m>· keep the level in the green</small><div class=tbar><div class=tg id=mgband style="width:20%"></div><div class=ti id=mgknob></div></div><div class=bar style="width:100%;height:8px"><i id=mgtm></i></div><small class=m>Hold SPACE or hold click to raise the level, let go to drop it</small>`}
  if(rec.st==0){/* sit just above the beat bar's HUD panel */const hb=document.querySelector('#hud .hb.modal');if(hb){const b=Math.round(innerHeight-hb.getBoundingClientRect().top+6)+'px';if(el.style.bottom!=b)el.style.bottom=b}}
