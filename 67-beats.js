@@ -390,8 +390,8 @@ function tick(){const E=cur;if(!E){clearInterval(timer);timer=0;return}const c=E
  const v=musicVol();if(Math.abs(v-E.vv)>.001){E.vv=v;G.vol.gain.setTargetAtTime(v,c.currentTime,.05)}
  if(!held||(typeof MU!='undefined'&&!MU.hold))holdBg(1);else if(typeof MU!='undefined'&&MU.pl){const a=MU.a&&MU.a[MU.cur];if(a&&!a.paused)a.pause()}
  if(E.paused||c.state!='running')return;const now=c.currentTime;
- if(E.next<now-.1){E.t0=now+.05-E.step*E.sd;E.next=stepTime(E,E.step)}
- let k=0;while(E.next<now+.15&&k++<48){try{sched(E,E.step,Math.max(E.next,now))}catch(e){if(!E.err){E.err=1;console.error('beats',e)}}E.step++;E.next=stepTime(E,E.step)}}
+ if(E.next<now-.4){E.t0=now+.05-E.step*E.sd;E.next=stepTime(E,E.step)}
+ let k=0;while(E.next<now+.6&&k++<96){try{sched(E,E.step,Math.max(E.next,now))}catch(e){if(!E.err){E.err=1;console.error('beats',e)}}E.step++;E.next=stepTime(E,E.step)}}
 function stop(fade){const E=cur;if(!E)return;cur=null;end(E,fade);holdBg(0)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&cur)pause(cur);else if(cur)tick()});
 addEventListener('pagehide',()=>stop(.02));
