@@ -19,19 +19,27 @@ function loadCode(c){let raw=c;try{c=scClean(c);if(c.toLowerCase()=='test'){chea
 /* autosave: keeps the game in the browser so a refresh doesn't reset it */
 let wiping=false;
 /* v26.125: two career slots. fw_save_1 / fw_save_2 hold the careers, fw_slot is the active one. The old single fw_save moves into slot 1. */
+/* v42.7.3: each Google account has its own career slots on this device (fw_u_{uid}_save_N, fw_u_{uid}_slot, fw_u_{uid}_cloud).
+   Guests keep fw_save_N / fw_slot / fw_cloud. fw_acct is the account signed in here; signing in or out reloads into that set. */
+const FW_ACCT=(()=>{try{return localStorage.getItem('fw_acct')||''}catch(e){return''}})();
+const SAVE_PRE=FW_ACCT?'fw_u_'+FW_ACCT+'_':'fw_',SLOT_K=SAVE_PRE+'slot';
 const SLOTS=2;
-function curSlot(){try{const n=+localStorage.getItem('fw_slot');return n==2?2:1}catch(e){return 1}}
+function curSlot(){try{const n=+localStorage.getItem(SLOT_K);return n==2?2:1}catch(e){return 1}}
 const BOOT_SLOT=curSlot();
 /* v26.139.2: a tab saves only to the slot it booted into, so a second tab on the other career can't overwrite it */
-function slotKey(n){return'fw_save_'+(n||BOOT_SLOT)}
+function slotKey(n){return SAVE_PRE+'save_'+(n||BOOT_SLOT)}
+/* recovered backups are shared by every account on this device (fw_bak_1..12, label in fw_bakw_N), so a backup is never pushed out by another one */
+const BK_MAX=12;
+function bakKeep(code,why){if(!code)return true;try{let e=0;for(let k=1;k<=BK_MAX;k++){const b=localStorage.getItem('fw_bak_'+k);if(b===code)return true;if(!b&&!e)e=k}
+ const k=e||BK_MAX;localStorage.setItem('fw_bak_'+k,code);localStorage.setItem('fw_bakw_'+k,why||'');return true}catch(e){return false}}
 try{const o=localStorage.getItem('fw_save');if(o){if(!localStorage.getItem('fw_save_1'))localStorage.setItem('fw_save_1',o);localStorage.removeItem('fw_save')}}catch(e){}
 function slotInfo(n){try{const c=localStorage.getItem(slotKey(n));if(!c)return null;let a='',d=0;try{const x=scDecode(c).S;a=x.artist||'';d=x.day||0}catch(e){}return{artist:a,day:d}}catch(e){return null}}
 let lastWrote=null;
 /* v26.145.2: the same career at the same or an earlier day (e.g. the first re-save in a new code format) is not backed up, so it can't push out a real backup */
 function sameCareer(old){try{const o=scDecode(old).S;return o.artist==S.artist&&(o.day||0)<=(S.day||0)}catch(e){return false}}
 /* before overwriting a slot with something this tab did not write, keep the old code as fw_bak_N (recoverable from the career select) */
-function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{const k=slotKey(),c=saveCode(),old=localStorage.getItem(k);if(old&&old!==lastWrote&&old!==c&&!sameCareer(old)){try{localStorage.setItem('fw_bak_'+BOOT_SLOT,old)}catch(e){}}localStorage.setItem(k,c);lastWrote=c}catch(e){}}
-function restoreSave(){let c=null;try{c=localStorage.getItem(slotKey())}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;try{localStorage.setItem('fw_bak_'+BOOT_SLOT,c)}catch(e){}return false}
+function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{const k=slotKey(),c=saveCode(),old=localStorage.getItem(k);if(old&&old!==lastWrote&&old!==c&&!sameCareer(old)){bakKeep(old,'Backup from career '+BOOT_SLOT)}localStorage.setItem(k,c);lastWrote=c}catch(e){}}
+function restoreSave(){let c=null;try{c=localStorage.getItem(slotKey())}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;bakKeep(c,'Career '+BOOT_SLOT+' that did not load');return false}
 /* v26.140: packing a big save takes ~100ms+, so the timer saves every 30s when the browser is idle (and waits out driving/recording/camera) instead of every 5s */
 let asLast=0;
 function autoSaveTick(){const n=Date.now();if(n-asLast<30000)return;if((mode=='drive'||mode=='rec'||(typeof PH!='undefined'&&PH.camOn))&&n-asLast<120000)return;asLast=n;autoSave()}
