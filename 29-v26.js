@@ -121,7 +121,7 @@ const curMonth=()=>Math.floor((S.day-1)/30);
 function mlInit(){if(!Array.isArray(S.mlHist))S.mlHist=[];if(S.mlMonth==null||!S.mlDiv){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);const m0=S.mlMonth*30+1;S.monthStreams=(S.hist||[]).filter(h=>h.d>=m0&&h.d<S.day).reduce((a,h)=>a+(h.st||0),0)+S.songs.reduce((a,x)=>a+(x.pd===S.day?x.today||0:0),0)}
  if(S.mlMonth!==curMonth()){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);S.monthStreams=0}}
 function addSt(s,k){if(k<=0)return;mlInit();S.monthStreams=(S.monthStreams||0)+k;s.acc+=k;s.streams+=k;s.today=(s.today||0)+k;S.streams+=k}
-function streamTick(){if(mode=='sleep'||mode=='load'||mode=='creator')return;S.songs.forEach(s=>{const pv=planOf(s),f=s.p0>=.999?0:Math.max(0,Math.min(1,(prog(S.t)-s.p0)/(1-s.p0)));addSt(s,Math.floor(pv*f)-s.acc)})}
+let stkT=0;function streamTick(){if(mode=='sleep'||mode=='load'||mode=='creator')return;const nw=performance.now();if(nw-stkT<120)return;stkT=nw;S.songs.forEach(s=>{const pv=planOf(s),f=s.p0>=.999?0:Math.max(0,Math.min(1,(prog(S.t)-s.p0)/(1-s.p0)));addSt(s,Math.floor(pv*f)-s.acc)})}
 function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class=fade></div>';setTimeout(()=>{try{wakeUp(auto)}catch(e){console.error('wake failed',e);if(mode=='sleep'){$('ui').innerHTML='';mode='play'}}},950)}
 /* the wake / new-day step; each side effect is guarded so one error never leaves the screen black */
 function wakeSafe(f,n){try{f()}catch(e){console.error('new-day step failed: '+n,e)}}
