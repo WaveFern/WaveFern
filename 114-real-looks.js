@@ -3,6 +3,12 @@
    from the character creator's own parts, so they stay blocky pixel characters, never photo likenesses.
    Used for the game's artists in Messages / collabs (ART), the Spotifly Browse artists and their pictures. Made-up artists keep their generated look.
    New: facial hair (c.fh 1 stubble, 2 moustache, 3 goatee, 4 beard; c.fhc colour) drawn on the pixel portrait and the 3D head. Characters without it are unchanged. */
+/* Look codes (v42.1.0): on the admin account the character creator shows a code like
+   "skin=7 hair=1 hc=#1b1b1f eyes=0 mouth=0 top=1 tc=#2f2f38 pc=#2c3e50 body=40 hgt=50" (see 124-look-code.js).
+   Keys are the creator's own fields: skin/hair/eyes/mouth/top are indexes (SKIN, NM.hair, NM.eyes, NM.mouth, NM.top), hc/tc/pc are hex colours,
+   body/hgt are 0-100. Any extra keys (jk, ht, ac, acc, fh, fhc ...) are copied as is. To give an artist a pasted look, set its config with
+   lookFromCode('<code>') (loaded later, so call it at runtime), e.g. in a later file: RLK['new rapper']=lookFromCode('skin=7 hair=1 ...');
+   and for an ART entry a[4]=lookFromCode(...). */
 const RLK={};
 {/* [name, skin 0-7 (0 fair .. 5 deep, 6 pale, 7 medium brown), hair style, hair colour, facial hair, {t top, tc top colour, jk jacket, ht hat, e eyes (4 shades,5 glasses), ac accessory (0 headphones,1 shades,2 chain,3 scarf), acc colour, pc trouser colour}] */
 const K='#1b1b1f',BR='#4a2c1a',BL='#e3c77a',GR='#9aa0a6',GD='#e6b422',W='#f4f4f4',BK='#17171c';

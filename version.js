@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v42.0.0';
+const GAME_VERSION='v42.1.0';
 const VERSION_HISTORY=[
+ {v:'v42.1.0',n:'On the dev account, the character creator shows a short look code with a Copy button, listing every look option, so new artists can be made to look like your designs. Saves still load.'},
  {v:'v42.0.0',n:'The graphics preset is now a slider: Auto, Low, Medium, High and a new Best, which draws sharper pixels with everything turned up. Saves still load.'},
  {v:'v41.9.1',n:'Prices artists say in Messages now have commas, like $600,000 instead of $600000, including in chats you already have. Saves still load.'},
  {v:'v41.9.0',n:'Collab odds and fees now fit the bigger real artists: they reach out to you as if they were about 3 times their old size rather than 10 times, so stars are rarer than before but still possible once you are big, and they charge about 3 times more when you message them. What artists pay you is priced as before. Saves still load.'},
