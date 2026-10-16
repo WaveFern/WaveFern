@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.139.6';
+const GAME_VERSION='v26.139.7';
 const VERSION_HISTORY=[
+ {v:'v26.139.7',n:'Faster frame rate: the game no longer wastes time updating the thousands of objects inside hidden shops, floors and far-away parts of the world every frame. Saves still load.'},
  {v:'v26.139.6',n:'Fixed lag in long careers: the game now saves every 30 seconds when idle instead of every 5 (big saves froze the game for a moment each time), and song streams are counted about 8 times a second instead of every frame. It still saves when you close or leave the tab. Saves still load.'},
  {v:'v26.139.5',n:'Fixed Recover on the Choose a career screen: a recovered backup now takes the first free career slot and loads it, and if both slots are full it tells you and keeps the backup. Recovered backups are now a collapsible dropdown. Saves still load.'},
  {v:'v26.139.4',n:'Fixed the First-person monitor setting turning itself back on: it now stays off when you switch it off, and is remembered between visits. Saves still load.'},
