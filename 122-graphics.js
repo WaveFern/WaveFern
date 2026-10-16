@@ -7,7 +7,7 @@
    - Draw distance: people and cars are only drawn near the camera's view (normal or near)
    Auto starts on High and steps down while the game runs slowly, remembering the level it settled on.
    Stored per device in localStorage 'fw_gfx' (missing = Auto), so saves are untouched. ===== */
-const GFX_PRE={high:{px:3,fps:0,crowd:4,wx:2,far:1},med:{px:3,fps:60,crowd:2,wx:1,far:1},low:{px:4,fps:30,crowd:1,wx:0,far:0}};
+const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1},high:{px:3,fps:0,crowd:4,wx:2,far:1},med:{px:3,fps:60,crowd:2,wx:1,far:1},low:{px:4,fps:30,crowd:1,wx:0,far:0}};
 const GFX_LV=['high','med','low'];
 let GFX={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1};
 try{const g=JSON.parse(localStorage.getItem('fw_gfx')||'null');if(g&&typeof g=='object')Object.assign(GFX,g)}catch(e){}
@@ -53,7 +53,7 @@ function gfxApply(){gfxSize();GFA.n=GFA.sum=0}
 function gfxSet(k,v){if(k=='p'){GFX.p=v;if(v=='auto')GFX.al='high'}else{if(GFX.p!='custom')Object.assign(GFX,gfxCur());GFX.p='custom';GFX[k]=v}gfxSv();gfxApply();stDraw()}
 const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];return`<div class=so><span>${l}${n?`<small class=m>${n}</small>`:''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${opts.map(([v,t])=>`<button class="${c==v?'go':''}" onclick="gfxSet('${k}',${typeof v=='string'?`'${v}'`:v})">${t}</button>`).join('')}</span></div>`};
 {const b0=stBody;stBody=function(){if(STAB!='gfx')return b0.apply(this,arguments);
-  return gfxRow('Preset','p',[['auto','Auto'],['low','Low'],['med','Medium'],['high','High']],GFX.p=='auto'?'Now on '+{high:'High',med:'Medium',low:'Low'}[GFX.al]:GFX.p=='custom'?'Custom':'')
+  return gfxSlider()
   +gfxRow('Pixel size','px',[[2,'Sharp'],[3,'Normal'],[4,'Chunky'],[5,'Chunkier']],'Bigger pixels run faster')
   +gfxRow('Frame rate cap','fps',[[0,'None'],[60,'60'],[30,'30']])
   +gfxRow('Crowds','crowd',[[4,'All'],[2,'Half'],[1,'Few']])
@@ -67,3 +67,10 @@ function fpsShow(){if(!FPSC.el){FPSC.el=document.createElement('div');FPSC.el.st
  FPSC.el.style.display=GFX.fpsOn?'block':'none';FPSC.n=0;FPSC.t=0}
 function fpsTick(n){if(!GFX.fpsOn)return;if(!FPSC.el)fpsShow();FPSC.n++;if(!FPSC.t)FPSC.t=n;if(n-FPSC.t>=500){FPSC.el.textContent=Math.round(FPSC.n*1000/(n-FPSC.t))+' FPS';FPSC.n=0;FPSC.t=n}}
 if(GFX.fpsOn)fpsShow();
+
+/* preset slider: Auto, Low, Medium, High, Best (the game's own range slider) */
+const GFX_STEPS=[['auto','Auto'],['low','Low'],['med','Medium'],['high','High'],['best','Best']];
+const GFX_NAME={best:'Best',high:'High',med:'Medium',low:'Low'};
+function gfxSlider(){const i=GFX_STEPS.findIndex(x=>x[0]==GFX.p),v=i<0?3:i,note=GFX.p=='auto'?'Auto, now on '+GFX_NAME[GFX.al]:GFX.p=='custom'?'Custom (move the slider to pick a preset)':GFX_NAME[GFX.p];
+ return`<div class=so style="flex-wrap:wrap"><span>Preset<small class=m id=gfxpn>${note}</small></span><input type=range min=0 max=4 step=1 value=${v} style="padding:0" oninput="$('gfxpn').textContent=GFX_STEPS[this.value][1]" onchange="gfxSet('p',GFX_STEPS[this.value][0])">
+ <div style="display:flex;justify-content:space-between;width:100%;font-size:11px;opacity:.75">${GFX_STEPS.map(x=>`<span>${x[1]}</span>`).join('')}</div></div>`}
