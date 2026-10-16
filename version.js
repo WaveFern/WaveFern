@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v42.5.0';
+const GAME_VERSION='v42.6.0';
 const VERSION_HISTORY=[
+ {v:'v42.6.0',n:'Sprinting now looks like sprinting: hold Shift and your artist takes quicker, longer strides, pumps their arms and leans forward. Bodyguards now walk, run and stand like you do, and sprint when they hurry. Pets and bodyguards always keep up: they run faster when you sprint, and if they ever fall far behind or get stuck they appear right next to you, including after doors, taxis and getting out of the car. Saves still load.'},
  {v:'v42.5.0',n:'Every career plays differently: each save now decides which artists are keen on you, which are not, and about 1 in 7 artists who will never message you in that save (you can still message them). 16 more fictional artists join across every genre and size, from tiny pop acts to Hip-Hop megastars. Saves still load.'},
  {v:'v42.4.0',n:'Admin accounts can start a chat with any artist in the game from New in Messages, whatever their size. Normal players are unchanged. Saves still load.'},
  {v:'v42.3.0',n:'Nine new fictional rappers fill the gap between the up-and-coming artists and the real stars, from about 800,000 to 400 million monthly listeners (Kezzy Vane, Lil Brickz, Marcus Flint, Yung Halo, Cass Rivers, Jaylo Banks, King Oduya, Sable Knox and Rhyme Dalton). Mid-career players now get collab offers from artists near their own size. Saves still load.'},
