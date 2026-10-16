@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v42.7.2';
+const GAME_VERSION='v42.7.3';
 const VERSION_HISTORY=[
+ {v:'v42.7.3',n:'Fixed Aurora Residences looking washed out and almost pure white inside: its floors, walls and furniture were near-white under full-strength room lights. Its colours are now softer and its lights dimmer, so every floor shows its tiles, panels and furniture like the other towers. Saves still load.'},
  {v:'v42.7.2',n:'Fixed switching Google account replacing your careers: each Google account now has its own careers on this device. Signing in shows that account\'s careers and its cloud save, signing out brings back the careers you play without an account, and nothing is overwritten. A brand new account can bring your current career with it as a copy. Before a cloud save loads over a career, or a career is saved over a different cloud save, the old one is kept under Recovered backups, which now holds up to 12. The admin Players list has a Copy save button. Saves still load.'},
  {v:'v42.7.1',n:'Fixed the sprint and followers update failing to load, so the sprint animation, bodyguard animations and pets and bodyguards keeping up now actually work. Saves still load.'},
  {v:'v42.7.0',n:'Making a song: each step (Beat, Lyrics and Mix) now starts with an animated 3, 2, 1, GO countdown. The Lyrics step adapts to you: get lines right and quick and the next ones come faster with longer rhymes and look-alike trap words, miss and they slow down and get easier, and your level carries over a little to your next song. When a song is finished the title box is no longer highlighted, so keys you are still pressing cannot overwrite it. Saves still load.'},
