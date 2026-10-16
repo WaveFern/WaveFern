@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v41.1.1';
+const GAME_VERSION='v41.2.0';
 const VERSION_HISTORY=[
+ {v:'v41.2.0',n:'Every Gphone app now fits the phone screen: Messages shows your chat list full width, then the open chat with a back button, instead of two squashed columns; Gigs (FestivalApp) shows each stage with its time slots two to a row so nothing runs off the side; photos and Instagrime posts stay inside the screen. Checked at desktop, small window and phone-sized screens. Saves still load.'},
  {v:'v41.1.1',n:'Search engines and AI tools now describe WaveFern as a 3D open-world game. Nothing changes in the game itself. Saves still load.'},
  {v:'v41.1.0',n:'Steadier on every browser and device: if one part of the game hits an error it is now skipped and the rest keeps running, instead of the game freezing mid-play or getting stuck on the loading screen. If a game file breaks while loading, the game still starts and a small bar names the file. Also fixed the Music source setting not saving straight away. Saves still load.'},
  {v:'v41.0.0',n:'The first-person computer monitor no longer squishes Spotifly or other apps: the screen now always keeps a full desktop-size layout and shrinks as a whole to fit the monitor in small, short or narrow windows, and re-fits when you open the computer, resize the window or come back from the pause menu. The right-click wallpaper menu opens where you click. Saves still load.'},
