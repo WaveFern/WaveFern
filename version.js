@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v42.7.4';
+const GAME_VERSION='v42.7.5';
 const VERSION_HISTORY=[
+ {v:'v42.7.5',n:'Gift checks can no longer throw an error if the Google sign-in part of the game fails to load. Saves still load.'},
  {v:'v42.7.4',n:'Fixed the Google account update stopping the game from starting (a name clash broke the sign-in file, so the main menu never appeared). Saves still load.'},
  {v:'v42.7.3',n:'Fixed Aurora Residences looking washed out and almost pure white inside: its floors, walls and furniture were near-white under full-strength room lights. Its colours are now softer and its lights dimmer, so every floor shows its tiles, panels and furniture like the other towers. Saves still load.'},
  {v:'v42.7.2',n:'Fixed switching Google account replacing your careers: each Google account now has its own careers on this device. Signing in shows that account\'s careers and its cloud save, signing out brings back the careers you play without an account, and nothing is overwritten. A brand new account can bring your current career with it as a copy. Before a cloud save loads over a career, or a career is saved over a different cloud save, the old one is kept under Recovered backups, which now holds up to 12. The admin Players list has a Copy save button. Saves still load.'},
