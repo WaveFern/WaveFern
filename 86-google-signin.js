@@ -96,11 +96,13 @@ function ttWorlds(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.sel=1;const
   rows.push(i?`<div class="ttsl${n==a?' on':''}"><div><b>${esc(i.artist||'Unnamed artist')}</b><small>Career ${n} · Day ${i.day||1}${n==a?' · last played':''}</small></div><button class=go onclick="ttSlot(${n})">Play</button><button class=ttdel title="Delete this career" aria-label="Delete career ${n}" onclick="ttDel(${n})">✕</button></div>`
    :`<div class="ttsl empty"><div><b>Empty slot</b><small>Career ${n}</small></div></div>`)}
  const rec=[];for(let n=1;n<=SLOTS;n++){try{const b=localStorage.getItem('fw_bak_'+n);if(b){let nm='';try{nm=scDecode(b).S.artist||''}catch(e){}rec.push(`<div class="ttsl"><div><b>${esc(nm||'Recovered career')}</b><small>Backup from slot ${n}</small></div><button onclick="ttRecover(${n})">Recover</button></div>`)}}catch(e){}}
- $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Choose a career</h2>${rows.join('')}${rec.length?'<small>Recovered backups</small>'+rec.join(''):''}<span class=ttnc title="${free.length?'':'Coming soon'}"><button ${free.length?`class=go onclick="ttSlot(${free[0]})"`:'disabled'}>+ New career</button>${free.length?'':'<em>Coming soon</em>'}</span><button onclick="ttBack()">Back</button></div></div>`}
+ $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Choose a career</h2>${rows.join('')}${rec.length?`<details class=ttrb><summary>Recovered backups (${rec.length})</summary>${rec.join('')}</details>`:''}<span class=ttnc title="${free.length?'':'Coming soon'}"><button ${free.length?`class=go onclick="ttSlot(${free[0]})"`:'disabled'}>+ New career</button>${free.length?'':'<em>Coming soon</em>'}</span><button onclick="ttBack()">Back</button></div></div>`}
 function ttRecover(n){let b=null;try{b=localStorage.getItem('fw_bak_'+n)}catch(e){}if(!b)return;
  let f=0;for(let k=1;k<=SLOTS;k++){const i=k==curSlot()?(TT.game?1:null):slotInfo(k);if(!i){f=k;break}}
- if(!f){prompt('No free slot. Copy this save code, delete a career, then load the code from Settings.',b);return}
- try{localStorage.setItem(slotKey(f),b);localStorage.removeItem('fw_bak_'+n)}catch(e){}ttSlot(f)}
+ if(!f){alert('No free career slot. Delete a career first, then press Recover again. Your backup is kept.');return}
+ snd('click');if(f==curSlot()&&TT.game)autoSave();wiping=true;
+ try{localStorage.setItem(slotKey(f),b);localStorage.removeItem('fw_bak_'+n);localStorage.setItem('fw_slot',f);sessionStorage.setItem('fw_go','1');if(FBU)localStorage.setItem('fw_cloud',JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){}
+ location.reload()}
 function ttBack(){snd('click');TT.sel=0;titleUI()}
 function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
  if(TT.game)autoSave();wiping=true;const i=slotInfo(n);

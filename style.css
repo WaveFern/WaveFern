@@ -113,3 +113,5 @@ body.notags #ntags{display:none}
 #ttl .ttnc{position:relative;display:block}#ttl .ttnc button{width:100%;padding:11px}
 #ttl .ttnc em{display:none;position:absolute;left:50%;bottom:calc(100% + 4px);transform:translateX(-50%);background:#000;border:2px solid var(--g);padding:4px 8px;font-style:normal;white-space:nowrap;pointer-events:none}
 #ttl .ttnc:hover em{display:block}
+
+#ttl .ttrb{display:flex;flex-direction:column;gap:8px}#ttl .ttrb summary{cursor:pointer;color:var(--m);padding:8px 10px;background:#0b0f0dd9;border:3px solid #000;box-shadow:4px 4px 0 #0008;list-style:none}#ttl .ttrb summary::before{content:'▸ '}#ttl .ttrb[open] summary::before{content:'▾ '}#ttl .ttrb summary::-webkit-details-marker{display:none}

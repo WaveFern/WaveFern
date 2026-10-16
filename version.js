@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.139.4';
+const GAME_VERSION='v26.139.5';
 const VERSION_HISTORY=[
+ {v:'v26.139.5',n:'Fixed Recover on the Choose a career screen: a recovered backup now takes the first free career slot and loads it, and if both slots are full it tells you and keeps the backup. Recovered backups are now a collapsible dropdown. Saves still load.'},
  {v:'v26.139.4',n:'Fixed the First-person monitor setting turning itself back on: it now stays off when you switch it off, and is remembered between visits. Saves still load.'},
  {v:'v26.139.3',n:'Fixed a new career not appearing in the Choose a career list: it now saves the moment you finish making your character. Saves still load.'},
  {v:'v26.139.2',n:'Fixed careers not saving or overwriting each other: each tab now saves only to its own career slot, a bad load no longer deletes the save, and the old copy is kept as a backup. Backups show under Recovered backups on the Choose a career screen. Saves still load.'},
