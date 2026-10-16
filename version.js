@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.146.0';
+const GAME_VERSION='v26.147.0';
 const VERSION_HISTORY=[
+ {v:'v26.147.0',n:'Gphone everyday apps: release your songs from the new Spotifly app (with today\'s streams and earnings live), order food in Goober Eats, book festival gigs in Gigs, and buy your next phone in the Store app, all without walking to the computer. Upgrades now pay off: every model from the Gphone 9 adds fan buzz to every song\'s daily streams (+2% up to +22% on the Gphone 18), the Gphone 9 lets you eat stored food anywhere, the Gphone 12 gives unlimited taxi rides from Maps, and apps open instantly from the Gphone 13. Saves still load.'},
  {v:'v26.146.0',n:'Gphone overhaul: a clean new phone with a status bar, wallpaper home screen, app headers and a home bar. Real reasons to upgrade: Gphone 8 to 12 load apps slowly; every model earns more Instagrime followers from photo posts (double for a selfie with an artist); Gphone 10 adds the Stats app, 11 Maps, 12 taxi rides and +1 reputation for selfies with artists, 13 a Bank with savings interest each night, and 16 brand Deals that pay for a daily photo post. The gphone.wf shop lists what each model gives. Saves still load.'},
  {v:'v26.145.3',n:'Fixed car hitboxes being square: each car now collides as a rectangle matching its real length and width, turning with the car, so long cars no longer snag on corners sideways and slim ones fit through gaps. Saves still load.'},
  {v:'v26.145.2',n:'Fixed "X sent you a message" pop-ups showing when no message arrived: if an artist\'s message was dropped (they gave up on you), the pop-up no longer appears. Saves still load.'},
