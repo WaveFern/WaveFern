@@ -41,11 +41,11 @@ function dmGateOK(i){const a=ART[i];if(!a)return false;const L=S.listeners||0;
 function dmWeight(i,mo){if(!dmGateOK(i))return 0;const a=ART[i],A=a[2],L=Math.max(S.listeners||0,5),d=Math.log10(A/L),M=mo==null?dmMomentum():mo,rep=Math.max(-10,Math.min(15,S.rep||0));let w;
  if(Math.abs(d)<=.35)w=1;/* similar size: the most common */
  else if(d<0&&d>-.9)w=.7;/* a bit smaller: frequent */
- else if(d>0&&d<=1)w=.3*(1+2*M);/* a bit bigger: occasional, more when you are gaining momentum */
+ else if(d>0){/* bigger than you: the chance falls off exponentially with the gap, never exactly zero (a megastar reaching a small artist is almost impossible but can happen) */
+  w=.5*Math.exp(-2.3*(d-.35))*(1+(d<=1?2*M:M)+Math.min(2,Math.max(0,rep)*.05))}
  else if(d<0){/* much smaller: rare unless there is a believable reason (a previous collab, or the same sound as your latest releases) */
   const rec=(S.songs||[]).slice(-5).map(s=>s.g);w=(rec.includes(a[1])||S.msgs.some(m=>m.a===i&&m.state==3))?.12:.015}
- else{/* much bigger: rare for an unknown, rising with your size, your reputation and your momentum */
-  const rise=1+Math.min(4,Math.max(0,rep)*.15)+Math.min(3,Math.log10(L+1)*.5)+M*2;w=(d<=2.2?.02:.004*Math.pow(10,-(d-2.2)*.35))*rise}
+ else w=1;
  /* secondary: genre fit with your recent releases, reputation */
  const rec=(S.songs||[]).slice(-5).map(s=>s.g);if(rec.length){w*=rec.includes(a[1])?1.6:GENREL.some(g=>g.includes(a[1])&&rec.some(r=>g.includes(r)))?1.25:.85}
  return w*(1+.03*rep)*(a[9]||1)}  /* a[9]: optional per-artist DM weight, 1 = normal */
