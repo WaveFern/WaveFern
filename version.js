@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v41.2.0';
+const GAME_VERSION='v41.3.0';
 const VERSION_HISTORY=[
+ {v:'v41.3.0',n:'Over 20 more of the most-streamed real artists join the game (Bruno Mars, Rihanna, Taylor Swift, Lady Gaga, Bad Bunny, Coldplay and more), with their own looks, and can DM you for collabs once you are big enough. Every real artist now has 10 times the monthly listeners, so the top of the ladder is much further away; featuring with them still brings the same fan streams as before. Saves still load.'},
  {v:'v41.2.0',n:'Every Gphone app now fits the phone screen: Messages shows your chat list full width, then the open chat with a back button, instead of two squashed columns; Gigs (FestivalApp) shows each stage with its time slots two to a row so nothing runs off the side; photos and Instagrime posts stay inside the screen. Checked at desktop, small window and phone-sized screens. Saves still load.'},
  {v:'v41.1.1',n:'Search engines and AI tools now describe WaveFern as a 3D open-world game. Nothing changes in the game itself. Saves still load.'},
  {v:'v41.1.0',n:'Steadier on every browser and device: if one part of the game hits an error it is now skipped and the rest keeps running, instead of the game freezing mid-play or getting stuck on the loading screen. If a game file breaks while loading, the game still starts and a small bar names the file. Also fixed the Music source setting not saving straight away. Saves still load.'},
