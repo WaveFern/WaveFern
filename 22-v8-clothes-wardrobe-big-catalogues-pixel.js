@@ -48,7 +48,7 @@ const KC={fit:['Pink zip hoodie, baggy denim and fluffy boots, full fit check','
 Object.values(KC).forEach(a=>a.forEach(c=>{if(!CAPS.includes(c))CAPS.push(c)}));
 const rc=(x,c,a,b,w,h)=>{x.fillStyle=c;x.fillRect(a,b,w,h)};
 function fig(x,c,ox,oy){const R_=(col,a,b,w,h)=>rc(x,col,ox+a,oy+b,w,h),sk=SKIN[c.skin%SKIN.length],hc=(c.hc_custom||HAIRC[c.hc%HAIRC.length]),jk=c.jk>=0,tc=jk?JKC[c.jk]:(c.tc_custom||TOPC[c.tc%TOPC.length]),pc=PANTC[c.pc%PANTC.length],h=c.hair,lg=jk||c.top==1||c.top==2,sl=c.bt==1?6:12;
- R_(pc,2,17,3,sl);R_(pc,7,17,3,sl);if(c.bt==1){R_(sk,2,23,3,6);R_(sk,7,23,3,6);R_('#fff',2,27,3,2);R_('#fff',7,27,3,2)}const sc=c.sh>=0?SHC[c.sh]:['#1d1d22',0];R_(sc[0],1,sc[1]?27:29,4,sc[1]?4:2);R_(sc[0],7,sc[1]?27:29,5,sc[1]?4:2);
+ R_(pc,2,17,3,sl);R_(pc,7,17,3,sl);if(c.bt==1){R_(sk,2,23,3,6);R_(sk,7,23,3,6);R_('#fff',2,27,3,2);R_('#fff',7,27,3,2)}const sc=(c.sh>=0&&SHC[c.sh])||['#1d1d22',0];R_(sc[0],1,sc[1]?27:29,4,sc[1]?4:2);R_(sc[0],7,sc[1]?27:29,5,sc[1]?4:2);
  R_(tc,2,8,8,9);if(jk)R_('#f4f4f4',5,9,2,8);R_(lg?tc:sk,0,8,2,lg?8:6);R_(lg?tc:sk,10,8,2,lg?8:6);R_(sk,0,lg?16:14,2,lg?2:4);R_(sk,10,lg?16:14,2,lg?2:4);R_(sk,5,7,2,1);R_(sk,3,0,6,7);
  if(h){R_(hc,3,-1,6,2);if(h>=2)R_(hc,2,0,1,5),R_(hc,9,0,1,5);if([5,6,12,17,19].includes(h))R_(hc,2,0,1,9),R_(hc,9,0,1,9);if(h==9||h==15)R_(hc,1,-3,10,5);if(h==4||h==16)R_(hc,5,-3,2,4);if(h==18){R_(hc,2,-3,3,3);R_(hc,7,-3,3,3)}if(h==14)R_(hc,3,-2,6,1)}if(c.ht>=0){R_(HTC[c.ht][0],2,-2,8,3);R_(HTC[c.ht][0],6,1,5,1)}
  if(c.eyes==4||c.eyes==5)R_('#111',3,3,6,2);else{R_('#111',4,3,1,2);R_('#111',7,3,1,2)}R_('#7a2b2b',5,5,2,1)}
