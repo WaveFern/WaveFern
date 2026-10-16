@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v41.4.0';
+const GAME_VERSION='v41.5.0';
 const VERSION_HISTORY=[
+ {v:'v41.5.0',n:'New Graphics tab in Settings for slower computers: pick Auto, Low, Medium or High, or set pixel size, a frame rate cap (60 or 30), crowds, weather effects and draw distance yourself. Auto starts on High and steps down if the game runs slowly. People and cars off the edge of the screen are no longer animated and drawn, so every setting runs a little faster. Saves still load.'},
  {v:'v41.4.0',n:'The Gphone no longer pauses the game: the clock keeps running and you can walk around with your phone open (it still closes for sleep and cutscenes, and stays away in the car and on the computer). Goober Eats on the phone now has the same white look as on the computer, two dishes a row, with your stored food on top. Spotifly on the phone is now an artist page: your picture as a big header with your name over it, monthly listeners, Follow, shuffle and play, and Music, Release and Stats tabs; songs keep playing while the phone is open. Nothing on the phone scrolls sideways. Saves still load.'},
  {v:'v41.3.0',n:'Over 20 more of the most-streamed real artists join the game (Bruno Mars, Rihanna, Taylor Swift, Lady Gaga, Bad Bunny, Coldplay and more), with their own looks, and can DM you for collabs once you are big enough. Every real artist now has 10 times the monthly listeners, so the top of the ladder is much further away; featuring with them still brings the same fan streams as before. Saves still load.'},
  {v:'v41.2.0',n:'Every Gphone app now fits the phone screen: Messages shows your chat list full width, then the open chat with a back button, instead of two squashed columns; Gigs (FestivalApp) shows each stage with its time slots two to a row so nothing runs off the side; photos and Instagrime posts stay inside the screen. Checked at desktop, small window and phone-sized screens. Saves still load.'},
