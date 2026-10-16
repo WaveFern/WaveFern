@@ -50,7 +50,7 @@ const MSG_CTX=[
 
 /* ---- ghosting and fewer chatty pings ---- */
 const unansweredDay=m=>{if(!Array.isArray(m.log)||!m.log.length)return null;let i=m.log.length-1;while(i>=0&&m.log[i].f!='me')i--;const nx=m.log[i+1];return nx?nx.d:null};
-{const w0=wakeUp;wakeUp=function(auto){const snap=new Map,nid0=S.nid;(S.msgs||[]).forEach(m=>{if(m&&Array.isArray(m.log))snap.set(m.id,{n:m.log.length,u:m.unread})});
+{const w0=wakeUp;wakeUp=function(auto){const snap=new Map,nid0=S.nid;(S.msgs||[]).forEach(m=>{if(m&&Array.isArray(m.log))snap.set(m.id,{n:m.log.length,u:m.unread,st:m.state})});
  /* hold back "X sent you a message" toasts until we know the message was not ghosted away (otherwise the toast shows with no message) */
  const held=[],say0=say;say=function(t){if(/ sent you a message$/.test(String(t)))held.push(t);else return say0.apply(this,arguments)};
  let r;try{r=w0.apply(this,arguments)}finally{say=say0}
@@ -58,6 +58,7 @@ const unansweredDay=m=>{if(!Array.isArray(m.log)||!m.log.length)return null;let 
    const fresh=m.log.slice(s.n);if(fresh.some(x=>x.f!='a'))return;
    const old=m.log.slice(0,s.n),ud=(()=>{let i=old.length-1;while(i>=0&&old[i].f!='me')i--;const nx=old[i+1];return nx?nx.d:null})();
    let drop=false;
+   if(s.st==3&&m.state==0){m.ghost=0;return}/* a past collaborator asking to work again always gets through */
    if(ud!==null&&S.day-ud>=MSGU.ghostDays)drop=true;                  /* ignored for days: stop */
    else if(!wantC(m)&&Math.random()>MSGU.chatKeep)drop=true;         /* blue-circle chatter: much rarer */
    if(drop){m.log.length=s.n;m.unread=s.u;m.ghost=1}else m.ghost=0})}catch(e){console.error('ghosting',e)}
