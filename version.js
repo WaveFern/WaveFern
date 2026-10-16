@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v41.8.0';
+const GAME_VERSION='v41.9.0';
 const VERSION_HISTORY=[
+ {v:'v41.9.0',n:'Collab odds and fees now fit the bigger real artists: they reach out to you as if they were about 3 times their old size rather than 10 times, so stars are rarer than before but still possible once you are big, and they charge about 3 times more when you message them. What artists pay you is priced as before. Saves still load.'},
  {v:'v41.8.0',n:'FPS counter: turn it on in Settings > Graphics to see frames per second at the top of the screen. It is off by default and remembered on this device. Saves still load.'},
  {v:'v41.7.0',n:'Homes look and feel like real places. Your house now has one proper roof over the main house and the back extension, window frames, flower boxes, gutters and a chimney, and once you own the upstairs the outside shows a second storey with its own windows. Upstairs and the extension now match downstairs: same wall height, same low walls with a wood cap, and windows. Neighbourhood houses are real sizes, one or two storeys with doors and windows you could walk through. New careers start with every room painted in one soft, matching colour palette. Buy paint tins on Amazoom, then press E in any room at home to repaint it. Older careers keep their wall colours until you paint. Saves still load.'},
  {v:'v41.6.0',n:'Big Vee\'s tutorial now starts straight after you make your character, with no pop-up to accept: his messages just begin, and a Skip tutorial button sits on his dialogue box. Loading a career you have played before never starts the tutorial or character creation again, and a tutorial you left halfway picks up where you stopped. Less explaining: the studio and mini game how-to text goes away after your first 3 songs, the festival rules fold into a How it works dropdown, and the map, bodyguard, robbery and sitting messages are shorter. Saves still load.'},
