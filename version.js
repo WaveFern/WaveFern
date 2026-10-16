@@ -3,9 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v26.143.2';
+const GAME_VERSION='v26.144.0';
 const VERSION_HISTORY=[
- {v:'v26.140.0',n:'You can now drag a recovered backup onto a career slot on the Choose a career screen. If the slot already has a career it asks before overwriting, and the replaced career is kept as a backup. Pressing Recover still works. Saves still load.'},
+ {v:'v26.144.0',n:'You can now drag a recovered backup onto a career slot on the Choose a career screen. If the slot already has a career it asks before overwriting, and the replaced career is kept as a backup. Pressing Recover still works. Saves still load.'},
  {v:'v26.143.2',n:'Fixed megastars still messaging small artists when only a few artists were left who had not contacted you yet: the unlikely ones were being picked anyway. Now, if only unlikely artists remain, usually nobody messages you that day. Saves still load.'},
  {v:'v26.143.1',n:'Fixed the startup error screen possibly showing on slow devices that were just taking a while to load: it now only appears when something actually failed, otherwise you get the Keep waiting prompt after 25 seconds. Saves still load.'},
  {v:'v26.143.0',n:'The game no longer hangs silently on the loading screen: if a game file fails to download, WebGL is missing, startup hits an error or loading takes too long, you now get a clear message with a Reload button (and a hint for graphics problems). If a file fails after the game has started, a small warning bar appears. Saves still load.'},
