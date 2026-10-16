@@ -5,6 +5,7 @@
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
 const GAME_VERSION='v26.145.2';
 const VERSION_HISTORY=[
+ {v:'v26.145.1',n:'Fixed car hitboxes being square: each car now collides as a rectangle matching its real length and width, turning with the car, so long cars no longer snag on corners sideways and slim ones fit through gaps. Saves still load.'},
  {v:'v26.145.2',n:'Fixed "X sent you a message" pop-ups showing when no message arrived: if an artist\'s message was dropped (they gave up on you), the pop-up no longer appears. Saves still load.'},
  {v:'v26.145.1',n:'Fixed some saves being rejected as invalid: saves with missing or empty fields, a missing character look, or furniture the game no longer has now load with sensible defaults, and a code that still cannot load is kept under Recovered backups instead of being lost. Saves still load.'},
  {v:'v26.145.0',n:'Driving: car hitboxes are smaller and cars now slide along walls instead of getting stuck, and a car trapped inside something is pushed free so reversing always works. The speedometer now matches the game look (blocky green panel, Silkscreen font). Saves still load.'},
