@@ -52,7 +52,7 @@ function dmWeight(i,mo){if(!dmGateOK(i))return 0;const a=ART[i],A=a[2],L=Math.ma
 /* draw k artists (nobody who already has a thread) in proportion to their weight, with noise so it is never predictable */
 function dmDraw(k){const mo=dmMomentum(),c=ART.map((a,i)=>i).filter(i=>!S.msgs.some(m=>m.a===i)&&!(typeof BLKI!='undefined'&&BLKI&&BLKI.has(i))),out=[];
  const w=c.map(i=>[i,dmWeight(i,mo)*(.5+Math.random())]).filter(q=>q[1]>0);
- while(out.length<k&&w.length){const tot=w.reduce((p,q)=>p+q[1],0);if(tot<=0)break;let r=Math.random()*tot,j=0;for(;j<w.length-1;j++){if(r<w[j][1])break;r-=w[j][1]}out.push(w[j][0]);w.splice(j,1)}
+ while(out.length<k&&w.length){const tot=w.reduce((p,q)=>p+q[1],0);if(tot<=0||Math.random()>=Math.min(1,tot))break;/* a pool of only unlikely artists usually gives nobody, instead of always picking one of them */let r=Math.random()*tot,j=0;for(;j<w.length-1;j++){if(r<w[j][1])break;r-=w[j][1]}out.push(w[j][0]);w.splice(j,1)}
  return out}
 /* how many new DMs today: usually none or one, sometimes two */
 function dmDaily(){const r=Math.random(),k=r<.2?0:r<.6?1:2,pend=S.msgs.filter(m=>m.a!==undefined&&!m.blocked&&m.state==0&&m.stage>=1&&m.unread).length,n=Math.max(0,Math.min(k,3-pend));
