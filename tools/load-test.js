@@ -9,7 +9,7 @@ let pw;for(const p of ['playwright','/opt/node-tools/node_modules/playwright'])t
 if(!pw){console.error('Playwright is not installed (npm i playwright).');process.exit(2)}
 const URL=process.argv[2]||'http://127.0.0.1:8080/index.html';
 const click=re=>`(()=>{const b=[...document.querySelectorAll('button')].filter(b=>b.offsetParent&&${re}.test(b.textContent));if(b[0])b[0].click();return !!b[0]})()`;
-const steps=[click('/^Play$/'),click('/New career/'),click('/Confirm/'),click('/^Skip$/'),
+const steps=[click('/^Play$/'),click('/New career/'),click('/Confirm/'),click('/^Skip tutorial$/'),
  `(()=>{dispatchEvent(new KeyboardEvent('keydown',{key:'w',code:'KeyW'}));return mode})()`,
  `(()=>{dispatchEvent(new KeyboardEvent('keyup',{key:'w',code:'KeyW'}));return mode})()`,
  `(()=>{openPhone();const r=[];for(const a of ['msg','ig','pho','home','fest','shop','spot','food'])try{phApp(a)}catch(e){r.push(a+': '+e.message)}closePhone();return r})()`,

@@ -1,5 +1,6 @@
 /* ===== v26.44: guided tutorial, "Big Vee's Bootcamp" =====
-   Offered after character creation on a brand-new game (Start / Skip), replayable from the pause menu.
+   Starts straight after character creation on a brand-new game (no accept pop-up; Skip tutorial sits on Big Vee's
+   dialogue box and the tracker's x), replayable from the pause menu. A loaded save never starts it; one left halfway resumes.
    Big Vee (washed-up one-hit wonder turned manager) guides you through 3 chapters of mini quests: pixel-portrait
    dialogue with typewriter text, DMs in Messages, a compact quest tracker, rewards (small cash + XP), confetti,
    camera pans and a bobbing arrow. Progress lives in S.tut (travels with the save code). Old saves have no S.tut.
@@ -53,6 +54,7 @@ function tutCSS(){if($('tutcss'))return;const s=document.createElement('style');
 @keyframes tdIn{from{transform:translate(-50%,20px);opacity:0}to{transform:translateX(-50%);opacity:1}}
 #tdlg img{width:64px;height:64px;image-rendering:pixelated;border:3px solid #000;box-shadow:0 0 0 2px #2fe68a66;flex:none;background:#2a4a38}
 #tdlg .td1{font-family:Silkscreen,ui-monospace,monospace;color:var(--g);font-size:12px;margin-bottom:3px}#tdlg .td2{font-size:14px;line-height:1.4;min-height:2.8em}#tdlg .td3{position:absolute;right:10px;bottom:5px;color:#ffd27a;font-size:11px;animation:tutP2 .6s infinite alternate}
+#tdlg .tdsk{position:absolute;right:8px;top:6px;padding:1px 6px;font-size:11px;min-width:0;box-shadow:inset 0 -2px #0007}
 #tdlg.drv{left:12px;right:236px;width:auto;transform:none;animation:none}
 @media (max-width:700px){#tqt{top:132px;width:calc(100vw - 132px)}#tqt.pcm{width:min(256px,62vw)}#tdlg.drv{right:12px;left:12px;bottom:200px}#tdlg img{width:48px;height:48px}#tdlg{bottom:104px}#tdlg .td2{font-size:13px}}
 #tcard{position:fixed;left:50%;top:26%;transform:translate(-50%,0);z-index:62;text-align:center;pointer-events:none;background:#0b0f0def;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,0 0 0 3px #2fe68a55,6px 6px 0 #0008;padding:16px 30px;min-width:min(340px,86vw);box-sizing:border-box;animation:tcIn 3s both}
@@ -74,7 +76,7 @@ function tutBub(t,ms=2200){tutCSS();if(TUTBUB)TUTBUB.e.remove();const e=document
 function tutSay(lines,cb){tutCSS();tutSayEnd(1);TD={q:lines.slice(),i:-1,pos:0,full:'',cb,done:0,wait:0};tutLine()}
 function tutSayEnd(quiet){const o=$('tdlg');if(o)o.remove();const d=TD;TD=null;if(!quiet&&d&&d.cb)d.cb()}
 function tutLine(){const d=TD;if(!d)return;d.i++;if(d.i>=d.q.length)return tutSayEnd();d.full=d.q[d.i];d.pos=0;d.done=0;
- let el=$('tdlg');if(!el){el=document.createElement('div');el.id='tdlg';el.onclick=tutAdv;el.innerHTML=`<img src="${tutPic()}"><div style="flex:1"><div class=td1>${VEE.toUpperCase()}</div><div class=td2></div></div><span class=td3>click &#9660;</span>`;document.body.appendChild(el)}
+ let el=$('tdlg');if(!el){el=document.createElement('div');el.id='tdlg';el.onclick=tutAdv;el.innerHTML=`<img src="${tutPic()}"><div style="flex:1"><div class=td1>${VEE.toUpperCase()}</div><div class=td2></div></div><span class=td3>click &#9660;</span>${S.tut&&S.tut.on?'<button class=tdsk onclick="event.stopPropagation();tutEnd()">Skip tutorial</button>':''}`;document.body.appendChild(el)}
  el.querySelector(".td2").textContent='';el.querySelector(".td3").style.visibility='hidden'}
 function tutAdv(){if(!TD)return;if(!TD.done){TD.pos=TD.full.length;return}tutLine()}
 addEventListener('keydown',e=>{if(TD&&tutOK()&&(e.key=='Enter'||e.key==' ')&&!/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))tutAdv()});
@@ -87,10 +89,8 @@ setInterval(()=>{try{const el=$('tdlg');
 function tutDM(t){let m=S.msgs.find(x=>x.g);if(!m){m={id:S.nid++,from:VEE,body:t,state:9,g:1,log:[],unread:0};S.msgs.push(m)}
  if(m.log.some(x=>x.t==t))return;m.log.push({f:'a',t,d:S.day});m.body=t;m.unread=1;say('💬 '+VEE+' sent you a DM')}
 /* ----- flow ----- */
-function tutOffer(){mode='menu';tutCSS();$('ui').innerHTML=`<div class="box modal" style="display:flex;gap:12px;max-width:min(460px,92vw)"><img src="${tutPic()}" style="width:72px;height:72px;image-rendering:pixelated;border:3px solid #000;box-shadow:0 0 0 2px #2fe68a66;align-self:flex-start;flex:none"><div><h2>${VEE} wants a word</h2><p class=m>"Yo! A $100 flat and an empty music career? Say less. I will show you the ropes: 3 short chapters, tiny rewards, zero homework."</p><p class=m>🎁 Start and I will slip you a one-time <b>$${TUT_GIFT}</b> for gear and clothes.</p><div class=row2><button class=go onclick="closeUI();tutStart()">Let's go</button><button onclick="tutSkipAll()">Skip</button></div></div></div>`}
-function tutSkipAll(){S.tut={on:0,i:0,f:{},skip:1};closeUI();say('No problem. Start the tutorial any time from the pause menu (Esc).')}
 function tutStart(){const o=S.tut||{},g=o.g;S.tut={on:1,i:0,f:{},b:{},g:g||0,p:o.p||{},xp:o.xp||0};TUTMIN=0;
- if(!g){S.tut.g=1;S.money=+(S.money+TUT_GIFT).toFixed(2);say('🎁 Tutorial gift: +$'+TUT_GIFT+' to spend on your first gear and clothes')}
+ if(!g){S.tut.g=1;S.money=+(S.money+TUT_GIFT).toFixed(2);say('🎁 Big Vee gave you $'+TUT_GIFT+' for gear and clothes')}
  tutDM('Yo, it is Big Vee. Welcome to WaveFern! I will pop up with tips and slide the boring bits in here.');tutEnter()}
 function tutEnter(){const T=S.tut,s=TUT[T.i];T.f={};T.b={x:P.x,z:P.z,d:S.drafts.length,s:S.songs.length,g:gearSum(),day:S.day};TUTK='';tutSayEnd(1);TUTEND=0;TUTPEND=null;
  if(s){(s.dm||[]).forEach(tutDM);const first=T.i==0||TUT[T.i-1].c!=s.c;let card=0;
@@ -110,7 +110,7 @@ function tutNext(skip){const T=S.tut;if(!T||!T.on)return;const i=T.i,s=TUT[i],la
  T.i++;if(T.i>=TUT.length){T.i=TUT.length;T.done=1;T.on=0;tutClr();tutRender();tutFinish();return}tutEnter();tutRender()}
 function tutFinish(){tutDM('You finished the bootcamp. Proud of you. Do not let it go to your head. (Let it go to your head a little.)');
  setTimeout(()=>{if(tutOK()){tutSay(['That is the basics. Record, release, sleep, spend, grow.','Now go make me famous. I mean, YOU famous. Totally different.'],()=>{tutBurst(innerWidth/2,innerHeight/2,50)})}},3200)}
-function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.done=1;tutClr();tutSayEnd(1);TUTPEND=null;tutRender();say('Tutorial ended. Restart it from the pause menu (Esc).')}
+function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.done=1;tutClr();tutSayEnd(1);TUTPEND=null;tutRender();say('Tutorial skipped. Replay it from the pause menu.')}
 function tutClr(){document.querySelectorAll('.tutHL').forEach(e=>e.classList.remove('tutHL'))}
 function tutRender(){let el=$('tqt');const T=S.tut,show=T&&T.on&&!PAUSED&&!/creator|load|sleep|cut|fest/.test(mode);
  if(!show){if(el)el.remove();TUTK='';TUTLI=-1;return}tutCSS();
@@ -141,7 +141,10 @@ function tutTgt(){const T=S.tut,s=T&&T.on&&TUT[T.i];if(!s||!s.w||mode!='play'||I
 /* detection wrappers */
 {const b0=buyG;buyG=function(id){const n=S.wr.length;const r=b0.apply(this,arguments);if(S.tut&&S.tut.f&&S.wr.length>n)S.tut.f.buy=1;return r}}
 {const w0=wearG;wearG=function(){const r=w0.apply(this,arguments);if(S.tut&&S.tut.f){S.tut.f.wear=1;S.tut.wore=1}return r}}
-/* new game: offer the tutorial instead of the old welcome card */
-{const c0=confirmChar;confirmChar=function(){c0.apply(this,arguments);S.tut={on:0,i:0,f:{}};tutOffer()}}
+/* new game: the tutorial just starts (no accept pop-up, no welcome card) */
+{const c0=confirmChar;confirmChar=function(){c0.apply(this,arguments);closeUI();S.tut={on:0,i:0,f:{}};tutStart()}}
+/* loading a save: clear any tutorial left on screen from before; a tutorial left halfway picks up where it was, otherwise none */
+{const lc=loadCode;loadCode=function(){const r=lc.apply(this,arguments);try{tutSayEnd(1);TUTPEND=null;TUTPAN=null;tutClr();TUTK='';
+ const T=S.tut;if(T&&T.on&&T.i<TUT.length){T.p=T.p||{};T.f={};T.b={x:P.x,z:P.z,d:S.drafts.length,s:S.songs.length,g:gearSum(),day:S.day};TUTPEND={i:T.i,card:1,at:0}}else if(T&&T.on){T.on=0;T.done=1}tutRender()}catch(e){}return r}}
 /* pause menu: replay button */
 {const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(m){const b=document.createElement('button');b.textContent=(S.tut&&S.tut.on?'Restart tutorial':'Tutorial');b.onclick=()=>{resumeGame();tutStart()};m.appendChild(b)}}}
