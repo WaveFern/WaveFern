@@ -24,7 +24,10 @@ let lastWrote=null;
 /* before overwriting a slot with something this tab did not write, keep the old code as fw_bak_N (recoverable from the career select) */
 function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{const k=slotKey(),c=saveCode(),old=localStorage.getItem(k);if(old&&old!==lastWrote&&old!==c){try{localStorage.setItem('fw_bak_'+BOOT_SLOT,old)}catch(e){}}localStorage.setItem(k,c);lastWrote=c}catch(e){}}
 function restoreSave(){let c=null;try{c=localStorage.getItem(slotKey())}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;try{localStorage.setItem('fw_bak_'+BOOT_SLOT,c)}catch(e){}return false}
-setInterval(autoSave,5000);
+/* v26.140: packing a big save takes ~100ms+, so the timer saves every 30s when the browser is idle (and waits out driving/recording/camera) instead of every 5s */
+let asLast=0;
+function autoSaveTick(){const n=Date.now();if(n-asLast<30000)return;if((mode=='drive'||mode=='rec'||(typeof PH!='undefined'&&PH.camOn))&&n-asLast<120000)return;asLast=n;autoSave()}
+setInterval(()=>{if(typeof requestIdleCallback=='function')requestIdleCallback(autoSaveTick,{timeout:3000});else autoSaveTick()},5000);
 addEventListener('pagehide',autoSave);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave()});
 function wipeSave(){if(!confirm('Wipe your save and start a new game? This cannot be undone.'))return;wiping=true;try{localStorage.removeItem(slotKey())}catch(e){}location.reload()}
