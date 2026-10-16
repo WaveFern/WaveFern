@@ -131,3 +131,21 @@ phR=function(){let e=document.getElementById('ph');if(!e){e=document.createEleme
  const b=e.querySelector('.phb');if(b&&st&&!an)b.scrollTop=st;
  try{const cv=document.getElementById('cv');if(cv)cv.scrollTop=cv.scrollHeight}catch(x){}
  try{if(PH.app=='ig'){const u=pxURL(S.pfpIg);if(u){const d=pxDef();e.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===d)i.src=u})}}}catch(x){}};
+/* ===== v41.2: every app laid out for the phone screen =====
+   Messages shows one column at a time on the phone: the chat list, or the open chat with a back button (PH.mv, not saved).
+   FestivalApp uses its own narrow layout (two slots a row, stage name above them). Instagrime and the rest fill the width. */
+{const a0=phApp;phApp=function(a){if(a=='msg')PH.mv='list';return a0.apply(this,arguments)}}
+{const o0=openChat;openChat=function(){if(mode=='phone')PH.mv='chat';return o0.apply(this,arguments)}}
+{const r0=phR;phR=function(){const r=r0.apply(this,arguments);try{const c=document.querySelector('#ph .chat');if(c){const list=PH.mv!='chat'||!!ncv;c.classList.add(list?'gpl':'gpc');
+ const h=c.querySelector('.cvh');if(h&&!list&&!h.querySelector('.gpbk')){const b=document.createElement('button');b.className='gpbk';b.textContent='◀';b.title='Chats';b.onclick=()=>{PH.mv='list';phR()};h.prepend(b)}
+ const cv=document.getElementById('cv');if(cv)cv.scrollTop=cv.scrollHeight}}catch(e){console.error('phone messages',e)}return r}}
+{const st=document.createElement('style');st.textContent=`
+#ph .chat{position:absolute;inset:0;font-size:13px}#ph .phb .chat .cl{width:auto!important;flex:1 1 auto;min-width:0;box-shadow:none}#ph .chat.gpl .cv{display:none}#ph .chat.gpc .cl{display:none}#ph .chat .cv{flex:1;min-width:0}
+#ph .chat .crs{overflow-x:hidden}#ph .chat .cr{min-width:0}#ph .chat .cr .t{min-width:0;flex:1}#ph .chat .cr .t b,#ph .chat .cr .t small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ph .chat .cvh{gap:8px;flex-wrap:wrap}#ph .chat .cvh .gpbk{flex:none;width:34px;height:34px;padding:0;border-radius:50%;border:0;background:#f7eefb;color:#2a2140;box-shadow:none;font-size:13px}
+#ph .chat .cvh>div:not(.cva){flex:1;min-width:0}#ph .chat .cva{flex-wrap:wrap}
+#ph .chat .cin input{min-width:0}
+#ph .gpfs{padding:8px}#ph .gpfs .fa{padding:10px}#ph .fa-grid{grid-template-columns:1fr 1fr!important;gap:6px}#ph .fa-grid>div:first-child,#ph .fa-grid>.fa-t{display:none}#ph .fa-h{grid-column:1/-1}#ph .fa-two{grid-template-columns:1fr!important}
+#ph .fa img,#ph .ig img{max-width:100%}#ph .phx{overflow-x:hidden}
+#ph .phv{max-height:60vh;object-fit:contain;box-sizing:border-box}
+`;document.head.appendChild(st)}
