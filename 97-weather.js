@@ -68,7 +68,8 @@ function wxTick(dt){const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='
  /* light: eases in and out as you step through the front door */
  const want=K.dim&&out?1:0;WTHR.cur+=(want-WTHR.cur)*Math.min(1,dt*2.5);if(WTHR.cur<.002)WTHR.cur=0;
  if(K.rain&&!WTHR.mesh)WTHR.mesh=wxRainMesh();if(K.fog&&!WTHR.fogs.length)WTHR.fogs=wxFogMeshes();
- if(WTHR.cur>0){const k=WTHR.cur;amb.intensity*=1-(1-K.amb)*k;sun.intensity*=1-(1-K.dim)*k;amb.color.lerp(WTHR_GREY,K.grey*k*.6);sun.color.lerp(WTHR_GREY,K.grey*k);scene.background.lerp(WTHR_BG,K.grey*k)}
+ if(K.dim)WTHR.lk=K;/* menus and chats count as sunny, which has no light numbers: keep easing out with the last wet kind (undefined numbers made the light NaN = black screen) */
+ if(WTHR.cur>0){const k=WTHR.cur,L=K.dim?K:WTHR.lk||WTHR.kinds.rain;amb.intensity*=1-(1-L.amb)*k;sun.intensity*=1-(1-L.dim)*k;amb.color.lerp(WTHR_GREY,L.grey*k*.6);sun.color.lerp(WTHR_GREY,L.grey*k);scene.background.lerp(WTHR_BG,L.grey*k)}
  /* lightning in storms, outdoors only */
  if(K===WTHR.kinds.storm&&live&&!PAUSED){WTHR.nextF-=dt;if(WTHR.nextF<=0){WTHR.nextF=7+Math.random()*12;WTHR.flash=1;if(!inner)wxThunder()}}
  if(WTHR.flash>0){WTHR.flash=Math.max(0,WTHR.flash-dt*5);if(out){const f=WTHR.flash*WTHR.flash;amb.intensity+=1.3*f;amb.color.lerp(WTHR_FL,f*.8)}}
