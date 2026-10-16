@@ -87,10 +87,12 @@ function spdTick(){const on=mode=='drive'&&!!dr&&!PAUSED;if(!SPD.el){if(!on)retu
 {const p0=pauseGame;pauseGame=function(){p0.apply(this,arguments);try{spdTick()}catch(e){}}}
 
 /* ---- v26.145: forgiving car collisions ----
-   Smaller hitbox (was a 2.6 m square), slide along walls instead of braking to a stop, and if the car ever ends up
+   Car-shaped hitbox (was a 2.6 m square), slide along walls instead of braking to a stop, and if the car ever ends up
    inside a wall or prop it is nudged out to the nearest free spot so reversing always works. */
-const DRV_R=.9;
-function drvFree(x,z){return!hit(x,z,DRV_R)}
+/* the hitbox is the car's real length x width (CSPEC, times the model scale) as a row of overlapping circles along its heading */
+function drvBox(){const S=(typeof CSPEC!='undefined'&&CSPEC[dr.i])||{L:2.4,W:1},k=(dr.m&&dr.m.scale&&dr.m.scale.x)||1.5;return{hl:S.L*k/2,hw:S.W*k/2*.88}}
+function drvFree(x,z,h){const{hl,hw}=drvBox(),sx=Math.sin(h===undefined?dr.h:h),cz=Math.cos(h===undefined?dr.h:h),e=hl-hw,n=Math.max(1,Math.ceil(e/(hw*.9)));
+ for(let k=-n;k<=n;k++){const o=e*k/n;if(hit(x+sx*o,z+cz*o,hw))return false}return true}
 function drvUnstick(){if(drvFree(dr.x,dr.z))return;
  for(let r=.25;r<=3.5;r+=.25)for(let k=0;k<16;k++){const a=k*Math.PI/8,x=dr.x+Math.cos(a)*r,z=dr.z+Math.sin(a)*r;if(drvFree(x,z)){dr.x=x;dr.z=z;dr.v*=.5;return}}}
 function drvMove(dt){drvUnstick();
