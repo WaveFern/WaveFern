@@ -119,9 +119,9 @@ function buildOut(){if(AP.og)return;const G=xgNew(),og=AP.og=new THREE.Group();s
  bx(4,26,4,'#e4e8ee',-282,13,108);bx(9,3.2,9,'#2b3a4c',-282,27.6,108);bx(9.6,.4,9.6,'#d7dbe2',-282,29.4,108);bx(1,4,1,'#c33',-282,31.5,108);cols.push([-284,106,-280,110]);
  fl(G,og);
  /* moving: a plane taking off and landing, a baggage train going round */
- const run=mkPlane({tail:'#ff6b4a'});run.rotation.y=-Math.PI/2;og.add(run);AP.anim.push({k:'rw',m:run,t:0});
+ const run=mkPlane({tail:'#ff6b4a'});run.rotation.y=-Math.PI/2;run.position.set(-220,0,146);run.visible=false;og.add(run);AP.anim.push({k:'rw',m:run,t:0});
  const tug=new THREE.Group();{const t=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.1,2.4),pm('#f5c542'));t.position.y=.6;tug.add(t);for(let i=1;i<=3;i++){const c=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.2,2.2),pm(i%2?'#4a5868':'#5b6b7c'));c.position.set(0,.7,-i*2.8);tug.add(c)}}
- og.add(tug);AP.anim.push({k:'tug',m:tug,t:0});
+ tug.position.set(-460,0,104);og.add(tug);AP.anim.push({k:'tug',m:tug,t:0});
  POIS.push([-322,20,'Airport ✈','#7fd4ff']);
  WB[0]=Math.min(WB[0],-345)}
 function fadeAll(dt,L){const px=P.x,pz=P.z;(L||AP.fadeM).forEach(f=>{const [x0,z0,x1,z1,h]=f.b;let lo=0,hi=(h-1)/13;const r=(p,a,c)=>{const t1=(a-p)/16,t2=(c-p)/16;lo=Math.max(lo,Math.min(t1,t2));hi=Math.min(hi,Math.max(t1,t2))};r(px,x0,x1);r(pz,z0,z1);
