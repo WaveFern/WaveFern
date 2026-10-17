@@ -16,6 +16,8 @@
                                  them outside your city's airport; otherwise they stay inside.
      'depart'      (ticket)      the player has boarded and the plane is taking off.
      'missed'      (ticket)      a ticket was lost because its gate closed.
+     'restore'     (id)          a career was loaded while abroad. Return true if you placed the player; otherwise they wait in
+                                 that place's terminal.
    Abroad, a city calls TRAVEL.enterAirport() from its airport doors to walk into the terminal (same terminal everywhere,
    signed with the city's name). */
 (function(){
@@ -28,7 +30,7 @@ function st(){if(!S.travel||typeof S.travel!='object')S.travel={};const t=S.trav
 const clockMin=t=>t<300?360+t/300*840:1200+(t-300)/300*600;
 const tOf=m=>m<1200?(m-360)/840*300:300+(m-1200)/600*300;
 const now=()=>(+S.day||1)*1440+clockMin(Math.max(0,Math.min(600,+S.t||0)));
-const hm=a=>{const m=((Math.round(a)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const hm=a=>{const m=((Math.floor(a)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
 const dayOf=a=>Math.floor((a-360)/1440);/* the game day a moment belongs to (a day runs 06:00 to 06:00) */
 const left=a=>{let m=Math.max(0,Math.round(a-now()));const d=Math.floor(m/1440);m-=d*1440;const h=Math.floor(m/60);m-=h*60;
  return(d?d+'d ':'')+(d||h?h+'h ':'')+m+'m'};

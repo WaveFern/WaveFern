@@ -4,13 +4,13 @@
    the middle, drag pans. Roads, lake and buildings scale with the zoom; markers, labels and the player square stay the
    same size and sit at their transformed spots. The zoom level is remembered between openings; the view recentres on
    the player each time the map opens. The minimap is untouched. */
-const MAPZ={z:1,ox:0,oy:0,min:.5,max:4,W:760,H:380};
-const mapSX=v=>(v+138)*.86,mapSZ=v=>(v+158)*1.15;
-function mapClamp(){const M=MAPZ,w=M.W*M.z,h=M.H*M.z;M.ox=w<=M.W?(M.W-w)/2:Math.min(0,Math.max(M.W-w,M.ox));M.oy=h<=M.H?(M.H-h)/2:Math.min(0,Math.max(M.H-h,M.oy))}
+const MAPZ={z:1,ox:0,oy:0,min:.5,max:4,W:760,H:380,L:0}/* L: extra metres of map west of x -138 (v43.5.0: the airport) */;
+const mapSX=v=>(v+138+MAPZ.L)*.86,mapSZ=v=>(v+158)*1.15;
+function mapClamp(){const M=MAPZ,w=(M.W+M.L*.86)*M.z,h=M.H*M.z;M.ox=w<=M.W?(M.W-w)/2:Math.min(0,Math.max(M.W-w,M.ox));M.oy=h<=M.H?(M.H-h)/2:Math.min(0,Math.max(M.H-h,M.oy))}
 function mapZoomAt(f,cx,cy){const M=MAPZ,z=Math.min(M.max,Math.max(M.min,M.z*f));if(z==M.z)return;M.ox=cx-(cx-M.ox)*z/M.z;M.oy=cy-(cy-M.oy)*z/M.z;M.z=z;mapClamp();mapDraw()}
 function mapCentre(x,z){const M=MAPZ;M.ox=M.W/2-mapSX(x)*M.z;M.oy=M.H/2-mapSZ(z)*M.z;mapClamp()}
 function mapDraw(){const c=$('bm');if(!c)return;const x=c.getContext('2d'),M=MAPZ,k=M.z,sx=v=>mapSX(v)*k+M.ox,sz=v=>mapSZ(v)*k+M.oy,kx=.86*k,kz=1.15*k;
- x.setTransform(1,0,0,1,0,0);x.fillStyle='#1d3a21';x.fillRect(0,0,M.W,M.H);x.fillStyle='#3f7a45';x.fillRect(M.ox,M.oy,M.W*k,M.H*k);
+ x.setTransform(1,0,0,1,0,0);x.fillStyle='#1d3a21';x.fillRect(0,0,M.W,M.H);x.fillStyle='#3f7a45';x.fillRect(M.ox,M.oy,(M.W+M.L*.86)*k,M.H*k);
  /* parks, water, fields, pavements, roads, centre lines, footprints, trees and road names (38-city-detail.js) */
  mapPaint(x,sx,sz,kx,kz,false);
  x.font='10px monospace';POIS.forEach(p=>{const X=sx(p[0]),Z=sz(p[1]);if(X<-80||X>M.W+10||Z<-10||Z>M.H+10)return;x.fillStyle=p[3];x.fillRect(X-3,Z-3,6,6);x.fillStyle='#fff';x.fillText(p[2],X+5,Z+3)});
