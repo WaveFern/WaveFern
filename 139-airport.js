@@ -409,5 +409,15 @@ window.VIEWX=()=>typeof mode!='undefined'&&mode=='play'?(inT()?12:inC()?8:0):0;
  if(!mini||kx>.5){x.strokeStyle='#0b2a5b';x.lineWidth=1;x.strokeRect(sx(OUT.x0),sz(OUT.z0),(OUT.x1-OUT.x0)*kx,(OUT.z1-OUT.z0)*kz)}
  if(!mini){x.save();x.fillStyle='#0b2a5b';x.font='bold '+Math.max(10,Math.min(18,kx*14))+'px monospace';x.textAlign='center';x.fillText('✈ AIRPORT',sx((OUT.x0+OUT.x1)/2),sz(20));x.font=Math.max(9,Math.min(12,kx*9))+'px monospace';x.fillStyle='#eee';x.fillText('Runway',sx(-400),sz(147));x.restore()}}catch(e){}}}
 {const b0=bigMap;bigMap=function(){b0();try{if(!$('bm')||T.abroad())return;const r=document.querySelector('#ui .row2');if(!r)return;const bt=document.createElement('button');bt.textContent='Taxi to Airport ✈';bt.onclick=()=>taxi(OUT.fx+6,OUT.fz);r.insertBefore(bt,r.lastElementChild)}catch(e){}}}
+/* bridge to the destination cities (DCITY, 137-tour-cities.js) when it is loaded: it builds each city and its airport */
+{const DC=()=>window.DCITY&&typeof window.DCITY=='object'?window.DCITY:null,
+ put=(f,id)=>{const d=DC();if(!d)return false;try{const fn=d[f]||d.arrive;return typeof fn=='function'&&fn.call(d,id)!==false}catch(e){console.error('DCITY '+f,e);return false}};
+ /* on landing (the player is off the plane, no interior): tear down the city flown from, then let the new city place them */
+ T.on('arrive',(id,tk)=>{const d=DC();if(d&&tk&&tk.from!='home'&&typeof d.leave=='function')try{d.leave()}catch(e){console.error('DCITY leave',e)}
+  return id!='home'&&put('arrive',id)});
+ T.on('exitAirport',id=>put('outside',id));
+ T.on('restore',id=>put('restore',id));
+ /* a city's airport doors or gate: walk into the shared terminal, where tickets, security and gates work as at home */
+ T.boardAt=()=>{if(typeof window.apEnter!='function')return false;window.apEnter('front');return true}}
 try{if(typeof MAPZ!='undefined')MAPZ.L=Math.max(MAPZ.L||0,480)}catch(e){}
 })();
