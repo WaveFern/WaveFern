@@ -224,7 +224,7 @@ function snare(E,t,v){const S=E.P.kit.s;if(S.tn&&S.f)tone(E,t,'triangle',S.f,S.f
 function clap(E,t,v){const C=E.P.kit.c,c=E.c,s=c.createBufferSource(),g=c.createGain();s.buffer=E.nb;s.loop=true;
  const G=g.gain;G.setValueAtTime(0,t);for(let i=0;i<3;i++){G.linearRampToValueAtTime(v*.9,t+i*.011+.001);G.linearRampToValueAtTime(v*.15,t+i*.011+.009)}G.linearRampToValueAtTime(v*.8,t+.034);G.setTargetAtTime(0,t+.035,C.dec/4);
  s.connect(g);g.connect(sf(E,'bandpass',C.f,1.4,E.dr,.25));s.start(t,(t*3.7)%1.5);s.stop(t+C.dec*1.4+.08)}
-function hat(E,t,v,open){const H=E.P.kit.h,b=!open&&dBuf(E.c,'hat',E.P.hh);
+function hat(E,t,v,open){const H=E.P.kit.h,b=!open&&E.uh&&dBuf(E.c,'hat',E.P.hh);
  if(b){const s=E.c.createBufferSource(),g=E.c.createGain();s.buffer=b;g.gain.value=v*.4;s.connect(g);g.connect(E.dr);s.start(t);return}nz(E,t,open?H.od:H.cd,v*H.v*1.4,'highpass',H.f,.6,E.dr,open?.08:0)}
 function drum(E,key,t,v){switch(key){
  case'k':return kick(E,t,v);case's':return snare(E,t,v);case'c':return clap(E,t,v);case'h':return hat(E,t,v,0);case'o':return hat(E,t,v,1);
@@ -272,11 +272,14 @@ function cbV(E,L,t,f,dur,v){const c=E.c,g=c.createGain(),bp=c.createGain();bp.co
 const SMP={},SMP_OF={bass:'bass',round:'bass',upright:'bass',funk:'bass',pluckb:'bass',pick:'bass',acid:'bass',reese:'bass',wob:'bass',
  epiano:'key',piano:'piano',bell:'bell',pbell:'bell',brass:'brass',lead:'lead',pluck:'pluck',flute:'flute',strings:'string',super:'synth'};
 const sampled=n=>{const f=SMP_OF[n];return !!(f&&SMP[f]&&SMP[f].length)};
-let smpLoad=null;
-function loadSamples(c){if(smpLoad||!c||typeof fetch!='function')return smpLoad;
- smpLoad=fetch('audio/oneshots/manifest.json').then(r=>r.ok?r.json():[]).then(list=>Promise.all(list.map(m=>fetch('audio/oneshots/'+m.f).then(r=>r.arrayBuffer()).then(b=>c.decodeAudioData(b)).then(buf=>{(SMP[m.c]=SMP[m.c]||[]).push({buf,root:m.root+(m.cents||0)/100})}).catch(()=>{})))).catch(()=>{});
+let smpLoad=null,smpDone=0;
+function loadSamples(c){if(typeof fetch!='function')smpDone=1;if(smpLoad||!c||typeof fetch!='function')return smpLoad;
+ smpLoad=fetch('audio/oneshots/manifest.json').then(r=>r.ok?r.json():[]).then(list=>Promise.all(list.map(m=>fetch('audio/oneshots/'+m.f).then(r=>r.arrayBuffer()).then(b=>c.decodeAudioData(b)).then(buf=>{(SMP[m.c]=SMP[m.c]||[]).push({buf,f:m.f,root:m.root+(m.cents||0)/100})}).catch(()=>{})))).catch(()=>{}).then(()=>{smpDone=1});
  return smpLoad}
-function smpV(E,L,t,m,dur,v,fam){let s=null,bd=1e9;for(const z of SMP[fam]){const d=Math.abs(m-z.root);if(d<bd){bd=d;s=z}}
+/* v43.0.1: one sample per instrument per song, picked from the song's seed (it used to take the sample nearest each note,
+   so the bass could change sound from note to note) */
+function smpV(E,L,t,m,dur,v,fam){const P=E.pk||(E.pk={});let s=P[fam];
+ if(!s){const A=SMP[fam].slice().sort((a,b)=>a.f<b.f?-1:1);s=P[fam]=A[mix32((E.P.seed^hash(fam))>>>0)%A.length]}
  const c=E.c,src=c.createBufferSource(),g=c.createGain(),end=t+dur;
  src.buffer=s.buf;src.playbackRate.value=Math.pow(2,(m-s.root)/12);
  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.9,t+.004);g.gain.setValueAtTime(v*.9,end);g.gain.linearRampToValueAtTime(0,end+.08);
@@ -292,9 +295,12 @@ function dBuf(c,kind,n){if(!n||!c||typeof fetch!='function')return null;const B=
 function s808(E,L,t,m,dur,v,b,x){const c=E.c,src=c.createBufferSource(),g=c.createGain(),root=24+D808[E.P.s8]/100,rt=n=>Math.pow(2,(n-root)/12),end=t+dur,R=src.playbackRate;src.buffer=b;
  if(x&&x.from){R.setValueAtTime(rt(69+12*Math.log2(x.from/440)),t);R.exponentialRampToValueAtTime(rt(m),t+.09)}else R.setValueAtTime(rt(m),t);
  g.gain.setValueAtTime(v*.85,t);g.gain.setTargetAtTime(0,end,.025);src.connect(g);g.connect(L.in);src.start(t);src.stop(end+.15)}
+/* v43.0.1: whether a song uses samples or the code-made voices is settled once, when it starts (lockE), so nothing swaps mid-song */
+function lockE(E){E.sm={};for(const k of['bs','ch','ar','ld']){const d=E.P[k];if(d&&sampled(d.i)){E.sm[d.i]=1;const L=E.lay[k];if(L&&L.f)L.f.frequency.value=15000}}
+ E.u8=!!dBuf(E.c,'808',E.P.s8);E.uh=!!dBuf(E.c,'hat',E.P.hh)}
 function note(E,lay,name,t,midi,dur,v,x){const I=INS[name]||INS.sine,L=E.lay[lay],f=mtof(midi);if(!L)return;
- if(name=='808'&&E.P.s8){const b=dBuf(E.c,'808',E.P.s8);if(b){s808(E,L,t,midi,dur,v,b,x);return}}
- if(sampled(name)){smpV(E,L,t,midi,dur,v,SMP_OF[name]);return}
+ if(name=='808'&&E.u8){s808(E,L,t,midi,dur,v,dBuf(E.c,'808',E.P.s8),x);return}
+ if(E.sm&&E.sm[name]){smpV(E,L,t,midi,dur,v,SMP_OF[name]);return}
  if(I.t=='o')oscV(E,L,t,f,dur,v,I,x);else if(I.t=='fm')fmV(E,L,t,f,dur,v,I);else if(I.t=='ks')ksV(E,L,t,f,dur,v,I);else if(I.t=='808')b808(E,L,t,f,dur,v,Object.assign({},I,x&&x.dr?{dr:x.dr}:{}),x);else cbV(E,L,t,f,dur,v)}
 
 /* ---------- harmony ---------- */
@@ -391,7 +397,7 @@ function end(E,fade){if(!E||E.dead)return;E.dead=1;const c=E.c,now=c.currentTime
 function play(src,o){o=o||{};if(o.owner=='sf')uvol=(typeof S=='object'&&S&&S.sfVol!=null)?Math.max(0,Math.min(1,+S.sfVol||0)):1;else if(o.owner!='car')uvol=1;let P;try{P=plan(src)}catch(e){console.error('beats plan',e);return null}const c=ctx();if(!c)return null;
  if(cur){end(cur,.25);cur=null}
  let E;try{E=mkE(c,G.vol,P,Object.assign({src},o))}catch(e){console.error('beats',e);return null}
- dBuf(c,'808',P.s8);dBuf(c,'hat',P.hh);
+ dBuf(c,'808',P.s8);dBuf(c,'hat',P.hh);E.wt=c.currentTime+2;
  const now=c.currentTime;E.t0=now+.08;E.next=E.t0;E.out.gain.setValueAtTime(0,now);E.gv=o.vol!=null?o.vol:1;E.out.gain.linearRampToValueAtTime(E.gv,now+(o.fadeIn||.06));
  if(o.pads){E.pads=1;setPads(P)}G.vol.gain.setValueAtTime(musicVol(),now);E.vv=musicVol();
  cur=E;holdBg(1);if(!timer)timer=setInterval(tick,25);tick();return info(E)}
@@ -405,6 +411,8 @@ function tick(){const E=cur;if(!E){clearInterval(timer);timer=0;return}const c=E
  const v=musicVol();if(Math.abs(v-E.vv)>.001){E.vv=v;G.vol.gain.setTargetAtTime(v,c.currentTime,.05)}
  if(!held||(typeof MU!='undefined'&&!MU.hold))holdBg(1);else if(typeof MU!='undefined'&&MU.pl){const a=MU.a&&MU.a[MU.cur];if(a&&!a.paused)a.pause()}
  if(E.paused||c.state!='running')return;const now=c.currentTime;
+ /* wait (up to 2 seconds) for this song's samples so it starts and stays on the same sounds */
+ if(E.wt){if(now>E.wt||smpDone&&(!E.P.s8||dBuf(c,'808',E.P.s8))&&(!E.P.hh||dBuf(c,'hat',E.P.hh))){E.wt=0;lockE(E);E.step=0;E.t0=now+.05;E.next=E.t0}else return}
  if(E.next<now-.4){E.t0=now+.05-E.step*E.sd;E.next=stepTime(E,E.step)}
  let k=0;while(E.next<now+.6&&k++<96){try{sched(E,E.step,Math.max(E.next,now))}catch(e){if(!E.err){E.err=1;console.error('beats',e)}}E.step++;E.next=stepTime(E,E.step)}}
 function stop(fade){const E=cur;if(!E)return;cur=null;end(E,fade);holdBg(0)}
@@ -413,7 +421,7 @@ addEventListener('pagehide',()=>stop(.02));
 
 /* offline render (tests, previews): returns a Promise of an AudioBuffer */
 function render(src,secs,o){o=o||{};const P=plan(src),sr=o.sampleRate||44100,OC=window.OfflineAudioContext||window.webkitOfflineAudioContext,c=new OC(2,Math.ceil(sr*secs),sr),out=outChain(c);
- out.vol.gain.value=(o.vol!=null?o.vol:.5)*BASE;const E=mkE(c,out.vol,P,o);E.t0=.02;if(o.solo){if(o.solo!='dr')E.dr.gain.value=0;for(const k in E.lay)if(k!=o.solo)E.lay[k].g.gain.value=0}for(let n=0;stepTime(E,n)<secs;n++)sched(E,n,stepTime(E,n));return c.startRendering()}
+ out.vol.gain.value=(o.vol!=null?o.vol:.5)*BASE;const E=mkE(c,out.vol,P,o);lockE(E);E.t0=.02;if(o.solo){if(o.solo!='dr')E.dr.gain.value=0;for(const k in E.lay)if(k!=o.solo)E.lay[k].g.gain.value=0}for(let n=0;stepTime(E,n)<secs;n++)sched(E,n,stepTime(E,n));return c.startRendering()}
 
 return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,+x||0))},setVolume:x=>{uvol=Math.max(0,Math.min(1,+x||0))},
  playing:()=>!!cur,current:()=>cur?Object.assign(info(cur),{owner:cur.owner,src:cur.src,paused:!!cur.paused,held:!!cur.up,intensity:cur.I}):null,
@@ -421,7 +429,7 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
     The game's pause menu and a hidden tab still pause it on their own. songBeats() = quarter notes in one play-through of a song. */
  hold:on=>{if(cur){cur.up=!!on;tick()}},songBeats:()=>FORMS.song.reduce((a,s)=>a+s[1],0)*4,
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
- beat:()=>{const E=cur;if(!E||E.t0==null)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
+ beat:()=>{const E=cur;if(!E||E.t0==null||E.wt)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
  bpm:()=>cur?cur.P.bpm:0,
  /* v43.0.0: the recorded 808 and hi hat names, and a one-shot preview of one (kind '808' or 'hat') */
  drums:{s808:N808.slice(),hats:DHAT.slice()},
