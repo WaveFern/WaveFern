@@ -104,7 +104,7 @@ const SFTY={/* kind: f = food (sells something), r = shop, s = special room; it 
  OPTICIAN:{k:'r',c:'#e8eef4',a:'#2d5a8d',kind:'glasses',cols:['#1a1a1a','#c0392b','#2d5a8d','#c9a227','#8e44ad','#e8e8ec'],kn:'Iris (optician)',say:['Read the bottom line for me. Perfect!','Shades for the stage are on the right.']},
  GYM:{k:'s',c:'#2a2a32',a:'#e03a3a',kn:'Tank (trainer)',say:['Stamina keeps you going on long days. Stay hydrated!','Leg day is every day.']},
  BANK:{k:'s',c:'#e8e2d0',a:'#2f4a6e',kn:'Mr. Grant (bank teller)',say:[]},LAUNDRY:{k:'s',c:'#e8f4ff',a:'#3b82f6',kn:'Suds (laundromat)',say:['Machine 4 eats socks. Avoid machine 4.','A fresh hoodie for every show, that is the secret.']},
- GALLERY:{k:'s',c:'#f4f4f4',a:'#1a1a1a',kn:'Odile (gallery)',say:['This piece is called "Sound of Rain". It is just blue.','Art and music are cousins, you know.']}};
+ GALLERY:{k:'s',c:'#f4f4f4',a:'#1a1a1a',kn:'Sushil (gallery)',say:['This piece is called "Sound of Rain". It is just blue.','Art and music are cousins, you know.']}};
 const SFROOMS=[];
 /* a shop room for one tower front: walls and floor match the kind, then the props for that kind */
 function sfRoom(nm){const T=SFTY[nm],c=T.c,a=T.a,food=T.k=='f';

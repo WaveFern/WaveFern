@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v43.1.0';
+const GAME_VERSION='v43.2.0';
 const VERSION_HISTORY=[
+ {v:'v43.2.0',n:'The art gallery keeper is now Sushil: very tall and very slim, with glasses and black side-swept hair. He runs the street gallery and the Skyline Tower gallery. All 19 classic hairstyles are rebuilt in 3D and look more like real hair: rounded heads of hair with layers, strands, highlights and shadows, spiky tips, curly afros and puffs made of curls, twists, braids and cornrows, and real dreads that hang in thick twisted locs over the shoulders and down the back. Hats still sit over the hair. Saves still load.'},
  {v:'v43.1.0',n:'Goals are gone, replaced by Quests: a new app preinstalled on your computer with its own look and Daily and Weekly tabs. Every day brings 3 daily quests (record, release, post, message, walk and more); finish all 3 for $30 at the start, more as your fame grows. Every week brings 3 tougher weekly quests (beat last week\'s streams, release several songs, hit a quality bar and more) worth $300 at the start. Quests stay the same if you reload, and new ones come after you sleep. Saves still load.'},
  {v:'v43.0.1',n:'Each song now keeps one bass sound from start to finish. The bass, 808 and other sampled instruments no longer change sound from note to note or part way through a song: each song picks one and sticks with it. Saves still load.'},
  {v:'v43.0.0',n:'New recorded 808s and hi hats. When you record a song you can now pick its 808 (Amen, Cactus, Camp, Daffy, Dime, Episode, Flo, Glaze, Grief, Notebook, Owl, Robin, Shiver, Shoe, Snowhurt, Thin, Vessel) and hi hat (Aisle, Business, Crusade, Fin, Guard, Meta, Rooftop, Turkey, Utter); picking one plays it once. Auto lets the beat choose, Built-in keeps the old sound. The 808 follows the bass notes and slides, and the song keeps its sounds after release. Older songs sound the same as before. Saves still load.'},
