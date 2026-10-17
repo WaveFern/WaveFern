@@ -153,6 +153,6 @@ ART.forEach(a=>{if(!a[8]&&a[9]===undefined)a[9]=.6});/* made-up filler artists c
 /* Amir's smell cloud: a small green cloud above his head on the 3D model */
 {const b0=buildChar;buildChar=function(c){const r=b0.apply(this,arguments);try{if(c&&c.smelly&&r&&r.g&&!r.g.userData.smelly){r.g.userData.smelly=1;
  [[.5,.2,.4,0,1.98,0],[.34,.18,.3,-.3,1.94,.05],[.34,.18,.3,.3,1.94,-.05],[.3,.14,.26,.05,2.14,0],[.2,.1,.2,-.18,2.12,.04]].forEach(p=>B(r.g,p[0],p[1],p[2],'#8fdc5a',p[3],p[4],p[5]))}}catch(e){}return r}}
-/* the art gallery shop keeper: tall, skinny, glasses, semi-curly salt and pepper hair (the tower gallery curator is set in 57) */
-{const CUR={hair:15,hc:0,hc_custom:'#5a5b62',eyes:5,mouth:0,top:2,tc:1,pc:0,skin:3,body:.1,hgt:.75};
- const i0=interior;interior=function(i,fl,wl,items,cl,kc,kn,act){if(/^Odile/.test(String(kn)))kc=CUR;return i0.call(this,i,fl,wl,items,cl,kc,kn,act)}}
+/* the art gallery shop keeper Sushil: very tall, very slim, glasses, black side-swept hair, a charcoal jacket (the tower gallery curator in 57 is Sushil too) */
+{const CUR=SUSHIL;
+ const i0=interior;interior=function(i,fl,wl,items,cl,kc,kn,act){if(/^(Sushil|Odile)/.test(String(kn)))kc=CUR;return i0.call(this,i,fl,wl,items,cl,kc,kn,act)}}

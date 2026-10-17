@@ -3,6 +3,8 @@ const HAIRC=['#1b1b1f','#4a2c1a','#8b5a2b','#d9a441','#e8d9a0','#c0392b','#e66a9
 TOPC=['#e74c3c','#3498db','#2ecc71','#f1c40f','#9b59b6','#ecf0f1','#2c3e50','#e67e22','#1abc9c','#e84393'],PANTC=['#2c3e50','#34495e','#7f8c8d','#8d6e4a','#1e1e24','#5b7db1','#a04050','#3f6f4a'];
 const NM={eyes:['Dots','Wide','Sleepy','Tall','Shades'],mouth:['Smile','Flat','Open','Smirk'],hair:['Bald','Buzz','Short','Spiky','Mohawk','Long','Bob','Ponytail','Bun','Afro','Pigtails','Quiff'],top:['T-shirt','Hoodie','Jacket','Striped','Tank']};
 let ch={skin:2,eyes:0,mouth:0,hair:2,hc:1,top:0,tc:1,pc:0,body:.4,hgt:.5};
+/* Sushil, the art gallery keeper and tower gallery curator: very tall, very slim, glasses, black side-swept hair (57, 115) */
+const SUSHIL={hair:17,hc:0,hc_custom:'#121214',eyes:5,mouth:0,top:2,tc:6,tc_custom:'#2b2b30',pc:4,skin:3,body:0,hgt:1.3};
 function buildChar(c){
  const g=new THREE.Group(),w=.42+c.body*.5,d=.3+c.body*.28,sk=SKIN[c.skin],tc=c.tc_custom||TOPC[c.tc],pc=c.pc_custom||PANTC[c.pc],hc=c.hc_custom||HAIRC[c.hc],T=c.top;
  const pv=(x,y,z,p=g)=>{const o=new THREE.Group();o.position.set(x,y,z);p.add(o);return o};
