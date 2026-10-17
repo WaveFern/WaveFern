@@ -18,7 +18,7 @@ function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
   P.mesh.position.set(P.x,(mv?Math.abs(Math.sin(P.t))*.06:0)+SY,P.z);P.mesh.rotation.y=cr()?Math.PI/4+Math.sin(tt*.8)*.6:P.rot}
  buildTick();stepTick(dt,mv);near=null;if(mode=='play'){let b=9;INT.concat(dynInt()).forEach(o=>{const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<o.r&&d<b){b=d;near=o}})}
  const f=S.t<240?0:S.t<300?(S.t-240)/60*.5:S.t<330?.5+(S.t-300)/30*.4:.9;amb.intensity=.75-.4*f;amb.color.copy(cD).lerp(cN,f);sun.intensity=.85-.55*f;sun.color.copy(cD).lerp(cN,f);lamps.forEach(l=>l.intensity=.2+.9*f);scene.background.copy(cBD).lerp(cBN,f);
- viewT=IN&&IN.i==7&&mode=='play'?12:cr()||mode=='load'?3.6:mode=='build'?16+WGX*.7:mode=='rec'?5.5:mode=='cut'?4.5:mode=='drive'?(typeof drvView=='function'?drvView():11):9;viewH+=(viewT-viewH)*Math.min(1,dt*4);const tx=mode=='build'?8:P.x,tz=mode=='build'?6-WGX/2:P.z;camT.x+=(tx-camT.x)*Math.min(1,dt*6);camT.z+=(tz-camT.z)*Math.min(1,dt*6);
+ viewT=(typeof VIEWX=='function'&&VIEWX())||(IN&&IN.i==7&&mode=='play'?12:cr()||mode=='load'?3.6:mode=='build'?16+WGX*.7:mode=='rec'?5.5:mode=='cut'?4.5:mode=='drive'?(typeof drvView=='function'?drvView():11):9);viewH+=(viewT-viewH)*Math.min(1,dt*4);const tx=mode=='build'?8:P.x,tz=mode=='build'?6-WGX/2:P.z;camT.x+=(tx-camT.x)*Math.min(1,dt*6);camT.z+=(tz-camT.z)*Math.min(1,dt*6);
  const a=innerWidth/innerHeight;cam.left=-viewH*a/2;cam.right=viewH*a/2;cam.top=viewH/2;cam.bottom=-viewH/2;cam.updateProjectionMatrix();
  cam.position.set(camT.x+16,13,camT.z+16);cam.lookAt(camT.x,.8,camT.z);hud();mmDraw()}
 function hud(){if(cr()){const g='<button class="hb gear px" style="top:10px;right:10px;bottom:auto" onclick="settings()">⚙ Settings</button>';if(hc!=g){hc=g;$('hud').innerHTML=g}return}

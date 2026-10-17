@@ -159,6 +159,16 @@ Look: a studio equipment rack. Charcoal panels with a faint scan-line texture, a
 - Swatches `.asw` (24px, 2px black border, `--g` outline when selected).
 - Wardrobe picker `.wrs`: `#1d2a24`; selected border `#ff3d81`.
 
+## Swiftwing Flights (`sw`, root `.swa`, HUD `#swhud`, flight overlay `#apfly`)
+
+- Airline look, not the dark studio look. Font: Trebuchet MS (fallback sans-serif).
+- Tokens: sky blue `#eaf4ff` page, navy `#0b2a5b` header and text, coral `#ff6b4a` for the logo tail, "Buy" and highlights, white cards with 10px corners and a soft navy shadow.
+- Tabs Book / My trips / Departures: pill buttons, the open one navy with white text.
+- World map: canvas with pale land on blue sea, pins in the continent colours from `WT_CONT`; the selected pin is coral.
+- Boarding passes: white card with a coral left stripe, big airport codes, gate, seat and a countdown.
+- In-world screens (departure boards, gate screens) are black with yellow `#ffd84a` text and green / amber / red status.
+- HUD strip `#swhud`: navy pill under the top bar with the next flight, gate and what to do next.
+
 ## Other HUD
 
 - Car speed box `#spdbox`: dark gradient `#141c18 → #090c0b`, 16px radius, 1px `--g` 25% border, 12px text.
