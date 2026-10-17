@@ -188,6 +188,7 @@ function plan(src){if(typeof src=='string')src={genre:src};src=src||{};const gen
  const A=genMotif(r,ld?ld.d:.4,2),B=genMotif(r,ld?ld.d:.4,1),V=genMotif(r,(ld?ld.d:.4)*.6,2);
  const kr=((key+6)%12)-6;
  return{genre,style:st.n,si,count:L.length,seed,bpm,key,kr,sc,keyName:KEYN[key]+' '+SCN[sc],prog,cpb:st.cpb||1,sw:st.sw||0,kit,dk,kick:kp?kp[1]:null,bs,ch,ar,ld,
+  s8:dPick(src.s8,N808,seed,0x808),hh:src.hh=='auto'&&!/^(trap|b808)$/.test(st.kit)?'':dPick(src.hh,DHAT,seed,0x4a7),
   hook:[A[0],A[1],A[0],B[0]],verse:V,fill:st.fill||'',crash:!!st.crash,side:st.side||0,fx:st.fx||{},mx:Object.assign({dr:1,bs:.6,ch:.3,ar:.2,ld:.24},st.mx||{})}}
 
 /* ---------- audio building blocks ---------- */
@@ -223,7 +224,8 @@ function snare(E,t,v){const S=E.P.kit.s;if(S.tn&&S.f)tone(E,t,'triangle',S.f,S.f
 function clap(E,t,v){const C=E.P.kit.c,c=E.c,s=c.createBufferSource(),g=c.createGain();s.buffer=E.nb;s.loop=true;
  const G=g.gain;G.setValueAtTime(0,t);for(let i=0;i<3;i++){G.linearRampToValueAtTime(v*.9,t+i*.011+.001);G.linearRampToValueAtTime(v*.15,t+i*.011+.009)}G.linearRampToValueAtTime(v*.8,t+.034);G.setTargetAtTime(0,t+.035,C.dec/4);
  s.connect(g);g.connect(sf(E,'bandpass',C.f,1.4,E.dr,.25));s.start(t,(t*3.7)%1.5);s.stop(t+C.dec*1.4+.08)}
-function hat(E,t,v,open){const H=E.P.kit.h;nz(E,t,open?H.od:H.cd,v*H.v*1.4,'highpass',H.f,.6,E.dr,open?.08:0)}
+function hat(E,t,v,open){const H=E.P.kit.h,b=!open&&dBuf(E.c,'hat',E.P.hh);
+ if(b){const s=E.c.createBufferSource(),g=E.c.createGain();s.buffer=b;g.gain.value=v*.4;s.connect(g);g.connect(E.dr);s.start(t);return}nz(E,t,open?H.od:H.cd,v*H.v*1.4,'highpass',H.f,.6,E.dr,open?.08:0)}
 function drum(E,key,t,v){switch(key){
  case'k':return kick(E,t,v);case's':return snare(E,t,v);case'c':return clap(E,t,v);case'h':return hat(E,t,v,0);case'o':return hat(E,t,v,1);
  case'n':nz(E,t,.06,v*.55,'bandpass',2200,3.5,E.dr,.3);return tone(E,t,'sine',1800,900,.01,.015,v*.2,E.dr);
@@ -279,7 +281,19 @@ function smpV(E,L,t,m,dur,v,fam){let s=null,bd=1e9;for(const z of SMP[fam]){cons
  src.buffer=s.buf;src.playbackRate.value=Math.pow(2,(m-s.root)/12);
  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.9,t+.004);g.gain.setValueAtTime(v*.9,end);g.gain.linearRampToValueAtTime(0,end+.08);
  src.connect(g);g.connect(L.in);src.start(t);src.stop(end+.1)}
+/* ---------- v43.0.0: recorded 808s and hi hats (audio/drums, all 808s tuned to C1 plus the cents below) ----------
+   A song can name one of each (s8, hh); 'auto' picks one from the song's seed (hats only for trap-style kits).
+   Songs without a pick, and any beat played before its sample has loaded, keep the code-made 808 and hat. */
+const D808={amen:-17,cactus:0,camp:5,daffy:-6,dime:0,episode:11,flo:2,glaze:0,grief:12,notebook:22,owl:12,robin:23,shiver:-1,shoe:11,snowhurt:0,thin:0,vessel:22},
+ N808=Object.keys(D808),DHAT=['aisle','business','crusade','fin','guard','meta','rooftop','turkey','utter'];
+function dPick(v,list,seed,salt){if(!v)return'';v=String(v).toLowerCase();if(v=='auto')return list[mix32((seed^salt)>>>0)%list.length];return list.includes(v)?v:''}
+function dBuf(c,kind,n){if(!n||!c||typeof fetch!='function')return null;const B=c._bds||(c._bds={}),k=kind+n;if(k in B)return B[k];B[k]=null;
+ fetch('audio/drums/'+kind+'-'+n+(kind=='hat'?'.wav':'.mp3')).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>c.decodeAudioData(b)).then(buf=>{B[k]=buf}).catch(()=>{});return null}
+function s808(E,L,t,m,dur,v,b,x){const c=E.c,src=c.createBufferSource(),g=c.createGain(),root=24+D808[E.P.s8]/100,rt=n=>Math.pow(2,(n-root)/12),end=t+dur,R=src.playbackRate;src.buffer=b;
+ if(x&&x.from){R.setValueAtTime(rt(69+12*Math.log2(x.from/440)),t);R.exponentialRampToValueAtTime(rt(m),t+.09)}else R.setValueAtTime(rt(m),t);
+ g.gain.setValueAtTime(v*.85,t);g.gain.setTargetAtTime(0,end,.025);src.connect(g);g.connect(L.in);src.start(t);src.stop(end+.15)}
 function note(E,lay,name,t,midi,dur,v,x){const I=INS[name]||INS.sine,L=E.lay[lay],f=mtof(midi);if(!L)return;
+ if(name=='808'&&E.P.s8){const b=dBuf(E.c,'808',E.P.s8);if(b){s808(E,L,t,midi,dur,v,b,x);return}}
  if(sampled(name)){smpV(E,L,t,midi,dur,v,SMP_OF[name]);return}
  if(I.t=='o')oscV(E,L,t,f,dur,v,I,x);else if(I.t=='fm')fmV(E,L,t,f,dur,v,I);else if(I.t=='ks')ksV(E,L,t,f,dur,v,I);else if(I.t=='808')b808(E,L,t,f,dur,v,Object.assign({},I,x&&x.dr?{dr:x.dr}:{}),x);else cbV(E,L,t,f,dur,v)}
 
@@ -377,6 +391,7 @@ function end(E,fade){if(!E||E.dead)return;E.dead=1;const c=E.c,now=c.currentTime
 function play(src,o){o=o||{};if(o.owner=='sf')uvol=(typeof S=='object'&&S&&S.sfVol!=null)?Math.max(0,Math.min(1,+S.sfVol||0)):1;else if(o.owner!='car')uvol=1;let P;try{P=plan(src)}catch(e){console.error('beats plan',e);return null}const c=ctx();if(!c)return null;
  if(cur){end(cur,.25);cur=null}
  let E;try{E=mkE(c,G.vol,P,Object.assign({src},o))}catch(e){console.error('beats',e);return null}
+ dBuf(c,'808',P.s8);dBuf(c,'hat',P.hh);
  const now=c.currentTime;E.t0=now+.08;E.next=E.t0;E.out.gain.setValueAtTime(0,now);E.gv=o.vol!=null?o.vol:1;E.out.gain.linearRampToValueAtTime(E.gv,now+(o.fadeIn||.06));
  if(o.pads){E.pads=1;setPads(P)}G.vol.gain.setValueAtTime(musicVol(),now);E.vv=musicVol();
  cur=E;holdBg(1);if(!timer)timer=setInterval(tick,25);tick();return info(E)}
@@ -407,7 +422,11 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
  hold:on=>{if(cur){cur.up=!!on;tick()}},songBeats:()=>FORMS.song.reduce((a,s)=>a+s[1],0)*4,
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
  beat:()=>{const E=cur;if(!E||E.t0==null)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
- bpm:()=>cur?cur.P.bpm:0,samples:()=>Object.fromEntries(Object.entries(SMP).map(([k,v])=>[k,v.length])),_dbg:{STY,INS,KIT},styles:Object.fromEntries(GENRES.map(g=>[g,STY[g].map(s=>s.n)])),genres:GENRES.slice(),render,
+ bpm:()=>cur?cur.P.bpm:0,
+ /* v43.0.0: the recorded 808 and hi hat names, and a one-shot preview of one (kind '808' or 'hat') */
+ drums:{s808:N808.slice(),hats:DHAT.slice()},
+ previewDrum(kind,n){const c=ctx();if(!c||!n)return;let k=0;const go=()=>{const b=dBuf(c,kind,n);if(!b){if(k++<20)setTimeout(go,100);return}
+  const s=c.createBufferSource(),g=c.createGain();s.buffer=b;g.gain.value=musicVol()*.9;s.connect(g);g.connect(c.destination);s.start();if(kind=='808')s.stop(c.currentTime+1.2)};go()},samples:()=>Object.fromEntries(Object.entries(SMP).map(([k,v])=>[k,v.length])),_dbg:{STY,INS,KIT},styles:Object.fromEntries(GENRES.map(g=>[g,STY[g].map(s=>s.n)])),genres:GENRES.slice(),render,
  /* festival set: called every frame by festMusic; plays the beat of the song on stage (a new beat when the setlist moves on)
     and follows the crowd's hype. Returns false if audio is not available, so the old drum loop can play instead. */
  fest(set){if(!set||!set.song||set._bt==-1)return false;
@@ -428,15 +447,16 @@ if(typeof loadCode=='function'){const lc0=loadCode;loadCode=function(){const r=l
 setInterval(songSeeds,500);
 /* recording: the song's beat plays under all four steps; the Beat bar sweeps in time with it */
 if(typeof startRec=='function'){const s0=startRec;startRec=function(i){s0.apply(this,arguments);try{if(rec&&mode=='rec'){rec.bs=(Math.random()*4294967296)>>>0;
- rec.bp=!!Beats.play({genre:rec.g,seed:rec.bs},{owner:'rec',form:'rec',intensity:.8,pads:1,alive:()=>!!rec&&mode=='rec'})}}catch(e){console.error('beats rec',e)}}}
+ const pk=(typeof S=='object'&&S&&S.bpick)||{};rec.s8=pk.s8!=null?pk.s8:'auto';rec.hh=pk.hh!=null?pk.hh:'auto';
+ rec.bp=!!Beats.play({genre:rec.g,seed:rec.bs,s8:rec.s8,hh:rec.hh},{owner:'rec',form:'rec',intensity:.8,pads:1,alive:()=>!!rec&&mode=='rec'})}}catch(e){console.error('beats rec',e)}}}
 function beatsBarTick(dt){rec.t+=dt;rec.cd=Math.max(0,rec.cd-dt);rec.fl=Math.max(0,rec.fl-dt);
  const b=Math.max(0,Beats.beat()),spb=60/Beats.bpm(),T=1/(.9*Math.pow(1.05,rec.hits)),n=[1,2,4].reduce((a,c)=>Math.abs(Math.log(c*spb/T))<Math.abs(Math.log(a*spb/T))?c:a);
  if(rec.bb==null){rec.bn=n;rec.bb=Math.round(b+.5*n)}else if(n!=rec.bn){const k=Math.round((b-rec.bb)/rec.bn),bc=rec.bb+k*rec.bn;rec.bb=k%2?bc-n:bc;rec.bn=n}
  let ph=((b-rec.bb)/rec.bn+.5)%2;if(ph<0)ph+=2;rec.pos=ph<1?ph:2-ph;rec.dir=ph<1?1:-1}
 if(typeof recTick=='function'){const t0=recTick;recTick=function(dt){if(rec&&rec.bp&&Beats.playing()){Beats.setIntensity(rec.st==1?.3:rec.st==2?.6:rec.st==3?1:.8);if(!rec.st)return beatsBarTick(dt)}return t0.apply(this,arguments)}}
 /* the beat's seed goes with the draft and the uploaded song, so the released song sounds like the session */
-if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n)S.drafts[S.drafts.length-1].bs=bs;const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
-if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs}}catch(e){}return r}}
+if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,s8=rec&&rec.s8,hh=rec&&rec.hh,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.bs=bs;if(s8!=null){d.s8=s8;d.hh=hh}}const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
+if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}}}catch(e){}return r}}
 
 /* Spotifly: a play button on each song on your artist page */
 {const st=document.createElement('style');st.textContent='.sr .bpl{width:24px;height:24px;padding:0;margin:0;border-radius:50%;border:0;background:#1db954;color:#000;font-size:10px;line-height:24px;cursor:pointer;box-shadow:none}.sr .bpl:hover{transform:scale(1.08)}.sr.bon{background:#1db95422}.sr.bon b{color:#1db954}';document.head.appendChild(st)}
