@@ -351,7 +351,7 @@ function exitPlane(){const tk=AP.tk;fade(()=>{AP.ph=null;AP.tk=null;IN=null;P.si
 /* ================= hooks ================= */
 {const h0=hit;hit=function(x,z,r){if(h0(x,z,r))return 1;if(typeof IN=='undefined'||!IN)return 0;const L=IN.i===AP.idx?AP.cols:IN.i===AP.cidx?AP.ccols:null;if(!L)return 0;
  if(L.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3]))return 1;
- if(IN.i===AP.idx&&P.z-AZ>=SECV&&z-AZ<SECV+.3&&!secOK()){secMsg();return 1}return 0}}
+ if(IN.i===AP.idx&&z<P.z&&P.z-AZ>=SECV&&z-AZ<SECV+.3&&!secOK()){secMsg();return 1}return 0}}
 {const d0=dynInt;dynInt=function(){const a=d0();try{if(inT())return a.concat(termInts());if(inC())return a.concat(cabinInts());return a.concat(outInts())}catch(e){return a}}}
 function termInts(){const a=[],u=v=>AX+v,w=v=>AZ+v,tk=T.active().find(k=>k.from==here()),abroad=T.abroad();
  a.push({x:u(36),z:w(55),r:2.4,l:abroad?'Go out into '+T.city(here()):'Leave the airport',a:apLeave});

@@ -68,7 +68,15 @@ function missTick(){try{if(!S||!S.artist||!S.travel)return;if(typeof mode!='unde
   try{snd('err')}catch(x){}
   try{glCard('MISSED FLIGHT',tk.fl+' to '+T.city(tk.to),'The gate closed at '+T.hm(tk.dep-CLOSE)+'. The ticket is lost. Book again in Swiftwing.')}catch(x){}
   say('✈ You missed '+tk.fl+' to '+T.place(tk.to)+'. The ticket is lost (no refund). Book a new flight in Swiftwing.')}})}catch(e){console.error('flights',e)}}
-setInterval(missTick,500);
+/* never stranded abroad: in a terminal abroad with no flight out and too little money for any flight home,
+   Swiftwing gives you a free seat on the next flight home */
+function rescue(){try{if(!S||!S.artist||!S.travel||!T.abroad())return;const w=typeof window.apWhere=='function'?window.apWhere():'';if(!w||w=='cabin')return;
+ const from=T.loc();if(T.active().some(k=>k.from==from))return;const n=T.now(),L=upcoming(from,40).filter(f=>f.to=='home'&&f.dep>=n+BOOK_CUT);if(!L.length)return;
+ if((+S.money||0)>=Math.min(...L.map(price)))return;const f=L[0],t=T.st(),id='T'+(t.nid++);
+ t.tickets.push({id,fl:f.fl,from:f.from,to:'home',dep:f.dep,arr:f.arr,hrs:f.hrs,gate:f.gate,seat:seatFor(id+S.day),price:0,st:'booked',bd:S.day,ck:0,bt:0,free:1});
+ try{glCard('FREE SEAT HOME',f.fl+' to '+T.city('home'),'You cannot afford a flight, so Swiftwing put you on the '+T.hm(f.dep)+' flight home for free. Check in, then Gate '+f.gate+'.')}catch(x){}
+ say('✈ Swiftwing gave you a free seat home: '+f.fl+' at '+T.hm(f.dep)+', Gate '+f.gate+'. Check in at a desk first.')}catch(e){console.error('flights rescue',e)}}
+setInterval(missTick,500);setInterval(rescue,2000);
 Object.assign(T,{flights,upcoming,fStatus,route,code,book,cancel,checkIn,ckWin,price,refundOf,canBook,
  RULES:{BOARD,FINAL,CLOSE,CK_OPEN,CK_CLOSE,BOOK_CUT,CANCEL_CUT,REFUND,GATES},AIRLINE,
  apName:id=>id&&id!='home'?T.city(id)+' Airport':HOME_AP,
