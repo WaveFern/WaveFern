@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v45.1.1';
+const GAME_VERSION='v45.1.2';
 const VERSION_HISTORY=[
+ {v:'v45.1.2',n:'Changed buildings back to fading out smoothly when they block your view, instead of the round dotted hole. They still never vanish or pop as you walk up to them. Saves still load.'},
  {v:'v45.1.1',n:'Fixed tour cities being nearly pitch black at night: buildings, streets and the ground now have a soft blue glow so you can read the city while the windows and signs still shine. Saves still load.'},
  {v:'v45.1.0',n:'Tour city buildings now have more varied shapes: round corner turrets with cone roofs, bay windows, stepped terraces on top, stepped gables, roof gardens with pergolas, chimneys, flagpoles, proper stairwell huts and fuller skyscraper roof plant instead of plain grey blocks. Saves still load.'},
  {v:'v45.0.0',n:'The land around every tour city is no longer an empty plane: there are fields, trees, rocks or desert dunes, hills, farmhouses and a ring of far-off buildings or skyscrapers, and the stadium plaza now has paved patterns, tree rows, lamps and benches. Saves still load.'},

@@ -58,8 +58,8 @@ D.cityHooks.push(C=>{const s=C.s,G=D.mkG(),Gw=D.mkG(),q=D.QB(),st=C.st,a=st.a,b=
  /* colliders: the bowl as a ring of rectangles, the gate */
  for(let i=0;i<24;i++){const x0=x-a+i*a*2/24,x1=x0+a*2/24,m=(x0+x1)/2-x,hz=b*Math.sqrt(Math.max(0,1-(m/a)**2));D.col(x0,z-hz,x1,z+hz)}
  D.col(x-gw/2,gz-1,x-1.5,gz+2.4);D.col(x+1.5,gz-1,x+gw/2,gz+2.4);D.col(sx0+4.5,gz+.5,sx0+4.9,gz+1.1);D.col(x-gw/2-7.7,gz+.5,x-gw/2-7.3,gz+1.1);
- const uR={value:0},body=D.cutMat(new THREE.MeshLambertMaterial({vertexColors:true,transparent:true}),uR),win=D.cutMat(D.winMat(),uR),U={mats:[body,win],b:[x-a,z-b,x+a,z+b+3,21],o:1,uR};
- D.flushTo(G,C.g,body);D.flushTo(Gw,C.g,win);D.flushTo(band,C.g,C.glowM);if(q.I.length){const sm=D.cutMat(new THREE.MeshBasicMaterial({map:C.A.tex,transparent:true,side:THREE.DoubleSide}),uR);C.signM.push(sm);U.mats.push(sm);C.signQ.push([q,sm,U])}C.fades.push(U);
+ const body=new THREE.MeshLambertMaterial({vertexColors:true,transparent:true}),win=D.winMat(),U={mats:[body,win],b:[x-a,z-b,x+a,z+b+3,21],o:1};
+ D.flushTo(G,C.g,body);D.flushTo(Gw,C.g,win);D.flushTo(band,C.g,C.glowM);if(q.I.length){const sm=new THREE.MeshBasicMaterial({map:C.A.tex,transparent:true,side:THREE.DoubleSide});C.signM.push(sm);U.mats.push(sm);C.signQ.push([q,sm,U])}C.fades.push(U);
  C.spots.stadium={x,z:gz+4,n:v.n};D.addInt(x,gz+3.6,2.6,'Enter '+v.n,()=>enterConcourse(C));
  /* club door */
  if(C.spots.club)D.addInt(C.spots.club.x,C.spots.club.z,2,'Enter '+((d.club&&d.club.n)||'the club'),()=>clubDoor(C));
