@@ -120,14 +120,62 @@ function selfie(C,name){S.dcity=S.dcity||{};const k=C.id+'|'+S.day,done=(S.dcity
  say('📸 Selfie at the '+name.replace(/^the /,'')+' posted · +'+f.toLocaleString()+' followers')}
 
 /* ---------- rooms ---------- */
-const RM={lobby:[1240,0,22,14],room:[1290,0,16,12],food:[1320,0,14,10],cafe:[1350,0,12,9],conv:[1380,0,12,10],souv:[1410,0,12,9],records:[1440,0,12,10],office:[1470,0,16,12]};
+const RM={lobby:[1240,0,22,14],room:[1290,0,16,12],food:[1320,0,14,10],cafe:[1350,0,12,9],conv:[1380,0,12,10],souv:[1410,0,12,9],records:[1440,0,12,10],office:[1470,0,16,12],books:[1300,-30,14,11],cloth:[1330,-30,14,11],pharm:[1360,-30,12,10]};
 function staff(rm,x,z,ry){let o;try{o=buildChar(fCfg())}catch(e){return}o.g.position.set(OX+x,0,OZ+z);o.g.rotation.y=ry||0;scene.add(o.g);rm.extra.push(o.g)}
 function chair(rm,x,z,c){rm.box(.7,.08,.7,c,x,.5,z);rm.box(.7,.7,.08,c,x,.85,z-.32);[[-.3,-.3],[.3,-.3],[-.3,.3],[.3,.3]].forEach(([a,b])=>rm.box(.06,.5,.06,'#333',x+a,.25,z+b))}
 function table(rm,x,z,w,d,c){rm.box(w,.08,d,c,x,.78,z,1);rm.box(.12,.74,.12,'#333',x,.37,z)}
 function plant(rm,x,z){rm.box(.6,.6,.6,'#8a5a3a',x,.3,z,1);rm.box(.9,1,.9,'#3a8a4a',x,1.1,z);rm.box(.5,.6,.5,'#4a9a5a',x,1.8,z)}
 /* exit at the front (south) wall back to where you came in */
 function exitTo(C,rm,x,z,label){rm.box(2,.05,1,'#7a3a2a',x,.03,z-.6);rm.int(x,z-.6,1.4,label||'Go back outside',()=>{const d=D.door||C.spots.hotel;D.goOut(d?d.x:C.spots.hotel.x,d?d.z+(d.face=='x'?0:.6):C.spots.hotel.z+1,0)})}
-function shopRoom(C,key){const s=C.s,[x0,z0,w,d]=RM[key],words=D.words(s.lang);const o={food:{floor:'#a07a52',wall:'#e8d8bc',name:'Restaurant'},cafe:{floor:'#8a6a4a',wall:'#f0e6d6',name:'Café'},conv:{floor:'#d8dce0',wall:'#f4f6f8',name:'Store',tiles:1},souv:{floor:'#b89a72',wall:'#f2e6cc',name:'Souvenirs'},records:{floor:'#3a3440',wall:'#2a2632',name:'Records'},office:{floor:'#c8c4bc',wall:'#e8e8ec',name:'Lobby',tiles:1}}[key];
+/* ---------- interior dressing: trim, lights, windows, art, and the extra furniture of each kind of room ---------- */
+const WCOL=['#e8b84a','#3a8ae8','#e84a6a','#4ab87a','#a86ae8','#e8803a'];
+function winArt(c,W,H){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#8ec8ee');g.addColorStop(1,'#e4f2fb');c.fillStyle=g;c.fillRect(0,0,W,H);
+ for(let i=0;i<12;i++){const w=10+Math.random()*18,h=20+Math.random()*60,x=Math.random()*W;c.fillStyle=i%2?'#8a9aaa':'#6a7a8c';c.fillRect(x,H-h,w,h)}
+ c.fillStyle='rgba(255,255,255,.7)';c.beginPath();c.ellipse(W*.7,H*.25,22,8,0,0,7);c.fill();c.strokeStyle='#f4efe6';c.lineWidth=7;c.strokeRect(0,0,W,H);c.beginPath();c.moveTo(W/2,0);c.lineTo(W/2,H);c.moveTo(0,H*.55);c.lineTo(W,H*.55);c.stroke()}
+function spineArt(c,W,H){c.fillStyle='#2a1c10';c.fillRect(0,0,W,H);const rows=3,rh=H/rows;for(let r=0;r<rows;r++){let x=2;while(x<W-4){const w=4+Math.random()*7,h=rh*(.6+Math.random()*.34);c.fillStyle=pick(['#a83a3a','#3a5a8a','#3a7a4a','#c8a040','#6a3a7a','#d8d0c0','#8a5a3a','#2a6a6a','#c86a3a']);c.fillRect(x,(r+1)*rh-h-2,w,h);x+=w+1}c.fillStyle='#5a3a20';c.fillRect(0,(r+1)*rh-3,W,3)}}
+function dress(C,rm,key,x0,z0,w,d,wc){const s=C.s,back=z0+.2,L=x0+.2,wh=rm.o.h||4,cx=x0+w/2,tr=dk(wc,.78);
+ rm.box(w,.2,.1,tr,cx,.1,back);rm.box(.1,.2,d,tr,L,.1,z0+d/2);rm.box(w,.14,.16,dk(wc,.92),cx,wh-.07,back);rm.box(.16,.14,d,dk(wc,.92),L,wh-.07,z0+d/2);
+ for(let x=x0+2;x<x0+w-1;x+=3.6)rm.glow(.22,.4,.12,'#ffd890',x,2.8,back+.1);for(let z=z0+3;z<z0+d-1;z+=4.2)rm.glow(.12,.4,.22,'#ffd890',L+.1,2.8,z);
+ if(key!='records'&&key!='office'){[.3,.72].forEach((f,i)=>{const zc=z0+d*f;rm.sign('x',x0+.08,zc-1.1,zc+1.1,1.1,3,160,128,winArt,'rw');rm.box(.1,.1,2.4,'#f4efe6',x0+.12,3.05,zc);rm.box(.1,2.4,.3,dk(s.acc||'#a83a3a',.8),x0+.14,1.85,zc-1.3);rm.box(.1,2.4,.3,dk(s.acc||'#a83a3a',.8),x0+.14,1.85,zc+1.3);rm.box(.3,.1,2.5,'#e8e0d0',x0+.25,1.05,zc)})}
+ const ax=[x0+w*.3,x0+w*.72];if(key!='food'&&key!='cafe'&&key!='office'){ax.forEach((x,i)=>{const c1=pick(WCOL);rm.box(1.1,.8,.06,'#3a2a1a',x,2.6,back+.1);rm.box(.9,.62,.04,c1,x,2.6,back+.14);rm.box(.4,.3,.04,pick(WCOL),x+(i?.1:-.1),2.6,back+.17)})}
+ rm.box(.55,.55,.06,'#3a2a1a',cx,3.3,back+.1);rm.box(.46,.46,.04,'#f8f6f0',cx,3.3,back+.13);rm.box(.04,.18,.03,'#111',cx,3.35,back+.16);rm.box(.14,.04,.03,'#111',cx+.05,3.3,back+.16)}
+function extras(C,rm,key,x0,z0,w,d,sign){const s=C.s,back=z0+.2,front=z0+d,cx=x0+w/2,wd='#6a4a2a',dkw='#4a3226',gl='#bfe0ff';
+ dress(C,rm,key,x0,z0,w,d,rm.o.wall||'#e8e4dc');
+ if(key=='food'){const f2=rm.o.floor;for(let ix=0;ix<w;ix++)for(let iz=0;iz<d;iz++)if((ix+iz)%2==0)D.quadY(rm.G,x0+ix,z0+iz,x0+ix+1,z0+iz+1,.012,dk(f2,.84));
+  rm.box(w-3,.12,.4,wd,cx,2.3,back+.3);for(let i=0;i<9;i++)rm.box(.26,.36,.26,pick(['#c8442a','#e8c040','#3a8a4a','#d8d0c0','#8a5a3a']),x0+2.2+i*(w-5)/8,2.54,back+.3);for(let i=0;i<4;i++){rm.box(.5,.05,.5,'#555',x0+3+i*2.4,2.9,back+.2);rm.box(.06,.4,.06,'#555',x0+3+i*2.4,2.7,back+.2)}
+  rm.sign('z',back+.12,x0+w-5,x0+w-1.5,2.4,3.7,256,144,(c,W,H)=>{c.fillStyle='#1e2a24';c.fillRect(0,0,W,H);c.strokeStyle='#8a6a40';c.lineWidth=8;c.strokeRect(0,0,W,H);c.fillStyle='#f4ecd8';c.font='bold 22px sans-serif';c.textAlign='center';c.fillText('MENU',W/2,30);c.font='16px sans-serif';c.textAlign='left';(D.food(C.id)||[]).slice(0,4).forEach((m,i)=>{c.fillText(String(m[0]).slice(0,16),16,62+i*22);c.textAlign='right';c.fillText('$'+m[1],W-16,62+i*22);c.textAlign='left'})},'menu'+C.id);
+  [z0+4.9,z0+8.5].forEach(z=>{rm.box(.7,.5,1.8,'#a03a2a',x0+.9,.3,z,1);rm.box(.2,.6,1.8,'#a03a2a',x0+.55,.8,z)});table(rm,x0+1.9,z0+4.9,.9,1.6,'#8a5a32');table(rm,x0+1.9,z0+8.5,.9,1.6,'#8a5a32');
+  plant(rm,x0+w-1,z0+d-2);rm.glow(1,.3,.06,'#ff4a4a',x0+2.2,3.5,back+.1)}
+ if(key=='cafe'){rm.box(2.2,.5,.5,gl,x0+4.9,1.4,z0+2.1);for(let i=0;i<5;i++)rm.box(.3,.2,.3,pick(['#e8b878','#c8803a','#f4e0b8','#a83a4a']),x0+4.1+i*.42,1.75,z0+2.1);rm.box(2.2,1.4,.08,'#2a3a30',x0+9,2.3,back+.12);for(let i=0;i<5;i++)rm.box(1.5-i%2*.4,.06,.02,'#e8e8d8',x0+8.7,2.8-i*.22,back+.17);
+  rm.box(3,.1,.3,wd,x0+3.5,2.3,back+.2);for(let i=0;i<8;i++)rm.box(.2,.2,.2,pick(['#f4f4f4','#d8c8a8','#8ab8d8']),x0+2.3+i*.32,2.45,back+.2);
+  rm.box(.9,.5,2.2,'#7a4a3a',x0+1,.3,z0+4.8,1);rm.box(.2,.55,2.2,'#7a4a3a',x0+.6,.75,z0+4.8);rm.box(.9,.06,.9,'#3a2a20',x0+2.2,.4,z0+4.8);rm.box(.08,.4,.08,'#333',x0+2.2,.2,z0+4.8);rm.box(.3,.04,.3,'#f4f4f4',x0+2.2,.46,z0+4.8);
+  for(let i=0;i<3;i++)rm.box(.4,.55,.4,'#3a3a3a',x0+6+i*.8,.28,z0+3.1)}
+ if(key=='conv'){rm.box(.45,1.6,1.8,'#5a4a3a',x0+.7,.8,z0+7,1);for(let j=0;j<5;j++)for(let k=0;k<4;k++)rm.box(.04,.28,.26,pick(WCOL),x0+.95,.4+k*.34,z0+6.2+j*.38);
+  rm.box(1.1,.4,.6,'#c8a040',x0+w-2,1.3,front-2.6);rm.box(.5,.5,.5,'#d83a2a',x0+w-1,.25,front-1.2);rm.box(.5,.5,.5,'#d83a2a',x0+w-1,.75,front-1.2);for(let i=0;i<4;i++)rm.box(.06,.06,.3,pick(['#e8c040','#e84a3a']),x0+3+i*2.4,3.4,z0+5.2)}
+ if(key=='souv'){rm.sign('z',back+.12,x0+w*.22,x0+w*.78,2,3.6,256,128,(c,W,H)=>{c.fillStyle='#4a8ac8';c.fillRect(0,0,W,H);c.fillStyle='#e8dcb4';[[.2,.3,40,28],[.28,.55,18,26],[.5,.32,34,22],[.55,.6,26,26],[.75,.35,36,26],[.85,.7,22,12]].forEach(([a,b,rx,ry])=>{c.beginPath();c.ellipse(W*a,H*b,rx,ry,0,0,7);c.fill()});c.strokeStyle='#5a3a20';c.lineWidth=8;c.strokeRect(0,0,W,H)},'wmap');
+  rm.box(2,.8,1.4,wd,x0+8,.4,z0+7,1);for(let i=0;i<7;i++)rm.box(.4,.4,.4,pick(['#e87aa8','#e8c040','#7ac8e8','#a8d86a','#f4f4f4']),x0+7.3+(i%4)*.45,1,z0+6.6+Math.floor(i/4)*.5);
+  rm.box(.08,1.6,1.8,'#c8b890',x0+.18,1.8,z0+4.5);for(let i=0;i<14;i++)rm.box(.04,.2,.2,pick(WCOL),x0+.24,1.2+(i%4)*.35,z0+3.9+Math.floor(i/4)*.4);
+  for(let x=x0+1;x<x0+w-1;x+=.7)rm.box(.3,.3,.04,pick(WCOL),x,3.4+Math.sin(x)*.1,back+.1)}
+ if(key=='records'){rm.box(.7,.9,.6,'#2a2a2a',x0+.9,.45,z0+6,1);rm.box(.5,.1,.5,'#c8c8cc',x0+.9,.95,z0+6);rm.box(.4,.1,.1,'#111',x0+.9,1.1,z0+5.8);rm.box(2.4,.5,.9,'#a83a4a',x0+4,.28,front-1.2,1);rm.box(2.4,.6,.2,'#a83a4a',x0+4,.7,front-.7);
+  [0,1,2].forEach(i=>{rm.box(.05,.8,.8,'#e8c040',x0+.18,2.8,z0+2.2+i*1.1);rm.box(.04,.6,.6,'#1a1a1a',x0+.22,2.8,z0+2.2+i*1.1)});rm.box(.5,1.4,.1,'#a8683a',x0+w*.8,2.4,back+.12);rm.box(.12,1,.06,'#3a2a1a',x0+w*.8,3.4,back+.12)}
+ if(key=='office'){D.quadY(rm.G,cx-1,z0+1,cx+1,z0+d-1,.015,'#7a2a3a');rm.sign('x',x0+.1,z0+3,z0+6,1.3,3,128,160,(c,W,H)=>{c.fillStyle='#1e2430';c.fillRect(0,0,W,H);c.fillStyle='#e8e0c8';c.font='bold 16px sans-serif';c.textAlign='center';c.fillText('DIRECTORY',W/2,24);c.font='13px sans-serif';c.textAlign='left';['5  Records Co.','4  Studio','3  Legal','2  Travel','1  Lobby'].forEach((t,i)=>c.fillText(t,14,52+i*22))},'dir');
+  rm.box(1.8,.4,.9,'#4a5a6a',x0+3,.2,front-1.4,1);rm.glow(.6,.4,.06,'#bfe0ff',x0+w-2,2.4,z0+d-3)}
+ if(key=='books'){rm.sign('z',back+.6,x0+1,x0+w-1,.3,2.9,512,128,spineArt,'bk');rm.box(w-1,3,.5,wd,cx,1.5,back+.34);rm.box(w-1,.1,.62,dkw,cx,3.05,back+.34);rm.box(w-1.2,.08,.6,dkw,cx,1.6,back+.34);
+  for(let i=0;i<3;i++){const x=x0+3+i*4,z=z0+5.2;rm.box(3.6,2,.5,wd,x,1,z,1);rm.sign('z',z+.26,x-1.7,x+1.7,.2,1.9,256,96,spineArt,'bk2');rm.sign('z',z-.26,x-1.7,x+1.7,.2,1.9,256,96,spineArt,'bk2')}
+  [z0+8.2,z0+9.4].forEach((z,i)=>{rm.box(.9,.5,.9,['#7a3a3a','#3a5a7a'][i],x0+1.2,.3,z,1);rm.box(.2,.6,.9,['#7a3a3a','#3a5a7a'][i],x0+.8,.75,z)});rm.box(.5,.5,.5,wd,x0+1.2,.3,z0+7,1);rm.glow(.3,.3,.3,'#ffe0a0',x0+1.2,.7,z0+7);rm.box(.1,3,.05,'#8a6a40',x0+w*.55,1.5,back+.9);rm.box(.1,3,.05,'#8a6a40',x0+w*.55+.6,1.5,back+.9);
+  rm.box(2.6,1.1,.8,wd,x0+w-2.2,.55,front-2.6,1);staff(rm,x0+w-2.2,front-3.4,0);plant(rm,x0+w-1,z0+1.5);rm.int(x0+w-2.2,front-1.6,1.6,'Browse the books',()=>D.shop(C,Object.assign({},D.door||{n:'Bookshop'},{k:'souv'})))}
+ if(key=='cloth'){for(let i=0;i<3;i++){const x=x0+3+i*3.2,z=z0+4.8;rm.box(.06,1.5,.06,'#aaa',x-1,.75,z);rm.box(.06,1.5,.06,'#aaa',x+1,.75,z);rm.box(2.1,.06,.06,'#aaa',x,1.5,z);for(let k=0;k<7;k++)rm.box(.1,.9,.45,pick(['#e84a6a','#3a6ab8','#f4f4f4','#2a2a2a','#e8c040','#4ab87a','#a86ae8']),x-.9+k*.3,1,z)}
+  rm.box(2.4,.8,1.2,'#e8e0d0',x0+w-3,.4,z0+8,1);for(let i=0;i<5;i++)rm.box(.9,.1,.7,pick(['#e84a6a','#3a6ab8','#f4f4f4','#e8c040']),x0+w-3.4+(i%2)*.8,.85+Math.floor(i/2)*.12,z0+8);
+  [[x0+3,z0+8.4],[x0+4.4,z0+8.8]].forEach(([x,z],i)=>{rm.box(.14,.14,.14,'#555',x,.07,z);rm.box(.3,.9,.2,'#e8d8c8',x,.75,z,1);rm.box(.4,.2,.25,pick(['#e84a6a','#3a6ab8']),x,1.2,z);rm.box(.22,.26,.22,'#e8d8c8',x,1.5,z)});
+  rm.box(1.1,2.3,.08,'#cfe0f0',x0+w-1.3,1.2,back+.14);rm.box(1.3,2.5,.04,'#3a2a1a',x0+w-1.3,1.2,back+.1);rm.box(2.4,2.4,.08,'#a83a6a',x0+w-2.8,1.2,z0+3.2,1);
+  rm.box(3,.1,.4,wd,x0+3,2.2,back+.3);for(let i=0;i<6;i++)rm.box(.4,.2,.28,pick(['#e8e8ec','#2a2a2a','#c8402a','#3a6ab8']),x0+1.8+i*.45,2.35,back+.3);
+  rm.box(2.4,1,.8,wd,x0+w-3.2,.5,front-2.6,1);staff(rm,x0+w-3.2,front-3.4,0);rm.int(x0+w-3.2,front-1.6,1.6,'Browse the boutique',()=>D.shop(C,Object.assign({},D.door||{n:'Boutique'},{k:'souv'})))}
+ if(key=='pharm'){for(let r=0;r<2;r++)for(let i=0;i<3;i++){const x=x0+2.4+i*2.6,z=z0+3.8+r*2.6;rm.box(2,1.7,.5,'#e8eef0',x,.85,z,1);for(let y=0;y<4;y++)for(let k=0;k<6;k++)rm.box(.22,.28,.2,pick(['#3a9a5a','#e8f0f4','#3a6ab8','#e8a03a']),x-.85+k*.34,.3+y*.4,z+.28)}
+  rm.sign('z',back+.12,cx-1.6,cx+1.6,2.2,3.8,160,160,(c,W,H)=>{c.fillStyle='#f4f8f8';c.fillRect(0,0,W,H);c.fillStyle='#2aa85a';const t=W*.2,a=W*.5;c.fillRect(a-t,H*.5-t*2.4,t*2,t*4.8);c.fillRect(a-t*2.4,H*.5-t,t*4.8,t*2);c.strokeStyle='#2aa85a';c.lineWidth=6;c.strokeRect(3,3,W-6,H-6)},'cross');
+  rm.box(4,1.1,.9,'#e8eef0',cx+2,.55,z0+2.2,1);rm.glow(3.6,.06,.7,'#bfe0ff',cx+2,1.14,z0+2.2);staff(rm,cx+2,z0+1.2,0);for(let i=0;i<3;i++){rm.box(1.6,.5,.5,'#c8d0d4',x0+1+i*1.8,.25,front-1.4,1);rm.box(1.6,.5,.12,'#c8d0d4',x0+1+i*1.8,.75,front-1.7)}
+  rm.box(.8,1.6,.7,'#e8eef0',x0+w-1,.8,z0+5,1);rm.glow(.5,.4,.05,'#ff6a6a',x0+w-1.1,1.4,z0+5.37);rm.int(cx+2,z0+3.4,1.8,'Buy something at the pharmacy',()=>D.shop(C,Object.assign({},D.door||{n:'Pharmacy'},{k:'conv'})))}}
+
+function shopRoom(C,key){const s=C.s,[x0,z0,w,d]=RM[key],words=D.words(s.lang);const o={food:{floor:'#a07a52',wall:'#e8d8bc',name:'Restaurant'},cafe:{floor:'#8a6a4a',wall:'#f0e6d6',name:'Café'},conv:{floor:'#d8dce0',wall:'#f4f6f8',name:'Store',tiles:1},souv:{floor:'#b89a72',wall:'#f2e6cc',name:'Souvenirs'},records:{floor:'#3a3440',wall:'#2a2632',name:'Records'},office:{floor:'#c8c4bc',wall:'#e8e8ec',name:'Lobby',tiles:1},books:{floor:'#7a5a3a',wall:'#e4d8c0',name:'Bookshop'},cloth:{floor:'#c8b8a0',wall:'#f2eee8',name:'Boutique'},pharm:{floor:'#e8ecee',wall:'#f4f8f8',name:'Pharmacy',tiles:1}}[key];
  const rm=D.mkRoom(key,x0,z0,w,d,Object.assign({h:4},o));if(!rm)return;const cx=x0+w/2,back=z0+.2,front=z0+d;
  const sign=(t,a,b2,y0,y1,opt)=>rm.sign('z',back+.08,a,b2,y0,y1,256,64,(c,W,H)=>D.signArt(c,W,H,t,opt||{bg:'#1a1426',fg:s.neon,neon:1}));
  if(key=='food'){rm.box(w-4,1.1,.9,'#7a4a2a',cx,.55,z0+2.2,1);rm.glow(w-4,.6,.1,'#ffcf80',cx,2.9,back+.1);for(let i=0;i<4;i++)chair(rm,x0+3+i*2.4,z0+3.4,'#6a3a1a');staff(rm,cx,z0+1.2,0);
@@ -150,7 +198,7 @@ function shopRoom(C,key){const s=C.s,[x0,z0,w,d]=RM[key],words=D.words(s.lang);c
  if(key=='office'){rm.box(5,1.1,1,'#3a3a40',cx,.55,z0+3,1);rm.glow(5,.1,1.02,'#bfe0ff',cx,1.12,z0+3);staff(rm,cx,z0+2,0);for(let i=0;i<3;i++){rm.box(1.8,2.8,.1,'#8a8e94',x0+2+i*2.4,1.4,back+.1);rm.glow(.1,.1,.05,'#ffd23d',x0+2+i*2.4+1,1.4,back+.18)}
   [[x0+2.5,z0+8],[x0+w-3,z0+8]].forEach(([x,z])=>{rm.box(2.6,.5,1,'#4a5a6a',x,.25,z,1);rm.box(2.6,.6,.3,'#4a5a6a',x,.7,z-.4)});plant(rm,x0+1,z0+1);plant(rm,x0+w-1,z0+1);plant(rm,x0+w-1,z0+d-2);sign('LOBBY',cx-2,cx+2,3,3.6,{bg:'#e8e8ec',fg:'#2a2a3a'});
   rm.int(cx,z0+4.4,1.8,'Coffee from the lobby kiosk',()=>D.shop(C,Object.assign({},D.door||{n:'Lobby'},{k:'cafe'})))}
- exitTo(C,rm,cx,front);rm.done()}
+ extras(C,rm,key,x0,z0,w,d,sign);exitTo(C,rm,cx,front);rm.done()}
 
 /* hotel lobby and room */
 function hotelRooms(C){const s=C.s,hn=(C.spots.hotel&&C.spots.hotel.n)||'Hotel',[lx,lz,lw,ld]=RM.lobby,[rx,rz,rw,rd]=RM.room;
@@ -160,7 +208,7 @@ function hotelRooms(C){const s=C.s,hn=(C.spots.hotel&&C.spots.hotel.n)||'Hotel',
  for(let i=0;i<2;i++){L.box(2,3.2,.2,'#a8a4a0',lx+14+i*3,1.6,lz+.2);L.glow(.25,.25,.05,'#ffd23d',lx+15.2+i*3,1.6,lz+.36)}L.glow(1.6,.4,1.6,'#fff2c0',lx+11,4.4,lz+7);L.glow(.8,.6,.8,'#ffe0a0',lx+11,4,lz+7);
  [[lx+4,lz+10],[lx+18,lz+10]].forEach(([x,z])=>{L.box(3,.5,1.2,'#3a5a6a',x,.25,z,1);L.box(3,.7,.3,'#3a5a6a',x,.75,z-.5);table(L,x,z+1.6,1.2,.8,'#5a3a2a')});plant(L,lx+1,lz+1);plant(L,lx+lw-1,lz+1);plant(L,lx+1,lz+ld-2);
  L.box(1,1.6,.6,'#c8a040',lx+lw-3,.8,lz+6,1);L.box(.8,.6,.5,'#8a4a2a',lx+lw-3,1.9,lz+6);
- L.int(lx+6,lz+4.4,2,'Reception: check in for the night',()=>checkIn(C));L.int(lx+15.5,lz+1.6,2,'Take the lift to your room',()=>lift(C));L.int(lx+4,lz+11.4,1.6,'Sit and rest for an hour',()=>D.hotelRest());
+ dress(C,L,'lobby',lx,lz,lw,ld,'#e8dcc4');L.int(lx+6,lz+4.4,2,'Reception: check in for the night',()=>checkIn(C));L.int(lx+15.5,lz+1.6,2,'Take the lift to your room',()=>lift(C));L.int(lx+4,lz+11.4,1.6,'Sit and rest for an hour',()=>D.hotelRest());
  L.box(3,.05,1,'#7a3a2a',lx+11,.03,lz+ld-.6);L.int(lx+11,lz+ld-.8,1.6,'Leave the hotel',()=>{const h=C.spots.hotel;D.goOut(h.x,h.z+1,0)});L.done();
  /* the room: a suite with a bathroom, bed by the big window, desk, sofa and TV */
  const R=D.mkRoom('room',rx,rz,rw,rd,{floor:'#9a7452',wall:'#efe6d6',h:4,name:'Your room'}),wd='#6a4a3a',dkw='#4a3226',fab=s.acc||'#3a5a8a';
@@ -208,12 +256,12 @@ D.hotelWake=function(auto){const C=D.C;if(!C||!C.rooms.room)return false;const i
  if(inRoom){D.goRoom('room',RM.room[0]+7.6,RM.room[1]+5.6,0);say('Good morning, '+(C.d.city||C.d.country)+'!')}else{D.goRoom('lobby',RM.lobby[0]+4,RM.lobby[1]+11.6,0);if(auto)say('You fell asleep on a sofa in the hotel lobby.')}return true};
 
 /* doors on the street: every shopfront opens into the matching interior */
-const KIND=[[/record|disc|vinyl|レコード|음반|唱片|music/i,'records'],[/caf|coffee|kaffee|koffie|カフェ|喫茶|커피|카페|咖啡|tea|茶/i,'cafe'],[/souvenir|gift|土産|みやげ|기념품|纪念|craft|bazaar|souk/i,'souv'],[/book|libr|flor|flower|barb|laund|sneak|vintage|thrift|zapat|mart|market|store|shop|pharm|farm|apothe|kiosk|コンビニ|薬|편의점|超市|便利|tienda|mercado|super/i,'conv']];
-const KN={food:'the restaurant',cafe:'the café',conv:'the shop',souv:'the souvenir shop',records:'the record shop'};
-D.doorInt=function(C,dr){const m=KIND.find(([r])=>r.test(dr.n));dr.k=m?m[1]:C.r()<.7?'food':'souv';if(dr.tall&&C.r()<.35)dr.k='office';const lab=dr.k=='office'?'Go into the office lobby':'Go into '+KN[dr.k]+': '+dr.n;D.addInt(dr.x,dr.z,1.3,lab,()=>{const[x0,z0,w,d]=RM[dr.k]||RM.food;D.door=dr;D.fade(()=>D.goRoom(dr.k,x0+w/2,z0+d-1.4,Math.PI),()=>say(dr.k=='office'?'An office lobby.':dr.n+': "'+D.words(C.s.lang).hi+'!"'),150)})};
+const KIND=[[/record|disc|vinyl|レコード|음반|唱片|music/i,'records'],[/caf|coffee|kaffee|koffie|カフェ|喫茶|커피|카페|咖啡|tea|茶/i,'cafe'],[/souvenir|gift|土産|みやげ|기념품|纪念|craft|bazaar|souk/i,'souv'],[/pharm|farm|apothe|drug|chemist|薬|약|药|apotek/i,'pharm'],[/book|libr|livre|buch|libro|書|책|书/i,'books'],[/cloth|fashion|boutique|moda|ropa|vêt|服|ブティック|패션|apparel|tailor|sneak|shoe|zapat|denim|vintage|thrift/i,'cloth'],[/book|libr|flor|flower|barb|laund|sneak|vintage|thrift|zapat|mart|market|store|shop|pharm|farm|apothe|kiosk|コンビニ|薬|편의점|超市|便利|tienda|mercado|super/i,'conv']];
+const KN={books:'the bookshop',cloth:'the boutique',pharm:'the pharmacy',food:'the restaurant',cafe:'the café',conv:'the shop',souv:'the souvenir shop',records:'the record shop'};
+D.doorInt=function(C,dr){const m=KIND.find(([r])=>r.test(dr.n));dr.k=m?m[1]:pick(['food','food','food','food','cafe','souv','souv','books','cloth','pharm']);if(dr.tall&&C.r()<.35)dr.k='office';const lab=dr.k=='office'?'Go into the office lobby':'Go into '+KN[dr.k]+': '+dr.n;D.addInt(dr.x,dr.z,1.3,lab,()=>{const[x0,z0,w,d]=RM[dr.k]||RM.food;D.door=dr;D.fade(()=>D.goRoom(dr.k,x0+w/2,z0+d-1.4,Math.PI),()=>say(dr.k=='office'?'An office lobby.':dr.n+': "'+D.words(C.s.lang).hi+'!"'),150)})};
 D.hotelInt=function(C){const h=C.spots.hotel;D.addInt(h.x,h.z,2,'Go into '+h.n,()=>{D.door=null;D.fade(()=>D.goRoom('lobby',RM.lobby[0]+11,RM.lobby[1]+RM.lobby[3]-1.6,Math.PI),()=>say('Reception is on the left, the lifts on the right.'),150)})};
 
-D.cityHooks=D.cityHooks||[];D.cityHooks.push(C=>{['food','cafe','conv','souv','records','office'].forEach(k=>{try{shopRoom(C,k)}catch(e){console.error('dcity room '+k,e)}});try{hotelRooms(C)}catch(e){console.error('dcity hotel',e)}});
+D.cityHooks=D.cityHooks||[];D.cityHooks.push(C=>{['food','cafe','conv','souv','records','office','books','cloth','pharm'].forEach(k=>{try{shopRoom(C,k)}catch(e){console.error('dcity room '+k,e)}});try{hotelRooms(C)}catch(e){console.error('dcity hotel',e)}});
 /* the windmill turns */
 {const u0=update;update=function(dt){u0(dt);try{const C=D.C;if(C&&C.spin)C.spin.forEach(g=>{g.rotation.z+=dt*.5})}catch(e){}}}
 
