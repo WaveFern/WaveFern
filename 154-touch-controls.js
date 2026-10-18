@@ -32,6 +32,7 @@ body.tch.tdrv #tchb{bottom:calc(var(--tsb) + 176px)}
 #tchb .tu i{font:700 calc(var(--tbb) * .36) Silkscreen,ui-monospace,monospace;color:var(--g)}
 #tchb .tu.hot{background:var(--g);color:#04120a;box-shadow:inset 0 -4px 0 #0004,3px 3px 0 #0008}#tchb .tu.hot i{color:#04120a}
 #tchb .tr2{right:calc(var(--tbb) + 12px);bottom:calc(var(--tbb) * .18);width:var(--tbs);height:var(--tbs);border-radius:50%}
+#tchb .tfs{right:calc(var(--tbb) + var(--tbs) + 20px);bottom:calc(var(--tbb) * .18);width:var(--tbs);height:var(--tbs);border-radius:50%}
 #tchb .tr2.on{background:#f5c542;color:#1a1300;box-shadow:inset 0 -3px 0 #0004,3px 3px 0 #0008}
 #tchb .tcol{position:absolute;right:calc((var(--tbb) - var(--tbs)) / 2);bottom:calc(var(--tbb) + 12px);display:flex;flex-direction:column-reverse;gap:7px;pointer-events:none}
 #tchb .tcol button{position:static;width:var(--tbs);height:var(--tbs);border-radius:8px}
@@ -52,6 +53,7 @@ body.tch #tqt{top:8px!important;left:282px!important;right:auto!important;width:
 #tchb .tcol{flex-direction:row-reverse;right:0;bottom:calc(var(--tbb) + 8px)}
 #tchb{width:calc(var(--tbb) + 4 * var(--tbs) + 40px)}
 #tchb .tr2{right:calc(var(--tbb) + 8px)}
+#tchb .tfs{right:calc(var(--tbb) + var(--tbs) + 16px)}
 }
 `;document.head.appendChild(s)}
 
@@ -59,6 +61,7 @@ function build(){if(ui)return;css();ui=document.createElement('div');ui.id='tch'
  ui.innerHTML=`<div id=tchj><div class=tjb><div class=tjk></div></div></div><div id=tchb>
 <button class=tu data-k=e aria-label="Use (E)"><i>E</i>Use</button>
 <button class=tr2 data-run=1 aria-label="Run (Shift)"><i>»</i>Run</button>
+<button class=tfs data-fs=1 aria-label="Full screen"><i>⛶</i>Full</button>
 <div class=tcol><button data-k=n data-w=map aria-label="Map (N)"><i>🗺</i>Map</button><button data-k=g data-w=ph aria-label="Phone (G)"><i>📱</i>Phone</button><button data-k=f data-w=st aria-label="Storage (F)"><i>📦</i>Store</button><button data-k=Escape data-w=pz aria-label="Pause (Esc)"><i>⏸</i>Pause</button></div></div>`;
  document.body.appendChild(ui);base=ui.querySelector('#tchj');knob=ui.querySelector('.tjk');
  ui.addEventListener('contextmenu',e=>e.preventDefault());
@@ -69,11 +72,17 @@ function build(){if(ui)return;css();ui=document.createElement('div');ui.id='tch'
  const jUp=e=>{if(e.pointerId===jid)jRel()};base.addEventListener('pointerup',jUp);base.addEventListener('pointercancel',jUp);base.addEventListener('lostpointercapture',jUp);
  /* buttons: key buttons press on finger down and release on lift, like holding a key; Run toggles */
  ui.querySelectorAll('#tchb button').forEach(b=>{
+  if(b.dataset.fs){b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();toggleFs()});return}
   b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(b.dataset.run){runOn=!runOn;b.classList.toggle('on',!!runOn);if(!runOn&&typeof keys!='undefined')delete keys.shift;return}
    const k=b.dataset.k;if(held[e.pointerId])return;held[e.pointerId]=k;b.classList.add('dn');try{b.setPointerCapture(e.pointerId)}catch(_){}kd(k)});
   const up=e=>{const k=held[e.pointerId];if(k==null)return;delete held[e.pointerId];b.classList.remove('dn');kd(k,'keyup')};
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up)})}
 
+const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+const fsOk=()=>{const d=document,r=d.documentElement;return !!((d.fullscreenEnabled||d.webkitFullscreenEnabled)&&(r.requestFullscreen||r.webkitRequestFullscreen))};
+function toggleFs(){const d=document,r=d.documentElement;try{if(fsEl()){(d.exitFullscreen||d.webkitExitFullscreen).call(d)}else{const q=(r.requestFullscreen||r.webkitRequestFullscreen).call(r,{navigationUI:'hide'});if(q&&q.catch)q.catch(()=>{});try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})}catch(_){}}}catch(_){}}
+function fsMark(){if(!ui)return;const b=ui.querySelector('.tfs');if(b)b.innerHTML=fsEl()?'<i>✕</i>Exit':'<i>⛶</i>Full'}
+['fullscreenchange','webkitfullscreenchange'].forEach(e=>document.addEventListener(e,fsMark));
 function jMove(e){const R=base.querySelector('.tjb').getBoundingClientRect().width*.5*.72;let dx=e.clientX-jc[0],dy=e.clientY-jc[1];const d=Math.hypot(dx,dy)||1,c=Math.min(d,R);
  knob.style.transform=`translate(${dx/d*c}px,${dy/d*c}px)`;const m=c/R,x=dx/d*m,y=dy/d*m;
  if(m<.16){J.on=0;J.x=J.y=0}else{J.on=1;J.x=x;J.y=y}
@@ -94,7 +103,7 @@ setInterval(()=>{if(!act||!ui)return;const m=M(),ok=(m=='play'||m=='drive'||m=='
  if(typeof keys!='undefined'){if(runOn&&m=='play')keys.shift=1;else if(runOn)delete keys.shift}
  const nr=typeof near!='undefined'&&near,sig=m+'|'+(nr?1:0)+'|'+W.st(m)+'|'+W.ph(m);if(sig==lastSig)return;lastSig=sig;
  const u=ui.querySelector('.tu');u.classList.toggle('hot',!!(nr||m=='drive'));
- ui.querySelector('.tr2').classList.toggle('hid',m!='play');
+ ui.querySelector('.tr2').classList.toggle('hid',m!='play');ui.querySelector('.tfs').classList.toggle('hid',!fsOk());
  ui.querySelectorAll('.tcol button').forEach(b=>b.classList.toggle('hid',!W[b.dataset.w](m)))},120);
 addEventListener('blur',relAll);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)relAll()});
