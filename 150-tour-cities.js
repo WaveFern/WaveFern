@@ -282,12 +282,25 @@ function facLow(C,G,Gw,L,h,wall){const s=C.s,r=C.r,x0=L.x0,x1=L.x1,z0=L.z0,z1=L.
  for(let y=.3,i=0;y<h-.4;y+=.62,i++){const c=i%2?dk(wall,.82):dk(wall,1.1);bx(G,.55,.34,.55,c,x1-.1,y+.17,z1-.1);bx(G,.55,.34,.55,c,x0+.1,y+.17,z1-.1)}
  if(h>6&&w>6){for(let y=5.2;y<h-1.2;y+=2.8){const n=Math.floor((w-1)/3.6);for(let i=0;i<n;i++){const a=x0+2+i*3.6;if(a>x1-1)break;bx(G,1.2,.1,.4,'#d8d0c0',a,y,z1+.2);bx(G,1.2,.3,.06,'#26262a',a,y+.2,z1+.4);bx(G,1.0,.22,.22,pick(['#c8442a','#e8a8c8','#e8d048','#a8d86a']),a,y+.35,z1+.22)}}}
  if(r()<.6)bx(G,.12,h-.3,.12,'#6a6a6e',x0+.3,h/2,z1+.12);
- if(r()<.55&&!s.desert){const cx=x0+w*(.15+r()*.7);bx(G,.9,2.2,.9,'#8a5a42',cx,h+.9,mz-dz*.2);bx(G,1.1,.2,1.1,'#4a3a32',cx,h+2.1,mz-dz*.2)}
  acUnits(C,G,x0,z0,x1,z1,h,Math.min(2,Math.floor(w/5)));roofKit(C,G,Gw,x0,z0,x1,z1,h+.3,'low')}
 function facTall(C,G,Gw,x0,z0,x1,z1,ins,pod,h2,wall){const r=C.r,fc=dk(wall,.78),w=x1-x0,dz=z1-z0,mx=(x0+x1)/2,mz=(z0+z1)/2;
  for(let a=x0+ins+1.6;a<x1-ins-.4;a+=3.2)bx(G,.22,h2-pod,.34,fc,a,pod+(h2-pod)/2,z1-ins+.1);for(let a=z0+ins+1.6;a<z1-ins-.4;a+=3.2)bx(G,.34,h2-pod,.22,fc,x1-ins+.1,pod+(h2-pod)/2,a);
  bx(G,w+.3,.18,dz+.3,dk(wall,.7),mx,pod,mz);bx(G,w+.1,.14,dz+.1,dk(wall,.85),mx,Math.min(h2,pod+14),mz);
  if(r()<.5)for(let y=pod+10;y<h2-4;y+=10)bx(G,w-ins*2+.2,.22,dz-ins*2+.2,dk(wall,.72),mx,y,mz)}
+
+/* silhouette kit: each lot gets one or two of these so rooflines and corners differ (own rng so the city layout stays put) */
+function bulkhead(G,Gw,x,z,y,wall){const c=dk(wall,1.05);bx(G,2.6,2.6,2.2,c,x,y+1.3,z);bx(G,3,.18,2.6,'#6a6e74',x,y+2.7,z);bx(G,.9,1.7,.06,'#2a2a30',x-.4,y+.85,z+1.13);bx(G,.5,.5,.5,'#8a8e94',x+.9,y+2.95,z-.3);for(let i=0;i<3;i++)bx(G,.5,.05,.04,'#5a5e64',x+.9,y+2.8+i*.1,z-.03)}
+function archKit(C,G,Gw,L,h,wall,kind){const s=C.s,rr=fRng(fHash('arch'+C.id+'|'+L.x0.toFixed(1)+'|'+L.z0.toFixed(1))),R=(a,b)=>a+rr()*(b-a),x0=L.x0,x1=L.x1,z0=L.z0,z1=L.z1,w=x1-x0,dz=z1-z0,mx=(x0+x1)/2,mz=(z0+z1)/2,lt=dk(wall,1.1),dkw=dk(wall,.8),roofC=s.terra?'#b8583a':s.mansard?'#5c6370':pick(['#6a4a3a','#4a4e56','#8a3a2a']);
+ const turret=(L.fx&&L.fz&&h>9&&w>8&&rr()<.55),stepG=(s.gable||s.brick)&&rr()<.5&&w>6,bay=h>10&&w>9&&!s.fire&&rr()<.45,setb=kind=='mid'&&h>15&&w>10&&rr()<.4,garden=s.big&&kind=='mid'&&!setb&&rr()<.3,chim=kind=='low'&&!s.desert&&rr()<.55,flag=kind=='mid'&&rr()<.18;
+ if(turret){const tx=x1-.1,tz=z1-.1,tr=Math.min(1.7,w*.16),th=h+2.2;xgPrism(G,tr,tr,th-3,12,lt,tx,3,tz);for(let y=6;y<th;y+=2.8){xgPrism(G,tr+.12,tr+.12,.16,12,dkw,tx,y,tz);for(let k=0;k<5;k++){const a=Math.PI*.25+k*Math.PI*.125;quadZ(Gw,tx+Math.cos(a)*tr*.95-.25,tx+Math.cos(a)*tr*.95+.25,y+.7,y+2,tz+Math.sin(a)*tr*1.0+.02,rr()<.6?'#ffd890':'#1a1e26')}}
+  xgPrism(G,tr*.9,tr*.15,1.4,12,dkw,tx,1.9,tz);xgPrism(G,tr+.3,0,3.4,12,roofC,tx,th,tz);bx(G,.08,1.2,.08,'#3a3a3e',tx,th+3.9,tz)}
+ if(stepG){const sw=Math.min(6,w*.5);[[1,1.1],[.72,1.1],[.42,1.1]].forEach(([k,hh],i)=>bx(G,sw*k,hh,.7,wall,mx,h+.5+i*hh,z1-.4,0,dkw));bx(G,sw*.2,.5,.8,dkw,mx,h+3.5,z1-.4)}
+ if(bay){const n=w>15?2:1;for(let b=0;b<n;b++){const bxx=n==1?mx:x0+w*(b?.7:.3),bw=2.8,y0=3.8,hh=Math.min(h-4.4,fhR(rr)*3);bx(G,bw,hh,.9,lt,bxx,y0+hh/2,z1+.5,0,dkw);bx(G,bw+.3,.22,1.1,dkw,bxx,y0+hh+.1,z1+.5);bx(G,bw+.3,.22,1.1,dkw,bxx,y0-.1,z1+.5);for(let y=y0+.4;y<y0+hh-1.2;y+=2.8)quadZ(Gw,bxx-bw/2+.3,bxx+bw/2-.3,y,y+1.7,z1+.96,rr()<.6?'#ffd890':'#1a1e26')}}
+ if(setb){const i=Math.min(2.2,w*.16),sh=3.2;bx(G,w-i*2,sh,dz-i*2,'#cfd8de',mx,h+sh/2+.1,mz,0,'#9aa6ae');quadZ(Gw,x0+i+.4,x1-i-.4,h+.6,h+sh-.4,z1-i+.04,'#bfe0ff');bx(G,w-i*2+.6,.2,dz-i*2+.6,'#6a6e74',mx,h+sh+.2,mz);for(let a=x0+1;a<x1-.8;a+=1.8){if(a>x0+i-.8&&a<x1-i+.8&&rr()<.2)continue;bx(G,1.2,.35,.5,'#6b5a42',a,h+.3,z1-.3);bx(G,1,.5,.4,'#3f8a4a',a,h+.7,z1-.3)}}
+ else if(garden){for(let a=x0+1.5;a<x1-1;a+=2.2)bx(G,1.4,.4,.7,'#6b5a42',a,h+.2,z1-1);for(let k=0;k<2;k++){const tx=x0+w*(.3+k*.4);bx(G,.2,1.4,.2,'#6a4a2a',tx,h+1,mz);bx(G,1.4,1.2,1.4,s.tree,tx,h+2,mz)}bx(G,2.8,.1,2.2,'#9a7a52',x0+w*.8,h+2.1,mz);[[-1.3,-1],[1.3,-1],[-1.3,1],[1.3,1]].forEach(([a,b])=>bx(G,.08,2,.08,'#6a4a2a',x0+w*.8+a,h+1.1,mz+b))}
+ if(chim){[.25,.7].forEach(k=>{if(rr()<.7){const cx=x0+w*k,cz=mz-dz*.2,ch=Math.min(3,2.2+rr());bx(G,.7,ch,.7,s.brick?'#7a3a2c':'#9a8a7a',cx,h+ch/2+.8,cz);bx(G,.95,.2,.95,'#3a3a3e',cx,h+ch+.9,cz)}})}
+ if(flag){const fx=x1-.8,fz=z1-.8,pl=5;bx(G,.1,pl,.1,'#c8ccd2',fx,h+pl/2,fz);const fc=pick([s.acc,s.neon,'#d7262f','#2f68c8']);quadZ(Gw,fx,fx+2.2,h+pl-1.5,h+pl-.1,fz+.05,fc);quadZ(Gw,fx,fx+2.2,h+pl-1.5,h+pl-.1,fz-.05,fc)}}
+function fhR(rr){return 2+Math.floor(rr()*4)}
 
 function dsBuildings(C){const s=C.s,r=C.r,RR=(a,b)=>a+r()*(b-a),words=dw(s.lang).shop,cx=C.cx,cz=C.cz,maxD=Math.hypot(C.sx0-cx,C.Dz/2);
  C.blocks.forEach(bk=>{if(bk.park){dsPark(C,bk);return}if(bk.land){let ok=false;if(D.landmark)try{ok=D.landmark(C,bk)}catch(e){console.error('landmark',e)}if(!ok)dsLandmark(C,bk);return}
@@ -315,7 +328,7 @@ function dsBuilding(C,L,h,words,li){const s=C.s,r=C.r,RR=(a,b)=>a+r()*(b-a),G=mk
   bx(G,w-ins*2+.3,.6,dz-ins*2+.3,dk(wall,.7),mx,top+.3,mz);
   const cr=r();if(s.heli&&cr<.5){xgPrism(G,Math.min(w,dz)*.32,Math.min(w,dz)*.32,.2,12,'#3a3a3a',mx,top+.6,mz);quadY(Gw,mx-1,mz-.15,mx+1,mz+.15,top+.85,'#ffe14d');quadY(Gw,mx-1,mz-1.2,mx-.7,mz+1.2,top+.85,'#ffe14d');quadY(Gw,mx+.7,mz-1.2,mx+1,mz+1.2,top+.85,'#ffe14d')}
   else if(cr<.35){xgPrism(G,.25,.04,RR(6,14),6,'#c8ccd2',mx,top+.6,mz);bx(Gw,.4,.4,.4,'#ff3030',mx,top+.6+10,mz)}else if(cr<.6&&s.gold){xgPrism(G,Math.min(w,dz)*.35,0,RR(6,12),4,'#d8b860',mx,top+.6,mz,{ph:Math.PI/4})}
-  else{bx(G,w*.3,2,dz*.3,'#8a8e94',mx-w*.15,top+1.6,mz-dz*.1);bx(G,w*.2,1.4,dz*.25,'#9aa0a6',mx+w*.2,top+1.3,mz+dz*.15)}
+  else{const pw=w*.36,pd=dz*.34,pc=dk(wall,.62),px=mx-w*.12,pz=mz-dz*.08;bx(G,pw,2.4,pd,pc,px,top+1.8,pz);bx(G,pw+.4,.2,pd+.4,'#5a5e64',px,top+3.1,pz);quadZ(Gw,px-pw/2+.4,px+pw/2-.4,top+1.1,top+2.4,pz+pd/2+.03,'#1a1e26');for(let a=px-pw/2+.6;a<px+pw/2-.5;a+=.5)bx(G,.06,1.2,.05,'#4a4e54',a,top+1.75,pz+pd/2+.05);for(let k=0;k<3;k++){xgPrism(G,.6,.6,.45,10,'#7a7e84',mx+w*(.12+k*.1),top+.85,mz+dz*.15);xgPrism(G,.5,.5,.03,10,'#222',mx+w*(.12+k*.1),top+1.3,mz+dz*.15)}bx(G,w*.14,.6,dz*.14,'#9aa0a6',mx+w*.2,top+.9,mz-dz*.2)}
   if(s.neonK>.7)quadZ(Gw,x0+ins,x1-ins,top-.25,top+.05,z1-ins+.04,pick([s.neon,s.acc]));
   if(L.kind=='hotel')hotelFront(C,G,Gw,q,L,pod+.6);else{if(L.fz)shopRow(C,G,Gw,q,'z',x0,z0,x1,z1,words);if(L.fx)shopRow(C,G,Gw,q,'x',x0,z0,x1,z1,words)}
   /* billboard high on the tower */
@@ -324,11 +337,11 @@ function dsBuilding(C,L,h,words,li){const s=C.s,r=C.r,RR=(a,b)=>a+r()*(b-a),G=mk
    if(fz)bx(G,fw+.4,fhh+.4,.15,'#1a1a1e',mx,y+fhh/2,z1-ins+.04);else bx(G,.15,fhh+.4,fw+.4,'#1a1a1e',x1-ins+.04,y+fhh/2,mz);neonFrame(Gw,fz?'z':'x',fz?z1-ins+.14:x1-ins+.14,fz?mx:mz,fw,y,fhh,pick([s.neon,s.acc,'#ff4fa8','#4fd8ff']))}}
  else if(L.kind=='hotel'||!low){/* mid-rise block */
   bx(G,w,h,dz,wall,mx,h/2,mz,0,dark);winBands(C,Gw,x0,z0,x1,z1,3.4,h-.8,fh,lit);
-  bx(G,w+.3,.5,dz+.3,dk(wall,.82),mx,h+.25,mz);bx(G,w+.2,.25,dz+.2,dk(wall,.86),mx,3.5,mz);facMid(C,G,Gw,L,h,wall);
+  bx(G,w+.3,.5,dz+.3,dk(wall,.82),mx,h+.25,mz);bx(G,w+.2,.25,dz+.2,dk(wall,.86),mx,3.5,mz);facMid(C,G,Gw,L,h,wall);archKit(C,G,Gw,L,h,wall,'mid');
   if(s.mansard){bx(G,w-.6,2.2,dz-.6,'#5c6370',mx,h+1.35,mz,0,'#4a505a');for(let a=x0+1.2;a<x1-1;a+=2.4){bx(G,.9,1.1,.5,'#e8e2d4',a,h+1.5,z1-.3);quadZ(Gw,a-.3,a+.3,h+1.1,h+1.8,z1-.04,'#ffd890')}
    for(let y=6.2;y<h-1;y+=fh)bx(G,w-.4,.08,.5,'#1d1d22',mx,y,z1+.25)}
   else if(s.terra){gable(G,x0-.3,z0-.3,x1+.3,z1+.3,h,Math.min(3,dz*.25),'#b8583a',wall,1)}
-  else{bx(G,w*.25,1.4,dz*.2,'#8a8e94',x0+w*.3,h+.9,mz);if(s.fire&&r()<.7){xgPrism(G,1.1,1.1,2.2,10,'#6a4a2a',x0+w*.75,h+2.6,mz-dz*.2);xgPrism(G,1.2,0,.8,10,'#4a3a2a',x0+w*.75,h+3.7,mz-dz*.2);for(let i=0;i<4;i++)bx(G,.1,1.6,.1,'#333',x0+w*.75+(i%2?.8:-.8),h+.8,mz-dz*.2+(i<2?.8:-.8))}}
+  else{bulkhead(G,Gw,x0+w*.3,mz,h+.5,wall);if(s.fire&&r()<.7){xgPrism(G,1.1,1.1,2.2,10,'#6a4a2a',x0+w*.75,h+2.6,mz-dz*.2);xgPrism(G,1.2,0,.8,10,'#4a3a2a',x0+w*.75,h+3.7,mz-dz*.2);for(let i=0;i<4;i++)bx(G,.1,1.6,.1,'#333',x0+w*.75+(i%2?.8:-.8),h+.8,mz-dz*.2+(i<2?.8:-.8))}}
   if(s.fire&&w>6){for(let y=4.4;y<h-1;y+=fh){bx(G,3,.1,1,'#1d1d22',mx,y,z1+.5);bx(G,3,.6,.06,'#1d1d22',mx,y+.35,z1+1)}xgBox(G,.1,h-4,.1,'#1d1d22',mx-1.45,h/2+1.2,z1+1)}
   if(s.mural&&r()<.35&&dz>6){const uv=C.A.add(192,192,(x,W,H)=>muralArt(x,W,H,s,r),'m'+((r()*8)|0));qFace(q,'x',x1+.05,z0+.6,Math.min(z1-.6,z0+.6+Math.min(dz-1.2,h-4)),3.6,3.6+Math.min(dz-1.2,h-4),uv&&uv.uv)}
   if(L.kind=='hotel')hotelFront(C,G,Gw,q,L,h);else if(L.kind=='club')clubFront(C,G,Gw,q,L,h);else{if(L.fz)shopRow(C,G,Gw,q,'z',x0,z0,x1,z1,words);if(L.fx)shopRow(C,G,Gw,q,'x',x0,z0,x1,z1,words)}
@@ -336,7 +349,7 @@ function dsBuilding(C,L,h,words,li){const s=C.s,r=C.r,RR=(a,b)=>a+r()*(b-a),G=mk
    qAdd(q,[[xs,y,z1+1.3],[xs,y,z1+.1],[xs,y+5,z1+.1],[xs,y+5,z1+1.3]],uv?uv.uv:[0,0,0,0]);bx(G,.12,5.2,1.3,'#111',xs-.08,y+2.5,z1+.7)}
   if(r()<Math.min(.8,s.bill*.8+.12)&&h>9){const fw=Math.min(w-1,9),fhh=fw*.42,k=(r()*30)|0,uv=C.A.add(256,108,(x,W,H)=>billArt(x,W,H,k,s,r),'bill'+k);bx(G,.15,fhh+.6,.15,'#333',mx-fw/3,h+fhh/2,mz);bx(G,.15,fhh+.6,.15,'#333',mx+fw/3,h+fhh/2,mz);bx(G,fw+.3,fhh+.3,.2,'#1a1a1e',mx,h+.9+fhh/2,mz);qFace(q,'z',mz+.12,mx-fw/2,mx+fw/2,h+.9,h+.9+fhh,uv&&uv.uv);neonFrame(Gw,'z',mz+.14,mx,fw,h+.9,fhh,pick([s.neon,s.acc,'#ff4fa8','#4fd8ff']));for(let i=0;i<4;i++)bx(Gw,.25,.25,.5,'#fff2c0',mx-fw/2+fw*(i+.5)/4,h+.75,mz+.5)}}
  else{/* low houses and shops */
-  bx(G,w,h,dz,wall,mx,h/2,mz,0,dark);winBands(C,Gw,x0,z0,x1,z1,3.4,h-.5,fh,lit*.8);facLow(C,G,Gw,L,h,wall);
+  bx(G,w,h,dz,wall,mx,h/2,mz,0,dark);winBands(C,Gw,x0,z0,x1,z1,3.4,h-.5,fh,lit*.8);facLow(C,G,Gw,L,h,wall);archKit(C,G,Gw,L,h,wall,'low');
   if(s.gable){const st=4,sw=w/st;for(let i=0;i<st;i++){const hh=(st-Math.abs(i-(st-1)/2)*1.4)*.7;bx(G,sw*(1-i*0)+.01,hh,.6,wall,x0+sw*(i+.5),h+hh/2,z1-.3)}bx(G,w,.25,dz,dk(wall,.7),mx,h+.12,mz)}
   else if(s.terra||s.wood||(!s.desert&&r()<.5))gable(G,x0-.3,z0-.3,x1+.3,z1+.3,h,Math.min(2.6,dz*.3),s.terra?'#b8583a':s.wood?'#4a4a4a':pick(['#6a4a3a','#4a4e56','#8a3a2a']),wall,w>=dz);
   else{bx(G,w+.2,.5,dz+.2,dk(wall,.85),mx,h+.25,mz);if(s.desert&&r()<.3)dome(G,Math.min(w,dz)*.28,mx,h+.5,mz,'#f0e8d8')}

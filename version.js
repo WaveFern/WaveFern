@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v45.0.0';
+const GAME_VERSION='v45.1.0';
 const VERSION_HISTORY=[
+ {v:'v45.1.0',n:'Tour city buildings now have more varied shapes: round corner turrets with cone roofs, bay windows, stepped terraces on top, stepped gables, roof gardens with pergolas, chimneys, flagpoles, proper stairwell huts and fuller skyscraper roof plant instead of plain grey blocks. Saves still load.'},
  {v:'v45.0.0',n:'The land around every tour city is no longer an empty plane: there are fields, trees, rocks or desert dunes, hills, farmhouses and a ring of far-off buildings or skyscrapers, and the stadium plaza now has paved patterns, tree rows, lamps and benches. Saves still load.'},
  {v:'v44.9.0',n:'Buildings no longer turn into murky ghosts when they block your view. Instead a clean round see-through hole opens in whatever is in front of you, centred on your character, so you can always see yourself and nothing ever vanishes as you walk up to it. Saves still load.'},
  {v:'v44.8.0',n:'Every tour city is much more detailed. Buildings now have floor ledges, corner pillars, cornices, balconies with railings and plants, air conditioners, drainpipes, water tanks, aerials and solar panels, glass towers have fins, and shopfronts have window frames, door frames, steps, plant pots and warm lights. Streets get corner signs, benches, hydrants, bins, bus shelters, food carts and flower baskets on the lamps. Inside, every shop, café, restaurant, record shop and lobby has skirting, wall lights, windows, wall art, a clock and more furniture, there are three new shop types (bookshop, boutique and pharmacy), and the hotel lobby is dressed too. The see-through fade for buildings is back and better: a building in the way turns into a faint ghost only when it really blocks you, and it never vanishes as you walk up to it. Saves still load.'},
