@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v44.8.0';
+const GAME_VERSION='v44.9.0';
 const VERSION_HISTORY=[
+ {v:'v44.9.0',n:'Buildings no longer turn into murky ghosts when they block your view. Instead a clean round see-through hole opens in whatever is in front of you, centred on your character, so you can always see yourself and nothing ever vanishes as you walk up to it. Saves still load.'},
  {v:'v44.8.0',n:'Every tour city is much more detailed. Buildings now have floor ledges, corner pillars, cornices, balconies with railings and plants, air conditioners, drainpipes, water tanks, aerials and solar panels, glass towers have fins, and shopfronts have window frames, door frames, steps, plant pots and warm lights. Streets get corner signs, benches, hydrants, bins, bus shelters, food carts and flower baskets on the lamps. Inside, every shop, café, restaurant, record shop and lobby has skirting, wall lights, windows, wall art, a clock and more furniture, there are three new shop types (bookshop, boutique and pharmacy), and the hotel lobby is dressed too. The see-through fade for buildings is back and better: a building in the way turns into a faint ghost only when it really blocks you, and it never vanishes as you walk up to it. Saves still load.'},
  {v:'v44.7.2',n:'Fixed buying a Gphone 9 or newer still saying you had no phone: the purchase now counts, and saves where you already bought one open the phone with G as normal. Saves still load.'},
  {v:'v44.7.1',n:'Fixed the game pausing or glitching on phones after sending a text on the computer: the on-screen keyboard opening or closing no longer pauses the game. Saves still load.'},
