@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v44.5.0';
+const GAME_VERSION='v44.6.0';
 const VERSION_HISTORY=[
+ {v:'v44.6.0',n:'Storage placing is completely redone and easy on phones. Furniture now snaps flush against walls and other furniture and turns its back to the wall by itself. Pick an item and drag it in the room, then tap Place, or tap a placed item to Move, turn or store it. Big buttons for Place, turn left and right, Store and Undo, and a settings button for snapping, turning to the wall and grid size. Saves still load.'},
  {v:'v44.5.0',n:'On a phone held upright, Spotifly on the computer now looks like the Gphone one: dark, with the pages as tabs along the top. A now-playing bar with a pause and play button sits at the bottom of the computer (upright phone screens) and the Gphone while a song plays. The touch Phone button hides until you own a phone, and pinching or double-tapping no longer zooms the page on phones. Saves still load.'},
  {v:'v44.4.1',n:'Closing the browser window on the computer now stops any music that was playing from a website in it. Saves still load.'},
  {v:'v44.4.0',n:'You no longer start with a phone: new players need to buy a Gphone 8 ($100) on Amazoom or gphone.wf on the computer before the G key (or the Phone button) works. Saves that already have a phone keep it. On phones and tablets the computer\'s app icons now look like the Gphone app grid, with rounded tiles. Saves still load.'},
