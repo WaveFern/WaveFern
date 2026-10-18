@@ -14,6 +14,7 @@ body.pcsmall .wt button{min-width:44px;min-height:36px;font-size:16px}
 body.pcsmall .tb{height:52px;overflow-x:auto;white-space:nowrap}body.pcsmall .tb button{min-height:40px;font-size:14px;flex:none}
 body.pcsmall .sm button{min-height:48px;font-size:16px}
 body.pcsmall .ico{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+body.pcsmall .ico img{border-radius:14px;border:2px solid #000;box-sizing:border-box;padding:6px;background:#1b1f1d}
 body.pcsmall .ico:active{filter:brightness(1.3)}
 `;document.head.appendChild(st);
 function fix(){const pc=document.getElementById('pc'),on=!!pc&&small();document.body.classList.toggle('pcsmall',on);
@@ -32,4 +33,11 @@ function fix(){const pc=document.getElementById('pc'),on=!!pc&&small();document.
 {const l0=pcLayout;pcLayout=function(){const r=l0.apply(this,arguments);try{fix()}catch(e){console.error('pcResp',e)}return r}}
 addEventListener('resize',()=>{try{if(document.getElementById('pc'))pcLayout()}catch(_){}});
 addEventListener('orientationchange',()=>setTimeout(()=>{try{if(document.getElementById('pc'))pcLayout()}catch(_){}},200));
+/* v44.3.0: new players start without a phone (S.noPhone, missing = has one). Buy a Gphone 8 on Amazoom or gphone.wf. */
+const P8=100;
+function phoneCard(){return S&&S.noPhone?`<div style="margin:12px 0;padding:10px;background:#fff;color:#111;border-radius:6px"><b style="font-size:16px">Gphone 8</b> <small>You do not have a phone yet. This one is slow, but it has the camera, Messages and Instagrime.</small><div style="margin:6px 0;font-weight:bold">$${P8}</div><button class=go ${S.money<P8?'disabled':''} onclick="buyPhone8()">Buy</button></div>`:''}
+window.buyPhone8=function(){if(!S||!S.noPhone)return;if(S.money<P8){try{snd('err')}catch(e){}return say('Not enough money.')}
+ S.money=+(S.money-P8).toFixed(2);delete S.noPhone;try{chime()}catch(e){}say('Bought a Gphone 8. Press G to use it.');pcR()};
+for(const k of ['amz','phones']){const a0=PA[k];PA[k]=function(){const h=a0.apply(this,arguments);try{return typeof h=='string'?phoneCard()+h:h}catch(e){return h}}}
+{const o0=openPhone;openPhone=function(){if(S&&S.noPhone&&mode=='play'){try{snd('err')}catch(e){}return say('You do not have a phone yet. Buy a Gphone on Amazoom or at gphone.wf on your computer.')}return o0.apply(this,arguments)}}
 })();
