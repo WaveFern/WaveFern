@@ -225,7 +225,7 @@ function dsOutskirts(C){const s=C.s,r=C.r,RR=(a,b)=>a+r()*(b-a),G=mkG(),W=C.W,zM
  flushTo(G,C.g)}
 /* one building = body + windows + signs, faded as one */
 /* the see-through hole: every unit material discards the pixels that sit between the camera and you, inside a cylinder along the (orthographic) view direction, with a dithered rim. uR is that unit's own radius, so only buildings in your way open up. */
-const CUT={uCut:{value:new THREE.Vector3()}};
+const CUT={uCut:{value:new THREE.Vector3()}},NITE=new THREE.Color('#9fb0e0');
 function cutMat(m,uR){const prev=m.onBeforeCompile,key=(m.customProgramCacheKey?m.customProgramCacheKey():'')+'|cut';
  m.onBeforeCompile=function(sh){if(prev)prev.call(this,sh);sh.uniforms.uCut=CUT.uCut;sh.uniforms.uR=uR;
   sh.vertexShader=sh.vertexShader.replace('void main() {','varying vec3 vWp;\nvoid main() {').replace('#include <begin_vertex>','#include <begin_vertex>\n vWp=(modelMatrix*vec4(transformed,1.)).xyz;');
@@ -654,7 +654,7 @@ function dsTick(dt){const C=D.C;if(!C)return;const t=performance.now()/1000,px=P
  /* fade buildings between you and the camera (three rays across your body) */
  const on=!cut&&!D.room&&mode!='pc'&&inCity();
  /* the camera is orthographic, looking along (-16,-13,-16): fade every building that stands on a sight line from nine points on your body towards the camera (it draws 80 units behind its own position, so t runs to about 4) */
- CUT.uCut.value.set(P.x,1,P.z);if(on){const pts=[];[[0,.1],[0,1],[0,1.9],[.55,1],[-.55,1],[.5,1.9],[-.5,1.9],[.5,.1],[-.5,.1]].forEach(([r,y])=>pts.push([P.x+r*.707,y,P.z-r*.707]));
+ CUT.uCut.value.set(P.x,1,P.z);if(S.t>=240&&amb.intensity<.66){const f=Math.min(1,(.66-amb.intensity)/.3);amb.intensity=.66;amb.color.lerp(NITE,.55*f+.2);sun.intensity=Math.max(sun.intensity,.42)}if(on){const pts=[];[[0,.1],[0,1],[0,1.9],[.55,1],[-.55,1],[.5,1.9],[-.5,1.9],[.5,.1],[-.5,.1]].forEach(([r,y])=>pts.push([P.x+r*.707,y,P.z-r*.707]));
   const hitBox=(b,q)=>{let t0=0,t1=4;const sl=(c,d,mn,mx)=>{let a=(mn-c)/d,e=(mx-c)/d;if(a>e){const k=a;a=e;e=k}t0=Math.max(t0,a);t1=Math.min(t1,e);return t0<t1};
    return sl(q[0],16,OX+b[0]-.3,OX+b[2]+.3)&&sl(q[1],13,0,b[4]+.5)&&sl(q[2],16,OZ+b[1]-.3,OZ+b[3]+.3)};
   C.fades.forEach(U=>{const b=U.b;let tg=1;if(Math.abs((b[0]+b[2])/2-px)<70&&Math.abs((b[1]+b[3])/2-pz)<70&&pts.some(q=>hitBox(b,q)))tg=0;dsCut(U,tg,dt)})}
