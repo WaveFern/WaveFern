@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v44.2.0';
+const GAME_VERSION='v44.3.0';
 const VERSION_HISTORY=[
+ {v:'v44.3.0',n:'The computer now fits phones and tablets: on touch screens it opens full screen with big, easy-to-tap app icons that fill the screen, app windows that fill the whole display, and larger taskbar and window buttons. Apps now open with a single click or tap, no double click needed, on every device. Saves still load.'},
  {v:'v44.2.0',n:'New Full screen button on phones and tablets, next to Run: tap it to hide the browser bars and play full screen, tap again to exit. It only shows where the browser allows full screen (iPhones do not, so there use Share > Add to Home Screen to play full screen). Saves still load.'},
  {v:'v44.1.1',n:'Fixed the phone controls crowding the screen in landscape: the touch buttons now sit in a row above Use, the minimap is hidden on short phone screens (use the Map button), and the tutorial boxes and prompts move clear of the joystick and buttons. Saves still load.'},
  {v:'v44.1.0',n:'The game now plays on phones and tablets. A joystick in the bottom-left corner moves your artist: drag it in any direction to walk, or to drive when you are in a car. Touch buttons in the bottom-right stand in for the keys: Use (E), Run (tap to switch sprinting on or off), Map, Phone, Storage and Pause. Prompts and tutorial boxes move so they do not sit under the controls, and the layout fits portrait and landscape screens. Keyboard and mouse controls on a computer are unchanged. Saves still load.'},
