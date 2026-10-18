@@ -198,6 +198,31 @@ function dsGround(C){const s=C.s,G=mkG(),W=C.W,Dz=C.Dz,hr=C.hr;
   for(let x=C.rx[0]+8;x<C.sx0;x+=22){if(C.rx.some(rx=>Math.abs(x-rx)<hr+3))continue;const b=new THREE.Group();B(b,1.6,.5,5,pick(['#2a4a6a','#6a2a2a','#2a5a3a']),0,.1,0);B(b,1.2,.6,1.8,'#e8e4d8',0,.6,.6);b.position.set(OX+x,-.15,OZ+z+R(-1,1));scene.add(b);C.extra.push(b)}}
  flushTo(G,C.g)}
 
+/* the land around the town: field patches, trees, rocks or dunes, and a ring of distant buildings so the edge never looks like an empty plane */
+function dsOutskirts(C){const s=C.s,r=C.r,RR=(a,b)=>a+r()*(b-a),G=mkG(),W=C.W,zM=C.zMax,st=C.st,pl=C.plaza;
+ const ok=(x,z,m)=>{m=m||0;if(x>-4-m&&x<W+4+m&&z>-4-m&&z<zM+4+m)return false;if(s.water&&z>C.wz-18-m)return false;if(st&&Math.abs(x-st.x)<st.a+16+m&&Math.abs(z-st.z)<st.b+16+m)return false;if(pl&&x>pl.x0-12-m&&x<pl.x1+12+m&&z>pl.z0-12-m&&z<pl.z1+12+m)return false;return true};
+ const R0=()=>({x:RR(-150,W+150),z:RR(-150,zM+150)});
+ const lt=(x,z,k)=>{bx(G,.3*k,1.5*k,.3*k,'#6a4a2a',x,.75*k,z);bx(G,1.9*k,1.3*k,1.9*k,dk(s.tree,RR(.85,1.15)),x,2*k,z);bx(G,1.2*k,.9*k,1.2*k,dk(s.tree,RR(.95,1.25)),x,3*k,z)};
+ /* plaza: paving grid, inlay band and rows of trees, lamps and benches so the stadium forecourt is not a bare slab */
+ if(pl){const jn=dk(s.walk,.88),px0=pl.x0,px1=pl.x1,pz0=pl.z0,pz1=pl.z1;for(let x=px0;x<=px1;x+=3.2)quadY(G,x-.05,pz0,x+.05,pz1,.006,jn);for(let z=pz0;z<=pz1;z+=3.2)quadY(G,px0,z-.05,px1,z+.05,.006,jn);
+  const bd=dk(s.walk,.8);quadY(G,px0+1.5,pz0+1.5,px1-1.5,pz0+2.1,.008,bd);quadY(G,px0+1.5,pz1-2.1,px1-1.5,pz1-1.5,.008,bd);quadY(G,px0+1.5,pz0+1.5,px0+2.1,pz1-1.5,.008,bd);quadY(G,px1-2.1,pz0+1.5,px1-1.5,pz1-1.5,.008,bd);
+  const inSt=(x,z,m)=>st&&Math.abs(x-st.x)<st.a+m&&z<st.z+st.b+m&&z>st.z-st.b-m;
+  for(let z=pz0+8;z<pz1-6;z+=11){[px0+4.5,px1-4.5].forEach(x=>{if(inSt(x,z,8))return;if(s.palm||s.desert)palm(G,x,z,RR(5,7.5));else lt(x,z,RR(1,1.4));bx(G,1.4,.35,1.4,'#6a5a4a',x,.18,z)});if(!inSt(px0+8,z+5,6)){bx(G,2,.14,.6,'#7a5a3a',px0+8,.55,z+5);bx(G,2,.5,.12,'#7a5a3a',px0+8,.9,z+4.75);bx(G,.12,.5,.5,'#333',px0+7.2,.28,z+5);bx(G,.12,.5,.5,'#333',px0+8.8,.28,z+5)}}
+  for(let x=px0+10;x<px1-8;x+=13){const z=pz1-4.5;if(inSt(x,z,6))continue;bx(G,.18,4.6,.18,'#2a2a30',x,2.3,z);bx(G,.9,.3,.5,'#fff2c0',x,4.7,z);bx(G,.12,.12,.9,'#2a2a30',x,4.5,z+.1)}
+  for(let x=px0+7;x<px1-5;x+=7){const z=pz1-3;if(inSt(x,z,6))continue;if(s.palm||s.desert)palm(G,x,z,RR(5,7));else lt(x,z,RR(1,1.4))}}
+ for(let i=0,n=0;i<400&&n<46;i++){const p=R0(),w=RR(14,44),d=RR(14,44);if(!ok(p.x,p.z,Math.max(w,d)/2+2))continue;n++;quadY(G,p.x-w/2,p.z-d/2,p.x+w/2,p.z+d/2,-.03,dk(s.ground,RR(.88,1.1)));if(r()<.4)for(let k=0;k<4;k++)quadY(G,p.x-w/2+(k+.5)*w/4-.15,p.z-d/2,p.x-w/2+(k+.5)*w/4+.15,p.z+d/2,-.02,dk(s.ground,.8))}
+ for(let i=0,n=0;i<900&&n<(s.desert?26:110);i++){const p=R0();if(!ok(p.x,p.z,3))continue;n++;
+  if(s.desert){const k=r();if(k<.4)palm(G,p.x,p.z,RR(4,7));else if(k<.75)bx(G,RR(.8,2.2),RR(.5,1.4),RR(.8,2.2),dk('#b89a68',RR(.8,1.1)),p.x,.5,p.z,r()*3);else{bx(G,.35,2.2,.35,'#4f8a45',p.x,1.1,p.z);bx(G,.9,.3,.3,'#4f8a45',p.x,1.4,p.z);bx(G,.3,1,.3,'#4f8a45',p.x+.6,1.9,p.z)}}
+  else if(r()<.3){const c=s.snow?'#f4f8fa':dk(s.ground,RR(.6,.85));bx(G,RR(.9,2),RR(.4,1.1),RR(.9,2),s.snow?c:'#8a8f94',p.x,.4,p.z,r()*3);if(!s.snow)bx(G,1.1,.7,1.1,c,p.x+1.1,.35,p.z+.4)}
+  else if(s.palm&&r()<.5)palm(G,p.x,p.z,RR(5,8));else lt(p.x,p.z,RR(.8,1.5))}
+ if(s.desert)for(let i=0,n=0;i<300&&n<14;i++){const p=R0(),rr=RR(8,18);if(!ok(p.x,p.z,rr+2))continue;n++;xgPrism(G,rr,rr*.35,RR(2,4),10,dk(s.ground,RR(.9,1.06)),p.x,-.04,p.z)}
+ if(s.hills)for(let i=0,n=0;i<300&&n<10;i++){const p=R0(),rr=RR(18,34);if(!ok(p.x,p.z,rr+40))continue;n++;xgPrism(G,rr,rr*.2,RR(10,22),9,dk(s.snow?'#c8d4dc':'#6b8a5a',RR(.85,1.1)),p.x,-.04,p.z)}
+ /* far buildings */
+ for(let i=0,n=0;i<600&&n<(s.big?34:22);i++){const p=R0();if(!ok(p.x,p.z,16))continue;const far=Math.max(-p.x,p.x-W,-p.z,p.z-zM);if(far<14)continue;n++;
+  const w=RR(7,14),d=RR(7,14),wall=pick(s.big?s.glassC:s.walls);
+  if(s.big){const h=RR(18,74)*(.6+s.tall*.5);bx(G,w,h,d,wall,p.x,h/2,p.z,0,dk(wall,.8));bx(G,w+.3,.5,d+.3,dk(wall,.7),p.x,h+.25,p.z);for(let y=4;y<h-1;y+=3.2)quadZ(G,p.x-w/2+.8,p.x+w/2-.8,y,y+1.5,p.z+d/2+.03,r()<.4?'#ffd890':dk(wall,.55))}
+  else{const h=RR(4.5,9);bx(G,w,h,d,wall,p.x,h/2,p.z,0,dk(wall,.8));if(s.desert)bx(G,w+.2,.5,d+.2,dk(wall,.85),p.x,h+.25,p.z);else gable(G,p.x-w/2-.3,p.z-d/2-.3,p.x+w/2+.3,p.z+d/2+.3,h,Math.min(2.6,d*.3),s.terra?'#b8583a':pick(['#6a4a3a','#4a4e56','#8a3a2a']),wall,w>=d);for(let a=p.x-w/2+1.4;a<p.x+w/2-1;a+=2.6)quadZ(G,a-.5,a+.5,2.2,3.4,p.z+d/2+.03,dk(wall,.5))}}
+ flushTo(G,C.g)}
 /* one building = body + windows + signs, faded as one */
 /* the see-through hole: every unit material discards the pixels that sit between the camera and you, inside a cylinder along the (orthographic) view direction, with a dithered rim. uR is that unit's own radius, so only buildings in your way open up. */
 const CUT={uCut:{value:new THREE.Vector3()}};
@@ -465,7 +490,7 @@ function dsPeople(C){const s=C.s,r=C.r,n=s.big?44:28,e=C.hr+2,paths=[];
 function dsBuild(id){const d=wtDest(id);if(!d)return null;const s=dsStyle(d),C={id,d,s,r:fRng(fHash('city-'+id)),g:new THREE.Group(),cols:[],ints:[],fades:[],peds:[],cars:[],fans:[],tugs:[],extra:[],shops:[],spots:{},signM:[],signQ:[],rooms:{}};
  C.g.position.set(OX,0,OZ);scene.add(C.g);C.A=mkAtlas();C.A.blank=C.A.add(8,8,(x)=>{x.fillStyle='#111';x.fillRect(0,0,8,8)});C.glowM=winMat();
  WU.uDay.value.set(s.sky).lerp(new THREE.Color('#6a7a8a'),.55);
- dsLayout(C);dsGround(C);dsBuildings(C);dsStreets(C);dsAirport(C);
+ dsLayout(C);dsGround(C);dsOutskirts(C);dsBuildings(C);dsStreets(C);dsAirport(C);
  D.building=C;D.cityHooks.forEach(f=>{try{f(C)}catch(e){console.error("city hook",e)}});D.building=null;
  C.A.done();C.signM.forEach(m=>{m.map=C.A.tex;m.needsUpdate=true});/* sign materials are made before the atlas texture exists */C.signQ.forEach(([q,sm,U])=>{const m=qMesh(q,sm);if(m)C.g.add(m)});
  dsTraffic(C);dsPeople(C);
