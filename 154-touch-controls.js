@@ -95,7 +95,7 @@ if(coarse())(document.body?enable():addEventListener('DOMContentLoaded',enable))
 addEventListener('pointerdown',e=>{if(e.pointerType=='touch')enable()},true);
 
 /* show the controls only while walking, driving or walking at the awards; keep Run held while it is on */
-const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function',st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};
+const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function'&&!(typeof S!='undefined'&&S&&S.noPhone),st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};
 let lastSig='';
 setInterval(()=>{if(!act||!ui)return;const m=M(),ok=(m=='play'||m=='drive'||m=='cutawd')&&typeof S!='undefined'&&S&&!document.getElementById('load');
  if(!ok){if(!ui.classList.contains('off')){ui.classList.add('off');relAll()}if(typeof keys!='undefined'&&runOn&&keys.shift&&m!='pause')delete keys.shift;return}
