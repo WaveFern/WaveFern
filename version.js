@@ -3,9 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v44.7.1';
+const GAME_VERSION='v44.7.2';
 const VERSION_HISTORY=[
- {v:'v44.4.1',n:'Fixed buying a Gphone 9 or newer still saying you had no phone: the purchase now counts, and saves where you already bought one open the phone with G as normal. Saves still load.'},
+ {v:'v44.7.2',n:'Fixed buying a Gphone 9 or newer still saying you had no phone: the purchase now counts, and saves where you already bought one open the phone with G as normal. Saves still load.'},
  {v:'v44.7.1',n:'Fixed the game pausing or glitching on phones after sending a text on the computer: the on-screen keyboard opening or closing no longer pauses the game. Saves still load.'},
  {v:'v44.7.0',n:'On a phone held upright, Messages on the computer now looks like the Gphone one: the chat list fills the screen, tapping a chat opens it full screen with a back button, and the message bar sits at the bottom. Saves still load.'},
  {v:'v44.6.0',n:'Storage placing is completely redone and easy on phones. Furniture now snaps flush against walls and other furniture and turns its back to the wall by itself. Pick an item and drag it in the room, then tap Place, or tap a placed item to Move, turn or store it. Big buttons for Place, turn left and right, Store and Undo, and a settings button for snapping, turning to the wall and grid size. Saves still load.'},
