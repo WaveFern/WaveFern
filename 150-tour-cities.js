@@ -224,16 +224,9 @@ function dsOutskirts(C){const s=C.s,r=C.r,RR=(a,b)=>a+r()*(b-a),G=mkG(),W=C.W,zM
   else{const h=RR(4.5,9);bx(G,w,h,d,wall,p.x,h/2,p.z,0,dk(wall,.8));if(s.desert)bx(G,w+.2,.5,d+.2,dk(wall,.85),p.x,h+.25,p.z);else gable(G,p.x-w/2-.3,p.z-d/2-.3,p.x+w/2+.3,p.z+d/2+.3,h,Math.min(2.6,d*.3),s.terra?'#b8583a':pick(['#6a4a3a','#4a4e56','#8a3a2a']),wall,w>=d);for(let a=p.x-w/2+1.4;a<p.x+w/2-1;a+=2.6)quadZ(G,a-.5,a+.5,2.2,3.4,p.z+d/2+.03,dk(wall,.5))}}
  flushTo(G,C.g)}
 /* one building = body + windows + signs, faded as one */
-/* the see-through hole: every unit material discards the pixels that sit between the camera and you, inside a cylinder along the (orthographic) view direction, with a dithered rim. uR is that unit's own radius, so only buildings in your way open up. */
-const CUT={uCut:{value:new THREE.Vector3()}},NITE=new THREE.Color('#9fb0e0');
-function cutMat(m,uR){const prev=m.onBeforeCompile,key=(m.customProgramCacheKey?m.customProgramCacheKey():'')+'|cut';
- m.onBeforeCompile=function(sh){if(prev)prev.call(this,sh);sh.uniforms.uCut=CUT.uCut;sh.uniforms.uR=uR;
-  sh.vertexShader=sh.vertexShader.replace('void main() {','varying vec3 vWp;\nvoid main() {').replace('#include <begin_vertex>','#include <begin_vertex>\n vWp=(modelMatrix*vec4(transformed,1.)).xyz;');
-  sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform vec3 uCut;uniform float uR;varying vec3 vWp;\nvoid main() {\n if(uR>.01){vec3 v=vWp-uCut;float t=dot(v,vec3(.6063,.4926,.6063));if(t>.35){float d=length(v-vec3(.6063,.4926,.6063)*t);float n=fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(.06711056,.00583715))));if(d<uR*(.72+.28*n))discard;}}')};
- m.customProgramCacheKey=()=>key;m.needsUpdate=true;return m}
-D.cutMat=cutMat;
-function dsUnit(C,G,Gw,q,b){const body=new THREE.MeshLambertMaterial({vertexColors:true}),win=winMat(),uR={value:0},U={mats:[body,win],b,o:1,uR};cutMat(body,uR);cutMat(win,uR);
- flushTo(G,C.g,body);flushTo(Gw,C.g,win);if(q&&q.I.length){const sm=cutMat(new THREE.MeshBasicMaterial({map:C.A.tex,transparent:true,side:THREE.DoubleSide}),uR);C.signM.push(sm);U.mats.push(sm);C.signQ.push([q,sm,U])}
+const NITE=new THREE.Color('#9fb0e0');
+function dsUnit(C,G,Gw,q,b){const body=new THREE.MeshLambertMaterial({vertexColors:true}),win=winMat(),U={mats:[body,win],b,o:1};
+ flushTo(G,C.g,body);flushTo(Gw,C.g,win);if(q&&q.I.length){const sm=new THREE.MeshBasicMaterial({map:C.A.tex,transparent:true,side:THREE.DoubleSide});C.signM.push(sm);U.mats.push(sm);C.signQ.push([q,sm,U])}
  C.fades.push(U);return U}
 /* windows on the two faces the camera sees */
 function winBands(C,Gw,x0,z0,x1,z1,y0,y1,fh,lit){const r=C.r;const LIT=['#ffd890','#ffe7b0','#ffcf80','#bfe0ff','#fff2d0'],OFF='#1a1e26';
@@ -627,9 +620,13 @@ const inCity=()=>D.on&&P.x>OX-600&&P.x<OX+3000&&Math.abs(P.z-OZ)<1600;D.inCity=i
 {const h0=hit;hit=function(x,z,r){if(!D.on||IN||!(x>OX-600&&x<OX+3000&&Math.abs(z-OZ)<1600))return h0(x,z,r);const lx=x-OX,lz=z-OZ,C=D.C,rm=D.room,ov=c=>lx+r>c[0]&&lx-r<c[2]&&lz+r>c[1]&&lz-r<c[3];
  if(rm){if(lx<rm.x0+.35||lx>rm.x0+rm.w-.35||lz<rm.z0+.35||lz>rm.z0+rm.d-.35)return 1;return rm.cols.some(ov)}
  if(lx<2||lx>C.W-2||lz<2||lz>C.zMax-.5)return 1;if(C.cars.some(v=>{if(v.x==null)return false;const hl=v.len/2,hw=v.len>8?1.35:1.2,ex=(v.L.ax=='x'?hl:hw)+r,ez=(v.L.ax=='x'?hw:hl)+r;return Math.abs(lx-v.x)<ex&&Math.abs(lz-v.z)<ez&&!(Math.abs(P.x-OX-v.x)<ex&&Math.abs(P.z-OZ-v.z)<ez)}))return 1;/* solid cars; never trap you inside one */return C.cols.some(ov)}}
-/* the cutaway: a building that stands between you and the camera opens a clear round hole around you (it grows and shrinks smoothly), the rest of it stays solid, so nothing blocks the view and nothing vanishes when you walk up to it */
-const HOLE=2.7;
-function dsCut(U,tg,dt){if(!U.uR)return;const want=tg?0:HOLE,r=U.uR.value;if(r===want)return;let n=r+(want-r)*Math.min(1,dt*9);if(Math.abs(want-n)<.03)n=want;U.uR.value=n}
+/* the fade: a building between you and the camera turns into a soft see-through ghost (the same idea as back home) and is solid again when you step clear. It never goes fully invisible. */
+const GHOST=.09;
+function dsCut(U,tg,dt){const want=tg?1:GHOST;if(U.o===want)return;
+ if(U.o>=1&&!tg)U.mats.forEach(m=>{if(m.b0==null)m.b0=m.transparent;m.transparent=true;m.needsUpdate=true});
+ U.o+=(want-U.o)*Math.min(1,dt*6);if(Math.abs(want-U.o)<.015)U.o=want;
+ const sol=U.o>.9;U.mats.forEach(m=>{m.opacity=U.o;m.depthWrite=sol});
+ if(U.o>=1)U.mats.forEach(m=>{m.transparent=!!m.b0;m.depthWrite=true;m.needsUpdate=true})}
 /* wait at a crossing while a car on the other road is in it */
 function yieldAt(C,L,v){const xs=L.ax=='x'?C.rx:C.rz,reach=v.len/2+C.hr+2.5;let c=null;for(const q of xs){const d=(q-v.p)*L.dir;if(d>C.hr-.5&&d<reach){c=q;break}}if(c==null)return false;
  const cx=L.ax=='x'?c:L.c,cz=L.ax=='x'?L.c:c,b=C.hr+1.2;return C.cars.some(o=>o!==v&&o.L.ax!==L.ax&&o.x!=null&&Math.abs(o.x-cx)<b+(o.L.ax=='x'?o.len/2:1)&&Math.abs(o.z-cz)<b+(o.L.ax=='z'?o.len/2:1))}
@@ -654,7 +651,8 @@ function dsTick(dt){const C=D.C;if(!C)return;const t=performance.now()/1000,px=P
  /* fade buildings between you and the camera (three rays across your body) */
  const on=!cut&&!D.room&&mode!='pc'&&inCity();
  /* the camera is orthographic, looking along (-16,-13,-16): fade every building that stands on a sight line from nine points on your body towards the camera (it draws 80 units behind its own position, so t runs to about 4) */
- CUT.uCut.value.set(P.x,1,P.z);if(S.t>=240&&amb.intensity<.66){const f=Math.min(1,(.66-amb.intensity)/.3);amb.intensity=.66;amb.color.lerp(NITE,.55*f+.2);sun.intensity=Math.max(sun.intensity,.42)}if(on){const pts=[];[[0,.1],[0,1],[0,1.9],[.55,1],[-.55,1],[.5,1.9],[-.5,1.9],[.5,.1],[-.5,.1]].forEach(([r,y])=>pts.push([P.x+r*.707,y,P.z-r*.707]));
+ if(S.t>=240&&amb.intensity<.66){const f=Math.min(1,(.66-amb.intensity)/.3);amb.intensity=.66;amb.color.lerp(NITE,.55*f+.2);sun.intensity=Math.max(sun.intensity,.42)}
+ if(on){const pts=[];[[0,.1],[0,1],[0,1.9],[.55,1],[-.55,1],[.5,1.9],[-.5,1.9],[.5,.1],[-.5,.1]].forEach(([r,y])=>pts.push([P.x+r*.707,y,P.z-r*.707]));
   const hitBox=(b,q)=>{let t0=0,t1=4;const sl=(c,d,mn,mx)=>{let a=(mn-c)/d,e=(mx-c)/d;if(a>e){const k=a;a=e;e=k}t0=Math.max(t0,a);t1=Math.min(t1,e);return t0<t1};
    return sl(q[0],16,OX+b[0]-.3,OX+b[2]+.3)&&sl(q[1],13,0,b[4]+.5)&&sl(q[2],16,OZ+b[1]-.3,OZ+b[3]+.3)};
   C.fades.forEach(U=>{const b=U.b;let tg=1;if(Math.abs((b[0]+b[2])/2-px)<70&&Math.abs((b[1]+b[3])/2-pz)<70&&pts.some(q=>hitBox(b,q)))tg=0;dsCut(U,tg,dt)})}
