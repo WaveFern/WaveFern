@@ -120,7 +120,7 @@ function selfie(C,name){S.dcity=S.dcity||{};const k=C.id+'|'+S.day,done=(S.dcity
  say('📸 Selfie at the '+name.replace(/^the /,'')+' posted · +'+f.toLocaleString()+' followers')}
 
 /* ---------- rooms ---------- */
-const RM={lobby:[1240,0,22,14],room:[1290,0,12,9],food:[1320,0,14,10],cafe:[1350,0,12,9],conv:[1380,0,12,10],souv:[1410,0,12,9],records:[1440,0,12,10],office:[1470,0,16,12]};
+const RM={lobby:[1240,0,22,14],room:[1290,0,16,12],food:[1320,0,14,10],cafe:[1350,0,12,9],conv:[1380,0,12,10],souv:[1410,0,12,9],records:[1440,0,12,10],office:[1470,0,16,12]};
 function staff(rm,x,z,ry){let o;try{o=buildChar(fCfg())}catch(e){return}o.g.position.set(OX+x,0,OZ+z);o.g.rotation.y=ry||0;scene.add(o.g);rm.extra.push(o.g)}
 function chair(rm,x,z,c){rm.box(.7,.08,.7,c,x,.5,z);rm.box(.7,.7,.08,c,x,.85,z-.32);[[-.3,-.3],[.3,-.3],[-.3,.3],[.3,.3]].forEach(([a,b])=>rm.box(.06,.5,.06,'#333',x+a,.25,z+b))}
 function table(rm,x,z,w,d,c){rm.box(w,.08,d,c,x,.78,z,1);rm.box(.12,.74,.12,'#333',x,.37,z)}
@@ -162,25 +162,50 @@ function hotelRooms(C){const s=C.s,hn=(C.spots.hotel&&C.spots.hotel.n)||'Hotel',
  L.box(1,1.6,.6,'#c8a040',lx+lw-3,.8,lz+6,1);L.box(.8,.6,.5,'#8a4a2a',lx+lw-3,1.9,lz+6);
  L.int(lx+6,lz+4.4,2,'Reception: check in for the night',()=>checkIn(C));L.int(lx+15.5,lz+1.6,2,'Take the lift to your room',()=>lift(C));L.int(lx+4,lz+11.4,1.6,'Sit and rest for an hour',()=>D.hotelRest());
  L.box(3,.05,1,'#7a3a2a',lx+11,.03,lz+ld-.6);L.int(lx+11,lz+ld-.8,1.6,'Leave the hotel',()=>{const h=C.spots.hotel;D.goOut(h.x,h.z+1,0)});L.done();
- const R=D.mkRoom('room',rx,rz,rw,rd,{floor:'#8a6a4a',wall:'#efe6d6',h:4,name:'Your room'});
- R.box(3.4,.6,4.2,'#f4f2ee',rx+3,.3,rz+3,1);R.box(3.4,1.4,.3,'#6a4a3a',rx+3,.7,rz+.9);R.box(3.2,.2,1.6,'#2a4a7a',rx+3,.66,rz+4.2);[[rx+2.2,rz+1.6],[rx+3.8,rz+1.6]].forEach(([x,z])=>R.box(1.2,.25,.7,'#ffffff',x,.72,z));
- [rx+.8,rx+5.2].forEach(x=>{R.box(.7,.6,.6,'#6a4a3a',x,.3,rz+1.2,1);R.glow(.3,.4,.3,'#ffe0a0',x,.9,rz+1.2)});
- R.sign('z',rz+.12,rx+6.6,rx+11,1.2,3.4,320,160,(c,W,H)=>{const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0c1028');g.addColorStop(1,dk(s.sky,.5));c.fillStyle=g;c.fillRect(0,0,W,H);for(let i=0;i<26;i++){const w=8+Math.random()*16,h=20+Math.random()*90,x=Math.random()*W;c.fillStyle='#141824';c.fillRect(x,H-h,w,h);c.fillStyle=pick(['#ffd890','#fff2c0',s.neon]);for(let y=H-h+4;y<H-4;y+=7)for(let xx=x+2;xx<x+w-2;xx+=4)if(Math.random()<.4)c.fillRect(xx,y,2,3)}c.strokeStyle='#e8e4dc';c.lineWidth=8;c.strokeRect(0,0,W,H);c.beginPath();c.moveTo(W/2,0);c.lineTo(W/2,H);c.stroke()});
- R.box(2,1.2,.5,'#3a3a3a',rx+10,1.6,rz+4.6);R.glow(1.8,1,.05,'#4a8ad8',rx+10,1.6,rz+4.86);R.box(2.6,.8,.6,'#6a4a3a',rx+10,.4,rz+4.6,1);
- R.box(.9,.9,.8,'#e8e8ec',rx+7.4,.45,rz+1,1);R.glow(.7,.3,.05,'#e8f6ff',rx+7.4,.6,rz+1.42);R.box(1.6,.8,.8,'#7a5a3a',rx+.9,1.2,rz+7.4,1);R.box(.1,2.6,3,'#d8d0c0',rx+5.6,1.3,rz+7.2);R.box(1.4,.6,1.4,'#e8f0f4',rx+4.4,.3,rz+7.7,1);
- R.int(rx+3,rz+5.4,1.8,'Sleep until morning',()=>bed(C));R.int(rx+10,rz+5.8,1.4,'Watch TV',()=>tv(C));R.int(rx+7.4,rz+2,1.3,'Minibar',()=>D.shop(C,{n:'Minibar',k:'conv'}));R.int(rx+4.4,rz+7,1.3,'Take a shower (+5 energy)',()=>{if(S.dcity._sh===S.day+':'+(S.t|0))return;S.dcity._sh=S.day+':'+(S.t|0);S.energy=Math.min(100,S.energy+5);S.t=Math.min(599,S.t+4);snd('pop');say('Fresh! +5 energy · '+clk())});
- R.box(2,.05,1,'#7a3a2a',rx+8.6,.03,rz+rd-.6);R.int(rx+8.6,rz+rd-.8,1.4,'Lift back down to the lobby',()=>D.goRoom('lobby',lx+15.5,lz+2.6,0));R.done()}
+ /* the room: a suite with a bathroom, bed by the big window, desk, sofa and TV */
+ const R=D.mkRoom('room',rx,rz,rw,rd,{floor:'#9a7452',wall:'#efe6d6',h:4,name:'Your room'}),wd='#6a4a3a',dkw='#4a3226',fab=s.acc||'#3a5a8a';
+ for(let x=rx+.6;x<rx+rw;x+=1.2)R.box(.04,.005,rd-.1,dk('#9a7452',.86),x,.006,rz+rd/2);
+ R.box(rw-.4,.3,.06,'#f8f4ec',rx+rw/2,3.85,rz+.04);R.box(.06,.3,rd-.4,'#f8f4ec',rx+.04,3.85,rz+rd/2);R.box(rw-.4,.14,.05,dk('#efe6d6',.8),rx+rw/2,.07,rz+.05);
+ /* bathroom, back left, half walls so you can see in */
+ R.box(4.5,.02,4.5,'#dfe6ea',rx+2.25,.012,rz+2.25);for(let i=1;i<5;i++){R.box(.03,.004,4.5,'#b8c4ca',rx+i*.9,.025,rz+2.25);R.box(4.5,.004,.03,'#b8c4ca',rx+2.25,.025,rz+i*.9)}
+ R.box(.2,1.1,3,'#f4f0e8',rx+4.5,.55,rz+1.5,1);R.box(4.6,1.1,.2,'#f4f0e8',rx+2.3,.55,rz+4.5,1);R.box(.24,.06,3,'#c8b89a',rx+4.5,1.12,rz+1.5);R.box(4.64,.06,.24,'#c8b89a',rx+2.3,1.12,rz+4.5);
+ R.box(2.8,.6,1.1,'#f8f8f8',rx+1.7,.3,rz+.75,1);R.box(2.5,.04,.8,'#8ac8e8',rx+1.7,.58,rz+.75);R.box(.1,.4,.1,'#c8ccd0',rx+.5,.85,rz+.3);R.box(.3,.06,.06,'#c8ccd0',rx+.6,1.05,rz+.3);
+ R.box(4.4,1.6,.04,'#dfe6ea',rx+2.25,.8,rz+.04);
+ R.box(.6,.8,1.4,'#e8e4dc',rx+.4,.4,rz+2.9,1);R.box(.5,.08,.5,'#f8f8f8',rx+.45,.84,rz+2.9);R.box(.04,1,1.2,'#bfe0ff',rx+.05,1.7,rz+2.9);R.glow(.06,.12,1.2,'#fff2d0',rx+.06,2.3,rz+2.9);
+ R.box(.5,.45,.6,'#f8f8f8',rx+3.7,.22,rz+3.8,1);R.box(.5,.5,.18,'#f8f8f8',rx+3.7,.6,rz+4.15);R.box(.06,.06,1,'#c8ccd0',rx+4.36,.95,rz+1.6);[0,1].forEach(i=>R.box(.05,.5,.4,i?'#f4f4f4':fab,rx+4.33,.7,rz+1.3+i*.5));
+ /* bed against the back wall, headboard, art, nightstands and lamps */
+ const bx0=rx+7.6;R.box(3.4,.4,4.4,dkw,bx0,.2,rz+2.5,1);R.box(3.2,.3,4.2,'#f8f6f2',bx0,.55,rz+2.5);R.box(3.24,.06,2.2,fab,bx0,.72,rz+3.5);R.box(3.24,.25,.4,dk(fab,.8),bx0,.6,rz+4.5);
+ [-.75,.75].forEach(o=>{R.box(1.3,.28,.6,'#ffffff',bx0+o,.82,rz+.75);R.box(1,.22,.4,fab,bx0+o,.86,rz+1.15)});R.box(4,1.8,.2,'#7a5a46',bx0,1.3,rz+.15);R.box(3.6,1.4,.06,dk(fab,.75),bx0,1.4,rz+.27);
+ R.sign('z',rz+.08,bx0-1.4,bx0+1.4,2.6,3.5,256,96,(c,W,H)=>{const g=c.createLinearGradient(0,0,W,0);g.addColorStop(0,s.acc||'#e86a3a');g.addColorStop(1,s.neon||'#3ad0ff');c.fillStyle='#f4ecdc';c.fillRect(0,0,W,H);c.fillStyle=g;c.beginPath();c.arc(W*.3,H*.6,H*.32,0,7);c.fill();c.fillRect(W*.55,H*.25,W*.3,H*.5);c.strokeStyle='#3a2a1a';c.lineWidth=8;c.strokeRect(0,0,W,H)});
+ [bx0-2.3,bx0+2.3].forEach(x=>{R.box(.9,.6,.7,wd,x,.3,rz+.6,1);R.box(.8,.04,.04,'#d8b860',x,.45,rz+.96);R.box(.16,.5,.16,'#d8c8a0',x,.85,rz+.6);R.glow(.42,.36,.42,'#ffe0a0',x,1.25,rz+.6);R.box(.3,.08,.2,'#2a2a2a',x+.2,.64,rz+.5)});
+ /* big window with the city at night, curtains and a desk under it */
+ const wx0=rx+10.6,wx1=rx+rw-.4;R.sign('z',rz+.1,wx0,wx1,1,3.5,384,160,(c,W,H)=>{const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0c1028');g.addColorStop(1,dk(s.sky,.5));c.fillStyle=g;c.fillRect(0,0,W,H);c.fillStyle='#fff8';for(let i=0;i<30;i++)c.fillRect(Math.random()*W,Math.random()*H*.4,1,1);for(let i=0;i<30;i++){const w=8+Math.random()*18,h=24+Math.random()*100,x=Math.random()*W;c.fillStyle='#141824';c.fillRect(x,H-h,w,h);c.fillStyle=pick(['#ffd890','#fff2c0',s.neon]);for(let y=H-h+4;y<H-4;y+=7)for(let xx=x+2;xx<x+w-2;xx+=4)if(Math.random()<.4)c.fillRect(xx,y,2,3)}c.strokeStyle='#e8e4dc';c.lineWidth=8;c.strokeRect(0,0,W,H);c.beginPath();c.moveTo(W/2,0);c.lineTo(W/2,H);c.moveTo(0,H*.62);c.lineTo(W,H*.62);c.stroke()});
+ R.box(wx1-wx0+.4,.08,.3,'#f4f0e8',(wx0+wx1)/2,.95,rz+.18);R.box(wx1-wx0+1.2,.12,.12,'#c8b89a',(wx0+wx1)/2,3.65,rz+.22);[wx0-.25,wx1+.15].forEach(x=>{R.box(.5,2.9,.18,dk(fab,.7),x,2.15,rz+.28);for(let k=0;k<3;k++)R.box(.06,2.9,.2,dk(fab,.55),x-.15+k*.15,2.15,rz+.3)});
+ R.box(2.6,.08,1,'#8a6a4a',rx+13.2,.78,rz+.9,1);[[-1.2,-.4],[1.2,-.4],[-1.2,.4],[1.2,.4]].forEach(([a,b2])=>R.box(.08,.74,.08,dkw,rx+13.2+a,.37,rz+.9+b2));R.box(.9,.04,.6,'#2a2c30',rx+13.4,.84,rz+.9);R.box(.9,.5,.04,'#2a2c30',rx+13.4,1.1,rz+.62);R.glow(.8,.4,.02,'#6aa8e8',rx+13.4,1.1,rz+.65);R.box(.12,.4,.12,'#2a2a2a',rx+12.3,1,rz+.7);R.glow(.3,.18,.3,'#fff2c0',rx+12.3,1.25,rz+.7);
+ chair(R,rx+13.2,rz+2,'#3a3a40');R.box(.9,.9,.8,'#e8e8ec',rx+11.2,.45,rz+.5,1);R.glow(.7,.3,.05,'#e8f6ff',rx+11.2,.6,rz+.92);R.box(.7,.04,.5,'#2a2a2a',rx+11.2,.92,rz+.5);R.box(.18,.22,.18,'#c8ccd0',rx+11,1.05,rz+.5);[0,1].forEach(i=>R.box(.1,.12,.1,'#f4f4f4',rx+11.3+i*.16,1,rz+.5));
+ /* lounge: rug, TV on the left wall, sofa, coffee table, armchair, floor lamp */
+ R.box(6,.02,4,dk(fab,1.25),rx+4.6,.016,rz+8.2);R.box(5.6,.022,3.6,dk(fab,.9),rx+4.6,.018,rz+8.2);
+ R.box(.6,.6,3.2,dkw,rx+.4,.3,rz+8.2,1);R.box(.1,1.4,2.6,'#1a1a1e',rx+.08,1.8,rz+8.2);R.glow(.04,1.24,2.44,'#4a8ad8',rx+.15,1.8,rz+8.2);R.box(.4,.2,.8,'#2a2a2a',rx+.4,.7,rz+7.2);plant(R,rx+.6,rz+10.4);
+ R.box(1,.45,3,fab,rx+5.2,.22,rz+8.2,1);R.box(.3,.6,3,fab,rx+5.6,.7,rz+8.2);[-1.55,1.55].forEach(o=>R.box(1,.5,.25,dk(fab,.85),rx+5.2,.5,rz+8.2+o));[-.7,.7].forEach(o=>R.box(.3,.4,.6,s.neon||'#e8c040',rx+5.35,.65,rz+8.2+o));
+ R.box(1.2,.06,1.8,'#3a2a20',rx+3.2,.45,rz+8.2,1);R.box(1,.4,.1,dkw,rx+3.2,.22,rz+7.5);R.box(1,.4,.1,dkw,rx+3.2,.22,rz+8.9);R.box(.5,.04,.35,'#e84a3a',rx+3.1,.5,rz+8);R.box(.18,.2,.18,'#f4f4f4',rx+3.3,.58,rz+8.6);
+ R.box(.9,.4,.9,dk(fab,.85),rx+3.2,.2,rz+10.6,1);R.box(.9,.5,.2,dk(fab,.85),rx+3.2,.55,rz+11);R.box(.06,1.8,.06,'#2a2a2a',rx+6.4,.9,rz+10.4);R.glow(.4,.35,.4,'#ffe0a0',rx+6.4,1.9,rz+10.4);
+ /* suitcase, luggage rack, plant, ceiling lights */
+ R.box(1.2,.5,.6,dkw,rx+rw-1.2,.25,rz+rd-2.4,1);R.box(.9,.6,.4,'#c8402a',rx+rw-1.2,.8,rz+rd-2.4);R.box(.3,.06,.06,'#2a2a2a',rx+rw-1.2,1.13,rz+rd-2.4);plant(R,rx+rw-.8,rz+4.4);
+ [[bx0,rz+3],[rx+4,rz+8.2],[rx+2.25,rz+2.25],[rx+13,rz+6]].forEach(([x,z])=>{R.box(.7,.06,.7,'#f4f0e8',x,3.97,z);R.glow(.5,.04,.5,'#fff2d0',x,3.93,z)});
+ R.int(bx0,rz+5.4,1.8,'Sleep until morning',()=>bed(C));R.int(rx+3.2,rz+9.6,1.4,'Watch TV',()=>tv(C));R.int(rx+11.2,rz+1.6,1.3,'Minibar',()=>D.shop(C,{n:'Minibar',k:'conv'}));R.int(rx+13.2,rz+3,1.3,'Look out of the window',()=>{snd('pop');say('The lights of '+(C.d.city||C.d.country)+' at night. '+(S.artist||'You')+' could get used to this.')});
+ R.int(rx+2.4,rz+2.2,1.4,'Take a bath (+5 energy)',()=>{if(S.dcity._sh===S.day+':'+(S.t|0))return;S.dcity._sh=S.day+':'+(S.t|0);S.energy=Math.min(100,S.energy+5);S.t=Math.min(599,S.t+4);snd('pop');say('Fresh! +5 energy · '+clk())});
+ R.box(2,.05,1,'#7a3a2a',rx+10,.03,rz+rd-.6);R.int(rx+10,rz+rd-.8,1.4,'Lift back down to the lobby',()=>D.goRoom('lobby',lx+15.5,lz+2.6,0));R.done()}
 function price(C){return Math.round(60+(C.d.venue?C.d.venue.tix:60)*1.2)}
 function hasKey(C){const k=S.dcity&&S.dcity.key;return !!k&&k.id===C.id&&k.day===S.day}
 function checkIn(C){if(hasKey(C)){snd('pop');return say('Reception: "You are already checked in. The lift is to your right."')}const p=price(C);mode='menu';
  $('ui').innerHTML=`<div class="box modal"><h2>🏨 ${esc((C.spots.hotel&&C.spots.hotel.n)||'Hotel')}</h2><p class=m>${clk()} · You have ${$$(S.money)}.</p><p>${esc(D.words(C.s.lang).hi)}! A room for tonight is ${$$(p)}. Sleep in your room and you wake up there in the morning.</p><div class=row2><button class=go onclick="DCITY.hotelKey(${p})">Check in · ${$$(p)}</button><button onclick="closeUI()">Not now</button></div></div>`}
 D.hotelKey=p=>{const C=D.C;if(!C)return closeUI();if(S.money<p){snd('err');return say('Not enough money for a room.')}S.money=+(S.money-p).toFixed(2);S.dcity.key={id:C.id,day:S.day};closeUI();snd('cash');say('Checked in! Take the lift to your room.')};
-function lift(C){if(!hasKey(C)){snd('err');return say('Reception first: check in to get your room key.')}D.fade(()=>{D.goRoom('room',RM.room[0]+8.6,RM.room[1]+7.6,Math.PI)},()=>say('Your room. The bed is by the window.'))}
+function lift(C){if(!hasKey(C)){snd('err');return say('Reception first: check in to get your room key.')}D.fade(()=>{D.goRoom('room',RM.room[0]+10,RM.room[1]+10.6,Math.PI)},()=>say('Your room. The bed is by the window.'))}
 function bed(C){if(!hasKey(C)){snd('err');return say('Check in at reception to sleep here tonight.')}if(S.t<240){snd('err');return say('It is too early to sleep. Come back in the evening.')}D.hotelWakeRoom=1;sleepNow(0)}
 function tv(C){const n=['Tonight on the news: '+(S.artist||'a rising star')+' is in '+(C.d.city||C.d.country)+'!','A cooking show about '+(D.food(C.id)[0]||['local food'])[0]+'.','The weather: '+(C.s.snow?'cold':'warm')+' and clear tomorrow.','A music chart show. One of your songs flashes past!'];snd('pop');say('📺 '+pick(n))}
 /* waking up abroad: in your room if you slept there, otherwise in the lobby */
 D.hotelWake=function(auto){const C=D.C;if(!C||!C.rooms.room)return false;const inRoom=D.hotelWakeRoom&&!auto;D.hotelWakeRoom=0;
- if(inRoom){D.goRoom('room',RM.room[0]+3,RM.room[1]+5.6,0);say('Good morning, '+(C.d.city||C.d.country)+'!')}else{D.goRoom('lobby',RM.lobby[0]+4,RM.lobby[1]+11.6,0);if(auto)say('You fell asleep on a sofa in the hotel lobby.')}return true};
+ if(inRoom){D.goRoom('room',RM.room[0]+7.6,RM.room[1]+5.6,0);say('Good morning, '+(C.d.city||C.d.country)+'!')}else{D.goRoom('lobby',RM.lobby[0]+4,RM.lobby[1]+11.6,0);if(auto)say('You fell asleep on a sofa in the hotel lobby.')}return true};
 
 /* doors on the street: every shopfront opens into the matching interior */
 const KIND=[[/record|disc|vinyl|レコード|음반|唱片|music/i,'records'],[/caf|coffee|kaffee|koffie|カフェ|喫茶|커피|카페|咖啡|tea|茶/i,'cafe'],[/souvenir|gift|土産|みやげ|기념품|纪念|craft|bazaar|souk/i,'souv'],[/book|libr|flor|flower|barb|laund|sneak|vintage|thrift|zapat|mart|market|store|shop|pharm|farm|apothe|kiosk|コンビニ|薬|편의점|超市|便利|tienda|mercado|super/i,'conv']];
@@ -191,4 +216,16 @@ D.hotelInt=function(C){const h=C.spots.hotel;D.addInt(h.x,h.z,2,'Go into '+h.n,(
 D.cityHooks=D.cityHooks||[];D.cityHooks.push(C=>{['food','cafe','conv','souv','records','office'].forEach(k=>{try{shopRoom(C,k)}catch(e){console.error('dcity room '+k,e)}});try{hotelRooms(C)}catch(e){console.error('dcity hotel',e)}});
 /* the windmill turns */
 {const u0=update;update=function(dt){u0(dt);try{const C=D.C;if(C&&C.spin)C.spin.forEach(g=>{g.rotation.z+=dt*.5})}catch(e){}}}
+
+/* test mode: a Teleport app on the phone jumps straight to any tour city (or home) */
+try{IC.tp=mkIc(['..........','...PPPP...','..PWWWWP..','.PWPPPPWP.','.PWPWWPWP.','.PWPWWPWP.','.PWPPPPWP.','..PWWWWP..','...PPPP...','..........'].map(r=>r.replace(/\./g,'K')),{K:'#2a1050',P:'#b05aff',W:'#e8d0ff'})}catch(e){IC.tp=IC.store}
+if(typeof GP_TITLE!='undefined')GP_TITLE.tp='Teleport';
+D.tp=function(id){if(!S.cheat)return;const T=window.TRAVEL;if(!T)return;if(typeof window.apWhere=='function'&&window.apWhere()=='cabin'){snd('err');return say('Land first, then teleport.')}
+ try{closePhone()}catch(e){}if(id==T.loc()&&(id=='home'||D.on)){return say('You are already here.')}IN=null;D.room=null;
+ D.fade(()=>{if(D.on)D.leave(id=='home');T.arrive(id);if(id=='home'){P.x=8;P.z=14;P.rot=0;camT.x=P.x;camT.z=P.z;mode='play'}},()=>{if(id=='home')say('Teleported home.')},150)};
+{const b0=phBody;phBody=function(){if(PH.app!='tp')return b0.apply(this,arguments);if(!S.cheat){PH.app='home';return b0.apply(this,arguments)}
+ const here=window.TRAVEL?TRAVEL.loc():'home',by={};WT_DEST.forEach(d=>{(by[d.cont]=by[d.cont]||[]).push(d)});
+ const btn=(id,t)=>`<button style="display:block;width:100%;text-align:left;margin:3px 0;${id==here?'opacity:.5':''}" onclick="DCITY.tp('${id}')">${esc(t)}${id==here?' · you are here':''}</button>`;
+ return`<div style="padding:10px"><p class=m style="margin:0 0 6px">Test mode: tap a city to jump there.</p>${btn('home','🏠 Home')}${Object.keys(by).map(k=>`<h3 style="margin:10px 0 2px">${esc((typeof WT_CONT!='undefined'&&WT_CONT[k]&&WT_CONT[k].n)||k)}</h3>`+by[k].map(d=>btn(d.id,wtPlace(d))).join('')).join('')}</div>`}}
+{const r0=phR;phR=function(){try{const i=GP_APPS.findIndex(a=>a[0]=='tp');if(S.cheat&&i<0)GP_APPS.push(['tp','Teleport',()=>IC.tp,'#7a2ad0']);if(!S.cheat&&i>=0)GP_APPS.splice(i,1)}catch(e){}return r0.apply(this,arguments)}}
 })();

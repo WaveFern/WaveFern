@@ -178,6 +178,9 @@ function dsGround(C){const s=C.s,G=mkG(),W=C.W,Dz=C.Dz,hr=C.hr;
  C.rx.forEach(x=>{asph(x-hr,zA-hr,x+hr,zB+hr);for(let z=zA+hr+1;z<zB-hr;z+=5)mark(x-.08,z,x+.08,z+2.4);quadY(G,x-hr-.25,zA-hr,x-hr,zB+hr,.05,'#8a8a86');quadY(G,x+hr,zA-hr,x+hr+.25,zB+hr,.05,'#8a8a86')});
  C.rz.forEach(z=>{if(z===C.canalZ)return;const x1=z===C.mid?C.plaza.x0+6:xB+hr,x0=z===C.mid?66:xA-hr;asph(x0,z-hr,x1,z+hr);for(let x=x0+2;x<x1-2;x+=5){if(C.rx.some(rx=>Math.abs(x+1.2-rx)<hr+1))continue;mark(x,z-.08,x+2.4,z+.08)}
   quadY(G,x0,z-hr-.25,x1,z-hr,.05,'#8a8a86');quadY(G,x0,z+hr,x1,z+hr+.25,.05,'#8a8a86')});
+ /* paving slabs along the kerbs and manhole covers in the road */
+ const jn=dk(s.walk,.86),sw=3.2;C.rx.forEach(x=>{[-1,1].forEach(sd=>{const a=x+sd*(hr+.25),b=x+sd*(hr+.25+sw),lo=Math.min(a,b),hi=Math.max(a,b);quadY(G,lo,zA-hr,hi,zB+hr,.004,dk(s.walk,.96));quadY(G,(a+b)/2-.04,zA-hr,(a+b)/2+.04,zB+hr,.008,jn);for(let z=zA-hr;z<zB+hr;z+=1.6)quadY(G,lo,z,hi,z+.08,.008,jn)});for(let z=zA+11;z<zB-6;z+=23)quadY(G,x+hr*.35-.45,z-.45,x+hr*.35+.45,z+.45,.03,'#3a3a3a')});
+ C.rz.forEach(z=>{if(z===C.canalZ)return;const x1=z===C.mid?C.plaza.x0+6:xB+hr,x0=z===C.mid?66:xA-hr;[-1,1].forEach(sd=>{const a=z+sd*(hr+.25),b=z+sd*(hr+.25+sw),lo=Math.min(a,b),hi=Math.max(a,b);quadY(G,x0,lo,x1,hi,.004,dk(s.walk,.96));quadY(G,x0,(a+b)/2-.04,x1,(a+b)/2+.04,.008,jn);for(let x=x0;x<x1;x+=1.6)quadY(G,x,lo,x+.08,hi,.008,jn)});for(let x=x0+13;x<x1-6;x+=23){if(C.rx.some(rx=>Math.abs(x-rx)<hr+2))continue;quadY(G,x-.45,z-hr*.35-.45,x+.45,z-hr*.35+.45,.03,'#3a3a3a')}});
  /* zebra crossings at every junction */
  C.rx.forEach(x=>C.rz.forEach(z=>{if(z===C.canalZ)return;for(let k=-3;k<=3;k++){mark(x+k*1.05-.35,z+hr+.4,x+k*1.05+.35,z+hr+2.6);mark(x+hr+.4,z+k*1.05-.35,x+hr+2.6,z+k*1.05+.35)}}));
  /* airport forecourt road and drop-off */
@@ -402,7 +405,7 @@ function dsPeople(C){const s=C.s,r=C.r,n=s.big?44:28,e=C.hr+2,paths=[];
   scene.add(o.g);C.extra.push(o.g);C.fans.push({o,t:r()*6,k:r()})}}
 
 /* ---------- build / tear down ---------- */
-const FOFF=[0,-3.2,3.2];
+const FOFF=[0,-1.4,1.4];
 function dsBuild(id){const d=wtDest(id);if(!d)return null;const s=dsStyle(d),C={id,d,s,r:fRng(fHash('city-'+id)),g:new THREE.Group(),cols:[],ints:[],fades:[],peds:[],cars:[],fans:[],tugs:[],extra:[],shops:[],spots:{},signM:[],signQ:[],rooms:{}};
  C.g.position.set(OX,0,OZ);scene.add(C.g);C.A=mkAtlas();C.A.blank=C.A.add(8,8,(x)=>{x.fillStyle='#111';x.fillRect(0,0,8,8)});C.glowM=winMat();
  WU.uDay.value.set(s.sky).lerp(new THREE.Color('#6a7a8a'),.55);
@@ -530,10 +533,12 @@ const inCity=()=>D.on&&P.x>OX-600&&P.x<OX+3000&&Math.abs(P.z-OZ)<1600;D.inCity=i
 {const h0=hit;hit=function(x,z,r){if(!D.on||IN||!(x>OX-600&&x<OX+3000&&Math.abs(z-OZ)<1600))return h0(x,z,r);const lx=x-OX,lz=z-OZ,C=D.C,rm=D.room,ov=c=>lx+r>c[0]&&lx-r<c[2]&&lz+r>c[1]&&lz-r<c[3];
  if(rm){if(lx<rm.x0+.35||lx>rm.x0+rm.w-.35||lz<rm.z0+.35||lz>rm.z0+rm.d-.35)return 1;return rm.cols.some(ov)}
  if(lx<2||lx>C.W-2||lz<2||lz>C.zMax-.5)return 1;if(C.cars.some(v=>{if(v.x==null)return false;const hl=v.len/2,hw=v.len>8?1.35:1.2,ex=(v.L.ax=='x'?hl:hw)+r,ez=(v.L.ax=='x'?hw:hl)+r;return Math.abs(lx-v.x)<ex&&Math.abs(lz-v.z)<ez&&!(Math.abs(P.x-OX-v.x)<ex&&Math.abs(P.z-OZ-v.z)<ez)}))return 1;/* solid cars; never trap you inside one */return C.cols.some(ov)}}
-/* the cutaway: every material of a building shares one clipping plane that slides from the roof down to CUTH and back */
-const CUTH=3.3;
-function dsCut(U,tg,dt){const top=U.b[4]+1;if(!U.pl){if(tg)return;U.pl=new THREE.Plane(new THREE.Vector3(0,-1,0),1e4);U.h=top;U.mats.forEach(m=>{m.clippingPlanes=[U.pl];m.opacity=1;m.depthWrite=true;m.needsUpdate=true});renderer.localClippingEnabled=true}
- const want=tg?top:CUTH;if(U.h===want)return;U.h+=(want-U.h)*Math.min(1,dt*7);if(Math.abs(want-U.h)<.05)U.h=want;U.pl.constant=U.h>=top-.01?1e4:U.h}
+/* the cutaway: a building between you and the camera fades out completely, signs and all, so nothing is left blocking the view */
+function dsCut(U,tg,dt){const want=tg?1:0;if(U.o===want)return;
+ if(U.o>=1&&!tg){U.mats.forEach(m=>{if(m.b0==null)m.b0=m.transparent;m.transparent=true;m.needsUpdate=true})}
+ U.o+=(want-U.o)*Math.min(1,dt*12);if(Math.abs(want-U.o)<.03)U.o=want;
+ U.mats.forEach(m=>{m.opacity=U.o;m.visible=U.o>0});
+ if(U.o>=1){U.mats.forEach(m=>{m.transparent=!!m.b0;m.needsUpdate=true})}}
 /* wait at a crossing while a car on the other road is in it */
 function yieldAt(C,L,v){const xs=L.ax=='x'?C.rx:C.rz,reach=v.len/2+C.hr+2.5;let c=null;for(const q of xs){const d=(q-v.p)*L.dir;if(d>C.hr-.5&&d<reach){c=q;break}}if(c==null)return false;
  const cx=L.ax=='x'?c:L.c,cz=L.ax=='x'?L.c:c,b=C.hr+1.2;return C.cars.some(o=>o!==v&&o.L.ax!==L.ax&&o.x!=null&&Math.abs(o.x-cx)<b+(o.L.ax=='x'?o.len/2:1)&&Math.abs(o.z-cz)<b+(o.L.ax=='z'?o.len/2:1))}
@@ -555,8 +560,8 @@ function dsTick(dt){const C=D.C;if(!C)return;const t=performance.now()/1000,px=P
  C.tugs.forEach(g=>{g.p+=dt;g.m.position.z=g.z0+Math.sin(g.p*.3)*14;g.m.rotation.y=Math.cos(g.p*.3)>0?0:Math.PI});
  if(C.fly){const F=C.fly;F.t+=dt;const T=F.t%46;let z,y=2.1,pitch=0;if(T<6){z=F.z0}else if(T<26){const u=(T-6)/20;z=F.z0+(F.z1-F.z0)*u*u*.9;if(u>.62){const k=(u-.62)/.38;y=2.1+k*k*40;pitch=k*.25}}else{z=F.z1-(T-26)*60;y=40+(T-26)*14;pitch=.25}
   F.m.position.set(OX+F.x,y,OZ+z);F.m.rotation.set(0,Math.PI/2,0);F.m.rotateZ(pitch);F.m.visible=T<40}
- /* cut away buildings between you and the camera down to the ground floor (three rays so towers either side of a street go too) */
- const on=!cut&&!D.room&&mode!='pc'&&inCity();C.fades.forEach(U=>{const b=U.b;let tg=1;if(on&&Math.abs((b[0]+b[2])/2-px)<70&&Math.abs((b[1]+b[3])/2-pz)<70){for(const o of FOFF){let lo=0,hi=1e9;const ff=(p,a,c)=>{const t1=(a-p)/16,t2=(c-p)/16;lo=Math.max(lo,Math.min(t1,t2));hi=Math.min(hi,Math.max(t1,t2))};ff(px+o,b[0],b[2]);ff(pz-o,b[1],b[3]);hi=Math.min(hi,(b[4]-1)/13);if(lo<hi){tg=0;break}}}
+ /* fade buildings between you and the camera (three rays across your body) */
+ const on=!cut&&!D.room&&mode!='pc'&&inCity();C.fades.forEach(U=>{const b=U.b;let tg=1;if(on&&Math.abs((b[0]+b[2])/2-px)<70&&Math.abs((b[1]+b[3])/2-pz)<70){for(const o of FOFF){let lo=0,hi=1e9;const ff=(p,a,c)=>{const t1=(a-p)/16,t2=(c-p)/16;lo=Math.max(lo,Math.min(t1,t2));hi=Math.min(hi,Math.max(t1,t2))};ff(px+o,b[0]-.5,b[2]+.5);ff(pz-o,b[1]-.5,b[3]+.5);hi=Math.min(hi,(b[4]+.5)/13);if(lo<hi){tg=0;break}}}
   dsCut(U,tg,dt)});
  if(D.view&&D.view.tick)D.view.tick(dt);
  dsHud()}
