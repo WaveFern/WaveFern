@@ -13,7 +13,7 @@ function pcLayout(){const pc=document.getElementById('pc');if(!pc)return;const i
  if(rows*ch>H-PCU.pad){sc=Math.max(.5,(H-PCU.pad)/(rows*ch));if(sc<1){cw=Math.round(cw*sc);ch=Math.round(ch*sc);cols=colsOf(cw);rows=Math.ceil(n/cols);if(rows*ch>H-PCU.pad)sc=Math.max(.45,(H-PCU.pad)/(rows*ch))}}
  ic.forEach((e,i)=>{const c=i%cols,r=Math.floor(i/cols);e.style.left=(PCU.pad+c*cw)+'px';e.style.top=(PCU.pad+r*ch)+'px';e.style.width=Math.max(60,cw-6)+'px';e.style.transformOrigin='0 0';if(sc<1)e.style.transform='scale('+Math.max(.5,Math.min(1,cw/PCU.cellW,ch/PCU.cellH))+')'});
  pcPower()}
-const pcView1=()=>OPT.pcView!==0;
+const pcView1=()=>OPT.pcView!==0&&!window.PCSMALL;
 function pcPower(){const pc=document.getElementById('pc');if(!pc)return;const ui=document.getElementById('ui');let b=document.getElementById('pcpower');
  if(!b){b=document.createElement('button');b.id='pcpower';b.title='Power off (leave the computer)';b.setAttribute('aria-label','Power off');b.onclick=()=>closePC()}
  const tb=pc.querySelector('.tb');
