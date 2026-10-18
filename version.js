@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v44.1.0';
+const GAME_VERSION='v44.1.1';
 const VERSION_HISTORY=[
+ {v:'v44.1.1',n:'Fixed the phone controls crowding the screen in landscape: the touch buttons now sit in a row above Use, the minimap is hidden on short phone screens (use the Map button), and the tutorial boxes and prompts move clear of the joystick and buttons. Saves still load.'},
  {v:'v44.1.0',n:'The game now plays on phones and tablets. A joystick in the bottom-left corner moves your artist: drag it in any direction to walk, or to drive when you are in a car. Touch buttons in the bottom-right stand in for the keys: Use (E), Run (tap to switch sprinting on or off), Map, Phone, Storage and Pause. Prompts and tutorial boxes move so they do not sit under the controls, and the layout fits portrait and landscape screens. Keyboard and mouse controls on a computer are unchanged. Saves still load.'},
  {v:'v44.0.0',n:'Buildings in every tour city now vanish cleanly when they are between you and the camera, so nothing blocks your view any more. Your hotel room is now a full suite with a bathroom and bath, a big bed under city art, a desk by the window, a sofa, TV, rug, lamps and your suitcase. City pavements have paving slabs and the roads have manhole covers. In test mode a Teleport app on your phone jumps you straight to any tour city or back home. Saves still load.'},
  {v:'v43.9.0',n:'Two new artists to collab with: Max You, a ginger-haired pop artist dressed all in white, and Henry Dodds, an indie singer. Their fees scale with their fame like everyone else, and they can DM you too. Saves still load.'},
