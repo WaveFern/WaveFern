@@ -139,6 +139,9 @@ function dress(C,rm,key,x0,z0,w,d,wc){const s=C.s,back=z0+.2,L=x0+.2,wh=rm.o.h||
  if(key!='records'&&key!='office'){[.3,.72].forEach((f,i)=>{const zc=z0+d*f;rm.sign('x',x0+.08,zc-1.1,zc+1.1,1.1,3,160,128,winArt,'rw');rm.box(.1,.1,2.4,'#f4efe6',x0+.12,3.05,zc);rm.box(.1,2.4,.3,dk(s.acc||'#a83a3a',.8),x0+.14,1.85,zc-1.3);rm.box(.1,2.4,.3,dk(s.acc||'#a83a3a',.8),x0+.14,1.85,zc+1.3);rm.box(.3,.1,2.5,'#e8e0d0',x0+.25,1.05,zc)})}
  const ax=[x0+w*.3,x0+w*.72];if(key!='food'&&key!='cafe'&&key!='office'){ax.forEach((x,i)=>{const c1=pick(WCOL);rm.box(1.1,.8,.06,'#3a2a1a',x,2.6,back+.1);rm.box(.9,.62,.04,c1,x,2.6,back+.14);rm.box(.4,.3,.04,pick(WCOL),x+(i?.1:-.1),2.6,back+.17)})}
  rm.box(.55,.55,.06,'#3a2a1a',cx,3.3,back+.1);rm.box(.46,.46,.04,'#f8f6f0',cx,3.3,back+.13);rm.box(.04,.18,.03,'#111',cx,3.35,back+.16);rm.box(.14,.04,.03,'#111',cx+.05,3.3,back+.16)}
+/* a customer or two standing about so the shops are not empty */
+function guests(rm,key,x0,z0,w,d){const cx=x0+w/2,P=Math.PI,G={food:[[x0+12.2,z0+4.6,P]],cafe:[[x0+3.5,z0+4,P],[x0+10.3,z0+6,-P/2]],conv:[[cx-2,z0+5.5,P/2]],souv:[[x0+6.2,z0+3.4,P]],records:[[x0+4,z0+5.1,P/2]],books:[[x0+4,z0+8.2,P]],cloth:[[cx+1,z0+7.2,P]],pharm:[[x0+w-2.4,z0+8.6,-P/2]]}[key];
+ if(G)G.forEach(([x,z,r])=>{staff(rm,x,z,r);rm.cols.push([x-.35,z-.35,x+.35,z+.35])})}
 function extras(C,rm,key,x0,z0,w,d,sign){const s=C.s,back=z0+.2,front=z0+d,cx=x0+w/2,wd='#6a4a2a',dkw='#4a3226',gl='#bfe0ff';
  dress(C,rm,key,x0,z0,w,d,rm.o.wall||'#e8e4dc');
  if(key=='food'){const f2=rm.o.floor;for(let ix=0;ix<w;ix++)for(let iz=0;iz<d;iz++)if((ix+iz)%2==0)D.quadY(rm.G,x0+ix,z0+iz,x0+ix+1,z0+iz+1,.012,dk(f2,.84));
@@ -198,7 +201,7 @@ function shopRoom(C,key){const s=C.s,[x0,z0,w,d]=RM[key],words=D.words(s.lang);c
  if(key=='office'){rm.box(5,1.1,1,'#3a3a40',cx,.55,z0+3,1);rm.glow(5,.1,1.02,'#bfe0ff',cx,1.12,z0+3);staff(rm,cx,z0+2,0);for(let i=0;i<3;i++){rm.box(1.8,2.8,.1,'#8a8e94',x0+2+i*2.4,1.4,back+.1);rm.glow(.1,.1,.05,'#ffd23d',x0+2+i*2.4+1,1.4,back+.18)}
   [[x0+2.5,z0+8],[x0+w-3,z0+8]].forEach(([x,z])=>{rm.box(2.6,.5,1,'#4a5a6a',x,.25,z,1);rm.box(2.6,.6,.3,'#4a5a6a',x,.7,z-.4)});plant(rm,x0+1,z0+1);plant(rm,x0+w-1,z0+1);plant(rm,x0+w-1,z0+d-2);sign('LOBBY',cx-2,cx+2,3,3.6,{bg:'#e8e8ec',fg:'#2a2a3a'});
   rm.int(cx,z0+4.4,1.8,'Coffee from the lobby kiosk',()=>D.shop(C,Object.assign({},D.door||{n:'Lobby'},{k:'cafe'})))}
- extras(C,rm,key,x0,z0,w,d,sign);exitTo(C,rm,cx,front);rm.done()}
+ extras(C,rm,key,x0,z0,w,d,sign);guests(rm,key,x0,z0,w,d);exitTo(C,rm,cx,front);rm.done()}
 
 /* hotel lobby and room */
 function hotelRooms(C){const s=C.s,hn=(C.spots.hotel&&C.spots.hotel.n)||'Hotel',[lx,lz,lw,ld]=RM.lobby,[rx,rz,rw,rd]=RM.room;
