@@ -39,5 +39,7 @@ function phoneCard(){return S&&S.noPhone?`<div style="margin:12px 0;padding:10px
 window.buyPhone8=function(){if(!S||!S.noPhone)return;if(S.money<P8){try{snd('err')}catch(e){}return say('Not enough money.')}
  S.money=+(S.money-P8).toFixed(2);delete S.noPhone;try{chime()}catch(e){}say('Bought a Gphone 8. Press G to use it.');pcR()};
 for(const k of ['amz','phones']){const a0=PA[k];PA[k]=function(){const h=a0.apply(this,arguments);try{return typeof h=='string'?phoneCard()+h:h}catch(e){return h}}}
-{const o0=openPhone;openPhone=function(){if(S&&S.noPhone&&mode=='play'){try{snd('err')}catch(e){}return say('You do not have a phone yet. Buy a Gphone on Amazoom or at gphone.wf on your computer.')}return o0.apply(this,arguments)}}
+/* a Gphone 9+ bought through buyPhone sets S.phone: that also counts as owning a phone, so saves that already bought one work too */
+{const b0=buyPhone;buyPhone=function(n){const r=b0.apply(this,arguments);try{if(S&&S.phone)delete S.noPhone}catch(e){}return r}}
+{const o0=openPhone;openPhone=function(){if(S&&S.noPhone&&S.phone)delete S.noPhone;if(S&&S.noPhone&&mode=='play'){try{snd('err')}catch(e){}return say('You do not have a phone yet. Buy a Gphone on Amazoom or at gphone.wf on your computer.')}return o0.apply(this,arguments)}}
 })();
