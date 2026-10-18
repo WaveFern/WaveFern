@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v43.7.1';
+const GAME_VERSION='v43.8.0';
 const VERSION_HISTORY=[
+ {v:'v43.8.0',n:'Tour cities look and play better: fewer, more spread-out buildings with small squares, gardens and car parks between them, billboards and shop signs that actually show their pictures and glow with neon frames at night, and buildings that cleanly cut away to the ground floor when they block your view instead of going glitchy see-through. Every city now has its famous landmark (the Eiffel Tower in Paris, Big Ben in London, Tokyo Tower and more) with a selfie spot, a hotel with a lobby and your own room to sleep in, and walk-in restaurants, cafés, shops, record shops and office lobbies. Cars are solid and wait at crossings, street lamps and trees no longer stand in the way of people walking, and park fountains are the same as back home. Saves still load.'},
  {v:'v43.7.1',n:'Fixed getting stuck at airport security after missing a flight: walking back out through a security lane now works, so you can leave the terminal or rebook. If you are abroad with no flight out and not enough money for one, Swiftwing now gives you a free seat on the next flight home. Saves still load.'},
  {v:'v43.7.0',n:'World Tour destinations are now real places to explore: each city or town has its own streets, shops, signs in the local language, traffic, a hotel and an airport, and you arrive with an aerial cutscene over the skyline. Every stop has a huge stadium and a smaller club: plan your setlist and production in the dressing room, rehearse, then walk out for a long, detailed show with crowd moments, talking to the crowd, an intermission, an encore and fireworks. Saves still load.'},
  {v:'v43.6.2',n:'Fixed a plane and a baggage cart from the airport standing in the middle of town, near your house, until you first went to the airport. Saves still load.'},
