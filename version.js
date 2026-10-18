@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v44.3.0';
+const GAME_VERSION='v44.4.0';
 const VERSION_HISTORY=[
+ {v:'v44.4.0',n:'You no longer start with a phone: new players need to buy a Gphone 8 ($100) on Amazoom or gphone.wf on the computer before the G key (or the Phone button) works. Saves that already have a phone keep it. On phones and tablets the computer\'s app icons now look like the Gphone app grid, with rounded tiles. Saves still load.'},
  {v:'v44.3.0',n:'The computer now fits phones and tablets: on touch screens it opens full screen with big, easy-to-tap app icons that fill the screen, app windows that fill the whole display, and larger taskbar and window buttons. Apps now open with a single click or tap, no double click needed, on every device. Saves still load.'},
  {v:'v44.2.0',n:'New Full screen button on phones and tablets, next to Run: tap it to hide the browser bars and play full screen, tap again to exit. It only shows where the browser allows full screen (iPhones do not, so there use Share > Add to Home Screen to play full screen). Saves still load.'},
  {v:'v44.1.1',n:'Fixed the phone controls crowding the screen in landscape: the touch buttons now sit in a row above Use, the minimap is hidden on short phone screens (use the Map button), and the tutorial boxes and prompts move clear of the joystick and buttons. Saves still load.'},
