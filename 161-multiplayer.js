@@ -114,8 +114,8 @@ function hostData(c,d){if(!d||!d.t)return;
   if(no){try{c.send({t:'no',why:no})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
   c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{id:c.peer,nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
   c.send({t:'wel',band:MPS.band,an:S.artist||'',you:c.peer,day:S.day,tm:S.t,mem:Object.values(MB).map(m=>Object.assign(pub(m),{x:m.x,z:m.z,zone:m.zone,where:m.where,studio:m.studio,stg:m.stg,rd:m.rd}))});
-  NET.gk='';roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
- if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
+  NET.gk='';NET.cs={};roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
+ if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
 function drop(id){const c=NET.conns[id];if(!c)return;delete NET.conns[id];const m=MB[id];if(m){say(m.nm+' left the room.');rmAv(id);delete MB[id]}roster()}
 function joinOpen(){const p=NET.peer=new Peer({debug:0});
  p.on('open',id=>{NET.id=ME.id=id;connectHost()});
@@ -126,7 +126,7 @@ function connectHost(){if(NET.closed||!NET.peer)return;const c=NET.hc=NET.peer.c
  c.on('data',d=>{if(!d||!d.t)return;
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
   if(d.t=='wel'){NET.on=1;NET.tries=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
-   if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+'.');NET.lastSt='';NET.gk='';return}
+   if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+'.');NET.lastSt='';NET.gk='';NET.cs={};return}
   handle(d,d.id)});
  c.on('close',()=>{if(NET.hc===c){NET.hc=null;lost()}})}
 function lost(){if(NET.closed||NET.rt)return;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}ME.rd=null;
@@ -141,14 +141,15 @@ function handle(d,id,self){
  if(d.t=='clk'){if(!isHost())clock(d);return}
  if(d.t=='go'){go(d);return}
  if(!id||self||id===ME.id)return;const m=MB[id];if(!m)return;
- if(d.t=='st'){['x','z','r','zone','where','studio','stg','nm','ctry'].forEach(k=>{if(d[k]!==undefined)m[k]=d[k]});if(d.look){m.look=d.look}}
- else if(d.t=='rd'){const was=m.rd;m.rd=d.rd||null;if(d.rd&&!was)say(m.nm+(d.rd.k=='rec'?' is ready to record.':d.rd.k=='slp'?' is in bed and wants to sleep.':' is ready to play Stage '+d.rd.n+'.'))}
- else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q}say(m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
+ if(d.t=='st'){['x','z','r','zone','where','studio','stg','nm','ctry','col'].forEach(k=>{if(d[k]!==undefined)m[k]=d[k]});if(d.look){m.look=d.look}}
+ else if(d.t=='rd'){const was=m.rd;m.rd=d.rd||null;if(d.rd&&!was)say(m.nm+(d.rd.k=='rec'?' is ready to record.':d.rd.k=='slp'?' is in bed and wants to sleep.':d.rd.k=='col'?' is ready to record with '+artN(d.rd.a)+'.':' is ready to play Stage '+d.rd.n+'.'))}
+ else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q}say(d.c?m.nm+' finished the collab session.':m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
  else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s Spotifly account "'+d.v+'".')}}
  else if(d.t=='em'){const a=AV[id];if(a&&EMK[d.k]&&a.g.visible){a.em={k:d.k,t:0};emFloat(a.g,d.k)}}
  else if(d.t=='rel')relRecv(d,m)
  else if(d.t=='scr')scrRecv(d,m)
- else if(d.t=='gr')gearRecv(d,m)}
+ else if(d.t=='gr')gearRecv(d,m)
+ else if(d.t=='cm')cmRecv(d,m)}
 const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
 
@@ -158,13 +159,13 @@ function zone(){if(['title','creator','load'].includes(mode))return'menu';try{re
 function where(){try{if(['title','creator','load'].includes(mode))return'in the menu';if(IN)return SHOPS[IN.i].name;if(typeof FEST!='undefined'&&FEST.view)return'on stage';const n=stg();if(n)return'Festival, Stage '+n;
  if(P.x>=0&&P.x<=16&&P.z>=0&&P.z<=12)return P.x<8?(P.z<6?'Bedroom':'Living room'):(P.z<6?'Studio':'Kitchen');return mode=='drive'?'driving':'out in town'}catch(e){return''}}
 function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.x=+P.x.toFixed(2);ME.z=+P.z.toFixed(2);ME.r=+(P.rot||0).toFixed(2);ME.zone=zone();ME.where=where();
- ME.ctry=ctry();ME.studio=ME.zone=='o'&&P.x>8&&P.x<16&&P.z>0&&P.z<6?1:0;ME.stg=stg();
+ ME.ctry=ctry();ME.studio=ME.zone=='o'&&P.x>8&&P.x<16&&P.z>0&&P.z<6?1:0;ME.stg=stg();ME.col=colNear();
  /* ready only holds while you are where it counts */
- if(ME.rd&&((ME.rd.k=='rec'&&!ME.studio&&mode!='rec')||(ME.rd.k=='fest'&&ME.stg!=ME.rd.n&&mode!='fest')||(ME.rd.k=='slp'&&(Math.hypot(P.x-ME.rd.x,P.z-ME.rd.z)>2.5||mode!='play')))){ME.rd=null;send({t:'rd',rd:null});say('You walked away, so you are no longer ready.')}
- if(ME.rd&&!band()){const r=ME.rd;ME.rd=null;if(r.k=='rec'){MPGO=1;try{startRec(r.g)}finally{MPGO=0}}else if(r.k=='slp'){if(mode=='play')sleepNow(0)}else if(r.k=='fest'&&r.lead&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}}
+ if(ME.rd&&((ME.rd.k=='rec'&&!ME.studio&&mode!='rec')||(ME.rd.k=='fest'&&ME.stg!=ME.rd.n&&mode!='fest')||(ME.rd.k=='slp'&&(Math.hypot(P.x-ME.rd.x,P.z-ME.rd.z)>2.5||mode!='play'))||(ME.rd.k=='col'&&ME.col!==ME.rd.a&&mode!='cut'))){ME.rd=null;send({t:'rd',rd:null});say('You walked away, so you are no longer ready.')}
+ if(ME.rd&&!band()){const r=ME.rd;ME.rd=null;if(r.k=='rec'){MPGO=1;try{startRec(r.g)}finally{MPGO=0}}else if(r.k=='slp'){if(mode=='play')sleepNow(0)}else if(r.k=='fest'&&r.lead&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}else if(r.k=='col')goCol({a:r.a,op:r.op,n:1})}
  if(online()&&S.artist&&S.artist!==NET.an&&mode!='creator'){NET.an=S.artist;send({t:'an',v:S.artist})}
  if(online()&&S.gear&&mode!='creator'){const gk=JSON.stringify(S.gear);if(gk!==NET.gk){NET.gk=gk;send({t:'gr',g:S.gear})}}
- if(!online())return;const now=Date.now(),o={t:'st',ctry:ME.ctry,x:ME.x,z:ME.z,r:ME.r,zone:ME.zone,where:ME.where,studio:ME.studio,stg:ME.stg,nm:ME.nm},k=JSON.stringify(o);
+ if(!online())return;const now=Date.now(),o={t:'st',ctry:ME.ctry,x:ME.x,z:ME.z,r:ME.r,zone:ME.zone,where:ME.where,studio:ME.studio,stg:ME.stg,nm:ME.nm,col:ME.col},k=JSON.stringify(o);
  if(k!==NET.lastSt||now-NET.stT>1000){NET.lastSt=k;NET.stT=now;if(now-NET.lkT>4000){NET.lkT=now;ME.look=o.look=myLook()}send(o)}
  if(isHost()){if(now-NET.clkT>2000){NET.clkT=now;sendAll({t:'clk',day:S.day,tm:S.t})}hostCheck()}}
 setInterval(()=>{try{netTick()}catch(e){console.error('mp tick',e)}},120);
@@ -172,10 +173,13 @@ setInterval(()=>{try{netTick()}catch(e){console.error('mp tick',e)}},120);
 function hostCheck(){const L=list();if(L.length<2)return;
  if(L.every(m=>m.rd&&m.rd.k=='rec'&&m.studio)){const f=L.slice().sort((a,b)=>a.rd.ts-b.rd.ts)[0];send({t:'go',k:'rec',g:f.rd.g,n:L.length,title:f.rd.title||'',bl:MPS.code+'-'+Date.now().toString(36)});return}
  const sl=L.find(m=>m.rd&&m.rd.k=='slp');if(sl){const G=L.filter(m=>(m.ctry||'home')==(sl.ctry||'home'));if(G.every(m=>m.rd&&m.rd.k=='slp')){send({t:'go',k:'slp',ctry:sl.ctry||'home'});return}}
+ const cl=L.slice().sort((a,b)=>(a.rd&&a.rd.ts||0)-(b.rd&&b.rd.ts||0)).find(m=>m.rd&&m.rd.k=='col');
+ if(cl&&L.every(m=>m.rd&&m.rd.k=='col'&&m.rd.a===cl.rd.a&&m.col===cl.rd.a)){const a=ART[cl.rd.a];send({t:'go',k:'col',a:cl.rd.a,op:cl.rd.op||0,n:L.length,title:featT(pick(A)+' '+pick(Bn),a[0]),bl:MPS.code+'-c'+Date.now().toString(36)});return}
  const ld=L.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);
  if(ld&&L.every(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n&&m.stg==ld.rd.n))send({t:'go',k:'fest',n:ld.rd.n,lead:ld.id,slot:ld.rd.slot,songs:ld.rd.songs,cnt:L.length})}
 function go(d){const r=ME.rd;for(const k in MB)MB[k].rd=null;ME.rd=null;if(!r||r.k!==d.k)return;
  if(d.k=='rec'){MPGO=1;try{startRec(d.g)}finally{MPGO=0}if(rec&&mode=='rec'){rec.band=d.n;rec.bt=d.title||'';rec.bl=d.bl;BT=d.bl;const sp=SPOT[MPS.inst];P.x=sp[0];P.z=sp[1];P.rot=sp[2];say('Band take! Everyone plays their part.')}}
+ else if(d.k=='col'){closeUI();goCol(d)}
  else if(d.k=='slp'){closeUI();say('The whole band is in bed. Good night!');sleepNow(0)}
  else if(d.k=='fest'){MPF=1;if(d.lead===ME.id&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}else guestSet(d);if(mode!='fest')MPF=0}}
 /* the host's clock is the band's clock */
@@ -343,6 +347,8 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
      h+=ME.rd&&ME.rd.k=='rec'?'<br><button onclick="mpUnready()">Not ready</button>':ME.studio?'<br><button class=go onclick="mpRecReady()">Ready to record</button>':'<br><small class=m>Go to the studio to join the take.</small>';h+='</div>'}
     const sp=me.filter(m=>m.rd&&m.rd.k=='slp');if(sp.length){const G=me.filter(m=>(m.ctry||'home')==(sp[0].ctry||'home')),aw=G.filter(m=>!(m.rd&&m.rd.k=='slp')).map(m=>esc(m.nm)),ab=me.length-G.length;
      h+=`<div class=mps>Going to sleep: <b>${sp.length}/${G.length} in bed</b>${aw.length?`<br><small class=m>Not in bed: ${aw.join(', ')}</small>`:''}${ab?`<br><small class=m>${ab} abroad, so not needed</small>`:''}`+(ME.rd&&ME.rd.k=='slp'?'<br><button onclick="mpUnready()">Get up</button>':'<br><small class=m>Press E at a bed to join.</small>')+'</div>'}
+    const cr=me.find(m=>m.rd&&m.rd.k=='col');if(cr){const ca=cr.rd.a,cn=artN(ca),cy=me.filter(m=>m.rd&&m.rd.k=='col'&&m.rd.a===ca),aw=me.filter(m=>m.col!==ca).map(m=>esc(m.nm));
+     h+=`<div class=mps>Collab with ${esc(cn)}: <b>${cy.length}/${n} members ready</b>${aw.length?`<br><small class=m>Not with ${esc(cn)}: ${aw.join(', ')}</small>`:''}`+(ME.rd&&ME.rd.k=='col'?'<br><button onclick="mpUnready()">Not ready</button>':ME.col===ca?`<br><button class=go onclick="mpColReady(${ca})">Ready to record</button>`:`<br><small class=m>Go to ${esc(cn)} to join.</small>`)+'</div>'}
     const ld=me.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);if(ld){const fr=me.filter(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n);h+=`<div class=mps>Stage ${ld.rd.n} set: <b>${fr.length}/${n} members ready</b>`;
      const away=me.filter(m=>m.stg!=ld.rd.n).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not at Stage ${ld.rd.n}: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='fest'?(ME.rd.lead?'<br><button onclick="mpUnready()">Cancel the set</button>':'<br><button onclick="mpUnready()">Not ready</button>'):ME.stg==ld.rd.n?`<br><button class=go onclick="mpFestReady(${ld.rd.n})">Ready to play</button>`:`<br><small class=m>Go to Stage ${ld.rd.n} at the festival.</small>`;h+='</div>'}}}}
@@ -433,6 +439,34 @@ addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)
 #emw .emc{position:absolute;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;background:#0b0f0de6;border:3px solid #000;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:Silkscreen,ui-monospace,monospace;color:var(--g)}
 .emf{position:fixed;z-index:4;pointer-events:none;font-size:30px;transform:translate(-50%,-100%);text-shadow:2px 2px 0 #000;animation:emfp .35s ease-out}
 @keyframes emfp{0%{transform:translate(-50%,-100%) scale(.2)}70%{transform:translate(-50%,-100%) scale(1.25)}100%{transform:translate(-50%,-100%) scale(1)}}`;document.head.appendChild(st)}
+
+/* ===== band collabs: every artist chat is shared, the whole band records the collab together, and the song is linked ===== */
+const artN=i=>{try{return ART[i][0]}catch(e){return'the artist'}};
+function colNear(){if(!MPS||IN&&!(typeof TW!='undefined'&&TW))return -1;let b=-1,bd=6;try{ART_M.forEach(o=>{if(o.m&&!o.m.parent)return;const d=Math.hypot(P.x-o.x,P.z-o.z);if(d<bd){bd=d;b=o.i}})}catch(e){}return b}
+window.mpColReady=a=>{if(S.energy<COLLAB_E){snd('err');return say('Too tired to record, even a collab. Rest and come back.')}const m=S.msgs.find(x=>x.a===a);let op=0;if(m){if((m.rel||0)>=5)op++;if(m.neg)op--}
+ snd('pop');closeUI();MEET=null;ME.rd={k:'col',a,op,ts:Date.now()};send({t:'rd',rd:ME.rd});say('Ready to record with '+artN(a)+'. Waiting for the rest of the band.')};
+{const m0=meetRec;meetRec=function(){const M=MEET;if(!M||!MPS||!band())return m0.apply(this,arguments);if(S.energy<COLLAB_E){snd('err');return say('Too tired to record, even a collab. Rest and come back.')}
+ const a=M.o.i;snd('pop');$('ui').innerHTML='';MEET=null;ME.rd={k:'col',a,op:M.op||0,ts:Date.now()};send({t:'rd',rd:ME.rd});
+ const w=list().filter(m=>m.id!==ME.id&&!(m.rd&&m.rd.k=='col'&&m.rd.a===a)).length;say(w?'Ready to record with '+artN(a)+'. Waiting for '+w+' more bandmate'+(w>1?'s':'')+'.':'Ready to record with '+artN(a)+'.')}}
+const COFF={vo:[0,0],gt:[-.6,1.1],bs:[-.6,-1.1],dr:[-1.4,1.6],ky:[-1.4,-1.6]};
+function goCol(d){const o=ART_M.find(x=>x.i===d.a);if(!o)return say('That artist is not around any more.');S.energy=Math.max(0,+(S.energy-COLLAB_E).toFixed(1));try{updateVersion()}catch(e){}
+ $('ui').innerHTML='';MEET=null;mode='cut';cs2={o,t:0,op:d.op||0,band:d.n||1,bt:d.title||'',bl:d.n>1?d.bl:null};const f=COFF[MPS.inst]||[0,0];P.x=o.x-1.4+f[0];P.z=o.z+f[1];P.rot=Math.PI/2;
+ say(d.n>1?'Band collab with '+o.name+' (fictional). Everyone records together.':'Recording with '+o.name+' (fictional)')}
+{const c0=collabDone;collabDone=function(){const c=cs2||{},b=c.band||0,bt=c.bt,bl=c.bl,n0=S.nid;const r=c0.apply(this,arguments);
+ try{const d=S.drafts[S.drafts.length-1];if(MPS&&bl&&d&&d.id===n0){const add=b>1?3*(b-1):0;d.q+=add;d.title=bt||d.title;d.bt=d.title;d.bl=bl;(BQ[bl]=BQ[bl]||{})[ME.id]=d.q;
+  const t=$('tin');if(t){t.value=d.title;t.readOnly=true;t.blur();t.insertAdjacentHTML('afterend',`<p class=m><small>Band collab with ${b} members (+${add} quality). Everyone gets this song, and releasing it releases it for the whole band.</small></p>`)}
+  send({t:'dn',c:1,q:d.q,bl});if(REL[bl])setTimeout(()=>relDo(bl),300)}}catch(e){console.error('mp collab',e)}return r}}
+/* artist chats: any change to one (a new message, a deal, a collab done) goes to the whole band */
+const cmSig=m=>{try{return JSON.stringify(Object.assign({},m,{id:0,unread:0,recv:0}))}catch(e){return''}};
+setInterval(()=>{try{if(!MPS||!S||!Array.isArray(S.msgs)||!online()||mode=='creator'||mode=='load')return;NET.cs=NET.cs||{};
+ S.msgs.forEach(m=>{if(m.a===undefined||m.a===null)return;const k=cmSig(m);if(NET.cs[m.a]!==k){NET.cs[m.a]=k;const c=JSON.parse(k);delete c.id;delete c.unread;delete c.recv;send({t:'cm',m:c})}})}catch(e){console.error('mp chats',e)}},1000);
+function cmRecv(d,from){const r=d.m;if(!r||typeof r!='object'||typeof r.a!='number'||!ART[r.a]||!Array.isArray(r.log)||!Array.isArray(S.msgs))return;NET.cs=NET.cs||{};
+ let m=S.msgs.find(x=>x.a===r.a);const grew=!m||r.log.length>m.log.length,st0=m?m.state:null;
+ if(m&&r.log.length<(m.log||[]).length)return;
+ if(!m){m={id:S.nid++};S.msgs.push(m)}const id=m.id,un=m.unread,rv=m.recv;Object.assign(m,r);m.id=id;m.recv=rv;m.unread=grew&&r.log.length&&r.log[r.log.length-1].f!='p'&&S.chat!==id?1:un||0;
+ NET.cs[r.a]=cmSig(m);if(st0!==m.state&&(st0==1||m.state==1)){try{syncArt()}catch(e){}}
+ if(grew&&st0!==null&&m.state==1&&st0!=1)say(from.nm+' agreed a collab with '+artN(r.a)+'. It is for the whole band.');
+ try{if(mode=='pc')pcR()}catch(e){}}
 
 if(MPS)setTimeout(start,0);
 })();

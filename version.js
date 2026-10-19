@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v45.5.2';
+const GAME_VERSION='v45.6.0';
 const VERSION_HISTORY=[
+ {v:'v45.6.0',n:'Band rooms: collabs are now done by the whole band. Artist chats are shared, so every member sees the same messages, deals and agreed collabs. When one member starts recording with an artist, the band panel shows how many members are ready, and the session only starts once everyone is with that artist and ready. The finished collab is one linked band song with the same name for everyone (+3 quality per extra member), and releasing it releases it for the whole band.'},
  {v:'v45.5.2',n:'Band rooms: the band now goes to sleep together. Everyone online has to be at a bed and press it (the band panel shows who is in bed), and members who are abroad in another country are not needed. Gear shop upgrades now count for the whole band: when one member upgrades, everyone\'s studio gets it. Saves still load.'},
  {v:'v45.5.1',n:'Band rooms: when one member runs out of goes or leaves a band take, the take is now scrapped for the whole band instead of the others carrying on, and any finished part of it is thrown away too. Saves still load.'},
  {v:'v45.5.0',n:'Band rooms: press B (or Emotes on the band panel) for an emote wheel with 8 animated emotes: wave, dance, clap, cheer, laugh, air guitar, spin and love. Your bandmates see them, with an emoji over your head. The whole band now shares one Spotifly artist account: when anyone picks the artist name it becomes everyone\'s, and the drawn profile picture shows every member. Whoever starts a recording names the song, everyone records it together, and when one member releases it, it comes out for the whole band at once. You now type your own name when you create or join a room. Fixed the bunk beds not counting as beds, so leaving Storage no longer asks you to place a bed, and the wardrobe no longer stands inside a bunk bed in band houses. Saves still load.'},
