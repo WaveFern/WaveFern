@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v45.2.0';
+const GAME_VERSION='v45.3.0';
 const VERSION_HISTORY=[
+ {v:'v45.3.0',n:'Shops in the tour cities have their own menus: souvenir shops open a gift counter under a striped awning with price tags and spinning previews, restaurants hand you a printed paper menu and cafés show a chalkboard. Souvenirs (postcard on an easel, snow globe, T-shirt on a stand, fridge magnet board) are now real models in each city\'s colours that go to your Storage at home to place like furniture, and souvenirs you bought before are added to your Storage. Shop doors no longer bounce you in and out when you hold or double-press E: you step clear of the door after going through it. Saves still load.'},
  {v:'v45.2.0',n:'Shops in the tour cities now have customers standing about: queueing at the café and restaurant counters, browsing the store, records, books, boutique, souvenir and pharmacy aisles. They block the way like furniture so you cannot walk through them. Saves still load.'},
  {v:'v45.1.2',n:'Changed buildings back to fading out smoothly when they block your view, instead of the round dotted hole. They still never vanish or pop as you walk up to them. Saves still load.'},
  {v:'v45.1.1',n:'Fixed tour cities being nearly pitch black at night: buildings, streets and the ground now have a soft blue glow so you can read the city while the windows and signs still shine. Saves still load.'},

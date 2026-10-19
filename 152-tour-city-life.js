@@ -126,7 +126,7 @@ function chair(rm,x,z,c){rm.box(.7,.08,.7,c,x,.5,z);rm.box(.7,.7,.08,c,x,.85,z-.
 function table(rm,x,z,w,d,c){rm.box(w,.08,d,c,x,.78,z,1);rm.box(.12,.74,.12,'#333',x,.37,z)}
 function plant(rm,x,z){rm.box(.6,.6,.6,'#8a5a3a',x,.3,z,1);rm.box(.9,1,.9,'#3a8a4a',x,1.1,z);rm.box(.5,.6,.5,'#4a9a5a',x,1.8,z)}
 /* exit at the front (south) wall back to where you came in */
-function exitTo(C,rm,x,z,label){rm.box(2,.05,1,'#7a3a2a',x,.03,z-.6);rm.int(x,z-.6,1.4,label||'Go back outside',()=>{const d=D.door||C.spots.hotel;D.goOut(d?d.x:C.spots.hotel.x,d?d.z+(d.face=='x'?0:.6):C.spots.hotel.z+1,0)})}
+function exitTo(C,rm,x,z,label){rm.box(2,.05,1,'#7a3a2a',x,.03,z-.6);rm.int(x,z-.6,1.4,label||'Go back outside',()=>{const d=D.door||C.spots.hotel;D.goOut(d?d.x+(d.face=='x'?.6:0):C.spots.hotel.x,d?d.z+(d.face=='x'?0:.6):C.spots.hotel.z+1,d&&d.face=='x'?Math.PI/2:0)})}
 /* ---------- interior dressing: trim, lights, windows, art, and the extra furniture of each kind of room ---------- */
 const WCOL=['#e8b84a','#3a8ae8','#e84a6a','#4ab87a','#a86ae8','#e8803a'];
 function winArt(c,W,H){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#8ec8ee');g.addColorStop(1,'#e4f2fb');c.fillStyle=g;c.fillRect(0,0,W,H);
