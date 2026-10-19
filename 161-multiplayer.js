@@ -115,7 +115,7 @@ function hostData(c,d){if(!d||!d.t)return;
   c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{id:c.peer,nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
   c.send({t:'wel',band:MPS.band,an:S.artist||'',you:c.peer,day:S.day,tm:S.t,mem:Object.values(MB).map(m=>Object.assign(pub(m),{x:m.x,z:m.z,zone:m.zone,where:m.where,studio:m.studio,stg:m.stg,rd:m.rd}))});
   roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
- if(!c.mp||!['st','rd','dn','an','em','rel'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
+ if(!c.mp||!['st','rd','dn','an','em','rel','scr'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
 function drop(id){const c=NET.conns[id];if(!c)return;delete NET.conns[id];const m=MB[id];if(m){say(m.nm+' left the room.');rmAv(id);delete MB[id]}roster()}
 function joinOpen(){const p=NET.peer=new Peer({debug:0});
  p.on('open',id=>{NET.id=ME.id=id;connectHost()});
@@ -146,7 +146,8 @@ function handle(d,id,self){
  else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q}say(m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
  else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s Spotifly account "'+d.v+'".')}}
  else if(d.t=='em'){const a=AV[id];if(a&&EMK[d.k]&&a.g.visible){a.em={k:d.k,t:0};emFloat(a.g,d.k)}}
- else if(d.t=='rel')relRecv(d,m)}
+ else if(d.t=='rel')relRecv(d,m)
+ else if(d.t=='scr')scrRecv(d,m)}
 const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
 
@@ -171,7 +172,7 @@ function hostCheck(){const L=list();if(L.length<2)return;
  const ld=L.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);
  if(ld&&L.every(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n&&m.stg==ld.rd.n))send({t:'go',k:'fest',n:ld.rd.n,lead:ld.id,slot:ld.rd.slot,songs:ld.rd.songs,cnt:L.length})}
 function go(d){const r=ME.rd;for(const k in MB)MB[k].rd=null;ME.rd=null;if(!r||r.k!==d.k)return;
- if(d.k=='rec'){MPGO=1;try{startRec(d.g)}finally{MPGO=0}if(rec&&mode=='rec'){rec.band=d.n;rec.bt=d.title||'';rec.bl=d.bl;const sp=SPOT[MPS.inst];P.x=sp[0];P.z=sp[1];P.rot=sp[2];say('Band take! Everyone plays their part.')}}
+ if(d.k=='rec'){MPGO=1;try{startRec(d.g)}finally{MPGO=0}if(rec&&mode=='rec'){rec.band=d.n;rec.bt=d.title||'';rec.bl=d.bl;BT=d.bl;const sp=SPOT[MPS.inst];P.x=sp[0];P.z=sp[1];P.rot=sp[2];say('Band take! Everyone plays their part.')}}
  else if(d.k=='fest'){MPF=1;if(d.lead===ME.id&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}else guestSet(d);if(mode!='fest')MPF=0}}
 /* the host's clock is the band's clock */
 function clock(d,force){if(mode=='sleep'||mode=='creator'||mode=='load'||!S)return;
@@ -223,7 +224,7 @@ window.mpRecReady=()=>{if(!S.artist)return say('Pick an artist name on the compu
  const o=list().filter(m=>m.rd&&m.rd.k=='rec').sort((a,b)=>a.rd.ts-b.rd.ts)[0];startRec(o?o.rd.g:0)};
 window.mpUnready=()=>{snd('click');ME.rd=null;send({t:'rd',rd:null})};
 /* the band take is better with more members */
-{const f0=mgFinish;mgFinish=function(){const bt=rec&&rec.bt,bl=rec&&rec.bl,b=rec&&rec.band||0,sc=rec&&rec.sc?[rec.sc.l||0,rec.sc.x||0]:[0,0],n0=S.nid;const r=f0.apply(this,arguments);
+{const f0=mgFinish;mgFinish=function(){if(rec&&rec.bl===BT)BT=null;const bt=rec&&rec.bt,bl=rec&&rec.bl,b=rec&&rec.band||0,sc=rec&&rec.sc?[rec.sc.l||0,rec.sc.x||0]:[0,0],n0=S.nid;const r=f0.apply(this,arguments);
  try{if(MPS){const d=S.drafts[S.drafts.length-1],add=b>1?3*(b-1):0;if(d&&d.id===n0&&add){d.q+=add;const p=document.querySelector('#ui .box p.m');if(p)p.insertAdjacentHTML('afterend',`<p class=m>Band take with ${b} members: +${add} quality</p>`)}
   if(MPS.inst!='vo'){const c=[...document.querySelectorAll('#ui .box .card')].find(c=>c.firstChild&&c.firstChild.textContent=='Lyrics');if(c)c.firstChild.textContent=INS[MPS.inst].st}
   const d2=S.drafts[S.drafts.length-1];if(bl&&d2&&d2.id===n0){d2.title=bt||d2.title;d2.bt=d2.title;d2.bl=bl;(BQ[bl]=BQ[bl]||{})[ME.id]=d2.q;const t=$('tin');if(t){t.value=d2.title;t.readOnly=true;t.blur();t.insertAdjacentHTML('afterend','<p class=m><small>Band song: everyone in the take gets it, and releasing it releases it for the whole band.</small></p>')}if(REL[bl])setTimeout(()=>relDo(bl),300)}
@@ -358,7 +359,12 @@ function pfComp(im){const k=document.createElement('canvas');k.width=k.height=32
  if(k!==PFK){PFK=k;PFU='';let n=0;const im=L.map(l=>{const i=new Image();i.onload=()=>{if(++n==L.length&&PFK===k){PFU=pfComp(im);try{if(mode=='pc')pcR()}catch(e){}}};i.src=p0(l);return i})}return p0()}}
 
 /* band songs: whoever starts the take names it, everyone records it together, and releasing it releases it for the whole band */
-const BQ={},REL={};let RELF=0;
+const BQ={},REL={};let RELF=0,BT=null;
+/* one member running out of goes (or leaving the take) scraps it for the whole band */
+setInterval(()=>{if(BT&&!(rec&&rec.bl===BT)){const bl=BT;BT=null;send({t:'scr',bl})}},150);
+function scrRecv(d,m){if(!d.bl)return;let hit=0;if(rec&&rec.bl===d.bl){BT=null;rec=null;mode='play';try{mgDraw()}catch(e){}hit=1}
+ const i=S.drafts.findIndex(x=>x.bl===d.bl);if(i>=0){S.drafts.splice(i,1);hit=1;if($('tin'))closeUI()}
+ if(hit){snd('err');say(m.nm+' ran out of goes, so the band take is scrapped.')}}
 const bqAvg=bl=>{const q=Object.values(BQ[bl]||{}).filter(v=>typeof v=='number'&&isFinite(v));return q.length?Math.round(q.reduce((a,b)=>a+b,0)/q.length):null};
 function relDo(bl){const d=S.drafts.find(x=>x.bl===bl);if(!d){REL[bl]=1;return}delete REL[bl];const q=bqAvg(bl);if(q!=null)d.q=q;d.title=d.bt||d.title;
  RELF=1;const p=pcR;if(mode!='pc')pcR=()=>{};try{upl(d.id)}catch(e){console.error('band release',e)}finally{pcR=p;RELF=0}}
