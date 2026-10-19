@@ -23,6 +23,7 @@ const pid=c=>'wavefern-rm-'+String(c).toLowerCase();
 const newCode=()=>{const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.random()*a.length|0];return s};
 const lsGet=()=>{try{const l=JSON.parse(localStorage.getItem(LK)||'[]');return Array.isArray(l)?l:[]}catch(e){return[]}};
 function lsAdd(o){const l=lsGet().filter(x=>!(x.code==o.code&&x.inst==o.inst));l.unshift(Object.assign({t:Date.now()},o));try{localStorage.setItem(LK,JSON.stringify(l.slice(0,8)))}catch(e){}}
+const lastNm=()=>{try{return localStorage.getItem(SAVE_PRE+'mpnm')||''}catch(e){return''}};
 const mpKey=()=>SAVE_PRE+'mp_'+MPS.code+'_'+MPS.inst;
 
 /* ---- saves: a band career lives under its own key and stays off the cloud ---- */
@@ -56,13 +57,13 @@ function insBtns(taken,lock){return`<div class=mpins>${IK.map(k=>{const off=(tak
 window.mpPick=k=>{snd('click');U.inst=k;document.querySelectorAll('.mpins button').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick')==`mpPick('${k}')`))};
 window.mpCreateUI=()=>{snd('click');TT.sel=1;U.inst='vo';const mine=lsGet().filter(x=>x.host);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Create a room</h2><p class=m>Up to ${MAXN} players live in one house as a band. Everyone picks one instrument and keeps it. Your friends join with the room code.</p>
-  <div class=r><span>Band name</span><input id=mpbn maxlength=24 placeholder="The Ferns"></div><p style="margin:10px 0 0">Your instrument</p>${insBtns()}
+  <div class=r><span>Band name</span><input id=mpbn maxlength=24 placeholder="The Ferns"></div><div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm())}"></div><p style="margin:10px 0 0">Your instrument</p>${insBtns()}
   <button class=go onclick="mpCreateGo()">Create room</button>
   ${mine.length?`<details class=ttrb open><summary>Your bands (host again)</summary>${mine.map(x=>`<div class=ttsl><div><b>${esc(x.band||'Band')}</b><small>Room ${esc(x.code)} · ${iName(x.inst)}</small></div><button onclick="mpHostAgain('${esc(x.code)}','${x.inst}')">Host</button></div>`).join('')}</details>`:''}
   <p class=m><small>Rooms connect browser to browser. Very strict networks (some schools and offices) can block them.</small></p><button onclick="ttBack()">Back</button></div></div>`};
-function enter(o){lsAdd(o);wiping=true;try{sessionStorage.setItem(SK,JSON.stringify(o));sessionStorage.setItem('fw_go','1')}catch(e){wiping=false;return say('Could not start the room in this browser.')}location.reload()}
+function enter(o){const y=$('mpyn');if(y){o.nm=(y.value||'').trim().slice(0,16);try{localStorage.setItem(SAVE_PRE+'mpnm',o.nm)}catch(e){}}lsAdd(o);wiping=true;try{sessionStorage.setItem(SK,JSON.stringify(o));sessionStorage.setItem('fw_go','1')}catch(e){wiping=false;return say('Could not start the room in this browser.')}location.reload()}
 window.mpCreateGo=()=>{snd('click');const b=($('mpbn').value||'').trim()||'The Ferns';enter({code:newCode(),inst:U.inst,band:b,host:1})};
-window.mpHostAgain=(c,i)=>{snd('click');const x=lsGet().find(q=>q.code==c&&q.inst==i);enter({code:c,inst:i,band:x&&x.band||'Band',host:1})};
+window.mpHostAgain=(c,i)=>{snd('click');const x=lsGet().find(q=>q.code==c&&q.inst==i);enter({code:c,inst:i,band:x&&x.band||'Band',host:1,nm:x&&x.nm||''})};
 window.mpJoinUI=()=>{snd('click');TT.sel=1;const rec=lsGet().filter(x=>!x.host);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Join a room</h2><p class=m>Type the room code your friend sees on their screen.</p>
   <div class=ng><input id=mpcd maxlength=5 placeholder="CODE" style="text-transform:uppercase;letter-spacing:3px" onkeydown="if(event.key=='Enter')mpFind()"><button class=go onclick="mpFind()">Find room</button></div>
@@ -80,7 +81,7 @@ window.mpFind=()=>{const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpj
     if(lock&&d.taken.includes(lock)){out.innerHTML='<p class=m>You play '+iName(lock)+' in this band, but someone else is playing it right now.</p>';return}
     U.inst=lock||IK.find(k=>!d.taken.includes(k))||'vo';U.q={code:c,band:d.band||'Band'};
     out.innerHTML=`<div class=ttsl style="margin-top:10px"><div><b>${esc(d.band||'Band')}</b><small>Room ${esc(c)} · ${d.n}/${MAXN} players</small></div></div>
-     <p style="margin:10px 0 0">${lock?'Your instrument in this band (it cannot change)':'Pick your instrument. You keep it for this band.'}</p>${insBtns(d.taken,lock)}<button class=go onclick="mpJoinGo()">Join the band</button>`})})
+     <p style="margin:10px 0 0">${lock?'Your instrument in this band (it cannot change)':'Pick your instrument. You keep it for this band.'}</p>${insBtns(d.taken,lock)}<div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm())}"></div><button class=go onclick="mpJoinGo()">Join the band</button>`})})
  }).catch(()=>fail('Could not load the room service. Check your connection and try again.'))};
 window.mpJoinGo=()=>{if(!U.q)return;snd('click');enter({code:U.q.code,inst:U.inst,band:U.q.band,host:0})};
 
@@ -112,9 +113,9 @@ function hostData(c,d){if(!d||!d.t)return;
   const no=L.length>=MAXN?'The room is full.':L.some(m=>m.inst==d.inst)?'Someone in the room already plays '+(INS[d.inst]?INS[d.inst].n:'that')+'.':!INS[d.inst]?'Unknown instrument.':'';
   if(no){try{c.send({t:'no',why:no})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
   c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{id:c.peer,nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
-  c.send({t:'wel',band:MPS.band,you:c.peer,day:S.day,tm:S.t,mem:Object.values(MB).map(m=>Object.assign(pub(m),{x:m.x,z:m.z,zone:m.zone,where:m.where,studio:m.studio,stg:m.stg,rd:m.rd}))});
+  c.send({t:'wel',band:MPS.band,an:S.artist||'',you:c.peer,day:S.day,tm:S.t,mem:Object.values(MB).map(m=>Object.assign(pub(m),{x:m.x,z:m.z,zone:m.zone,where:m.where,studio:m.studio,stg:m.stg,rd:m.rd}))});
   roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
- if(!c.mp||!['st','rd','dn'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
+ if(!c.mp||!['st','rd','dn','an','em','rel'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
 function drop(id){const c=NET.conns[id];if(!c)return;delete NET.conns[id];const m=MB[id];if(m){say(m.nm+' left the room.');rmAv(id);delete MB[id]}roster()}
 function joinOpen(){const p=NET.peer=new Peer({debug:0});
  p.on('open',id=>{NET.id=ME.id=id;connectHost()});
@@ -125,7 +126,7 @@ function connectHost(){if(NET.closed||!NET.peer)return;const c=NET.hc=NET.peer.c
  c.on('data',d=>{if(!d||!d.t)return;
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
   if(d.t=='wel'){NET.on=1;NET.tries=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
-   if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+'.');NET.lastSt='';return}
+   if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+'.');NET.lastSt='';return}
   handle(d,d.id)});
  c.on('close',()=>{if(NET.hc===c){NET.hc=null;lost()}})}
 function lost(){if(NET.closed||NET.rt)return;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}ME.rd=null;
@@ -142,8 +143,11 @@ function handle(d,id,self){
  if(!id||self||id===ME.id)return;const m=MB[id];if(!m)return;
  if(d.t=='st'){['x','z','r','zone','where','studio','stg','nm'].forEach(k=>{if(d[k]!==undefined)m[k]=d[k]});if(d.look){m.look=d.look}}
  else if(d.t=='rd'){const was=m.rd;m.rd=d.rd||null;if(d.rd&&!was)say(m.nm+(d.rd.k=='rec'?' is ready to record.':' is ready to play Stage '+d.rd.n+'.'))}
- else if(d.t=='dn')say(m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
-const myName=()=>String((S&&S.artist)||'Player').slice(0,24);
+ else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q}say(m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
+ else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s Spotifly account "'+d.v+'".')}}
+ else if(d.t=='em'){const a=AV[id];if(a&&EMK[d.k]&&a.g.visible){a.em={k:d.k,t:0};emFloat(a.g,d.k)}}
+ else if(d.t=='rel')relRecv(d,m)}
+const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
 
 /* ---- your own state: sent about 8 times a second while it changes ---- */
@@ -156,17 +160,18 @@ function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.x=+P.x.
  /* ready only holds while you are where it counts */
  if(ME.rd&&((ME.rd.k=='rec'&&!ME.studio&&mode!='rec')||(ME.rd.k=='fest'&&ME.stg!=ME.rd.n&&mode!='fest'))){ME.rd=null;send({t:'rd',rd:null});say('You walked away, so you are no longer ready.')}
  if(ME.rd&&!band()){const r=ME.rd;ME.rd=null;if(r.k=='rec'){MPGO=1;try{startRec(r.g)}finally{MPGO=0}}else if(r.k=='fest'&&r.lead&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}}
+ if(online()&&S.artist&&S.artist!==NET.an&&mode!='creator'){NET.an=S.artist;send({t:'an',v:S.artist})}
  if(!online())return;const now=Date.now(),o={t:'st',x:ME.x,z:ME.z,r:ME.r,zone:ME.zone,where:ME.where,studio:ME.studio,stg:ME.stg,nm:ME.nm},k=JSON.stringify(o);
  if(k!==NET.lastSt||now-NET.stT>1000){NET.lastSt=k;NET.stT=now;if(now-NET.lkT>4000){NET.lkT=now;ME.look=o.look=myLook()}send(o)}
  if(isHost()){if(now-NET.clkT>2000){NET.clkT=now;sendAll({t:'clk',day:S.day,tm:S.t})}hostCheck()}}
 setInterval(()=>{try{netTick()}catch(e){console.error('mp tick',e)}},120);
 /* the host starts a band take or set once every online member is there and ready */
 function hostCheck(){const L=list();if(L.length<2)return;
- if(L.every(m=>m.rd&&m.rd.k=='rec'&&m.studio)){const f=L.slice().sort((a,b)=>a.rd.ts-b.rd.ts)[0];send({t:'go',k:'rec',g:f.rd.g,n:L.length});return}
+ if(L.every(m=>m.rd&&m.rd.k=='rec'&&m.studio)){const f=L.slice().sort((a,b)=>a.rd.ts-b.rd.ts)[0];send({t:'go',k:'rec',g:f.rd.g,n:L.length,title:f.rd.title||'',bl:MPS.code+'-'+Date.now().toString(36)});return}
  const ld=L.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);
  if(ld&&L.every(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n&&m.stg==ld.rd.n))send({t:'go',k:'fest',n:ld.rd.n,lead:ld.id,slot:ld.rd.slot,songs:ld.rd.songs,cnt:L.length})}
 function go(d){const r=ME.rd;for(const k in MB)MB[k].rd=null;ME.rd=null;if(!r||r.k!==d.k)return;
- if(d.k=='rec'){MPGO=1;try{startRec(d.g)}finally{MPGO=0}if(rec&&mode=='rec'){rec.band=d.n;const sp=SPOT[MPS.inst];P.x=sp[0];P.z=sp[1];P.rot=sp[2];say('Band take! Everyone plays their part.')}}
+ if(d.k=='rec'){MPGO=1;try{startRec(d.g)}finally{MPGO=0}if(rec&&mode=='rec'){rec.band=d.n;rec.bt=d.title||'';rec.bl=d.bl;const sp=SPOT[MPS.inst];P.x=sp[0];P.z=sp[1];P.rot=sp[2];say('Band take! Everyone plays their part.')}}
  else if(d.k=='fest'){MPF=1;if(d.lead===ME.id&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}else guestSet(d);if(mode!='fest')MPF=0}}
 /* the host's clock is the band's clock */
 function clock(d,force){if(mode=='sleep'||mode=='creator'||mode=='load'||!S)return;
@@ -185,19 +190,20 @@ function avTick(dt){const myZ=zone();for(const id in AV)if(!MB[id]||id===ME.id)r
   a.g.visible=m.zone===myZ&&myZ!=='menu';const g=a.g,dx=m.x-g.position.x,dz=m.z-g.position.z,dd=Math.hypot(dx,dz);
   if(dd>6){g.position.set(m.x,0,m.z)}else{const f=Math.min(1,dt*10);g.position.x+=dx*f;g.position.z+=dz*f}
   g.rotation.y=m.r||0;const mv=dd>.05;a.t+=dt*(mv?10:2);const s=mv?.7:.05;
-  if(a.legs.length==2&&a.arms.length==2){a.legs[0].rotation.x=Math.sin(a.t)*s;a.legs[1].rotation.x=-Math.sin(a.t)*s;a.arms[0].rotation.x=-Math.sin(a.t)*s;a.arms[1].rotation.x=Math.sin(a.t)*s}}}
+  if(a.legs.length==2&&a.arms.length==2){a.legs[0].rotation.x=Math.sin(a.t)*s;a.legs[1].rotation.x=-Math.sin(a.t)*s;a.arms[0].rotation.x=-Math.sin(a.t)*s;a.arms[1].rotation.x=Math.sin(a.t)*s;
+   if(a.em){a.em.t+=dt;if(mv||!emApply(a.em,a,g,m.r||0,0)){emReset(a,g);a.em=null}}}}}
 {const u0=update;update=function(dt){u0.apply(this,arguments);if(!MPS)return;try{avTick(dt);gearTick();panel()}catch(e){console.error('mp',e)}}}
 
 /* ---- the house: bunk beds, everyone's instruments, spawn in the studio ---- */
 const bunk=(a,b)=>{const W='#6b4a2e',D='#5a3d24',p=[];[[-.6,-1.1],[.6,-1.1],[-.6,1.1],[.6,1.1]].forEach(([x,z])=>p.push([.08,2.1,.08,D,x,1.05,z]));
  [[.3,.48,.56,.6],[1.35,1.5,1.58,1.62]].forEach(([y0,y1,y2,y3],i)=>{p.push([1.25,.18,2.25,W,0,y0,0],[1.12,.16,2.1,'#e8e4da',0,y1,0],[1.14,.12,1.3,i?b:a,0,y2,.35],[.8,.1,.35,'#fff',0,y3,-.8])});
  p.push([.05,.18,1.4,D,.6,1.78,-.35],[.05,1.55,.05,D,.64,.95,.95],[.05,1.55,.05,D,.64,.95,.55]);[.55,.85,1.15].forEach(y=>p.push([.05,.04,.4,D,.66,y,.75]));return p};
-[['bunk','Bunk bed',bunk('#3b6fb5','#c0392b')],['bunk2','Bunk bed',bunk('#2e8b57','#e6b422')]].forEach(([k,n,b])=>Object.defineProperty(F,k,{value:{n,p:0,w:1.3,d:2.3,b},enumerable:false,writable:true,configurable:true}));
-['bunk','bunk2'].forEach(k=>{const o={r:1.4,get l(){return INT[0].l},a:()=>INT[0].a()};spFollow(o,k,.95,0);INT.push(o)});
+[['bunk','Bunk bed',bunk('#3b6fb5','#c0392b')],['bunk2','Bunk bed',bunk('#2e8b57','#e6b422')],['bed_91','Bunk bed',bunk('#3b6fb5','#c0392b')],['bed_92','Bunk bed',bunk('#2e8b57','#e6b422')]].forEach(([k,n,b])=>Object.defineProperty(F,k,{value:{n,p:0,w:1.3,d:2.3,b},enumerable:false,writable:true,configurable:true}));
+['bed_91','bed_92'].forEach(k=>{const o={r:1.4,get l(){return INT[0].l},a:()=>INT[0].a()};spFollow(o,k,.95,0);INT.push(o)});
 {const e0=ensureStarters;ensureStarters=function(){if(S.sp||!MPS)return e0.apply(this,arguments);if(typeof PL=='undefined'||!scene)return;S.sp=1;if(!S.inv)S.inv={};
- [['bunk',1,1.55,0],['bunk2',1,4.45,0],['nstand',2.2,.45,0],['desk',6,.7,0],['srug',4.5,4,0]].forEach(([k,x,z,r])=>{if(PL.some(q=>q.t==k)||S.inv[k]>0)return;const m=mkF(k);m.position.set(x,0,z);m.rotation.y=r*Math.PI/2;scene.add(m);PL.push({t:k,x,z,r,m})})}}
+ [['bed_91',1,1.55,0],['bed_92',1,4.45,0],['nstand',2.2,.45,0],['desk',6,.7,0],['srug',4.5,4,0]].forEach(([k,x,z,r])=>{if(PL.some(q=>q.t==k)||S.inv[k]>0)return;const m=mkF(k);m.position.set(x,0,z);m.rotation.y=r*Math.PI/2;scene.add(m);PL.push({t:k,x,z,r,m})})}}
 let bassG=null,gearK='';
-function gearTick(){if(!S||!S.gear||mode=='creator')return;const mp=S.mp=S.mp&&typeof S.mp=='object'?S.mp:{};mp.code=MPS.code;mp.inst=MPS.inst;mp.band=MPS.band;mp.host=MPS.host?1:0;
+function gearTick(){if(!S||!S.gear||mode=='creator')return;migBunk();const mp=S.mp=S.mp&&typeof S.mp=='object'?S.mp:{};mp.code=MPS.code;mp.inst=MPS.inst;mp.band=MPS.band;mp.host=MPS.host?1:0;
  if(!Array.isArray(mp.seen))mp.seen=[];list().concat([ME]).forEach(m=>{if(INS[m.inst]&&!mp.seen.includes(m.inst))mp.seen.push(m.inst)});
  const k=mp.seen.join();if(k===gearK)return;gearK=k;let ch0=0;
  if(mp.seen.includes('ky')&&!(S.gear.keys>=1)){S.gear.keys=1;ch0=1}if(mp.seen.includes('dr')&&!(S.gear.drums>=1)){S.gear.drums=1;ch0=1}
@@ -211,15 +217,17 @@ function spawn(){if(!MPS||IN)return;const sp=SPOT[MPS.inst]||SPOT.vo;P.x=sp[0];P
 
 /* ---- recording: everyone online must be in the studio and ready ---- */
 {const s0=startRec;startRec=function(i){if(!MPS||MPGO||!band())return s0.apply(this,arguments);
- ME.rd={k:'rec',g:i,ts:Date.now()};send({t:'rd',rd:ME.rd});closeUI();snd('pop');say('Ready to record. Waiting for the whole band in the studio.')}}
+ const ti=$('mpst'),o=list().filter(m=>m.rd&&m.rd.k=='rec').sort((a,b)=>a.rd.ts-b.rd.ts)[0];
+ ME.rd={k:'rec',g:o?o.rd.g:i,title:o?o.rd.title:(ti&&ti.value.trim()||pick(A)+' '+pick(Bn)).slice(0,32),ts:Date.now()};send({t:'rd',rd:ME.rd});closeUI();snd('pop');say('Ready to record. Waiting for the whole band in the studio.')}}
 window.mpRecReady=()=>{if(!S.artist)return say('Pick an artist name on the computer first.');if(S.energy<15)return say('Too tired to record. Get some sleep.');
  const o=list().filter(m=>m.rd&&m.rd.k=='rec').sort((a,b)=>a.rd.ts-b.rd.ts)[0];startRec(o?o.rd.g:0)};
 window.mpUnready=()=>{snd('click');ME.rd=null;send({t:'rd',rd:null})};
 /* the band take is better with more members */
-{const f0=mgFinish;mgFinish=function(){const b=rec&&rec.band||0,sc=rec&&rec.sc?[rec.sc.l||0,rec.sc.x||0]:[0,0],n0=S.nid;const r=f0.apply(this,arguments);
+{const f0=mgFinish;mgFinish=function(){const bt=rec&&rec.bt,bl=rec&&rec.bl,b=rec&&rec.band||0,sc=rec&&rec.sc?[rec.sc.l||0,rec.sc.x||0]:[0,0],n0=S.nid;const r=f0.apply(this,arguments);
  try{if(MPS){const d=S.drafts[S.drafts.length-1],add=b>1?3*(b-1):0;if(d&&d.id===n0&&add){d.q+=add;const p=document.querySelector('#ui .box p.m');if(p)p.insertAdjacentHTML('afterend',`<p class=m>Band take with ${b} members: +${add} quality</p>`)}
   if(MPS.inst!='vo'){const c=[...document.querySelectorAll('#ui .box .card')].find(c=>c.firstChild&&c.firstChild.textContent=='Lyrics');if(c)c.firstChild.textContent=INS[MPS.inst].st}
-  if(b>1)send({t:'dn',sc:(sc[0]+sc[1])/2})}}catch(e){console.error('mp finish',e)}return r}}
+  const d2=S.drafts[S.drafts.length-1];if(bl&&d2&&d2.id===n0){d2.title=bt||d2.title;d2.bt=d2.title;d2.bl=bl;(BQ[bl]=BQ[bl]||{})[ME.id]=d2.q;const t=$('tin');if(t){t.value=d2.title;t.readOnly=true;t.blur();t.insertAdjacentHTML('afterend','<p class=m><small>Band song: everyone in the take gets it, and releasing it releases it for the whole band.</small></p>')}if(REL[bl])setTimeout(()=>relDo(bl),300)}
+  if(b>1)send({t:'dn',sc:(sc[0]+sc[1])/2,q:d2&&d2.q,bl})}}catch(e){console.error('mp finish',e)}return r}}
 
 /* ---- the middle recording step depends on your instrument (vocals keep the rhyming) ---- */
 const igKind=()=>MPS&&MPS.inst!='vo'?MPS.inst:'';
@@ -320,13 +328,91 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
  let h=head;if(!PMIN){
   if(!online())h+=`<div class=m style="margin-top:4px">${NET.closed?'Not in the room.':NET.on||NET.tries?'Room offline. Reconnecting…':'Connecting to the room…'} You play ${iName(MPS.inst)}.</div>`;
   else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].e:''} <small class=m>${esc(m.where||'')}</small></span></div>`).join('');
-   if(n>1){const rr=me.filter(m=>m.rd&&m.rd.k=='rec');if(rr.length){h+=`<div class=mps>Recording: <b>${rr.length}/${n} members ready</b>`;
+   if(n>1){const rr=me.filter(m=>m.rd&&m.rd.k=='rec');if(rr.length){h+=`<div class=mps>Recording${rr[0].rd.title?' "'+esc(rr[0].rd.title)+'"':''}: <b>${rr.length}/${n} members ready</b>`;
      const away=me.filter(m=>!m.studio).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not in the studio: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='rec'?'<br><button onclick="mpUnready()">Not ready</button>':ME.studio?'<br><button class=go onclick="mpRecReady()">Ready to record</button>':'<br><small class=m>Go to the studio to join the take.</small>';h+='</div>'}
     const ld=me.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);if(ld){const fr=me.filter(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n);h+=`<div class=mps>Stage ${ld.rd.n} set: <b>${fr.length}/${n} members ready</b>`;
      const away=me.filter(m=>m.stg!=ld.rd.n).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not at Stage ${ld.rd.n}: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='fest'?(ME.rd.lead?'<br><button onclick="mpUnready()">Cancel the set</button>':'<br><button onclick="mpUnready()">Not ready</button>'):ME.stg==ld.rd.n?`<br><button class=go onclick="mpFestReady(${ld.rd.n})">Ready to play</button>`:`<br><small class=m>Go to Stage ${ld.rd.n} at the festival.</small>`;h+='</div>'}}}}
+ if(!PMIN)h+='<div class=mps><button onclick="emWheel()">😀 Emotes (B)</button></div>';
  if(h!==PK){PK=h;el.innerHTML=h}}
+
+/* ===== v45.5.0: band room fixes, shared artist account, linked band songs ===== */
+/* the bunks are beds (bed_91, bed_92) so Storage knows the band has somewhere to sleep; v45.4.0 band saves are moved over */
+function migBunk(){if(S.mpb2||typeof PL=='undefined')return;S.mpb2=1;
+ PL.forEach(q=>{if(q.t!='bunk'&&q.t!='bunk2')return;const nk=q.t=='bunk'?'bed_91':'bed_92';if(q.m)scene.remove(q.m);q.t=nk;q.m=mkF(nk);q.m.position.set(q.x,0,q.z);q.m.rotation.y=q.r*Math.PI/2;scene.add(q.m)});
+ if(S.inv){['bunk','bunk2'].forEach((k,i)=>{if(S.inv[k]>0){const nk='bed_9'+(i+1);S.inv[nk]=(S.inv[nk]||0)+S.inv[k]}delete S.inv[k]});if(S.inv.bed>0&&PL.some(q=>/^bed_9[12]$/.test(q.t)))delete S.inv.bed}}
+/* the wardrobe stood inside the second bunk: in a band house it stands against the studio wall instead */
+if(MPS)try{const w=scene.children.find(g=>g.isGroup&&g.children[0]&&g.children[0].geometry&&g.children[0].geometry.parameters&&Math.abs(g.children[0].position.x-.6)<.01&&Math.abs(g.children[0].position.z-4.4)<.01&&Math.abs(g.children[0].geometry.parameters.height-2.2)<.01);
+ if(w){w.rotation.y=Math.PI;w.position.set(8,0,9.3)}const c=cols.find(c=>c[0]==.2&&c[1]==3.7&&c[2]==1&&c[3]==5.1);if(c){c[0]=7;c[1]=4.2;c[2]=7.8;c[3]=5.6}
+ const o=INT.find(o=>o.l=='Open wardrobe'&&o.x==1.9);if(o){o.x=6.2;o.z=4.9}}catch(e){console.error('band wardrobe',e)}
+
+/* one Spotifly account for the band: the drawn picture shows every member */
+const bandLooks=()=>{const m=S&&S.mp&&S.mp.mem;return m?IK.filter(k=>m[k]&&m[k].look).map(k=>m[k].look):[]};
+let MEMT=0;setInterval(()=>{if(!MPS||!S||!S.mp||mode=='creator'||mode=='load')return;const mem=S.mp.mem=S.mp.mem&&typeof S.mp.mem=='object'?S.mp.mem:{};
+ mem[MPS.inst]={nm:myName(),look:myLook()};list().forEach(m=>{if(m.id!==ME.id&&INS[m.inst]&&m.look)mem[m.inst]={nm:m.nm,look:m.look}})},2000);
+let PFK='',PFU='';
+function pfComp(im){const k=document.createElement('canvas');k.width=k.height=32;const x=k.getContext('2d');x.imageSmoothingEnabled=false;x.fillStyle='#2a4a38';x.fillRect(0,0,32,32);
+ const n=im.length,pos=n==2?[[0,8],[16,8]]:n==3?[[0,0],[16,0],[8,16]]:[[0,0],[16,0],[0,16],[16,16]];im.slice(0,4).forEach((i,j)=>x.drawImage(i,pos[j][0],pos[j][1],16,16));return k.toDataURL()}
+{const p0=pfp;pfp=function(c){if(arguments.length||!MPS||(S&&S.pfpSp))return p0.apply(this,arguments);const L=bandLooks();if(L.length<2)return p0();const k=JSON.stringify(L);if(k===PFK&&PFU)return PFU;
+ if(k!==PFK){PFK=k;PFU='';let n=0;const im=L.map(l=>{const i=new Image();i.onload=()=>{if(++n==L.length&&PFK===k){PFU=pfComp(im);try{if(mode=='pc')pcR()}catch(e){}}};i.src=p0(l);return i})}return p0()}}
+
+/* band songs: whoever starts the take names it, everyone records it together, and releasing it releases it for the whole band */
+const BQ={},REL={};let RELF=0;
+const bqAvg=bl=>{const q=Object.values(BQ[bl]||{}).filter(v=>typeof v=='number'&&isFinite(v));return q.length?Math.round(q.reduce((a,b)=>a+b,0)/q.length):null};
+function relDo(bl){const d=S.drafts.find(x=>x.bl===bl);if(!d){REL[bl]=1;return}delete REL[bl];const q=bqAvg(bl);if(q!=null)d.q=q;d.title=d.bt||d.title;
+ RELF=1;const p=pcR;if(mode!='pc')pcR=()=>{};try{upl(d.id)}catch(e){console.error('band release',e)}finally{pcR=p;RELF=0}}
+function relRecv(d,m){if(!d.bl)return;say(m.nm+' released the band song "'+(d.title||'')+'". It is out for the whole band.');relDo(d.bl)}
+{const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bl=d&&d.bl;if(bl&&MPS&&!RELF){const q=bqAvg(bl);if(q!=null)d.q=q;d.title=d.bt||d.title}
+ const r=u0.apply(this,arguments);if(bl&&MPS&&!RELF&&!S.drafts.some(x=>x.id==id))send({t:'rel',bl,title:d.title});return r}}
+/* a band song can be released by a bandmate while your title box is still open */
+{const t0=saveT;saveT=function(id){if(MPS&&!S.drafts.some(d=>d.id==id)){closeUI();return say('Your band already released this song.')}return t0.apply(this,arguments)}}
+{const r0=recMenu;recMenu=function(){if(!MPS||!band())return r0.apply(this,arguments);if(list().some(m=>m.rd&&m.rd.k=='rec'))return mpRecReady();
+ const r=r0.apply(this,arguments);try{const b=document.querySelector('#ui .box'),g=b&&b.querySelector('.gen');if(g&&!$('mpst'))g.insertAdjacentHTML('beforebegin',`<div class=r><span>Song name</span><input id=mpst maxlength=32 value="${esc(pick(A)+' '+pick(Bn))}"></div><p class=m style="margin:4px 0 8px"><small>The whole band records this song together, then pick a genre to get ready.</small></p>`)}catch(e){}return r}}
+
+/* ===== emote wheel: B (or the band panel button) opens 8 animated emotes; bandmates see them ===== */
+const EMO=[{k:'wave',n:'Wave',e:'👋',d:2.6},{k:'dance',n:'Dance',e:'🕺',d:4.2},{k:'clap',n:'Clap',e:'👏',d:2.6},{k:'cheer',n:'Cheer',e:'🙌',d:2.6},
+ {k:'laugh',n:'Laugh',e:'😂',d:2.6},{k:'guitar',n:'Air guitar',e:'🎸',d:3.4},{k:'spin',n:'Spin',e:'🌀',d:1.6},{k:'heart',n:'Love',e:'❤️',d:2.8}];
+const EMK={};EMO.forEach(e=>EMK[e.k]=e);
+function emReset(L,g){g.position.y=0;(L.arms||[]).forEach(a=>a.rotation.z=0);(L.legs||[]).forEach(a=>a.rotation.z=0);g.rotation.x=0;g.rotation.z=0}
+function emApply(em,L,g,r0,y0){const e=EMK[em.k],t=em.t,d=e.d,A=L.arms||[],G=L.legs||[];if(t>=d||A.length<2||G.length<2)return false;
+ const v=Math.min(1,t/.2,(d-t)/.2),sn=Math.sin,ab=Math.abs;let y=0,ry=0,rx=0,rz=0,ax=[0,0],az=[0,0],lx=[null,null],lz=[0,0];
+ switch(em.k){
+  case'wave':az=[0,2.5+.35*sn(t*10)];ax=[.1,-.2];ry=.1*sn(t*5);break;
+  case'dance':y=ab(sn(t*6))*.12;ry=.4*sn(t*3);ax=[-1.1*sn(t*6),1.1*sn(t*6)];az=[-.5,.5];lx=[.5*sn(t*6),-.5*sn(t*6)];rz=.08*sn(t*6);break;
+  case'clap':{const c=.5+.5*sn(t*14);ax=[-1.35,-1.35];az=[.15+.35*c,-(.15+.35*c)];y=ab(sn(t*7))*.03;break}
+  case'cheer':{const j=Math.max(0,sn(t*7));y=j*.35;az=[-(2.7+.2*sn(t*14)),2.7+.2*sn(t*14)];lx=[-.4*j,-.4*j];break}
+  case'laugh':rx=-.18+.06*sn(t*18);ax=[-.5,-.5];az=[.6,-.6];y=ab(sn(t*18))*.03;break;
+  case'guitar':ax=[-1.1,-.5+.45*sn(t*16)];az=[.6,-.2];rx=.15*Math.max(0,sn(t*8));lz=[-.2,.2];y=ab(sn(t*8))*.04;break;
+  case'spin':{const u=t/d,s2=u*u*(3-2*u);ry=s2*Math.PI*2;az=[-1.4,1.4];y=.15*sn(u*Math.PI);break}
+  default:az=[-2.3,2.3];ax=[-.35,-.35];ry=.12*sn(t*3);y=.03*sn(t*4)}
+ A.forEach((a,i)=>{a.rotation.x=a.rotation.x*(1-v)+ax[i]*v;a.rotation.z=az[i]*v});G.forEach((l,i)=>{if(lx[i]!=null)l.rotation.x=l.rotation.x*(1-v)+lx[i]*v;l.rotation.z=lz[i]*v});
+ g.position.y=y0+y*v;g.rotation.y=r0+(em.k=='spin'?ry:ry*v);g.rotation.x=rx*v;g.rotation.z=rz*v;return true}
+const EF=[],EV=new THREE.Vector3();
+function emFloat(g,k){const el=document.createElement('div');el.className='emf';el.textContent=EMK[k].e;document.body.appendChild(el);EF.push({el,g,t:0})}
+let LEM=null;
+function emPlay(k){emClose();if(!EMK[k]||mode!='play'||!P.mesh)return;if(LEM)emReset(P,P.mesh);LEM={k,t:0,x:P.x,z:P.z};emFloat(P.mesh,k);snd('pop');if(MPS&&online())send({t:'em',k})}
+function emTick(dt){if(LEM){LEM.t+=dt;const mv=Math.hypot(P.x-LEM.x,P.z-LEM.z)>.05;if(mv||mode!='play'||!P.mesh||!emApply(LEM,P,P.mesh,P.rot,P.mesh.position.y)){if(P.mesh)emReset(P,P.mesh);LEM=null}}
+ for(let i=EF.length-1;i>=0;i--){const f=EF[i];f.t+=dt;if(f.t>2.2||!f.g.parent){f.el.remove();EF.splice(i,1);continue}
+  const on=f.g.visible&&!(typeof FEST!='undefined'&&FEST.view)&&['play','menu','drive'].includes(mode);f.el.style.display=on?'':'none';if(!on)continue;
+  EV.set(f.g.position.x,f.g.position.y+2.5+f.t*.5,f.g.position.z).project(cam);f.el.style.left=((EV.x+1)/2*innerWidth)+'px';f.el.style.top=((1-EV.y)/2*innerHeight)+'px';f.el.style.opacity=Math.min(1,(2.2-f.t)/.6)}
+ if($('emw')&&mode!='play')emClose()}
+{const u0=update;update=function(dt){u0.apply(this,arguments);try{emTick(dt)}catch(e){console.error('emote',e)}}}
+function emClose(){const w=$('emw');if(w)w.remove()}
+window.emWheel=()=>{if($('emw'))return emClose();if(mode!='play')return;snd('click');const w=document.createElement('div');w.id='emw';
+ w.innerHTML=`<div class=emr>${EMO.map((e,i)=>{const a=i/EMO.length*Math.PI*2-Math.PI/2;return`<button style="left:calc(50% + ${Math.round(Math.cos(a)*112)}px);top:calc(50% + ${Math.round(Math.sin(a)*112)}px)" onclick="emPick('${e.k}')"><b>${e.e}</b><small>${i+1} ${e.n}</small></button>`}).join('')}<div class=emc>Emotes<br><small class=m>1-8 · B to close</small></div></div>`;
+ w.onclick=e=>{if(e.target===w)emClose()};document.body.appendChild(w)};
+window.emPick=k=>emPlay(k);
+addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.repeat)return;const k=e.key.toLowerCase(),open=!!$('emw');
+ if(k=='b'&&(mode=='play'||open)){e.preventDefault();e.stopImmediatePropagation();emWheel();return}
+ if(!open)return;const n=parseInt(k);if(n>=1&&n<=8){e.preventDefault();e.stopImmediatePropagation();emPlay(EMO[n-1].k)}else if(k=='escape'){e.preventDefault();e.stopImmediatePropagation();emClose()}},true);
+{const st=document.createElement('style');st.textContent=`#emw{position:fixed;inset:0;z-index:7;background:#0006}
+#emw .emr{position:absolute;left:50%;top:50%;width:0;height:0}
+#emw button{position:absolute;transform:translate(-50%,-50%);width:92px;height:76px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;background:#0b0f0de6;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;transition:transform .12s}
+#emw button:hover,#emw button:focus{transform:translate(-50%,-50%) scale(1.12);box-shadow:inset 0 0 0 2px var(--g),4px 4px 0 #0008}#emw button b{font-size:28px;line-height:1}#emw button small{font-size:11px;color:var(--t)}
+#emw .emc{position:absolute;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;background:#0b0f0de6;border:3px solid #000;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:Silkscreen,ui-monospace,monospace;color:var(--g)}
+.emf{position:fixed;z-index:4;pointer-events:none;font-size:30px;transform:translate(-50%,-100%);text-shadow:2px 2px 0 #000;animation:emfp .35s ease-out}
+@keyframes emfp{0%{transform:translate(-50%,-100%) scale(.2)}70%{transform:translate(-50%,-100%) scale(1.25)}100%{transform:translate(-50%,-100%) scale(1)}}`;document.head.appendChild(st)}
 
 if(MPS)setTimeout(start,0);
 })();
