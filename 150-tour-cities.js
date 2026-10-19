@@ -236,7 +236,7 @@ function winBands(C,Gw,x0,z0,x1,z1,y0,y1,fh,lit){const r=C.r;const LIT=['#ffd890
 function shopFront(C,G,Gw,q,face,x0,z0,x1,z1,name,awn){/* ground floor: glass, door, awning, sign above */
  const s=C.s,c=face=='z'?z1:x1,a0=face=='z'?x0:z0,a1=face=='z'?x1:z1,w=a1-a0;if(w<3)return null;
  const glass=(A,Bv,y0,y1,col)=>face=='z'?quadZ(Gw,A,Bv,y0,y1,c+.04,col):quadX(Gw,A,Bv,y0,y1,c+.04,col);
- glass(a0+.4,a1-.4,.15,2.5,pick(['#ffe2a8','#fff0cc','#d8f0ff']));glass((a0+a1)/2-.6,(a0+a1)/2+.6,0,2.4,'#2a2420');
+ {const gc=pick(['#ffe2a8','#fff0cc','#d8f0ff']),gmid=(a0+a1)/2;glass(a0+.4,gmid-.62,.15,2.5,gc);glass(gmid+.62,a1-.4,.15,2.5,gc)}/* the window stops at the door so the two never fight */glass((a0+a1)/2-.6,(a0+a1)/2+.6,0,2.4,'#2a2420');
  const ac=awn||pick([s.acc,'#c0392b','#2f6fb5','#2a8a4a','#e6b422','#8e44ad']);
  if(face=='z')for(let i=0;i<Math.floor(w/1.2);i++)xgBox(G,1.2,.12,1.1,i%2?ac:'#f4f0e8',a0+.6+i*1.2,2.85,c+.55,0);else for(let i=0;i<Math.floor(w/1.2);i++)xgBox(G,1.1,.12,1.2,i%2?ac:'#f4f0e8',c+.55,2.85,a1-.6-i*1.2,0);
  const neon=C.r()<C.s.neonK*.8,so=neon?{bg:'#120e1c',fg:pick([s.neon,s.acc,'#ff4fa8','#4fd8ff','#ffe14d']),neon:1}:{bg:ac,fg:'#fff'},uv=C.A.add(224,56,(x,W,H)=>signArt(x,W,H,name,so),'s'+name+so.bg+so.fg);
