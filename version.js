@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v45.6.1';
+const GAME_VERSION='v45.6.2';
 const VERSION_HISTORY=[
+ {v:'v45.6.2',n:'Improved the page description so search engines and AI assistants can find WaveFern as a browser rapping and music career game with world tours and band rooms. Saves still load.'},
  {v:'v45.6.1',n:'Tightened the cloud (Firebase) rules: saves can never be deleted or listed by players, every save and gift field is checked for type and size, timestamps must be sane, and everything not listed is denied. Saves still load.'},
  {v:'v45.6.0',n:'Band rooms: collabs are now done by the whole band. Artist chats are shared, so every member sees the same messages, deals and agreed collabs. When one member starts recording with an artist, the band panel shows how many members are ready, and the session only starts once everyone is with that artist and ready. The finished collab is one linked band song with the same name for everyone (+3 quality per extra member), and releasing it releases it for the whole band.'},
  {v:'v45.5.2',n:'Band rooms: the band now goes to sleep together. Everyone online has to be at a bed and press it (the band panel shows who is in bed), and members who are abroad in another country are not needed. Gear shop upgrades now count for the whole band: when one member upgrades, everyone\'s studio gets it. Saves still load.'},
