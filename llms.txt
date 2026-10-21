@@ -1,6 +1,6 @@
 # WaveFern Records
 
-> WaveFern Records is a free 3D open-world music career sim in your browser. Create a character, record songs and albums in your studio, release them on Spotifly and grow your fame, then explore a big open-world 3D city on foot or by car, buy houses, cars and clothes, and meet other artists. No download. It is a free browser rapping career game: make a rapper or artist, record songs, release them on Spotifly, tour the world, and play multiplayer band rooms with up to 4 friends.
+> WaveFern Records is a free 3D open-world music career sim in your browser. Create a character, record songs and albums in your studio, release them on Spotifly and grow your fame, then explore a big open-world 3D city on foot or by car, buy houses, cars and clothes, and meet other artists. No download. It is a free browser music career game for rappers, singers, producers and bands: make an artist, record songs, release them on Spotifly, tour the world, and play multiplayer band rooms with up to 4 friends.
 
 WaveFern Records is a fictional 3D open-world browser game built with Three.js (plain JavaScript, no install). Real artists named in-game are inspiration references only, with no affiliation or endorsement.
 
