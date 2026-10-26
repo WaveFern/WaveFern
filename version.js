@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v47.5.0';
+const GAME_VERSION='v47.5.1';
 const VERSION_HISTORY=[
+ {v:'v47.5.1',n:'Controller prompts match your controller: PlayStation pads show ✕ ○ □ △, L1/R1, L2/R2, Share and Options; Switch Pro pads show their own letters, ZL/ZR and + / −; Xbox and other pads keep A B X Y.'},
  {v:'v47.5.0',n:'Controller support. Left stick walks (LT runs), A interacts, X opens storage, Y the phone, View the map, Start pauses. Driving uses RT and LT. In recording and festival games A is the hit button and X Y B RB are 1 to 4. In menus, the computer and the phone the D-pad moves a green ring between buttons, A presses, B goes back and the right stick scrolls. Placing furniture gives you a cursor on the left stick. Prompts switch to pad buttons while you use one.'},
  {v:'v47.4.0',n:'A better-looking wiki: each category has its own colour, pages open with an icon and a one-line summary, an On this page box jumps to each section, Previous and Next links step through a category, and the home page has category cards, popular pages and the latest update.'},
  {v:'v47.3.1',n:'The wiki\'s scroll bars now match the game: square, black-edged and pixel-shaded, turning green while you drag them.'},

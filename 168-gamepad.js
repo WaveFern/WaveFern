@@ -36,7 +36,7 @@ const offPad=()=>{if(act){act=0;document.body.classList.remove('gpad');setFoc(nu
 addEventListener('mousemove',e=>{if(e.isTrusted&&(Math.abs(e.movementX)+Math.abs(e.movementY)>3))offPad()},true);
 addEventListener('keydown',e=>{if(e.isTrusted)offPad()},true);
 addEventListener('touchstart',()=>offPad(),true);
-addEventListener('gamepadconnected',e=>{try{say('🎮 Controller connected: left stick to move, A to interact, Start to pause.')}catch(_){}});
+addEventListener('gamepadconnected',e=>{try{fam=famOf(e.gamepad&&e.gamepad.id);say('🎮 Controller connected: left stick to move, '+N_('A')+' to interact, '+N_('Start')+' to pause.')}catch(_){}});
 addEventListener('gamepaddisconnected',()=>{freeAll();offPad()});
 
 /* ---- focus ring for menus ---- */
@@ -75,11 +75,17 @@ const cvs=()=>document.getElementById('c');
 const ptr=(type,b)=>{const c=cvs();if(c)c.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,clientX:cx,clientY:cy,pointerId:7,pointerType:'mouse',button:0,buttons:b?1:0,isPrimary:true}))};
 
 /* ---- prompts ---- */
-const P_=s=>'<b>'+s+'</b>';
+/* v47.6.0: prompts name the buttons of the pad in your hands. Standard-mapping index 0 is always the bottom face button:
+   Xbox A, PlayStation ✕, Switch B. Labels below are keyed by the Xbox name the code uses. */
+const LAB={ps:{A:'✕',B:'○',X:'□',Y:'△',LB:'L1',RB:'R1',LT:'L2',RT:'R2',View:'Share',Start:'Options'},
+ ns:{A:'B',B:'A',X:'Y',Y:'X',LB:'L',RB:'R',LT:'ZL',RT:'ZR',View:'−',Start:'+'}};
+const famOf=id=>/xbox|xinput|045e/i.test(id||'')?'xb':/054c|playstation|dualshock|dualsense|ps[345]|wireless controller/i.test(id||'')?'ps':/057e|nintendo|pro controller|joy-?con|switch/i.test(id||'')?'ns':'xb';
+let fam='xb';
+const N_=s=>(LAB[fam]||{})[s]||s,P_=s=>'<b>'+N_(s)+'</b>';
 function prompts(m){const hud=document.getElementById('hud');if(hud){
-  const pr=hud.querySelector('.hb.pr');if(pr&&!pr.dataset.gp){const t=pr.textContent;if(/^\[E\] Exit car/.test(t))pr.innerHTML=`${P_('A')} Exit car · ${P_('RT')} drive · ${P_('LT')} brake · stick steer`;else if(/^\[E\]/.test(t))pr.innerHTML=P_('A')+' '+esc0(t.slice(4));pr.dataset.gp=1}
-  const hi=hud.querySelector('.hb.hint');if(hi&&!hi.dataset.gp){hi.innerHTML=`Stick move (${P_('LT')} run) · ${P_('A')} interact · ${P_('X')} storage · ${P_('Y')} phone · ${P_('View')} map · ${P_('Start')} pause`;hi.dataset.gp=1}
-  hud.querySelectorAll('button').forEach(b=>{if(!b.dataset.gp&&/\[F\]/.test(b.textContent)){b.innerHTML=b.innerHTML.replace('[F]','[X]');b.dataset.gp=1}})}
+  const pr=hud.querySelector('.hb.pr');if(pr&&pr.dataset.gp!==fam){const t=pr.textContent;if(/^\[E\] Exit car/.test(t))pr.innerHTML=`${P_('A')} Exit car · ${P_('RT')} drive · ${P_('LT')} brake · stick steer`;else if(/^\[E\]/.test(t))pr.innerHTML=P_('A')+' '+esc0(t.slice(4));pr.dataset.gp=fam}
+  const hi=hud.querySelector('.hb.hint');if(hi&&hi.dataset.gp!==fam){hi.innerHTML=`Stick move (${P_('LT')} run) · ${P_('A')} interact · ${P_('X')} storage · ${P_('Y')} phone · ${P_('View')} map · ${P_('Start')} pause`;hi.dataset.gp=fam}
+  hud.querySelectorAll('button').forEach(b=>{if(b.dataset.gp!==fam&&/\[(F|X|□|Y)\]/.test(b.textContent)){b.innerHTML=b.innerHTML.replace(/\[(F|X|□|Y)\]/,'['+N_('X')+']');b.dataset.gp=fam}})}
  let t='';
  if(MG.has(m))t=`${P_('A')} hit / go · ${P_('X')} 1 · ${P_('Y')} 2 · ${P_('B')} 3 · ${P_('RB')} 4 · ${P_('Start')} quit`;
  else if(m=='build')t=`Stick: cursor · ${P_('A')} place / pick up · ${P_('LB')}/${P_('RB')} turn · ${P_('X')} store · D-pad: panel · ${P_('B')} done`;
@@ -94,6 +100,7 @@ let lt=performance.now();
 function tick(now){requestAnimationFrame(tick);const dt=Math.min(.1,(now-lt)/1000);lt=now;
  let g=null;try{const ps=[...navigator.getGamepads()].filter(p=>p&&p.connected);g=ps.find(p=>p.mapping=='standard')||ps[0]||null}catch(_){}
  if(!g){if(Object.keys(held).length||own)freeAll();prev=[];return}
+ {const f=famOf(g.id);if(f!==fam){fam=f;legT=''}}
  const B=i=>{const b=g.buttons[i];return!!b&&(b.pressed||b.value>.5)},V=i=>{const b=g.buttons[i];return b?b.value:0},dn=i=>B(i)&&!prev[i];
  const ax=g.axes[0]||0,ay=g.axes[1]||0,rx=g.axes[2]||0,ry=g.axes[3]||0,mag=Math.hypot(ax,ay),stick=mag>DZ;
  const any=g.buttons.some((b,i)=>b&&b.pressed)||stick||Math.abs(ry)>DZ||Math.abs(rx)>DZ;if(any)on();
