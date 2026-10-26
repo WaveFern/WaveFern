@@ -159,6 +159,27 @@ ${H2('Other')}
 ${Q('Is there a cheat code?',`There is a secret code. That is all this wiki will say. See ${L('secrets')}.`)}
 ${Q('Who made the game?',`James Hutchinson and Rowan Burton. See ${L('credits')}.`)}`});
 
+/* ===================== Contact: a form that sends through Web3Forms, so the address never appears on the site.
+   CONTACT_KEY is the Web3Forms access key (safe to be public). While it is empty the page says the form is not open yet. */
+const CONTACT_KEY='';
+page('contact','Contact','meta',{sum:'Send a message to the people who make the game.',kw:'contact email message feedback bug report help',body:()=>CONTACT_KEY?`
+<p class=lead>Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Records.</p>
+<form id=cform class=cform>
+<label>Your name<input name=name maxlength=80 required></label>
+<label>Your email <span class=m>(only if you want a reply)</span><input name=email type=email maxlength=120></label>
+<label>Message<textarea name=message rows=7 maxlength=4000 required></textarea></label>
+<input type=checkbox name=botcheck class=hp tabindex=-1 autocomplete=off>
+<button type=submit>Send</button> <span id=cstat class=m></span>
+</form>`:`<p class=lead>The contact form is not open yet. Check back soon.</p>`});
+document.addEventListener('wiki:render',e=>{if(e.detail.id!='contact')return;const f=document.getElementById('cform');if(!f)return;
+ f.onsubmit=async ev=>{ev.preventDefault();const st=document.getElementById('cstat'),b=f.querySelector('button'),d=Object.fromEntries(new FormData(f));
+  if(d.botcheck)return;delete d.botcheck;if(!d.email)delete d.email;
+  b.disabled=true;st.textContent='Sending...';
+  try{const r=await fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({access_key:CONTACT_KEY,subject:'WaveFern wiki message',from_name:'WaveFern Wiki',...d})}),j=await r.json();
+   if(!j.success)throw 0;f.reset();st.textContent='Sent. Thanks for the message.'}
+  catch(x){st.textContent='That did not send. Try again in a minute.'}
+  b.disabled=false}});
+
 page('song-audio','How Spotifly songs sound','music',{sum:'How the game makes a playable track for every song you record.',src:['67-beats.js','132-808-hats.js'],kw:'audio beat engine sound play listen spotifly samples 808 hi hat tumfy music',body:()=>`
 ${IB('Beat engine','',[['Made in','The browser, as it plays'],['Styles',Object.values(D.styles||{}).reduce((a,l)=>a+l.length,0)+' across '+(D.genres||[]).length+' genres'],['Scales','Major or minor'],['Recorded 808s',((D.drums||{}).s808||[]).length],['Recorded hi hats',((D.drums||{}).hats||[]).length]])}
 <p class=lead>Every song you make has its own instrumental that you can play from your Spotifly artist page. The tracks are not stored as audio files. The game writes each one in the browser when you press play, from a few numbers saved with the song.</p>

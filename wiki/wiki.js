@@ -38,7 +38,7 @@ const fameOf=L=>{const s=(D.fame&&D.fame.starts)||[];let n=0;while(n<s.length&&s
 
 /* ---------- rendering ---------- */
 const $=id=>document.getElementById(id);
-function sideHTML(cur){return `<h3>Navigation</h3><a href="#/home" class="${cur=='home'?'on':''}">Main page</a><a href="#" onclick="return rndPage()">Random page</a><a href="#/versions" class="${cur=='versions'?'on':''}">Recent changes</a><a href="../">Play the game</a>`+
+function sideHTML(cur){return `<h3>Navigation</h3><a href="#/home" class="${cur=='home'?'on':''}">Main page</a><a href="#" onclick="return rndPage()">Random page</a><a href="#/versions" class="${cur=='versions'?'on':''}">Recent changes</a><a href="#/contact" class="${cur=='contact'?'on':''}">Contact</a><a href="../">Play the game</a>`+
  CATS.map(c=>`<h3><a href="#/cat-${c.id}">${c.t}</a></h3>`+PAGES.filter(p=>p.cat===c.id&&!p.hide).map(p=>`<a href="#/${p.id}" class="${p.id===cur?'on':''}">${p.t}</a>`).join('')).join('')}
 const acc=()=>'';
 /* Wikipedia-style "Contents" box: numbered, can be hidden, after the lead paragraph on pages with three or more sections */
