@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v47.9.1';
+const GAME_VERSION='v48.0.0';
 const VERSION_HISTORY=[
+ {v:'v48.0.0',n:'The wiki has a new Frequently asked questions page with quick answers to the questions players ask most.'},
  {v:'v47.9.1',n:'The wiki now links to tumfy.net in the credits and on the page about how songs are made.'},
  {v:'v47.9.0',n:'The wiki credits the soundtrack (Rowan Burton, made in FL Studio with Surge XT, Arminator 2 and tumfy\'s free kits) and has a new page on how the songs you make are turned into music. Haggling styles and real artists are no longer listed in the wiki.'},
  {v:'v47.8.0',n:'Big Vee and the tutorial now say you pass out at 06:00, which is when it really happens. The wiki gets Tips on its main pages, a Credits page, a Secrets page, and a note on what Label HQ will be for.'},

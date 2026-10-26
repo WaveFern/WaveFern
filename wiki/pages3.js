@@ -127,6 +127,38 @@ ${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.
 <p>The songs you make in the game are a separate thing: see ${L('song-audio','How Spotifly songs sound')}.</p>
 ${H2('Built with')}<p>The game runs in the browser with Three.js. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});
 
+/* ===================== FAQ: questions new players tend to ask, answered as pointers and advice ===================== */
+const Q=(q,a)=>`<h3>${q}</h3><p>${a}</p>`;
+page('faq','Frequently asked questions','start',{sum:'Quick answers to the questions players ask most.',kw:'faq help questions stuck how do i why',body:()=>`
+<p class=lead>Short answers to common questions. Each one links to the page with the full details.</p>
+${H2('Getting started')}
+${Q('What should I do first?',`Follow Big Vee's tutorial. It walks you through your first song, your first upload and your first night. ${L('first-day','Your first day')} covers the same steps.`)}
+${Q('Can I play on my phone?',`Yes. A joystick and buttons appear on phones and tablets. See ${L('controls')}.`)}
+${Q('Why did I pass out?',`You were still awake at 06:00. You wake where you fell with only 70 energy, so get to bed after 20:00 instead. See ${L('days','Days, time and energy')}.`)}
+${Q('I ran out of energy. What now?',`Eat something, or go to bed if it is night. Energy also comes back slowly on its own. See ${L('food','Food and energy')}.`)}
+${H2('Music')}
+${Q('My songs are bad. How do I make them better?',`Keep making them. You get better with every song, and gear, mentors and a good run in one genre family all add up. ${L('song-quality')} explains every part of the score.`)}
+${Q('Why are my streams so low?',`New artists start small. Releasing often keeps interest up, and better songs lift everything else. See ${L('streams')}.`)}
+${Q('Why did my monthly listeners go down?',`The monthly number is recounted as days pass, so a quiet spell shows up there. Keep releasing and it climbs back. See ${L('listeners','Monthly listeners and followers')}.`)}
+${Q('How do I get a collab?',`Artists about your size DM you on their own, and you can message artists yourself in Messages. See ${L('collabs','Collabs')}.`)}
+${Q('Can I listen to my songs?',`Yes. Each song has its own beat that plays from your Spotifly artist page. See ${L('song-audio','How Spotifly songs sound')}.`)}
+${H2('Career')}
+${Q('How do I get signed to a label?',`Labels only start writing from day 5, and only once your listeners, streams and reputation are high enough for them. The first offers are rarely the best ones. See ${L('labels','Record labels')}.`)}
+${Q('How do I go up in fame?',`Fame follows your monthly listeners, so anything that grows your listeners grows your fame. See ${L('fame','Fame levels')} for what each level unlocks.`)}
+${Q('When can I play the festival?',`A festival opens every 7th day. Book a slot in FestivalApp at least 2 days ahead. The first stage opens at Fame Level 10. See ${L('festival','Park Fields Festival')}.`)}
+${Q('When can I go on tour?',`The World Tour app appears at Fame Level 275. Start saving early, because it is not cheap. See ${L('world-tour','World Tour')}.`)}
+${H2('City life')}
+${Q('Someone stole my money!',`Some fans asking for an autograph are thieves. Carry less cash, or hire ${L('bodyguards')}. See ${L('fans','Fans, autographs and robbery')}.`)}
+${Q('How do I get around faster?',`Sprint, buy a car, or take the taxi from the map. See ${L('city','The city and the map')} and ${L('cars','Cars and the garage')}.`)}
+${H2('Saves and settings')}
+${Q('Is my career saved?',`It autosaves to your browser. Sign in with Google to keep it in the cloud, or export a save code from the pause menu. See ${L('saves','Saves and careers')}.`)}
+${Q('My save will not load.',`It is not lost. Look under Recovered backups on the career screen. See ${L('saves','Saves and careers')}.`)}
+${Q('The game is slow on my computer.',`Open Settings and pick a lower graphics preset, or leave it on Auto. See ${L('settings','Settings and graphics')}.`)}
+${Q('How do I play with friends?',`Pick Multiplayer on the main menu and create or join a band room with a code. You need to be signed in with Google. See ${L('band-rooms','Band rooms')}.`)}
+${H2('Other')}
+${Q('Is there a cheat code?',`There is a secret code. That is all this wiki will say. See ${L('secrets')}.`)}
+${Q('Who made the game?',`James Hutchinson and Rowan Burton. See ${L('credits')}.`)}`});
+
 page('song-audio','How Spotifly songs sound','music',{sum:'How the game makes a playable track for every song you record.',src:['67-beats.js','132-808-hats.js'],kw:'audio beat engine sound play listen spotifly samples 808 hi hat tumfy music',body:()=>`
 ${IB('Beat engine','',[['Made in','The browser, as it plays'],['Styles',Object.values(D.styles||{}).reduce((a,l)=>a+l.length,0)+' across '+(D.genres||[]).length+' genres'],['Scales','Major or minor'],['Recorded 808s',((D.drums||{}).s808||[]).length],['Recorded hi hats',((D.drums||{}).hats||[]).length]])}
 <p class=lead>Every song you make has its own instrumental that you can play from your Spotifly artist page. The tracks are not stored as audio files. The game writes each one in the browser when you press play, from a few numbers saved with the song.</p>
