@@ -3,7 +3,7 @@ rules_version = '2';
 // Saves: each signed-in player can read and write only their own save at saves/{their uid}; the admin can read every save.
 // Gifts: only the admin can create or delete gifts; a player can only read gifts sent to them and mark them claimed.
 // Nothing else is open: any other path (and any delete of a save) is denied by default.
-// Band rooms (multiplayer) do not use Firestore, so no rules are needed for them.
+// Band rooms: gameplay is browser to browser, but a signed-in host writes a small rooms/CODE entry (heartbeat) so the admin can list and join active rooms. Only the admin can read it; a host can only write an entry that carries their own uid.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {
@@ -43,6 +43,22 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed'])
         && request.resource.data.claimed == true;
       allow delete: if isAdmin();
+    }
+    match /rooms/{code} {
+      allow get, list: if isAdmin();
+      allow create: if request.auth != null && code.matches('[A-Z0-9]{5}')
+        && request.resource.data.keys().hasOnly(['code', 'band', 'n', 'uid', 't'])
+        && request.resource.data.code == code && request.resource.data.uid == request.auth.uid
+        && request.resource.data.band is string && request.resource.data.band.size() <= 24
+        && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 4
+        && isStamp(request.resource.data.t);
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['code', 'band', 'n', 'uid', 't'])
+        && request.resource.data.code == code && request.resource.data.uid == request.auth.uid
+        && request.resource.data.band is string && request.resource.data.band.size() <= 24
+        && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 4
+        && isStamp(request.resource.data.t);
+      allow delete: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
     }
     // everything else: denied
     match /{document=**} {
