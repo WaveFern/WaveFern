@@ -43,8 +43,8 @@ function wxStep(dt){const ck=F.wx=='chaos'?['duck','conf','money','snow','meteor
  if(F.wx=='storm'||(F.wx=='chaos'&&ck=='storm')){W.nf-=dt;if(W.nf<=0){W.nf=rnd(2.5,7);W.fl=1;try{sfx(48,1,'sawtooth',.1,22,.25,.6)}catch(e){}}}
  W.fl=Math.max(0,W.fl-dt*2.2);W.shake=Math.max(0,W.shake-dt*.6)}
 /* the character's head is the group at neck height; scaled up for big heads */
-const headOf=g=>g&&g.children.find(c=>c.isGroup&&Math.abs(c.position.y-1.4)<.2&&c.children.length>3);
-function bigHead(g,on){const h=headOf(g);if(!h)return;if(on){h.scale.setScalar(2.4);h.position.y=1.78}else if(h.scale.x!=1){h.scale.setScalar(1);h.position.y=1.4}}
+const headOf=g=>{if(!g)return null;if(g.userData.fxHead)return g.userData.fxHead;const h=g.children.find(c=>c.isGroup&&Math.abs(c.position.y-1.4)<.2&&c.children.length>3);if(h)g.userData.fxHead=h;return h};
+function bigHead(g,on){const h=headOf(g);if(!h)return;if(on){if(h.scale.x!=2.4)h.scale.setScalar(2.4);if(h.position.y!=1.78)h.position.y=1.78}else if(h.scale.x!=1||h.position.y==1.78){h.scale.setScalar(1);h.position.y=1.4}}
 function carFix(){try{if(mode=='drive'&&dr&&dr.fxk&&dr.fxk<1&&P.mesh){P.mesh.visible=true;P.mesh.rotation.y=dr.h}}catch(e){}}
 function post(dt){if(!ok()){const rf=rfx();if(rf){F.wx=rf.wx;F.disco=rf.di;F.head=rf.hd;F.size=F.speed='';F.moon=F.spin=F.drunk=0}else{if(W.grp||F.wx||F.size||F.speed||F.moon||F.disco||F.head||F.spin||F.drunk)reset(1);avFx();return}}
  const lv=live();

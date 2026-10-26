@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v46.0.0';
+const GAME_VERSION='v46.0.1';
 const VERSION_HISTORY=[
+ {v:'v46.0.1',n:'Fixed the admin big heads command: heads (with hair and hats) now turn off and reset cleanly instead of staying giant or floating after you switch it off. Saves still load.'},
  {v:'v46.0.0',n:'Band rooms: when the admin uses the Gphone Admin fun commands, everyone in the room now sees the weather, disco lights, big heads, giant or tiny size and tiny or giant car on the admin\'s character. Only admins can send it, it is never saved and it clears when the admin turns it off or leaves. Saves still load.'},
  {v:'v45.9.1',n:'Fixed the admin Active band rooms list showing nothing: every band room host now registers the room (no Google sign-in needed), and the room is removed when the host closes the page. Saves still load.'},
  {v:'v45.9.0',n:'Band rooms: the host can now remove a member with the ✕ button next to their name on the band panel (with a confirmation). The removed player is told why and sent back to play alone, and cannot rejoin that room until the host closes it. Saves still load.'},
