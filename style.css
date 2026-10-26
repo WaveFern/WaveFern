@@ -149,7 +149,7 @@ body.notags #ntags{display:none}
 #ttl .ttsl.drop{border-color:var(--g);background:#14301ad9}#ttl .ttbk{cursor:grab}
 
 /* v46.7.0: main menu, career screens and pause menu in the game's own look: the same black-bordered panels as the HUD,
-   hard pixel shadows instead of glows, and buttons that grow towards the side the pointer came in from (164-menu-fx.js sets --ox/--oy) */
+   hard pixel shadows instead of glows, and buttons that smoothly grow from their centre on hover (ease in and out, like a video keyframe) */
 #ttl{background:#050806a6}
 #ttl .ttm{gap:0;width:min(340px,90vw);animation:ttin .25s steps(4) both}
 #ttl .ttm h1{font-size:clamp(34px,7.5vw,54px);line-height:1.05;letter-spacing:2px;margin:0;color:var(--g);text-shadow:3px 3px 0 #0b3a22,6px 6px 0 #000;animation:ttbob 1.6s steps(1) infinite}
@@ -159,8 +159,8 @@ body.notags #ntags{display:none}
 #ttl .ttw{background:#0b0f0de6;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,6px 6px 0 #000a;padding:16px;box-sizing:border-box;max-height:calc(100vh - 32px);overflow:auto;animation:ttin .25s steps(4) both}
 #ttl .ttw h2,.pzm h2{font-size:24px;color:var(--g);text-shadow:3px 3px 0 #000}
 #ttl .ttft{position:fixed;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;color:#8aa094;font-size:11px;pointer-events:none;text-shadow:1px 1px 0 #000}
-/* menu buttons: chunky, a ▶ marker on hover, and they swell towards the side the pointer is on */
-#ttl button,#pzm button{position:relative;border:3px solid #000;box-shadow:inset 0 -4px #0007,3px 3px 0 #000a;transform-origin:var(--ox,50%) var(--oy,50%);transition:transform .3s cubic-bezier(.22,.61,.36,1),background .2s,box-shadow .3s}
+/* menu buttons: chunky, a ▶ marker on hover, and a smooth eased grow */
+#ttl button,#pzm button{position:relative;border:3px solid #000;box-shadow:inset 0 -4px #0007,3px 3px 0 #000a;transition:transform .35s cubic-bezier(.65,0,.35,1),background .35s cubic-bezier(.65,0,.35,1),box-shadow .35s cubic-bezier(.65,0,.35,1)}
 #ttl .ttbx>button,#ttl .ttw>button,#ttl .ttw .row2 button,#ttl .ttnc button,#pzm button{padding:12px;font-family:'Silkscreen',ui-monospace,monospace;font-size:15px;letter-spacing:1px}
 #ttl button:not(:disabled):hover,#pzm button:not(:disabled):hover{z-index:1;transform:scale(1.07);box-shadow:inset 0 -4px #0007,5px 5px 0 #000a}
 #ttl button.go:not(:disabled):hover,#pzm button.go:not(:disabled):hover{background:#5df2a6}
