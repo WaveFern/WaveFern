@@ -100,7 +100,7 @@ const isHost=()=>!!(MPS&&MPS.host);
 const online=()=>!!(MPS&&NET.on&&(isHost()||(NET.hc&&NET.hc.open)));
 const list=()=>online()?Object.values(MB):[];
 const band=()=>list().length>1;
-const pub=m=>({id:m.id,nm:m.nm,inst:m.inst,look:m.look});
+const pub=m=>({id:m.id,nm:m.nm,inst:m.inst,look:m.look,ad:m.ad?1:0});
 function sendAll(o,ex){for(const id in NET.conns){const c=NET.conns[id];if(id!==ex&&c.open&&c.mp)try{c.send(o)}catch(e){}}}
 function send(o){if(isHost()){o.id=ME.id;handle(o,ME.id,1);sendAll(o)}else if(NET.hc&&NET.hc.open)try{NET.hc.send(o)}catch(e){}}
 function roster(){sendAll({t:'ros',band:MPS.band,mem:Object.values(MB).map(pub)})}
@@ -130,10 +130,10 @@ function hostData(c,d){if(!d||!d.t)return;
   const kd=!d.ad&&(NET.kk[c.peer]||(d.uid&&NET.kk['u'+d.uid]));
   const no=kd?'The host removed you from this room.':L.length>=MAXN?'The room is full.':L.some(m=>m.inst==d.inst)?'Someone in the room already plays '+(INS[d.inst]?INS[d.inst].n:'that')+'.':!INS[d.inst]?'Unknown instrument.':'';
   if(no){try{c.send({t:'no',why:no})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
-  c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{id:c.peer,uid:String(d.uid||'').slice(0,16),nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
+  c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{ad:d.ad?1:0,id:c.peer,uid:String(d.uid||'').slice(0,16),nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
   c.send({t:'wel',band:MPS.band,an:S.artist||'',you:c.peer,day:S.day,tm:S.t,mem:Object.values(MB).map(m=>Object.assign(pub(m),{x:m.x,z:m.z,zone:m.zone,where:m.where,studio:m.studio,stg:m.stg,rd:m.rd}))});
   NET.gk='';NET.cs={};roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
- if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
+ if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm','fx'].includes(d.t))return;if(d.t=='fx'&&!MB[c.peer].ad)return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
 /* v45.9.0: host removes a member: tell them, close their link, remember their ids for this session */
 function kick(id){if(!isHost()||id===ME.id)return;const m=MB[id],c=NET.conns[id];NET.kk[id]=1;if(m&&m.uid)NET.kk['u'+m.uid]=1;if(c){try{c.send({t:'kick'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},800)}if(m){say('You removed '+m.nm+' from the room.');rmAv(id);delete MB[id]}delete NET.conns[id];roster()}
 window.mpKick=id=>{const m=MB[id];if(!m||!isHost())return;if(!confirm('Remove '+m.nm+' from the band room? They will not be able to rejoin this room until you close it.'))return;snd('click');kick(id)};
@@ -174,7 +174,8 @@ function handle(d,id,self){
  else if(d.t=='rel')relRecv(d,m)
  else if(d.t=='scr')scrRecv(d,m)
  else if(d.t=='gr')gearRecv(d,m)
- else if(d.t=='cm')cmRecv(d,m)}
+ else if(d.t=='cm')cmRecv(d,m)
+ else if(d.t=='fx'&&m.ad&&window.WFUN_RECV)window.WFUN_RECV(id,d)}
 const myUid=()=>{try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Math.random().toString(36).slice(2,12);localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
 const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
@@ -184,7 +185,7 @@ function stg(){try{if(typeof FEST=='undefined'||FEST.ph!='fest'||IN)return 0;con
 function zone(){if(['title','creator','load'].includes(mode))return'menu';try{return IN?'i'+IN.i+(IN.i==7?'f'+S.fl:''):'o'}catch(e){return'o'}}
 function where(){try{if(['title','creator','load'].includes(mode))return'in the menu';if(IN)return SHOPS[IN.i].name;if(typeof FEST!='undefined'&&FEST.view)return'on stage';const n=stg();if(n)return'Festival, Stage '+n;
  if(P.x>=0&&P.x<=16&&P.z>=0&&P.z<=12)return P.x<8?(P.z<6?'Bedroom':'Living room'):(P.z<6?'Studio':'Kitchen');return mode=='drive'?'driving':'out in town'}catch(e){return''}}
-function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.x=+P.x.toFixed(2);ME.z=+P.z.toFixed(2);ME.r=+(P.rot||0).toFixed(2);ME.zone=zone();ME.where=where();
+function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.ad=(typeof isAdmin=='function'&&isAdmin())?1:0;ME.x=+P.x.toFixed(2);ME.z=+P.z.toFixed(2);ME.r=+(P.rot||0).toFixed(2);ME.zone=zone();ME.where=where();
  ME.ctry=ctry();ME.studio=ME.zone=='o'&&P.x>8&&P.x<16&&P.z>0&&P.z<6?1:0;ME.stg=stg();ME.col=colNear();
  /* ready only holds while you are where it counts */
  if(ME.rd&&((ME.rd.k=='rec'&&!ME.studio&&mode!='rec')||(ME.rd.k=='fest'&&ME.stg!=ME.rd.n&&mode!='fest')||(ME.rd.k=='slp'&&(Math.hypot(P.x-ME.rd.x,P.z-ME.rd.z)>2.5||mode!='play'))||(ME.rd.k=='col'&&ME.col!==ME.rd.a&&mode!='cut'))){ME.rd=null;send({t:'rd',rd:null});say('You walked away, so you are no longer ready.')}
@@ -494,5 +495,7 @@ function cmRecv(d,from){const r=d.m;if(!r||typeof r!='object'||typeof r.a!='numb
  if(grew&&st0!==null&&m.state==1&&st0!=1)say(from.nm+' agreed a collab with '+artN(r.a)+'. It is for the whole band.');
  try{if(mode=='pc')pcR()}catch(e){}}
 
+/* v45.10.0: lets the admin fun effects (162-fun-admin.js) ride on the room: send, who is in the room, their avatars */
+window.MPFX={on:()=>online(),send:o=>send(o),mem:()=>MB,av:()=>AV};
 if(MPS)setTimeout(start,0);
 })();

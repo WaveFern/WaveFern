@@ -5,6 +5,7 @@
    - Weather: object rain (rubber ducks, confetti, money, meteors), blizzard, mega storm with lightning, and Crazy weather
      that cycles through all of them with a rainbow sky.
    - Size: giant or tiny you. Tiny car / giant car: spawns a temporary car under you (a giant you in a tiny car is allowed).
+   - v45.10.0: in a band room the admin's weather, size, car, disco and big heads are shared with the room (see the end of the file).
    - Moon jump (Space), disco party lights, big heads, spin cycle, drunk camera, slow-mo and hyper speed. */
 (()=>{
 const LIVE=['play','drive','rec','cut','phone'];
@@ -45,7 +46,7 @@ function wxStep(dt){const ck=F.wx=='chaos'?['duck','conf','money','snow','meteor
 const headOf=g=>g&&g.children.find(c=>c.isGroup&&Math.abs(c.position.y-1.4)<.2&&c.children.length>3);
 function bigHead(g,on){const h=headOf(g);if(!h)return;if(on){h.scale.setScalar(2.4);h.position.y=1.78}else if(h.scale.x!=1){h.scale.setScalar(1);h.position.y=1.4}}
 function carFix(){try{if(mode=='drive'&&dr&&dr.fxk&&dr.fxk<1&&P.mesh){P.mesh.visible=true;P.mesh.rotation.y=dr.h}}catch(e){}}
-function post(dt){if(!ok()){if(W.grp||F.wx||F.size||F.speed||F.moon||F.disco||F.head||F.spin||F.drunk)reset(1);return}
+function post(dt){if(!ok()){const rf=rfx();if(rf){F.wx=rf.wx;F.disco=rf.di;F.head=rf.hd;F.size=F.speed='';F.moon=F.spin=F.drunk=0}else{if(W.grp||F.wx||F.size||F.speed||F.moon||F.disco||F.head||F.spin||F.drunk)reset(1);avFx();return}}
  const lv=live();
  wxStep(dt);
  /* size */
@@ -71,7 +72,7 @@ function post(dt){if(!ok()){if(W.grp||F.wx||F.size||F.speed||F.moon||F.disco||F.
  /* camera: shake and drunk wobble */
  if(lv){if(W.shake>0){cam.position.x+=rnd(-1,1)*W.shake;cam.position.y+=rnd(-1,1)*W.shake}
   if(F.drunk){cam.rotateZ(Math.sin(tt*1.3)*.07);cam.zoom=1+Math.sin(tt*.9)*.08;cam.updateProjectionMatrix()}else if(cam.zoom!=1){cam.zoom=1;cam.updateProjectionMatrix()}}
- carFix()}
+ carFix();avFx()}
 {const u0=update;update=function(dt){const k=ok()?(F.speed=='slow'?.35:F.speed=='hyper'?2:1):1;const r=u0.call(this,dt*k);try{post(dt)}catch(e){console.error('fun admin',e)}return r}}
 /* Space = moon jump when nothing is nearby to interact with */
 addEventListener('keydown',e=>{if(!F.moon||!ok()||mode!='play'||e.key!=' '||near||W.jy>0||e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;W.jv=7.5;W.jy=.01;try{sfx(330,.3,'triangle',.06,660,0,.1)}catch(x){}});
@@ -85,6 +86,24 @@ function clearCars(){try{if(mode=='drive'&&dr&&dr.fxk)exitDrive();PK=PK.filter(c
 function reset(quiet){F.wx=F.size=F.speed='';F.moon=F.disco=F.head=F.spin=F.drunk=0;setKind('');W.jy=W.jv=0;W.fl=0;W.shake=0;clearCars();
  try{if(P.mesh){P.mesh.scale.setScalar(1);bigHead(P.mesh,false)}NPC.forEach(n=>{if(n.m){bigHead(n.m,false);n.m.position.y=0}});lamps.forEach(l=>l.color.set(0xffffff));cam.zoom=1;cam.updateProjectionMatrix()}catch(e){}
  if(!quiet){say('✨ Everything is back to normal.');if(mode=='phone')phR()}}
+/* ---- v45.10.0: sharing with the band room ----
+   The admin sends its effect state (weather, size, car, disco, big heads) to the room every few seconds; the host relays it.
+   Others only accept it from a member the room knows is an admin. It is memory only: it expires 9s after the last message
+   (so it clears on leaving, closing the page or turning things off) and nothing is saved. */
+const RX={},CX={};
+let lastFx='',lastFxT=0;
+const mem=()=>{try{return window.MPFX&&window.MPFX.mem()}catch(e){return null}};
+function rfx(){const M=mem(),n=Date.now();if(!M)return null;for(const id in RX){const r=RX[id];if(!M[id]||!M[id].ad||n-r.ts>9000){delete RX[id];continue}if(r.wx||r.di||r.hd)return r}return null}
+window.WFUN_RECV=(id,d)=>{if(ok())return;const M=mem();if(!M||!M[id]||!M[id].ad)return;
+ RX[id]={ts:Date.now(),wx:WX.some(w=>w[0]==d.wx)?d.wx:'',sz:d.sz=='giant'||d.sz=='tiny'?d.sz:'',di:d.di?1:0,hd:d.hd?1:0,cr:d.cr>0&&d.cr<=3?+d.cr:0,ci:d.ci|0}};
+setInterval(()=>{try{const M=window.MPFX;if(!M||!M.on()||!ok())return;const cr=mode=='drive'&&dr&&dr.fxk?dr.fxk:0,o={t:'fx',wx:F.wx,sz:F.size,di:F.disco?1:0,hd:F.head?1:0,cr,ci:cr?dr.i:0},k=JSON.stringify(o),n=Date.now();
+ if(k!==lastFx||n-lastFxT>3000){lastFx=k;lastFxT=n;M.send(o)}}catch(e){}},500);
+/* other admins' avatars: size and temporary car */
+function avFx(){try{const M=window.MPFX;if(!M)return;const A=M.av();for(const id in A){const a=A[id],r=RX[id],ex=r&&Date.now()-r.ts<9000&&mem()[id]&&mem()[id].ad&&!ok()?r:null,k=ex?(ex.sz=='giant'?2.6:ex.sz=='tiny'?.45:1):1,cr=ex?ex.cr:0;
+  a.g.scale.setScalar(k);bigHead(a.g,!!(ex&&ex.hd));
+  const c=CX[id];if(c&&(!cr||c.k!=cr||c.i!=ex.ci)){a.g.remove(c.m);delete CX[id]}
+  if(cr&&!CX[id]&&CARS[ex.ci]){const m=mkS(carb(ex.ci));m.scale.setScalar(1.5*cr/k);a.g.add(m);CX[id]={m,k:cr,i:ex.ci}}
+  if(CX[id]&&CX[id].m.parent!==a.g)delete CX[id]}}catch(e){}}
 /* ---- the app ---- */
 const NAMES={giant:'🍄 Giant you',tiny:'🐜 Tiny you',slow:'🐌 Slow-mo',hyper:'⏩ Hyper speed',moon:'🦘 Moon jump',disco:'🪩 Disco party',head:'🤯 Big heads',spin:'🌀 Spin cycle',drunk:'🥴 Drunk camera'};
 window.WFUN={
