@@ -100,6 +100,7 @@ const INS={
    bass/chords: x root/chord, o octave, 5 fifth, 3 third, 7 seventh, b approach, u up-strum, - hold. bs.p 'k' follows the kick.
    arp (ar.p): digits pick chord tones (higher digits go up an octave). ld: hook melody (d density, all = also in verses). */
 const BB='....X.......X...',HT='........X.......',H8='x.x.x.x.x.x.x.x.',HA='X.x.X.x.X.x.X.x.',FOUR='X...X...X...X...',OFF='..x...x...x...x.',G16='.g.g.g.g.g.g.g.g',SH='xgxgxgxgxgxgxgxg';
+const DEM='...x..x....x..x.',CLV='x.....x.....x.......x...x.......';
 const STY={
 'Hip-Hop':[
  {n:'Boom Bap',bpm:[86,94],sw:.16,sc:['min','dor'],kit:'dusty',dr:{k:['X.....x...x.....','X......x..x..x..','X.x.......x..x..X......x..x.....'],s:[BB,'....X..g....X...'],h:[HA,'X.xgX.x.X.xgX.x.']},bs:{i:'bass',p:'k',o:36},ch:{i:'piano',x:7,p:['x-----x-...x----','x--x---.x--x---.'],o:62},ld:{i:'brass',d:.22,o:72},fill:'sn',fx:{vinyl:.4,verb:.18}},
@@ -157,10 +158,18 @@ const STY={
  {n:'Drum & Bass',bpm:[170,176],sc:'min',cpb:.5,kit:'dnb',dr:{k:['X.........X.....X.x.......x.....','X.........x.....'],s:BB,h:'x.xxx.x.x.xxx.x.'},bs:{i:'reese',p:'x-------x---x---',o:34},ch:{i:'pad',x:7,p:'x---------------',o:62},ld:{i:'bell',d:.25,o:76},fill:'sn',fx:{verb:.3}},
  {n:'Dubstep',bpm:[140,142],sc:['min','phr'],pr:'mind',cpb:.5,kit:'trap',dr:{k:'X.........x.....',s:HT,h:H8},bs:{i:'wob',p:['x---x-x-x---x---','x-x-x---x-----x-'],o:31},ch:{i:'pad',x:3,p:'x---------------',o:62},ld:{i:'square',d:.3,o:74},side:.3,fill:'drop'},
  {n:'Synthwave',bpm:[96,110],sc:'min',kit:'gated',dr:{k:'X.......X.......',s:BB,h:'gxgxgxgxgxgxgxgx'},bs:{i:'pluckb',p:'x.x.o.x.x.x.o.x.',o:36},ch:{i:'pad',x:3,p:'x---------------',o:62},ar:{i:'pluck',p:'0123',r:1,o:62},ld:{i:'saw',d:.4,o:74},crash:1,fill:'tom',fx:{dly:1,verb:.35,rt:2.6}},
- {n:'Future Bass',bpm:[140,150],sc:'maj',kit:'trap',dr:{k:'X.........x.....',c:HT,h:'x.x.x.x.x.xrx.x.'},bs:{i:'sub',p:'x-------x-----x-',o:36},ch:{i:'super',x:7,p:['x--.x--.x-.x-...','x-x-..x-x-..x-x-'],o:64},ld:{i:'pluck',d:.5,o:76},side:.8,fill:'drop',fx:{verb:.3}}]};
+ {n:'Future Bass',bpm:[140,150],sc:'maj',kit:'trap',dr:{k:'X.........x.....',c:HT,h:'x.x.x.x.x.xrx.x.'},bs:{i:'sub',p:'x-------x-----x-',o:36},ch:{i:'super',x:7,p:['x--.x--.x-.x-...','x-x-..x-x-..x-x-'],o:64},ld:{i:'pluck',d:.5,o:76},side:.8,fill:'drop',fx:{verb:.3}}],
+/* v47.0.0: Latin. DEM is the dembow snare (3+3+2), CLV a 3-2 son clave over two bars */
+'Latin':[
+ {n:'Reggaeton',bpm:[88,96],sc:['min','phr'],pr:'mind',kit:'trap',dr:{k:FOUR,s:DEM,h:H8,p:SH},bs:{i:'808',p:'k',o:31,sl:.1,dr:1},ch:{i:'pad',x:3,p:'x---------------',o:60},ld:{i:'pluck',d:.4,o:74,all:1},fill:'roll',fx:{verb:.18}},
+ {n:'Latin Trap',bpm:[132,142],sc:['min','hmin'],pr:'mind',cpb:.5,kit:'trap',dr:{k:'X......x..X.....',s:'...x..x....x..x.',h:'x.x.x.xrx.x.x.x.'},bs:{i:'808',p:'k',o:30,sl:.3,oc:.1},ch:{i:'nylon',x:3,p:'x..x..x.x..x..x.',o:60},ld:{i:'whine',d:.3,o:72},fill:'stop'},
+ {n:'Bachata',bpm:[122,132],sc:['min','maj'],pr:['min','maj'],kit:'brush',dr:{k:'X.......X.......',r:'..x...x...x.x.x.',p:SH},bs:{i:'upright',p:'x..x..x.x..x..x.',o:36},ch:{i:'strum',x:3,p:'x...x...x...x...',o:60},ar:{i:'nylon',p:'0123212301232123',r:2,o:64},ld:{i:'nylon',d:.35,o:72},fx:{verb:.22}},
+ {n:'Salsa',bpm:[176,196],sc:['min','maj'],pr:['min','mind'],cpb:.5,kit:'soft',dr:{k:'X.......X.......',r:CLV,b:'X.x.X.x.X.x.X.x.',p:SH},bs:{i:'upright',p:'...x..x....x..x.',o:36},ch:{i:'piano',x:3,p:'x.xx.x.xx.x.x.x.',o:62},ld:{i:'brass',d:.35,o:72,all:1},fill:'tom',fx:{verb:.2}},
+ {n:'Cumbia',bpm:[90,102],sc:['min','maj'],pr:['min','maj'],kit:'soft',dr:{k:'X.......X.......',r:'....x.......x...',p:SH},bs:{i:'round',p:'x...5...x...5...',o:36},ch:{i:'pluck',x:3,p:'..x...x...x...x.',o:62},ld:{i:'organ',d:.4,o:72,all:1},fx:{verb:.18}},
+ {n:'Latin Pop',bpm:[94,104],sc:'maj',pr:'maj',kit:'909',dr:{k:FOUR,s:DEM,h:H8},bs:{i:'sub',p:'k',o:36},ch:{i:'strum',x:3,p:'x.xux.xux.xux.xu',o:60},ld:{i:'pluck',d:.45,o:76},side:.3,fill:'drop',fx:{verb:.2}}]};
 const GENRES=Object.keys(STY);
-const GALIAS=[[/drill|trap|rage|plugg|phonk|^rap/,'Rap'],[/hip.?hop|boom|g.?funk/,'Hip-Hop'],[/r.?(and|&|n).?b|soul/,'R&B'],[/lo.?fi|chill/,'Lo-fi'],[/country|folk|bluegrass/,'Country'],[/edm|house|techno|trance|dance|electr|dub|dnb|drum/,'Electronic'],[/rock|punk|grunge|metal|indie/,'Rock'],[/pop/,'Pop']];
-function normG(g){if(!g)return 'Pop';if(STY[g])return g;const s=String(g).toLowerCase();for(const[re,n]of GALIAS)if(re.test(s))return n;return GENRES[hash(s)%GENRES.length]}
+const GALIAS=[[/latin|reggaet|salsa|bachata|cumbia|dembow|merengue|urbano/,'Latin'],[/drill|trap|rage|plugg|phonk|^rap/,'Rap'],[/hip.?hop|boom|g.?funk/,'Hip-Hop'],[/r.?(and|&|n).?b|soul/,'R&B'],[/lo.?fi|chill/,'Lo-fi'],[/country|folk|bluegrass/,'Country'],[/edm|house|techno|trance|dance|electr|dub|dnb|drum/,'Electronic'],[/rock|punk|grunge|metal|indie/,'Rock'],[/pop/,'Pop'],[/jazz/,'Lo-fi'],[/funk|afro|gospel/,'R&B'],[/grime/,'Rap']];
+function normG(g){if(!g)return 'Pop';if(STY[g])return g;const s=String(g).toLowerCase();for(const[re,n]of GALIAS)if(re.test(s))return n;return 'Pop'}
 
 /* ---------- pattern parsing ---------- */
 const VEL={x:.8,X:1,g:.3,o:.55,r:-1};

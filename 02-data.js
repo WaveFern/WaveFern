@@ -3,7 +3,7 @@
    payRate: $ per stream, paid when you wake up (was $0.03). Now $0.05: about 300 streams a day pays about $15.
    gearCost: multiplier on every gear price (0.8 = 20% cheaper). Balances in saves are not touched. */
 const TUNE={payRate:.05,gearCost:.8};
-const GEN=['Hip-Hop','Rap','Pop','Rock','R&B','Lo-fi','Country','Electronic'];
+const GEN=['Hip-Hop','Rap','Pop','Rock','R&B','Lo-fi','Country','Electronic','Latin'];
 const GEAR={chair:{n:'Chair',d:'Better songs',lv:['Wobbly stool','Office chair','Ergonomic chair',"Producer's throne"],c:[200,650,1800]},
 mic:{n:'Microphone',d:'Much better vocals',lv:['Karaoke mic','USB condenser','Studio condenser','Tube mic'],c:[280,850,2400]},
 guitar:{n:'Guitar',d:'Richer sound',lv:['Pawn-shop guitar','Acoustic','Semi-hollow','Custom electric'],c:[240,750,2100]},

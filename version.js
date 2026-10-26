@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v46.9.0';
+const GAME_VERSION='v47.0.0';
 const VERSION_HISTORY=[
+ {v:'v47.0.0',n:'A ninth genre: Latin, with its own beats (reggaeton, Latin trap, bachata, salsa, cumbia and Latin pop). Every artist\'s music now plays in its own genre: Latin, jazz, funk, afro and grime artists no longer fall back to a random genre\'s beat. New genre focus: fans reward a steady sound. Each new song looks at your last five releases: staying in the same genre or family earns up to +40% streams, and hopping around (say rap, then country, then pop, then lo-fi) costs up to 25%. Families are Hip-Hop, Rap, R&B and Latin; Pop and Country; Lo-fi and Electronic; and Rock. The Make a song screen shows each genre\'s focus before you pick. Songs you already released keep their streams. Saves still load.'},
  {v:'v46.9.0',n:'A new Make a song screen in the game\'s menu style: genres are big pixel buttons in a grid with HOT and COLD tags for trending and cold genres, and the diss track, rival, 808 and hi hat options now sit in an Extras dropdown that shows what you have picked even while it is closed. Saves still load.'},
  {v:'v46.8.0',n:'Buttons in the game\'s own menus (making a song, settings, wardrobe, shops and pop-ups) now match the main menu: black edges, a hard pixel shadow, a smooth eased grow when you point at them and a press-in when clicked. The in-game computer and phone screens and the rhythm-game pads keep their own look. Saves still load.'},
  {v:'v46.7.5',n:'Menu buttons grow a little quicker on hover. Saves still load.'},
