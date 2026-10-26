@@ -160,7 +160,7 @@ body.notags #ntags{display:none}
 #ttl .ttw h2,.pzm h2{font-size:24px;color:var(--g);text-shadow:3px 3px 0 #000}
 #ttl .ttft{position:fixed;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;color:#8aa094;font-size:11px;pointer-events:none;text-shadow:1px 1px 0 #000}
 /* menu buttons: chunky, a ▶ marker on hover, and a smooth eased grow */
-#ttl button,#pzm button{position:relative;border:3px solid #000;box-shadow:inset 0 -4px #0007,3px 3px 0 #000a;transition:transform .35s cubic-bezier(.65,0,.35,1),background .35s cubic-bezier(.65,0,.35,1),box-shadow .35s cubic-bezier(.65,0,.35,1)}
+#ttl button,#pzm button{position:relative;border:3px solid #000;box-shadow:inset 0 -4px #0007,3px 3px 0 #000a;transition:transform .22s cubic-bezier(.65,0,.35,1),background .22s cubic-bezier(.65,0,.35,1),box-shadow .22s cubic-bezier(.65,0,.35,1)}
 #ttl .ttbx>button,#ttl .ttw>button,#ttl .ttw .row2 button,#ttl .ttnc button,#pzm button{padding:12px;font-family:'Silkscreen',ui-monospace,monospace;font-size:15px;letter-spacing:1px}
 #ttl button:not(:disabled):hover,#pzm button:not(:disabled):hover{z-index:1;transform:scale(1.07);box-shadow:inset 0 -4px #0007,5px 5px 0 #000a}
 #ttl button.go:not(:disabled):hover,#pzm button.go:not(:disabled):hover{background:#5df2a6}
