@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v46.2.3';
+const GAME_VERSION='v46.3.0';
 const VERSION_HISTORY=[
+ {v:'v46.3.0',n:'Main menu: Create a room and Join a room are now grouped under one Multiplayer button. Tap Multiplayer to show them, tap again to hide them. Saves still load.'},
  {v:'v46.2.3',n:'Admin Active band rooms: rooms seen in the last hour are now listed even if the host has gone quiet, with how long ago they were last seen, so you can still try to join them. Saves still load.'},
  {v:'v46.2.2',n:'Admin Active band rooms: rooms no longer disappear from the list when the host switches tabs or apps. Hosts now ping every 20 seconds and again when they come back, and the room is not removed when the page is hidden. Saves still load.'},
  {v:'v46.2.1',n:'Band rooms: only the admin now spawns in with the best Gphone (every app unlocked); everyone else keeps their own Gphone again. Saves still load.'},

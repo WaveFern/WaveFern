@@ -1,5 +1,5 @@
 /* ===== v45.4.0: band rooms (multiplayer) =====
-   The main menu offers Create a room, Join a room and Single player. A room is a band of up to 4 players who live in the
+   The main menu offers Multiplayer (which opens Create a room and Join a room) and Single player. A room is a band of up to 4 players who live in the
    starter house together. Networking is browser to browser (WebRTC) through PeerJS and its free public signalling server,
    so there is no server of our own: the player who creates the room is the host and relays everything. If the host
    leaves, the room closes and the others carry on alone.
@@ -70,7 +70,8 @@ function menu(){const m=document.querySelector('#ttl .ttm');if(!m)return;const p
   m.querySelectorAll('button[onclick="fbSignInAsk()"]').forEach(b=>{const p=b.nextElementSibling;if(p&&p.tagName=='P')p.remove();b.remove()});return}
  play.textContent=play.disabled?play.textContent:'Single player';
  const last=FW_ACCT?lsGet()[0]:null;
- play.insertAdjacentHTML('beforebegin',(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:'')+'<button class=go onclick="mpCreateUI()">Create a room</button><button class=go onclick="mpJoinUI()">Join a room</button>'+(FW_ACCT?'':'<p class=m style="margin:2px 0 6px"><small>Band rooms need a Google sign-in.</small></p>'))}
+ play.insertAdjacentHTML('beforebegin',(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:'')+'<button class=go onclick="mpMulti()">Multiplayer ▸</button><div id=mpgrp style="display:none;flex-direction:column;gap:inherit;align-self:stretch;padding:0 14px;box-sizing:border-box"><button class=go onclick="mpCreateUI()">Create a room</button><button class=go onclick="mpJoinUI()">Join a room</button>'+(FW_ACCT?'':'<p class=m style="margin:2px 0 6px"><small>Band rooms need a Google sign-in.</small></p>')+'</div>')}
+window.mpMulti=()=>{snd('click');const g=$('mpgrp'),b=g&&g.previousElementSibling;if(!g)return;const o=g.style.display=='none';g.style.display=o?'flex':'none';if(b)b.textContent='Multiplayer '+(o?'▾':'▸')};
 window.mpContinue=()=>{if(needLogin())return;snd('click');const x=lsGet()[0];if(!x)return;enter(Object.assign({},x))};
 window.mpPlay=()=>ttPlay();
 window.mpLeave=()=>{snd('click');try{autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.reload()};
