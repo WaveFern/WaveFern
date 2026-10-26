@@ -106,9 +106,9 @@ function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionSt
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
  const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'Cloud save on':'Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><span><b>Guest</b><small>Saves on this device</small></span></div>`;
- $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN<br>RECORDS</h1><i class=ttln></i><div class=px>Music Career Sim</div>
+ $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN<br>RECORDS</h1><div class=px>Music Career Sim</div><div class=ttbx>
   <button class=go onclick="ttWorlds()" ${busy?'disabled':''}>${busy?'Loading your save…':'Play'}</button>
-  <button onclick="ttSet()">Settings</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · Made with Three.js</div></div>`}
+  <button onclick="ttSet()">Settings</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · Made with Three.js</div></div>`}
 function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;TT.sel=0;pauseOverlay(0);menuMusic(0);PAUSED=0;PS='';MU.hold=0;try{const a=MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}catch(e){}
  if(TT.game){mode='play';$('ui').innerHTML=''}else{mode='creator';creatorUI()}}
 /* v26.125: career select (two slots, Minecraft style). Switching slot reloads the page into the chosen career so no state leaks between them.

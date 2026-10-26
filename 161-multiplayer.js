@@ -1,5 +1,5 @@
 /* ===== v45.4.0: band rooms (multiplayer) =====
-   The main menu offers Multiplayer (its own screen with Your rooms, Create a room and Join a room) and Single player. A room is a band of up to 4 players who live in the
+   The main menu offers Single player and Multiplayer (Your rooms, with Create a room and Join a room). A room is a band of up to 4 players who live in the
    starter house together. Networking is browser to browser (WebRTC) through PeerJS and its free public signalling server,
    so there is no server of our own: the player who creates the room is the host and relays everything. If the host
    leaves, the room closes and the others carry on alone.
@@ -70,19 +70,15 @@ function menu(){const m=document.querySelector('#ttl .ttm');if(!m)return;const p
   m.querySelectorAll('button[onclick="fbSignInAsk()"]').forEach(b=>{const p=b.nextElementSibling;if(p&&p.tagName=='P')p.remove();b.remove()});return}
  play.textContent=play.disabled?play.textContent:'Single player';
  const last=FW_ACCT?lsGet()[0]:null;
- play.insertAdjacentHTML('beforebegin',(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:'')+'<button class=go onclick="mpHub()">Multiplayer</button>')}
-/* v46.4.0: Multiplayer opens its own screen (like Play opens the career list) with Your rooms, Create a room and Join a room */
-window.mpHub=()=>{if(!TT.on)return ttBack();snd('click');TT.sel=1;const n=lsGet().length;
- $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Multiplayer</h2><p class=m style="text-align:center;margin:0">Play as a band of up to ${MAXN} with friends. You can keep up to ${MPMAX} band careers.</p>
-  <button class=go onclick="mpRooms()">Your rooms (${Math.min(n,MPMAX)}/${MPMAX})</button><button class=go onclick="mpCreateUI()">Create a room</button><button class=go onclick="mpJoinUI()">Join a room</button>
-  ${FW_ACCT?'':'<p class=m style="margin:0;text-align:center"><small>Band rooms need a Google sign-in.</small></p>'}<button onclick="ttBack()">Back</button></div></div>`};
+ play.insertAdjacentHTML('afterend','<button class=go onclick="mpRooms()">Multiplayer</button>'+(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:''))}
+/* v46.7.0: Multiplayer opens straight into Your rooms, which also has Create a room and Join a room */
 /* Your rooms: the band careers on this device, at most MPMAX. Older lists may hold more; those still show and play, but no new one can start until there is room. */
 const svInfo=x=>{try{const c=localStorage.getItem(SAVE_PRE+'mp_'+x.code+'_'+x.inst);if(!c)return null;const q=scDecode(c).S;return{day:q.day||1}}catch(e){return null}};
 window.mpRooms=()=>{if(needLogin())return;snd('click');TT.sel=1;const L=lsGet(),rows=L.map((x,i)=>{const v=svInfo(x);
   return`<div class=ttsl><div><b>${esc(x.band||'Band')}</b><small>Room ${esc(x.code)} · ${iName(x.inst)} · ${x.host?'you host':'you joined'}${v?' · Day '+v.day:''}</small></div><button class=go onclick="mpRoomGo(${i})">${x.host?'Host':'Join'}</button><button class=ttdel title="Delete this band career" aria-label="Delete band career ${i+1}" onclick="mpRoomDel(${i})">✕</button></div>`});
  for(let i=L.length;i<MPMAX;i++)rows.push(`<div class="ttsl empty"><div><b>Empty slot</b><small>Band career ${i+1}</small></div></div>`);
- $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Your rooms</h2>${rows.join('')}${L.length>=MPMAX?`<p class=m style="margin:0"><small>You have ${MPMAX} band careers. Delete one to create or join a new room.</small></p>`:''}
-  <div class=row2><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpCreateUI()">Create a room</button><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpJoinUI()">Join a room</button></div><button onclick="mpHub()">Back</button></div></div>`};
+ $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Your rooms</h2><p class=m style="text-align:center;margin:0">Play as a band of up to ${MAXN} with friends. Keep up to ${MPMAX} band careers.</p>${rows.join('')}${L.length>=MPMAX?`<p class=m style="margin:0"><small>You have ${MPMAX} band careers. Delete one to create or join a new room.</small></p>`:''}
+  <div class=row2><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpCreateUI()">Create a room</button><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpJoinUI()">Join a room</button></div><button onclick="ttBack()">Back</button></div></div>`};
 window.mpRoomGo=i=>{const x=lsGet()[i];if(!x)return;if(x.host)return mpHostAgain(x.code,x.inst);mpJoinUI();$('mpcd').value=x.code;mpFind()};
 window.mpRoomDel=i=>{const x=lsGet()[i];if(!x)return;if(!confirm('Delete your band career in '+(x.band||'Band')+' (room '+x.code+')? Your progress in that band is lost.'))return;snd('click');
  try{localStorage.setItem(LK,JSON.stringify(lsGet().filter(q=>!(q.code==x.code&&q.inst==x.inst))));localStorage.removeItem(SAVE_PRE+'mp_'+x.code+'_'+x.inst)}catch(e){}mpRooms()};
@@ -99,7 +95,7 @@ window.mpCreateUI=()=>{if(needLogin())return;snd('click');TT.sel=1;U.inst='vo';c
   <div class=r><span>Band name</span><input id=mpbn maxlength=24 placeholder="The Ferns"></div><div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm()||acctNm())}"></div><p style="margin:10px 0 0">Your instrument</p>${insBtns()}
   <button class=go onclick="mpCreateGo()">Create room</button>
   ${mine.length?`<details class=ttrb open><summary>Your bands (host again)</summary>${mine.map(x=>`<div class=ttsl><div><b>${esc(x.band||'Band')}</b><small>Room ${esc(x.code)} · ${iName(x.inst)}</small></div><button onclick="mpHostAgain('${esc(x.code)}','${x.inst}')">Host</button></div>`).join('')}</details>`:''}
-  <p class=m><small>Rooms connect browser to browser. Very strict networks (some schools and offices) can block them.</small></p><button onclick="mpHub()">Back</button></div></div>`};
+  <p class=m><small>Rooms connect browser to browser. Very strict networks (some schools and offices) can block them.</small></p><button onclick="mpRooms()">Back</button></div></div>`};
 function enter(o){if(needLogin())return;if(roomsFull(o))return fullMsg();const y=$('mpyn');if(y){o.nm=(y.value||'').trim().slice(0,16);try{localStorage.setItem(SAVE_PRE+'mpnm',o.nm)}catch(e){}}lsAdd(o);wiping=true;try{sessionStorage.setItem(SK,JSON.stringify(o));sessionStorage.setItem('fw_go','1')}catch(e){wiping=false;return say('Could not start the room in this browser.')}location.reload()}
 window.mpCreateGo=()=>{snd('click');const b=($('mpbn').value||'').trim()||'The Ferns';enter({code:newCode(),inst:U.inst,band:b,host:1})};
 window.mpHostAgain=(c,i)=>{snd('click');const x=lsGet().find(q=>q.code==c&&q.inst==i);enter({code:c,inst:i,band:x&&x.band||'Band',host:1,nm:x&&x.nm||''})};
@@ -107,7 +103,7 @@ window.mpJoinUI=()=>{if(needLogin())return;snd('click');TT.sel=1;const rec=lsGet
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Join a room</h2><p class=m>Type the room code your friend sees on their screen.</p>
   <div class=ng><input id=mpcd maxlength=5 placeholder="CODE" style="text-transform:uppercase;letter-spacing:3px" onkeydown="if(event.key=='Enter')mpFind()"><button class=go onclick="mpFind()">Find room</button></div>
   ${rec.length?`<p class=m style="margin:8px 0 0"><small>Rooms you joined: ${rec.map(x=>`<button onclick="$('mpcd').value='${esc(x.code)}';mpFind()">${esc(x.code)}</button>`).join(' ')}</small></p>`:''}
-  <div id=mpjr></div><button onclick="mpHub()">Back</button></div></div>`;setTimeout(()=>{const i=$('mpcd');i&&i.focus()},50)};
+  <div id=mpjr></div><button onclick="mpRooms()">Back</button></div></div>`;setTimeout(()=>{const i=$('mpcd');i&&i.focus()},50)};
 window.mpFind=()=>{if(needLogin())return;const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers.</p>';return}
  snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'…</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
  const fail=t=>{if(U.qc!==c||U.qok===c)return;out.innerHTML='<p class=m>'+t+'</p>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;U.qok='';
