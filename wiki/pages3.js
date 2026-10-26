@@ -123,7 +123,7 @@ page('credits','Credits','meta',{sum:'Who made WaveFern Records.',kw:'credits ma
 ${IB('WaveFern Records','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton']])}
 <p class=lead>WaveFern Records was made by James Hutchinson and Rowan Burton.</p>
 ${H2('Game')}<p>James Hutchinson and Rowan Burton.</p>
-${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.image-line.com/fl-studio/" target=_blank rel=noopener>FL Studio</a>, using its stock plugins, <a href="https://surge-synthesizer.github.io/" target=_blank rel=noopener>Surge XT</a>, <a href="https://www.looperman.com/free-music-software/detail/krakli-software-arminator-2" target=_blank rel=noopener>Arminator 2</a> and tumfy's free kits.</p>
+${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.image-line.com/fl-studio/" target=_blank rel=noopener>FL Studio</a>, using its stock plugins, <a href="https://surge-synthesizer.github.io/" target=_blank rel=noopener>Surge XT</a>, <a href="https://www.looperman.com/free-music-software/detail/krakli-software-arminator-2" target=_blank rel=noopener>Arminator 2</a> and <a href="https://tumfy.net/" target=_blank rel=noopener>tumfy</a>'s free kits.</p>
 <p>The songs you make in the game are a separate thing: see ${L('song-audio','How Spotifly songs sound')}.</p>
 ${H2('Built with')}<p>The game runs in the browser with Three.js. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});
 
@@ -135,7 +135,7 @@ ${ul(['a beat style from the song\'s genre (see '+L('genres')+')','the tempo, wi
 <p>The same seed always gives the same beat, so a song sounds the same every time you play it, on any device. Collabs and band songs get their own seed too.</p>
 ${H2('The sounds')}<p>Most of the sounds are made in code with the browser's audio engine: drums, basses, keys, plucked guitars and synths. On top of that, some sounds are recorded samples:</p>
 ${ul(['Melodic one-shots (keys, basses, bells, brass, plucks, flutes, strings and more). Each song picks one sample per instrument from its seed, so a bass never changes sound halfway through.','The recorded 808s and hi hats you can pick under Extras when you make a song (see '+L('extras')+').'])}
-<p>Some of these sounds come from tumfy's free kits.</p>
+<p>Some of these sounds come from <a href="https://tumfy.net/" target=_blank rel=noopener>tumfy</a>'s free kits.</p>
 ${H2('Song structure')}<p>A song on Spotifly plays an intro, then verses and hooks with a short bridge, and loops after that. A festival or tour set uses a livelier order that gets to the hook sooner, and a recording session plays a short version under the minigames.</p>
 ${H2('Where you hear it')}${ul(['Under the minigames while you record','On your Spotifly artist page, with the play button on each song','During festival sets and tour shows, where each song in the setlist plays its own beat'])}
 <p>The background music you hear while walking around is different: that is the game's soundtrack, made by Rowan Burton (see ${L('credits')}).</p>`});
