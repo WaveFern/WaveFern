@@ -92,7 +92,7 @@ window.mpFind=()=>{const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpj
 window.mpJoinGo=()=>{if(!U.q)return;snd('click');enter({code:U.q.code,inst:U.inst,band:U.q.band,host:0})};
 
 /* ---- network: star around the host ---- */
-const NET={peer:null,hc:null,conns:{},id:'',on:0,tries:0,closed:0,lastSt:'',stT:0,lkT:0,clkT:0};
+const NET={kk:{},peer:null,hc:null,conns:{},id:'',on:0,tries:0,closed:0,lastSt:'',stT:0,lkT:0,clkT:0};
 const MB={};/* every member by peer id, yourself included */
 const ME={id:'',nm:'',inst:MPS?MPS.inst:'',look:null,x:0,z:0,r:0,zone:'menu',where:'',studio:0,stg:0,rd:null};
 let MPGO=0,MPF=0,festBk=null,sleepW=0;
@@ -119,15 +119,22 @@ function regBeat(){if(NET.regT||!isHost())return;const w=()=>{try{if(NET.closed|
  w();NET.regT=setInterval(w,40000)}
 window.mpAdminJoin=c=>{try{mpJoinUI();$('mpcd').value=c;mpFind()}catch(e){console.error(e)}};
 function hostData(c,d){if(!d||!d.t)return;
+ if(NET.kk[c.peer]){try{c.close()}catch(e){}return}
  if(d.t=='q'){const L=Object.values(MB);try{c.send({t:'qi',band:MPS.band,n:L.length,taken:L.map(m=>m.inst)})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
  if(d.t=='hi'){const cl=Object.values(MB).find(m=>m.inst==d.inst&&m.id!==c.peer&&m.id!==ME.id);if(cl&&(!NET.conns[cl.id]||!NET.conns[cl.id].open||cl.nm==d.nm))drop(cl.id);
   const L=Object.values(MB).filter(m=>m.id!==c.peer);
-  const no=L.length>=MAXN?'The room is full.':L.some(m=>m.inst==d.inst)?'Someone in the room already plays '+(INS[d.inst]?INS[d.inst].n:'that')+'.':!INS[d.inst]?'Unknown instrument.':'';
+  const kd=!d.ad&&(NET.kk[c.peer]||(d.uid&&NET.kk['u'+d.uid]));
+  const no=kd?'The host removed you from this room.':L.length>=MAXN?'The room is full.':L.some(m=>m.inst==d.inst)?'Someone in the room already plays '+(INS[d.inst]?INS[d.inst].n:'that')+'.':!INS[d.inst]?'Unknown instrument.':'';
   if(no){try{c.send({t:'no',why:no})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
-  c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{id:c.peer,nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
+  c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{id:c.peer,uid:String(d.uid||'').slice(0,16),nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
   c.send({t:'wel',band:MPS.band,an:S.artist||'',you:c.peer,day:S.day,tm:S.t,mem:Object.values(MB).map(m=>Object.assign(pub(m),{x:m.x,z:m.z,zone:m.zone,where:m.where,studio:m.studio,stg:m.stg,rd:m.rd}))});
   NET.gk='';NET.cs={};roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
  if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
+/* v45.9.0: host removes a member: tell them, close their link, remember their ids for this session */
+function kick(id){if(!isHost()||id===ME.id)return;const m=MB[id],c=NET.conns[id];NET.kk[id]=1;if(m&&m.uid)NET.kk['u'+m.uid]=1;if(c){try{c.send({t:'kick'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},800)}if(m){say('You removed '+m.nm+' from the room.');rmAv(id);delete MB[id]}delete NET.conns[id];roster()}
+window.mpKick=id=>{const m=MB[id];if(!m||!isHost())return;if(!confirm('Remove '+m.nm+' from the band room? They will not be able to rejoin this room until you close it.'))return;snd('click');kick(id)};
+function kicked(){NET.closed=1;NET.on=0;const h=NET.hc;NET.hc=null;try{h&&h.close()}catch(e){}for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}ME.rd=null;try{localStorage.setItem(LK,JSON.stringify(lsGet().filter(x=>x.code!=MPS.code)))}catch(e){}say('The host removed you from the band room.');const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
+ d.innerHTML='<div class="box modal" style="width:min(380px,92vw)"><h2>Removed from the room</h2><p>The host removed you from this band room. You cannot rejoin it right now.</p><div class=row2><button class=go onclick="mpLeave()">Back to menu</button><button onclick="this.closest(\'#mpno\').remove()">Play alone</button></div></div>';document.body.appendChild(d)}
 function drop(id){const c=NET.conns[id];if(!c)return;delete NET.conns[id];const m=MB[id];if(m){say(m.nm+' left the room.');rmAv(id);delete MB[id]}roster()}
 function joinOpen(){const p=NET.peer=new Peer(peerOpts());
  p.on('open',id=>{NET.id=ME.id=id;connectHost()});
@@ -135,8 +142,9 @@ function joinOpen(){const p=NET.peer=new Peer(peerOpts());
  p.on('error',e=>{if(e&&e.type=='peer-unavailable')lost();else if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.on){say('Could not reach the room service. Trying again…');try{p.destroy()}catch(x){}setTimeout(joinOpen,6000)}})}
 function connectHost(){if(NET.closed||!NET.peer)return;const c=NET.hc=NET.peer.connect(pid(MPS.code),{reliable:true,serialization:'json'});
  const ct=setTimeout(()=>{if(!c.open&&!NET.closed)say('Still trying to reach room '+MPS.code+'. Your network may be blocking direct connections, so a relay is being tried…')},12000);
- c.on('open',()=>{clearTimeout(ct);c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook()})});
+ c.on('open',()=>{clearTimeout(ct);c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook(),uid:myUid(),ad:(typeof isAdmin=='function'&&isAdmin())?1:0})});
  c.on('data',d=>{if(!d||!d.t)return;
+  if(d.t=='kick'){kicked();return}
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
   if(d.t=='wel'){NET.on=1;NET.tries=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
    if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+'.');NET.lastSt='';NET.gk='';NET.cs={};return}
@@ -163,6 +171,7 @@ function handle(d,id,self){
  else if(d.t=='scr')scrRecv(d,m)
  else if(d.t=='gr')gearRecv(d,m)
  else if(d.t=='cm')cmRecv(d,m)}
+const myUid=()=>{try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Math.random().toString(36).slice(2,12);localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
 const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
 
@@ -354,7 +363,7 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
  const L=list(),me=L.length?L:[ME],n=me.length,head=`<div class=mph onclick="mpTog()"><span><b>${esc(MPS.band||'Band')}</b> <small class=m>Room ${esc(MPS.code)}</small></span><small class=m>${PMIN?'▸':'▾'}</small></div>`;
  let h=head;if(!PMIN){
   if(!online())h+=`<div class=m style="margin-top:4px">${NET.closed?'Not in the room.':NET.on||NET.tries?'Room offline. Reconnecting…':'Connecting to the room…'} You play ${iName(MPS.inst)}.</div>`;
-  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].e:''} <small class=m>${esc(m.where||'')}</small></span></div>`).join('');
+  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].e:''} <small class=m>${esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');
    if(n>1){const rr=me.filter(m=>m.rd&&m.rd.k=='rec');if(rr.length){h+=`<div class=mps>Recording${rr[0].rd.title?' "'+esc(rr[0].rd.title)+'"':''}: <b>${rr.length}/${n} members ready</b>`;
      const away=me.filter(m=>!m.studio).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not in the studio: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='rec'?'<br><button onclick="mpUnready()">Not ready</button>':ME.studio?'<br><button class=go onclick="mpRecReady()">Ready to record</button>':'<br><small class=m>Go to the studio to join the take.</small>';h+='</div>'}

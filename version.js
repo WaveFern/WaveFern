@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v45.8.0';
+const GAME_VERSION='v45.9.0';
 const VERSION_HISTORY=[
+ {v:'v45.9.0',n:'Band rooms: the host can now remove a member with the ✕ button next to their name on the band panel (with a confirmation). The removed player is told why and sent back to play alone, and cannot rejoin that room until the host closes it. Saves still load.'},
  {v:'v45.8.0',n:'Admin Gphone app: admins get a new Admin app on the Gphone with silly reversible commands: crazy weather (rubber ducks, confetti, money, blizzard, meteors, mega storm), giant or tiny you, a tiny or giant car, moon jump, disco party, big heads, spin cycle, drunk camera, slow-mo and hyper speed. Nothing is saved. Saves still load.'},
  {v:'v45.7.0',n:'Admin panel: a new Active band rooms list shows every band room that is open right now (band name and player count) with a Join button, so the admin can hop into any room without the code. Saves still load.'},
  {v:'v45.6.5',n:'Fixed not being able to rename collab songs: the title box now shows just the song name and the (feat. NAME) tag is kept on automatically. Saves still load.'},
