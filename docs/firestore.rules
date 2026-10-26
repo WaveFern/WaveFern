@@ -3,7 +3,7 @@ rules_version = '2';
 // Saves: each signed-in player can read and write only their own save at saves/{their uid}; the admin can read every save.
 // Gifts: only the admin can create or delete gifts; a player can only read gifts sent to them and mark them claimed.
 // Nothing else is open: any other path (and any delete of a save) is denied by default.
-// Band rooms: gameplay is browser to browser, but a signed-in host writes a small rooms/CODE entry (heartbeat) so the admin can list and join active rooms. Only the admin can read it; a host can only write an entry that carries their own uid.
+// Band rooms: gameplay is browser to browser, but any host (anonymous or Google login) writes a small rooms/CODE entry (heartbeat) so the admin can list and join active rooms. Only the admin can read it; a host can only write an entry that carries their own uid.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {

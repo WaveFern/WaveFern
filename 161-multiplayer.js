@@ -112,11 +112,15 @@ function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
  p.on('error',e=>{if(e&&e.type=='unavailable-id'){try{p.destroy()}catch(x){}if(++NET.tries<6)return setTimeout(hostOpen,2500);
    const o=MPS.code;MPS.code=newCode();NET.tries=0;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(x){}lsAdd(MPS);say('Room code '+o+' is busy, so your room is now '+MPS.code+'.');return setTimeout(hostOpen,500)}
   if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.on){try{p.destroy()}catch(x){}say('Could not reach the room service. Trying again…');setTimeout(hostOpen,6000)}})}
-/* v45.7.0: public room list for the admin. A signed-in host writes rooms/CODE (band name, player count, heartbeat);
+/* v45.7.0: public room list for the admin. The host writes rooms/CODE (using a separate anonymous Firebase login, so Google sign-in is not needed) (band name, player count, heartbeat);
    the admin panel lists fresh entries. Best effort: hosts who are not signed in, or offline, just do not appear. */
-function regBeat(){if(NET.regT||!isHost())return;const w=()=>{try{if(NET.closed||!FBF||!FBD||!FBU||!NET.on)return;
-  FBF.setDoc(FBF.doc(FBD,'rooms',MPS.code),{code:MPS.code,band:String(MPS.band||'Band').slice(0,24),n:Object.keys(MB).length,uid:FBU.uid,t:Date.now()}).catch(()=>{})}catch(e){}};
- w();NET.regT=setInterval(w,40000)}
+function regAuth(){if(NET.ra)return NET.ra;if(typeof FB_ON=='undefined'||!FB_ON)return Promise.reject('off');const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
+ return NET.ra=Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js')]).then(([a,m,f])=>{const app=a.initializeApp(FB_CFG,'rooms');const au=m.getAuth(app);
+  return(au.currentUser?Promise.resolve(au.currentUser):m.signInAnonymously(au).then(r=>r.user)).then(usr=>({uid:usr.uid,F:f,D:f.getFirestore(app)}))}).catch(e=>{NET.ra=null;throw e})}
+function regBeat(){if(NET.regT||!isHost())return;const w=()=>{if(NET.closed||!NET.on)return;
+  regAuth().then(r=>r.F.setDoc(r.F.doc(r.D,'rooms',MPS.code),{code:MPS.code,band:String(MPS.band||'Band').slice(0,24),n:Object.keys(MB).length,uid:r.uid,t:Date.now()})).catch(()=>{})};
+ w();NET.regT=setInterval(w,40000);
+ addEventListener('pagehide',()=>{if(NET.regT)regAuth().then(r=>r.F.deleteDoc(r.F.doc(r.D,'rooms',MPS.code))).catch(()=>{})})}
 window.mpAdminJoin=c=>{try{mpJoinUI();$('mpcd').value=c;mpFind()}catch(e){console.error(e)}};
 function hostData(c,d){if(!d||!d.t)return;
  if(NET.kk[c.peer]){try{c.close()}catch(e){}return}
