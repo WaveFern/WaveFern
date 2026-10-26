@@ -42,28 +42,54 @@ function sideHTML(cur){return `<a href="#/home" class="hm${cur=='home'?' on':''}
 /* each category has its own accent colour (headers, sidebar, cards, infobox) */
 const ACC={start:'#5aa8ff',music:'#2fe68a',career:'#ffcc33',live:'#ff7ac8',life:'#40e0d0',band:'#b48cff',meta:'#8aa094'};
 const acc=c=>ACC[c]||'#2fe68a';
-/* "On this page": a contents box after the lead paragraph on pages with three or more sections */
+/* Wikipedia-style "Contents" box: numbered, can be hidden, after the lead paragraph on pages with three or more sections */
+let TOCH=0;try{TOCH=+localStorage.getItem('wk_toch')||0}catch(e){}
 function withToc(body,pid){const hs=[];body.replace(/<h2 id="([^"]+)">(.*?)<\/h2>/g,(m,i,t)=>hs.push([i,t]));if(hs.length<3)return body;
- const toc=`<nav class=toc><b>On this page</b>${hs.map(([i,t])=>`<a href="#/${pid}/${i}">${t}</a>`).join('')}</nav>`;
+ const toc=`<nav class="toc${TOCH?' shut':''}"><div class=toch><b>Contents</b><button class=tg onclick="tocToggle(this)">${TOCH?'show':'hide'}</button></div><ol>${hs.map(([i,t])=>`<li><a href="#/${pid}/${i}">${t}</a></li>`).join('')}</ol></nav>`;
  const k=body.indexOf('class=lead'),e=k<0?-1:body.indexOf('</p>',k);return e<0?toc+body:body.slice(0,e+4)+toc+body.slice(e+4)}
+window.tocToggle=b=>{const n=b.closest('.toc');TOCH=n.classList.toggle('shut')?1:0;b.textContent=TOCH?'show':'hide';try{localStorage.setItem('wk_toch',TOCH)}catch(e){}};
+/* a superscript reference after the lead paragraph, pointing at the References list */
+function withRef(body,p){if(!p.src)return body;const k=body.indexOf('class=lead'),e=k<0?-1:body.indexOf('</p>',k);if(e<0)return body;
+ return body.slice(0,e)+`<sup class=ref><a href="#/${p.id}/references">[1]</a></sup>`+body.slice(e)}
+/* "See also": every other page this one links to */
+function seeAlso(body,p){const ids=[];body.replace(/href="#\/([a-z0-9-]+)/g,(m,i)=>{if(i!==p.id&&i!=='home'&&!/^cat-/.test(i)&&byId(i)&&!ids.includes(i))ids.push(i)});
+ return ids.length?H2('See also','see-also')+`<ul class=also>${ids.slice(0,10).map(i=>{const q=byId(i);return `<li><a href="#/${i}">${q.e||''} ${q.t}</a> <span class=m>— ${q.sum||''}</span></li>`}).join('')}</ul>`:''}
+function refs(p){return p.src?H2('References','references')+`<ol class=refs>${p.src.map(f=>`<li><b>^</b> ${src(f)}. <i>WaveFern Records</i> source code, game ${esc(D.version||'')}.</li>`).join('')}</ol>`:''}
 /* previous and next page in the same category */
 function pager(p){const l=PAGES.filter(x=>x.cat===p.cat&&!x.hide),i=l.indexOf(p);if(i<0||l.length<2)return'';const pv=l[i-1],nx=l[i+1];
  return `<nav class=pager>${pv?`<a href="#/${pv.id}"><small>◀ Previous</small>${pv.e||''} ${pv.t}</a>`:'<span></span>'}${nx?`<a class=nx href="#/${nx.id}"><small>Next ▶</small>${nx.e||''} ${nx.t}</a>`:'<span></span>'}</nav>`}
+/* the Source and History tabs */
+function srcTab(p){return `<p class=lead>Everything on <b>${p.t}</b> was worked out from these files of the game's code. Open one on GitHub to read it.</p>`+
+ (p.src?`<div class=files>${p.src.map(f=>`<a class=file href="https://github.com/WaveFern/WaveFern/blob/main/${f}" target=_blank rel=noopener><span>📄</span><b>${f}</b><small>View on GitHub ↗</small></a>`).join('')}</div>`:N('This page is not built from one part of the code.'))+
+ `<p class=m>The tables on this page come from <code>wiki/data.js</code>, which <code>tools/wiki-data.js</code> copies out of the running game every time the site is published.</p>`}
+function histTab(p){if(typeof VERSION_HISTORY=='undefined')return N('The version list could not be loaded.','warn');
+ const stop=new Set(['and','the','your','with','what','how','from','into','that','this','song','songs','game']);
+ const ws=[...new Set((p.t+' '+(p.kw||'')).toLowerCase().replace(/[^a-z0-9& ]+/g,' ').split(/\s+/).filter(w=>w.length>2&&!stop.has(w)))];
+ const re=new RegExp('\\b('+ws.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(e?s)?\\b','i');
+ const vs=ws.length?VERSION_HISTORY.filter(v=>re.test(v.n)):[];
+ return `<p class=lead>Updates that touched <b>${p.t}</b>, newest first: ${vs.length} of ${VERSION_HISTORY.length} versions mention it.</p>`+
+  (vs.length?`<ol class=hist>${vs.slice(0,60).map(v=>`<li><span class="tag${/\.0$/.test(v.v)?' g':''}">${v.v}</span> ${esc(v.n).replace(re,m=>'<mark>'+m+'</mark>')}</li>`).join('')}</ol>`:N('No updates mention this page by name.'))+
+  `<p>${L('versions','See every version')}</p>`}
 function render(){const h=decodeURIComponent(location.hash.replace(/^#\/?/,'')),[id,sec]=h.split('/'),q=/^search=/.test(h)?h.slice(7):null;
  TID=0;let html,cur=null;
  if(q!=null)html=searchPage(q);
  else{const p=byId(id||'home');cur=p;
-  if(!p)html=`<article class=panel><header class=ah><span class=ae>❓</span><div><div class=crumb>${L('home','Wiki')}</div><h1>Page not found</h1></div></header><p>There is no page called <code>${esc(id)}</code> yet. Try the search box, or go back to the ${L('home','Main Page')}.</p></article>`;
+  if(!p)html=`<article class=panel><header class=ah><span class=ae>❓</span><div><div class=crumb>${L('home','Wiki')}</div><h1>Page not found</h1></div></header><p>There is no page called <code>${esc(id)}</code> yet. Try the search box, ${L('home','go back to the Main Page')}, or <a href="#" onclick="return rndPage()">open a random page</a>.</p></article>`;
   else{const c=CATS.find(c=>c.id===p.cat);let body='';try{body=p.body()}catch(e){console.error(e);body=N('This page could not be built: '+esc(e.message),'warn')}
-   const isCat=/^cat-/.test(p.id);
+   const isCat=/^cat-/.test(p.id),tab=sec=='~src'?'src':sec=='~hist'?'hist':'read';
+   const tabs=isCat?'':`<nav class=tabs><a href="#/${p.id}" class="${tab=='read'?'on':''}">📖 Read</a><a href="#/${p.id}/~src" class="${tab=='src'?'on':''}">🧩 Source</a><a href="#/${p.id}/~hist" class="${tab=='hist'?'on':''}">🕓 History</a></nav>`;
+   const main=isCat?body:tab=='src'?srcTab(p):tab=='hist'?histTab(p):withToc(withRef(body,p),p.id)+seeAlso(body,p)+refs(p);
    html=p.id=='home'?`<article class="panel home">${body}</article>`:
-    `<article class=panel style="--a:${acc(p.cat)}"><header class=ah><span class=ae>${isCat?c.e:p.e||'📄'}</span><div><div class=crumb>${L('home','Wiki')} › ${c&&!isCat?`<a href="#/cat-${c.id}">${c.t}</a> › `:''}<span>${isCat?'Category':p.t}</span></div><h1>${p.t}</h1>${p.sum?`<p class=sum>${p.sum}</p>`:''}</div></header>
-    ${isCat?body:withToc(body,p.id)}
-    ${isCat?'':pager(p)+`<div class=cats><b>Category</b>${c?`<a href="#/cat-${c.id}">${c.e} ${c.t}</a>`:''}${p.src?`<b>From the code</b>${p.src.map(src).join(' ')}`:''}</div>`}</article>`}
+    `<article class=panel style="--a:${acc(p.cat)}">${tabs}<header class=ah><span class=ae>${isCat?c.e:p.e||'📄'}</span><div><div class=crumb>${L('home','Wiki')} › ${c&&!isCat?`<a href="#/cat-${c.id}">${c.t}</a> › `:''}<span>${isCat?'Category':p.t}</span></div><h1>${p.t}</h1>${p.sum?`<p class=sum>${p.sum}</p>`:''}</div></header>
+    <div class=from>From the WaveFern Wiki, the encyclopedia of the music career sim</div>
+    ${main}
+    ${isCat?'':pager(p)+`<div class=cats><b>Category</b>${c?`<a href="#/cat-${c.id}">${c.e} ${c.t}</a>`:''}<b>Built from</b>game ${esc(D.version||'')}</div>`}</article>`}
   document.title=(p&&p.id!='home'?p.t+' – ':'')+'WaveFern Wiki'}
  $('main').innerHTML=html;$('side').innerHTML='<div class=panel>'+sideHTML(id||'home')+'</div>';$('side').classList.remove('on');
  const a=$('side').querySelector('a.on'),sd=$('side');sd.scrollTop=a?Math.max(0,a.offsetTop-sd.clientHeight/2):0;
- if(sec){const t=$(sec);if(t){t.scrollIntoView();return}}window.scrollTo(0,0)}
+ document.dispatchEvent(new CustomEvent('wiki:render',{detail:{page:cur&&!cur.hide?cur:null,id:id||'home'}}));
+ if(sec&&sec[0]!='~'){const t=$(sec);if(t){t.scrollIntoView();return}}window.scrollTo(0,0)}
+window.rndPage=()=>{const l=PAGES.filter(p=>!p.hide&&!location.hash.endsWith('/'+p.id));location.hash='#/'+l[Math.random()*l.length|0].id;return false};
 
 /* category index pages */
 function catPages(){CATS.forEach(c=>page('cat-'+c.id,c.t,c.id,{hide:1,sum:c.d,body:()=>`<div class=grid>${PAGES.filter(p=>p.cat===c.id&&!p.hide).map(p=>`<a class=card href="#/${p.id}" style="--a:${acc(c.id)}"><span class=e>${p.e||''}</span><h3>${p.t}</h3><p>${p.sum||''}</p></a>`).join('')}</div>`}))}

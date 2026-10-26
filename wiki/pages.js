@@ -9,14 +9,42 @@ cat('band','Multiplayer','🎸','Band rooms: playing with up to three friends.')
 cat('meta','About the game','📜','Settings, graphics, saves and the full version history.');
 
 /* ===================== Main Page ===================== */
-page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide).length,V=typeof VERSION_HISTORY!='undefined'?VERSION_HISTORY[0]:null;
+/* "Did you know…" facts for the Main Page; numbers come from the game's data */
+const DYK=()=>{const f=D.perf||{},cars=D.cars||[],fast=cars.slice().sort((a,b)=>b.mph-a.mph)[0],lab=(D.labels||[]).slice(-1)[0],s=(D.fame||{}).starts||[];
+ return [`…that a song's ${L('genres/genre-focus','genre focus')} can swing its streams from −25% to +40%, depending on your last five releases?`,
+ `…that ${L('streams')} build up twice as fast at night as during the day?`,
+ `…that a ${L('streams/viral','viral')} song gets at least ${fmt(f.viralMin||5e6)} extra streams?`,
+ ...Object.entries(D.dmLock||{}).map(([n,v])=>`…that ${n} won't ${L('collabs','DM you')} until you have ${big(v)} monthly listeners?`),
+ `…that if you're still awake at 06:00 you ${L('days','pass out')} and wake with only 70 energy?`,
+ fast?`…that the ${fast.n} is the fastest ${L('cars','car')}, at ${fast.mph} mph?`:'',
+ s[349]?`…that ${L('fame','Fame Level 350')} needs ${fmt(s[349])} monthly listeners?`:'',
+ `…that a fan asking for an autograph might be a thief who grabs ${L('fans','35% of your cash')}?`,
+ `…that greeting a ${L('tour-shows','stadium crowd')} in their own language gets them more hyped?`,
+ `…that typing a lone "100" while ${L('collabs/haggle','haggling')} means "keep it 100", not an offer?`,
+ lab?`…that ${esc(lab.n)} keeps only ${pct(lab.cut)} of your streams, but wants ${fmt(lab.ml)} monthly listeners before it calls?`:'',
+ `…that ${L('pets','every pet')} you own adds +1 quality to every song you make?`,
+ `…that ${L('band-rooms','band songs')} get +3 quality for each extra band member?`,
+ `…that there are ${((D.drums||{}).s808||[]).length} different ${L('extras','808s')} to choose from?`,
+ `…that the ${L('festival','Park Fields Festival')} is held on every 7th day?`,
+ `…that your ${L('gphone','phone')} model can add up to +22% streams to every song?`].filter(Boolean)};
+let DYKS=0;
+window.dykMore=()=>{DYKS++;const el=document.getElementById('dyk');if(el){el.classList.remove('swap');void el.offsetWidth;el.innerHTML=dykList();el.classList.add('swap')}};
+function dykList(){const a=DYK(),n=a.length,o=[];for(let i=0;i<4;i++)o.push(a[(DYKS*4+i+new Date().getDate())%n]);return o.map(x=>'<li>'+x+'</li>').join('')}
+page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide).length,ps=PAGES.filter(p=>!p.hide&&p.cat!='meta'),day=Math.floor(Date.now()/864e5),fa=ps[day%ps.length];
+ let lead='';try{const m=/class=lead>([\s\S]*?)<\/p>/.exec(fa.body());lead=m?m[1]:''}catch(e){}TID=0;
+ const news=typeof VERSION_HISTORY!='undefined'?VERSION_HISTORY.slice(0,4):[];
  return `<div class=hero><div class=eq aria-hidden=true><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h1>WAVEFERN<br>WIKI</h1><div class="px sub">Music Career Sim</div>
- <p class=lead>Every mechanic of WaveFern Records, worked out from the game's own code. The tables come straight from the game's data, so the numbers are always the real ones.</p>
+ <p class=lead>Welcome to the WaveFern Wiki, the encyclopedia of WaveFern Records. Every mechanic, worked out from the game's own code, with numbers straight from its data.</p>
  <div class=stats><div><b>${n}</b>pages</div><div><b>${(D.genres||[]).length}</b>genres</div><div><b>${(D.artists||[]).length}</b>artists</div><div><b>${(D.dest||[]).length}</b>tour cities</div><div><b>${(D.fame&&D.fame.starts.length-1)||350}</b>fame levels</div></div>
- <p class=cta><a class="btn go" href="../">▶ Play the game</a><a class=btn href="#/first-day">New here? Start here</a></p></div>
- <div class=grid>${CATS.filter(c=>c.id!='meta').map(c=>{const ps=PAGES.filter(p=>p.cat===c.id&&!p.hide);return `<a class="card cat" href="#/cat-${c.id}" style="--a:${acc(c.id)}"><span class=e>${c.e}</span><h3>${c.t}</h3><p>${c.d}</p><small>${ps.length} page${ps.length==1?'':'s'} ▶</small></a>`}).join('')}</div>
- <div class=duo><section class=box2><h2>Popular pages</h2><div class=chips>${['streams','song-quality','genres','extras','collabs','fame','labels','festival','world-tour','band-rooms'].map(i=>{const p=byId(i);return p?`<a class=chip href="#/${i}" style="--a:${acc(p.cat)}">${p.e||''} ${p.t}</a>`:''}).join('')}</div></section>
- ${V?`<section class=box2><h2>Latest update</h2><p><span class="tag g">${V.v}</span></p><p>${esc(V.n)}</p><p>${L('versions','Full version history ▶')}</p></section>`:''}</div>`}});
+ <p class=cta><a class="btn go" href="../">▶ Play the game</a><a class=btn href="#/first-day">New here? Start here</a><button class=btn onclick="rndPage()">🎲 Random page</button></p></div>
+ <div class=mp>
+  <section class="box2 fa" style="--a:${acc(fa.cat)}"><h2>⭐ Today's featured article</h2><div class=fah><span class=ae>${fa.e||'📄'}</span><div><a class=fat href="#/${fa.id}">${fa.t}</a><small>${(CATS.find(c=>c.id==fa.cat)||{}).t||''}</small></div></div><p>${lead}</p><p><a href="#/${fa.id}">Read more ▶</a></p><div class=fam><small>More in ${(CATS.find(c=>c.id==fa.cat)||{}).t||''}</small><div class=chips>${PAGES.filter(x=>x.cat==fa.cat&&!x.hide&&x!==fa).slice(0,4).map(x=>`<a class=chip href="#/${x.id}" style="--a:${acc(x.cat)}">${x.e||''} ${x.t}</a>`).join('')}</div></div></section>
+  <section class="box2" style="--a:#ffcc33"><h2>📰 In the news</h2><ul class=news>${news.map(v=>`<li><span class="tag${/\.0$/.test(v.v)?' g':''}">${v.v}</span> ${esc(v.n.length>150?v.n.slice(0,147)+'…':v.n)}</li>`).join('')}</ul><p>${L('versions','All updates ▶')}</p></section>
+  <section class="box2 dyk" style="--a:#ff7ac8"><h2>💡 Did you know…</h2><ul id=dyk>${dykList()}</ul><button class="btn dyk-more" onclick="dykMore()">🎲 More facts</button></section>
+  <section class="box2" style="--a:#40e0d0"><h2>🔥 Popular pages</h2><div class=chips>${['streams','song-quality','genres','extras','collabs','fame','labels','festival','world-tour','band-rooms'].map(i=>{const p=byId(i);return p?`<a class=chip href="#/${i}" style="--a:${acc(p.cat)}">${p.e||''} ${p.t}</a>`:''}).join('')}</div></section>
+ </div>
+ <h2 class=hh>Explore by category</h2>
+ <div class=grid>${CATS.filter(c=>c.id!='meta').map(c=>{const ps=PAGES.filter(p=>p.cat===c.id&&!p.hide);return `<a class="card cat" href="#/cat-${c.id}" style="--a:${acc(c.id)}"><span class=e>${c.e}</span><h3>${c.t}</h3><p>${c.d}</p><small>${ps.length} page${ps.length==1?'':'s'} ▶</small></a>`}).join('')}</div>`}});
 
 /* ===================== Getting started ===================== */
 page('first-day','Your first day','start',{e:'🌅',sum:'What to do in your first hour, step by step.',src:['72-tutorial.js','02-data.js'],body:()=>`
