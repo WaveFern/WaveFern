@@ -49,7 +49,7 @@ body.tch #hud .hb.pr{bottom:calc(var(--tsb) + 6px);max-width:calc(100vw - 410px)
 body.tch #glc{display:none!important}
 body.tch #tdlg{bottom:calc(var(--tsb) + 6px);width:min(540px,calc(100vw - 410px));padding:6px 8px;gap:8px;font-size:12px}
 body.tch #tdlg canvas,body.tch #tdlg img{width:44px;height:44px}
-body.tch #tqt{top:8px!important;left:282px!important;right:auto!important;width:min(300px,calc(100vw - 282px - 214px))!important;padding:5px 8px;font-size:11px}
+
 #tchb .tcol{flex-direction:row-reverse;right:0;bottom:calc(var(--tbb) + 8px)}
 #tchb{width:calc(var(--tbb) + 4 * var(--tbs) + 40px)}
 #tchb .tr2{right:calc(var(--tbb) + 8px)}

@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v48.1.1';
+const GAME_VERSION='v48.2.0';
 const VERSION_HISTORY=[
+ {v:'v48.2.0',n:'The tutorial now teaches as you play. A new career only covers the basics (walk, pick a name, record, release), then Big Vee pops up the first time you reach something new: your first DM, the street, a car, a shop, being tired, the festival, a booked flight and the airport, a tour city and more. When a tip is about a place, a glowing guide line runs along the ground from you to it. The progress panel is gone, and tips can be turned on or off from the pause menu.'},
  {v:'v48.1.1',n:'The wiki Contact form is now open.'},
  {v:'v48.1.0',n:'The wiki has a Contact page with a form for sending a message to the people who make the game.'},
  {v:'v48.0.0',n:'The wiki has a new Frequently asked questions page with quick answers to the questions players ask most.'},
