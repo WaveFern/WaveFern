@@ -165,18 +165,47 @@ const CONTACT_KEY='06696629-392c-46ce-8e33-57c060b74007';
 page('contact','Contact','meta',{sum:'Send a message to the people who make the game.',kw:'contact email message feedback bug report help',body:()=>CONTACT_KEY?`
 <p class=lead>Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Records.</p>
 <form id=cform class=cform>
-<label>Your name<input name=name maxlength=80 required></label>
+<label>Your name<input name=name maxlength=40 required></label>
 <label>Your email <span class=m>(only if you want a reply)</span><input name=email type=email maxlength=120></label>
-<label>Message<textarea name=message rows=7 maxlength=4000 required></textarea></label>
+<label>Message<textarea name=message rows=7 maxlength=1500 required></textarea></label>
 <input type=checkbox name=botcheck class=hp tabindex=-1 autocomplete=off>
 <button type=submit>Send</button> <span id=cstat class=m></span>
 </form>`:`<p class=lead>The contact form is not open yet. Check back soon.</p>`});
+/* Contact filter: runs in the browser before anything is sent. It stops swearing, slurs, threats, links, shouting,
+   gibberish and repeat sends. The word lists are base64 so the page source does not read as a list of slurs. Anyone
+   determined can get round a filter in the browser; it is there to stop casual abuse, not every bad message. */
+const CF_PRE=atob('ZnVja3xzaGl0fGN1bnR8Yml0Y2h8YmFzdGFyZHx3YW5rfHR3YXR8ZGlja2hlYWR8Ym9sbG9ja3xuaWdnfGZhZ2d8cmV0YXJkfHNsdXR8d2hvcmV8cHVzc3l8dHJhbm55fHNwYXN0aWN8a2lrZXxjaGlua3x3ZXRiYWNrfGR5a2V8cG9ybnxudWRlfG1vdGhlcmZ8YmVsbGVuZHxwcmljaw==').split('|'),CF_EX=atob('YXNzfGFzc2VzfGFyc2V8YXJzZWhvbGV8YXNzaG9sZXxkaWNrfGRpY2tzfHBpc3N8ZmFnfGZhZ3N8dGl0c3x0aXR0eXxib29ic3xjdW18Y29ja3xjb2Nrc3xreXN8bmF6aXxuYXppc3xoaXRsZXJ8cmFwZXxyYXBlZHxyYXBpc3R8cmFwZXN8Y29vbnxjb29uc3xzcGF6fHBha2l8cGFraXN8c2V4fHNleHl8aG9ybnl8aG9lfGhvZXN8dGhvdA==').split('|');
+const CF_RE=new RegExp('\\b(('+CF_PRE.join('|')+')[a-z]*|('+CF_EX.join('|')+'))\\b');
+const CF_THREAT=/\b(kill|hurt|stab|shoot|dox+)\s+(you|u|ya|yourself|urself|him|them)\b|\b(find|track)\s+(you|u)\s+(and|down)\b|\bwhere\s+(you|u)\s+live\b|\b(go|hope\s+(you|u))\s+die\b|\bdie\s+in\s+a\b|\byour\s+(address|house|home)\b/;
+const CF_LINK=/(https?:|www\.|\b[a-z0-9-]+\s*\.\s*(com|net|org|io|gg|xyz|ru|co|uk|ly|me|tv|info|biz|link|site|top)\b|@[a-z0-9_]{3,}|discord\.|t\.me)/i;
+const cfNorm=s=>s.toLowerCase().replace(/[0@4]/g,c=>({'0':'o','@':'a','4':'a'})[c]).replace(/[1!|]/g,'i').replace(/3/g,'e').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/(\w)[.*_-](?=\w\b)/g,'$1');
+function cfCheck(name,msg){
+ const all=name+' '+msg,n=cfNorm(all);
+ if(name.trim().length<2)return 'Please put your name.';
+ if(msg.trim().length<15)return 'Please write a little more so we know what you mean.';
+ if(msg.length>1500)return 'Please keep it under 1,500 characters.';
+ if(CF_RE.test(n)||CF_RE.test(n.replace(/(\w)\1+/g,'$1$1'))||CF_RE.test(n.replace(/(\w)\1+/g,'$1')))return 'Please keep it friendly. Your message has language we do not accept.';
+ if(CF_THREAT.test(n))return 'Messages that sound like threats are not sent.';
+ if(CF_LINK.test(all))return 'Please do not put links, handles or web addresses in your message.';
+ const L=msg.replace(/[^a-z]/gi,'');
+ if(L.length>15&&L.replace(/[^A-Z]/g,'').length/L.length>.7)return 'Please do not write in all capitals.';
+ if(/(.)\1{5,}/.test(msg)||/[a-z]{26,}/i.test(msg)||(L.length>=20&&L.replace(/[^aeiouy]/gi,'').length/L.length<.2))return 'That looks like random letters. Please write a real message.';
+ if(msg.trim().split(/\s+/).length<3)return 'Please write a few words.';
+ return ''}
+function cfLimit(msg){let h=[];try{h=JSON.parse(localStorage.getItem('wk_sent')||'[]')}catch(e){}
+ const now=Date.now();h=h.filter(x=>now-x.t<864e5);
+ if(h.length&&now-h[h.length-1].t<12e4)return 'Please wait a couple of minutes before sending another message.';
+ if(h.length>=5)return 'You have sent a lot of messages today. Please try again tomorrow.';
+ if(h.some(x=>x.m==msg.trim()))return 'You have already sent that message.';
+ return ''}
+function cfLog(msg){try{let h=JSON.parse(localStorage.getItem('wk_sent')||'[]');h=h.filter(x=>Date.now()-x.t<864e5);h.push({t:Date.now(),m:msg.trim()});localStorage.setItem('wk_sent',JSON.stringify(h))}catch(e){}}
 document.addEventListener('wiki:render',e=>{if(e.detail.id!='contact')return;const f=document.getElementById('cform');if(!f)return;
  f.onsubmit=async ev=>{ev.preventDefault();const st=document.getElementById('cstat'),b=f.querySelector('button'),d=Object.fromEntries(new FormData(f));
   if(d.botcheck)return;delete d.botcheck;if(!d.email)delete d.email;
+  const bad=cfCheck(d.name||'',d.message||'')||cfLimit(d.message||'');if(bad){st.textContent=bad;return}
   b.disabled=true;st.textContent='Sending...';
   try{const r=await fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({access_key:CONTACT_KEY,subject:'WaveFern wiki message',from_name:'WaveFern Wiki',...d})}),j=await r.json();
-   if(!j.success)throw 0;f.reset();st.textContent='Sent. Thanks for the message.'}
+   if(!j.success)throw 0;cfLog(d.message);f.reset();st.textContent='Sent. Thanks for the message.'}
   catch(x){st.textContent='That did not send. Try again in a minute.'}
   b.disabled=false}});
 
