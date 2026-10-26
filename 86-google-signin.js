@@ -154,7 +154,7 @@ function saveQuit(){snd('click');autoSave();TT.game=1;
  const cf0=confirmChar;confirmChar=function(){TT.game=1;const r=cf0.apply(this,arguments);try{autoSave()}catch(e){}return r}}
 
 /* pause menu: Save & quit, plus who is signed in and the cloud save state */
-{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='Save & quit';q.onclick=saveQuit;m.appendChild(q);
+{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='Save and quit';q.onclick=saveQuit;m.appendChild(q);
  if(!FB_ON||!FBU)return;const n=document.createElement('p');n.className='m';n.innerHTML='<small>Signed in as <b></b><br><span></span></small>';n.querySelector('b').textContent=FBU.displayName||FBU.email||'Google user';
  n.querySelector('span').textContent=CLD.err||(CLD.ok?'Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'Checking cloud save…');m.appendChild(n);};
  const pg=pauseGame;pauseGame=function(){pg();csPush()}}
