@@ -1,65 +1,79 @@
 rules_version = '2';
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
-// Saves: each signed-in player can read and write only their own save at saves/{their uid}; the admin can read every save.
-// Gifts: only the admin can create or delete gifts; a player can only read gifts sent to them and mark them claimed.
-// Nothing else is open: any other path (and any delete of a save) is denied by default.
-// Band rooms: gameplay is browser to browser, but any host (anonymous or Google login) writes a small rooms/CODE entry (heartbeat) so the admin can list and join active rooms. Only the admin can read it; a host can only write an entry that carries their own uid.
+// Strict version (v46.5.1): every path, field, type and size the game uses is listed; anything else is refused.
+// Saves: a Google-signed-in player can read and write only their own save at saves/{their uid}; the admin can read every save.
+// Gifts: only the admin can create or delete gifts; a player can only read gifts sent to them and mark an unclaimed one claimed.
+// Band rooms: gameplay is browser to browser, but the host's browser (anonymous login) writes a small rooms/CODE heartbeat
+//   so the admin can list and join active rooms. Only the admin can read it; a host can only write an entry carrying their own uid.
+// Nothing else is open: any other collection, field or delete is denied.
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isGoogle() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
     function isAdmin() {
-      return request.auth != null && request.auth.uid == 'wE6oPZIHYifrqBFxzpPse6ripGY2';
+      return isGoogle() && request.auth.uid == 'wE6oPZIHYifrqBFxzpPse6ripGY2';
     }
     function isCount(v) {
       return v is int && v >= 0 && v <= 1000000000000;
     }
     function isStamp(v) {
-      // millisecond timestamp, not absurdly far in the future (clock skew allowed)
-      return v is number && v >= 0 && v <= request.time.toMillis() + 604800000;
+      // millisecond timestamp, after 2024 and at most a week ahead (clock skew allowed)
+      return v is int && v >= 1704067200000 && v <= request.time.toMillis() + 604800000;
     }
+
     match /saves/{uid} {
-      // players read only their own save; only the admin may list saves
-      allow get: if request.auth != null && (request.auth.uid == uid || isAdmin());
-      allow list: if isAdmin();
-      allow create, update: if request.auth != null && request.auth.uid == uid
+      allow get: if (isGoogle() && request.auth.uid == uid) || isAdmin();
+      allow list: if isAdmin() && request.query.limit <= 100;
+      allow create, update: if isGoogle() && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['code', 'day', 'artist', 't'])
         && request.resource.data.keys().hasAll(['code', 'day', 'artist', 't'])
         && request.resource.data.code is string && request.resource.data.code.size() > 0 && request.resource.data.code.size() < 1000000
         && request.resource.data.day is number && request.resource.data.day >= 0 && request.resource.data.day <= 1000000
-        && request.resource.data.artist is string && request.resource.data.artist.size() < 200
+        && request.resource.data.artist is string && request.resource.data.artist.size() <= 64
         && isStamp(request.resource.data.t);
       allow delete: if false;
     }
+
     match /gifts/{id} {
-      allow get, list: if isAdmin() || (request.auth != null && resource.data.to == request.auth.uid);
+      allow get: if isAdmin() || (isGoogle() && resource.data.to == request.auth.uid);
+      allow list: if (isAdmin() && request.query.limit <= 30)
+        || (isGoogle() && resource.data.to == request.auth.uid);
       allow create: if isAdmin()
         && request.resource.data.keys().hasOnly(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
-        && request.resource.data.to is string && request.resource.data.to.size() > 0 && request.resource.data.to.size() <= 128
+        && request.resource.data.keys().hasAll(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
+        && request.resource.data.to is string && request.resource.data.to.matches('[A-Za-z0-9]{10,128}')
         && request.resource.data.from is string && request.resource.data.from.size() <= 40
         && request.resource.data.msg is string && request.resource.data.msg.size() <= 200
         && isCount(request.resource.data.money) && isCount(request.resource.data.streams) && isCount(request.resource.data.listeners)
-        && request.resource.data.keys().hasAll(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
         && isStamp(request.resource.data.t) && request.resource.data.claimed == false;
-      allow update: if request.auth != null && resource.data.to == request.auth.uid
+      allow update: if isGoogle() && resource.data.to == request.auth.uid
+        && resource.data.claimed == false
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed'])
         && request.resource.data.claimed == true;
       allow delete: if isAdmin();
     }
+
     match /rooms/{code} {
-      allow get, list: if isAdmin();
-      allow create: if request.auth != null && code.matches('[A-Z0-9]{5}')
-        && request.resource.data.keys().hasOnly(['code', 'band', 'n', 'uid', 't'])
-        && request.resource.data.code == code && request.resource.data.uid == request.auth.uid
-        && request.resource.data.band is string && request.resource.data.band.size() <= 24
-        && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 4
-        && isStamp(request.resource.data.t);
-      allow update: if request.auth != null && resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['code', 'band', 'n', 'uid', 't'])
-        && request.resource.data.code == code && request.resource.data.uid == request.auth.uid
-        && request.resource.data.band is string && request.resource.data.band.size() <= 24
-        && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 4
-        && isStamp(request.resource.data.t);
-      allow delete: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      function validRoom() {
+        return code.matches('[A-Z0-9]{5}')
+          && request.resource.data.keys().hasOnly(['code', 'band', 'n', 'uid', 't'])
+          && request.resource.data.keys().hasAll(['code', 'band', 'n', 'uid', 't'])
+          && request.resource.data.code == code && request.resource.data.uid == request.auth.uid
+          && request.resource.data.band is string && request.resource.data.band.size() >= 1 && request.resource.data.band.size() <= 24
+          && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 4
+          && isStamp(request.resource.data.t);
+      }
+      allow get: if isAdmin();
+      allow list: if isAdmin() && request.query.limit <= 100;
+      allow create: if signedIn() && validRoom();
+      allow update: if signedIn() && resource.data.uid == request.auth.uid && validRoom();
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
     }
+
     // everything else: denied
     match /{document=**} {
       allow read, write: if false;
