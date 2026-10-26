@@ -33,6 +33,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      # Refresh the wiki's tables (wiki/data.js) from the game itself. If this fails, the committed copy is published.
+      - name: Refresh wiki data
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pw" playwright-core@1.47.2
+          NODE_PATH="$RUNNER_TEMP/pw/node_modules" CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)" node tools/wiki-data.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

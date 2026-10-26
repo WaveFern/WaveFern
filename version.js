@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v47.2.0';
+const GAME_VERSION='v47.3.0';
 const VERSION_HISTORY=[
+ {v:'v47.3.0',n:'The WaveFern Wiki: a Wiki button on the main menu opens a full guide to every mechanic (genre focus, stream formulas, collab fees, labels, festivals, the World Tour, band rooms and more), with search, categories and tables copied from the game itself'},
  {v:'v47.2.0',n:'You can place furniture upstairs now: press F on the upstairs floor and the camera frames that floor, and furniture fits against its walls (not in the stairwell). Paint has its own Paint category on Amazoom, so tins are easy to find; one tin paints one room, upstairs or down.'},
  {v:'v47.1.0',n:'Quitting now remembers where you are on the map: load your career and you are back on the same spot (inside buildings and tour cities still start at their usual spot). Also moved one glitched player into the Main Stage crowd.'},
  {v:'v47.0.0',n:'A ninth genre: Latin, with its own beats (reggaeton, Latin trap, bachata, salsa, cumbia and Latin pop). Every artist\'s music now plays in its own genre: Latin, jazz, funk, afro and grime artists no longer fall back to a random genre\'s beat. New genre focus: fans reward a steady sound. Each new song looks at your last five releases: staying in the same genre or family earns up to +40% streams, and hopping around (say rap, then country, then pop, then lo-fi) costs up to 25%. Families are Hip-Hop, Rap, R&B and Latin; Pop and Country; Lo-fi and Electronic; and Rock. The Make a song screen shows each genre\'s focus before you pick. Songs you already released keep their streams. Saves still load.'},

@@ -7,4 +7,5 @@ WaveFern Records is a fictional 3D open-world browser game built with Three.js (
 ## Links
 
 - [Play the game](https://wavefern.github.io/WaveFern/): the live game
+- [Wiki](https://wavefern.github.io/WaveFern/wiki/): a guide to every game mechanic, with tables from the game's own data
 - [Version history](https://wavefern.github.io/WaveFern/versions.html): player-facing changelog
