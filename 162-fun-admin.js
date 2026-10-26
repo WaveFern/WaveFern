@@ -5,7 +5,7 @@
    - Weather: object rain (rubber ducks, confetti, money, meteors), blizzard, mega storm with lightning, and Crazy weather
      that cycles through all of them with a rainbow sky.
    - Size: giant or tiny you. Tiny car / giant car: spawns a temporary car under you (a giant you in a tiny car is allowed).
-   - v45.10.0: in a band room the admin's weather, size, car, disco and big heads are shared with the room (see the end of the file).
+   - v46.0.0: in a band room the admin's weather, size, car, disco and big heads are shared with the room (see the end of the file).
    - Moon jump (Space), disco party lights, big heads, spin cycle, drunk camera, slow-mo and hyper speed. */
 (()=>{
 const LIVE=['play','drive','rec','cut','phone'];
@@ -86,7 +86,7 @@ function clearCars(){try{if(mode=='drive'&&dr&&dr.fxk)exitDrive();PK=PK.filter(c
 function reset(quiet){F.wx=F.size=F.speed='';F.moon=F.disco=F.head=F.spin=F.drunk=0;setKind('');W.jy=W.jv=0;W.fl=0;W.shake=0;clearCars();
  try{if(P.mesh){P.mesh.scale.setScalar(1);bigHead(P.mesh,false)}NPC.forEach(n=>{if(n.m){bigHead(n.m,false);n.m.position.y=0}});lamps.forEach(l=>l.color.set(0xffffff));cam.zoom=1;cam.updateProjectionMatrix()}catch(e){}
  if(!quiet){say('✨ Everything is back to normal.');if(mode=='phone')phR()}}
-/* ---- v45.10.0: sharing with the band room ----
+/* ---- v46.0.0: sharing with the band room ----
    The admin sends its effect state (weather, size, car, disco, big heads) to the room every few seconds; the host relays it.
    Others only accept it from a member the room knows is an admin. It is memory only: it expires 9s after the last message
    (so it clears on leaving, closing the page or turning things off) and nothing is saved. */

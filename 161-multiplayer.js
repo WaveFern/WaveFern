@@ -495,7 +495,7 @@ function cmRecv(d,from){const r=d.m;if(!r||typeof r!='object'||typeof r.a!='numb
  if(grew&&st0!==null&&m.state==1&&st0!=1)say(from.nm+' agreed a collab with '+artN(r.a)+'. It is for the whole band.');
  try{if(mode=='pc')pcR()}catch(e){}}
 
-/* v45.10.0: lets the admin fun effects (162-fun-admin.js) ride on the room: send, who is in the room, their avatars */
+/* v46.0.0: lets the admin fun effects (162-fun-admin.js) ride on the room: send, who is in the room, their avatars */
 window.MPFX={on:()=>online(),send:o=>send(o),mem:()=>MB,av:()=>AV};
 if(MPS)setTimeout(start,0);
 })();
