@@ -124,6 +124,8 @@ ${IB('WaveFern Records','',[['Game','James Hutchinson and Rowan Burton'],['Music
 <p class=lead>WaveFern Records was made by James Hutchinson and Rowan Burton.</p>
 ${H2('Game')}<p>James Hutchinson and Rowan Burton.</p>
 ${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.image-line.com/fl-studio/" target=_blank rel=noopener>FL Studio</a>, using its stock plugins, and <a href="https://surge-synthesizer.github.io/" target=_blank rel=noopener>Surge XT</a>, <a href="https://www.looperman.com/free-music-software/detail/krakli-software-arminator-2" target=_blank rel=noopener>Arminator 2</a> plus <a href="https://tumfy.net/" target=_blank rel=noopener>tumfy</a>'s free kits.</p>
+<p>Play the whole soundtrack here. It keeps playing while you read other pages.</p>
+${ostTable()}
 <p>The songs you make in the game are a separate thing: see ${L('song-audio','How Spotifly songs sound')}.</p>
 ${H2('Built with')}<p>The game runs in the browser with Three.js. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});
 

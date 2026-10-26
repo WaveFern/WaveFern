@@ -156,3 +156,22 @@ footer{text-align:center;color:var(--m);font-size:12.5px;padding:0 16px 30px}
 .cform input,.cform textarea{display:block;width:100%;margin-top:4px;font:inherit;font-size:13px;background:#000;color:var(--t);border:2px solid var(--line);padding:6px 8px;outline:0;resize:vertical}
 .cform input:focus,.cform textarea:focus{border-color:var(--g)}
 .cform .hp{position:absolute;left:-9999px}
+/* soundtrack player bar, fixed to the bottom like a music app's now-playing bar */
+body.hasbar{padding-bottom:84px}
+#pbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:1fr minmax(0,2fr) 1fr;align-items:center;gap:12px;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:#070908;border-top:2px solid var(--line);font-size:13px}
+#pbar .pnow{min-width:0;line-height:1.3}
+#pbar .pnow b{display:block;font-family:'Silkscreen',ui-monospace,monospace;font-weight:400;color:var(--g);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pbar .pbtns{display:flex;justify-content:center;gap:6px}
+#pbar button{padding:3px 8px;font-size:12px;min-width:34px;height:28px;display:inline-flex;align-items:center;justify-content:center}
+#pbar button svg{width:12px;height:12px;fill:currentColor}
+#pbar #pplay{min-width:42px}
+#pbar .go{background:var(--g2);color:#000}
+#pbar .go:hover{background:var(--g)}
+#pbar .pseek{display:flex;align-items:center;gap:8px;margin-top:4px;color:var(--m);font-size:12px}
+#pbar .pseek span{min-width:34px;text-align:center}
+#pbar input[type=range]{flex:1;min-width:0;accent-color:var(--g);height:14px;cursor:pointer}
+#pbar .pvol{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+#pbar .pvol input{flex:0 0 110px;width:110px}
+.ost tr.on td{background:var(--btn);color:var(--g)}
+.ost td:first-child,.ost td:nth-child(3){width:1%;white-space:nowrap}
+@media (max-width:700px){#pbar{grid-template-columns:1fr auto;gap:6px 10px}#pbar .pmid{grid-column:1/-1;grid-row:2}#pbar .pvol label,#pbar .pvol input{display:none}body.hasbar{padding-bottom:110px}}
