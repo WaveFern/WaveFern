@@ -119,9 +119,23 @@ Object.entries(TIPS).forEach(([k,v])=>{const p=byId(k);if(p)p.tips=v});
 page('secrets','Secrets','meta',{sum:'Things the game does not tell you.',kw:'secret code cheat hidden mystery',body:()=>`
 <p class=lead>There is a secret code somewhere in WaveFern Records. What it is, where it goes and what it does is a mystery.</p>
 <p>This wiki will not say any more than that. Good luck.</p>`});
-page('credits','Credits','meta',{sum:'Who made WaveFern Records.',kw:'credits made by james rowan music fl studio',body:()=>`
-${IB('WaveFern Records','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton'],['Made in','FL Studio']])}
+page('credits','Credits','meta',{sum:'Who made WaveFern Records.',kw:'credits made by james rowan music soundtrack fl studio surge arminator tumfy',body:()=>`
+${IB('WaveFern Records','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton']])}
 <p class=lead>WaveFern Records was made by James Hutchinson and Rowan Burton.</p>
 ${H2('Game')}<p>James Hutchinson and Rowan Burton.</p>
-${H2('Music')}<p>All of the game's music was made by Rowan Burton in FL Studio.</p>
+${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.image-line.com/fl-studio/" target=_blank rel=noopener>FL Studio</a>, using its stock plugins, <a href="https://surge-synthesizer.github.io/" target=_blank rel=noopener>Surge XT</a>, <a href="https://www.looperman.com/free-music-software/detail/krakli-software-arminator-2" target=_blank rel=noopener>Arminator 2</a> and tumfy's free kits.</p>
+<p>The songs you make in the game are a separate thing: see ${L('song-audio','How Spotifly songs sound')}.</p>
 ${H2('Built with')}<p>The game runs in the browser with Three.js. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});
+
+page('song-audio','How Spotifly songs sound','music',{sum:'How the game makes a playable track for every song you record.',src:['67-beats.js','132-808-hats.js'],kw:'audio beat engine sound play listen spotifly samples 808 hi hat tumfy music',body:()=>`
+${IB('Beat engine','',[['Made in','The browser, as it plays'],['Styles',Object.values(D.styles||{}).reduce((a,l)=>a+l.length,0)+' across '+(D.genres||[]).length+' genres'],['Scales','Major or minor'],['Recorded 808s',((D.drums||{}).s808||[]).length],['Recorded hi hats',((D.drums||{}).hats||[]).length]])}
+<p class=lead>Every song you make has its own instrumental that you can play from your Spotifly artist page. The tracks are not stored as audio files. The game writes each one in the browser when you press play, from a few numbers saved with the song.</p>
+${H2('One seed per song')}<p>When you record a song it gets a random number called a seed. The seed picks everything about the beat:</p>
+${ul(['a beat style from the song\'s genre (see '+L('genres')+')','the tempo, within that style\'s range','the key, and a major or minor scale','a chord progression','which drum pattern variations play, and small changes to the drum sounds','a hook melody, made up note by note'])}
+<p>The same seed always gives the same beat, so a song sounds the same every time you play it, on any device. Collabs and band songs get their own seed too.</p>
+${H2('The sounds')}<p>Most of the sounds are made in code with the browser's audio engine: drums, basses, keys, plucked guitars and synths. On top of that, some sounds are recorded samples:</p>
+${ul(['Melodic one-shots (keys, basses, bells, brass, plucks, flutes, strings and more). Each song picks one sample per instrument from its seed, so a bass never changes sound halfway through.','The recorded 808s and hi hats you can pick under Extras when you make a song (see '+L('extras')+').'])}
+<p>Some of these sounds come from tumfy's free kits.</p>
+${H2('Song structure')}<p>A song on Spotifly plays an intro, then verses and hooks with a short bridge, and loops after that. A festival or tour set uses a livelier order that gets to the hook sooner, and a recording session plays a short version under the minigames.</p>
+${H2('Where you hear it')}${ul(['Under the minigames while you record','On your Spotifly artist page, with the play button on each song','During festival sets and tour shows, where each song in the setlist plays its own beat'])}
+<p>The background music you hear while walking around is different: that is the game's soundtrack, made by Rowan Burton (see ${L('credits')}).</p>`});

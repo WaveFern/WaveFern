@@ -30,14 +30,15 @@ function serve(){return new Promise(res=>{const s=http.createServer((rq,rs)=>{le
 function collect(){
  const tryv=f=>{try{return f()}catch(e){return null}};
  const gear=Object.keys(GEAR).map(k=>{const g=GEAR[k];return{k,n:g.n,d:g.d,lv:g.lv,c:g.c,q:(typeof GQ!='undefined'&&GQ[k])||0,s:(typeof GSB!='undefined'&&GSB[k])||0,fl:g.fl||null}});
- const art=ART.map((a,i)=>({n:a[0],g:a[1],l:a[2],fee:a[3],pers:a[5],big:a[7]?1:0,real:a[8]?1:0,np:tryv(()=>artNP(i))}));
+ /* real-artist stand-ins are left out of the wiki (only the game's own made-up artists, plus Panic Man Dan) */
+ const art=ART.filter(a=>!a[8]||a[0]=='Panic Man Dan').map(a=>({n:a[0],g:a[1],l:a[2],fee:a[3]})),artN=ART.length;
  const fl=[];for(let n=1;n<=351;n++)fl.push(fameStart(n));
  return{
   genres:GEN.slice(),styles:Beats.styles,drums:{s808:Beats.drums.s808,hats:Beats.drums.hats},
   fam:GEN.map(g=>[g,tryv(()=>GFOCUS.famName(g))]),
-  tune:TUNE,pace:PACE,perf:PERF,gear,gcat:null,mentors:MEN,
+  tune:TUNE,pace:PACE,perf:PERF,gear,gcat:null,mentors:MEN.map(m=>[m[0],'',m[2]]),
   fame:{starts:fl,ft:FT,ftl:FTL()},
-  artists:art,dmStar:DM_STAR,dmLock:DM_LOCK,
+  artists:art,artistCount:artN,dmStar:DM_STAR,dmLock:DM_LOCK,
   cars:CARS,props:PROPS,late:LATE,pets:PETS,jewels:JEW,apps:APPD,
   furniture:Object.keys(F).filter(k=>!/_\d+$/.test(k)).map(k=>({k,n:F[k].n,p:F[k].p,az:(AZ[k]||[])[7]||''})),
   furnitureVariants:Object.keys(F).filter(k=>/_\d+$/.test(k)).length,
@@ -50,7 +51,7 @@ function collect(){
   fests:FFOOD.map(f=>({n:f[1],kind:f[6],menu:f[7]})),fmg:FMG,
   dest:WT_DEST.map(d=>({id:d.id,city:d.city,country:d.country,cont:d.cont,tz:d.tz,lang:d.lang,km:d.km,hrs:d.hrs,fare:d.fare,venue:d.venue,club:d.club})),
   weather:Object.keys(WTHR.kinds).map(k=>WTHR.kinds[k].n),
-  awards:{need:AW.need,cool:AW.cool,pool:AW.pool,cats:AW.cats},
+  awards:{need:AW.need,cool:AW.cool,pool:AW.pool.length,cats:AW.cats},
   pois:POIS.map(p=>String(p[2]).replace(/ ·.*| ✈/,"")),rivals:RVN,tutorial:TUT.map(t=>({c:t.c,n:t.n,o:t.o})),
   version:GAME_VERSION}}
 
@@ -64,7 +65,6 @@ function collect(){
  const d=await p.evaluate(collect);await b.close();srv.close();
  /* scoped constants, read from source */
  const G=lit('52-gear-shop-plus.js','GCAT');d.gcat=G;
- d.neg=lit('33-haggle.js','NEG_P');
  d.radio=lit('16-big-world-fame-chat-instagrime-v2.js','RS').map(r=>({n:r[0],p:r[1],interest:r[2],fol:r[3]}));
  d.prod=lit('151-tour-shows.js','PROD');
  d.streetFood=lit('150-tour-cities.js','DFOOD');

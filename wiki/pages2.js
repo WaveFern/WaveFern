@@ -51,7 +51,7 @@ ${H2('Weekly quests')}${ul(['Get 35% more streams than last week','Earn 35% more
 page('awards','Gramophone Awards','career',{e:'🏆',sum:'Submit a song, beat the stars, win a trophy.',src:['110-awards.js'],kw:'awards gramophone trophy song of the year',body:()=>{const a=D.awards||{};
  return `${IB('Gramophone Awards','🏆',[['Needs','Fame Level '+a.need],['Cooldown',a.cool+' days'],['Category','Song of the Year'],['Prize','Gramophone Trophy']])}
 <p class=lead>The awards hall stands at the end of your street. From Fame Level ${a.need} you can check in (once every ${a.cool} days), submit one song, and watch the ceremony.</p>
-${H2('How to win')}<p>You're up against four of ${(a.pool||[]).length} big stars, and only the single best song wins. The judges look mostly at how good your song is, with a small bonus for how many streams it has.</p>
+${H2('How to win')}<p>You're up against four of ${a.pool||16} big stars, and only the single best song wins. The judges look mostly at how good your song is, with a small bonus for how many streams it has.</p>
 ${H2('Tips')}${ul(['Submit your best song, not your newest one.','Quality matters far more than streams here. A great song with few plays beats an average song with millions.','The stars you face are very good. If you lose, keep improving your gear and come back in 15 days.','Mentors, a home and pets all add quality, so they help here too.'])}
 <p>A win puts a Gramophone Trophy in your Storage: furniture that isn't sold anywhere.</p>`}});
 
