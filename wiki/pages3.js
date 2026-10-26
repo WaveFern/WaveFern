@@ -161,7 +161,7 @@ ${Q('Who made the game?',`James Hutchinson and Rowan Burton. See ${L('credits')}
 
 /* ===================== Contact: a form that sends through Web3Forms, so the address never appears on the site.
    CONTACT_KEY is the Web3Forms access key (safe to be public). While it is empty the page says the form is not open yet. */
-const CONTACT_KEY='';
+const CONTACT_KEY='06696629-392c-46ce-8e33-57c060b74007';
 page('contact','Contact','meta',{sum:'Send a message to the people who make the game.',kw:'contact email message feedback bug report help',body:()=>CONTACT_KEY?`
 <p class=lead>Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Records.</p>
 <form id=cform class=cform>
