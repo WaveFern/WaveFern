@@ -74,7 +74,7 @@ function render(){const h=decodeURIComponent(location.hash.replace(/^#\/?/,'')),
   else{const c=CATS.find(c=>c.id===p.cat);let body='';try{body=p.body()}catch(e){console.error(e);body=N('This page could not be built: '+esc(e.message),'warn')}
    const isCat=/^cat-/.test(p.id),tab=sec=='~src'?'src':sec=='~hist'?'hist':'read';
    const tabs=isCat||p.id=='home'?'':`<nav class=tabs><a href="#/${p.id}" class="${tab=='read'?'on':''}">Article</a><a href="#/${p.id}/~src" class="${tab=='src'?'on':''}">Source</a><a href="#/${p.id}/~hist" class="${tab=='hist'?'on':''}">History</a></nav>`;
-   const main=isCat||p.id=='home'?body:tab=='src'?srcTab(p):tab=='hist'?histTab(p):withToc(withRef(body,p),p.id)+seeAlso(body,p)+refs(p);
+   const main=isCat||p.id=='home'?body:tab=='src'?srcTab(p):tab=='hist'?histTab(p):withToc(withRef(body+(p.tips?H2('Tips','tips')+ul(p.tips):''),p),p.id)+seeAlso(body,p)+refs(p);
    html=`<article class="panel${p.id=='home'?' home':''}">${tabs}<h1>${isCat?'Category: ':''}${p.t}</h1>
     <div class=from>From the WaveFern Wiki</div>
     ${main}

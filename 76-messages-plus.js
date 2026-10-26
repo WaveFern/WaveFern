@@ -30,7 +30,7 @@ const VEE_TOPICS=[
  ['Using Messages',/pin|clear|delete|search|suggest|new chat|unpin|messages/,'Press New to see suggested people, they are not new DMs. Open a chat and use Pin to keep it on top or Clear chat to delete it. A cleared chat only comes back if that artist messages you again. The search box finds chats by name or message text.'],
  ['Gear',/gear|equipment|headphone|upgrade|mixer|speaker|rig/,'Gearshop on the laptop. Better gear means better mixes and more streams. Start cheap, like Headphones.'],
  ['Clothes',/cloth|drip|outfit|wear|wardrobe|threadz|shoe|hat|hair/,'Browser, then Clothes (Threadz) to buy pieces. Put them on at the Wardrobe in your bedroom (E).'],
- ['Sleep & energy',/sleep|energy|tired|bed|night|day|pass(ed)? out|time/,'A day is 12 minutes: 6 light, 6 dark. Recording eats energy. Go to bed (E) and your streams pay out when you wake. Stay up past 02:00 and you pass out.'],
+ ['Sleep & energy',/sleep|energy|tired|bed|night|day|pass(ed)? out|time/,'A day is 12 minutes: 6 light, 6 dark. Recording eats energy. Go to bed (E) and your streams pay out when you wake. Stay up past 06:00 and you pass out.'],
  ['Map & cars',/map|travel|city|drive|car|motors|taxi|zoom|where/,'Press N for the map, scroll or +/- to zoom. The city is way east: walk, drive, or grab a Taxi from the map. Motors sells cars: press E by one to drive, W goes, S brakes.'],
  ['Festivals',/festival|gig|stage|fields|perform|book a/,'FestivalApp on the laptop. Park Fields Festival runs every 7th day. Book 2+ days ahead; the smallest stage wants Fame Level 10. Booked sets are listed in FestivalApp.'],
  ['Fame',/fame|level|listener|follower|famous|popular/,'Fame Level climbs with monthly listeners and unlocks gear, homes and festival stages.'],

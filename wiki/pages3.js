@@ -99,3 +99,29 @@ ${T(['Version','What changed'],VERSION_HISTORY.map(v=>[`<span class=tag${/\.0$/.
 page('about-wiki','About this wiki','meta',{e:'📖',sum:'How the wiki is made and kept up to date.',body:()=>`
 <p class=lead>This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by <code>tools/wiki-data.js</code> each time the site is published, so it can't fall behind.</p>
 <p>Data snapshot: game ${esc(D.version||'?')}. Formulas are written out by hand from the code: each page links the files it comes from.</p>`});
+
+/* ===================== Tips: advice rather than answers, shown near the end of the article ===================== */
+const TIPS={
+ recording:['Do not rush the Beat step. A clean run with no misses adds more than you would think.','The Lyrics step gets harder as you get better at it. Harder lines are worth more, so it evens out.','In the Mix step, small taps keep the level steadier than long holds.'],
+ 'song-quality':['Early on, making lots of songs is how you get better. Experience grows with every song.','Spend on the gear that gives the most quality per level first.','Things that stay with you for good (mentors, a home, pets) add up over a career.'],
+ genres:['Pick a family you like and stick with it for a while. Hopping between sounds costs you.','A HOT genre is a nice bonus for one day. It is not worth breaking a long run in your family for.','If you want to switch sound, do it gradually through a genre in the same family.'],
+ streams:['Release often. Interest fades every day you do not put something out.','A song does most of its streaming in its first few weeks, so a steady flow beats one big drop.','Quality lifts everything else in the formula, so it is the best place to spend effort.'],
+ listeners:['The monthly number can drop at the start of a new month. Keep releasing and it climbs back.','Followers come mostly from streams, so they follow the same advice.'],
+ gear:['Cheap first levels across many items often beat one expensive top level.','Getting heard gear does not make songs better, but it makes good songs earn more.','Some upgrades are locked behind fame. Plan for them before you have the money.'],
+ fame:['Jewellery is a shortcut to looking more famous, but it does nothing for your songs.','Big unlocks (festival stages, the awards, the World Tour) come at set fame levels. Check the milestones table to plan ahead.'],
+ money:['Buy things that make every future song better before things that only look good.','Do not walk around with all your cash once you are famous.'],
+ festival:['Book the biggest stage your fame allows. The crowd and pay grow fast with stage size.','Put your best songs in the setlist. The crowd notices quality.','Arrive at the stage a little early so you do not miss your slot.'],
+ 'world-tour':['Rehearse before big shows. It costs a little energy and makes a real difference.','Learn how to greet each crowd. Talking to them well lifts the whole show.','Production costs a lot at first, so save it for the stadiums.'],
+ 'first-day':['Your first songs will not be great. That is normal: keep making them.','Sleep before 06:00, or you will start the next day tired.']};
+Object.entries(TIPS).forEach(([k,v])=>{const p=byId(k);if(p)p.tips=v});
+
+/* ===================== Secrets and credits ===================== */
+page('secrets','Secrets','meta',{sum:'Things the game does not tell you.',kw:'secret code cheat hidden mystery',body:()=>`
+<p class=lead>There is a secret code somewhere in WaveFern Records. What it is, where it goes and what it does is a mystery.</p>
+<p>This wiki will not say any more than that. Good luck.</p>`});
+page('credits','Credits','meta',{sum:'Who made WaveFern Records.',kw:'credits made by james rowan music fl studio',body:()=>`
+${IB('WaveFern Records','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton'],['Made in','FL Studio']])}
+<p class=lead>WaveFern Records was made by James Hutchinson and Rowan Burton.</p>
+${H2('Game')}<p>James Hutchinson and Rowan Burton.</p>
+${H2('Music')}<p>All of the game's music was made by Rowan Burton in FL Studio.</p>
+${H2('Built with')}<p>The game runs in the browser with Three.js. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});

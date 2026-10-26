@@ -28,16 +28,17 @@ ${T([['Tier','n'],['Listeners','n'],['Fame level','n']],ft.map((v,i)=>[i+1,[fmt(
 ${H2('Every level','all')}${T([['Level','n'],['Listeners from','n']],step.map(l=>[l,[big(s[l-1]),s[l-1]]]).concat([]),{})}
 <details><summary class=btn>Show all ${s.length-1} levels</summary>${T([['Level','n'],['Listeners from','n']],s.slice(0,350).map((v,i)=>[i+1,[big(v),v]]),{filter:1,tall:1})}</details>`}});
 
-page('mentors','Mentors','career',{e:'🧑‍🏫',sum:'Legends who unlock as you grow and add song quality.',src:['02-data.js','06-computer.js'],kw:'mentor legends michael jackson prince dolly dre hendrix',body:()=>`
-<p class=lead>Mentors are fictional takes on music legends. Each one unlocks when you reach their monthly listeners and gives +2 quality to every song (and 8 experience). See them on the laptop under Legends.</p>
-${T([['Listeners','n'],'Mentor','Advice'],(D.mentors||[]).map(m=>[m[0],m[1],'<i>'+esc(m[2])+'</i>']))}`});
+page('mentors','Mentors','career',{e:'🧑‍🏫',sum:'Legends who unlock as you grow and add song quality.',src:['02-data.js','06-computer.js'],kw:'mentor legends',body:()=>`
+<p class=lead>There are ${(D.mentors||[]).length} mentors, each inspired by a music legend. One unlocks each time you reach the next monthly listener milestone, and every mentor adds +2 quality to every song (and 8 experience). Meet them on the laptop under Legends.</p>
+${T(['Mentor',['Monthly listeners','n'],'Their advice'],(D.mentors||[]).map((m,i)=>['Mentor '+(i+1),m[0],'<i>'+esc(m[2])+'</i>']))}`});
 
 page('labels','Record labels','career',{e:'🏷️',sum:'Label offers, advances, cuts and leaving.',src:['101-economy-labels.js','106-label-hq-soon.js'],kw:'label record deal sign advance cut contract',body:()=>`
 ${IB('Labels','🏷️',[['First offer','Day 5'],['Offer chance','20% a day'],['Same label again','After 20 days'],['Leave fee','30% of advance'],['After leaving','No offers for 14 days']])}
 <p class=lead>Labels message you with an offer when your monthly listeners, total streams and reputation all reach their thresholds. Signing pays an advance up front; from then on the label keeps a cut of your streaming income every night.</p>
 ${T(['Label','Quality',['Listeners','n'],['Total streams','n'],['Reputation','n'],['Advance','n'],['Cut','n']],(D.labels||[]).map(l=>[`<b>${esc(l.n)}</b><br><small class=m>${esc(l.pitch)}</small>`,'★'.repeat(Math.max(1,Math.round(l.q*5)))+'☆'.repeat(5-Math.max(1,Math.round(l.q*5))),[fmt(l.ml),l.ml],[fmt(l.st),l.st],[l.rep<-50?'any':l.rep,l.rep],[$$(l.adv),l.adv],[pct(l.cut),l.cut]]))}
 ${H2('Rules')}${ul(['Offers start on day 5, once you have released a song. Each day there is a 20% chance one eligible label writes; the same label waits 20 days before asking again.','Only one offer is open at a time.','Leaving a label costs 30% of the advance you got, and no label writes for 14 days afterwards.'])}
-${N('The Label HQ app is "coming soon". Offers, advances and cuts already work.','','Label HQ')}`});
+${N('Label HQ is coming soon. It is planned as the home for everything about being signed to a label. Offers, advances and cuts already work through Messages.','','Label HQ')}
+${H2('Tips')}${ul(['The first labels to call are the weakest deals. Waiting for a better label can pay off.','A label takes its cut every single night, so a big advance is not always the better deal over time.','Keep your reputation up: the best labels will not look at you without it.'])}`});
 
 page('quests','Quests','career',{e:'📋',sum:'Daily and weekly quest sets and their rewards.',src:['133-quests.js'],kw:'quest daily weekly goal reward',body:()=>{const r=l=>Math.max(5,Math.round(30*Math.pow(1.04,l)/5)*5);
  return `<p class=lead>The Quests app (preinstalled on the laptop) gives you 3 daily quests and 3 weekly quests. Finish the whole set to get paid. Quests are rolled once and saved, so reloading never changes them.</p>
@@ -50,9 +51,8 @@ ${H2('Weekly quests')}${ul(['Get 35% more streams than last week','Earn 35% more
 page('awards','Gramophone Awards','career',{e:'🏆',sum:'Submit a song, beat the stars, win a trophy.',src:['110-awards.js'],kw:'awards gramophone trophy song of the year',body:()=>{const a=D.awards||{};
  return `${IB('Gramophone Awards','🏆',[['Needs','Fame Level '+a.need],['Cooldown',a.cool+' days'],['Category','Song of the Year'],['Prize','Gramophone Trophy']])}
 <p class=lead>The awards hall stands at the end of your street. From Fame Level ${a.need} you can check in (once every ${a.cool} days), submit one song, and watch the ceremony.</p>
-${H2('How to win')}<p>You're up against four of these 16 stars. Only the single highest score wins. Their scores move a little each year.</p>
-${FX('your score = song quality + min(25, 5 × log10(1 + streams ÷ 1000))')}
-${T(['Star',['Score','n'],'Nominated song'],(a.pool||[]).map(p=>[esc(p[0]),p[1],'<i>'+esc(p[2])+'</i>']))}
+${H2('How to win')}<p>You're up against four of ${(a.pool||[]).length} big stars, and only the single best song wins. The judges look mostly at how good your song is, with a small bonus for how many streams it has.</p>
+${H2('Tips')}${ul(['Submit your best song, not your newest one.','Quality matters far more than streams here. A great song with few plays beats an average song with millions.','The stars you face are very good. If you lose, keep improving your gear and come back in 15 days.','Mentors, a home and pets all add quality, so they help here too.'])}
 <p>A win puts a Gramophone Trophy in your Storage: furniture that isn't sold anywhere.</p>`}});
 
 page('reputation','Reputation','career',{e:'🎖️',sum:'What raises and lowers your reputation, and what it does.',src:['75-collab-fees-dms.js','71-festival-booking.js','21-v7-albums-rivals-instagrime-profiles-sit.js'],kw:'rep reputation',body:()=>`
