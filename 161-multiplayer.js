@@ -140,7 +140,7 @@ const pub=m=>({id:m.id,nm:m.nm,inst:m.inst,look:m.look,ad:m.ad?1:0});
 function sendAll(o,ex){for(const id in NET.conns){const c=NET.conns[id];if(id!==ex&&c.open&&c.mp)try{c.send(o)}catch(e){}}}
 function send(o){if(isHost()){o.id=ME.id;handle(o,ME.id,1);sendAll(o)}else if(NET.hc&&NET.hc.open)try{NET.hc.send(o)}catch(e){}}
 function roster(){sendAll({t:'ros',band:MPS.band,mem:Object.values(MB).map(pub)});fbInfo()}
-function start(){if(!MPS)return;if(!tabLock())return dupTab();ME.uid=myUid();if(isHost())fbHost();lib().then(()=>{isHost()?hostOpen():joinOpen()}).catch(()=>{if(!isHost())fbJoin()})}
+function start(){if(!MPS)return;if(!tabLock())return dupTab();ME.uid=myUid();if(isHost())fbHost();else if(/[?&]relay\b/.test(location.search))return fbJoin();lib().then(()=>{isHost()?hostOpen():joinOpen()}).catch(()=>{if(!isHost())fbJoin()})}
 function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
  p.on('open',id=>{const was=NET.on;NET.pOn=1;NET.id=ME.id=id;NET.on=1;NET.tries=0;MB[id]=ME;regBeat();if(!was)say('Room '+MPS.code+' is open. Friends join with this code.')});
  p.on('connection',c=>{c.on('data',d=>hostData(c,d));c.on('close',()=>drop(c.peer));c.on('error',()=>drop(c.peer))});
