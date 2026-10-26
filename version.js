@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v45.6.3';
+const GAME_VERSION='v45.6.4';
 const VERSION_HISTORY=[
+ {v:'v45.6.4',n:'Band rooms now work between different networks (for example your wifi and a friend\'s wifi or mobile data): connections can fall back to a relay server when a direct link is blocked, and a slow connection now tells you it is still trying. Saves still load.'},
  {v:'v45.6.3',n:'The page description now calls WaveFern a music career game for any kind of artist, not just rappers. Saves still load.'},
  {v:'v45.6.2',n:'Improved the page description so search engines and AI assistants can find WaveFern as a browser rapping and music career game with world tours and band rooms. Saves still load.'},
  {v:'v45.6.1',n:'Tightened the cloud (Firebase) rules: saves can never be deleted or listed by players, every save and gift field is checked for type and size, timestamps must be sane, and everything not listed is denied. Saves still load.'},

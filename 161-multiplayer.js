@@ -34,6 +34,12 @@ if(MPS){
  csPush=function(){return Promise.resolve()};csLoad=function(){};
 }
 
+/* ---- ICE servers: STUN plus TURN relays so players on different networks (wifi vs mobile data, strict NATs) can connect.
+   To use your own TURN account, set window.WF_TURN=[{urls:'turn:...',username:'...',credential:'...'}] before this file loads. ---- */
+function peerOpts(){const ice=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}];
+ if(Array.isArray(window.WF_TURN))ice.push(...window.WF_TURN);
+ else ice.push({urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'});
+ return{debug:0,config:{iceServers:ice,iceCandidatePoolSize:4}}}
 /* ---- PeerJS, loaded only when a room is used ---- */
 let libP=null;
 function lib(){if(window.Peer)return Promise.resolve();if(libP)return libP;
@@ -72,7 +78,7 @@ window.mpJoinUI=()=>{snd('click');TT.sel=1;const rec=lsGet().filter(x=>!x.host);
 window.mpFind=()=>{const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers.</p>';return}
  snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'…</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
  const fail=t=>{if(U.qc!==c)return;out.innerHTML='<p class=m>'+t+'</p>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;
- lib().then(()=>{const p=U.qp=new Peer({debug:0});const to=setTimeout(()=>fail('No answer from room '+esc(c)+'. Check the code and that the host is in the game.'),15000);
+ lib().then(()=>{const p=U.qp=new Peer(peerOpts());const to=setTimeout(()=>fail('No answer from room '+esc(c)+'. Check the code and that the host is in the game.'),15000);
   p.on('error',e=>{clearTimeout(to);fail(e&&e.type=='peer-unavailable'?'There is no room '+esc(c)+' right now. Check the code and that the host is in the game.':'Could not reach the room service. Check your connection and try again.')});
   p.on('open',()=>{const cn=p.connect(pid(c),{reliable:true,serialization:'json'});cn.on('open',()=>cn.send({t:'q'}));
    cn.on('data',d=>{if(!d||d.t!='qi')return;clearTimeout(to);try{p.destroy()}catch(e){}U.qp=null;if(U.qc!==c)return;
@@ -99,7 +105,7 @@ function sendAll(o,ex){for(const id in NET.conns){const c=NET.conns[id];if(id!==
 function send(o){if(isHost()){o.id=ME.id;handle(o,ME.id,1);sendAll(o)}else if(NET.hc&&NET.hc.open)try{NET.hc.send(o)}catch(e){}}
 function roster(){sendAll({t:'ros',band:MPS.band,mem:Object.values(MB).map(pub)})}
 function start(){if(!MPS)return;lib().then(()=>{isHost()?hostOpen():joinOpen()}).catch(()=>say('Could not load the room service, so you are playing this band career on your own.'))}
-function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),{debug:0});
+function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
  p.on('open',id=>{NET.id=ME.id=id;NET.on=1;NET.tries=0;MB[id]=ME;say('Room '+MPS.code+' is open. Friends join with this code.')});
  p.on('connection',c=>{c.on('data',d=>hostData(c,d));c.on('close',()=>drop(c.peer));c.on('error',()=>drop(c.peer))});
  p.on('disconnected',()=>{if(!NET.closed)setTimeout(()=>{try{p.reconnect()}catch(e){}},2000)});
@@ -117,12 +123,13 @@ function hostData(c,d){if(!d||!d.t)return;
   NET.gk='';NET.cs={};roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
  if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm'].includes(d.t))return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
 function drop(id){const c=NET.conns[id];if(!c)return;delete NET.conns[id];const m=MB[id];if(m){say(m.nm+' left the room.');rmAv(id);delete MB[id]}roster()}
-function joinOpen(){const p=NET.peer=new Peer({debug:0});
+function joinOpen(){const p=NET.peer=new Peer(peerOpts());
  p.on('open',id=>{NET.id=ME.id=id;connectHost()});
  p.on('disconnected',()=>{if(!NET.closed)setTimeout(()=>{try{p.reconnect()}catch(e){}},2000)});
  p.on('error',e=>{if(e&&e.type=='peer-unavailable')lost();else if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.on){say('Could not reach the room service. Trying again…');try{p.destroy()}catch(x){}setTimeout(joinOpen,6000)}})}
 function connectHost(){if(NET.closed||!NET.peer)return;const c=NET.hc=NET.peer.connect(pid(MPS.code),{reliable:true,serialization:'json'});
- c.on('open',()=>{c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook()})});
+ const ct=setTimeout(()=>{if(!c.open&&!NET.closed)say('Still trying to reach room '+MPS.code+'. Your network may be blocking direct connections, so a relay is being tried…')},12000);
+ c.on('open',()=>{clearTimeout(ct);c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook()})});
  c.on('data',d=>{if(!d||!d.t)return;
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
   if(d.t=='wel'){NET.on=1;NET.tries=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
