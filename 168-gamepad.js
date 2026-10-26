@@ -90,7 +90,7 @@ function prompts(m){hudFix();setLeg(legFor(m))}
    could land a frame late and flash the keyboard text; a MutationObserver rewrites it before the browser paints. */
 function hudFix(){if(!act)return;const hud=document.getElementById('hud');if(hud){
   const pr=hud.querySelector('.hb.pr');if(pr&&pr.dataset.gp!==fam){const t=pr.textContent;if(/^\[E\] Exit car/.test(t))pr.innerHTML=`${P_('A')} Exit car · ${P_('RT')} drive · ${P_('LT')} brake · stick steer`;else if(/^\[E\]/.test(t))pr.innerHTML=P_('A')+' '+esc0(t.slice(4));pr.dataset.gp=fam}
-  const hi=hud.querySelector('.hb.hint');if(hi&&hi.dataset.gp!==fam){hi.innerHTML=`Stick move (${P_('LT')} run) · ${P_('A')} interact · ${P_('X')} storage · ${P_('Y')} phone · ${P_('View')} map · ${P_('Start')} pause`;hi.dataset.gp=fam}
+  const hi=hud.querySelector('.hb.hint');if(hi&&hi.dataset.gp!==fam&&/^WASD|^Stick move/.test(hi.textContent)){/* only the walking hint; the recording hint is relabelled by txtFix */hi.innerHTML=`Stick move (${P_('LT')} run) · ${P_('A')} interact · ${P_('X')} storage · ${P_('Y')} phone · ${P_('View')} map · ${P_('Start')} pause`;hi.dataset.gp=fam}
   hud.querySelectorAll('button').forEach(b=>{if(b.dataset.gp!==fam&&/\[(F|X|□|Y)\]/.test(b.textContent)){b.innerHTML=b.innerHTML.replace(/\[(F|X|□|Y)\]/,'['+N_('X')+']');b.dataset.gp=fam}})}
 }
 function legFor(m){let t='';
@@ -100,7 +100,16 @@ function legFor(m){let t='';
  else if(m=='cut'||m=='dcut')t=`${P_('A')} continue`;
  else t=`D-pad: move · ${P_('A')} select · ${P_('B')} back · right stick: scroll`;
  return t}
-{const h=document.getElementById('hud');if(h&&window.MutationObserver)new MutationObserver(()=>{try{hudFix()}catch(_){}}).observe(h,{childList:true,subtree:true})}
+/* v47.6.2: the song-making games (and band / show games) tell you which keys to press; while a pad is in use that text names
+   the pad's buttons, and each answer button shows the button that picks it */
+const TXR=()=>{const A=N_('A'),X=N_('X'),Y=N_('Y'),B=N_('B'),RB=N_('RB');return[
+ [/SPACE \/ click/g,A],[/Hold SPACE or hold click/g,'Hold '+A],[/Press SPACE \(or tap\)/g,'Press '+A],[/Start \(Space\)/g,'Start ('+A+')'],[/Esc cancels/g,N_('Start')+' cancels'],
+ [/with keys 1-3 or by tapping it/g,'with '+X+' '+Y+' '+B+' (or D-pad ← ↑ →)'],[/Keys 1-3 or tap a word/g,X+' '+Y+' '+B+' or D-pad ← ↑ → to pick'],
+ [/^([1-4])\. /,(_,n)=>'['+[X,Y,B,RB][n-1]+'] ']]};
+function txtFix(root){if(!act||!root)return;const R=TXR(),w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
+ while(n=w.nextNode()){const v=n.nodeValue;if(!v||!/SPACE|Space|Esc cancels|Keys 1-3|keys 1-3|^[1-4]\. /.test(v))continue;let t=v;R.forEach(([a,b])=>{if(a.source.startsWith('^')&&!(n.parentElement&&n.parentElement.closest('button')))return;t=t.replace(a,b)});if(t!==v)n.nodeValue=t}}
+{const h=document.getElementById('hud');if(h&&window.MutationObserver)new MutationObserver(()=>{try{hudFix();txtFix(h)}catch(_){}}).observe(h,{childList:true,subtree:true})}
+if(window.MutationObserver)new MutationObserver(ms=>{if(!act||!MG.has(M()))return;try{const seen=new Set();ms.forEach(r=>{const el=r.target.nodeType==1?r.target:r.target.parentElement;const c=el&&el.closest('#mg,#ui,#fsg,#fst,#fcr');if(c&&!seen.has(c)){seen.add(c);txtFix(c)}})}catch(_){}}).observe(document.body,{childList:true,subtree:true});
 const esc0=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---- the poll ---- */
@@ -146,7 +155,7 @@ function tick(now){requestAnimationFrame(tick);const dt=Math.min(.1,(now-lt)/100
   if(modal&&dn(0)&&foc&&document.contains(foc))press(foc);
   else if(dn(0)){if(m=='drive')kd('e');else{kd(' ');held[' ']=1;if(typeof keys!='undefined')keys[' ']=1}}
   if(!B(0)&&held[' ']){delete held[' '];if(typeof keys!='undefined')delete keys[' '];kd(' ','keyup')}
-  if(MG.has(m)){if(dn(2))kd('1');if(dn(3))kd('2');if(dn(1))kd('3');if(dn(5))kd('4')}
+  if(MG.has(m)){if(dn(2))kd('1');if(dn(3))kd('2');if(dn(1))kd('3');if(dn(5))kd('4');/* D-pad ← ↑ → ↓ also pick 1 2 3 4 */if(!modal){if(dn(14))kd('1');if(dn(12))kd('2');if(dn(15))kd('3');if(dn(13))kd('4')}}
   else if(m=='play'||phCam){if(dn(2))kd('f');if(dn(3))kd('g');if(dn(8))kd('n');if(dn(1)&&phCam)kd('g')}
   if(dn(9))kd('Escape');
  }
