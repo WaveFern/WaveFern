@@ -121,4 +121,6 @@ function body(){return`<div class=phs2><div class=pcd><h3>🌦 CRAZY WEATHER</h3
  <button class=go style="width:100%" onclick="WFUN.reset()">✨ Reset everything</button><p class=sub>Admin only. Nothing here is saved.</p></div>`}
 {const b0=phBody;phBody=function(){if(PH.app!='fun')return b0.apply(this,arguments);if(!ok()){PH.app='home';return b0.apply(this,arguments)}if(PH.loading)return b0.apply(this,arguments);return body()}}
 {const r0=phR;phR=function(){try{const i=GP_APPS.findIndex(a=>a[0]=='fun'),a=ok();if(a&&i<0)GP_APPS.push(['fun','Admin',()=>ic,'#ff4fd8']);if(!a&&i>=0)GP_APPS.splice(i,1)}catch(e){}return r0.apply(this,arguments)}}
+/* v46.2.1: only the admin spawns into a band room with the best Gphone (the band character's own save, never the career saves) */
+setInterval(()=>{try{if(!ok()||!sessionStorage.getItem('fw_mp'))return;const b=Math.max.apply(null,Object.keys(GPH).map(Number));if(!(S.phone>=b)){S.phone=b;say('Admin: Gphone '+b+' unlocked for this band room.')}}catch(e){}},2000);
 })();
