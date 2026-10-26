@@ -110,18 +110,21 @@ window.mpJoinUI=()=>{if(needLogin())return;snd('click');TT.sel=1;const rec=lsGet
   <div id=mpjr></div><button onclick="mpHub()">Back</button></div></div>`;setTimeout(()=>{const i=$('mpcd');i&&i.focus()},50)};
 window.mpFind=()=>{if(needLogin())return;const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers.</p>';return}
  snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'…</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
- const fail=t=>{if(U.qc!==c)return;out.innerHTML='<p class=m>'+t+'</p>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;
+ const fail=t=>{if(U.qc!==c||U.qok===c)return;out.innerHTML='<p class=m>'+t+'</p>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;U.qok='';
+ /* ask the Firebase relay at the same time: it answers even when direct connections are blocked */
+ fbRoomInfo(c).then(d=>{if(d&&U.qc===c)qShow(c,d)}).catch(()=>{});
  lib().then(()=>{const p=U.qp=new Peer(peerOpts());const to=setTimeout(()=>fail('No answer from room '+esc(c)+'. Check the code and that the host is in the game.'),15000);
   p.on('error',e=>{clearTimeout(to);fail(e&&e.type=='peer-unavailable'?'There is no room '+esc(c)+' right now. Check the code and that the host is in the game.':'Could not reach the room service. Check your connection and try again.')});
   p.on('open',()=>{const cn=p.connect(pid(c),{reliable:true,serialization:'json'});cn.on('open',()=>cn.send({t:'q'}));
-   cn.on('data',d=>{if(!d||d.t!='qi')return;clearTimeout(to);try{p.destroy()}catch(e){}U.qp=null;if(U.qc!==c)return;
-    const old=lsGet().find(x=>x.code==c&&!x.host),lock=old&&old.inst;
-    if(d.n>=MAXN&&!lock){out.innerHTML='<p class=m>That room is full ('+MAXN+' players).</p>';return}
-    if(lock&&d.taken.includes(lock)){out.innerHTML='<p class=m>You play '+iName(lock)+' in this band, but someone else is playing it right now.</p>';return}
-    U.inst=lock||IK.find(k=>!d.taken.includes(k))||'vo';U.q={code:c,band:d.band||'Band'};
-    out.innerHTML=`<div class=ttsl style="margin-top:10px"><div><b>${esc(d.band||'Band')}</b><small>Room ${esc(c)} · ${d.n}/${MAXN} players</small></div></div>
-     <p style="margin:10px 0 0">${lock?'Your instrument in this band (it cannot change)':'Pick your instrument. You keep it for this band.'}</p>${insBtns(d.taken,lock)}<div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm()||acctNm())}"></div><button class=go onclick="mpJoinGo()">Join the band</button>`})})
- }).catch(()=>fail('Could not load the room service. Check your connection and try again.'))};
+   cn.on('data',d=>{if(!d||d.t!='qi')return;clearTimeout(to);try{p.destroy()}catch(e){}U.qp=null;if(U.qc!==c)return;qShow(c,cln(d))})})
+ }).catch(()=>setTimeout(()=>fail('Could not reach room '+esc(c)+'. Check the code and your connection, then try again.'),4000))};
+function qShow(c,d){const out=$('mpjr');if(!out||U.qok===c)return;U.qok=c;const taken=Array.isArray(d.taken)?d.taken:[],n=+d.n||0;
+ const old=lsGet().find(x=>x.code==c&&!x.host),lock=old&&old.inst;
+ if(n>=MAXN&&!lock){out.innerHTML='<p class=m>That room is full ('+MAXN+' players).</p>';return}
+ if(lock&&taken.includes(lock)){out.innerHTML='<p class=m>You play '+iName(lock)+' in this band, but someone else is playing it right now.</p>';return}
+ U.inst=lock||IK.find(k=>!taken.includes(k))||'vo';U.q={code:c,band:d.band||'Band'};
+ out.innerHTML=`<div class=ttsl style="margin-top:10px"><div><b>${esc(d.band||'Band')}</b><small>Room ${esc(c)} · ${n}/${MAXN} players</small></div></div>
+  <p style="margin:10px 0 0">${lock?'Your instrument in this band (it cannot change)':'Pick your instrument. You keep it for this band.'}</p>${insBtns(taken,lock)}<div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm()||acctNm())}"></div><button class=go onclick="mpJoinGo()">Join the band</button>`}
 window.mpJoinGo=()=>{if(!U.q)return;snd('click');enter({code:U.q.code,inst:U.inst,band:U.q.band,host:0})};
 
 /* ---- network: star around the host ---- */
@@ -136,15 +139,15 @@ const band=()=>list().length>1;
 const pub=m=>({id:m.id,nm:m.nm,inst:m.inst,look:m.look,ad:m.ad?1:0});
 function sendAll(o,ex){for(const id in NET.conns){const c=NET.conns[id];if(id!==ex&&c.open&&c.mp)try{c.send(o)}catch(e){}}}
 function send(o){if(isHost()){o.id=ME.id;handle(o,ME.id,1);sendAll(o)}else if(NET.hc&&NET.hc.open)try{NET.hc.send(o)}catch(e){}}
-function roster(){sendAll({t:'ros',band:MPS.band,mem:Object.values(MB).map(pub)})}
-function start(){if(!MPS)return;if(!tabLock())return dupTab();ME.uid=myUid();lib().then(()=>{isHost()?hostOpen():joinOpen()}).catch(()=>say('Could not load the room service, so you are playing this band career on your own.'))}
+function roster(){sendAll({t:'ros',band:MPS.band,mem:Object.values(MB).map(pub)});fbInfo()}
+function start(){if(!MPS)return;if(!tabLock())return dupTab();ME.uid=myUid();if(isHost())fbHost();lib().then(()=>{isHost()?hostOpen():joinOpen()}).catch(()=>{if(!isHost())fbJoin()})}
 function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
- p.on('open',id=>{NET.id=ME.id=id;NET.on=1;NET.tries=0;MB[id]=ME;regBeat();say('Room '+MPS.code+' is open. Friends join with this code.')});
+ p.on('open',id=>{const was=NET.on;NET.pOn=1;NET.id=ME.id=id;NET.on=1;NET.tries=0;MB[id]=ME;regBeat();if(!was)say('Room '+MPS.code+' is open. Friends join with this code.')});
  p.on('connection',c=>{c.on('data',d=>hostData(c,d));c.on('close',()=>drop(c.peer));c.on('error',()=>drop(c.peer))});
  p.on('disconnected',()=>{if(!NET.closed)setTimeout(()=>{try{p.reconnect()}catch(e){}},2000)});
  p.on('error',e=>{if(e&&e.type=='unavailable-id'){try{p.destroy()}catch(x){}if(++NET.tries<6)return setTimeout(hostOpen,2500);
-   const o=MPS.code;try{const k=SAVE_PRE+'mp_'+o+'_'+MPS.inst,v=localStorage.getItem(k);localStorage.setItem(LK,JSON.stringify(lsGet().filter(x=>!(x.code==o&&x.inst==MPS.inst))));MPS.code=newCode();if(v){localStorage.setItem(mpKey(),v);localStorage.removeItem(k)}}catch(x){MPS.code=newCode()}NET.tries=0;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(x){}lsAdd(MPS);say('Room code '+o+' is busy, so your room is now '+MPS.code+'.');return setTimeout(hostOpen,500)}
-  if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.on){try{p.destroy()}catch(x){}say('Could not reach the room service. Trying again…');setTimeout(hostOpen,6000)}})}
+   const o=MPS.code;try{const k=SAVE_PRE+'mp_'+o+'_'+MPS.inst,v=localStorage.getItem(k);localStorage.setItem(LK,JSON.stringify(lsGet().filter(x=>!(x.code==o&&x.inst==MPS.inst))));MPS.code=newCode();if(v){localStorage.setItem(mpKey(),v);localStorage.removeItem(k)}}catch(x){MPS.code=newCode()}NET.tries=0;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(x){}lsAdd(MPS);say('Room code '+o+' is busy, so your room is now '+MPS.code+'.');fbHostStop();fbHost();return setTimeout(hostOpen,500)}
+  if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.pOn){try{p.destroy()}catch(x){}if(!NET.on)say('Could not reach the room service. Trying again…');setTimeout(hostOpen,6000)}})}
 /* v45.7.0: public room list for the admin. The host writes rooms/CODE (using a separate anonymous Firebase login, so Google sign-in is not needed) (band name, player count, heartbeat);
    the admin panel lists fresh entries. Best effort: hosts who are not signed in, or offline, just do not appear. */
 function regAuth(){if(NET.ra)return NET.ra;if(typeof FB_ON=='undefined'||!FB_ON)return Promise.reject('off');const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
@@ -154,7 +157,7 @@ function regBeat(){if(NET.regT||!isHost())return;const w=()=>{if(NET.closed||!NE
   regAuth().then(r=>r.F.setDoc(r.F.doc(r.D,'rooms',MPS.code),{code:MPS.code,band:String(MPS.band||'Band').slice(0,24),n:Object.keys(MB).length,uid:r.uid,t:Date.now()})).then(()=>{if(NET.regBad){NET.regBad=0;try{say('Room list: registered.')}catch(e){}}console.log('[rooms] registered',MPS.code)},e=>{const c=(e&&e.code)||String(e);console.warn('[rooms] register failed',c,e);if(!NET.regBad){NET.regBad=1;try{say('Admin room list: could not register this room ('+c+').')}catch(x){}}})};
  w();NET.regT=setInterval(w,20000);addEventListener('visibilitychange',()=>{if(!document.hidden)w()});addEventListener('online',w)}
 window.mpAdminJoin=c=>{try{mpJoinUI();$('mpcd').value=c;mpFind()}catch(e){console.error(e)}};
-function hostData(c,d){if(!d||!d.t)return;
+function hostData(c,d){if(!d||!d.t)return;d=cln(d);
  if(NET.kk[c.peer]){try{c.close()}catch(e){}return}
  if(d.t=='q'){const L=Object.values(MB);try{c.send({t:'qi',band:MPS.band,n:L.length,taken:L.map(m=>m.inst)})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
  if(d.t=='hi'){const gu=String(d.uid||'').slice(0,16);
@@ -180,15 +183,17 @@ function drop(id){const c=NET.conns[id];if(!c)return;delete NET.conns[id];const 
 function joinOpen(){const p=NET.peer=new Peer(peerOpts());
  p.on('open',id=>{NET.id=ME.id=id;connectHost()});
  p.on('disconnected',()=>{if(!NET.closed)setTimeout(()=>{try{p.reconnect()}catch(e){}},2000)});
- p.on('error',e=>{if(e&&e.type=='peer-unavailable')lost();else if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.on){say('Could not reach the room service. Trying again…');try{p.destroy()}catch(x){}setTimeout(joinOpen,6000)}})}
-function connectHost(){if(NET.closed||!NET.peer)return;const c=NET.hc=NET.peer.connect(pid(MPS.code),{reliable:true,serialization:'json'});
- const ct=setTimeout(()=>{if(!c.open&&!NET.closed)say('Still trying to reach room '+MPS.code+'. Your network may be blocking direct connections, so a relay is being tried…')},12000);
- c.on('open',()=>{clearTimeout(ct);c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook(),uid:myUid(),ad:(typeof isAdmin=='function'&&isAdmin())?1:0})});
- c.on('data',d=>{if(!d||!d.t)return;
+ p.on('error',e=>{if(NET.fb)return;if(e&&(e.type=='peer-unavailable'||e.type=='network'||e.type=='server-error'||e.type=='socket-error'||e.type=='browser-incompatible'||e.type=='webrtc'))fbJoin()})}
+function connectHost(){if(NET.closed)return;if(NET.fb)return fbConnect();if(!NET.peer)return;const c=NET.hc=NET.peer.connect(pid(MPS.code),{reliable:true,serialization:'json'});
+ /* no direct link after 9 s: the network is probably blocking it, so use the Firebase relay */
+ setTimeout(()=>{if(!c.open&&!NET.closed&&NET.hc===c)fbJoin()},9000);bindHost(c)}
+function bindHost(c){
+ c.on('open',()=>{c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook(),uid:myUid(),ad:(typeof isAdmin=='function'&&isAdmin())?1:0})});
+ c.on('data',d=>{if(!d||!d.t)return;d=cln(d);
   if(d.t=='kick'){kicked();return}
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
   if(d.t=='wel'){NET.on=1;NET.tries=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
-   if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+'.');NET.lastSt='';NET.gk='';NET.cs={};return}
+   if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+(NET.fb?' through the Firebase relay.':'.'));NET.lastSt='';NET.gk='';NET.cs={};return}
   handle(d,d.id)});
  c.on('close',()=>{if(NET.hc===c){NET.hc=null;lost()}})}
 function lost(){if(NET.closed||NET.rt)return;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}ME.rd=null;
@@ -196,6 +201,100 @@ function lost(){if(NET.closed||NET.rt)return;for(const k in MB)if(k!==ME.id){rmA
  if(++NET.tries<=12)NET.rt=setTimeout(()=>{NET.rt=0;connectHost()},5000);else say('Room '+MPS.code+' is closed. You are playing this band career on your own.')}
 function noJoin(why){say('Could not join: '+why);const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Could not join</h2><p>${esc(why)}</p><div class=row2><button class=go onclick="mpLeave()">Leave room</button><button onclick="this.closest('#mpno').remove()">Play alone</button></div></div>`;document.body.appendChild(d)}
+/* ---- v46.6.0: Firebase relay. When a direct (WebRTC) link cannot be made, for example on a school network, a guest
+   talks to the host through Firebase Realtime Database instead. The host always listens there too and passes messages
+   between direct and relay players, so everyone shares one room. Layout under r/CODE (rules in docs/database.rules.json):
+     h: {u,t} the host's claim · i: {b,n,k} room info for Join a room
+     u/UID: what a relay guest sends: o 1 while connected, p "x,z,r", m meta JSON, l look JSON, e/* other messages (JSON, removed once read)
+     d/UID: what the host sends that guest: p/ID, m/ID, l/ID per member, c clock "day,time", e/* other messages
+   To keep downloads small: positions only go to players in the same area, nothing is re-sent unless it changed,
+   and a player's position, area info and look each overwrite one spot instead of piling up. ---- */
+const RTDB_URL='https://waveferngame-default-rtdb.europe-west1.firebasedatabase.app';
+const MK=['zone','where','studio','stg','nm','ctry','col'];
+const FB={vc:{},un:[],gun:[],r:null};
+let FBRP=null;
+function rtdb(){if(FBRP)return FBRP;if(typeof FB_ON=='undefined'||!FB_ON)return Promise.reject(new Error('off'));
+ const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
+ const waitA=()=>new Promise((res,rej)=>{let n=0;const t=setInterval(()=>{if(FBA){clearInterval(t);res()}else if(++n>300){clearInterval(t);rej(new Error('auth'))}},100)});
+ return FBRP=waitA().then(()=>FBA.authStateReady()).then(()=>import(u+'database.js')).then(R=>{const usr=FBA.currentUser;if(!usr||usr.isAnonymous)throw new Error('Google sign-in needed');
+  return FB.r={R,db:R.getDatabase(FBA.app,RTDB_URL),uid:usr.uid}}).catch(e=>{FBRP=null;throw e})}
+/* everything from other players is cleaned before the game uses it: no HTML characters, bounded sizes */
+function cln(v,dp){dp=dp||0;if(typeof v=='string')return v.slice(0,4000).replace(/[<>"]/g,c=>c=='<'?'‹':c=='>'?'›':'”');
+ if(typeof v=='number')return isFinite(v)?v:0;if(typeof v=='boolean'||v==null)return v;if(dp>8)return null;
+ if(Array.isArray(v))return v.slice(0,2000).map(x=>cln(x,dp+1));
+ if(typeof v=='object'){const o={};let n=0;for(const k in v){if(++n>300)break;if(k=='__proto__'||k=='constructor'||k=='prototype')continue;o[k]=cln(v[k],dp+1)}return o}return null}
+const pos3=(x,z,r)=>[x,z,r].map(v=>Math.round((+v||0)*100)/100).join(',');
+const unpos=p=>{const a=String(p||'').split(',').map(Number);return a.length==3&&a.every(isFinite)?{x:a[0],z:a[1],r:a[2]}:null};
+const jp=s=>{try{return JSON.parse(s)}catch(e){return null}};
+function fbRoomInfo(c){return rtdb().then(({R,db})=>R.get(R.ref(db,'r/'+c+'/i'))).then(s=>{const v=s.val();if(!v)return null;
+ return{band:String(v.b||'Band'),n:+v.n||0,taken:String(v.k||'').split(',').filter(k=>INS[k])}})}
+
+/* host side */
+function fbHost(){if(!isHost())return;rtdb().then(r=>{const{R,db,uid}=r,code=MPS.code,base=R.ref(db,'r/'+code);
+ return R.set(base,{h:{u:uid,t:R.serverTimestamp()}}).then(()=>{if(MPS.code!==code)return R.remove(base);R.onDisconnect(base).remove();FB.code=code;
+  if(!NET.on){NET.id=ME.id=pid(code);NET.on=1;NET.tries=0;MB[ME.id]=ME;regBeat();say('Room '+code+' is open. Friends join with this code.')}
+  fbInfo();FB.un.push(R.onValue(R.ref(db,'r/'+code+'/u'),s=>{try{fbHostIn(s.val()||{})}catch(e){console.error('[relay] host',e)}}))})})
+ .catch(e=>console.warn('[relay] host relay off:',e&&e.message||e))}
+function fbHostStop(){const r=FB.r,c=FB.code;FB.un.forEach(f=>{try{f()}catch(e){}});FB.un=[];FB.vc={};FB.code='';if(r&&c){try{r.R.onDisconnect(r.R.ref(r.db,'r/'+c)).cancel();r.R.remove(r.R.ref(r.db,'r/'+c))}catch(e){}}}
+function fbInfo(){const r=FB.r;if(!r||!FB.code||!isHost())return;const L=Object.values(MB);
+ r.R.set(r.R.ref(r.db,'r/'+FB.code+'/i'),{b:String(MPS.band||'Band').slice(0,24),n:Math.min(L.length,MAXN),k:L.map(m=>m.inst).filter(k=>INS[k]).join(',')}).catch(()=>{})}
+function fbHostIn(all){const{R,db}=FB.r,code=FB.code;
+ for(const uid in FB.vc)if(!all[uid]){const vc=FB.vc[uid];delete FB.vc[uid];vc.open=false;if(NET.conns[vc.peer]===vc)drop(vc.peer);R.remove(R.ref(db,'r/'+code+'/d/'+uid)).catch(()=>{})}
+ for(const uid in all){const g=all[uid]||{};let vc=FB.vc[uid];if(!vc){vc=FB.vc[uid]=hostVC(uid);R.remove(R.ref(db,'r/'+code+'/d/'+uid)).catch(()=>{})}
+  const was=vc.mp;
+  Object.keys(g.e||{}).sort().forEach(k=>{if(vc.seen[k])return;vc.seen[k]=1;R.remove(R.ref(db,'r/'+code+'/u/'+uid+'/e/'+k)).catch(()=>{});
+   const d=jp(g.e[k]);if(!d||!vc.open)return;if(d.t=='hi')d.uid=uid.slice(0,16);hostData(vc,d)});
+  if(!vc.open||!vc.mp)continue;if(!was){vc.im=vc.ip=vc.il=undefined}
+  if(g.m!==vc.im){vc.im=g.m;const o=jp(g.m);if(o){const m=MB[vc.peer],z0=m&&m.zone,d={t:'st'};MK.forEach(k=>{if(o[k]!==undefined)d[k]=o[k]});hostData(vc,d);if(m&&m.zone!==z0)vc.flush()}}
+  if(g.p!==vc.ip){vc.ip=g.p;const p=unpos(g.p);if(p)hostData(vc,Object.assign({t:'st'},p))}
+  if(g.l!==vc.il){vc.il=g.l;const l=jp(g.l);if(l)hostData(vc,{t:'st',look:l})}}}
+function hostVC(uid){const{R,db}=FB.r,code=FB.code,dp='r/'+code+'/d/'+uid,ref=k=>R.ref(db,dp+'/'+k),peer='fb-'+uid;
+ const same=mid=>{const a=MB[mid],b=MB[peer];return!a||!b||a.zone===b.zone};
+ const vc={peer,open:true,mp:0,seen:{},lp:{},sp:{},sm:{},sl:{},mm:{},on(){},
+  close(){vc.open=false;setTimeout(()=>R.remove(R.ref(db,dp)).catch(()=>{}),5000)},
+  flush(){for(const mid in vc.lp)if(mid!==peer&&same(mid)&&vc.lp[mid]!==vc.sp[mid]){vc.sp[mid]=vc.lp[mid];R.set(ref('p/'+mid),vc.lp[mid]).catch(()=>{})}},
+  send(o){if(!vc.open||!o)return;
+   if(o.t=='st'){const mid=o.id;if(!mid||mid===peer)return;
+    const mm={};let has=0;MK.forEach(k=>{if(o[k]!==undefined){mm[k]=o[k];has=1}});
+    if(has){const s=JSON.stringify(vc.mm[mid]=Object.assign(vc.mm[mid]||{},mm));if(s!==vc.sm[mid]){vc.sm[mid]=s;R.set(ref('m/'+mid),s).catch(()=>{})}}
+    if(o.x!==undefined){const p=vc.lp[mid]=pos3(o.x,o.z,o.r);if(same(mid)&&p!==vc.sp[mid]){vc.sp[mid]=p;R.set(ref('p/'+mid),p).catch(()=>{})}}
+    if(o.look){const s=JSON.stringify(o.look);if(s.length<=4000&&s!==vc.sl[mid]){vc.sl[mid]=s;R.set(ref('l/'+mid),s).catch(()=>{})}}return}
+   if(o.t=='clk'){R.set(ref('c'),o.day+','+(+o.tm||0).toFixed(2)).catch(()=>{});return}
+   if(o.t=='wel'){vc.mm={};vc.sm={};vc.sl={};vc.sp={}}
+   R.push(R.ref(db,dp+'/e'),JSON.stringify(o)).catch(()=>{})}};
+ return vc}
+
+/* guest side */
+function fbJoin(){if(NET.fb||NET.closed||isHost())return;NET.fb=1;const p=NET.peer;NET.peer=null;try{p&&p.destroy()}catch(e){}
+ const h=NET.hc;if(h){NET.hc=null;try{h.close()}catch(e){}}say('Direct connection blocked, so the band is joining through the Firebase relay…');connectHost()}
+function fbConnect(){if(NET.closed)return;FB.gun.forEach(f=>{try{f()}catch(e){}});FB.gun=[];
+ rtdb().then(r=>{const{R,db,uid}=r,base='r/'+MPS.code;return R.get(R.ref(db,base+'/h')).then(h=>{if(!h.exists())throw new Error('no room');
+  const up=R.ref(db,base+'/u/'+uid);NET.id=ME.id='fb-'+uid;
+  return R.set(up,{o:1}).then(()=>{R.onDisconnect(up).remove();const vc=guestVC(r,base,uid);NET.hc=vc;bindHost(vc);
+   FB.gun=[R.onValue(R.ref(db,base+'/d/'+uid),s=>{try{vc.in(s.val()||{})}catch(e){console.error('[relay] guest',e)}}),R.onValue(R.ref(db,base+'/h'),s=>{if(!s.exists())vc.gone()})];vc.emit('open')})})})
+ .catch(e=>{console.warn('[relay] join failed:',e&&e.message||e);NET.hc=null;lost()})}
+function guestVC(r,base,uid){const{R,db}=r,up=k=>R.ref(db,base+'/u/'+uid+'/'+k),H={open:[],data:[],close:[]};
+ const vc={peer:pid(MPS.code),open:true,seen:{},mm:{},im:{},ip:{},il:{},
+  on(ev,f){(H[ev]||[]).push(f)},emit(ev,a){(H[ev]||[]).slice().forEach(f=>{try{f(a)}catch(e){console.error('[relay]',e)}})},
+  send(o){if(!vc.open||!o)return;
+   if(o.t=='st'){const mm={};let has=0;MK.forEach(k=>{if(o[k]!==undefined){mm[k]=o[k];has=1}});
+    if(has){const s=JSON.stringify(Object.assign(vc.mm,mm));if(s!==vc.sm){vc.sm=s;R.set(up('m'),s).catch(()=>{})}}
+    if(o.x!==undefined){const p=pos3(o.x,o.z,o.r),share=Object.values(MB).some(m=>m.id!==ME.id&&m.zone===ME.zone);
+     if(!share)vc.sp=null;else if(p!==vc.sp){vc.sp=p;R.set(up('p'),p).catch(()=>{})}}
+    if(o.look){const s=JSON.stringify(o.look);if(s.length<=4000&&s!==vc.sl){vc.sl=s;R.set(up('l'),s).catch(()=>{})}}return}
+   R.push(up('e'),JSON.stringify(o)).catch(()=>{})},
+  in(v){Object.keys(v.e||{}).sort().forEach(k=>{if(vc.seen[k])return;vc.seen[k]=1;R.remove(R.ref(db,base+'/d/'+uid+'/e/'+k)).catch(()=>{});
+    const d=jp(v.e[k]);if(!d||!vc.open)return;if(d.t=='wel'){vc.im={};vc.ip={};vc.il={}}vc.emit('data',d)});
+   if(!vc.open)return;
+   if(v.c&&v.c!==vc.ic){vc.ic=v.c;const a=String(v.c).split(',').map(Number);if(a.length==2&&a.every(isFinite))vc.emit('data',{t:'clk',day:a[0],tm:a[1]})}
+   const m=v.m||{},p=v.p||{},l=v.l||{};
+   for(const id in m)if(m[id]!==vc.im[id]){vc.im[id]=m[id];const o=jp(m[id]);if(o){const d={t:'st',id};MK.forEach(k=>{if(o[k]!==undefined)d[k]=o[k]});vc.emit('data',d)}}
+   for(const id in p)if(p[id]!==vc.ip[id]){vc.ip[id]=p[id];const q=unpos(p[id]);if(q)vc.emit('data',Object.assign({t:'st',id},q))}
+   for(const id in l)if(l[id]!==vc.il[id]){vc.il[id]=l[id];const o=jp(l[id]);if(o)vc.emit('data',{t:'st',id,look:o})}},
+  stop(){vc.open=false;FB.gun.forEach(f=>{try{f()}catch(e){}});FB.gun=[]},
+  gone(){if(!vc.open)return;vc.stop();vc.emit('close')},
+  close(){if(!vc.open)return;vc.stop();try{R.onDisconnect(R.ref(db,base+'/u/'+uid)).cancel();R.remove(R.ref(db,base+'/u/'+uid)).catch(()=>{})}catch(e){}}};
+ return vc}
 /* messages from members (relayed by the host) */
 function handle(d,id,self){
  if(d.t=='ros'){if(isHost())return;const ids=new Set(d.mem.map(m=>m.id));for(const k in MB)if(k!==ME.id&&!ids.has(k)){rmAv(k);delete MB[k]}
@@ -401,7 +500,7 @@ body.fston #mpb,body.mgon #mpb,body.dsshow #mpb{display:none}
 let PK='',PMIN=0;window.mpTog=()=>{PMIN=!PMIN;PK=''};
 function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode);
  if(!on){if(el)el.style.display='none';return}if(!el){el=document.createElement('div');el.id='mpb';el.className='hb';document.body.appendChild(el)}el.style.display='';
- const L=list(),me=L.length?L:[ME],n=me.length,head=`<div class=mph onclick="mpTog()"><span><b>${esc(MPS.band||'Band')}</b> <small class=m>Room ${esc(MPS.code)}</small></span><small class=m>${PMIN?'▸':'▾'}</small></div>`;
+ const L=list(),me=L.length?L:[ME],n=me.length,head=`<div class=mph onclick="mpTog()"><span><b>${esc(MPS.band||'Band')}</b> <small class=m>Room ${esc(MPS.code)}${NET.fb?' · relay':''}</small></span><small class=m>${PMIN?'▸':'▾'}</small></div>`;
  let h=head;if(!PMIN){
   if(!online())h+=`<div class=m style="margin-top:4px">${NET.closed?'Not in the room.':NET.on||NET.tries?'Room offline. Reconnecting…':'Connecting to the room…'} You play ${iName(MPS.inst)}.</div>`;
   else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].e:''} <small class=m>${esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');

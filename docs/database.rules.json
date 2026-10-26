@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "r": {
+      "$code": {
+        ".write": "auth != null && auth.token.firebase.sign_in_provider == 'google.com' && $code.matches(/^[A-Z0-9]{5}$/) && (!data.exists() || data.child('h/u').val() == auth.uid) && (!newData.exists() || newData.child('h/u').val() == auth.uid)",
+        "h": {
+          ".read": "auth != null",
+          ".validate": "newData.hasChildren(['u', 't'])",
+          "u": { ".validate": "newData.val() == auth.uid" },
+          "t": { ".validate": "newData.val() == now" },
+          "$other": { ".validate": false }
+        },
+        "i": {
+          ".read": "auth != null",
+          ".validate": "newData.hasChildren(['b', 'n', 'k'])",
+          "b": { ".validate": "newData.isString() && newData.val().length <= 24" },
+          "n": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4" },
+          "k": { ".validate": "newData.isString() && newData.val().length <= 20" },
+          "$other": { ".validate": false }
+        },
+        "u": {
+          ".read": "auth != null && data.parent().child('h/u').val() == auth.uid",
+          "$uid": {
+            ".write": "auth != null && auth.uid == $uid && auth.token.firebase.sign_in_provider == 'google.com' && data.parent().parent().child('h').exists()",
+            "o": { ".validate": "newData.val() == 1" },
+            "p": { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "m": { ".validate": "newData.isString() && newData.val().length <= 400" },
+            "l": { ".validate": "newData.isString() && newData.val().length <= 4000" },
+            "e": { "$k": { ".validate": "newData.isString() && newData.val().length <= 100000" } },
+            "$other": { ".validate": false }
+          }
+        },
+        "d": {
+          "$uid": {
+            ".read": "auth != null && auth.uid == $uid",
+            "c": { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "e": { "$k": {
+              ".write": "auth != null && auth.uid == $uid && !newData.exists()",
+              ".validate": "newData.isString() && newData.val().length <= 200000" } },
+            "p": { "$m": { ".validate": "newData.isString() && newData.val().length <= 40" } },
+            "m": { "$m": { ".validate": "newData.isString() && newData.val().length <= 400" } },
+            "l": { "$m": { ".validate": "newData.isString() && newData.val().length <= 4000" } },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

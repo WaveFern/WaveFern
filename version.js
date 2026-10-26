@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v46.5.0';
+const GAME_VERSION='v46.6.0';
 const VERSION_HISTORY=[
+ {v:'v46.6.0',n:'Band rooms now work on networks that block direct connections, such as many school networks. If a direct link to the host cannot be made, the game switches on its own to a relay through Firebase (Google), and the band panel shows "relay". Relay players and direct players share the same room. The relay only sends what changed and only sends positions of bandmates in the same area, so it stays inside the free Firebase limits. Everything that arrives from other players is now cleaned before the game uses it. Join a room can also find rooms through the relay. Saves still load.'},
  {v:'v46.5.0',n:'A more polished loading screen and main menu. The loading screen has a glowing logo, a bouncing equaliser, a progress bar with a percentage, a game tip, and messages like "Tuning the guitars…" and "Counting in the drummer…" that change every couple of seconds. The main menu has a darker vignette behind it, a glowing title, chunky buttons that lift when you point at them and press in when clicked, framed panels for the career and multiplayer screens, and the game version at the bottom. Saves still load.'},
  {v:'v46.4.0',n:'Main menu: Multiplayer now opens its own screen, like Play does, with Your rooms, Create a room and Join a room. Your rooms lists your band careers (up to 2) so you can host or rejoin one, or delete one to make space for a new band. The minimap now always sits just under the top-left box and the band room panel moves below it, so the room code and band list never cover the map. Saves still load.'},
  {v:'v46.3.0',n:'Main menu: Create a room and Join a room are now grouped under one Multiplayer button. Tap Multiplayer to show them, tap again to hide them. Saves still load.'},
