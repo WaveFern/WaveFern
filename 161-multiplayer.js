@@ -14,6 +14,19 @@
 const SK='fw_mp',LK=SAVE_PRE+'mpl',MAXN=4;
 let MPS=null;try{MPS=JSON.parse(sessionStorage.getItem(SK)||'null')}catch(e){}
 if(MPS&&!(MPS.code&&MPS.inst))MPS=null;
+/* v46.1.0: band rooms need a Google sign-in (FW_ACCT is only set by the Google account, never by the anonymous room-list login) */
+if(MPS&&!FW_ACCT){MPS=null;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}}
+const TABK='fw_mp_tab',TABID=(()=>{try{let t=sessionStorage.getItem('fw_mp_tabid');if(!t){t=Math.random().toString(36).slice(2,10);sessionStorage.setItem('fw_mp_tabid',t)}return t}catch(e){return Math.random().toString(36).slice(2,10)}})();
+const acctNm=()=>{try{return localStorage.getItem('fw_acctnm')||''}catch(e){return''}};
+function needLogin(){if(FW_ACCT)return false;snd('err');const o=document.getElementById('mpli');if(o)o.remove();const d=document.createElement('div');d.id='mpli';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
+ d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Sign in to play with the band</h2><p>Band rooms need a Google account, so your band character is kept safe on your account and each account can only be in a room once.</p>${FB_ON?'<div class=row2><button class=go onclick="document.getElementById(\'mpli\').remove();fbSignInAsk()">Sign in with Google</button><button onclick="document.getElementById(\'mpli\').remove()">Cancel</button></div>':'<p class=m>Sign-in is not available right now.</p><button onclick="document.getElementById(\'mpli\').remove()">OK</button>'}</div>`;document.body.appendChild(d);return true}
+function dupTab(){NET.closed=1;const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000e';
+ d.innerHTML='<div class="box modal" style="width:min(380px,92vw)"><h2>Already open</h2><p>This band room is already open in another tab on this browser. Only one tab per account can be in a room.</p><button class=go onclick="mpDupLeave()">Back to menu</button></div>';document.body.appendChild(d)}
+window.mpDupLeave=()=>{wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.reload()};
+function tabLock(){const rd=()=>{try{return JSON.parse(localStorage.getItem(TABK)||'null')}catch(e){return null}};
+ const l=rd();if(l&&l.id!==TABID&&Date.now()-l.t<9000)return false;
+ const beat=()=>{if(NET.closed)return;const c=rd();if(c&&c.id!==TABID&&Date.now()-c.t<9000){dupTab();return}try{localStorage.setItem(TABK,JSON.stringify({id:TABID,t:Date.now()}))}catch(e){}};
+ beat();setInterval(beat,3000);addEventListener('pagehide',()=>{const c=rd();if(c&&c.id===TABID)try{localStorage.removeItem(TABK)}catch(e){}});return true}
 const INS={vo:{n:'Vocals',e:'🎤',st:'Lyrics'},gt:{n:'Guitar',e:'🎸',st:'Riff'},bs:{n:'Bass',e:'🔊',st:'Groove'},dr:{n:'Drums',e:'🥁',st:'Drums'},ky:{n:'Keys',e:'🎹',st:'Melody'}};
 const IK=Object.keys(INS),iName=k=>INS[k]?INS[k].e+' '+INS[k].n:'?';
 /* where each instrument stands in the studio (x, z, facing) and its offset on a festival stage */
@@ -56,26 +69,28 @@ function menu(){const m=document.querySelector('#ttl .ttm');if(!m)return;const p
   play.insertAdjacentHTML('afterend','<button onclick="mpLeave()">Leave room</button>');
   m.querySelectorAll('button[onclick="fbSignInAsk()"]').forEach(b=>{const p=b.nextElementSibling;if(p&&p.tagName=='P')p.remove();b.remove()});return}
  play.textContent=play.disabled?play.textContent:'Single player';
- play.insertAdjacentHTML('beforebegin','<button class=go onclick="mpCreateUI()">Create a room</button><button class=go onclick="mpJoinUI()">Join a room</button>')}
+ const last=FW_ACCT?lsGet()[0]:null;
+ play.insertAdjacentHTML('beforebegin',(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:'')+'<button class=go onclick="mpCreateUI()">Create a room</button><button class=go onclick="mpJoinUI()">Join a room</button>'+(FW_ACCT?'':'<p class=m style="margin:2px 0 6px"><small>Band rooms need a Google sign-in.</small></p>'))}
+window.mpContinue=()=>{if(needLogin())return;snd('click');const x=lsGet()[0];if(!x)return;enter(Object.assign({},x))};
 window.mpPlay=()=>ttPlay();
 window.mpLeave=()=>{snd('click');try{autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.reload()};
 function insBtns(taken,lock){return`<div class=mpins>${IK.map(k=>{const off=(taken||[]).includes(k)||(lock&&lock!=k);return`<button class="${U.inst==k?'on':''}" ${off?'disabled':''} onclick="mpPick('${k}')">${INS[k].e}<br><small>${INS[k].n}</small></button>`}).join('')}</div>`}
 window.mpPick=k=>{snd('click');U.inst=k;document.querySelectorAll('.mpins button').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick')==`mpPick('${k}')`))};
-window.mpCreateUI=()=>{snd('click');TT.sel=1;U.inst='vo';const mine=lsGet().filter(x=>x.host);
+window.mpCreateUI=()=>{if(needLogin())return;snd('click');TT.sel=1;U.inst='vo';const mine=lsGet().filter(x=>x.host);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Create a room</h2><p class=m>Up to ${MAXN} players live in one house as a band. Everyone picks one instrument and keeps it. Your friends join with the room code.</p>
-  <div class=r><span>Band name</span><input id=mpbn maxlength=24 placeholder="The Ferns"></div><div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm())}"></div><p style="margin:10px 0 0">Your instrument</p>${insBtns()}
+  <div class=r><span>Band name</span><input id=mpbn maxlength=24 placeholder="The Ferns"></div><div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm()||acctNm())}"></div><p style="margin:10px 0 0">Your instrument</p>${insBtns()}
   <button class=go onclick="mpCreateGo()">Create room</button>
   ${mine.length?`<details class=ttrb open><summary>Your bands (host again)</summary>${mine.map(x=>`<div class=ttsl><div><b>${esc(x.band||'Band')}</b><small>Room ${esc(x.code)} · ${iName(x.inst)}</small></div><button onclick="mpHostAgain('${esc(x.code)}','${x.inst}')">Host</button></div>`).join('')}</details>`:''}
   <p class=m><small>Rooms connect browser to browser. Very strict networks (some schools and offices) can block them.</small></p><button onclick="ttBack()">Back</button></div></div>`};
-function enter(o){const y=$('mpyn');if(y){o.nm=(y.value||'').trim().slice(0,16);try{localStorage.setItem(SAVE_PRE+'mpnm',o.nm)}catch(e){}}lsAdd(o);wiping=true;try{sessionStorage.setItem(SK,JSON.stringify(o));sessionStorage.setItem('fw_go','1')}catch(e){wiping=false;return say('Could not start the room in this browser.')}location.reload()}
+function enter(o){if(needLogin())return;const y=$('mpyn');if(y){o.nm=(y.value||'').trim().slice(0,16);try{localStorage.setItem(SAVE_PRE+'mpnm',o.nm)}catch(e){}}lsAdd(o);wiping=true;try{sessionStorage.setItem(SK,JSON.stringify(o));sessionStorage.setItem('fw_go','1')}catch(e){wiping=false;return say('Could not start the room in this browser.')}location.reload()}
 window.mpCreateGo=()=>{snd('click');const b=($('mpbn').value||'').trim()||'The Ferns';enter({code:newCode(),inst:U.inst,band:b,host:1})};
 window.mpHostAgain=(c,i)=>{snd('click');const x=lsGet().find(q=>q.code==c&&q.inst==i);enter({code:c,inst:i,band:x&&x.band||'Band',host:1,nm:x&&x.nm||''})};
-window.mpJoinUI=()=>{snd('click');TT.sel=1;const rec=lsGet().filter(x=>!x.host);
+window.mpJoinUI=()=>{if(needLogin())return;snd('click');TT.sel=1;const rec=lsGet().filter(x=>!x.host);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Join a room</h2><p class=m>Type the room code your friend sees on their screen.</p>
   <div class=ng><input id=mpcd maxlength=5 placeholder="CODE" style="text-transform:uppercase;letter-spacing:3px" onkeydown="if(event.key=='Enter')mpFind()"><button class=go onclick="mpFind()">Find room</button></div>
   ${rec.length?`<p class=m style="margin:8px 0 0"><small>Rooms you joined: ${rec.map(x=>`<button onclick="$('mpcd').value='${esc(x.code)}';mpFind()">${esc(x.code)}</button>`).join(' ')}</small></p>`:''}
   <div id=mpjr></div><button onclick="ttBack()">Back</button></div></div>`;setTimeout(()=>{const i=$('mpcd');i&&i.focus()},50)};
-window.mpFind=()=>{const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers.</p>';return}
+window.mpFind=()=>{if(needLogin())return;const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers.</p>';return}
  snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'…</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
  const fail=t=>{if(U.qc!==c)return;out.innerHTML='<p class=m>'+t+'</p>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;
  lib().then(()=>{const p=U.qp=new Peer(peerOpts());const to=setTimeout(()=>fail('No answer from room '+esc(c)+'. Check the code and that the host is in the game.'),15000);
@@ -87,7 +102,7 @@ window.mpFind=()=>{const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpj
     if(lock&&d.taken.includes(lock)){out.innerHTML='<p class=m>You play '+iName(lock)+' in this band, but someone else is playing it right now.</p>';return}
     U.inst=lock||IK.find(k=>!d.taken.includes(k))||'vo';U.q={code:c,band:d.band||'Band'};
     out.innerHTML=`<div class=ttsl style="margin-top:10px"><div><b>${esc(d.band||'Band')}</b><small>Room ${esc(c)} · ${d.n}/${MAXN} players</small></div></div>
-     <p style="margin:10px 0 0">${lock?'Your instrument in this band (it cannot change)':'Pick your instrument. You keep it for this band.'}</p>${insBtns(d.taken,lock)}<div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm())}"></div><button class=go onclick="mpJoinGo()">Join the band</button>`})})
+     <p style="margin:10px 0 0">${lock?'Your instrument in this band (it cannot change)':'Pick your instrument. You keep it for this band.'}</p>${insBtns(d.taken,lock)}<div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm()||acctNm())}"></div><button class=go onclick="mpJoinGo()">Join the band</button>`})})
  }).catch(()=>fail('Could not load the room service. Check your connection and try again.'))};
 window.mpJoinGo=()=>{if(!U.q)return;snd('click');enter({code:U.q.code,inst:U.inst,band:U.q.band,host:0})};
 
@@ -104,7 +119,7 @@ const pub=m=>({id:m.id,nm:m.nm,inst:m.inst,look:m.look,ad:m.ad?1:0});
 function sendAll(o,ex){for(const id in NET.conns){const c=NET.conns[id];if(id!==ex&&c.open&&c.mp)try{c.send(o)}catch(e){}}}
 function send(o){if(isHost()){o.id=ME.id;handle(o,ME.id,1);sendAll(o)}else if(NET.hc&&NET.hc.open)try{NET.hc.send(o)}catch(e){}}
 function roster(){sendAll({t:'ros',band:MPS.band,mem:Object.values(MB).map(pub)})}
-function start(){if(!MPS)return;lib().then(()=>{isHost()?hostOpen():joinOpen()}).catch(()=>say('Could not load the room service, so you are playing this band career on your own.'))}
+function start(){if(!MPS)return;if(!tabLock())return dupTab();ME.uid=myUid();lib().then(()=>{isHost()?hostOpen():joinOpen()}).catch(()=>say('Could not load the room service, so you are playing this band career on your own.'))}
 function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
  p.on('open',id=>{NET.id=ME.id=id;NET.on=1;NET.tries=0;MB[id]=ME;regBeat();say('Room '+MPS.code+' is open. Friends join with this code.')});
  p.on('connection',c=>{c.on('data',d=>hostData(c,d));c.on('close',()=>drop(c.peer));c.on('error',()=>drop(c.peer))});
@@ -125,7 +140,12 @@ window.mpAdminJoin=c=>{try{mpJoinUI();$('mpcd').value=c;mpFind()}catch(e){consol
 function hostData(c,d){if(!d||!d.t)return;
  if(NET.kk[c.peer]){try{c.close()}catch(e){}return}
  if(d.t=='q'){const L=Object.values(MB);try{c.send({t:'qi',band:MPS.band,n:L.length,taken:L.map(m=>m.inst)})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
- if(d.t=='hi'){const cl=Object.values(MB).find(m=>m.inst==d.inst&&m.id!==c.peer&&m.id!==ME.id);if(cl&&(!NET.conns[cl.id]||!NET.conns[cl.id].open||cl.nm==d.nm))drop(cl.id);
+ if(d.t=='hi'){const gu=String(d.uid||'').slice(0,16);
+  if(!gu){try{c.send({t:'no',why:'Sign in with Google to join a band room.'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
+  const du=Object.values(MB).find(m=>m.uid==gu&&m.id!==c.peer&&m.id!==ME.id);
+  if(gu==myUid()||(du&&NET.conns[du.id]&&NET.conns[du.id].open)){try{c.send({t:'no',why:'This Google account is already in the room (maybe in another tab or on another device).'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
+  if(du)drop(du.id);
+  const cl=Object.values(MB).find(m=>m.inst==d.inst&&m.id!==c.peer&&m.id!==ME.id);if(cl&&(!NET.conns[cl.id]||!NET.conns[cl.id].open||cl.nm==d.nm))drop(cl.id);
   const L=Object.values(MB).filter(m=>m.id!==c.peer);
   const kd=!d.ad&&(NET.kk[c.peer]||(d.uid&&NET.kk['u'+d.uid]));
   const no=kd?'The host removed you from this room.':L.length>=MAXN?'The room is full.':L.some(m=>m.inst==d.inst)?'Someone in the room already plays '+(INS[d.inst]?INS[d.inst].n:'that')+'.':!INS[d.inst]?'Unknown instrument.':'';
@@ -176,7 +196,7 @@ function handle(d,id,self){
  else if(d.t=='gr')gearRecv(d,m)
  else if(d.t=='cm')cmRecv(d,m)
  else if(d.t=='fx'&&m.ad&&window.WFUN_RECV)window.WFUN_RECV(id,d)}
-const myUid=()=>{try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Math.random().toString(36).slice(2,12);localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
+const myUid=()=>{if(FW_ACCT)return FW_ACCT.slice(0,16);try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Math.random().toString(36).slice(2,12);localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
 const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
 

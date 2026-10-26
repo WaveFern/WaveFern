@@ -27,7 +27,7 @@ function csAcct(usr){const id=usr?usr.uid:'';if(id==FW_ACCT)return false;autoSav
    if(!FW_ACCT&&m.uid==id&&!localStorage.getItem(p+'save_1')&&!localStorage.getItem(p+'save_2')){
     for(let n=1;n<=SLOTS;n++){const c=localStorage.getItem('fw_save_'+n);if(c){localStorage.setItem(p+'save_'+n,c);localStorage.removeItem('fw_save_'+n)}}
     const s=localStorage.getItem('fw_slot');if(s)localStorage.setItem(p+'slot',s);localStorage.setItem(p+'cloud',JSON.stringify(m));localStorage.removeItem('fw_cloud')}
-   localStorage.setItem('fw_acct',id);sessionStorage.setItem('fw_msg','Signed in as '+(usr.displayName||usr.email||'Google user'))}
+   localStorage.setItem('fw_acct',id);localStorage.setItem('fw_acctnm',String(usr.displayName||usr.email||'').split(' ')[0].slice(0,16));sessionStorage.setItem('fw_msg','Signed in as '+(usr.displayName||usr.email||'Google user'))}
   else{localStorage.removeItem('fw_acct');sessionStorage.setItem('fw_msg','Signed out. These are the careers on this device without an account.')}}catch(e){return false}
  wiping=true;try{sessionStorage.removeItem('fw_signing')}catch(e){}location.reload();return true}
 function csGuestCode(){try{const s=+localStorage.getItem('fw_slot')==2?2:1;return localStorage.getItem('fw_save_'+s)||localStorage.getItem('fw_save_'+(3-s))}catch(e){return null}}
