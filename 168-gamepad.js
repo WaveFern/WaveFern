@@ -33,7 +33,10 @@ const legend=()=>{if(!leg){leg=document.createElement('div');leg.id='gpl';docume
 const setLeg=t=>{legend();if(t!==legT){legT=t;leg.innerHTML=t}leg.classList.toggle('on',!!t)};
 const on=()=>{if(!act){act=1;document.body.classList.add('gpad')}};
 const offPad=()=>{if(act){act=0;document.body.classList.remove('gpad');setFoc(null);if(cur)cur.style.display='none'}};
-addEventListener('mousemove',e=>{if(e.isTrusted&&(Math.abs(e.movementX)+Math.abs(e.movementY)>3))offPad()},true);
+/* v47.5.2: switching back to keyboard/mouse prompts needs a real key press or a deliberate mouse move (40 px within a quarter
+   second), so a nudged desk or a jittery mouse does not flip the prompts back and forth while you play on the pad */
+let mAcc=0,mT=0;
+addEventListener('mousemove',e=>{if(!e.isTrusted||!act)return;const n=performance.now();if(n-mT>250)mAcc=0;mT=n;mAcc+=Math.abs(e.movementX)+Math.abs(e.movementY);if(mAcc>40){mAcc=0;offPad()}},true);
 addEventListener('keydown',e=>{if(e.isTrusted)offPad()},true);
 addEventListener('touchstart',()=>offPad(),true);
 addEventListener('gamepadconnected',e=>{try{fam=famOf(e.gamepad&&e.gamepad.id);say('🎮 Controller connected: left stick to move, '+N_('A')+' to interact, '+N_('Start')+' to pause.')}catch(_){}});
@@ -82,17 +85,22 @@ const LAB={ps:{A:'✕',B:'○',X:'□',Y:'△',LB:'L1',RB:'R1',LT:'L2',RT:'R2',V
 const famOf=id=>/xbox|xinput|045e/i.test(id||'')?'xb':/054c|playstation|dualshock|dualsense|ps[345]|wireless controller/i.test(id||'')?'ps':/057e|nintendo|pro controller|joy-?con|switch/i.test(id||'')?'ns':'xb';
 let fam='xb';
 const N_=s=>(LAB[fam]||{})[s]||s,P_=s=>'<b>'+N_(s)+'</b>';
-function prompts(m){const hud=document.getElementById('hud');if(hud){
+function prompts(m){hudFix();setLeg(legFor(m))}
+/* the HUD is redrawn from keyboard text every time it changes (the clock ticks every game minute). Rewriting it from the poll
+   could land a frame late and flash the keyboard text; a MutationObserver rewrites it before the browser paints. */
+function hudFix(){if(!act)return;const hud=document.getElementById('hud');if(hud){
   const pr=hud.querySelector('.hb.pr');if(pr&&pr.dataset.gp!==fam){const t=pr.textContent;if(/^\[E\] Exit car/.test(t))pr.innerHTML=`${P_('A')} Exit car · ${P_('RT')} drive · ${P_('LT')} brake · stick steer`;else if(/^\[E\]/.test(t))pr.innerHTML=P_('A')+' '+esc0(t.slice(4));pr.dataset.gp=fam}
   const hi=hud.querySelector('.hb.hint');if(hi&&hi.dataset.gp!==fam){hi.innerHTML=`Stick move (${P_('LT')} run) · ${P_('A')} interact · ${P_('X')} storage · ${P_('Y')} phone · ${P_('View')} map · ${P_('Start')} pause`;hi.dataset.gp=fam}
   hud.querySelectorAll('button').forEach(b=>{if(b.dataset.gp!==fam&&/\[(F|X|□|Y)\]/.test(b.textContent)){b.innerHTML=b.innerHTML.replace(/\[(F|X|□|Y)\]/,'['+N_('X')+']');b.dataset.gp=fam}})}
- let t='';
+}
+function legFor(m){let t='';
  if(MG.has(m))t=`${P_('A')} hit / go · ${P_('X')} 1 · ${P_('Y')} 2 · ${P_('B')} 3 · ${P_('RB')} 4 · ${P_('Start')} quit`;
  else if(m=='build')t=`Stick: cursor · ${P_('A')} place / pick up · ${P_('LB')}/${P_('RB')} turn · ${P_('X')} store · D-pad: panel · ${P_('B')} done`;
  else if(m=='drive'||m=='play'||m=='load'||m=='sleep')t='';
  else if(m=='cut'||m=='dcut')t=`${P_('A')} continue`;
  else t=`D-pad: move · ${P_('A')} select · ${P_('B')} back · right stick: scroll`;
- setLeg(t)}
+ return t}
+{const h=document.getElementById('hud');if(h&&window.MutationObserver)new MutationObserver(()=>{try{hudFix()}catch(_){}}).observe(h,{childList:true,subtree:true})}
 const esc0=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---- the poll ---- */
