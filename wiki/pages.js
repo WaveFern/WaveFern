@@ -9,48 +9,44 @@ cat('band','Multiplayer','🎸','Band rooms: playing with up to three friends.')
 cat('meta','About the game','📜','Settings, graphics, saves and the full version history.');
 
 /* ===================== Main Page ===================== */
-/* "Did you know…" facts for the Main Page; numbers come from the game's data */
+/* "Did you know..." facts for the Main Page; numbers come from the game's data */
 const DYK=()=>{const f=D.perf||{},cars=D.cars||[],fast=cars.slice().sort((a,b)=>b.mph-a.mph)[0],lab=(D.labels||[]).slice(-1)[0],s=(D.fame||{}).starts||[];
- return [`…that a song's ${L('genres/genre-focus','genre focus')} can swing its streams from −25% to +40%, depending on your last five releases?`,
- `…that ${L('streams')} build up twice as fast at night as during the day?`,
- `…that a ${L('streams/viral','viral')} song gets at least ${fmt(f.viralMin||5e6)} extra streams?`,
- ...Object.entries(D.dmLock||{}).map(([n,v])=>`…that ${n} won't ${L('collabs','DM you')} until you have ${big(v)} monthly listeners?`),
- `…that if you're still awake at 06:00 you ${L('days','pass out')} and wake with only 70 energy?`,
- fast?`…that the ${fast.n} is the fastest ${L('cars','car')}, at ${fast.mph} mph?`:'',
- s[349]?`…that ${L('fame','Fame Level 350')} needs ${fmt(s[349])} monthly listeners?`:'',
- `…that a fan asking for an autograph might be a thief who grabs ${L('fans','35% of your cash')}?`,
- `…that greeting a ${L('tour-shows','stadium crowd')} in their own language gets them more hyped?`,
- `…that typing a lone "100" while ${L('collabs/haggle','haggling')} means "keep it 100", not an offer?`,
- lab?`…that ${esc(lab.n)} keeps only ${pct(lab.cut)} of your streams, but wants ${fmt(lab.ml)} monthly listeners before it calls?`:'',
- `…that ${L('pets','every pet')} you own adds +1 quality to every song you make?`,
- `…that ${L('band-rooms','band songs')} get +3 quality for each extra band member?`,
- `…that there are ${((D.drums||{}).s808||[]).length} different ${L('extras','808s')} to choose from?`,
- `…that the ${L('festival','Park Fields Festival')} is held on every 7th day?`,
- `…that your ${L('gphone','phone')} model can add up to +22% streams to every song?`].filter(Boolean)};
+ return [`... that a song's ${L('genres/genre-focus','genre focus')} can swing its streams from −25% to +40%, depending on your last five releases?`,
+ `... that ${L('streams')} build up twice as fast at night as during the day?`,
+ `... that a ${L('streams/viral','viral')} song gets at least ${fmt(f.viralMin||5e6)} extra streams?`,
+ ...Object.entries(D.dmLock||{}).map(([n,v])=>`... that ${n} won't ${L('collabs','DM you')} until you have ${big(v)} monthly listeners?`),
+ `... that if you're still awake at 06:00 you ${L('days','pass out')} and wake with only 70 energy?`,
+ fast?`... that the ${fast.n} is the fastest ${L('cars','car')}, at ${fast.mph} mph?`:'',
+ s[349]?`... that ${L('fame','Fame Level 350')} needs ${fmt(s[349])} monthly listeners?`:'',
+ `... that a fan asking for an autograph might be a thief who grabs ${L('fans','35% of your cash')}?`,
+ `... that greeting a ${L('tour-shows','stadium crowd')} in their own language gets them more hyped?`,
+ `... that typing a lone "100" while ${L('collabs/haggle','haggling')} means "keep it 100", not an offer?`,
+ lab?`... that ${esc(lab.n)} keeps only ${pct(lab.cut)} of your streams, but wants ${fmt(lab.ml)} monthly listeners before it calls?`:'',
+ `... that ${L('pets','every pet')} you own adds +1 quality to every song you make?`,
+ `... that ${L('band-rooms','band songs')} get +3 quality for each extra band member?`,
+ `... that there are ${((D.drums||{}).s808||[]).length} different ${L('extras','808s')} to choose from?`,
+ `... that the ${L('festival','Park Fields Festival')} is held on every 7th day?`,
+ `... that your ${L('gphone','phone')} model can add up to +22% streams to every song?`].filter(Boolean)};
 let DYKS=0;
-window.dykMore=()=>{DYKS++;const el=document.getElementById('dyk');if(el){el.classList.remove('swap');void el.offsetWidth;el.innerHTML=dykList();el.classList.add('swap')}};
+window.dykMore=()=>{DYKS++;const el=document.getElementById('dyk');if(el)el.innerHTML=dykList();return false};
 function dykList(){const a=DYK(),n=a.length,o=[];for(let i=0;i<4;i++)o.push(a[(DYKS*4+i+new Date().getDate())%n]);return o.map(x=>'<li>'+x+'</li>').join('')}
 page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide).length,ps=PAGES.filter(p=>!p.hide&&p.cat!='meta'),day=Math.floor(Date.now()/864e5),fa=ps[day%ps.length];
  let lead='';try{const m=/class=lead>([\s\S]*?)<\/p>/.exec(fa.body());lead=m?m[1]:''}catch(e){}TID=0;
  const news=typeof VERSION_HISTORY!='undefined'?VERSION_HISTORY.slice(0,4):[];
- return `<div class=hero><div class=eq aria-hidden=true><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h1>WAVEFERN<br>WIKI</h1><div class="px sub">Music Career Sim</div>
- <p class=lead>Welcome to the WaveFern Wiki, the encyclopedia of WaveFern Records. Every mechanic, worked out from the game's own code, with numbers straight from its data.</p>
- <div class=stats><div><b>${n}</b>pages</div><div><b>${(D.genres||[]).length}</b>genres</div><div><b>${(D.artists||[]).length}</b>artists</div><div><b>${(D.dest||[]).length}</b>tour cities</div><div><b>${(D.fame&&D.fame.starts.length-1)||350}</b>fame levels</div></div>
- <p class=cta><a class="btn go" href="../">▶ Play the game</a><a class=btn href="#/first-day">New here? Start here</a><button class=btn onclick="rndPage()">🎲 Random page</button></p></div>
- <div class=mp>
-  <section class="box2 fa" style="--a:${acc(fa.cat)}"><h2>⭐ Today's featured article</h2><div class=fah><span class=ae>${fa.e||'📄'}</span><div><a class=fat href="#/${fa.id}">${fa.t}</a><small>${(CATS.find(c=>c.id==fa.cat)||{}).t||''}</small></div></div><p>${lead}</p><p><a href="#/${fa.id}">Read more ▶</a></p><div class=fam><small>More in ${(CATS.find(c=>c.id==fa.cat)||{}).t||''}</small><div class=chips>${PAGES.filter(x=>x.cat==fa.cat&&!x.hide&&x!==fa).slice(0,4).map(x=>`<a class=chip href="#/${x.id}" style="--a:${acc(x.cat)}">${x.e||''} ${x.t}</a>`).join('')}</div></div></section>
-  <section class="box2" style="--a:#ffcc33"><h2>📰 In the news</h2><ul class=news>${news.map(v=>`<li><span class="tag${/\.0$/.test(v.v)?' g':''}">${v.v}</span> ${esc(v.n.length>150?v.n.slice(0,147)+'…':v.n)}</li>`).join('')}</ul><p>${L('versions','All updates ▶')}</p></section>
-  <section class="box2 dyk" style="--a:#ff7ac8"><h2>💡 Did you know…</h2><ul id=dyk>${dykList()}</ul><button class="btn dyk-more" onclick="dykMore()">🎲 More facts</button></section>
-  <section class="box2" style="--a:#40e0d0"><h2>🔥 Popular pages</h2><div class=chips>${['streams','song-quality','genres','extras','collabs','fame','labels','festival','world-tour','band-rooms'].map(i=>{const p=byId(i);return p?`<a class=chip href="#/${i}" style="--a:${acc(p.cat)}">${p.e||''} ${p.t}</a>`:''}).join('')}</div></section>
- </div>
- <h2 class=hh>Explore by category</h2>
- <div class=grid>${CATS.filter(c=>c.id!='meta').map(c=>{const ps=PAGES.filter(p=>p.cat===c.id&&!p.hide);return `<a class="card cat" href="#/cat-${c.id}" style="--a:${acc(c.id)}"><span class=e>${c.e}</span><h3>${c.t}</h3><p>${c.d}</p><small>${ps.length} page${ps.length==1?'':'s'} ▶</small></a>`}).join('')}</div>`}});
+ return `<div class=welcome><p class=w1>Welcome to WaveFern Wiki</p><p>the guide to <a href="../">WaveFern Records</a> that explains how the game works, from the first song to a world tour.</p><p class=m>${n} articles, written for game ${esc(D.version||'')}.</p></div>
+ <div class=mp><div>
+  <section class=mpb><h2>Today's featured article</h2><p><b>${fa.t}</b>. ${lead} (<a href="#/${fa.id}">Full article</a>)</p></section>
+  <section class=mpb><h2>Did you know</h2><ul id=dyk>${dykList()}</ul><p class=more><a href="#" onclick="return dykMore()">More facts</a></p></section>
+ </div><div>
+  <section class=mpb><h2>Recent changes to the game</h2><ul class=news>${news.map(v=>`<li><b>${v.v}</b>: ${esc(v.n.length>160?v.n.slice(0,v.n.lastIndexOf(' ',157))+'...':v.n)}</li>`).join('')}</ul><p class=more>${L('versions','Full version history')}</p></section>
+  <section class=mpb><h2>Browse by category</h2><ul class=catl>${CATS.map(c=>{const k=PAGES.filter(p=>p.cat===c.id&&!p.hide).length;return `<li><a href="#/cat-${c.id}">${c.t}</a> <span class=m>(${k})</span></li>`}).join('')}</ul></section>
+ </div></div>`}});
 
 /* ===================== Getting started ===================== */
 page('first-day','Your first day','start',{e:'🌅',sum:'What to do in your first hour, step by step.',src:['72-tutorial.js','02-data.js'],body:()=>`
 ${IB('New career','🌅',[['Cash','$100'],['Energy','100'],['Home','Starter house'],['Phone','Gphone 8'],['Tutorial gift','$150 + small rewards']])}
 <p class=lead>You start as an unknown artist with $100, a starter house with a tiny studio and a laptop. The goal: record songs, release them on Spotifly, and grow from nobody to a global star.</p>
-${H2('The quick loop')}<ol>
+${H2('Gameplay')}<ol>
 <li>Pick an artist name on the laptop (${K('E')} at the desk, then <b>Spotifly</b>). You cannot record until you have one.</li>
 <li>Walk to the mic in your studio and press ${K('E')}. Pick a genre and play the three ${L('recording','recording minigames')}. Each song costs 15 ${L('days','energy')}.</li>
 <li>Back at the laptop, open Spotifly › Upload, give the draft a title and release it. Streams start right away.</li>
@@ -59,7 +55,7 @@ ${H2('The quick loop')}<ol>
 ${H2('The tutorial')}<p>Big Vee, your manager, walks you through the first steps. Each step pays a little cash and each chapter a bit more:</p>
 ${T(['Chapter','Step','Goal'],(D.tutorial||[]).map(t=>[t.c+1,t.n,esc(t.o||'')]),{tall:1})}
 ${N('Every step pays $3, every chapter $10, and finishing the whole tutorial $20 more. You can skip it from the pause menu, and you still get the $150 starting gift.','tip','Rewards')}
-${H2('Good first goals')}${ul([`Record a few songs in one ${L('genres','genre family')}: the ${L('genres','genre focus')} bonus rewards a steady sound.`,`Buy a better ${L('gear','microphone')} first: it gives the most quality per level.`,`Install ${L('instagrime','Instagrime')} and post once a day for followers.`,`Reach 10 monthly listeners to unlock your first ${L('mentors','mentor')}.`])}`});
+${H2('Early goals')}${ul([`Record a few songs in one ${L('genres','genre family')}: the ${L('genres','genre focus')} bonus rewards a steady sound.`,`Buy a better ${L('gear','microphone')} first: it gives the most quality per level.`,`Install ${L('instagrime','Instagrime')} and post once a day for followers.`,`Reach 10 monthly listeners to unlock your first ${L('mentors','mentor')}.`])}`});
 
 page('controls','Controls','start',{e:'⌨️',sum:'Keyboard, mouse and touch controls.',src:['07-input-loop.js','154-touch-controls.js'],kw:'keys keyboard wasd shift sprint',body:()=>`
 <p class=lead>WaveFern plays with a keyboard and mouse, or with touch controls on phones and tablets.</p>
@@ -68,7 +64,7 @@ ${H2('Walking and stamina')}<p>You walk at 3.3 m/s and sprint at 6.5 m/s. Sprint
 ${H2('Touch')}<p>On a phone or tablet a joystick appears bottom left, with buttons for sprint and interact. Menus, the phone and the computer work by tapping.</p>`});
 
 page('days','Days, time and energy','start',{e:'⏰',sum:'How long a day lasts, energy, sleeping and passing out.',src:['29-v26.js','07-input-loop.js','04-house.js'],kw:'clock sleep bed pass out energy night',body:()=>`
-${IB('A game day','⏰',[['Real time','12 minutes'],['Starts','06:00'],['Night','20:00 – 06:00'],['Pass out','06:00, with 70% energy'],['Song cost','15 energy']])}
+${IB('A game day','⏰',[['Real time','12 minutes'],['Starts','06:00'],['Night','20:00 to 06:00'],['Pass out','06:00, with 70% energy'],['Song cost','15 energy']])}
 <p class=lead>A full in-game day lasts 12 real minutes, from 06:00 to 06:00 the next morning. About nine songs fit in one day.</p>
 ${H2('The clock')}<p>The first half of the day runs from 06:00 to 20:00; the second half is night, from 20:00 to 06:00. The clock keeps running while the computer or phone is open.</p>
 ${H2('Energy')}${ul(['You wake with 100 energy after sleeping in your bed.','Recording a song costs 15 energy (7.5 for your part in a collab). A festival set costs 15 and a tour show 25.','Energy slowly comes back by itself during the day, about 36 over a full day.',`Food tops it up: the corner shop, City Cafe, ${L('food','Goober Eats')} and festival stalls.`])}
@@ -88,20 +84,20 @@ ${IB('Recording','🎙️',[['Where','The mic in any studio'],['Energy','15'],['
 ${H2('The Make a song screen')}${ul([`A grid of the ${(D.genres||[]).length} ${L('genres','genres')}. A genre marked <span class="tag g">HOT</span> has hype above ×1.12 today and earns more streams; <span class="tag r">COLD</span> is below ×0.92.`,`Each genre shows its ${L('genres/genre-focus','genre focus')} percentage: how much your fans will reward (or punish) that choice.`,`An <b>Extras</b> drop-down holds the diss track, 808 and hi hat options. See ${L('extras')}.`])}
 <p>Every step starts with an animated <b>3, 2, 1, GO</b> countdown; nothing counts until it is over.</p>
 ${H2('1. Beat')}<p>A marker swings along a bar. Hit it when it is inside the green zone (within 8% of the centre). Six good hits finish the step. Each hit speeds the marker up by 5%. You get three goes: every miss uses one, and running out scraps the take.</p>
-${H2('2. Lyrics')}<p>Pick the word that rhymes with the one shown (keys 1–3 or tap). There are five lines and the game adapts to you:</p>
-${T(['Level','Difficulty','Time per line','Traps'],[['Easy','under 0.35','about 8 s','any other word'],['Tricky','0.35 – 0.7','about 5–6 s','words that look like the answer'],['Hard','0.7 and up','down to 3.5 s','longer rhymes, near-rhymes as traps']])}
+${H2('2. Lyrics')}<p>Pick the word that rhymes with the one shown (keys 1-3 or tap). There are five lines and the game adapts to you:</p>
+${T(['Level','Difficulty','Time per line','Traps'],[['Easy','under 0.35','about 8 s','any other word'],['Tricky','0.35 to 0.7','about 5-6 s','words that look like the answer'],['Hard','0.7 and up','down to 3.5 s','longer rhymes, near-rhymes as traps']])}
 <p>The time limit is <code>8 − 4.5 × difficulty</code> seconds. A right answer is worth <code>0.85 + 0.3 × difficulty</code> points, so harder lines count for more. Half your level carries over to the next session.</p>
 ${H2('3. Mix')}<p>Hold ${K('Space')} (or hold the mouse) to raise the level, let go to drop it. The level rises at 1.15 per second and falls at 0.95. Keep it within 0.1 of the moving green band for 6 seconds.</p>
 ${FX('mix score = min(1, time in band ÷ 6 s × 1.15)')}
-${H2('Session grade')}${T(['Average of Lyrics and Mix','Grade'],[['0.9 and up','Studio magic'],['0.7 – 0.9','Solid session'],['0.45 – 0.7','Rough around the edges'],['below 0.45','Messy take']])}
+${H2('Session grade')}${T(['Average of Lyrics and Mix','Grade'],[['0.9 and up','Studio magic'],['0.7 to 0.9','Solid session'],['0.45 to 0.7','Rough around the edges'],['below 0.45','Messy take']])}
 <p>The finished draft waits on your laptop. Give it a title and release it from Spotifly › Upload, or use <b>Upload all</b> to release every titled draft at once.</p>
 ${N(`In a ${L('band-rooms','band room')} the middle step depends on your instrument: only vocalists rhyme. Guitar, bass, drums and keys play their own part.`,'','Bands')}`});
 
-page('song-quality','Song quality','music',{e:'⭐',sum:'Exactly how a song\'s quality score is worked out.',src:['34-studio-minigames.js','29-v26.js','52-gear-shop-plus.js'],kw:'quality score q experience formula',body:()=>{const g=D.gear||[];
+page('song-quality','Song quality','music',{e:'⭐',sum:'How a song\'s quality score is calculated.',src:['34-studio-minigames.js','29-v26.js','52-gear-shop-plus.js'],kw:'quality score q experience formula',body:()=>{const g=D.gear||[];
  return `<p class=lead>Every song gets a quality score. Quality drives almost everything: daily ${L('streams')}, the chance of a hit, ${L('festival')} crowds and ${L('awards')}.</p>
 ${H2('The formula')}${FX(`quality = max(3, round( <b>experience</b> × (
-    random 8–14
-  + 16 × <b>session</b>            (average of Lyrics and Mix, 0–1)
+    random 8-14
+  + 16 × <b>session</b>            (average of Lyrics and Mix, 0-1)
   + <b>gear points</b>             (see below)
   + 3 if you own a home      + 1 per pet you own
   + 2 per unlocked mentor
@@ -114,11 +110,11 @@ xp = songs made + 8 per mentor + 6 per fame level`)}
 ${H2('Gear points','gear-points')}<p>Each level of a piece of gear adds a fixed number of points (level 0 = the starting item):</p>
 ${T(['Gear',['Points per level','n'],['Max level','n'],['At max','n']],g.filter(x=>x.q).map(x=>[L('gear',x.n),x.q,x.lv.length-1,x.q*(x.lv.length-1)]))}
 <p>Promo, decks and the content kit don't add quality; they add ${L('streams','reach')} instead.</p>
-${H2('Collab songs')}<p>A ${L('collabs','collab')}'s quality uses a different recipe: a random 30–40 base plus gear, times experience, plus up to 25 points from the fee you agreed (more for a bigger fee) and ±4 per point of opinion from the meeting chat.</p>
+${H2('Collab songs')}<p>A ${L('collabs','collab')}'s quality uses a different recipe: a random 30-40 base plus gear, times experience, plus up to 25 points from the fee you agreed (more for a bigger fee) and ±4 per point of opinion from the meeting chat.</p>
 ${H2('Band songs')}<p>A band song's quality is the average of every member's take, plus 3 for each extra member.</p>`}});
 
 page('genres','Genres and genre focus','music',{e:'🎼',sum:'The nine genres, their families, beat styles, hype and the genre focus bonus.',src:['02-data.js','166-genre-focus.js','67-beats.js'],kw:'genre focus family hype hot cold trending latin hip-hop rap pop rock',body:()=>{const fams={};(D.fam||[]).forEach(([g,f])=>(fams[f]=fams[f]||[]).push(g));
- return `${IB('Genres','🎼',[['Genres',(D.genres||[]).length],['Families',Object.keys(fams).length],['Hype range','×0.8 – ×1.3'],['Focus range','about −25% to +40%']])}
+ return `${IB('Genres','🎼',[['Genres',(D.genres||[]).length],['Families',Object.keys(fams).length],['Hype range','×0.8 to ×1.3'],['Focus range','about −25% to +40%']])}
 <p class=lead>There are ${(D.genres||[]).length} genres. Each has its own beat styles, its own daily hype, and belongs to a family of similar sounds.</p>
 ${H2('Genres and beat styles')}${T(['Genre','Family','Beat styles'],(D.genres||[]).map(g=>[g,(D.fam.find(f=>f[0]==g)||[])[1]||'',((D.styles||{})[g]||[]).join(', ')]))}
 ${H2('Hype (trending)')}<p>Every morning each genre's hype is rerolled between ×0.8 and ×1.3. It multiplies the daily streams of every song in that genre, old ones included. On the Make a song screen a genre above ×1.12 shows <span class="tag g">HOT</span> and one below ×0.92 shows <span class="tag r">COLD</span>.</p>
@@ -143,8 +139,8 @@ ${ul(['On release, interest changes by somewhere between −8% and +25%.','2 to 
 page('streams','Streams','music',{e:'📈',sum:'The full daily streams formula, decay, caps, hits and viral songs.',src:['29-v26.js','02-data.js','166-genre-focus.js'],kw:'streams formula plays daily decay hit viral cap payout',body:()=>{const p=D.pace||{},f=D.perf||{};
  return `${IB('Streams','📈',[['Pay per stream','$'+(D.tune||{}).payRate],['Paid','Every morning'],['Night speed','×2'],['Hit chance','about '+pct(f.hitP||.08)],['Viral chance','about '+(100*(f.viralP||0)).toFixed(2)+'%']])}
 <p class=lead>Every released song earns streams every day. Streams build up through the day (twice as fast at night) and are paid the next morning at <b>$${(D.tune||{}).payRate} per stream</b>, minus any ${L('labels','label')} cut.</p>
-${H2('Daily streams')}${FX(`daily = quality × ${p.base} × random(0.75–1.25)
-      × <b>genre hype</b>                         (×0.8–1.3, rerolled daily)
+${H2('Daily streams')}${FX(`daily = quality × ${p.base} × random(0.75-1.25)
+      × <b>genre hype</b>                         (×0.8-1.3, rerolled daily)
       × <b>age decay</b>   (0.86^days + ${p.floor})
       × <b>fame</b>        1.5^fame tier × (1 + min(1, √listeners ÷ 200))
       × <b>interest</b>    0.3 + 0.7 × interest
@@ -155,11 +151,11 @@ ${H2('Daily streams')}${FX(`daily = quality × ${p.base} × random(0.75–1.25)
       × 1.5 on release day`)}
 <p>On top of that, a ${L('collabs','collab')} brings the featured artist's fans: about 1% of their monthly listeners a day, decaying the same way.</p>
 <p>Other boosts that stack on top: ${L('promotions')}, ${L('albums','album')} tracks, the ${L('halo','catalogue halo')}, your ${L('gphone','Gphone')} model and ${L('radio')} slots.</p>
-${H2('Interest')}<p>Interest is a 0–100% measure of how much people are talking about you. Each morning it drops by 10%, then gains 6% for every song you released yesterday. Albums, radio and diss tracks also move it. Releasing steadily keeps it high.</p>
+${H2('Interest')}<p>Interest is a 0-100% measure of how much people are talking about you. Each morning it drops by 10%, then gains 6% for every song you released yesterday. Albums, radio and diss tracks also move it. Releasing steadily keeps it high.</p>
 <p>Whether a song is a hit, goes viral or is normal is rolled <b>once, on its release day</b>.</p>${H2('Hits','hits')}${FX(`hit chance = ${f.hitP} × clamp(quality ÷ ${f.hitQRef}, ${f.hitQMin}, ${f.hitQMax})
-a hit streams ×${f.hitMin}–${f.hitMax}`)}
+a hit streams ×${f.hitMin}-${f.hitMax}`)}
 ${H2('Going viral','viral')}${FX(`viral chance = ${f.viralP} × min(1, quality ÷ ${f.viralQBest})^${f.viralQPow}
-a viral song gets ${fmt(f.viralMin)} + listeners × ${f.viralLisMin}–${f.viralLisMax} extra streams over ${f.viralDays} days`)}
+a viral song gets ${fmt(f.viralMin)} + listeners × ${f.viralLisMin}-${f.viralLisMax} extra streams over ${f.viralDays} days`)}
 ${H2('The cap')}<p>So one song can't run away forever, daily streams are capped:</p>${FX('cap = quality² × 25 × 1.5^fame tier × hit multiplier')}
 ${H2('Payouts')}<p>Each morning you're paid yesterday's streams × $${(D.tune||{}).payRate}. If you're signed, the label keeps its cut first. Earnings show on the morning summary and in Spotifly › Stats.</p>`}});
 
@@ -180,34 +176,34 @@ ${H2('What an album does')}${ul(['Releasing an album adds 20% interest.','For th
 ${N('Put your best song as track 1: it gets the biggest boost.','tip')}`});
 
 page('collabs','Collabs, fees and haggling','music',{e:'🤝',sum:'DMs, negotiation, meetings and how collab fees are set.',src:['75-collab-fees-dms.js','33-haggle.js','29-v26.js','54-skyline-meetings.js'],kw:'collab feature feat dm message fee haggle negotiate meeting personality',body:()=>{const np=D.neg||{};
- return `${IB('Collabs','🤝',[['Started by','You, or a DM from them'],['Energy','7.5'],['Song tag','(feat. NAME)'],['DMs a day','0–2, max 3 waiting'],['Artists',(D.artists||[]).length]])}
+ return `${IB('Collabs','🤝',[['Started by','You, or a DM from them'],['Energy','7.5'],['Song tag','(feat. NAME)'],['DMs a day','0-2, max 3 waiting'],['Artists',(D.artists||[]).length]])}
 <p class=lead>A collab is a song with another artist. You either pay them (you messaged them) or they pay you (they messaged you). Their fans come along: a featured song gets about 1% of their monthly listeners in extra streams each day.</p>
-${H2('Who messages you')}<p>Each day 0 DMs (20%), 1 (40%) or 2 (40%) can arrive, never more than 3 waiting. On your first day 2–3 small artists say hello. Who writes depends on size:</p>
+${H2('Who messages you')}<p>Each day 0 DMs (20%), 1 (40%) or 2 (40%) can arrive, never more than 3 waiting. On your first day 2-3 small artists say hello. Who writes depends on size:</p>
 ${ul(['Artists about your size are the most likely.','A bit smaller: common. Much smaller: rare, unless you worked together before or share a genre.','Bigger: falls off fast with the gap, helped by your growth this week, your interest and your reputation.',`Your recent genres: ×1.6 for the same genre, ×1.25 for a related one, ×0.85 otherwise.`,`Artists with ${fmt((D.dmStar||{}).A)}+ listeners only DM you once you have ${fmt((D.dmStar||{}).L)}. ${Object.entries(D.dmLock||{}).map(([n,v])=>`${n} waits until you have ${fmt(v)}.`).join(' ')}`])}
 ${H2('The price')}${FX(`what they charge = their fee × size factor × markup × reach × repeat × reputation
   size factor = 0.18 + 0.82 × A ÷ (A + 1500)        (A = their listeners)
-  markup      = 0.92 – 1.12, fixed per artist
-  reach       = ((A + 5) ÷ (you + 5))^0.2, kept within 0.75 – 1.35
+  markup      = 0.92 to 1.12, fixed per artist
+  reach       = ((A + 5) ÷ (you + 5))^0.2, kept within 0.75 to 1.35
   repeat      = ×0.92 if you've worked together before
   reputation  = −1% per point (up to −10%)
 what they pay you = 55% of your own market price, never more than 80% of their fee`)}
 ${H2('Haggling','haggle')}<p>Type your offer in Messages ("how about $120?", "two fifty", "1.5k"). Each artist has a fixed negotiation personality:</p>
 ${T(['Personality',['Moves on price','n'],['Closes the gap per round','n'],['Rounds before a final offer','n'],['Insulted below','n']],Object.entries(np).map(([k,v])=>[k,pct(v.drop),pct(v.rate),v.pat,pct(v.ins)]))}
 <p>Big names move less. Offers inside their range are usually accepted, more often the longer you've talked. Lowball too hard and they're insulted. A lone "100" means "keep it 100", not an offer.</p>
-${H2('The meeting')}<p>Once you agree, press <b>Confirm &amp; pay</b> (or <b>Accept &amp; get paid</b>). The artist waits at the meeting place (gold beacon). Walk up to them to chat for 1–3 exchanges: pick a tone (hype, chill, pro, joke, cocky) that suits their personality (chill, hype, shy, formal, goofy). Their opinion goes from −3 to +3 and changes the song: ±4 quality and ±12% feature strength per point.</p>
+${H2('The meeting')}<p>Once you agree, press <b>Confirm &amp; pay</b> (or <b>Accept &amp; get paid</b>). The artist waits at the meeting place (gold beacon). Walk up to them to chat for 1-3 exchanges: pick a tone (hype, chill, pro, joke, cocky) that suits their personality (chill, hype, shy, formal, goofy). Their opinion goes from −3 to +3 and changes the song: ±4 quality and ±12% feature strength per point.</p>
 ${FX(`feature strength = (1.05 + min(0.3, fee ÷ 6000)) × (1 + opinion × 0.12)`)}
 ${H2('All artists','artists')}<p>Listeners as in the game's data. <i>Real</i> artists are fictional stand-ins of real stars.</p>
 ${T(['Artist','Genre',['Listeners','n'],['Base fee','n'],'Personality','Haggling','Type'],(D.artists||[]).map(a=>[esc(a.n),a.g,[fmt(a.l),a.l],[$$(a.fee),a.fee],a.pers,a.np||'',a.real?tag('real','y'):a.big?tag('big'):'']),{filter:1,tall:1})}`}});
 
 page('promotions','Promotions','music',{e:'📣',sum:'Paid campaigns that multiply a song\'s streams for a few days.',src:['83-promotions.js'],kw:'promo boost campaign blitz',body:()=>`
 <p class=lead>From Instagrime you can pay to promote a released song. The price grows with your monthly listeners. A promoted song streams its multiplier times its normal amount every day of the campaign, and you gain followers when it starts.</p>
-${T(['Promotion',['Days','n'],['Streams','n'],'Price',['Followers','n']],(D.promos||[]).map(p=>[p.n,p.days,mul(p.m),`$${p.base} + $${p.per} × listeners`,'3–12 + '+pct(p.f,0)+' of listeners']))}
+${T(['Promotion',['Days','n'],['Streams','n'],'Price',['Followers','n']],(D.promos||[]).map(p=>[p.n,p.days,mul(p.m),`$${p.base} + $${p.per} × listeners`,'3-12 + '+pct(p.f,0)+' of listeners']))}
 ${N('A promotion multiplies the song\'s normal daily streams, so it is worth most on a strong, fresh song in a HOT genre.','tip')}`});
 
 page('halo','Catalogue halo','music',{e:'✨',sum:'When your listeners balloon, some of them dig into your older songs.',src:['108-catalogue-halo.js'],kw:'halo catalogue back catalog',body:()=>{const h=D.halo||{};return `
 <p class=lead>When your monthly listeners jump (after a hit or a viral song, say), some of those new fans dig into your older songs, so nothing in your catalogue is stuck at a few hundred streams.</p>
 ${FX(`extra daily streams per song = listeners × ${h.rate} ÷ max(${h.minSongs}, songs − 1)
-                                × quality factor × age factor × (0.5 + 0.5 × interest) × random(0.75–1.25)
+                                × quality factor × age factor × (0.5 + 0.5 × interest) × random(0.75-1.25)
 age factor = ${h.ageKeep} + ${1-h.ageKeep} × ${h.ageDecay}^days since release`)}
 <p>Because it's split across the catalogue, the total stays about the same however many songs you have. Hit and viral songs don't get it. It does nothing early on, when your listeners are small.</p>`}});
 

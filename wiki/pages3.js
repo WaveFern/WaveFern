@@ -15,13 +15,13 @@ ${T(['Car',['Price','n'],['Top speed','n']],(D.cars||[]).map(c=>[`<span style="c
 
 page('homes','Homes','life',{e:'🏠',sum:'Buying a bigger home and what it gives you.',src:['14-world-fame-cars-pets-collabs.js','15-homes-shop-interiors-hover-previews.js','95-property-no-starter.js'],kw:'home house villa penthouse property',body:()=>`
 <p class=lead>Book a viewing on <b>homes.wf</b>, then buy at the Property office. A home gives +3 to every song's quality and +10% reach on streams.</p>
-${T(['Home',['Price','n'],'Notes'],(D.props||[]).map((p,i)=>[p[0],[i?$$(p[1]):'—',i?p[1]:0],i?'':'Not for sale: your starter house']))}
+${T(['Home',['Price','n'],'Notes'],(D.props||[]).map((p,i)=>[p[0],[i?$$(p[1]):'',i?p[1]:0],i?'':'Not for sale: your starter house']))}
 ${N(`Decorate with ${L('furniture')} and ${L('paint')}.`,'tip')}`});
 
 page('furniture','Furniture and storage','life',{e:'🛋️',sum:'Every piece of furniture, Amazoom, storage and build mode.',src:['10-apps-shop-furniture.js','104-furniture-storage.js','158-placement-overhaul.js','79-amazoom-detail.js'],kw:'furniture amazoom storage build place rotate sofa bed',body:()=>`
 <p class=lead>Buy furniture on <b>Amazoom</b> (a $250 app). It arrives in Storage. At home press ${K('F')} to open Storage and build mode: place, move and rotate (${K('R')}) pieces.</p>
 ${T(['Item',['Price','n'],'Amazoom section'],(D.furniture||[]).map(f=>[esc(f.n),[$$(f.p),f.p],f.az||'']),{filter:1,tall:1})}
-<p class=m>Plus ${D.furnitureVariants||0} colour and style variants (armchairs, sofas, beds, rugs, beanbags, prints…).</p>`});
+<p class=m>Plus ${D.furnitureVariants||0} colour and style variants (armchairs, sofas, beds, rugs, beanbags, prints...).</p>`});
 
 page('paint','Wall paint','life',{e:'🎨',sum:'Repainting your walls.',src:['123-property-polish.js'],kw:'paint wall colour',body:()=>`
 <p class=lead>Repaint the walls of your home for $40 a colour.</p><p>${(D.paints||[]).map(p=>`<span class=tag style="background:${p[1]};color:#111">${esc(p[0])}</span>`).join(' ')}</p>`});
@@ -48,7 +48,7 @@ ${T(['Piece',['Price','n']],(D.jewels||[]).map(j=>[j[0],[$$(j[1]),j[1]]]))}`});
 
 page('fans','Fans, autographs and robbery','life',{e:'✍️',sum:'Fans who stop you in the street, tips and thieves.',src:['14-world-fame-cars-pets-collabs.js','92-fan-robbery.js'],kw:'fan autograph rob robbery thief tip',body:()=>`
 <p class=lead>The more famous you are, the more people recognise you. A passer-by notices you with a chance of monthly listeners ÷ 5,000,000.</p>
-${H2('Autographs')}<p>Sign and you usually get a tip: $3–12 × your fame tier (at least ×1).</p>
+${H2('Autographs')}<p>Sign and you usually get a tip: $3-12 × your fame tier (at least ×1).</p>
 ${H2('Robbery')}<p>Some "fans" are thieves. A robbery can only happen when you sign an autograph: instead of a tip, they grab <b>35% of the cash you're carrying</b> and run.</p>
 ${T([['Guards with you','n'],'Fans let through','Thief chance'],[[0,'all','5%'],[1,'50%','2.5%'],[2,'10%','0.5%'],[3,'none','0%']])}`});
 
@@ -65,7 +65,7 @@ page('gphone','Gphone','life',{e:'📱',sum:'Phone models, perks and the camera.
 ${T([['Model','n'],['Price','n'],['Streams','n'],['Followers per photo post','n'],'Perks'],(D.phones||[]).map(p=>['Gphone '+p.m,[p.p?$$(p.p):'starter',p.p],['+'+pct(p.buzz),p.buzz],['+'+p.post,p.post],esc(p.perks)]))}`});
 
 page('instagrime','Instagrime','life',{e:'📸',sum:'Posting, followers and promotions.',src:['16-big-world-fame-chat-instagrime-v2.js','103-instagrime-icons-trees.js','83-promotions.js'],kw:'instagrime post followers feed photo',body:()=>`
-<p class=lead>Instagrime is a $400 app. Post once a day for 2–8 new followers. Photos from your ${L('gphone','Gphone')} camera can be posted too, for more followers with a better phone. ${L('promotions','Promotions')} are bought here.</p>`});
+<p class=lead>Instagrime is a $400 app. Post once a day for 2-8 new followers. Photos from your ${L('gphone','Gphone')} camera can be posted too, for more followers with a better phone. ${L('promotions','Promotions')} are bought here.</p>`});
 
 page('apps','Computer and apps','life',{e:'💻',sum:'The laptop, its websites and every app in the App Barn.',src:['06-computer.js','10-apps-shop-furniture.js','11-os-v2.js'],kw:'laptop computer app barn browser website',body:()=>`
 <p class=lead>Press ${K('E')} at your desk to use the laptop: Spotifly, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.</p>

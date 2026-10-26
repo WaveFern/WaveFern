@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v47.6.1';
+const GAME_VERSION='v47.7.0';
 const VERSION_HISTORY=[
+ {v:'v47.7.0',n:'The wiki has a plainer, encyclopedia-style look: a sidebar of links, Article, Source and History tabs, one green accent colour, plain boxes and bordered tables. Emoji icons, rainbow colours, pop-up rewards and scroll animations are gone. Links to pages you have read turn a darker green.'},
  {v:'v47.6.1',n:'Fixed the controls hint flickering between keyboard and controller: the controller text is now put in before the screen draws, and the game only switches back to keyboard prompts when you press a key or clearly move the mouse.'},
  {v:'v47.6.0',n:'The wiki now reads like an encyclopedia: Read, Source and History tabs on every page, a numbered Contents box, See also and References, page previews when you point at a link, and a Main Page with a featured article, In the news and Did you know. It is more fun too: pages you read are ticked off with a rank and a progress bar, new pages and rank-ups pop up with pixel confetti, sections slide in as you scroll, and a random page button.'},
  {v:'v47.5.1',n:'Controller prompts match your controller: PlayStation pads show ✕ ○ □ △, L1/R1, L2/R2, Share and Options; Switch Pro pads show their own letters, ZL/ZR and + / −; Xbox and other pads keep A B X Y.'},

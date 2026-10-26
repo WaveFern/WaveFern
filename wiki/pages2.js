@@ -1,5 +1,5 @@
 /* WaveFern Wiki pages, part 2: Career, Live and touring. */
-const tierLv=i=>i<0?'—':'Lv '+((D.fame&&D.fame.ftl)||[])[i];
+const tierLv=i=>i<0?'':'Lv '+((D.fame&&D.fame.ftl)||[])[i];
 
 /* ===================== Career ===================== */
 page('money','Money','career',{e:'💵',sum:'Every way to earn and spend money.',src:['29-v26.js','02-data.js'],kw:'cash earn income spend pay',body:()=>`
@@ -11,7 +11,7 @@ ${N(`Carrying lots of cash in the street can get you robbed. See ${L('fans','Fan
 page('gear','Studio gear','career',{e:'🎛️',sum:'Every piece of studio gear, its levels, prices and what it adds.',src:['02-data.js','52-gear-shop-plus.js','101-economy-labels.js'],kw:'gear mic chair guitar keyboard drums booth promo decks headphones interface monitors synth shop',body:()=>{const g=D.gear||[],cats=D.gcat||[],by=k=>g.find(x=>x.k==k);
  return `<p class=lead>Gear is bought on the laptop (Shop). Each item has 3 upgrades. Prices grow 6× per level, and the effect grows with it. Some upgrades only unlock at a fame level.</p>
 ${FX('price of level n = base × 6^(n − 1)')}
-${cats.map(([t,ks])=>H2(t)+T(['Gear','Effect','Levels','Price per level','Unlocks'],ks.map(by).filter(Boolean).map(x=>[`<b>${x.n}</b><br><small class=m>${esc(x.d)}</small>`,x.q?`+${x.q} quality / level`:x.s?`+${pct(x.s,1)} streams / level`:'',x.lv.map((l,i)=>i?`${i}. ${esc(l)}`:`<span class=m>${esc(l)}</span>`).join('<br>'),['<span class=m>owned</span>'].concat(x.c.map(c=>$$(c))).join('<br>'),['<span class=m>—</span>'].concat(x.fl?x.fl.map(f=>tierLv(f)):x.c.map(()=>'—')).join('<br>')]))).join('')}
+${cats.map(([t,ks])=>H2(t)+T(['Gear','Effect','Levels','Price per level','Unlocks'],ks.map(by).filter(Boolean).map(x=>[`<b>${x.n}</b><br><small class=m>${esc(x.d)}</small>`,x.q?`+${x.q} quality / level`:x.s?`+${pct(x.s,1)} streams / level`:'',x.lv.map((l,i)=>i?`${i}. ${esc(l)}`:`<span class=m>${esc(l)}</span>`).join('<br>'),['<span class=m>owned</span>'].concat(x.c.map(c=>$$(c))).join('<br>'),[''].concat(x.fl?x.fl.map(f=>tierLv(f)):x.c.map(()=>'')).join('<br>')]))).join('')}
 ${N(`Quality points are multiplied by your ${L('song-quality/experience','experience')}, so gear pays off more as you make more songs.`)}`}});
 
 page('fame','Fame levels','career',{e:'🌟',sum:'All 350 fame levels, fame tiers and what each level unlocks.',src:['16-big-world-fame-chat-instagrime-v2.js','136-fame-350.js'],kw:'fame level tier unlock listeners bling',body:()=>{const s=(D.fame||{}).starts||[],ftl=(D.fame||{}).ftl||[],ft=(D.fame||{}).ft||[];
@@ -43,9 +43,9 @@ page('quests','Quests','career',{e:'📋',sum:'Daily and weekly quest sets and t
  return `<p class=lead>The Quests app (preinstalled on the laptop) gives you 3 daily quests and 3 weekly quests. Finish the whole set to get paid. Quests are rolled once and saved, so reloading never changes them.</p>
 ${FX('daily reward  = $30 × 1.04^fame level   (rounded to $5)\nweekly reward = 10 × the daily reward')}
 ${T([['Fame level','n'],['Daily set','n'],['Weekly set','n']],[0,10,25,50,100,150,200,275,350].map(l=>[l,[$$(r(l)),r(l)],[$$(r(l)*10),r(l)*10]]))}
-${H2('Daily quests')}${ul(['Record 2–4 songs (more at fame 10 and 30)','Release 1–3 songs','Release a song at or above your recent average quality + 3','Post on Instagrime','Send 4 messages','Walk or run 400–700 m'])}
-${H2('Weekly quests')}${ul(['Get 35% more streams than last week','Earn 35% more from music than last week','Gain 35% more followers than last week','Release 5–9 songs','Record 12–18 songs','Release 3 songs at your recent average quality + 6','Release an album','Post on Instagrime on 5 different days','Walk or run 3,000–6,000 m'])}
-<p>Weeks run day 1–7, 8–14 and so on. The night after a day still counts for that day, so overnight streams land in the right week. Each set never has two quests of the same kind.</p>`}});
+${H2('Daily quests')}${ul(['Record 2-4 songs (more at fame 10 and 30)','Release 1-3 songs','Release a song at or above your recent average quality + 3','Post on Instagrime','Send 4 messages','Walk or run 400-700 m'])}
+${H2('Weekly quests')}${ul(['Get 35% more streams than last week','Earn 35% more from music than last week','Gain 35% more followers than last week','Release 5-9 songs','Record 12-18 songs','Release 3 songs at your recent average quality + 6','Release an album','Post on Instagrime on 5 different days','Walk or run 3,000-6,000 m'])}
+<p>Weeks run day 1-7, 8-14 and so on. The night after a day still counts for that day, so overnight streams land in the right week. Each set never has two quests of the same kind.</p>`}});
 
 page('awards','Gramophone Awards','career',{e:'🏆',sum:'Submit a song, beat the stars, win a trophy.',src:['110-awards.js'],kw:'awards gramophone trophy song of the year',body:()=>{const a=D.awards||{};
  return `${IB('Gramophone Awards','🏆',[['Needs','Fame Level '+a.need],['Cooldown',a.cool+' days'],['Category','Song of the Year'],['Prize','Gramophone Trophy']])}
@@ -73,7 +73,7 @@ page('billboards','Billboards','career',{e:'🪧',sum:'When your name goes up be
 /* ===================== Live ===================== */
 page('festival','Park Fields Festival','live',{e:'🎪',sum:'The weekly festival: stages, crowds, pay and crowd minigames.',src:['70-festival.js','71-festival-booking.js'],kw:'festival stage crowd tent pit riverside main stage set',body:()=>`
 ${IB('Park Fields Festival','🎪',[['When','Every 7th day'],['Where','The field east of Park Avenue'],['Book','FestivalApp, 2+ days ahead'],['Set','Up to 4 hours'],['Energy','15 per set'],['Pay per song','$0.08 × stage × crowd']])}
-<p class=lead>A festival opens on every day that is a multiple of 7 (day 7, 14, 21…). The day before, a crew builds it; the day after, they take it down.</p>
+<p class=lead>A festival opens on every day that is a multiple of 7 (day 7, 14, 21...). The day before, a crew builds it; the day after, they take it down.</p>
 ${H2('Stages')}${T(['Stage',['Fame level','n'],['Pay','n'],['Base crowd','n'],['Max crowd','n']],(D.stages||[]).map(s=>[s.n,s.req,mul(s.mult),big(s.base),big(s.cap)]))}
 ${H2('Crowd and pay')}${FX(`crowd = min(max, base × 1.055^(your level − stage level))
         × (0.9 + min(0.2, average quality ÷ 400))  × 1.15 for a collab song
@@ -87,11 +87,11 @@ ${T(['Stall','Type','Menu (price / energy)'],(D.fests||[]).map(f=>[esc(f.n),f.ki
 
 page('festival-app','FestivalApp and bookings','live',{e:'🗓️',sum:'Booking a slot and planning a setlist.',src:['71-festival-booking.js'],kw:'festivalapp booking slot setlist cancel',body:()=>`
 <p class=lead>FestivalApp is free and installed for you. Pick a festival, a stage your fame allows and a free slot.</p>
-${T(['Slot','Time'],(D.slots||[]).map((s,i)=>{const h=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':00';return['Slot '+(i+1),h(s[0])+' – '+h(s[1])]}))}
-${ul(['Book at least 2 days before the festival. Booking is free.','Other acts have already taken some slots; at least one per stage is always left free.','Build a setlist from released songs and whole albums. Each song lasts 30–55 in-game minutes, so 4–8 songs fill a slot. The setlist can\'t go over 4 hours.','Editing or cancelling is free while the festival is 2+ days away. Cancelling later costs 2 reputation.','On the day, be at your stage\'s steps during your slot. Miss it and the slot is given away, and you lose 3 reputation.'])}`});
+${T(['Slot','Time'],(D.slots||[]).map((s,i)=>{const h=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':00';return['Slot '+(i+1),h(s[0])+' to '+h(s[1])]}))}
+${ul(['Book at least 2 days before the festival. Booking is free.','Other acts have already taken some slots; at least one per stage is always left free.','Build a setlist from released songs and whole albums. Each song lasts 30-55 in-game minutes, so 4-8 songs fill a slot. The setlist can\'t go over 4 hours.','Editing or cancelling is free while the festival is 2+ days away. Cancelling later costs 2 reputation.','On the day, be at your stage\'s steps during your slot. Miss it and the slot is given away, and you lose 3 reputation.'])}`});
 
 page('flights','Flights and the airport','live',{e:'✈️',sum:'Swiftwing Airways: booking, check-in, security and boarding.',src:['138-flights.js','139-airport.js','137-travel.js','135-destinations.js'],kw:'flight airport swiftwing plane gate boarding check in ticket travel',body:()=>`
-${IB('Swiftwing Airways','✈️',[['Flights','One a day per route'],['Departures','07:00 – 23:30'],['Book','Up to 3 days ahead'],['Refund','70% if cancelled 2h+ ahead'],['Gates','1 – 6']])}
+${IB('Swiftwing Airways','✈️',[['Flights','One a day per route'],['Departures','07:00 to 23:30'],['Book','Up to 3 days ahead'],['Refund','70% if cancelled 2h+ ahead'],['Gates','1 to 6']])}
 <p class=lead>Swiftwing is the game's airline. Book from the Swiftwing app (computer or Gphone) or at the ticket desk in any airport. Fernfield International is at the far west end of Fern Road.</p>
 ${H2('Fares and flight times')}${FX(`flight time = max(2, round(km ÷ 800 + 0.7)) hours
 fare        = round((180 + km × 0.11) ÷ 10) × 10, varying a little day to day`)}
@@ -115,7 +115,7 @@ page('tour-shows','Stadium and club shows','live',{e:'🏟️',sum:'Rehearsing, 
 ${H2('Before the show')}${ul(['Setlist: starts from your World Tour plan for that stop, or your top songs. The last song is the encore.','Rehearse up to 2 times a day: you need 20 energy and it uses 8.','A show needs 25 energy and must start between 12:00 and 02:00.'])}
 ${H2('Production')}${T(['Stadium extra',['Price','n']],(p.venue||[]).map(x=>[x[1],[$$(x[2]),x[2]]]))}${T(['Club extra',['Price','n']],(p.club||[]).map(x=>[x[1],[$$(x[2]),x[2]]]))}
 ${H2('Show score')}${FX('score = 0.12 + 0.5 × minigames + 0.18 × crowd hype + 0.1 × song quality + 0.05 × rehearsals (max 2) + production')}
-<p>Between songs you talk to the crowd. Greeting them in the local language works best (+0.16 hype). A stadium show has an intermission and an encore and runs 6–10 in-game hours.</p>`}});
+<p>Between songs you talk to the crowd. Greeting them in the local language works best (+0.16 hype). A stadium show has an intermission and an encore and runs 6-10 in-game hours.</p>`}});
 
 page('tour-cities','Tour cities','live',{e:'🗼',sum:'Walking around abroad: landmarks, hotels, street food and souvenirs.',src:['150-tour-cities.js','152-tour-city-life.js','160-tour-shop-menus.js'],kw:'city abroad landmark selfie hotel souvenir street food',body:()=>{const sf=D.streetFood||{};
  return `<p class=lead>Every destination becomes a city you can walk around when you land: signs in the local language, its own colours and traffic, an airport, a hotel, shops, a club and a stadium.</p>
