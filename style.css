@@ -149,7 +149,7 @@ body.notags #ntags{display:none}
 #ttl .ttsl.drop{border-color:var(--g);background:#14301ad9}#ttl .ttbk{cursor:grab}
 
 /* v46.7.0: main menu, career screens and pause menu in the game's own look: the same black-bordered panels as the HUD,
-   hard pixel shadows instead of glows, and buttons that fill from where the pointer comes in (164-menu-fx.js sets --x/--y where the circle grows from) */
+   hard pixel shadows instead of glows, and buttons that grow towards the pointer (164-menu-fx.js sets --ox/--oy and --tx/--ty) */
 #ttl{background:#050806a6}
 #ttl .ttm{gap:0;width:min(340px,90vw);animation:ttin .25s steps(4) both}
 #ttl .ttm h1{font-size:clamp(34px,7.5vw,54px);line-height:1.05;letter-spacing:2px;margin:0;color:var(--g);text-shadow:3px 3px 0 #0b3a22,6px 6px 0 #000;animation:ttbob 1.6s steps(1) infinite}
@@ -159,16 +159,15 @@ body.notags #ntags{display:none}
 #ttl .ttw{background:#0b0f0de6;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,6px 6px 0 #000a;padding:16px;box-sizing:border-box;max-height:calc(100vh - 32px);overflow:auto;animation:ttin .25s steps(4) both}
 #ttl .ttw h2,.pzm h2{font-size:24px;color:var(--g);text-shadow:3px 3px 0 #000}
 #ttl .ttft{position:fixed;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;color:#8aa094;font-size:11px;pointer-events:none;text-shadow:1px 1px 0 #000}
-/* menu buttons: chunky, a ▶ marker on hover, and a fill that spreads out from the pointer */
-#ttl button,#pzm button{position:relative;overflow:hidden;isolation:isolate;border:3px solid #000;box-shadow:inset 0 -4px #0007,3px 3px 0 #000a;transition:color .15s,transform .06s,box-shadow .06s}
+/* menu buttons: chunky, a ▶ marker on hover, and they swell towards the side the pointer is on */
+#ttl button,#pzm button{position:relative;border:3px solid #000;box-shadow:inset 0 -4px #0007,3px 3px 0 #000a;transform-origin:var(--ox,50%) var(--oy,50%);transition:transform .16s cubic-bezier(.3,1.6,.5,1),transform-origin .16s ease-out,background .1s,box-shadow .1s}
 #ttl .ttbx>button,#ttl .ttw>button,#ttl .ttw .row2 button,#ttl .ttnc button,#pzm button{padding:12px;font-family:'Silkscreen',ui-monospace,monospace;font-size:15px;letter-spacing:1px}
-#ttl button::before,#pzm button::before{content:'';position:absolute;left:var(--x,50%);top:var(--y,50%);width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;z-index:-1;background:var(--g);transform:scale(0);transition:transform .45s cubic-bezier(.25,.8,.3,1)}
-#ttl button.go::before,#pzm button.go::before{background:#e8f3ec}
-#ttl button:not(:disabled):hover,#pzm button:not(:disabled):hover{color:#04120a}
-#ttl button:not(:disabled):hover::before,#pzm button:not(:disabled):hover::before{transform:scale(32)}
+#ttl button:not(:disabled):hover,#pzm button:not(:disabled):hover{z-index:1;transform:translate(var(--tx,0),var(--ty,0)) scale(1.07);box-shadow:inset 0 -4px #0007,5px 5px 0 #000a}
+#ttl button.go:not(:disabled):hover,#pzm button.go:not(:disabled):hover{background:#5df2a6}
+#ttl button:not(.go):not(:disabled):hover,#pzm button:not(.go):not(:disabled):hover{background:#3a4a40}
 #ttl .ttbx>button::after,#ttl .ttw>button::after,#pzm button::after{content:'▶';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:11px;opacity:0}
 #ttl .ttbx>button:not(:disabled):hover::after,#ttl .ttw>button:not(:disabled):hover::after,#pzm button:not(:disabled):hover::after{opacity:1;animation:ttblk .8s steps(1) infinite}
-#ttl button:not(:disabled):active,#pzm button:not(:disabled):active{transform:translate(3px,3px);box-shadow:inset 0 -2px #0007,0 0 0 #000}
+#ttl button:not(:disabled):active,#pzm button:not(:disabled):active{transform:translate(var(--tx,0),var(--ty,0)) scale(.97);box-shadow:inset 0 -2px #0007,0 0 0 #000;transition-duration:.05s}
 #ttl button:not(.go):not(:disabled),#pzm button:not(.go):not(:disabled){background:#26302a}
 /* pause menu */
 #pzo{backdrop-filter:blur(3px) saturate(.6)}

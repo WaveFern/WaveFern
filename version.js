@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v46.7.0';
+const GAME_VERSION='v46.7.1';
 const VERSION_HISTORY=[
+ {v:'v46.7.1',n:'Menu buttons now grow towards your pointer: point at the right side of a button and it stretches out to the right, the left side and it stretches left, and it follows as you move. This replaces the colour fill. Saves still load.'},
  {v:'v46.7.0',n:'Main menu, loading screen and pause menu redone in the game\'s own pixel look: the same black-bordered panels as the in-game boxes, blocky pixel shadows on the title, and menu buttons that fill with colour from wherever your pointer enters them, with a blinking ▶ marker. Single player now comes first, and Multiplayer opens straight into Your rooms, where you can also create or join a room. The pause menu shows the day. Saves still load.'},
  {v:'v46.6.0',n:'Band rooms now work on networks that block direct connections, such as many school networks. If a direct link to the host cannot be made, the game switches on its own to a relay through Firebase (Google), and the band panel shows "relay". Relay players and direct players share the same room. The relay only sends what changed and only sends positions of bandmates in the same area, so it stays inside the free Firebase limits. Everything that arrives from other players is now cleaned before the game uses it. Join a room can also find rooms through the relay. Saves still load.'},
  {v:'v46.5.0',n:'A more polished loading screen and main menu. The loading screen has a glowing logo, a bouncing equaliser, a progress bar with a percentage, a game tip, and messages like "Tuning the guitars…" and "Counting in the drummer…" that change every couple of seconds. The main menu has a darker vignette behind it, a glowing title, chunky buttons that lift when you point at them and press in when clicked, framed panels for the career and multiplayer screens, and the game version at the bottom. Saves still load.'},
