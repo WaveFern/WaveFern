@@ -1,82 +1,54 @@
 rules_version = '2';
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
-// Strict version (v46.5.1): every path, field, type and size the game uses is listed; anything else is refused.
-// Saves: a Google-signed-in player can read and write only their own save at saves/{their uid}; the admin can read every save.
-// Gifts: only the admin can create or delete gifts; a player can only read gifts sent to them and mark an unclaimed one claimed.
-// Band rooms: gameplay is browser to browser, but the host's browser (anonymous login) writes a small rooms/CODE heartbeat
-//   so the admin can list and join active rooms. Only the admin can read it; a host can only write an entry carrying their own uid.
-// Nothing else is open: any other collection, field or delete is denied.
+// Only what the game uses is allowed; everything else is refused. No get()/exists() lookups, so rules never cost extra reads.
+// saves/{uid}: a Google player reads and writes only their own save; the admin reads all.
+// gifts/{id}: the admin creates and deletes; a player reads their own and marks one claimed once.
+// rooms/{code}: a band host (anonymous login) writes a heartbeat carrying their own uid; only the admin reads.
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
-    function isGoogle() {
-      return signedIn() && request.auth.token.firebase.sign_in_provider == 'google.com';
-    }
-    function isAdmin() {
-      return isGoogle() && request.auth.uid == 'wE6oPZIHYifrqBFxzpPse6ripGY2';
-    }
-    function isCount(v) {
-      return v is int && v >= 0 && v <= 1000000000000;
-    }
-    function isStamp(v) {
-      // millisecond timestamp, after 2024 and at most a week ahead (clock skew allowed)
-      return v is int && v >= 1704067200000 && v <= request.time.toMillis() + 604800000;
-    }
+    function me() { return request.auth.uid; }
+    function google() { return request.auth != null && request.auth.token.firebase.sign_in_provider == 'google.com'; }
+    function admin() { return google() && me() == 'wE6oPZIHYifrqBFxzpPse6ripGY2'; }
+    function fields(k) { return request.resource.data.keys().toSet() == k.toSet(); }
+    function stamp(v) { return v is int && v > 1704067200000 && v < request.time.toMillis() + 604800000; }
+    function count(v) { return v is int && v >= 0 && v <= 1000000000000; }
+    function str(v, lo, hi) { return v is string && v.size() >= lo && v.size() <= hi; }
 
     match /saves/{uid} {
-      allow get: if (isGoogle() && request.auth.uid == uid) || isAdmin();
-      allow list: if isAdmin() && request.query.limit <= 100;
-      allow create, update: if isGoogle() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['code', 'day', 'artist', 't'])
-        && request.resource.data.keys().hasAll(['code', 'day', 'artist', 't'])
-        && request.resource.data.code is string && request.resource.data.code.size() > 0 && request.resource.data.code.size() < 1000000
-        && request.resource.data.day is number && request.resource.data.day >= 0 && request.resource.data.day <= 1000000
-        && request.resource.data.artist is string && request.resource.data.artist.size() <= 64
-        && isStamp(request.resource.data.t);
-      allow delete: if false;
+      allow get: if google() && me() == uid || admin();
+      allow list: if admin() && request.query.limit <= 100;
+      allow create, update: if google() && me() == uid && saveOk(request.resource.data);
+      function saveOk(d) {
+        return fields(['code', 'day', 'artist', 't']) && str(d.code, 1, 999999)
+          && d.day is number && d.day >= 0 && d.day <= 1000000 && str(d.artist, 0, 64) && stamp(d.t);
+      }
     }
 
     match /gifts/{id} {
-      allow get: if isAdmin() || (isGoogle() && resource.data.to == request.auth.uid);
-      allow list: if (isAdmin() && request.query.limit <= 30)
-        || (isGoogle() && resource.data.to == request.auth.uid);
-      allow create: if isAdmin()
-        && request.resource.data.keys().hasOnly(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
-        && request.resource.data.keys().hasAll(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
-        && request.resource.data.to is string && request.resource.data.to.matches('[A-Za-z0-9]{10,128}')
-        && request.resource.data.from is string && request.resource.data.from.size() <= 40
-        && request.resource.data.msg is string && request.resource.data.msg.size() <= 200
-        && isCount(request.resource.data.money) && isCount(request.resource.data.streams) && isCount(request.resource.data.listeners)
-        && isStamp(request.resource.data.t) && request.resource.data.claimed == false;
-      allow update: if isGoogle() && resource.data.to == request.auth.uid
-        && resource.data.claimed == false
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed'])
+      allow get, list: if admin() || google() && resource.data.to == me();
+      allow create: if admin() && giftOk(request.resource.data);
+      allow update: if google() && resource.data.to == me() && resource.data.claimed == false
+        && request.resource.data.diff(resource.data).affectedKeys() == ['claimed'].toSet()
         && request.resource.data.claimed == true;
-      allow delete: if isAdmin();
+      allow delete: if admin();
+      function giftOk(d) {
+        return fields(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
+          && d.to is string && d.to.matches('[A-Za-z0-9]{10,128}') && str(d.from, 0, 40) && str(d.msg, 0, 200)
+          && count(d.money) && count(d.streams) && count(d.listeners) && stamp(d.t) && d.claimed == false;
+      }
     }
 
     match /rooms/{code} {
-      function validRoom() {
-        return code.matches('[A-Z0-9]{5}')
-          && request.resource.data.keys().hasOnly(['code', 'band', 'n', 'uid', 't'])
-          && request.resource.data.keys().hasAll(['code', 'band', 'n', 'uid', 't'])
-          && request.resource.data.code == code && request.resource.data.uid == request.auth.uid
-          && request.resource.data.band is string && request.resource.data.band.size() >= 1 && request.resource.data.band.size() <= 24
-          && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 4
-          && isStamp(request.resource.data.t);
+      allow get, list: if admin();
+      allow create: if request.auth != null && roomOk(request.resource.data);
+      allow update: if request.auth != null && resource.data.uid == me() && roomOk(request.resource.data);
+      allow delete: if admin() || request.auth != null && resource.data.uid == me();
+      function roomOk(d) {
+        return code.matches('[A-Z0-9]{5}') && fields(['code', 'band', 'n', 'uid', 't'])
+          && d.code == code && d.uid == me() && str(d.band, 1, 24) && d.n is int && d.n >= 1 && d.n <= 4 && stamp(d.t);
       }
-      allow get: if isAdmin();
-      allow list: if isAdmin() && request.query.limit <= 100;
-      allow create: if signedIn() && validRoom();
-      allow update: if signedIn() && resource.data.uid == request.auth.uid && validRoom();
-      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
     }
 
-    // everything else: denied
-    match /{document=**} {
-      allow read, write: if false;
-    }
+    match /{document=**} { allow read, write: if false; }
   }
 }
