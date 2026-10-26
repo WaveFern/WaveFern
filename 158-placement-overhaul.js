@@ -7,14 +7,19 @@ const PS=()=>{const p=S.pset=S.pset||{};if(p.snap===undefined)p.snap=1;if(p.turn
 const dims=(t,r)=>{const f=F[t];return r%2?[f.d,f.w]:[f.w,f.d]};
 let sel=-1,moving=null,drag=null,pType='mouse',setOpen=false,PX=0,PY=0,man=false;
 
+/* v47.2.0: the room you are placing in. Downstairs is the house (x 0-16, z -WGX-12); upstairs is the annex floor at x 900, z 320,
+   whose walls and stairwell are in ANX.cw */
+const upst=()=>!!IN&&typeof ANX!='undefined'&&ANX.idx!=null&&IN.i==ANX.idx&&ANX.lv>0;
+const room=()=>upst()?[900,320,900+ANX.W,320+ANX.D]:[0,-WGX,16,12];
+const walls=()=>upst()?cols.concat(ANX.cw||[]):cols;
 /* does an item of type t fit at x,z facing r? (skip = index in PL to ignore) */
-function valid(t,x,z,r,skip){const f=F[t],c=fb(t,x,z,r);let ok=c[0]>=-1e-6&&c[1]>=-WGX-1e-6&&c[2]<=16+1e-6&&c[3]<=12+1e-6;
+function valid(t,x,z,r,skip){const f=F[t],c=fb(t,x,z,r),R=room();let ok=c[0]>=R[0]-1e-6&&c[1]>=R[1]-1e-6&&c[2]<=R[2]+1e-6&&c[3]<=R[3]+1e-6;
  if(ok&&!f.f){const o=q=>c[0]<q[2]&&c[2]>q[0]&&c[1]<q[3]&&c[3]>q[1];
-  ok=!(cols.some(o)||dyn.some(o)||PL.some((q,i)=>i!=skip&&!F[q.t].f&&o(fb(q.t,q.x,q.z,q.r)))||o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
+  ok=!(walls().some(o)||dyn.some(o)||PL.some((q,i)=>i!=skip&&!F[q.t].f&&o(fb(q.t,q.x,q.z,q.r)))||o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
  return ok}
 
 /* where the item ends up for a ground point px,pz: grid, clamp into the room, then snap flush to walls/furniture */
-function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=[0,-WGX,16,12];let wall=null;
+function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
  const run=()=>{const[w,d]=dims(t,r);let x=px,z=pz;if(s.grid>0){x=Math.round(x/s.grid)*s.grid;z=Math.round(z/s.grid)*s.grid}
   x=Math.max(R[0]+w/2,Math.min(R[2]-w/2,x));z=Math.max(R[1]+d/2,Math.min(R[3]-d/2,z));wall=null;
   if(s.snap){const T=.6;let bx=T,bz=T,nx=x,nz=z;wall=[0,0];
@@ -22,7 +27,7 @@ function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=[0,-WGX,16,12];let wall=null;
    if(Math.abs(R[2]-w/2-x)<bx){bx=Math.abs(R[2]-w/2-x);nx=R[2]-w/2;wall[0]=1}
    if(Math.abs(R[1]+d/2-z)<bz){bz=Math.abs(R[1]+d/2-z);nz=R[1]+d/2;wall[1]=-1}
    if(Math.abs(R[3]-d/2-z)<bz){bz=Math.abs(R[3]-d/2-z);nz=R[3]-d/2;wall[1]=1}
-   const rects=cols.filter(q=>q[2]>R[0]&&q[0]<R[2]&&q[3]>R[1]&&q[1]<R[3]);
+   const rects=walls().filter(q=>q[2]>R[0]&&q[0]<R[2]&&q[3]>R[1]&&q[1]<R[3]);
    if(!f.f)PL.forEach((q,i)=>{if(i!=skip&&!F[q.t].f)rects.push(fb(q.t,q.x,q.z,q.r))});
    rects.forEach(q=>{const nearZ=z-d/2<q[3]+T&&z+d/2>q[1]-T,nearX=x-w/2<q[2]+T&&x+w/2>q[0]-T;
     if(nearZ)[q[2]+w/2,q[0]-w/2].forEach(v=>{const e=Math.abs(v-x);if(e<bx){bx=e;nx=v;wall[0]=0}});
