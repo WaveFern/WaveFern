@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v47.3.0';
+const GAME_VERSION='v47.3.1';
 const VERSION_HISTORY=[
+ {v:'v47.3.1',n:'The wiki\'s scroll bars now match the game: square, black-edged and pixel-shaded, turning green while you drag them.'},
  {v:'v47.3.0',n:'The WaveFern Wiki: a Wiki button on the main menu opens a full guide to every mechanic (genre focus, stream formulas, collab fees, labels, festivals, the World Tour, band rooms and more), with search, categories and tables copied from the game itself'},
  {v:'v47.2.0',n:'You can place furniture upstairs now: press F on the upstairs floor and the camera frames that floor, and furniture fits against its walls (not in the stairwell). Paint has its own Paint category on Amazoom, so tins are easy to find; one tin paints one room, upstairs or down.'},
  {v:'v47.1.0',n:'Quitting now remembers where you are on the map: load your career and you are back on the same spot (inside buildings and tour cities still start at their usual spot). Also moved one glitched player into the Main Stage crowd.'},

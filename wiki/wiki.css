@@ -141,3 +141,15 @@ article.panel{animation:pin .25s steps(4) both}
  .ib{float:none;width:auto;margin:0 0 14px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* v47.3.1: scroll bars in the game's look: a black track with the panel edge, square button-coloured thumbs with
+   black borders and the inset bottom shadow, green while dragged. Firefox gets the colours only
+   (scrollbar-color is kept out of Chrome, where it would switch off the custom bars). */
+@supports not selector(::-webkit-scrollbar){html,#side,.tw,#sug{scrollbar-color:#3a4a40 #050806}}
+::-webkit-scrollbar{width:14px;height:14px}
+::-webkit-scrollbar-track{background:#050806;box-shadow:inset 0 0 0 2px var(--edge)}
+::-webkit-scrollbar-thumb{background:#3a4a40;border:3px solid #000;box-shadow:inset 0 -3px #0007}
+::-webkit-scrollbar-thumb:hover{background:#4d6355}
+::-webkit-scrollbar-thumb:active{background:var(--g)}
+::-webkit-scrollbar-corner{background:#000}
+::-webkit-scrollbar-button{display:none}
