@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v46.7.3';
+const GAME_VERSION='v46.7.4';
 const VERSION_HISTORY=[
+ {v:'v46.7.4',n:'Fixed the menu button grow jumping straight to full size on devices with animations turned down in the system settings: the smooth ease now always plays (only the looping title bob and blinking marker stay off there). Saves still load.'},
  {v:'v46.7.3',n:'Menu buttons now grow evenly from their centre when you point at them, easing in and out smoothly like a keyframe in a video editor, and shrink back the same way. Saves still load.'},
  {v:'v46.7.2',n:'Menu buttons now smoothly expand towards the side your pointer came in from, and stay put while you move over them. Saves still load.'},
  {v:'v46.7.1',n:'Menu buttons now grow towards your pointer: point at the right side of a button and it stretches out to the right, the left side and it stretches left, and it follows as you move. This replaces the colour fill. Saves still load.'},

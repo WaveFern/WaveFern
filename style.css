@@ -178,4 +178,4 @@ body.notags #ntags{display:none}
 @keyframes ttbob{50%{transform:translateY(-3px)}}
 @keyframes ttblk{50%{opacity:0}}
 @media(max-height:560px){#ttl .ttm h1{font-size:28px}#ttl .ttm>.px{margin:8px 0}#ttl .ttbx{gap:6px;padding:10px}#ttl .ttbx>button{padding:8px}#ttl .ttft{display:none}}
-@media(prefers-reduced-motion:reduce){#ttl *,#load *,#pzm,#pzm *{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){#ttl *,#load *,#pzm,#pzm *{animation:none!important}}
