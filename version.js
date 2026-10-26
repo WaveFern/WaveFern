@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v46.7.5';
+const GAME_VERSION='v46.8.0';
 const VERSION_HISTORY=[
+ {v:'v46.8.0',n:'Buttons in the game\'s own menus (making a song, settings, wardrobe, shops and pop-ups) now match the main menu: black edges, a hard pixel shadow, a smooth eased grow when you point at them and a press-in when clicked. The in-game computer and phone screens and the rhythm-game pads keep their own look. Saves still load.'},
  {v:'v46.7.5',n:'Menu buttons grow a little quicker on hover. Saves still load.'},
  {v:'v46.7.4',n:'Fixed the menu button grow jumping straight to full size on devices with animations turned down in the system settings: the smooth ease now always plays (only the looping title bob and blinking marker stay off there). Saves still load.'},
  {v:'v46.7.3',n:'Menu buttons now grow evenly from their centre when you point at them, easing in and out smoothly like a keyframe in a video editor, and shrink back the same way. Saves still load.'},

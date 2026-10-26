@@ -179,3 +179,12 @@ body.notags #ntags{display:none}
 @keyframes ttblk{50%{opacity:0}}
 @media(max-height:560px){#ttl .ttm h1{font-size:28px}#ttl .ttm>.px{margin:8px 0}#ttl .ttbx{gap:6px;padding:10px}#ttl .ttbx>button{padding:8px}#ttl .ttft{display:none}}
 @media(prefers-reduced-motion:reduce){#ttl *,#load *,#pzm,#pzm *{animation:none!important}}
+/* v46.8.0: the menu button feel everywhere in the game's own menus (making a song, settings, wardrobe, shops, pop-ups):
+   black edge, hard shadow, smooth eased grow on hover, press-in on click. Left out: the in-game computer and phone
+   screens (#pc, #ph, websites) and rhythm-game pads (anything pressed with onpointerdown). :where keeps it low priority,
+   so screens with their own button colours keep them. */
+:where(#ui .box,#ui .modal) button:where(:not(:is(#pc,#ph,.site,.bw,.pads,.kb,.mgpads,.lanes) button):not([onpointerdown])){position:relative;border-color:#000;box-shadow:inset 0 -3px #0007,2px 2px 0 #000a;transition:transform .22s cubic-bezier(.65,0,.35,1),background .22s cubic-bezier(.65,0,.35,1),box-shadow .22s cubic-bezier(.65,0,.35,1)}
+:where(#ui .box,#ui .modal) button:where(:not(:is(#pc,#ph,.site,.bw,.pads,.kb,.mgpads,.lanes) button):not([onpointerdown]):not(:disabled):hover){z-index:1;transform:scale(1.05);box-shadow:inset 0 -3px #0007,3px 3px 0 #000a}
+:where(#ui .box,#ui .modal) button:where(:not(:is(#pc,#ph,.site,.bw,.pads,.kb,.mgpads,.lanes) button):not([onpointerdown]):not(:disabled):not(.go):hover){background:#3a4a40}
+:where(#ui .box,#ui .modal) button:where(.go:not(:is(#pc,#ph,.site,.bw,.pads,.kb,.mgpads,.lanes) button):not([onpointerdown]):not(:disabled):hover){background:#5df2a6}
+:where(#ui .box,#ui .modal) button:where(:not(:is(#pc,#ph,.site,.bw,.pads,.kb,.mgpads,.lanes) button):not([onpointerdown]):not(:disabled):active){transform:scale(.97);box-shadow:inset 0 -2px #0007,0 0 0 #000;transition-duration:.05s}
