@@ -9,14 +9,14 @@ cat('band','Multiplayer','🎸','Band rooms: playing with up to three friends.')
 cat('meta','About the game','📜','Settings, graphics, saves and the full version history.');
 
 /* ===================== Main Page ===================== */
-page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide).length;
- return `<div class=hero><h1>WAVEFERN<br>WIKI</h1><div class="px sub">Music Career Sim</div>
- <p class=lead>Welcome to the WaveFern Records wiki: every mechanic of the game, worked out from the game's own code.<br>The tables on these pages are copied straight from the game's data each time it updates, so the numbers are always the real ones.</p>
+page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide).length,V=typeof VERSION_HISTORY!='undefined'?VERSION_HISTORY[0]:null;
+ return `<div class=hero><div class=eq aria-hidden=true><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h1>WAVEFERN<br>WIKI</h1><div class="px sub">Music Career Sim</div>
+ <p class=lead>Every mechanic of WaveFern Records, worked out from the game's own code. The tables come straight from the game's data, so the numbers are always the real ones.</p>
  <div class=stats><div><b>${n}</b>pages</div><div><b>${(D.genres||[]).length}</b>genres</div><div><b>${(D.artists||[]).length}</b>artists</div><div><b>${(D.dest||[]).length}</b>tour cities</div><div><b>${(D.fame&&D.fame.starts.length-1)||350}</b>fame levels</div></div>
- <p><a class="btn go" href="../">▶ Play the game</a> <a class=btn href="#/first-day">New here? Start here</a></p></div>
- <div class=grid>${CATS.map(c=>`<a class=card href="#/cat-${c.id}"><span class=e>${c.e}</span><h3>${c.t}</h3><ul>${PAGES.filter(p=>p.cat===c.id&&!p.hide).slice(0,7).map(p=>'<li>'+p.t+'</li>').join('')}${PAGES.filter(p=>p.cat===c.id&&!p.hide).length>7?'<li>…and more</li>':''}</ul></a>`).join('')}</div>
- ${H2('Popular pages')}<p>${['streams','song-quality','genres','extras','collabs','fame','labels','festival','world-tour','band-rooms'].map(i=>L(i)).join(' · ')}</p>
- ${H2('Latest update')}${typeof VERSION_HISTORY!='undefined'?`<p><span class="tag g">${VERSION_HISTORY[0].v}</span> ${esc(VERSION_HISTORY[0].n)}</p><p>${L('versions','See the full version history')}</p>`:''}`}});
+ <p class=cta><a class="btn go" href="../">▶ Play the game</a><a class=btn href="#/first-day">New here? Start here</a></p></div>
+ <div class=grid>${CATS.filter(c=>c.id!='meta').map(c=>{const ps=PAGES.filter(p=>p.cat===c.id&&!p.hide);return `<a class="card cat" href="#/cat-${c.id}" style="--a:${acc(c.id)}"><span class=e>${c.e}</span><h3>${c.t}</h3><p>${c.d}</p><small>${ps.length} page${ps.length==1?'':'s'} ▶</small></a>`}).join('')}</div>
+ <div class=duo><section class=box2><h2>Popular pages</h2><div class=chips>${['streams','song-quality','genres','extras','collabs','fame','labels','festival','world-tour','band-rooms'].map(i=>{const p=byId(i);return p?`<a class=chip href="#/${i}" style="--a:${acc(p.cat)}">${p.e||''} ${p.t}</a>`:''}).join('')}</div></section>
+ ${V?`<section class=box2><h2>Latest update</h2><p><span class="tag g">${V.v}</span></p><p>${esc(V.n)}</p><p>${L('versions','Full version history ▶')}</p></section>`:''}</div>`}});
 
 /* ===================== Getting started ===================== */
 page('first-day','Your first day','start',{e:'🌅',sum:'What to do in your first hour, step by step.',src:['72-tutorial.js','02-data.js'],body:()=>`
@@ -117,7 +117,7 @@ page('streams','Streams','music',{e:'📈',sum:'The full daily streams formula, 
 <p class=lead>Every released song earns streams every day. Streams build up through the day (twice as fast at night) and are paid the next morning at <b>$${(D.tune||{}).payRate} per stream</b>, minus any ${L('labels','label')} cut.</p>
 ${H2('Daily streams')}${FX(`daily = quality × ${p.base} × random(0.75–1.25)
       × <b>genre hype</b>                         (×0.8–1.3, rerolled daily)
-      × <b>age decay</b>   (0.86^days + ${p.floor})      (a new song fades over a few weeks)
+      × <b>age decay</b>   (0.86^days + ${p.floor})
       × <b>fame</b>        1.5^fame tier × (1 + min(1, √listeners ÷ 200))
       × <b>interest</b>    0.3 + 0.7 × interest
       × <b>reach</b>       1 + promo×0.3 + decks×0.2 + content kit + home×0.1

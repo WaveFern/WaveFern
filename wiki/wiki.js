@@ -1,4 +1,4 @@
-/* WaveFern Wiki (v47.3.0): a small hash-routed wiki. Pages live in pages.js; their tables are built from
+/* WaveFern Wiki (v47.4.0 polish): a small hash-routed wiki. Pages live in pages.js; their tables are built from
    window.WIKI_DATA (data.js, copied out of the game by tools/wiki-data.js) and the changelog from ../version.js,
    so the numbers here are the game's own. Links: #/page-id or #/page-id/section. */
 const D=window.WIKI_DATA||{},PAGES=[],CATS=[];
@@ -38,22 +38,35 @@ const fameOf=L=>{const s=(D.fame&&D.fame.starts)||[];let n=0;while(n<s.length&&s
 
 /* ---------- rendering ---------- */
 const $=id=>document.getElementById(id);
-function sideHTML(cur){return CATS.map(c=>`<h3>${c.e} ${c.t}</h3>`+PAGES.filter(p=>p.cat===c.id&&!p.hide).map(p=>`<a href="#/${p.id}" class="${p.id===cur?'on':''}">${p.t}</a>`).join('')).join('')}
+function sideHTML(cur){return `<a href="#/home" class="hm${cur=='home'?' on':''}">🏠 Main Page</a>`+CATS.map(c=>`<h3 style="--a:${acc(c.id)}"><a href="#/cat-${c.id}">${c.e} ${c.t}</a></h3>`+PAGES.filter(p=>p.cat===c.id&&!p.hide).map(p=>`<a href="#/${p.id}" class="${p.id===cur?'on':''}" style="--a:${acc(c.id)}">${p.t}</a>`).join('')).join('')}
+/* each category has its own accent colour (headers, sidebar, cards, infobox) */
+const ACC={start:'#5aa8ff',music:'#2fe68a',career:'#ffcc33',live:'#ff7ac8',life:'#40e0d0',band:'#b48cff',meta:'#8aa094'};
+const acc=c=>ACC[c]||'#2fe68a';
+/* "On this page": a contents box after the lead paragraph on pages with three or more sections */
+function withToc(body,pid){const hs=[];body.replace(/<h2 id="([^"]+)">(.*?)<\/h2>/g,(m,i,t)=>hs.push([i,t]));if(hs.length<3)return body;
+ const toc=`<nav class=toc><b>On this page</b>${hs.map(([i,t])=>`<a href="#/${pid}/${i}">${t}</a>`).join('')}</nav>`;
+ const k=body.indexOf('class=lead'),e=k<0?-1:body.indexOf('</p>',k);return e<0?toc+body:body.slice(0,e+4)+toc+body.slice(e+4)}
+/* previous and next page in the same category */
+function pager(p){const l=PAGES.filter(x=>x.cat===p.cat&&!x.hide),i=l.indexOf(p);if(i<0||l.length<2)return'';const pv=l[i-1],nx=l[i+1];
+ return `<nav class=pager>${pv?`<a href="#/${pv.id}"><small>◀ Previous</small>${pv.e||''} ${pv.t}</a>`:'<span></span>'}${nx?`<a class=nx href="#/${nx.id}"><small>Next ▶</small>${nx.e||''} ${nx.t}</a>`:'<span></span>'}</nav>`}
 function render(){const h=decodeURIComponent(location.hash.replace(/^#\/?/,'')),[id,sec]=h.split('/'),q=/^search=/.test(h)?h.slice(7):null;
- TID=0;let html;
+ TID=0;let html,cur=null;
  if(q!=null)html=searchPage(q);
- else{const p=byId(id||'home');
-  if(!p)html=`<article class=panel><h1>Page not found</h1><p>There is no page called <code>${esc(id)}</code> yet. Try the search box, or go back to the ${L('home','Main Page')}.</p></article>`;
+ else{const p=byId(id||'home');cur=p;
+  if(!p)html=`<article class=panel><header class=ah><span class=ae>❓</span><div><div class=crumb>${L('home','Wiki')}</div><h1>Page not found</h1></div></header><p>There is no page called <code>${esc(id)}</code> yet. Try the search box, or go back to the ${L('home','Main Page')}.</p></article>`;
   else{const c=CATS.find(c=>c.id===p.cat);let body='';try{body=p.body()}catch(e){console.error(e);body=N('This page could not be built: '+esc(e.message),'warn')}
-   html=`<article class=panel>${p.id=='home'?'':`<div class=crumb>${L('home','Wiki')} › ${c?`<a href="#/cat-${c.id}">${c.t}</a> › `:''}${p.t}</div><h1>${p.t}</h1>`}${body}
-   ${p.id=='home'?'':`<div class=cats><b>Category:</b>${c?`<a href="#/cat-${c.id}">${c.t}</a>`:''}${p.src?` · <b>Code:</b> ${p.src.map(src).join(' ')}`:''}</div>`}</article>`}
+   const isCat=/^cat-/.test(p.id);
+   html=p.id=='home'?`<article class="panel home">${body}</article>`:
+    `<article class=panel style="--a:${acc(p.cat)}"><header class=ah><span class=ae>${isCat?c.e:p.e||'📄'}</span><div><div class=crumb>${L('home','Wiki')} › ${c&&!isCat?`<a href="#/cat-${c.id}">${c.t}</a> › `:''}<span>${isCat?'Category':p.t}</span></div><h1>${p.t}</h1>${p.sum?`<p class=sum>${p.sum}</p>`:''}</div></header>
+    ${isCat?body:withToc(body,p.id)}
+    ${isCat?'':pager(p)+`<div class=cats><b>Category</b>${c?`<a href="#/cat-${c.id}">${c.e} ${c.t}</a>`:''}${p.src?`<b>From the code</b>${p.src.map(src).join(' ')}`:''}</div>`}</article>`}
   document.title=(p&&p.id!='home'?p.t+' – ':'')+'WaveFern Wiki'}
  $('main').innerHTML=html;$('side').innerHTML='<div class=panel>'+sideHTML(id||'home')+'</div>';$('side').classList.remove('on');
  const a=$('side').querySelector('a.on'),sd=$('side');sd.scrollTop=a?Math.max(0,a.offsetTop-sd.clientHeight/2):0;
  if(sec){const t=$(sec);if(t){t.scrollIntoView();return}}window.scrollTo(0,0)}
 
 /* category index pages */
-function catPages(){CATS.forEach(c=>page('cat-'+c.id,c.t,c.id,{hide:1,body:()=>`<p class=lead>${c.d}</p>`+`<div class=grid>${PAGES.filter(p=>p.cat===c.id&&!p.hide).map(p=>`<a class=card href="#/${p.id}"><span class=e>${p.e||''}</span><h3>${p.t}</h3><p class=m style="margin:0;font-size:12.5px">${p.sum||''}</p></a>`).join('')}</div>`}))}
+function catPages(){CATS.forEach(c=>page('cat-'+c.id,c.t,c.id,{hide:1,sum:c.d,body:()=>`<div class=grid>${PAGES.filter(p=>p.cat===c.id&&!p.hide).map(p=>`<a class=card href="#/${p.id}" style="--a:${acc(c.id)}"><span class=e>${p.e||''}</span><h3>${p.t}</h3><p>${p.sum||''}</p></a>`).join('')}</div>`}))}
 
 /* ---------- search ---------- */
 let IDX=null;
