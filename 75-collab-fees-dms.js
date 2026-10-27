@@ -30,21 +30,18 @@ function collabFee(i,dir,k){const a=ART[i];if(!a)return 5;const A=a[2],mk=artMK(
 const GENREL=[['Hip-Hop','Rap'],['Pop','R&B','Indie'],['Lo-fi','Electronic','Folk'],['Rock','Country','Folk','Indie'],['R&B','Latin','Pop']];
 /* 0..1: how fast the player is growing (monthly listeners now vs a week ago) and how much interest their releases have */
 function dmMomentum(){const h=S.mlHist||[],cur=h.length?h[h.length-1].ml:S.listeners||0,old=(h.filter(q=>q.day<=S.day-7).pop()||h[0]||{ml:cur}).ml,g=Math.max(0,Math.min(1,((cur+1)/(old+1)-1)));return Math.min(1,g*.7+(S.interest||0)*.3)}
-/* who may reach out at all. All the thresholds for famous artists are here.
-   DM_STAR: artists with at least A monthly listeners only DM a player with at least L monthly listeners.
-   DM_LOCK: named top-tier artists with their own player threshold (monthly listeners).
-   DM_GAP: an artist that size or bigger also never DMs a player they are more than DM_GAP times bigger than
-           (a 559M Doja Cat waits until you have about 56M, not 20M). */
-const DM_STAR={A:50000,L:25000},DM_LOCK={'Panic Man Dan':5000},DM_GAP=10;
+/* who may reach out at all. Size never locks anyone out: how much bigger an artist is than you only lowers the odds (see dmWeight).
+   DM_LOCK: named artists with their own player threshold (monthly listeners), part of their story. */
+const DM_LOCK={'Panic Man Dan':5000};
 function dmGateOK(i){const a=ART[i];if(!a)return false;const L=S.listeners||0;
- if(a[2]>=DM_STAR.A)return L>=DM_STAR.L&&a[2]<=L*DM_GAP;
  if(DM_LOCK[a[0]]!==undefined)return L>=DM_LOCK[a[0]];
  return true}
 function dmWeight(i,mo){if(!dmGateOK(i))return 0;const a=ART[i],A=a[2],L=Math.max(S.listeners||0,5),d=Math.log10(A/L),M=mo==null?dmMomentum():mo,rep=Math.max(-10,Math.min(15,S.rep||0));let w;
  if(Math.abs(d)<=.35)w=1;/* similar size: the most common */
  else if(d<0&&d>-.9)w=.7;/* a bit smaller: frequent */
- else if(d>0){/* bigger than you: the chance falls off exponentially with the gap, never exactly zero (a megastar reaching a small artist is almost impossible but can happen) */
-  w=.5*Math.exp(-2.3*(d-.35))*(1+(d<=1?2*M:M)+Math.min(2,Math.max(0,rep)*.05))}
+ else if(d>0){/* bigger than you: the chance falls off faster and faster with the gap (g = how many powers of 10 past "similar size"), never exactly zero.
+     about 1 in 9 at 4x bigger, 1 in 300 at 10x, 1 in 80,000 at 28x (a 560M star and a 20M player), and so small at 1,000x or more that it never really happens */
+  const g=d-.35;w=.5*Math.pow(10,-2*g-2*g*g)*(1+(d<=1?2*M:M)+Math.min(2,Math.max(0,rep)*.05))}
  else if(d<0){/* much smaller: rare unless there is a believable reason (a previous collab, or the same sound as your latest releases) */
   const rec=(S.songs||[]).slice(-5).map(s=>s.g);w=(rec.includes(a[1])||S.msgs.some(m=>m.a===i&&m.state==3))?.12:.015}
  else w=1;

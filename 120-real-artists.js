@@ -34,13 +34,11 @@ ART.forEach(a=>{if(a[8]){a[2]=Math.round(a[2]*REAL_X);REAL_SET.add(a[0])}});
 if(typeof MKT!='undefined')MKT=null;if(typeof BRAL!='undefined')BRAL=null;
 /* featured fan streams from a real artist stay what they were before the 10x */
 {const p0=planOf;planOf=function(s){if(!s||!s.ft||!REAL_SET.has(s.ft)||s.pd===S.day)return p0.apply(this,arguments);const k=PERF.featLis;PERF.featLis=k/REAL_X;try{return p0.apply(this,arguments)}finally{PERF.featLis=k}}}
-/* collab odds and fees after the 10x: a real artist DMs you as if they were about 3x (sqrt of REAL_X) bigger than before, not 10x,
-   so the stars are rarer than before but still reachable; they charge about 3x more when you message them;
+/* collab odds and fees after the 10x: a real artist's DM odds use their full 10x size, so a megastar only messages a player near their size;
+   they charge about 3x (sqrt of REAL_X) more when you message them;
    and what an artist pays you for your audience is priced from the roster as it was before the 10x */
 const REAL_DM=Math.sqrt(REAL_X);
 const realSize=(fn,f)=>{const c=[];ART.forEach(a=>{if(a[8]&&REAL_SET.has(a[0])){c.push([a,a[2]]);a[2]=Math.round(a[2]*f)}});try{return fn()}finally{c.forEach(([a,v])=>a[2]=v)}};
-/* the who-may-DM gate (dmGateOK) is checked at their real size first, so the scaling never lets a megastar slip under DM_GAP */
-{const w0=dmWeight;dmWeight=function(i){if(!dmGateOK(i))return 0;const t=this,g=arguments;return realSize(()=>w0.apply(t,g),REAL_DM/REAL_X)}}
 let MKT_R=null;/* fee curve of the pre-10x roster, cached */
 {const c0=collabFee;collabFee=function(i,dir,k){const a=ART[i],real=a&&a[8]&&REAL_SET.has(a[0]),t=this,g=arguments;
  const m0=MKT;MKT=MKT_R;let v;try{v=realSize(()=>c0.apply(t,g),1/REAL_X)}finally{MKT_R=MKT;MKT=m0}
