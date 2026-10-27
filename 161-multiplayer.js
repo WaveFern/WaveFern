@@ -418,22 +418,22 @@ function igEnd(sc){rec.sc.l=Math.max(0,Math.min(1,sc));rec.ig=null;MGK='';mgStag
 function igTick(dt){const g=rec.ig;g.t+=dt;
  if(g.k=='dr'){g.lit=g.lit.map(v=>Math.max(0,v-dt));g.N.forEach(n=>{if(!n.h&&g.t>n.at+.22){n.h=-1;g.fb='Miss'}});if(g.t>=g.end)igEnd(g.pts/g.N.length)}
  else if(g.k=='gt'){const q=g.R[g.r];g.lt+=dt;
-  if(g.ph=='show'){const j=Math.floor(g.lt/.55);g.lit=j<q.length&&g.lt-j*.55<.4?q[j]:-1;if(g.lit>=0&&g.lit!==g.pl){g.pl=g.lit;sfx(MG_NOTE[g.lit]/2,.25,'sawtooth',.06)}if(g.lit<0)g.pl=-1;if(j>=q.length+.5){g.ph='play';g.i=0;g.lt=0;g.lim=2.5+q.length*.9;g.lit=-1;g.fb='Your turn'}}
+  if(g.ph=='show'){const j=Math.floor(g.lt/.55);g.lit=j<q.length&&g.lt-j*.55<.4?q[j]:-1;if(g.lit>=0&&g.lit!==g.pl){g.pl=g.lit;mgPluck(MG_NOTE[g.lit]/2)}if(g.lit<0)g.pl=-1;if(j>=q.length+.5){g.ph='play';g.i=0;g.lt=0;g.lim=2.5+q.length*.9;g.lit=-1;g.fb='Your turn'}}
   else if(g.ph=='play'){if(g.lt>=g.lim){g.fb='Too slow';g.ph='gap';g.lt=0}}
   else if(g.ph=='gap'&&g.lt>.9){g.lit=-1;if(++g.r>=g.R.length)return igEnd(g.ok/g.tot);g.ph='show';g.lt=0;g.fb='Watch the riff'}}
  else if(g.k=='bs'){for(let j=g.lead;j<g.lead+g.n;j++){const k=j-g.lead;if(g.res[k]==null&&g.t>igBeat(g,j)+.25){g.res[k]=0;g.fb='Missed a beat'}}
-  const jb=Math.floor((g.t-g.t0)/g.bp+.001);if(jb>=0&&jb!==g.lb&&jb<g.lead+g.n){g.lb=jb;sfx(jb<g.lead?660:110,.08,jb<g.lead?'square':'sine',.08)}
+  const jb=Math.floor((g.t-g.t0)/g.bp+.001);if(jb>=0&&jb!==g.lb&&jb<g.lead+g.n){g.lb=jb;mgTick(jb<g.lead)}
   if(g.t>igBeat(g,g.lead+g.n-1)+.5)igEnd(g.res.reduce((a,b)=>a+(b||0),0)/g.n)}
  else{g.lt+=dt;if(g.fbt>0)g.fbt-=dt;if(g.lt>=g.lim){g.fb='Too slow';g.fbt=.5;g.pk=-1;igNext(g)}}}
 function igNext(g){if(++g.i>=g.n)return igEnd(g.ok/g.n);let c;do c=Math.random()*7|0;while(c===g.cur);g.cur=c;g.lt=0;g.lim=Math.max(.85,1.7-g.i*.09)}
 window.mpIg=p=>{if(!rec||!rec.ig||mode!='rec'||rec.wait||rec.cdn>0)return;const g=rec.ig;
- if(g.k=='dr'){if(p<0||p>3)return;g.lit[p]=.15;sfx([70,190,900,600][p],.08,p<2?'sine':'square',.09);let b=null,bd=.22;g.N.forEach(n=>{const d=Math.abs(g.t-n.at);if(!n.h&&n.l==p&&d<bd){bd=d;b=n}});
+ if(g.k=='dr'){if(p<0||p>3)return;g.lit[p]=.15;mgDrum(p);let b=null,bd=.22;g.N.forEach(n=>{const d=Math.abs(g.t-n.at);if(!n.h&&n.l==p&&d<bd){bd=d;b=n}});
   if(b){b.h=1;g.pts+=bd<.08?1:bd<.15?.7:.4;g.fb=bd<.08?'Perfect':bd<.15?'Good':'OK'}else{g.pts=Math.max(0,g.pts-.1);g.fb='Off the beat'}}
- else if(g.k=='gt'){if(g.ph!='play'||p<0||p>3)return;const q=g.R[g.r];g.lit=p;g.pt=g.t;sfx(MG_NOTE[p]/2,.2,'sawtooth',.07);
+ else if(g.k=='gt'){if(g.ph!='play'||p<0||p>3)return;const q=g.R[g.r];g.lit=p;g.pt=g.t;mgPluck(MG_NOTE[p]/2);
   if(q[g.i]===p){g.ok++;if(++g.i>=q.length){g.fb='Nailed it';g.ph='gap';g.lt=0}}else{g.fb='Wrong string';g.ph='gap';g.lt=0}}
- else if(g.k=='bs'){let bj=-1,bd=g.bp/2;for(let j=g.lead;j<g.lead+g.n;j++){const d=Math.abs(g.t-igBeat(g,j));if(d<bd&&g.res[j-g.lead]==null){bd=d;bj=j}}sfx(90,.12,'sine',.12);
+ else if(g.k=='bs'){let bj=-1,bd=g.bp/2;for(let j=g.lead;j<g.lead+g.n;j++){const d=Math.abs(g.t-igBeat(g,j));if(d<bd&&g.res[j-g.lead]==null){bd=d;bj=j}}mgBass(82);
   if(bj<0){g.fb='Wait for the beat';return}const off=g.t-igBeat(g,bj);g.res[bj-g.lead]=bd<.06?1:bd<.12?.7:bd<.2?.4:.1;g.fb=bd<.06?'Perfect':off<0?'Early':'Late'}
- else{if(p<0||p>6)return;sfx(KBN[p],.2,'triangle',.08);g.pk=p;g.fbt=.25;if(p===g.cur){g.ok++;g.fb='✓'}else g.fb='✗';igNext(g)}};
+ else{if(p<0||p>6)return;mgKey(KBN[p]);g.pk=p;g.fbt=.25;if(p===g.cur){g.ok++;g.fb='✓'}else g.fb='✗';igNext(g)}};
 addEventListener('keydown',e=>{if(mode!='rec'||!rec||!rec.ig||rec.wait||rec.cdn>0||e.repeat||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key.toLowerCase(),g=rec.ig,n=parseInt(k);
  if(g.k=='dr'){const i=n>=1&&n<=4?n-1:['d','f','j','k'].indexOf(k);if(i>=0)mpIg(i)}
  else if(g.k=='gt'){if(n>=1&&n<=4)mpIg(n-1)}

@@ -457,9 +457,9 @@ function festMgStart(){const set=FEST.set,ks=Object.keys(FMG).filter(k=>k!=set.l
  else Object.assign(m,{dur:4.5,lv:.2,c:.5,in:0});
  set.mg=m;snd('pop');FEST.mgK=''}
 function festMgPress(p){const set=FEST.set;if(!set||!set.mg||set.mg.sc!=null||set.mg.t<0)return;const m=set.mg;
- if(m.k=='hype'&&p==-1){m.lv=Math.min(1.05,m.lv+.075);sfx(220+m.lv*500,.05,'square',.04)}
+ if(m.k=='hype'&&p==-1){m.lv=Math.min(1.05,m.lv+.075);sdNz(.09,500+m.lv*1400,.05,{q:1.4,pan:R(-.3,.3)})}
  else if(m.k=='drop'&&p==-1){m.tries++;const ok=m.pos>m.z0&&m.pos<m.z0+m.zw;if(ok){m.hits++;snd('cash');sfx(60,.25,'sine',.35,35,0,0)}else snd('err');m.fl=ok?.35:-.35;m.z0=R(.15,.7);if(m.tries>=3)festMgDone(m.hits/3)}
- else if(m.k=='call'&&p>=0&&m.ph=='input'){m.lit=p;m.lt=.25;sfx(MG_NOTE[p],.25,'triangle',.12);if(p==m.seq[m.i]){m.i++;m.ok++;if(m.i>=m.seq.length)festMgDone(1)}else{snd('err');festMgDone(m.ok/m.seq.length)}}
+ else if(m.k=='call'&&p>=0&&m.ph=='input'){m.lit=p;m.lt=.25;mgPad(MG_NOTE[p]);if(p==m.seq[m.i]){m.i++;m.ok++;if(m.i>=m.seq.length)festMgDone(1)}else{snd('err');festMgDone(m.ok/m.seq.length)}}
  else if(m.k=='lyric'&&p>=0&&!(m.lt>0)){const it=m.items[m.i];m.pk=p;m.lt=.6;if(it.opts[p]==it.right){m.ok++;snd('cash')}else snd('err')}}
 function festMgDone(sc){const set=FEST.set,m=set.mg;if(!m||m.sc!=null)return;m.sc=Math.max(0,Math.min(1,sc));m.fb=1.5;set.sc.push(m.sc);if(set.ss)set.ss.push(m.sc);const C0=set.C0;let d;
  if(m.sc>=.75)d=C0*(.1+.12*(m.sc-.75)/.25);else if(m.sc>=.5)d=C0*.04*(m.sc-.5)/.25;else d=-C0*(.05+.12*(.5-m.sc)/.5);
@@ -468,7 +468,7 @@ function festMgDone(sc){const set=FEST.set,m=set.mg;if(!m||m.sc!=null)return;m.s
 function festMgTick(dt){const set=FEST.set,m=set.mg;m.t+=dt;if(m.sc!=null){m.fb-=dt;if(m.fb<=0){set.mg=null;set.next=set.t+R(3.5,9)}return}if(m.t<0)return;
  if(m.k=='hype'){m.lv=Math.max(0,m.lv-.32*dt);m.best=Math.max(m.best,m.lv);if(m.lv>=1)festMgDone(1);else if(m.t>=m.lim)festMgDone(m.best)}
  else if(m.k=='drop'){m.pos+=m.dir*m.sp*dt;if(m.pos>1){m.pos=1;m.dir=-1}if(m.pos<0){m.pos=0;m.dir=1}m.fl*=.9;if(m.t>=m.lim)festMgDone(m.hits/3)}
- else if(m.k=='call'){m.lt=Math.max(0,m.lt-dt);if(m.lt<=0)m.lit=-1;if(m.ph=='show'){const k=Math.floor(m.t/.6);if(k!=m.st&&k<m.seq.length){m.st=k;m.lit=m.seq[k];m.lt=.3;sfx(MG_NOTE[m.lit],.28,'triangle',.12)}if(m.t>m.seq.length*.6+.2){m.ph='input';m.t=0}}else if(m.t>=m.lim)festMgDone(m.ok/m.seq.length)}
+ else if(m.k=='call'){m.lt=Math.max(0,m.lt-dt);if(m.lt<=0)m.lit=-1;if(m.ph=='show'){const k=Math.floor(m.t/.6);if(k!=m.st&&k<m.seq.length){m.st=k;m.lit=m.seq[k];m.lt=.3;mgPad(MG_NOTE[m.lit])}if(m.t>m.seq.length*.6+.2){m.ph='input';m.t=0}}else if(m.t>=m.lim)festMgDone(m.ok/m.seq.length)}
  else if(m.k=='lyric'){if(m.lt>0){m.lt-=dt;if(m.lt<=0){m.pk=-1;m.t=0;if(++m.i>=m.items.length)festMgDone(m.ok/m.items.length)}}else if(m.t>=m.lim){m.pk=-1;m.lt=.6}}
  else{const hold=keys[' ']||keys.e||keys.enter||MGH;m.lv=Math.max(0,Math.min(1,m.lv+(hold?1.1:-.9)*dt));m.c=Math.max(.15,Math.min(.85,.5+.28*Math.sin(m.t*1.1)+.1*Math.sin(m.t*2.4+1)));if(Math.abs(m.lv-m.c)<.11)m.in+=dt;if(m.t>=m.dur)festMgDone(m.in/m.dur*1.15)}}
 function festMgDraw(){const set=FEST.set;let el=$('fsg');const m=set&&set.mg;if(!m){if(el)el.remove();FEST.mgK='';return}

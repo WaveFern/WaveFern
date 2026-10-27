@@ -82,7 +82,9 @@ const clockOn=()=>!PAUSED&&(mode=='play'||mode=='rec'||mode=='drive'||mode=='pc'
 function energyTick(dt){if(!clockOn()||S.energy>=100)return;S.eacc=(S.eacc||0)+dt*DAYK*.06;if(S.eacc>=1){const k=Math.floor(S.eacc);S.eacc-=k;S.energy=Math.min(100,S.energy+k)}}
 /* one footstep scheduler: steps follow actual movement, never overlap, and fade in so they do not pop */
 const STP={t:.2,last:0,px:0,pz:0};
-function stepSnd(run){if(!FX||!OPT.steps)return;try{ac();const t=AC.currentTime;if(t-STP.last<.18)return;STP.last=t;const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;f.type='lowpass';f.frequency.value=360+R(0,160);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(run?.3:.22,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.09);s.connect(f);f.connect(g);g.connect(MG);s.start(t,R(0,.5));s.stop(t+.12)}catch(e){}}
+/* v48.6.0: a footstep is a heel (soft low thud) then a fainter toe scuff, feet alternate a little left and right, and hard floors indoors sound tighter than the street */
+function stepSnd(run){if(!FX||!OPT.steps)return;try{ac();const t=AC.currentTime;if(t-STP.last<.18)return;STP.last=t;STP.ft=-(STP.ft||1);const h=!!IN,v=(run?1.2:1)*R(.85,1.1),pn=STP.ft*.1;
+ sdNz(.075,h?650:380+R(0,140),.17*v,{ty:'lowpass',q:.8,pan:pn});sdHit(h?135:90,.05,.05*v,[[1,1,1]],{jit:.08,lp:400});sdNz(.025,(h?2800:1800)+R(0,600),(h?.022:.016)*v,{q:1.3,del:.035+R(0,.02),pan:pn})}catch(e){}}
 function stepTick(dt,mv){const d=Math.hypot(P.x-STP.px,P.z-STP.pz);STP.px=P.x;STP.pz=P.z;if(!mv||mode!='play'||d<1e-4){STP.t=Math.min(STP.t,.2);return}const sp=d/Math.max(dt,1e-4);STP.t+=dt;if(STP.t>=(sp>5?.27:.4)){STP.t=0;stepSnd(sp>5)}}
 {const u1=update;update=function(dt){u1(dt);energyTick(dt)}}
 {const st=document.createElement('style');st.textContent='.dsel{background:#0d1411;color:inherit;border:2px solid #000;padding:6px 10px;font:inherit}';document.head.appendChild(st)}

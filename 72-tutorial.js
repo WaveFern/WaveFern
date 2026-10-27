@@ -42,7 +42,7 @@ function tutCSS(){if($('tutcss'))return;const s=document.createElement('style');
 /* ----- effects ----- */
 function tutBurst(x,y,n=26){const C=['#2fe68a','#ffd27a','#5aa8ff','#ff6ad5','#fff'];for(let i=0;i<n;i++){const e=document.createElement('i');e.className='tcf';const a=Math.random()*6.28,d=40+Math.random()*90;e.style.cssText=`left:${x}px;top:${y}px;background:${C[i%5]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-30}px;--r:${Math.random()*540}deg`;document.body.appendChild(e);setTimeout(()=>e.remove(),1200)}}
 function tutPop(t,sub,x,y){const e=document.createElement('div');e.id='trw';e.style.left=x+'px';e.style.top=y+'px';e.innerHTML=t+(sub?`<b>${sub}</b>`:'');document.body.appendChild(e);setTimeout(()=>e.remove(),2000)}
-function tutTick(){sfx(900+R(0,300),.025,'square',.03,0,0,0)}
+function tutTick(){sdNz(.006,2200+R(0,1400),.022,{q:1.6})}
 function tutCard(k,t,s){tutCSS();const o=$('tcard');if(o)o.remove();const e=document.createElement('div');e.id='tcard';e.innerHTML=`<small>${k}</small><h2>${t}</h2><p>${s||''}</p>`;document.body.appendChild(e);setTimeout(()=>{if(e.parentNode)e.remove()},3000)}
 function tutOK(){return !PAUSED&&(mode=='play'||mode=='drive')}
 function tutBub(t,ms=2200){tutCSS();if(TUTBUB)TUTBUB.e.remove();const e=document.createElement('div');e.id='tbub';e.textContent=VEE+': '+t;document.body.appendChild(e);TUTBUB={e,end:Date.now()+ms}}

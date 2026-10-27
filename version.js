@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v48.5.0';
+const GAME_VERSION='v48.6.0';
 const VERSION_HISTORY=[
+ {v:'v48.6.0',n:'New sound effects. Clicks, pickups, purchases, wins, errors, doors and footsteps are now built from layers (a soft tap, a short wooden or glassy tone, a little room) and change slightly every time, so they feel less like beeps and do not get tiring. They sit a little quieter under the music. Footsteps alternate left and right and sound harder on indoor floors, the tutorial typing is a soft tick, night crickets sound more natural, and the music minigames have proper drum, bass, guitar, keys and pad sounds. A button that makes its own sound no longer plays a click on top.'},
  {v:'v48.5.0',n:'The wiki has screenshots: 29 pictures taken from the game, beside the text on the pages they belong to, with a gallery where a page has more than one. Click one to see it full size.'},
  {v:'v48.4.0',n:'You can play the whole soundtrack from the wiki Credits page. A player bar at the bottom has play and pause, previous and next, 10 second skips, a seek bar and volume, and keeps playing while you read other pages.'},
  {v:'v48.3.0',n:'The wiki Contact form now filters messages before sending: no swearing, slurs, threats, links, shouting or random letters, and one message every couple of minutes, up to 5 a day.'},
