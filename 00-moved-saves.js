@@ -2,7 +2,8 @@
    The game moved from wavefern.github.io/WaveFern to wavefern.com, and browsers keep saves per address.
    The first time a browser opens wavefern.com, hop to wavefern.github.io/move.html (repo WaveFern.github.io),
    which reads the fw_ and wk_ keys still stored there and comes straight back with them in #fwmove=.
-   Keys this browser already has here are never overwritten. Runs before anything else reads a save. */
+   Keys this browser already has here are never overwritten. Runs before anything else reads a save.
+   v49.0.0: a browser that brought saves across gets fw_moved_note, and 170-domain-note.js says we moved. */
 (function(){
  const H=location.hostname;if(H!=='wavefern.com'&&H!=='www.wavefern.com')return;
  let ls;try{ls=localStorage;ls.setItem('fw_moved_t','1');ls.removeItem('fw_moved_t')}catch(e){return}
@@ -15,7 +16,7 @@
   const bin=atob(h.slice(2).replace(/-/g,'+').replace(/_/g,'/')),u=new Uint8Array(bin.length);
   for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
   const txt=h[0]=='g'?new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text():Promise.resolve(new TextDecoder().decode(u));
-  txt.then(t=>{const d=JSON.parse(t);for(const k in d)if(/^(fw|wk)_/.test(k)&&ls.getItem(k)===null&&typeof d[k]=='string')ls.setItem(k,d[k])})
+  txt.then(t=>{const d=JSON.parse(t);for(const k in d)if(/^(fw|wk)_/.test(k)&&ls.getItem(k)===null&&typeof d[k]=='string')ls.setItem(k,d[k]);ls.setItem('fw_moved_note','1')})
    .catch(()=>{}).then(()=>location.replace(here));
   return;
  }

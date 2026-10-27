@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v48.9.0';
+const GAME_VERSION='v49.0.0';
 const VERSION_HISTORY=[
+ {v:'v49.0.0',n:'If you played at the old wavefern.github.io/WaveFern address, a card now tells you the game has moved to wavefern.com and that your saves came with you. The old address and anything under wavefern.github.io send you to wavefern.com.'},
  {v:'v48.9.0',n:'A new soundtrack track: Rocket. It plays in the background with the rest of the soundtrack, can be turned on or off and previewed in Settings, and is in the soundtrack player on the wiki Credits page. Your track on and off choices are kept.'},
  {v:'v48.8.0',n:'WaveFern has its own web address: play at wavefern.com and read the wiki at wavefern.com/wiki. The old wavefern.github.io/WaveFern link still works and sends you to the new one, and the first time you open wavefern.com your careers, backups and settings from the old address come with you.'},
  {v:'v48.7.0',n:'Pop-ups no longer pile on top of each other. Messages, release and goal cards, flight cards and tutorial cards all line up in one neat column at the top of the screen, below any bar that is showing there, with at most 5 at once. When the same pop-up comes up again while it is still on screen it shows a counter instead (x2, x3, x4...) and stays up a little longer. Floating reward pops step out of each other\'s way too.'},
