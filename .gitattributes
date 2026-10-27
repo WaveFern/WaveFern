@@ -16,3 +16,5 @@ audio/rocket.mp3 -filter -diff -merge binary
 audio/applause.mp3 -filter -diff -merge binary
 # recorded 808s and hi hats: plain files so GitHub Pages serves the real mp3
 audio/drums/*.mp3 -filter -diff -merge binary
+# social share picture: plain file so GitHub Pages serves the real png
+og-image.png -filter -diff -merge binary

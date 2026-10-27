@@ -9,3 +9,65 @@ WaveFern Records is a fictional 3D open-world browser game built with Three.js (
 - [Play the game](https://wavefern.com/): the live game
 - [Wiki](https://wavefern.com/wiki/): a guide to every game mechanic, with tables from the game's own data
 - [Version history](https://wavefern.com/versions.html): player-facing changelog
+
+<!-- wiki pages: made by tools/wiki-static.js -->
+## Wiki pages
+
+- [Your first day](https://wavefern.com/wiki/first-day/): You start as an unknown artist with $100, a starter house with a tiny studio and a laptop. The goal: record songs, release them on Spotifly, and grow from nobody to a global star.[1]
+- [Controls](https://wavefern.com/wiki/controls/): WaveFern plays with a keyboard and mouse, or with touch controls on phones and tablets.[1]
+- [Days, time and energy](https://wavefern.com/wiki/days/): A full in-game day lasts 12 real minutes, from 06:00 to 06:00 the next morning. About nine songs fit in one day.[1]
+- [Saves and careers](https://wavefern.com/wiki/saves/): Two career slots, autosave, cloud saves, save codes and backups.
+- [Recording a song](https://wavefern.com/wiki/recording/): The Make a song screen and the three minigames: Beat, Lyrics and Mix.
+- [Song quality](https://wavefern.com/wiki/song-quality/): Every song gets a quality score. Quality drives almost everything: daily Streams, the chance of a hit, Park Fields Festival crowds and Gramophone Awards.[1]
+- [Genres and genre focus](https://wavefern.com/wiki/genres/): The nine genres, their families, beat styles, hype and the genre focus bonus.
+- [Extras: diss tracks, 808s and hi hats](https://wavefern.com/wiki/extras/): Open Extras on the Make a song screen to choose a diss track, your 808 and your hi hats.[1]
+- [Streams](https://wavefern.com/wiki/streams/): The full daily streams formula, decay, caps, hits and viral songs.
+- [Monthly listeners and followers](https://wavefern.com/wiki/listeners/): Monthly listeners are the headline number: they set your Fame levels level, who DMs you, which Record labels want you, and how big your Park Fields Festival crowds are.[1]
+- [Albums](https://wavefern.com/wiki/albums/): Once you have at least two released songs you can bundle them into an album from Spotifly. Pick the tracks, the order, a title and cover art.[1]
+- [Collabs, fees and haggling](https://wavefern.com/wiki/collabs/): A collab is a song with another artist. You either pay them (you messaged them) or they pay you (they messaged you). Their fans come along: a featured song gets about 1% of their monthly listeners in extra streams each day.[1]
+- [Promotions](https://wavefern.com/wiki/promotions/): Paid campaigns that multiply a song's streams for a few days.
+- [Catalogue halo](https://wavefern.com/wiki/halo/): When your listeners balloon, some of them dig into your older songs.
+- [Spotifly](https://wavefern.com/wiki/spotifly/): Spotifly is where your music lives. Open it on the laptop (or the Spotifly app on your phone).[1]
+- [Money](https://wavefern.com/wiki/money/): You start with $100. Most of your income comes from streams, paid every morning.[1]
+- [Studio gear](https://wavefern.com/wiki/gear/): Every piece of studio gear, its levels, prices and what it adds.
+- [Fame levels](https://wavefern.com/wiki/fame/): Your fame level comes from your monthly listeners. Jewellery makes you look more famous: each piece adds 8%.[1]
+- [Mentors](https://wavefern.com/wiki/mentors/): There are 5 mentors, each inspired by a music legend. One unlocks each time you reach the next monthly listener milestone, and every mentor adds +2 quality to every song (and 8 experience). Meet them on the laptop under Legends.[1]
+- [Record labels](https://wavefern.com/wiki/labels/): Labels message you with an offer when your monthly listeners, total streams and reputation all reach their thresholds. Signing pays an advance up front; from then on the label keeps a cut of your streaming income every night.[1]
+- [Quests](https://wavefern.com/wiki/quests/): The Quests app (preinstalled on the laptop) gives you 3 daily quests and 3 weekly quests. Finish the whole set to get paid. Quests are rolled once and saved, so reloading never changes them.[1]
+- [Gramophone Awards](https://wavefern.com/wiki/awards/): The awards hall stands at the end of your street. From Fame Level 225 you can check in (once every 15 days), submit one song, and watch the ceremony.[1]
+- [Reputation](https://wavefern.com/wiki/reputation/): Reputation is a hidden score that starts at 0.[1]
+- [Rivals](https://wavefern.com/wiki/rivals/): You can make a diss track about any of these rivals.[1]
+- [Radio and TV](https://wavefern.com/wiki/radio/): The Radio Station sells airtime. Each slot raises interest (which lifts every song's daily streams) and brings followers.[1]
+- [Billboards](https://wavefern.com/wiki/billboards/): Billboards beside the main roads rotate every 10 seconds through roster artists with 5,000+ monthly listeners. Once you reach 10,000 monthly listeners, your own name joins the rotation.[1]
+- [Park Fields Festival](https://wavefern.com/wiki/festival/): The weekly festival: stages, crowds, pay and crowd minigames.
+- [FestivalApp and bookings](https://wavefern.com/wiki/festival-app/): FestivalApp is free and installed for you. Pick a festival, a stage your fame allows and a free slot.[1]
+- [Flights and the airport](https://wavefern.com/wiki/flights/): Swiftwing is the game's airline. Book from the Swiftwing app (computer or Gphone) or at the ticket desk in any airport. Fernfield International is at the far west end of Fern Road.[1]
+- [World Tour](https://wavefern.com/wiki/world-tour/): The World Tour app appears in the App Barn at Fame Level 275. It costs $250,000 once. Plan on its world map: click a continent, then a country, then add its stops, up to 5. Each stop gets a setlist (songs or a whole album). Then book Flights and the airport and fly there.[1]
+- [Stadium and club shows](https://wavefern.com/wiki/tour-shows/): Rehearsing, production, talking to the crowd and the show score.
+- [Tour cities](https://wavefern.com/wiki/tour-cities/): Walking around abroad: landmarks, hotels, street food and souvenirs.
+- [The city and the map](https://wavefern.com/wiki/city/): Your house sits on a quiet street west of the city. Press N for the map: scroll or +/− to zoom.[1]
+- [Cars and the garage](https://wavefern.com/wiki/cars/): Book a car on motors.wf in the laptop browser, then visit Motors to pick it up. You need a garage first ($2,500), which appears beside your house once bought.[1]
+- [Homes](https://wavefern.com/wiki/homes/): Book a viewing on homes.wf, then buy at the Property office. A home gives +3 to every song's quality and +10% reach on streams.[1]
+- [Furniture and storage](https://wavefern.com/wiki/furniture/): Buy furniture on Amazoom (a $250 app). It arrives in Storage. At home press F to open Storage and build mode: place, move and rotate (R) pieces.[1]
+- [Wall paint](https://wavefern.com/wiki/paint/): Repaint the walls of your home for $40 a colour.[1]
+- [Clothes (Threadz)](https://wavefern.com/wiki/clothes/): Buy clothes on Threadz in the laptop browser and wear them from the wardrobe in your bedroom (E). Every piece comes in 24+ colours.[1]
+- [Barbershop](https://wavefern.com/wiki/barbershop/): The Barbershop in the city restyles you. Classic cuts are $20 and a dye job is $15. Signature styles:[1]
+- [Pets](https://wavefern.com/wiki/pets/): Book on pawfinder.wf, then pick up at the Pet Shop. You can keep up to 3. Each pet adds +1 to every song's quality. Pets can stay home or follow you around.[1]
+- [Bodyguards](https://wavefern.com/wiki/bodyguards/): Book on bodyguards.wf and hire at Security. Guards unlock at Fame Level 34. You can have up to 3, and dismiss them or call them back.[1]
+- [Jewellery](https://wavefern.com/wiki/jewellery/): Each piece bought at the Jewellery store adds 8% to your Fame levels value.[1]
+- [Fans, autographs and robbery](https://wavefern.com/wiki/fans/): The more famous you are, the more people recognise you. A passer-by notices you with a chance of monthly listeners ÷ 5,000,000.[1]
+- [Food and energy](https://wavefern.com/wiki/food/): Food refills energy. Drinks marked "stamina" also refill your sprint.[1]
+- [Gphone](https://wavefern.com/wiki/gphone/): Press G to open your phone. You start with a laggy Gphone 8; newer models are sold on Amazoom. Every model has Messages, Spotifly, Instagrime, Eats, Gigs, Camera and Photos. Better models boost every song's streams and make photo posts bring more followers.[1]
+- [Instagrime](https://wavefern.com/wiki/instagrime/): Instagrime is a $400 app. Post once a day for 2-8 new followers. Photos from your Gphone camera can be posted too, for more followers with a better phone. Promotions are bought here.[1]
+- [Computer and apps](https://wavefern.com/wiki/apps/): Press E at your desk to use the laptop: Spotifly, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.[1]
+- [Messages and Big Vee](https://wavefern.com/wiki/messages/): Messages holds every chat: artists who DM you (see Collabs, fees and haggling), label offers and Big Vee, your manager. Pin chats to keep them on top, clear them, or press New for suggested people.[1]
+- [Band rooms](https://wavefern.com/wiki/band-rooms/): Up to four friends in one band, how songs and sets work together.
+- [Settings and graphics](https://wavefern.com/wiki/settings/): Settings opens from the main menu or the pause menu. Under Graphics pick a preset or your own mix.[1]
+- [Version history](https://wavefern.com/wiki/versions/): The game is on v49.0.0. This list is read live from the game, so it is always current.
+- [About this wiki](https://wavefern.com/wiki/about-wiki/): This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by tools/wiki-data.js each time the site is published, so it can't fall behind.
+- [Secrets](https://wavefern.com/wiki/secrets/): There is a secret code somewhere in WaveFern Records. What it is, where it goes and what it does is a mystery.
+- [Credits](https://wavefern.com/wiki/credits/): WaveFern Records was made by James Hutchinson and Rowan Burton.
+- [Frequently asked questions](https://wavefern.com/wiki/faq/): Short answers to common questions. Each one links to the page with the full details.
+- [Contact](https://wavefern.com/wiki/contact/): Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Records.
+- [How Spotifly songs sound](https://wavefern.com/wiki/song-audio/): How the game makes a playable track for every song you record.
+<!-- /wiki pages -->

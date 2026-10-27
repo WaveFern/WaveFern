@@ -40,6 +40,12 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/pw" playwright-core@1.47.2
           NODE_PATH="$RUNNER_TEMP/pw/node_modules" CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)" node tools/wiki-data.js
+      # Plain HTML copies of every wiki page, plus sitemap.xml and llms-full.txt, so search engines and AI tools can read the wiki.
+      # If this fails, the committed copies are published.
+      - name: Build static wiki pages
+        continue-on-error: true
+        timeout-minutes: 5
+        run: NODE_PATH="$RUNNER_TEMP/pw/node_modules" CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)" node tools/wiki-static.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
