@@ -66,6 +66,15 @@ function histTab(p){if(typeof VERSION_HISTORY=='undefined')return N('The version
  return `<p>Game updates whose notes mention this topic, newest first (${vs.length} of ${VERSION_HISTORY.length}).</p>`+
   (vs.length?`<ol class=hist>${vs.slice(0,60).map(v=>`<li><span class="tag${/\.0$/.test(v.v)?' g':''}">${v.v}</span> ${esc(v.n).replace(re,m=>'<mark>'+m+'</mark>')}</li>`).join('')}</ol>`:N('No updates mention this page by name.'))+
   `<p>${L('versions','See every version')}</p>`}
+/* screenshots (wiki/img, made by tools/wiki-shots.js): the first floats beside the lead like a thumbnail, any others go in
+   a Screenshots gallery at the end of the article. Clicking one opens it full size. */
+const FIG=(f,c,cls)=>`<figure class="${cls}"><a href="img/${f}.webp" onclick="return lbOpen(this)"><img src="img/${f}.webp" alt="${c.replace(/"/g,'&quot;')}" loading=lazy width=320 height=180></a><figcaption>${c}</figcaption></figure>`;
+function withFigs(body,p){const f=p.figs;if(!f||!f.length)return body;const first=FIG(f[0][0],f[0][1],'thumb'),i=body.indexOf('</p>');
+ body=i<0?first+body:body.slice(0,i+4)+first+body.slice(i+4);
+ return f.length>1?body+H2('Screenshots','screenshots')+`<div class=gallery>${f.slice(1).map(x=>FIG(x[0],x[1],'gi')).join('')}</div>`:body}
+window.lbOpen=a=>{let l=document.getElementById('lb');if(!l){l=document.createElement('div');l.id='lb';l.onclick=()=>l.classList.remove('on');document.body.appendChild(l);
+  addEventListener('keydown',e=>{if(e.key=='Escape')l.classList.remove('on')})}
+ const c=a.parentNode.querySelector('figcaption');l.innerHTML=`<figure><img src="${a.getAttribute('href')}" alt=""><figcaption>${c?c.innerHTML:''}</figcaption></figure>`;l.classList.add('on');return false};
 function render(){const h=decodeURIComponent(location.hash.replace(/^#\/?/,'')),[id,sec]=h.split('/'),q=/^search=/.test(h)?h.slice(7):null;
  TID=0;let html,cur=null;
  if(q!=null)html=searchPage(q);
@@ -74,7 +83,7 @@ function render(){const h=decodeURIComponent(location.hash.replace(/^#\/?/,'')),
   else{const c=CATS.find(c=>c.id===p.cat);let body='';try{body=p.body()}catch(e){console.error(e);body=N('This page could not be built: '+esc(e.message),'warn')}
    const isCat=/^cat-/.test(p.id),tab=sec=='~src'?'src':sec=='~hist'?'hist':'read';
    const tabs=isCat||p.id=='home'?'':`<nav class=tabs><a href="#/${p.id}" class="${tab=='read'?'on':''}">Article</a><a href="#/${p.id}/~src" class="${tab=='src'?'on':''}">Source</a><a href="#/${p.id}/~hist" class="${tab=='hist'?'on':''}">History</a></nav>`;
-   const main=isCat||p.id=='home'?body:tab=='src'?srcTab(p):tab=='hist'?histTab(p):withToc(withRef(body+(p.tips?H2('Tips','tips')+ul(p.tips):''),p),p.id)+seeAlso(body,p)+refs(p);
+   const main=isCat||p.id=='home'?body:tab=='src'?srcTab(p):tab=='hist'?histTab(p):withToc(withRef(withFigs(body,p)+(p.tips?H2('Tips','tips')+ul(p.tips):''),p),p.id)+seeAlso(body,p)+refs(p);
    html=`<article class="panel${p.id=='home'?' home':''}">${tabs}<h1>${isCat?'Category: ':''}${p.t}</h1>
     <div class=from>From the WaveFern Wiki</div>
     ${main}

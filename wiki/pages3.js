@@ -98,6 +98,7 @@ ${T(['Version','What changed'],VERSION_HISTORY.map(v=>[`<span class=tag${/\.0$/.
 
 page('about-wiki','About this wiki','meta',{e:'📖',sum:'How the wiki is made and kept up to date.',body:()=>`
 <p class=lead>This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by <code>tools/wiki-data.js</code> each time the site is published, so it can't fall behind.</p>
+<p>The screenshots are taken from a fresh career by <code>tools/wiki-shots.js</code>, which plays the game in a hidden browser. Click one to see it full size.</p>
 <p>Data snapshot: game ${esc(D.version||'?')}. Formulas are written out by hand from the code: each page links the files it comes from.</p>`});
 
 /* ===================== Tips: advice rather than answers, shown near the end of the article ===================== */
@@ -114,6 +115,32 @@ const TIPS={
  'world-tour':['Rehearse before big shows. It costs a little energy and makes a real difference.','Learn how to greet each crowd. Talking to them well lifts the whole show.','Production costs a lot at first, so save it for the stadiums.'],
  'first-day':['Your first songs will not be great. That is normal: keep making them.','Sleep before 06:00, or you will start the next day tired.']};
 Object.entries(TIPS).forEach(([k,v])=>{const p=byId(k);if(p)p.tips=v});
+
+/* ===================== Screenshots: taken from the game by tools/wiki-shots.js, shown on these pages ===================== */
+const FIGS={
+ 'first-day':[['bedroom','Your bedroom on day one: the bed, the wardrobe and the computer desk.'],['creator','The character creator at the start of a new career.']],
+ saves:[['title','The main menu, where you pick a career slot.']],
+ recording:[['song-menu','The Make a song screen.'],['minigame-beat','The Beat step.'],['minigame-lyrics','The Lyrics step.'],['minigame-mix','The Mix step.']],
+ spotifly:[['spotifly','A new artist page on Spotifly.']],
+ gear:[['gearshop','The Gearshop app on the computer.'],['music-store','The Music Store in the city.']],
+ apps:[['app-barn','The App Barn, where you buy apps for the laptop.']],
+ messages:[['messages','The Messages app with a few DMs from other artists.']],
+ quests:[['quests','The quest log.']],
+ festival:[['festival','A set at The Pit on a festival day.']],
+ 'festival-app':[['festivalapp','FestivalApp, for booking a slot.']],
+ flights:[['swiftwing','Booking a flight in the Swiftwing app.'],['airport-outside','The airport entrance.']],
+ awards:[['awards-outside','The red carpet outside the awards hall.']],
+ city:[['street','A street in town.'],['map','The world map, with the taxi buttons.']],
+ homes:[['home-outside','The starter house from the street.']],
+ cars:[['motors','Motors, the car dealer.']],
+ pets:[['pet-shop','The Pet Shop.']],
+ bodyguards:[['security','The security office, where you hire guards.']],
+ barbershop:[['barbershop','Choosing a cut at the barbershop.']],
+ jewellery:[['jewellery','The jewellery shop counter.']],
+ food:[['corner-shop','The corner shop.']],
+ gphone:[['gphone','The Gphone home screen.']],
+ settings:[['settings','The Graphics settings.']]};
+Object.entries(FIGS).forEach(([k,v])=>{const p=byId(k);if(p)p.figs=v});
 
 /* ===================== Secrets and credits ===================== */
 page('secrets','Secrets','meta',{sum:'Things the game does not tell you.',kw:'secret code cheat hidden mystery',body:()=>`

@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v48.4.0';
+const GAME_VERSION='v48.5.0';
 const VERSION_HISTORY=[
+ {v:'v48.5.0',n:'The wiki has screenshots: 29 pictures taken from the game, beside the text on the pages they belong to, with a gallery where a page has more than one. Click one to see it full size.'},
  {v:'v48.4.0',n:'You can play the whole soundtrack from the wiki Credits page. A player bar at the bottom has play and pause, previous and next, 10 second skips, a seek bar and volume, and keeps playing while you read other pages.'},
  {v:'v48.3.0',n:'The wiki Contact form now filters messages before sending: no swearing, slurs, threats, links, shouting or random letters, and one message every couple of minutes, up to 5 a day.'},
  {v:'v48.2.1',n:'The wiki soundtrack credit has new wording.'},
