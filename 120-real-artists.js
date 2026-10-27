@@ -39,7 +39,8 @@ if(typeof MKT!='undefined')MKT=null;if(typeof BRAL!='undefined')BRAL=null;
    and what an artist pays you for your audience is priced from the roster as it was before the 10x */
 const REAL_DM=Math.sqrt(REAL_X);
 const realSize=(fn,f)=>{const c=[];ART.forEach(a=>{if(a[8]&&REAL_SET.has(a[0])){c.push([a,a[2]]);a[2]=Math.round(a[2]*f)}});try{return fn()}finally{c.forEach(([a,v])=>a[2]=v)}};
-{const w0=dmWeight;dmWeight=function(){const t=this,g=arguments;return realSize(()=>w0.apply(t,g),REAL_DM/REAL_X)}}
+/* the who-may-DM gate (dmGateOK) is checked at their real size first, so the scaling never lets a megastar slip under DM_GAP */
+{const w0=dmWeight;dmWeight=function(i){if(!dmGateOK(i))return 0;const t=this,g=arguments;return realSize(()=>w0.apply(t,g),REAL_DM/REAL_X)}}
 let MKT_R=null;/* fee curve of the pre-10x roster, cached */
 {const c0=collabFee;collabFee=function(i,dir,k){const a=ART[i],real=a&&a[8]&&REAL_SET.has(a[0]),t=this,g=arguments;
  const m0=MKT;MKT=MKT_R;let v;try{v=realSize(()=>c0.apply(t,g),1/REAL_X)}finally{MKT_R=MKT;MKT=m0}

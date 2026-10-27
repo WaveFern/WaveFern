@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.0.0';
+const GAME_VERSION='v49.0.1';
 const VERSION_HISTORY=[
+ {v:'v49.0.1',n:'Big stars no longer DM you while you are still far smaller than them. An artist only messages you once you have at least a tenth of their monthly listeners, so someone like Doja Cat or Shawn Mendes waits until you are at about 56M, not 20M. You can still message anyone yourself.'},
  {v:'v49.0.0',n:'If you played at the old wavefern.github.io/WaveFern address, a card now tells you the game has moved to wavefern.com and that your saves came with you. The old address and anything under wavefern.github.io send you to wavefern.com.'},
  {v:'v48.9.0',n:'A new soundtrack track: Rocket. It plays in the background with the rest of the soundtrack, can be turned on or off and previewed in Settings, and is in the soundtrack player on the wiki Credits page. Your track on and off choices are kept.'},
  {v:'v48.8.0',n:'WaveFern has its own web address: play at wavefern.com and read the wiki at wavefern.com/wiki. The old wavefern.github.io/WaveFern link still works and sends you to the new one, and the first time you open wavefern.com your careers, backups and settings from the old address come with you.'},

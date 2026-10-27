@@ -32,10 +32,12 @@ const GENREL=[['Hip-Hop','Rap'],['Pop','R&B','Indie'],['Lo-fi','Electronic','Fol
 function dmMomentum(){const h=S.mlHist||[],cur=h.length?h[h.length-1].ml:S.listeners||0,old=(h.filter(q=>q.day<=S.day-7).pop()||h[0]||{ml:cur}).ml,g=Math.max(0,Math.min(1,((cur+1)/(old+1)-1)));return Math.min(1,g*.7+(S.interest||0)*.3)}
 /* who may reach out at all. All the thresholds for famous artists are here.
    DM_STAR: artists with at least A monthly listeners only DM a player with at least L monthly listeners.
-   DM_LOCK: named top-tier artists with their own player threshold (monthly listeners). */
-const DM_STAR={A:50000,L:25000},DM_LOCK={'Panic Man Dan':5000};
+   DM_LOCK: named top-tier artists with their own player threshold (monthly listeners).
+   DM_GAP: an artist that size or bigger also never DMs a player they are more than DM_GAP times bigger than
+           (a 559M Doja Cat waits until you have about 56M, not 20M). */
+const DM_STAR={A:50000,L:25000},DM_LOCK={'Panic Man Dan':5000},DM_GAP=10;
 function dmGateOK(i){const a=ART[i];if(!a)return false;const L=S.listeners||0;
- if(a[2]>=DM_STAR.A)return L>=DM_STAR.L;
+ if(a[2]>=DM_STAR.A)return L>=DM_STAR.L&&a[2]<=L*DM_GAP;
  if(DM_LOCK[a[0]]!==undefined)return L>=DM_LOCK[a[0]];
  return true}
 function dmWeight(i,mo){if(!dmGateOK(i))return 0;const a=ART[i],A=a[2],L=Math.max(S.listeners||0,5),d=Math.log10(A/L),M=mo==null?dmMomentum():mo,rep=Math.max(-10,Math.min(15,S.rep||0));let w;
