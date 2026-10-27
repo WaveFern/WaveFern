@@ -1,6 +1,6 @@
 /* Soundtrack player (v48.4.0): the game's own soundtrack, played from the Credits page through a now-playing bar fixed
    to the bottom of the wiki. The bar sits outside #main, so the music keeps going while you move between pages. */
-const OST=[['Track 1','../assets/track1.mp3',108],['Track 2','../assets/track2.mp3',104],['Track 3','../assets/track3.mp3',72],['Box','../audio/box.mp3',107],['Catch','../audio/catch.mp3',83],['Main menu','../menu.mp3',60]];
+const OST=[['Track 1','../assets/track1.mp3',108],['Track 2','../assets/track2.mp3',104],['Track 3','../assets/track3.mp3',72],['Box','../audio/box.mp3',107],['Catch','../audio/catch.mp3',83],['Rocket','../audio/rocket.mp3',99],['Main menu','../menu.mp3',60]];
 const PL={a:new Audio(),i:-1,drag:0};PL.a.preload='none';
 try{const v=+localStorage.getItem('wk_vol');PL.a.volume=isNaN(v)||localStorage.getItem('wk_vol')==null?.7:v}catch(e){PL.a.volume=.7}
 const mmss=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};

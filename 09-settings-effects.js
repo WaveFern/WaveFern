@@ -49,7 +49,7 @@ const snd=n=>{const f=SND[n],t=performance.now();if(!f||t-(SDL[n]||0)<30||(n=='c
 setInterval(()=>{if(!MU.on||!FX||mode=='load'||PAUSED)return;if(S.t>=300){const f=4300+R(0,400),pn=R(-.6,.6),n=2+(Math.random()*3|0);for(let i=0;i<n;i++)sdHit(f,.035,.02,[[1,1,1]],{del:i*.065,jit:.005,pan:pn,rev:.1})}else if(Math.random()<.3)nz(1.4,900+R(0,500),.04,1,'lowpass',0,300)},1400);
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button'))snd('click')});
 /* v26.97: Settings has tabs (Sound, Music, Game, Save) and more options; everything except the volumes lives in OPT (08-music.js) */
-let STAB='sound';const TRN=['Track 1','Track 2','Track 3','Box','Catch'];
+let STAB='sound';const TRN=['Track 1','Track 2','Track 3','Box','Catch','Rocket'];
 const stTog=(l,on,f,n)=>`<div class=so><span>${l}${n?`<small class=m>${n}</small>`:''}</span><button class="${on?'go':''}" onclick="${f};stDraw()">${on?'On':'Off'}</button></div>`;
 const stSl=(l,v,f,c='')=>`<div class=so><span>${l}</span><input type=range min=0 max=100 value=${Math.round(v*100)} oninput="${f}" ${c} style="padding:0"></div>`;
 function stOpt(k,v){OPT[k]=v==null?OPT[k]?0:1:v;svOpt();if(k=='menuMus'||k=='pauseMus')menuSync();if(k=='tags')document.body.classList.toggle('notags',!OPT.tags)}
