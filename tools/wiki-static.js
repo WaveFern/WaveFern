@@ -90,7 +90,7 @@ function shell(p,pages,cats,article,ver){const title=p.id=='home'?'WaveFern Wiki
 
  const day=new Date().toISOString().slice(0,10),u=(l,f,pr)=>` <url><loc>${SITE}${l}</loc><lastmod>${day}</lastmod><changefreq>${f}</changefreq><priority>${pr}</priority></url>`;
  fs.writeFileSync(path.join(ROOT,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`+
-  [u('/','weekly','1.0'),u('/wiki/','weekly','0.8'),u('/versions.html','weekly','0.4')].concat(out.filter(p=>p.id!='home').map(p=>u(url(p.id),'weekly',p.hide?'0.4':'0.6'))).join('\n')+'\n</urlset>\n');
+  [u('/','weekly','1.0'),u('/about/','monthly','0.9'),u('/wiki/','weekly','0.8'),u('/versions.html','weekly','0.4')].concat(out.filter(p=>p.id!='home').map(p=>u(url(p.id),'weekly',p.hide?'0.4':'0.6'))).join('\n')+'\n</urlset>\n');
 
  const lt=path.join(ROOT,'llms.txt'),ls=fs.readFileSync(lt,'utf8'),list=`<!-- wiki pages: made by tools/wiki-static.js -->\n## Wiki pages\n\n`+
   listed.map(p=>`- [${p.t}](${SITE}/wiki/${p.id}/): ${p.desc}`).join('\n')+'\n<!-- /wiki pages -->';

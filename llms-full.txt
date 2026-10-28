@@ -1,6 +1,6 @@
 # WaveFern Records: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.0.0. WaveFern Records is a free 3D open-world music career sim that runs in the browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.0.2. WaveFern Records is a free 3D open-world music career sim that runs in the browser at https://wavefern.com/.
 
 ---
 
@@ -2335,9 +2335,11 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.0.0. This list is read live from the game, so it is always current.
+The game is on v49.0.2. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.0.2	No more hard cutoff for who can DM you: any artist can, but the bigger they are than you, the faster the chance drops. Someone about your size messages often, a star 10x bigger is rare, and a star like Doja Cat or Shawn Mendes (about 560M) messaging a 20M player is around 1 in 80,000 a day. At a handful of listeners it is so unlikely it will probably never happen.
+v49.0.1	Big stars no longer DM you while you are still far smaller than them. An artist only messages you once you have at least a tenth of their monthly listeners, so someone like Doja Cat or Shawn Mendes waits until you are at about 56M, not 20M. You can still message anyone yourself.
 v49.0.0	If you played at the old wavefern.github.io/WaveFern address, a card now tells you the game has moved to wavefern.com and that your saves came with you. The old address and anything under wavefern.github.io send you to wavefern.com.
 v48.9.0	A new soundtrack track: Rocket. It plays in the background with the rest of the soundtrack, can be turned on or off and previewed in Settings, and is in the soundtrack player on the wiki Credits page. Your track on and off choices are kept.
 v48.8.0	WaveFern has its own web address: play at wavefern.com and read the wiki at wavefern.com/wiki. The old wavefern.github.io/WaveFern link still works and sends you to the new one, and the first time you open wavefern.com your careers, backups and settings from the old address come with you.

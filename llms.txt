@@ -7,6 +7,7 @@ WaveFern Records is a fictional 3D open-world browser game built with Three.js (
 ## Links
 
 - [Play the game](https://wavefern.com/): the live game
+- [About WaveFern](https://wavefern.com/about/): what the game is, its features and common questions, in plain words
 - [Wiki](https://wavefern.com/wiki/): a guide to every game mechanic, with tables from the game's own data
 - [Version history](https://wavefern.com/versions.html): player-facing changelog
 
@@ -63,7 +64,7 @@ WaveFern Records is a fictional 3D open-world browser game built with Three.js (
 - [Messages and Big Vee](https://wavefern.com/wiki/messages/): Messages holds every chat: artists who DM you (see Collabs, fees and haggling), label offers and Big Vee, your manager. Pin chats to keep them on top, clear them, or press New for suggested people.[1]
 - [Band rooms](https://wavefern.com/wiki/band-rooms/): Up to four friends in one band, how songs and sets work together.
 - [Settings and graphics](https://wavefern.com/wiki/settings/): Settings opens from the main menu or the pause menu. Under Graphics pick a preset or your own mix.[1]
-- [Version history](https://wavefern.com/wiki/versions/): The game is on v49.0.0. This list is read live from the game, so it is always current.
+- [Version history](https://wavefern.com/wiki/versions/): The game is on v49.0.2. This list is read live from the game, so it is always current.
 - [About this wiki](https://wavefern.com/wiki/about-wiki/): This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by tools/wiki-data.js each time the site is published, so it can't fall behind.
 - [Secrets](https://wavefern.com/wiki/secrets/): There is a secret code somewhere in WaveFern Records. What it is, where it goes and what it does is a mystery.
 - [Credits](https://wavefern.com/wiki/credits/): WaveFern Records was made by James Hutchinson and Rowan Burton.
