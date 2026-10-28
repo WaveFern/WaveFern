@@ -119,7 +119,8 @@ body.trlon>*:not(#c):not(#trl){visibility:hidden!important}body.trlon,body.trlon
 #trl .qend{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,#0d2a1b,#000 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 #trl .qend h1{font-family:'Silkscreen',monospace;font-size:clamp(44px,9vw,150px);line-height:1;color:#2fe68a;margin:0;text-shadow:4px 4px 0 #0b3a22,8px 8px 0 #000;letter-spacing:.04em;opacity:0;transform:scale(1.3);transition:opacity .15s,transform .5s cubic-bezier(.1,1.3,.3,1)}
 #trl .qend h1.qin{opacity:1;transform:none}#trl .qend p{opacity:0;transition:opacity .8s;margin:.6em 0 0;font-size:clamp(14px,1.8vw,30px);letter-spacing:.12em}#trl .qend p.qin{opacity:1}#trl .qend p.qu{color:#2fe68a;font-size:clamp(18px,2.6vw,44px)}
-#trl .qhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;font-family:system-ui,sans-serif;color:#8aa094;font-size:15px;line-height:1.6;z-index:7}
+#trl .qhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,86vw);text-align:center;font-family:system-ui,sans-serif;color:#e8f3ec;font-size:18px;line-height:1.6;z-index:7;background:#0c0f0d;border:2px solid #2fe68a;border-radius:14px;padding:22px 26px}#trl .qhint b{color:#2fe68a}#trl .qhint>b:first-child{display:block;font-family:'Silkscreen',monospace;font-size:26px;margin-bottom:8px}#trl .qhint small{color:#8aa094;font-size:14px}
+body.trlon.trlrdy,body.trlon.trlrdy *{cursor:pointer!important}
 #trlm{position:fixed;inset:0;z-index:2147483001;background:rgba(3,8,6,.88);display:flex;align-items:center;justify-content:center;font-family:system-ui,'Segoe UI',Roboto,sans-serif;color:#e8f3ec}
 #trlm .box{width:min(720px,94vw);max-height:92vh;overflow:auto;padding:22px}#trlm h2{color:#2fe68a}#trlm .sc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}
 #trlm .sc button{text-align:left;padding:8px 10px;font-size:13px}#trlm .sc small{display:block;color:#8aa094}#trlm label{display:inline-flex;gap:6px;align-items:center;margin:4px 14px 4px 0;font-size:14px}
@@ -211,7 +212,7 @@ function trlMute(on){try{MU.hold=on?1:0;MU.a.forEach(a=>{if(!a.paused)a.pause()}
 function trlMenu(){if(!['play','pause','menu','pc'].includes(mode)||!P.mesh){snd('err');return say('Load a career first, then type trailer.')}
  try{if(!TRL.on)autoSave()}catch(e){}TRL.on=1;
  /* the track is loaded whole into memory, so it can be started at any point in it (seeking a streamed file is not always allowed) */
- if(!TRL.aud)fetch('audio/rocket.mp3').then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});trlCSS();try{$('ui').innerHTML=''}catch(e){}if(mode=='pause')try{resumeGame()}catch(e){}mode='trl';
+ if(!TRL.aud)fetch('audio/rocket.mp3').then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});trlCSS();try{$('ui').innerHTML=''}catch(e){}/* opened from the pause menu: the game is paused under Settings, so unpause it or nothing would move */try{if(PAUSED)resumeGame()}catch(e){}PAUSED=0;mode='trl';
  if(!TRL.name)TRL.name=S.artist||'';TRL.shots=trlShots();let m=$('trlm');if(m)m.remove();m=document.createElement('div');m.id='trlm';
  const o=TRL.opt,ck=(k,l)=>`<label><input type=checkbox ${o[k]?'checked':''} onchange="TRL.opt.${k}=this.checked?1:0"> ${l}</label>`;
  const groups=[];TRL.shots.forEach(s=>{const n=s.sc.replace(/ \d$/,'');const g=groups.find(x=>x.n==n);if(g)g.d+=s.d;else groups.push({n,k:s.k,d:s.d,t:s.t})});
@@ -222,16 +223,18 @@ function trlMenu(){if(!['play','pause','menu','pc'].includes(mode)||!P.mesh){snd
  <p class=m style="margin-top:14px"><small>Or play from a scene (it plays on to the end):</small></p><div class=sc>${groups.map(g=>`<button onclick="trlPlay(${g.k})">${trlEsc(g.n)}<small>${(g.t).toFixed(1)}s · ${g.d.toFixed(1)}s long</small></button>`).join('')}</div>
  <div class=row><button onclick="trlExit()">Leave trailer mode</button></div></div>`;document.body.appendChild(m)}
 function trlPlay(k){const n=$('trln'),s=$('trls');if(n)TRL.name=n.value.trim();if(s)TRL.song=s.value.trim()||'Night Bus';const m=$('trlm');if(m)m.remove();
- TRL.shots=trlShots();closeUI();mode='trl';try{if(IN)leaveShop()}catch(e){}
+ TRL.shots=trlShots();closeUI();try{if(PAUSED)resumeGame()}catch(e){}PAUSED=0;mode='trl';try{if(IN)leaveShop()}catch(e){}
  try{trlState()}catch(e){console.error('trailer state',e)}
  TRL.cam=TRL.cam||new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,2600);document.body.classList.add('trlon');const o=trlOverlay();trlSize();trlMute(1);
  TRL.i=-1;TRL.cut=0;TRL.done=0;TRL.showOn=0;TRL.shots.forEach(s=>s.capOut=0);TRL.k0=k||0;
  /* hold on black until Space: start the screen recording first */
- TRL.ready=1;const h=document.createElement('div');h.className='hint';h.id='trlh';h.innerHTML='Start your screen recording, then press <b style="color:#e8f3ec">Space</b> to roll.<br>Esc stops the trailer.';o.appendChild(h);
+ TRL.ready=1;const h=document.createElement('div');h.className='qhint';h.id='trlh';h.innerHTML='<b>🎬 Ready</b>Start your screen recording, then press <b>Space</b> or click anywhere to roll.<br><small>Esc stops the trailer and takes you back to the menu.</small>';o.appendChild(h);
  const blk=$('trlblk');blk.style.transition='none';blk.style.opacity=1;
  const s0=TRL.shots[TRL.k0];try{s0.pre&&s0.pre()}catch(e){}try{const prev=TRL.shots[TRL.k0-1];if(prev&&prev.pre)prev.pre()}catch(e){}
  if(TRL.k0>0){try{s0.set&&s0.set()}catch(e){}}
- const go=e=>{if(e.key!==' '&&e.key!=='Enter')return;e.preventDefault();e.stopImmediatePropagation();removeEventListener('keydown',go,true);trlRoll()};addEventListener('keydown',go,true)}
+ document.body.classList.add('trlrdy');const done=()=>{removeEventListener('keydown',go,true);removeEventListener('pointerdown',go,true);document.body.classList.remove('trlrdy')};
+ const go=e=>{if(e.type=='keydown'){if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();done();return trlStop()}if(e.key!==' '&&e.key!=='Enter'){e.preventDefault();e.stopImmediatePropagation();return}}e.preventDefault();e.stopImmediatePropagation();done();trlRoll()};
+ addEventListener('keydown',go,true);addEventListener('pointerdown',go,true)}
 function trlRoll(){const h=$('trlh');if(h)h.remove();const s0=TRL.shots[TRL.k0];
  setTimeout(()=>{TRL.run=1;TRL.i=-1;const start=()=>{TRL.t0=performance.now()-s0.t*1000};
   start();if(TRL.opt.music){try{const a=TRL.aud=TRL.aud||new Audio('audio/rocket.mp3');a.preload='auto';a.volume=1;
