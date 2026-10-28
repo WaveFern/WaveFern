@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.7.0';
+const GAME_VERSION='v49.7.1';
 const VERSION_HISTORY=[
+ {v:'v49.7.1',n:'Trailer fixes: the cut from the Tokyo flyover to the stadium no longer flashes the airport street (it holds black for a moment, then the stadium slams in on the beat), and starting the trailer from a later scene uses the same character the creator scene makes.'},
  {v:'v49.7.0',n:'The first 24 seconds of the trailer now build suspense: short bursts of the start of a career (making your character, naming yourself, messaging an artist, meeting up, a first take) fade in and out of black between cards that set up the game and its challenges: Every star started in a bedroom. $100, a laptop, zero fans. Rent is due, rivals are climbing. The critics are watching. How far can you go? Then the beat drops on the city.'},
  {v:'v49.6.0',n:'The trailer now plays its own soundtrack, made for it at 120 BPM, and is retimed to it: the beat drops on the city at 0:24, Then take it on tour runs 0:56 to 1:00, the Tokyo flyover 1:00 to 1:08, the stadium show 1:08 to 1:20, and the end card lands on the final bit at 1:20. The artist in the trailer is called WaveFern. The own-music picker in the trailer menu is gone.'},
  {v:'v49.5.0',n:'Trailer polish. The beat now drops on a slow camera move over the city, with more cinematic shots mixed into the gameplay: Fern Road, the festival crowd, and a stadium camera that pushes in from the crowd and then rises over the show. Tokyo uses the real arrival flyover. Shots are cleaner, with no stray HUD, skip button or guards. Starting from a later scene gives you a styled character. You can load your own music in the trailer menu and set its BPM and drop time so the cuts land on your beat.'},

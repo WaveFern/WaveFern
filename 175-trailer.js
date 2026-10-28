@@ -88,8 +88,8 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
  {sc:'Card: tour',d:2*B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo',{quiet:1})}catch(e){console.error(e)}}]]},
  /* the game's own arrival flyover, with its city title */
- {sc:'Tokyo',d:4*B,show:['dscut'],set(){/* the city is built under the card; arriving again just runs the flyover */try{DCITY.arrive('tyo')}catch(e){console.error(e)}},acts:[[4*B-.35,()=>trlShow()]]},
- {sc:'Stadium',d:2*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* from the crowd, pushing in on you on stage */return{p:[P.x+3.2-k*2.2,2.1-k*.3,P.z+16-k*9],l:[P.x,2.3,P.z],f:44}}},
+ {sc:'Tokyo',d:4*B,show:['dscut'],set(){/* the city is built under the card; arriving again just runs the flyover */try{DCITY.arrive('tyo')}catch(e){console.error(e)}},acts:[[4*B-.8,()=>{trlShow();const k=$('trlblk');if(k)k.innerHTML=''}]],/* a beat of black while the show loads, before the stadium slams in */tick(u){if(u>=1-.8/(4*B)){const k=$('trlblk');if(k)k.style.display='flex'}}},
+ {sc:'Stadium',d:2*B,show:[],set(){if(mode!='dshow')trlShow()},/* hold black until the show is up */tick(){const k=$('trlblk');if(k)k.style.display=mode=='dshow'?'none':'flex'},cam:u=>{const k=trlE.s(u);/* from the crowd, pushing in on you on stage */return{p:[P.x+3.2-k*2.2,2.1-k*.3,P.z+16-k*9],l:[P.x,2.3,P.z],f:44}}},
  {sc:'Stadium wide',d:4*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* rising back over the whole crowd */return{p:[P.x-6+k*14,4+k*24,P.z+24+k*40],l:[P.x,3,P.z+6],f:52}}},
  {sc:'End card',d:4*B,end:1}];
  let t=0;L.forEach((s,i)=>{s.k=i;s.t=t;t+=s.d});TRL.len=t;return L}
@@ -98,7 +98,7 @@ function trlCam(A,B2,e){return u=>{const k=(e||trlE.s)(u),m=(a,b)=>a.map((v,i)=>
 /* ---------- a fresh career for the trailer, so no real save is ever used ---------- */
 function trlFresh(plain){try{resetState()}catch(e){}TRL.star=0;TRL.showOn=0;TRL.art=-1;trlHome();
  /* the creator starts plain; any later scene starts with the look the creator ends on */
- ch=plain?{skin:2,eyes:0,mouth:0,hair:0,hc:0,top:0,tc:0,pc:0,body:.4,hgt:.5}:{skin:2,eyes:0,mouth:0,hair:2,hc:5,top:1,tc:6,pc:1,body:.4,hgt:.5};S.tut={v:2,on:0,seen:{},f:{},g:1};S.wx={d:S.day,k:'sun'};
+ ch=plain?{skin:2,eyes:0,mouth:0,hair:0,hc:0,top:0,tc:0,pc:0,body:.4,hgt:.5}:{skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};S.tut={v:2,on:0,seen:{},f:{},g:1};S.wx={d:S.day,k:'sun'};
  [()=>refresh(),()=>parkCars(),()=>syncF(),()=>buildStudio(),()=>buildLots(),()=>syncArt()].forEach(f=>{try{f()}catch(e){}});trlPut(4.5,3.8,0);S.t=20}
 function trlCre(k,d){const R=[...document.querySelectorAll('#cre .r')].find(r=>r.querySelector('span')&&r.querySelector('span').textContent==({hair:'Hairstyle',top:'Clothes',eyes:'Eyes',mouth:'Mouth'})[k]);return R?R.querySelectorAll('button')[d>0?1:0]:null}
 function trlSw(row,i){const R=[...document.querySelectorAll('#cre .sw')][row];return R?R.querySelectorAll('i')[i]:null}
