@@ -119,7 +119,7 @@ const xHead=g=>g.children.find(o=>o.isGroup&&Math.abs(o.position.y-1.4)<1e-6&&o.
  try{const x={g:r.g,legs:r.legs,arms:r.arms,h:xHead(r.g),w:.42+c.body*.5,d:.3+c.body*.28,sk:SKIN[c.skin],c,jk:c.jk>=0,o:c.jk>=0?.045:0};
   if(nT)nT(x,c.tc_custom||TOPC[c.tc]||'#888888');if(nB)nB(x,c.pc_custom||PANTC[c.pc]||'#888888');if(nJ)nJ(x,JKC[c.jk]||'#888888');
   if(nS){r.legs.forEach(l=>{const m=xShoe(l);if(m)l.remove(m)});nS(x,(SHC[c.sh]||['#222222'])[0])}
-  if(nH&&x.h)nH(x,(HTC[c.ht]||['#888888'])[0]);if(nA)nA(x,c.acc||'#222222')}catch(e){console.warn('clothes',e)}
+  if(nH&&x.h){const n0=x.h.children.length;nH(x,(HTC[c.ht]||['#888888'])[0]);for(let i=n0;i<x.h.children.length;i++)x.h.children[i].userData.hat=1}if(nA)nA(x,c.acc||'#222222')}catch(e){console.warn('clothes',e)}
  return r}}
 
 /* ---- shop and wardrobe previews for the new styles (box lists, same frame as clb) ---- */

@@ -5,7 +5,7 @@
    the fringe under a cap) stays as it was. Open hats (headband, visor, sweatband) leave the hair alone.
    HAT_BRIM is the height in head space (the head is a .55 box centred on 0, so its top is at .275) where each
    hat style meets the head, by hat style (c.hts, or the old default style for each colour). */
-const HAT_BRIM={0:.28,1:.22,2:.29,3:.29,4:null,5:.35,6:.28,7:.3,8:.22,9:null,10:.3,11:.29,12:.285,13:.24,14:.28,15:.31,16:.255,17:.285,18:.28,19:null,20:.28};
+const HAT_BRIM={0:.28,1:.22,2:.29,3:.29,4:null,5:.3,6:.28,7:.3,8:.22,9:null,10:.3,11:.29,12:.285,13:.24,14:.28,15:.31,16:.255,17:.285,18:.28,19:null,20:.28};
 const hatStyle=c=>c&&c.ht>=0?(c.hts!==undefined?c.hts:[0,1,2,0,3,1,2][c.ht]??0):null;
 function hatBrim(c){const s=hatStyle(c);if(s==null)return null;return s in HAT_BRIM?HAT_BRIM[s]:.28}
 /* pixel portraits (fig0 in 22-v8...js): the row the hat's crown ends on, hair above it is clipped */

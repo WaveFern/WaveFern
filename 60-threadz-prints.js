@@ -116,7 +116,7 @@ const xSlotCol=(c,sl)=>sl=='top'?c.tc_custom||TOPC[c.tc]||'#888888':sl=='jk'?JKC
 {const bc2=buildChar;buildChar=function(c){const r=bc2(c);if(c!==ch)return r;
  try{const x={g:r.g,legs:r.legs,arms:r.arms,h:xHead(r.g),w:.42+c.body*.5,d:.3+c.body*.28,sk:SKIN[c.skin],c,jk:c.jk>=0,o:c.jk>=0?.045:0};
   ['top','jk','bt','sh','ht','ac'].forEach(sl=>{if(sl=='top'&&x.jk)return;const g=xWorn(c,sl),sp=g&&XPD[g.n];if(!sp)return;const col=xSlotCol(c,sl),v=sp.v?sp.v():null;
-   if(sp.k=='top'||sp.k=='jk')xpPlace(x,sp.k,sp,col,v);if(sp.on&&(sl!='ht'||x.h))sp.on(x,col,v)})}catch(e){console.warn('prints',e)}return r}}
+   if(sp.k=='top'||sp.k=='jk')xpPlace(x,sp.k,sp,col,v);if(sp.on&&(sl!='ht'||x.h)){const n0=sl=='ht'?x.h.children.length:0;sp.on(x,col,v);if(sl=='ht')for(let i=n0;i<x.h.children.length;i++)x.h.children[i].userData.hat=1}})}catch(e){console.warn('prints',e)}return r}}
 
 /* ---- previews: the shop's flat drawing and the wardrobe's 3D model learn to show prints ---- */
 {const clb2=clb;clb=function(k){const L=clb2(k),[id,col]=String(k).split('|'),g=GM[id],sp=g&&XPD[g.n];if(!sp||!Array.isArray(L))return L;const c=col||g.dc;

@@ -420,4 +420,6 @@ window.VIEWX=()=>typeof mode!='undefined'&&mode=='play'?(inT()?12:inC()?8:0):0;
  /* a city's airport doors or gate: walk into the shared terminal, where tickets, security and gates work as at home */
  T.boardAt=()=>{if(typeof window.apEnter!='function')return false;window.apEnter('front');return true}}
 try{if(typeof MAPZ!='undefined')MAPZ.L=Math.max(MAPZ.L||0,480)}catch(e){}
+/* v49.1.0: shared for 72-tutorial.js (inAp: the airport tutorial step never finished) and 167-resume-spot.js (no resume spot in a plane cabin), which look for them with typeof */
+window.AX=AX;window.inC=inC;
 })();

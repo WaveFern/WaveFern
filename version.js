@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.0.3';
+const GAME_VERSION='v49.1.0';
 const VERSION_HISTORY=[
+ {v:'v49.1.0',n:'Wardrobe fix and polish. Picking a colour in the wardrobe now recolours the clothes you have on straight away: the wardrobe never knew what the character creator dressed you in, so it only changed the card. Wardrobe cards now show you wearing each piece in the colour you pick, hats sit over your hair instead of it poking through, and the beret and headband sit properly. New settings in Settings > Game: camera zoom, always run, key hints, auto-pause and a 12-hour clock. The first days move faster (new artist buzz on streams until Fame Level 4), passing 100, 1K, 10K and more listeners, streams or followers gets a celebration, and a few one-time tips point new players at the map, Quests, Instagrime and the Gearshop. Smoother play: the HUD is no longer rebuilt every frame. Fixed the airport tutorial step never finishing.'},
  {v:'v49.0.3',n:'Fixed a player being teleported back into the Main Stage crowd at the festival field. An old one-off fix kept firing every time they started or reloaded a career; it is gone, so you now stay where you left off.'},
  {v:'v49.0.2',n:'No more hard cutoff for who can DM you: any artist can, but the bigger they are than you, the faster the chance drops. Someone about your size messages often, a star 10x bigger is rare, and a star like Doja Cat or Shawn Mendes (about 560M) messaging a 20M player is around 1 in 80,000 a day. At a handful of listeners it is so unlikely it will probably never happen.'},
  {v:'v49.0.1',n:'Big stars no longer DM you while you are still far smaller than them. An artist only messages you once you have at least a tenth of their monthly listeners, so someone like Doja Cat or Shawn Mendes waits until you are at about 56M, not 20M. You can still message anyone yourself.'},
