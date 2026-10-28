@@ -100,10 +100,10 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
 function trlZoom(s){const z=s&&s.pz,e=z&&$(z[0]);if(TRL.pzEl&&TRL.pzEl!==e){TRL.pzEl.style.transform='';TRL.pzEl.style.transformOrigin=''}TRL.pzEl=e||null;if(!e)return;
  const u=Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)),k=u*u*(3-2*u);let o=z[3];if(Array.isArray(o)){const K=o;let j=0;while(j<K.length-2&&u>=K[j+1][0])j++;const a=K[j],b=K[Math.min(j+1,K.length-1)],v=Math.max(0,Math.min(1,(u-a[0])/((b[0]-a[0])||1))),q=v*v*(3-2*v),A=a[1].split(' ').map(parseFloat),B=b[1].split(' ').map(parseFloat);o=A.map((x,i)=>(x+(B[i]-x)*q).toFixed(2)+'%').join(' ')}e.style.transformOrigin=o;e.style.transform='scale('+(z[1]+(z[2]-z[1])*k).toFixed(4)+')'}
 function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Collab session');if(!c)return;
- const n=Math.max(0,Math.min(12,Math.floor((T-c.t)/TRL.BEAT+1e-3)+1));if(TRL.pwN===n)return;TRL.pwN=n;trlWallClear();if(!n)return;
- /* same layout as the game's plaque wall (174-career-depth.js), built here so it can change on the beat instead of every 2 seconds */
+ const n=Math.max(0,Math.min(12,Math.floor((T-c.t)/(2*TRL.BEAT)+1e-3)+1));if(TRL.pwN===n)return;TRL.pwN=n;trlWallClear();if(!n)return;
+ /* same layout as the game's plaque wall (174-career-depth.js), built here so a new one lands exactly every second, on the hits */
  const G=TRL.pw=new THREE.Group(),C=['#e6b422','#d8dde3','#9be7ff','#1ed760'],bx=(w,h,d,col,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col}));m.position.set(x,y,z);G.add(m)};
- for(let i=0;i<n;i++){const col=C[i<4?0:i<8?1:i<11?2:3],x=15.3-(i%6)*.82,y=i<6?2.3:1.45,z=.03;bx(.66,.8,.05,'#141414',x,y,z);bx(.56,.7,.02,col,x,y,z+.03);
+ for(let i=0;i<n;i++){const col=C[[0,0,1,1,2,3][Math.min(i,5)]],x=15.3-(i%6)*.82,y=i<6?2.3:1.45,z=.03;bx(.66,.8,.05,'#141414',x,y,z);bx(.56,.7,.02,col,x,y,z+.03);
   const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),new THREE.MeshLambertMaterial({color:col=='#d8dde3'?'#f4f4f4':col}));d.rotation.x=Math.PI/2;d.position.set(x,y+.08,z+.05);G.add(d);bx(.07,.07,.02,'#141414',x,y+.08,z+.065);bx(.4,.08,.02,'#f4f1e8',x,y-.24,z+.05)}
  scene.add(G)}
 function trlWallClear(){const G=TRL.pw;if(!G)return;scene.remove(G);G.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});TRL.pw=null}
@@ -164,7 +164,7 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  let k=TRL.shots.findIndex(s=>T>=s.t&&T<s.t+s.d);if(k<0)k=T<0?-1:TRL.shots.length-1;if(k>=0&&k!==TRL.i)trlEnter(k);
  const s=TRL.shots[TRL.i];if(!s)return;const lt=T-s.t;
  (s.acts||[]).forEach((a,j)=>{if(!s.done[j]&&lt>=a[0]){s.done[j]=1;try{a[1]()}catch(e){console.error('trailer act',s.sc,e)}}});
- if(s.end){const h=.05,on=(id,at)=>{const e=$(id);if(e&&lt>=at)e.classList.add('on')};on('trle1',h);on('trle4',h+.9);on('trle2',h+1.7);on('trle3',h+2.4)}
+ if(s.end){/* one line a second, on the hits of the final bit */const h=0,on=(id,at)=>{const e=$(id);if(e&&lt>=at)e.classList.add('on')};on('trle1',h);on('trle4',h+2*TRL.BEAT);on('trle2',h+4*TRL.BEAT);on('trle3',h+6*TRL.BEAT)}
  /* keep the clock on the music; the track carries its own stop and final bit */
  const a=TRL.aud;if(a&&TRL.opt.music){const E=TRL.shots[TRL.shots.length-1];
   if(!TRL.cut&&TRL.fz==null&&a.readyState>=2&&!a.paused){const d=a.currentTime-TRL.MO-T;if(Math.abs(d)>.3){if(!a.seeking&&performance.now()-(TRL.seekT||0)>2500){TRL.seekT=performance.now();try{a.currentTime=TRL.MO+T}catch(e){}}}else TRL.t0-=d*1000*.08}}

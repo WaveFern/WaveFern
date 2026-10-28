@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.9.1';
+const GAME_VERSION='v49.9.2';
 const VERSION_HISTORY=[
+ {v:'v49.9.2',n:'Trailer: the studio plaques go up once a second, on the hits, Gold to Billions Club, and the end card text lands on the beat, one line a second from 1:20.'},
  {v:'v49.9.1',n:'Trailer: the studio plaques now go up exactly on each beat (the game only rebuilt its plaque wall every 2 seconds, so the trailer puts up its own).'},
  {v:'v49.9.0',n:'Trailer: in the studio after the drop, a plaque goes up on the wall on every beat of the song, Gold to Platinum to Diamond to Billions Club, until the wall is full. The solo studio shot before the drop now plays the Mix step (holding the level in the green band) instead of the beat bar. The soundtrack is unchanged.'},
  {v:'v49.8.0',n:'Trailer review pass. The end card now says A music career game. Spotifly listeners and followers count up from zero to millions, and a new shot shows your single blowing up on Instagrime with likes counting up and comments rolling in. The setup cards now name real challenges: Money runs out. Rivals fire back. The internet is watching. The wardrobe, map and second city shots are cut and the festival gets the time. Text-heavy shots (naming yourself, messaging, Spotifly, Instagrime, World Tour) zoom in on the screen so they read on a phone.'},
