@@ -41,6 +41,7 @@ function trlStar(){if(TRL.star)return;TRL.star=1;trlName();
  S.apps=S.apps||{};Object.keys(APPD).forEach(k=>S.apps[k]=1);S.phone=Math.max(S.phone||0,12);delete S.noPhone;
  const T=[TRL.song||'Night Bus','Gold Rush','Neon Rain','Fernfield','Midnight Drive','Paper Planes'];
  T.forEach((t,i)=>{if(!S.songs.some(s=>s.title==t))S.songs.push({id:9e5+i,title:t,g:GEN[i%4],q:88-i*3,day:Math.max(1,S.day-i*3),streams:Math.round(2.6e7/(i+1)),today:Math.round(9e5/(i+1))})});
+ /* the trailer puts up its own plaques on the beat, so the game's wall stays empty */S.songs.forEach(x=>x.pq=4);S.plq=[];
  [()=>parkCars(),()=>syncF(),()=>buildStudio(),()=>refresh(),()=>syncArt()].forEach(f=>{try{f()}catch(e){}})}
 function trlFestDay(){if(S.day%7)S.day=Math.ceil(S.day/7)*7;S.wx={d:S.day,k:'sun'};try{festSync()}catch(e){}}
 function trlShow(){if(TRL.showOn)return;TRL.showOn=1;try{trlStar();if(!DCITY.on||DCITY.id!='tyo')DCITY.arrive('tyo',{quiet:1});const id=DCITY.id;
@@ -74,7 +75,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Silence',d:.5,card:' '},
  /* the drop: the city from above, the one shot not tied to the player */
  {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},
- {sc:'Collab session',d:B,plq:1,show:[],set(){trlClear();S.plq=[];try{plaqueWall()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
+ {sc:'Collab session',d:B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
  {sc:'Recording',d:2*B,plq:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0)}catch(e){}},rec:1},
  /* zero fans to millions: the listener and follower numbers count up */
  {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.95))}},
@@ -98,10 +99,14 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
 /* text-heavy shots push in on the screen so they read on a phone: pz = [element id, scale from, scale to, origin or [[u, origin], ...] keys to pan along] */
 function trlZoom(s){const z=s&&s.pz,e=z&&$(z[0]);if(TRL.pzEl&&TRL.pzEl!==e){TRL.pzEl.style.transform='';TRL.pzEl.style.transformOrigin=''}TRL.pzEl=e||null;if(!e)return;
  const u=Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)),k=u*u*(3-2*u);let o=z[3];if(Array.isArray(o)){const K=o;let j=0;while(j<K.length-2&&u>=K[j+1][0])j++;const a=K[j],b=K[Math.min(j+1,K.length-1)],v=Math.max(0,Math.min(1,(u-a[0])/((b[0]-a[0])||1))),q=v*v*(3-2*v),A=a[1].split(' ').map(parseFloat),B=b[1].split(' ').map(parseFloat);o=A.map((x,i)=>(x+(B[i]-x)*q).toFixed(2)+'%').join(' ')}e.style.transformOrigin=o;e.style.transform='scale('+(z[1]+(z[2]-z[1])*k).toFixed(4)+')'}
-function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Collab session');if(!c)return;S.plq=Array.isArray(S.plq)?S.plq:[];
- const n=Math.min(12,Math.floor((T-c.t)/TRL.BEAT+1e-3)+1);if(S.plq.length>=n)return;
- while(S.plq.length<n){const i=S.plq.length,p=[[1e6,'Gold','#e6b422'],[1e7,'Platinum','#d8dde3'],[1e8,'Diamond','#9be7ff'],[1e9,'Billions Club','#1ed760']][i<4?0:i<8?1:i<11?2:3],so=S.songs[S.songs.length-1-(i%Math.max(1,S.songs.length))]||{title:TRL.song};S.plq.push({s:so.title,t:p[1],c:p[2],n:p[0],d:S.day})}
- try{plaqueWall()}catch(e){}}
+function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Collab session');if(!c)return;
+ const n=Math.max(0,Math.min(12,Math.floor((T-c.t)/TRL.BEAT+1e-3)+1));if(TRL.pwN===n)return;TRL.pwN=n;trlWallClear();if(!n)return;
+ /* same layout as the game's plaque wall (174-career-depth.js), built here so it can change on the beat instead of every 2 seconds */
+ const G=TRL.pw=new THREE.Group(),C=['#e6b422','#d8dde3','#9be7ff','#1ed760'],bx=(w,h,d,col,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col}));m.position.set(x,y,z);G.add(m)};
+ for(let i=0;i<n;i++){const col=C[i<4?0:i<8?1:i<11?2:3],x=15.3-(i%6)*.82,y=i<6?2.3:1.45,z=.03;bx(.66,.8,.05,'#141414',x,y,z);bx(.56,.7,.02,col,x,y,z+.03);
+  const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),new THREE.MeshLambertMaterial({color:col=='#d8dde3'?'#f4f4f4':col}));d.rotation.x=Math.PI/2;d.position.set(x,y+.08,z+.05);G.add(d);bx(.07,.07,.02,'#141414',x,y+.08,z+.065);bx(.4,.08,.02,'#f4f1e8',x,y-.24,z+.05)}
+ scene.add(G)}
+function trlWallClear(){const G=TRL.pw;if(!G)return;scene.remove(G);G.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});TRL.pw=null}
 /* counts the listener and follower numbers on screen up from zero */
 function trlCount(u){const k=1-Math.pow(1-u,3),pc=$('pc');if(!pc)return;const w=document.createTreeWalker(pc,NodeFilter.SHOW_TEXT);let n;
  while(n=w.nextNode()){const m=/^\s*([\d,]{3,})(\s+(monthly listeners|followers|likes))\s*$/.exec(n.nodeValue);if(!m)continue;if(n.trlN==null)n.trlN=+m[1].replace(/,/g,'');n.nodeValue=Math.round(n.trlN*k).toLocaleString()+m[2]}}
