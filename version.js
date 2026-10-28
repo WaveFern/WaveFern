@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.8.0';
+const GAME_VERSION='v49.9.0';
 const VERSION_HISTORY=[
+ {v:'v49.9.0',n:'Trailer: in the studio after the drop, a plaque goes up on the wall on every beat of the song, Gold to Platinum to Diamond to Billions Club, until the wall is full. The solo studio shot before the drop now plays the Mix step (holding the level in the green band) instead of the beat bar. The soundtrack is unchanged.'},
  {v:'v49.8.0',n:'Trailer review pass. The end card now says A music career game. Spotifly listeners and followers count up from zero to millions, and a new shot shows your single blowing up on Instagrime with likes counting up and comments rolling in. The setup cards now name real challenges: Money runs out. Rivals fire back. The internet is watching. The wardrobe, map and second city shots are cut and the festival gets the time. Text-heavy shots (naming yourself, messaging, Spotifly, Instagrime, World Tour) zoom in on the screen so they read on a phone.'},
  {v:'v49.7.1',n:'Trailer fixes: the cut from the Tokyo flyover to the stadium no longer flashes the airport street (it holds black for a moment, then the stadium slams in on the beat), and starting the trailer from a later scene uses the same character the creator scene makes.'},
  {v:'v49.7.0',n:'The first 24 seconds of the trailer now build suspense: short bursts of the start of a career (making your character, naming yourself, messaging an artist, meeting up, a first take) fade in and out of black between cards that set up the game and its challenges: Every star started in a bedroom. $100, a laptop, zero fans. Rent is due, rivals are climbing. The critics are watching. How far can you go? Then the beat drops on the city.'},
