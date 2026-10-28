@@ -10,7 +10,7 @@
    Nothing is saved in trailer mode: it runs on a fresh career, and your own careers and cloud save are never touched. */
 const TRL={on:!!(window.FW_TRAILER||/[?&]trailer\b/.test(location.search)),run:0,T:0,t0:0,i:-1,shots:[],len:0,
  opt:{music:1,cap:1},name:'',song:'Night Bus',aud:null,zoom:0,cur:null,typ:null,scr:null,art:-1,
- SRC:'assets/track1.mp3',MO:0,DROP:24.45,BAR:2.043,BEAT:.5108,HIT:24.42};
+ SRC:'assets/track1.mp3',MO:0,DROP:24.45,BAR:2.043,BEAT:.5108,HIT:24.42,custom:0};
 /* track 1: a quiet build to 24.45 s, then the beat (bars of 2.043 s). The music clock starts at MO. */
 
 /* ---------- all game audio is muted on the trailer page: only the trailer track plays ---------- */
@@ -37,7 +37,7 @@ function trlName(){if(!S.artist)S.artist=TRL.name||'Fern Wave'}
 /* the career after the drop: the money, fame and toys of a rising star, still your character */
 function trlStar(){if(TRL.star)return;TRL.star=1;trlName();
  Object.assign(S,{money:Math.max(S.money||0,2.4e6),energy:100,stam:100,listeners:Math.max(S.listeners||0,3.8e6),followers:Math.max(S.followers||0,1.2e6),
-  bling:2,garage:1,guards:2,gs:'follow',pets:[0],petsOut:1,cars:CARS.map((c,i)=>i),cheat:1});
+  bling:2,garage:1,guards:0,gs:'follow',pets:[0],petsOut:1,cars:CARS.map((c,i)=>i),cheat:1});
  S.apps=S.apps||{};Object.keys(APPD).forEach(k=>S.apps[k]=1);S.phone=Math.max(S.phone||0,12);delete S.noPhone;
  const T=[TRL.song||'Night Bus','Gold Rush','Neon Rain','Fernfield','Midnight Drive','Paper Planes'];
  T.forEach((t,i)=>{if(!S.songs.some(s=>s.title==t))S.songs.push({id:9e5+i,title:t,g:GEN[i%4],q:88-i*3,day:Math.max(1,S.day-i*3),streams:Math.round(2.6e7/(i+1)),today:Math.round(9e5/(i+1))})});
@@ -45,7 +45,7 @@ function trlStar(){if(TRL.star)return;TRL.star=1;trlName();
 function trlFestDay(){if(S.day%7)S.day=Math.ceil(S.day/7)*7;S.wx={d:S.day,k:'sun'};try{festSync()}catch(e){}}
 function trlShow(){if(TRL.showOn)return;TRL.showOn=1;try{trlStar();if(!DCITY.on||DCITY.id!='tyo')DCITY.arrive('tyo',{quiet:1});const id=DCITY.id;
  S.dcity=S.dcity||{};S.dcity.prep=S.dcity.prep||{};S.dcity.prep[id+'|venue']={songs:S.songs.slice(-6).map(s=>s.id),prod:{pyro:1,lasers:1,confetti:1,dancers:1},reh:2,rd:S.day};
- S.money=Math.max(S.money,1e7);S.energy=100;S.t=Math.max(S.t,380);trlClear();DCITY.startShow('venue')}catch(e){console.error('trailer show',e)}}
+ S.money=Math.max(S.money,1e7);S.energy=100;S.t=Math.max(S.t,380);const cu=$('dscut');if(cu)cu.remove();document.body.classList.remove('dscut');DCITY.view=null;trlClear();DCITY.startShow('venue')}catch(e){console.error('trailer show',e)}}
 
 /* ---------- the shots ----------
    d: length in seconds. set(): run on the first frame. acts: [time in shot, fn]. zoom: the game camera's view height
@@ -54,38 +54,47 @@ function trlShow(){if(TRL.showOn)return;TRL.showOn=1;try{trlStar();if(!DCITY.on|
 function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  const L=[
  {sc:'Title screen',d:3.2,show:['ui'],set(){trlHome();try{titleOpen()}catch(e){}PAUSED=0},acts:[[.5,()=>trlMove(()=>trlQ('#ttl button',/Single player|^Play$/),1.6)]]},
- {sc:'Make a character',d:7.6,show:['ui'],set(){trlFresh();TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
+ {sc:'Make a character',d:7.6,show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
   acts:[[.15,()=>trlClick(()=>trlCre('hair',1),.7)],[1.15,()=>trlClick(()=>trlCre('hair',1),.35)],[1.85,()=>trlClick(()=>trlSw(1,5),.7)],
    [2.95,()=>trlClick(()=>trlCre('top',1),.75)],[3.95,()=>trlClick(()=>trlSw(3,6),.65)],[4.9,()=>trlClick(()=>trlSw(4,1),.6)],[5.9,()=>trlClick(()=>trlQ('#cre button',/Confirm/),.85,()=>{})]]},
  {sc:'Card: start',d:1.6,card:'YOU START WITH $100<br>AND A LAPTOP.'},
- {sc:'Artist name',d:5,show:['ui'],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
-  acts:[[.3,()=>trlClick(()=>$('an'),.8,()=>{const i=$('an');if(i)i.focus()})],[1.3,()=>trlType(()=>$('an'),TRL.name||'Fern Wave')],[3.4,()=>trlClick(()=>trlQ('#pc button',/Create profile/),.7)]]},
- {sc:'Message an artist',d:5,show:['ui'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
-  acts:[[.3,()=>trlClick(()=>$('cin'),.75,()=>{const i=$('cin');if(i)i.focus()})],[1.2,()=>trlType(()=>$('cin'),'love your stuff. collab?')],[3.3,()=>trlClick(()=>trlQ('#pc button',/^Send$/),.55)]]},
- {sc:'Collab meeting',d:TRL.DROP-22.4,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
+ {sc:'Artist name',d:4.6,show:['ui'],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
+  acts:[[.25,()=>trlClick(()=>$('an'),.7,()=>{const i=$('an');if(i)i.focus()})],[1.1,()=>trlType(()=>$('an'),TRL.name||'Fern Wave')],[3.1,()=>trlClick(()=>trlQ('#pc button',/Create profile/),.6)]]},
+ {sc:'Message an artist',d:4.6,show:['ui'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+  acts:[[.25,()=>trlClick(()=>$('cin'),.7,()=>{const i=$('cin');if(i)i.focus()})],[1.05,()=>trlType(()=>$('cin'),'love your stuff. collab?')],[3.1,()=>trlClick(()=>trlQ('#pc button',/^Send$/),.5)]]},
+ {sc:'Collab meeting',d:2.4,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
    /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o)}catch(e){}}},zoom:6,
-  acts:[[.4,()=>trlClick(()=>trlQ('#ui .mto'),.7)]]},
- /* the drop */
+  acts:[[.35,()=>trlClick(()=>trlQ('#ui .mto'),.65)]]},
+ /* the drop: the city from above, the one shot not tied to the player */
+ {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},
  {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
- {sc:'Recording',d:2*B,show:['ui','hud','mg'],set(){trlClear();trlStar();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0)}catch(e){}},rec:1},
- {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},acts:[[.25,()=>trlScroll('#pc .mn',140,1.4)]]},
- {sc:'City',d:2*B,show:[],set(){trlClear();trlStar();S.t=262;trlPut(566,26.2,Math.PI/2);trlKeys('ds')},zoom:7.5},
- {sc:'Drive',d:2*B,show:[],set(){trlClear();S.t=275;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlKeys('w')}}},
+ {sc:'Recording',d:2*B,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0)}catch(e){}},rec:1},
+ {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},acts:[[.2,()=>trlScroll('#pc .mn',150,1.3)]]},
+ {sc:'City',d:2*B,show:[],set(){trlClear();S.t=262;trlPut(566,26.2,Math.PI/2);trlKeys('ds')},zoom:7.5},
+ {sc:'Fern Road',d:B,show:[],set(){trlClear();S.t=272;trlPut(44,14.2,Math.PI/2);trlKeys('ds')},cam:u=>{const x=P.x;return{p:[x+7.5,1.25,20.5],l:[x,1.2,14.2],f:42}}},
+ {sc:'Drive',d:2*B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlKeys('w')}}},
  {sc:'Wardrobe',d:2*b,show:['ui'],set(){trlClear();S.t=120;trlPut(2.6,4.4,-Math.PI/2);try{wardrobe()}catch(e){}}},
  {sc:'Gphone',d:2*b,show:['ph'],set(){trlClear();S.t=268;trlPut(40,14.2,Math.PI/2);try{openPhone()}catch(e){}}},
  {sc:'Map',d:2*b,show:['ui'],set(){trlClear();S.t=268;trlPut(560,20,0);try{bigMap()}catch(e){}}},
- {sc:'Crew',d:2*b,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlKeys('ds')},zoom:5.5},
+ {sc:'Crew',d:2*b,crew:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlKeys('ds')},zoom:5.5},
  {sc:'Festival',d:2*B,show:[],set(){trlClear();trlFestDay();S.t=392;trlPut(364,-100,0);try{festStartBooked({n:1,slot:3,songs:S.songs.slice(-4).map(s=>s.id)})}catch(e){console.error(e)}}},
- {sc:'Card: tour',d:B,card:'THEN TAKE IT<br>ON TOUR.'},
- {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},acts:[[.2,()=>trlClick(()=>trlQ('#pc button',/^Asia$/),.9)]]},
- {sc:'Tokyo',d:2*B,show:[],set(){trlClear();try{if(!DCITY.on||DCITY.id!='tyo')DCITY.arrive('tyo',{quiet:1})}catch(e){}S.t=392;mode='play';try{const k=DCITY.C.spots.hotel;trlPut(4000+k.x-4,-4000+k.z+2.5,Math.PI/2)}catch(e){}trlKeys('ds')},zoom:12,acts:[[2*B-.7,()=>trlShow()]]},
- {sc:'Stadium',d:4*B,show:[],set(){trlShow()},tick(u){try{const c=DCITY.view&&DCITY.view.cam;if(c){c.fov=56-trlE.s(u)*14;c.updateProjectionMatrix()}}catch(e){}}},
+ {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
+ {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
+ {sc:'Card: tour',d:B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo')}catch(e){console.error(e)}}]]},
+ /* the game's own arrival flyover, with its city title */
+ {sc:'Tokyo',d:2*B,show:['dscut'],set(){if(!DCITY.on)try{DCITY.arrive('tyo')}catch(e){}},acts:[[2*B-.35,()=>trlShow()]]},
+ {sc:'Stadium',d:2*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* from the crowd, pushing in on you on stage */return{p:[P.x+3.2-k*2.2,2.1-k*.3,P.z+16-k*9],l:[P.x,2.3,P.z],f:44}}},
+ {sc:'Stadium wide',d:2*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* rising back over the whole crowd */return{p:[P.x-6+k*12,4+k*20,P.z+24+k*34],l:[P.x,3,P.z+6],f:52}}},
  {sc:'End card',d:9,end:1}];
+ /* the build before the drop stretches to wherever the drop is in the track */
+ const k=TRL.DROP/24;L.forEach(s=>{if(s.dropped)return});let pre=1;L.forEach(s=>{if(s.drop)pre=0;if(pre){s.d*=k;(s.acts||[]).forEach(a=>a[0]*=k)}});
  let t=0;L.forEach((s,i)=>{s.k=i;s.t=t;t+=s.d});TRL.len=t;return L}
+function trlCam(A,B2,e){return u=>{const k=(e||trlE.s)(u),m=(a,b)=>a.map((v,i)=>v+(b[i]-v)*k);return{p:m(A[0],B2[0]),l:m(A[1],B2[1]),f:A[2]+(B2[2]-A[2])*k}}}
 
 /* ---------- a fresh career for the trailer, so no real save is ever used ---------- */
-function trlFresh(){try{resetState()}catch(e){}TRL.star=0;TRL.showOn=0;TRL.art=-1;trlHome();
- ch={skin:2,eyes:0,mouth:0,hair:0,hc:0,top:0,tc:0,pc:0,body:.4,hgt:.5};S.tut={v:2,on:0,seen:{},f:{},g:1};S.wx={d:S.day,k:'sun'};
+function trlFresh(plain){try{resetState()}catch(e){}TRL.star=0;TRL.showOn=0;TRL.art=-1;trlHome();
+ /* the creator starts plain; any later scene starts with the look the creator ends on */
+ ch=plain?{skin:2,eyes:0,mouth:0,hair:0,hc:0,top:0,tc:0,pc:0,body:.4,hgt:.5}:{skin:2,eyes:0,mouth:0,hair:2,hc:5,top:1,tc:6,pc:1,body:.4,hgt:.5};S.tut={v:2,on:0,seen:{},f:{},g:1};S.wx={d:S.day,k:'sun'};
  [()=>refresh(),()=>parkCars(),()=>syncF(),()=>buildStudio(),()=>buildLots(),()=>syncArt()].forEach(f=>{try{f()}catch(e){}});trlPut(4.5,3.8,0);S.t=20}
 function trlCre(k,d){const R=[...document.querySelectorAll('#cre .r')].find(r=>r.querySelector('span')&&r.querySelector('span').textContent==({hair:'Hairstyle',top:'Clothes',eyes:'Eyes',mouth:'Mouth'})[k]);return R?R.querySelectorAll('button')[d>0?1:0]:null}
 function trlSw(row,i){const R=[...document.querySelectorAll('#cre .sw')][row];return R?R.querySelectorAll('i')[i]:null}
@@ -104,7 +113,7 @@ function trlPointer(){const c=TRL.cur;if(!c)return;if(c.t0!=null){const u=Math.m
 
 /* ---------- overlay ---------- */
 function trlCSS(){if($('trlcss'))return;const st=document.createElement('style');st.id='trlcss';st.textContent=`
-body.trlon>*:not(#c):not(#trl):not(.trlv){visibility:hidden!important}body.trlon #hud:not(.trlv){visibility:hidden!important}body.trlon,body.trlon *{cursor:none!important}
+body.trlon>*:not(#c):not(#trl):not(.trlv){visibility:hidden!important}body.trlon #hud:not(.trlv){visibility:hidden!important}body.trlon #dscut .skip{display:none!important}body.trlon #hud.trlv>*:not(.modal){visibility:hidden!important}body.trlon,body.trlon *{cursor:none!important}
 #trl{position:fixed;inset:0;z-index:2147483000;pointer-events:none;overflow:hidden;color:#fff}
 #trl .qblk{position:absolute;inset:0;background:#000;display:none;align-items:center;justify-content:center;text-align:center}
 #trl .qcard{font-family:'Silkscreen',ui-monospace,monospace;font-size:clamp(26px,4.4vw,72px);line-height:1.25;letter-spacing:.02em}
@@ -125,22 +134,29 @@ function trlEnter(k){const s=TRL.shots[k];TRL.i=k;TRL.typ=null;TRL.scr=null;TRL.
  const blk=$('trlblk');TRL.cur.t0=null;TRL.cur.cb=null;TRL.cur.el.style.opacity=0;
  if(s.card||s.end){blk.style.display='flex';blk.innerHTML=s.card?(TRL.opt.cap?`<div class="qcard">${s.card}</div>`:''):`<div class="qend"><h1 id="trle1">WAVEFERN<br>RECORDS</h1><p id="trle2">FREE IN YOUR BROWSER</p><p id="trle3">WAVEFERN.COM</p></div>`}
  else{blk.style.display='none';blk.innerHTML='';try{s.set&&s.set()}catch(e){console.error('trailer shot '+s.sc,e)}}
- s.done=(s.acts||[]).map(()=>0);trlShowOnly(s.show)}
+ s.done=(s.acts||[]).map(()=>0);trlShowOnly(s.show);
+ /* bodyguards only walk with you in the crew shot, so they never crowd the others */
+ if(TRL.star&&!s.card&&!s.end){const g=s.crew?2:0;if(S.guards!==g){S.guards=g;try{syncF()}catch(e){}if(s.crew)FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}})}}}
 function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;const T=TRL.T;
  let k=TRL.shots.findIndex(s=>T>=s.t&&T<s.t+s.d);if(k<0)k=T<0?-1:TRL.shots.length-1;if(k>=0&&k!==TRL.i)trlEnter(k);
  const s=TRL.shots[TRL.i];if(!s)return;const lt=T-s.t;
  (s.acts||[]).forEach((a,j)=>{if(!s.done[j]&&lt>=a[0]){s.done[j]=1;try{a[1]()}catch(e){console.error('trailer act',s.sc,e)}}});
- if(s.end){const on=(id,at)=>{const e=$(id);if(e&&lt>=at)e.classList.add('on')};on('trle1',1.05);on('trle2',2.2);on('trle3',2.9)}
+ if(s.end){const h=TRL.custom?TRL.BAR/2:1.05,on=(id,at)=>{const e=$(id);if(e&&lt>=at)e.classList.add('on')};on('trle1',h);on('trle2',h+1.15);on('trle3',h+1.85)}
  /* keep the clock on the music, then cut it at the end card and play one last hit on the logo */
  const a=TRL.aud;if(a&&TRL.opt.music){const E=TRL.shots[TRL.shots.length-1];
   if(!TRL.cut&&TRL.fz==null&&a.readyState>=2&&!a.paused){const d=a.currentTime-TRL.MO-T;if(Math.abs(d)>.3){if(!a.seeking&&performance.now()-(TRL.seekT||0)>2500){TRL.seekT=performance.now();try{a.currentTime=TRL.MO+T}catch(e){}}}else TRL.t0-=d*1000*.08}
-  if(T>=E.t&&!TRL.cut){TRL.cut=1;a.pause()}
+  /* your own track carries its own stop and last hit; track 1 is cut here and its drop replayed on the logo */
+  if(T>=E.t&&!TRL.cut&&!TRL.custom){TRL.cut=1;a.pause()}
   if(T>=E.t+1.05&&TRL.cut==1){TRL.cut=2;try{a.currentTime=TRL.HIT;a.volume=1;a.play().catch(()=>{})}catch(e){}}
   if(TRL.cut==2)a.volume=Math.max(0,Math.min(1,1-(T-E.t-3.6)/4))}
  /* the beat minigame: hit in the middle, like a good player */
  if(s.rec&&mode=='rec'&&rec&&!rec.st&&Math.abs(rec.pos-.5)<.035&&!rec.cd)try{recHit()}catch(e){}}
-function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);if(s.tick)s.tick(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)))}
+function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);
+ if(s.cam){const c=s.cam(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)));const C=TRL.cam=TRL.cam||new THREE.PerspectiveCamera(45,1,.1,2600);C.position.set(...c.p);C.lookAt(...c.l);C.fov=c.f;C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}if(s.tick)s.tick(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)))}
 {const u0=update;update=function(dt){if(TRL.run){try{trlPre(dt)}catch(e){console.error('trailer',e)}}u0(dt);if(TRL.run){try{trlPost(dt)}catch(e){console.error('trailer',e)}}}}
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){const s=TRL.run&&TRL.shots[TRL.i];if(s&&s.cam&&TRL.cam&&sc===scene&&c===cam)return r0(sc,TRL.cam);return r0(sc,c)}}
+/* in the few cinematic shots every building stays solid (the game fades the ones in front of the player) */
+{const f0=fadeT;fadeT=function(dt){const s=TRL.run&&TRL.shots[TRL.i];if(s&&s.cam){try{CT.forEach(b=>{b.mat.opacity=1;b.mat.depthWrite=true;if(b.dm){b.dm.opacity=1;b.dm.depthWrite=true}})}catch(e){}return}return f0.apply(this,arguments)}}
 {const v0=window.VIEWX;window.VIEWX=function(){if(TRL.run&&TRL.zoom&&['play','cut'].includes(mode))return TRL.zoom;return typeof v0=='function'?v0():0}}
 /* nothing is saved in trailer mode, and nothing is loaded over the trailer's career */
 {const a0=autoSave;autoSave=function(){if(TRL.on)return;return a0.apply(this,arguments)}}
@@ -156,11 +172,15 @@ function trlMenu(){trlCSS();let m=$('trlm');if(m)m.remove();TRL.shots=trlShots()
  const o=TRL.opt,ck=(k,l)=>`<label style="display:inline-flex;gap:6px;margin-right:16px"><input type=checkbox ${o[k]?'checked':''} onchange="TRL.opt.${k}=this.checked?1:0"> ${l}</label>`;
  m.innerHTML=`<div class="box modal"><h2>Trailer</h2><p class=m><small>A ${Math.round(TRL.len)} second trailer of real gameplay for screen recording. Press Play, start recording, then press Space to roll. Esc stops it. It runs on a fresh career and saves nothing, so your own careers are safe.</small></p>
  <label>Artist name<input type=text id=trln maxlength=24 value="${trlEsc(TRL.name||'Fern Wave')}"></label><label>Song title<input type=text id=trls maxlength=28 value="${trlEsc(TRL.song)}"></label>
- <div>${ck('music','Music (track 1)')}${ck('cap','Title cards')}</div>
+ <div>${ck('music','Music')}${ck('cap','Title cards')}</div>
+ <p class=m style="margin:10px 0 4px"><small>Your own music (optional): pick an MP3 made at 120 BPM with the drop at 0:24. It stays on this computer. Another tempo or drop time works too: type them in.</small></p>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input type=file id=trlf accept="audio/*" onchange="trlFile(this)"><label style="display:inline-flex;gap:6px;align-items:center;margin:0">BPM <input type=number id=trlbpm value="${TRL.custom?Math.round(240/TRL.BAR*10)/10:120}" min=60 max=200 step=.1 style="width:80px"></label><label style="display:inline-flex;gap:6px;align-items:center;margin:0">Drop at (s) <input type=number id=trldrop value="${TRL.custom?TRL.DROP:24}" min=4 max=90 step=.01 style="width:80px"></label></div><p class=m id=trlfm><small>${TRL.custom?'Using your track.':'Using track 1 of the soundtrack.'}</small></p>
  <div class=row2><button class=go onclick="trlPlay(0)">▶ Play the trailer</button></div>
  <p class=m style="margin-top:14px"><small>Or start from a scene:</small></p><div class=trlsc>${TRL.shots.map(s=>`<button onclick="trlPlay(${s.k})">${trlEsc(s.sc)}<small>${s.t.toFixed(1)}s</small></button>`).join('')}</div>
  <div class=row2><button onclick="location.href=new URL('../',location.href).href">Leave and play the game</button></div></div>`;document.body.appendChild(m)}
-function trlPlay(k){const n=$('trln'),s=$('trls');if(n)TRL.name=n.value.trim()||'Fern Wave';if(s)TRL.song=s.value.trim()||'Night Bus';const m=$('trlm');if(m)m.remove();
+function trlFile(inp){const f=inp.files&&inp.files[0];if(!f)return;try{if(TRL.aud)TRL.aud.pause()}catch(e){}TRL.SRC=URL.createObjectURL(f);TRL.aud=new Audio(TRL.SRC);TRL.aud.preload='auto';TRL.custom=1;TRL.HIT=0;const m=$('trlfm');if(m)m.innerHTML='<small>Using your track: '+trlEsc(f.name)+'</small>'}
+function trlPlay(k){const n=$('trln'),s=$('trls');
+ if(TRL.custom){const bp=+(($('trlbpm')||{}).value)||120,dp=+(($('trldrop')||{}).value)||24;TRL.BAR=240/bp;TRL.BEAT=60/bp;TRL.DROP=dp}if(n)TRL.name=n.value.trim()||'Fern Wave';if(s)TRL.song=s.value.trim()||'Night Bus';const m=$('trlm');if(m)m.remove();
  TRL.started=1;TRL.shots=trlShots();TRL.k0=k||0;TRL.cut=0;TRL.i=-1;
  try{TT.on=0;pauseOverlay(0)}catch(e){}PAUSED=0;
  /* scenes after the creator need a career: make the fresh one now, and the star one for scenes after the drop */
