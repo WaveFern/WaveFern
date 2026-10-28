@@ -3,15 +3,15 @@
    play a scripted trailer, about 75 seconds, made to be screen recorded. It is real gameplay in the game's own camera:
    the title screen, making a character, picking an artist name, messaging an artist, the collab meeting and session, the
    recording minigame, Spotifly, walking the city, driving, the wardrobe, the Gphone, the map, a Main Stage festival set,
-   the World Tour app, Tokyo and a stadium show, with a few plain title cards and the end card. Track 1 of the soundtrack
-   plays over it, cut so the beat drops on the collab session; every other game sound and all game music are muted.
+   the World Tour app, Tokyo and a stadium show, with a few plain title cards and the end card. the trailer track
+   plays over it, with the beat dropping on the city reveal; every other game sound and all game music are muted.
    A pointer moves and clicks through the menus like a player would. Each scene can be played on its own (it plays on to
    the end). Esc stops it and reloads the page.
    Nothing is saved in trailer mode: it runs on a fresh career, and your own careers and cloud save are never touched. */
 const TRL={on:!!(window.FW_TRAILER||/[?&]trailer\b/.test(location.search)),run:0,T:0,t0:0,i:-1,shots:[],len:0,
  opt:{music:1,cap:1},name:'',song:'Night Bus',aud:null,zoom:0,cur:null,typ:null,scr:null,art:-1,
- SRC:'assets/track1.mp3',MO:0,DROP:24.45,BAR:2.043,BEAT:.5108,HIT:24.42,custom:0};
-/* track 1: a quiet build to 24.45 s, then the beat (bars of 2.043 s). The music clock starts at MO. */
+ SRC:'assets/trailer.mp3',MO:0,DROP:24,BAR:2,BEAT:.5};
+/* the trailer track (120 BPM): a quiet build to 0:24, the drop, a breakdown at 0:56, back in at 1:08, a final bit at 1:20 */
 
 /* ---------- all game audio is muted on the trailer page: only the trailer track plays ---------- */
 if(TRL.on){
@@ -33,7 +33,7 @@ function trlHome(){try{if(DCITY.on)DCITY.leave(1)}catch(e){}}
 /* a fictional artist to message and collab with (never one of the real artists) */
 function trlArtist(){if(TRL.art>=0)return TRL.art;let b=-1;ART.forEach((a,i)=>{if(!a[8]&&a[4]&&a[2]>=1e4&&a[2]<=5e6&&(b<0||a[2]>ART[b][2]))b=i});if(b<0)b=ART.findIndex(a=>!a[8]&&a[4]);TRL.art=b;return b}
 function trlConv(){const i=trlArtist();let m=S.msgs.find(x=>x.a===i);if(!m){newConv(i,1);m=S.msgs.find(x=>x.a===i)}return m}
-function trlName(){if(!S.artist)S.artist=TRL.name||'Fern Wave'}
+function trlName(){if(!S.artist)S.artist=TRL.name||'WaveFern'}
 /* the career after the drop: the money, fame and toys of a rising star, still your character */
 function trlStar(){if(TRL.star)return;TRL.star=1;trlName();
  Object.assign(S,{money:Math.max(S.money||0,2.4e6),energy:100,stam:100,listeners:Math.max(S.listeners||0,3.8e6),followers:Math.max(S.followers||0,1.2e6),
@@ -59,7 +59,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
    [2.95,()=>trlClick(()=>trlCre('top',1),.75)],[3.95,()=>trlClick(()=>trlSw(3,6),.65)],[4.9,()=>trlClick(()=>trlSw(4,1),.6)],[5.9,()=>trlClick(()=>trlQ('#cre button',/Confirm/),.85,()=>{})]]},
  {sc:'Card: start',d:1.6,card:'YOU START WITH $100<br>AND A LAPTOP.'},
  {sc:'Artist name',d:4.6,show:['ui'],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
-  acts:[[.25,()=>trlClick(()=>$('an'),.7,()=>{const i=$('an');if(i)i.focus()})],[1.1,()=>trlType(()=>$('an'),TRL.name||'Fern Wave')],[3.1,()=>trlClick(()=>trlQ('#pc button',/Create profile/),.6)]]},
+  acts:[[.25,()=>trlClick(()=>$('an'),.7,()=>{const i=$('an');if(i)i.focus()})],[1.1,()=>trlType(()=>$('an'),TRL.name||'WaveFern')],[3.1,()=>trlClick(()=>trlQ('#pc button',/Create profile/),.6)]]},
  {sc:'Message an artist',d:4.6,show:['ui'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   acts:[[.25,()=>trlClick(()=>$('cin'),.7,()=>{const i=$('cin');if(i)i.focus()})],[1.05,()=>trlType(()=>$('cin'),'love your stuff. collab?')],[3.1,()=>trlClick(()=>trlQ('#pc button',/^Send$/),.5)]]},
  {sc:'Collab meeting',d:2.4,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
@@ -70,7 +70,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
  {sc:'Recording',d:2*B,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0)}catch(e){}},rec:1},
  {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},acts:[[.2,()=>trlScroll('#pc .mn',150,1.3)]]},
- {sc:'City',d:2*B,show:[],set(){trlClear();S.t=262;trlPut(566,26.2,Math.PI/2);trlKeys('ds')},zoom:7.5},
+ {sc:'City',d:B,show:[],set(){trlClear();S.t=262;trlPut(566,26.2,Math.PI/2);trlKeys('ds')},zoom:7.5},
  {sc:'Fern Road',d:B,show:[],set(){trlClear();S.t=272;trlPut(44,14.2,Math.PI/2);trlKeys('ds')},cam:u=>{const x=P.x;return{p:[x+7.5,1.25,20.5],l:[x,1.2,14.2],f:42}}},
  {sc:'Drive',d:2*B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlKeys('w')}}},
  {sc:'Wardrobe',d:2*b,show:['ui'],set(){trlClear();S.t=120;trlPut(2.6,4.4,-Math.PI/2);try{wardrobe()}catch(e){}}},
@@ -80,12 +80,12 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Festival',d:2*B,show:[],set(){trlClear();trlFestDay();S.t=392;trlPut(364,-100,0);try{festStartBooked({n:1,slot:3,songs:S.songs.slice(-4).map(s=>s.id)})}catch(e){console.error(e)}}},
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
- {sc:'Card: tour',d:B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo')}catch(e){console.error(e)}}]]},
+ {sc:'Card: tour',d:2*B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo',{quiet:1})}catch(e){console.error(e)}}]]},
  /* the game's own arrival flyover, with its city title */
- {sc:'Tokyo',d:2*B,show:['dscut'],set(){if(!DCITY.on)try{DCITY.arrive('tyo')}catch(e){}},acts:[[2*B-.35,()=>trlShow()]]},
+ {sc:'Tokyo',d:4*B,show:['dscut'],set(){/* the city is built under the card; arriving again just runs the flyover */try{DCITY.arrive('tyo')}catch(e){console.error(e)}},acts:[[4*B-.35,()=>trlShow()]]},
  {sc:'Stadium',d:2*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* from the crowd, pushing in on you on stage */return{p:[P.x+3.2-k*2.2,2.1-k*.3,P.z+16-k*9],l:[P.x,2.3,P.z],f:44}}},
- {sc:'Stadium wide',d:2*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* rising back over the whole crowd */return{p:[P.x-6+k*12,4+k*20,P.z+24+k*34],l:[P.x,3,P.z+6],f:52}}},
- {sc:'End card',d:9,end:1}];
+ {sc:'Stadium wide',d:4*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* rising back over the whole crowd */return{p:[P.x-6+k*14,4+k*24,P.z+24+k*40],l:[P.x,3,P.z+6],f:52}}},
+ {sc:'End card',d:4*B,end:1}];
  /* the build before the drop stretches to wherever the drop is in the track */
  const k=TRL.DROP/24;L.forEach(s=>{if(s.dropped)return});let pre=1;L.forEach(s=>{if(s.drop)pre=0;if(pre){s.d*=k;(s.acts||[]).forEach(a=>a[0]*=k)}});
  let t=0;L.forEach((s,i)=>{s.k=i;s.t=t;t+=s.d});TRL.len=t;return L}
@@ -141,14 +141,10 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  let k=TRL.shots.findIndex(s=>T>=s.t&&T<s.t+s.d);if(k<0)k=T<0?-1:TRL.shots.length-1;if(k>=0&&k!==TRL.i)trlEnter(k);
  const s=TRL.shots[TRL.i];if(!s)return;const lt=T-s.t;
  (s.acts||[]).forEach((a,j)=>{if(!s.done[j]&&lt>=a[0]){s.done[j]=1;try{a[1]()}catch(e){console.error('trailer act',s.sc,e)}}});
- if(s.end){const h=TRL.custom?TRL.BAR/2:1.05,on=(id,at)=>{const e=$(id);if(e&&lt>=at)e.classList.add('on')};on('trle1',h);on('trle2',h+1.15);on('trle3',h+1.85)}
- /* keep the clock on the music, then cut it at the end card and play one last hit on the logo */
+ if(s.end){const h=.05,on=(id,at)=>{const e=$(id);if(e&&lt>=at)e.classList.add('on')};on('trle1',h);on('trle2',h+1.15);on('trle3',h+1.85)}
+ /* keep the clock on the music; the track carries its own stop and final bit */
  const a=TRL.aud;if(a&&TRL.opt.music){const E=TRL.shots[TRL.shots.length-1];
-  if(!TRL.cut&&TRL.fz==null&&a.readyState>=2&&!a.paused){const d=a.currentTime-TRL.MO-T;if(Math.abs(d)>.3){if(!a.seeking&&performance.now()-(TRL.seekT||0)>2500){TRL.seekT=performance.now();try{a.currentTime=TRL.MO+T}catch(e){}}}else TRL.t0-=d*1000*.08}
-  /* your own track carries its own stop and last hit; track 1 is cut here and its drop replayed on the logo */
-  if(T>=E.t&&!TRL.cut&&!TRL.custom){TRL.cut=1;a.pause()}
-  if(T>=E.t+1.05&&TRL.cut==1){TRL.cut=2;try{a.currentTime=TRL.HIT;a.volume=1;a.play().catch(()=>{})}catch(e){}}
-  if(TRL.cut==2)a.volume=Math.max(0,Math.min(1,1-(T-E.t-3.6)/4))}
+  if(!TRL.cut&&TRL.fz==null&&a.readyState>=2&&!a.paused){const d=a.currentTime-TRL.MO-T;if(Math.abs(d)>.3){if(!a.seeking&&performance.now()-(TRL.seekT||0)>2500){TRL.seekT=performance.now();try{a.currentTime=TRL.MO+T}catch(e){}}}else TRL.t0-=d*1000*.08}}
  /* the beat minigame: hit in the middle, like a good player */
  if(s.rec&&mode=='rec'&&rec&&!rec.st&&Math.abs(rec.pos-.5)<.035&&!rec.cd)try{recHit()}catch(e){}}
 function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);
@@ -171,16 +167,13 @@ function trlMenu(){trlCSS();let m=$('trlm');if(m)m.remove();TRL.shots=trlShots()
  if(!TRL.aud)fetch(TRL.SRC).then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});
  const o=TRL.opt,ck=(k,l)=>`<label style="display:inline-flex;gap:6px;margin-right:16px"><input type=checkbox ${o[k]?'checked':''} onchange="TRL.opt.${k}=this.checked?1:0"> ${l}</label>`;
  m.innerHTML=`<div class="box modal"><h2>Trailer</h2><p class=m><small>A ${Math.round(TRL.len)} second trailer of real gameplay for screen recording. Press Play, start recording, then press Space to roll. Esc stops it. It runs on a fresh career and saves nothing, so your own careers are safe.</small></p>
- <label>Artist name<input type=text id=trln maxlength=24 value="${trlEsc(TRL.name||'Fern Wave')}"></label><label>Song title<input type=text id=trls maxlength=28 value="${trlEsc(TRL.song)}"></label>
+ <label>Artist name<input type=text id=trln maxlength=24 value="${trlEsc(TRL.name||'WaveFern')}"></label><label>Song title<input type=text id=trls maxlength=28 value="${trlEsc(TRL.song)}"></label>
  <div>${ck('music','Music')}${ck('cap','Title cards')}</div>
- <p class=m style="margin:10px 0 4px"><small>Your own music (optional): pick an MP3 made at 120 BPM with the drop at 0:24. It stays on this computer. Another tempo or drop time works too: type them in.</small></p>
- <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input type=file id=trlf accept="audio/*" onchange="trlFile(this)"><label style="display:inline-flex;gap:6px;align-items:center;margin:0">BPM <input type=number id=trlbpm value="${TRL.custom?Math.round(240/TRL.BAR*10)/10:120}" min=60 max=200 step=.1 style="width:80px"></label><label style="display:inline-flex;gap:6px;align-items:center;margin:0">Drop at (s) <input type=number id=trldrop value="${TRL.custom?TRL.DROP:24}" min=4 max=90 step=.01 style="width:80px"></label></div><p class=m id=trlfm><small>${TRL.custom?'Using your track.':'Using track 1 of the soundtrack.'}</small></p>
  <div class=row2><button class=go onclick="trlPlay(0)">▶ Play the trailer</button></div>
  <p class=m style="margin-top:14px"><small>Or start from a scene:</small></p><div class=trlsc>${TRL.shots.map(s=>`<button onclick="trlPlay(${s.k})">${trlEsc(s.sc)}<small>${s.t.toFixed(1)}s</small></button>`).join('')}</div>
  <div class=row2><button onclick="location.href=new URL('../',location.href).href">Leave and play the game</button></div></div>`;document.body.appendChild(m)}
-function trlFile(inp){const f=inp.files&&inp.files[0];if(!f)return;try{if(TRL.aud)TRL.aud.pause()}catch(e){}TRL.SRC=URL.createObjectURL(f);TRL.aud=new Audio(TRL.SRC);TRL.aud.preload='auto';TRL.custom=1;TRL.HIT=0;const m=$('trlfm');if(m)m.innerHTML='<small>Using your track: '+trlEsc(f.name)+'</small>'}
 function trlPlay(k){const n=$('trln'),s=$('trls');
- if(TRL.custom){const bp=+(($('trlbpm')||{}).value)||120,dp=+(($('trldrop')||{}).value)||24;TRL.BAR=240/bp;TRL.BEAT=60/bp;TRL.DROP=dp}if(n)TRL.name=n.value.trim()||'Fern Wave';if(s)TRL.song=s.value.trim()||'Night Bus';const m=$('trlm');if(m)m.remove();
+ if(n)TRL.name=n.value.trim()||'WaveFern';if(s)TRL.song=s.value.trim()||'Night Bus';const m=$('trlm');if(m)m.remove();
  TRL.started=1;TRL.shots=trlShots();TRL.k0=k||0;TRL.cut=0;TRL.i=-1;
  try{TT.on=0;pauseOverlay(0)}catch(e){}PAUSED=0;
  /* scenes after the creator need a career: make the fresh one now, and the star one for scenes after the drop */
