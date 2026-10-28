@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.0.2';
+const GAME_VERSION='v49.0.3';
 const VERSION_HISTORY=[
+ {v:'v49.0.3',n:'Fixed a player being teleported back into the Main Stage crowd at the festival field. An old one-off fix kept firing every time they started or reloaded a career; it is gone, so you now stay where you left off.'},
  {v:'v49.0.2',n:'No more hard cutoff for who can DM you: any artist can, but the bigger they are than you, the faster the chance drops. Someone about your size messages often, a star 10x bigger is rare, and a star like Doja Cat or Shawn Mendes (about 560M) messaging a 20M player is around 1 in 80,000 a day. At a handful of listeners it is so unlikely it will probably never happen.'},
  {v:'v49.0.1',n:'Big stars no longer DM you while you are still far smaller than them. An artist only messages you once you have at least a tenth of their monthly listeners, so someone like Doja Cat or Shawn Mendes waits until you are at about 56M, not 20M. You can still message anyone yourself.'},
  {v:'v49.0.0',n:'If you played at the old wavefern.github.io/WaveFern address, a card now tells you the game has moved to wavefern.com and that your saves came with you. The old address and anything under wavefern.github.io send you to wavefern.com.'},
