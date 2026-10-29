@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.24.3';
+const GAME_VERSION='v49.24.4';
 const VERSION_HISTORY=[
+ {v:'v49.24.4',n:'Trailer: the laptop zooms now follow the real thing on screen (the listener and follower counts, the message box, the Upload row) and pull it to the middle, zooming less if it would not fit, so nothing is cropped on a phone in landscape. On short screens the Spotifly page scrolls so the counts are in view.'},
  {v:'v49.24.3',n:'Trailer: tapping the screen on the Ready card starts it too, so it works on phones and tablets with no Space key.'},
  {v:'v49.24.2',n:'Trailer: the flashes, beat punches, shakes and confetti are gone. The Gain fans screen now looks like the game\'s own new day box (Day 2, the four result cards and Start the day) over your room, with the cards coming in on the beat and the numbers counting up. The trailer page asks for full screen as soon as it opens, and again on the first click or key press if the browser said no.'},
  {v:'v49.24.1',n:'Trailer: pressing Space on the Ready card now puts the page into true full screen (no browser bars or scrollbars) before the trailer rolls.'},

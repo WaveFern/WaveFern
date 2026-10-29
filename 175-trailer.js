@@ -69,11 +69,11 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  /* 2. making a song: the Lyrics step, always pressing the word that rhymes */
  {sc:'Record',d:6,pre:1,cap:'2|RECORD SONGS',show:['ui','hud','mg'],set(){trlClear();trlName();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(1);rec.wait=0;rec.cdn=0;rec.cgo=0}catch(e){}},zoom:5.5,
   acts:[[.3,trlLyr],[2.05,trlLyr],[3.8,trlLyr]]},
- {sc:'Release',d:4,pre:1,cap:'3|RELEASE THEM',show:['ui'],set(){trlClear();trlName();S.t=230;S.drafts=[{id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48}];openPC();app=1;smo=0;pg='upload';pcR()},pz:['pc',1.35,1.5,'30% 22%'],
+ {sc:'Release',d:4,pre:1,cap:'3|RELEASE THEM',show:['ui'],set(){trlClear();trlName();S.t=230;S.drafts=[{id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48}];openPC();app=1;smo=0;pg='upload';pcR()},pz:['pc',1.35,1.5,()=>{const u=trlQ('#pc .ng button',/^Upload$/);return u&&u.closest('.ng')}],
   acts:[[.35,()=>trlClick(()=>trlQ('#pc .ng button',/^Upload$/),.75)]]},
  /* 4. the new day's results, restaged for the trailer (marked non-gameplay): the same cards as the game's morning screen, slammed in on the beat */
  {sc:'First streams',d:6,pre:1,cap:'4|GAIN FANS',ng:1,day:1,show:[],set(){trlClear();trlName();S.t=40;trlPut(4.6,4.2,0);if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:0,today:0})}},
- {sc:'Message an artist',d:6,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.08,'34% 93%',1.9],[.45,'34% 93%',1.9],[.55,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+ {sc:'Message an artist',d:6,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.08,()=>$('cin'),1.9],[.45,()=>$('cin'),1.9],[.55,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   /* everything on the trailer clock so the zooms meet it: type, send, their answer */
   acts:[[.2,()=>trlClick(()=>$('cin'),.5,()=>{const i=$('cin');if(i)i.focus()})],[.9,()=>trlType(()=>$('cin'),TRL.msg)],
    [2.2,()=>{const i=$('cin');if(TRL.typ&&i){i.value=TRL.msg;TRL.typ=null}trlClick(()=>trlQ('#pc button',/^Send$/),.45)}],
@@ -92,7 +92,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
  /* zero fans to millions: the listener and follower numbers count up */
 /* the climb: each Spotifly check-in picks up where the last one left off, so you have millions by the tour */
- {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[1284,48200],followers:[37,6900],fame:[3,12]})}},
+ {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[1284,48200],followers:[37,6900],fame:[3,12]})}},
  /* the internet is watching: your new single blowing up on Instagrime */
  {sc:'Instagrime',d:B,show:['ui'],set(){trlClear();openPC();app='ig';const q={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap:'new single out now. 50k streams already, thank you',day:S.day,l:21400};S.igPosts.push(q);igp=q;igv='post';smo=0;pcR()},pz:['pc',1.3,1.42,'50% 40%'],ng:1,hearts:1,
   tick(u){trlCount(Math.min(1,u/.7),{likes:[0,21400]});const m=document.querySelector('#pc .mn'),k=Math.max(0,Math.min(1,(u-.25)/.6));if(m)m.scrollTop=Math.round(330*k*k*(3-2*k))}},
@@ -100,14 +100,14 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Drive',d:B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlRoad(c);trlKeys('w')}}},
  {sc:'Gphone',d:2*b,show:['ph'],set(){trlClear();S.t=268;trlPut(40,14.2,Math.PI/2);try{openPhone()}catch(e){}}},
  {sc:'Crew',d:2*b,crew:1,walk:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlPath(30);trlKeys('ds')},zoom:5.5},
- {sc:'Spotifly: 180K',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.3,1.45,'30% 20%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[48200,640000],followers:[6900,182000],fame:[12,58]})}},
+ {sc:'Spotifly: 180K',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.3,1.45,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[48200,640000],followers:[6900,182000],fame:[12,58]})}},
  /* the festival, as you play it: from the smallest stage to the Main Stage, one stage a second, the crowd growing each time */
  {sc:'Festival: Fresh Fern Tent',d:2*b,show:[],set(){trlStage(4)},tick(){trlCrowd(90)}},
  {sc:'Festival: The Pit',d:2*b,show:[],set(){trlStage(3)},tick(){trlCrowd(420)}},
  {sc:'Festival: Riverside',d:2*b,show:[],set(){trlStage(2)},tick(){trlCrowd(3200)}},
  {sc:'Festival: Main Stage',d:2*b,show:[],set(){trlStage(1)},tick(){trlCrowd(60000)}},
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
- {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.5,1.7,'24% 16%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
+ {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.5,1.7,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
  /* the plaques come once the streams are in the millions: a cutscene of your studio wall, one going up on each hit */
  {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI);/* a dark charcoal wall behind the plaques, wide and tall enough that no outside shows past its ends */const w=TRL.wall=new THREE.Mesh(new THREE.PlaneGeometry(14,4.4),new THREE.MeshLambertMaterial({color:'#2c2b31',polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));w.position.set(14,2.2,.004);scene.add(w)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},pz:['pc',1.2,1.32,'50% 45%'],acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
@@ -120,9 +120,28 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Black',d:2*B,card:' '},
  {sc:'End card',d:4*B,end:1}];
  let t=0;L.forEach((s,i)=>{s.k=i;s.t=t;t+=s.d});TRL.len=t;return L}
-/* text-heavy shots push in on the screen so they read on a phone: pz = [element id, scale from, scale to, origin or [[u, origin], ...] keys to pan along] */
+/* text-heavy shots push in on the screen so they read on a phone: pz = [element id, scale from, scale to, target or [[u, target, scale], ...] keys] */
+/* a zoom target is either a fixed 'x% y%' spot or a function returning the element(s) to frame. An element target is found
+   on screen every frame, pulled to the middle and the zoom eased off if needed so it all fits, so it works on any screen shape */
+function trlZoomAt(o,e,er){if(typeof o!='function'){const v=o.split(' ').map(parseFloat);return{x:er.left+er.width*v[0]/100,y:er.top+er.height*v[1]/100}}
+ const L=[].concat(o()||[]).filter(x=>x&&x.getBoundingClientRect).map(x=>x.getBoundingClientRect()).filter(r=>r.width||r.height);if(!L.length)return{x:er.left+er.width/2,y:er.top+er.height/2};
+ const l=Math.min(...L.map(r=>r.left)),r=Math.max(...L.map(r=>r.right)),t=Math.min(...L.map(r=>r.top)),b=Math.max(...L.map(r=>r.bottom));return{x:(l+r)/2,y:(t+b)/2,w:r-l,h:b-t,el:1}}
 function trlZoom(s){const z=s&&s.pz,e=z&&$(z[0]);if(TRL.pzEl&&TRL.pzEl!==e){TRL.pzEl.style.transform='';TRL.pzEl.style.transformOrigin=''}TRL.pzEl=e||null;if(!e)return;
- const u=Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)),k=u*u*(3-2*u);let o=z[3];if(Array.isArray(o)){const K=o;let j=0;while(j<K.length-2&&u>=K[j+1][0])j++;const a=K[j],b=K[Math.min(j+1,K.length-1)],v=Math.max(0,Math.min(1,(u-a[0])/((b[0]-a[0])||1))),q=v*v*(3-2*v),A=a[1].split(' ').map(parseFloat),B=b[1].split(' ').map(parseFloat);o=A.map((x,i)=>(x+(B[i]-x)*q).toFixed(2)+'%').join(' ');if(a[2]!=null)TRL.pzS=a[2]+(b[2]-a[2])*q}e.style.transformOrigin=o;e.style.transform='scale('+(Array.isArray(z[3])&&z[3][0][2]!=null?TRL.pzS:z[1]+(z[2]-z[1])*k).toFixed(4)+')'}
+ /* measure without our own transform */e.style.transform='';const er=e.getBoundingClientRect();
+ const u=Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)),k=u*u*(3-2*u);let o=z[3],sc;
+ if(Array.isArray(o)){const K=o;let j=0;while(j<K.length-2&&u>=K[j+1][0])j++;const a=K[j],b=K[Math.min(j+1,K.length-1)],v=Math.max(0,Math.min(1,(u-a[0])/((b[0]-a[0])||1))),q=v*v*(3-2*v),A=trlZoomAt(a[1],e,er),Bp=trlZoomAt(b[1],e,er);
+  o={x:A.x+(Bp.x-A.x)*q,y:A.y+(Bp.y-A.y)*q,w:Bp.w||A.w,h:Bp.h||A.h,el:A.el||Bp.el};sc=a[2]+(b[2]-a[2])*q}else{o=trlZoomAt(o,e,er);sc=z[1]+(z[2]-z[1])*k}
+ if(o.w)sc=Math.max(1,Math.min(sc,innerWidth/o.w,innerHeight*.55/o.h));
+ /* pull the target toward the middle of the screen, as far as the window still covers the screen */
+ let tx=0,ty=0;if(o.el&&sc>1){const m=Math.min(1,(sc-1)/.3),cl=(v,lo,hi)=>lo<=hi?Math.max(lo,Math.min(hi,v)):0;
+  tx=cl((innerWidth/2-o.x)*m,innerWidth-o.x-(er.right-o.x)*sc,(o.x-er.left)*sc-o.x);ty=cl((innerHeight/2-o.y)*m,innerHeight-o.y-(er.bottom-o.y)*sc,(o.y-er.top)*sc-o.y)}
+ const P=TRL.pzP=TRL.pzP&&TRL.pzP.s===s?TRL.pzP:{s,x:o.x,y:o.y,tx,ty};P.x+=(o.x-P.x)*.25;P.y+=(o.y-P.y)*.25;P.tx+=(tx-P.tx)*.25;P.ty+=(ty-P.ty)*.25;
+ e.style.transformOrigin=(P.x-er.left).toFixed(1)+'px '+(P.y-er.top).toFixed(1)+'px';e.style.transform=`translate(${P.tx.toFixed(1)}px,${P.ty.toFixed(1)}px) scale(${sc.toFixed(4)})`}
+/* the listener and follower counts on a Spotifly page */
+function trlNums(){const pc=$('pc');if(!pc)return null;const w=document.createTreeWalker(pc,NodeFilter.SHOW_TEXT),L=[];let n;while(n=w.nextNode())if(/monthly listeners|followers/.test(n.nodeValue)&&n.parentElement)L.push(n.parentElement);L.length=Math.min(L.length,2);
+ /* on a short screen the counts sit below the page's fold: scroll the page so they are in view */
+ const m=L[0]&&L[0].closest('.mn');if(m){const r=m.getBoundingClientRect(),a=L[0].getBoundingClientRect(),b=(L[1]||L[0]).getBoundingClientRect(),c=(Math.min(a.top,b.top)+Math.max(a.bottom,b.bottom))/2;if(c>r.bottom-r.height*.3||c<r.top+r.height*.2)m.scrollTop+=c-(r.top+r.height/2)}
+ return L}
 /* plays the Mix step like a person: reacts to where the band was about a fifth of a second ago, lets the level drift past it before correcting, and now and then holds on too long */
 function trlMixHand(dt){const x=rec.x,M=TRL.mix=TRL.mix||{q:[],h:0,slip:0};M.q.push([x.t,x.c]);while(M.q.length>1&&M.q[1][0]<=x.t-.2)M.q.shift();const c=M.q[0][1];
  if(M.slip>0){M.slip-=dt;MGH=M.h;return}if(Math.random()<dt*.2){M.slip=.25+Math.random()*.2;M.h=Math.random()<.5?1:0;MGH=M.h;return}
