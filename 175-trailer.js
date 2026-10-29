@@ -56,21 +56,22 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  const L=[
  /* before the drop: short bursts of the real start of a career, each fading to black, between cards that set up the game and what stands in your way */
  {sc:'Card: bedroom',d:4,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
- {sc:'Make a character',d:6,pre:1,show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
+ {sc:'Make a character',d:2,pre:1,show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
   /* the Randomize button flicks through looks (no pointer), landing on the look the rest of the trailer uses */
-  acts:[...[.15,.55,.95,1.35,1.75,2.15,2.55,2.95,3.35,3.75,4.15,4.55,4.95].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[5.35,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
+  acts:[...[.1,.4,.7,1,1.3].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[1.6,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
  {sc:'Card: start',d:2,pre:1,card:'$100. A LAPTOP.<br>ZERO FANS.'},
- {sc:'Artist name',d:4,pre:1,show:['ui'],pz:['pc',1.35,1.4,[[0,'4% 12%'],[.62,'4% 12%'],[.74,'96% 12%'],[.86,'96% 12%'],[.97,'4% 12%']]],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
-  acts:[[.1,()=>trlClick(()=>$('an'),.45,()=>{const i=$('an');if(i)i.focus()})],[.7,()=>trlType(()=>$('an'),TRL.name||'WaveFern')],[2.75,()=>trlClick(()=>trlQ('#pc button',/Create profile/),.45)]]},
+ {sc:'Artist name',d:4,pre:1,show:['ui'],pz:['pc',1.35,1.4,[[0,'4% 12%'],[.58,'4% 12%'],[.7,'96% 12%'],[.88,'96% 12%'],[.98,'4% 12%']]],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
+  acts:[[.2,()=>trlClick(()=>$('an'),.8,()=>{const i=$('an');if(i)i.focus();trlType(()=>$('an'),TRL.name||'WaveFern',()=>setTimeout(()=>trlClick(()=>trlQ('#pc button',/Create profile/),.7),200))})]]},
  /* on your own in the studio: the Mix step, holding the level in the green band */
  {sc:'First take',d:4,pre:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(2);rec.wait=0;rec.cdn=0;rec.cgo=0;rec.x.lv=.45}catch(e){}},mix:1},
 /* the first song and its first few listeners */
  {sc:'First streams',d:4,pre:1,show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
- {sc:'Message an artist',d:4,pre:1,show:['ui'],pz:['pc',1.22,1.3,'62% 62%'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
-  acts:[[.2,()=>trlClick(()=>$('cin'),.5,()=>{const i=$('cin');if(i)i.focus()})],[.8,()=>trlType(()=>$('cin'),'love your stuff. collab?')],[2.9,()=>trlClick(()=>trlQ('#pc button',/^Send$/),.45)]]},
+ {sc:'Message an artist',d:8,pre:1,show:['ui'],pz:['pc',1.22,1.3,'100% 60%'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+  acts:/* type, then send once the message is written, and hold on the sent message */
+  [[.3,()=>trlClick(()=>$('cin'),.8,()=>{const i=$('cin');if(i)i.focus();trlType(()=>$('cin'),'love your stuff. collab?',()=>setTimeout(()=>trlClick(()=>trlQ('#pc button',/^Send$/),.7),350))})]]},
  {sc:'Collab meeting',d:6,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
    /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o)}catch(e){}}},zoom:6,
-  acts:[[.4,()=>trlClick(()=>trlQ('#ui .mto'),.6)],[2.4,()=>trlClick(()=>trlQ('#ui .mto'),.6)],[4.3,()=>trlClick(()=>trlQ('#ui .mto'),.6)]]},
+  acts:[[.4,()=>trlClick(()=>trlQ('#ui .mto'),.8)],[2.4,()=>trlClick(()=>trlQ('#ui .mto'),.8)],[4.2,()=>trlClick(()=>trlQ('#ui .mto'),.8)]]},
  {sc:'Card: how far',d:5.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
  {sc:'Silence',d:.5,card:' '},
  /* the drop: the city from above, the one shot not tied to the player */
@@ -133,12 +134,12 @@ function trlSw(row,i){const R=[...document.querySelectorAll('#cre .sw')][row];re
 function trlMove(get,dur,cb){const c=TRL.cur;if(!c)return;const e=get();if(!e){if(cb)cb(null);return}const r=e.getBoundingClientRect();
  c.f=[c.x,c.y];c.to=[r.left+r.width*(.42+Math.random()*.16),r.top+r.height*(.45+Math.random()*.15)];c.bend=(Math.random()-.5)*.35;c.t0=TRL.T;c.d=dur;c.cb=cb;c.el.style.opacity=1}
 function trlClick(get,dur,after){trlMove(get,dur,()=>{const c=TRL.cur;c.el.classList.add('pr');setTimeout(()=>c.el.classList.remove('pr'),110);const e=get();if(e){if(after)after(e);else e.click()}})}
-function trlType(get,txt){TRL.typ={get,txt,i:0,next:TRL.T+.15}}
+function trlType(get,txt,cb){TRL.typ={get,txt,i:0,next:TRL.T+.15,cb}}
 function trlScroll(sel,px,dur){TRL.scr={sel,px,t0:TRL.T,d:dur,y0:null}}
 function trlPointer(){const c=TRL.cur;if(!c)return;if(c.t0!=null){const u=Math.min(1,(TRL.T-c.t0)/c.d),k=trlE.io(u),dx=c.to[0]-c.f[0],dy=c.to[1]-c.f[1];
-  c.x=c.f[0]+dx*k-dy*c.bend*Math.sin(Math.PI*k);c.y=c.f[1]+dy*k+dx*c.bend*Math.sin(Math.PI*k);if(u>=1){c.t0=null;const f=c.cb;c.cb=null;if(f)setTimeout(f,60)}}
+  c.x=c.f[0]+dx*k-dy*c.bend*Math.sin(Math.PI*k);c.y=c.f[1]+dy*k+dx*c.bend*Math.sin(Math.PI*k);if(u>=1){c.t0=null;const f=c.cb;c.cb=null;if(f)setTimeout(f,170)}}
  c.el.style.transform=`translate(${c.x}px,${c.y}px)`;
- const t=TRL.typ;if(t&&TRL.T>=t.next){const e=t.get();if(e){t.i++;e.value=t.txt.slice(0,t.i);e.dispatchEvent(new Event('input',{bubbles:true}));t.next=TRL.T+.06+Math.random()*.11+(t.txt[t.i-1]==' '?.08:0)}if(!e||t.i>=t.txt.length)TRL.typ=null}
+ const t=TRL.typ;if(t&&TRL.T>=t.next){const e=t.get();if(e){t.i++;e.value=t.txt.slice(0,t.i);e.dispatchEvent(new Event('input',{bubbles:true}));t.next=TRL.T+.06+Math.random()*.11+(t.txt[t.i-1]==' '?.08:0)}if(!e||t.i>=t.txt.length){TRL.typ=null;if(t.cb)t.cb()}}
  const s=TRL.scr;if(s){const e=document.querySelector(s.sel);if(e){if(s.y0==null)s.y0=e.scrollTop;const u=Math.min(1,(TRL.T-s.t0)/s.d);e.scrollTop=s.y0+s.px*trlE.s(u);if(u>=1)TRL.scr=null}else TRL.scr=null}}
 
 /* ---------- overlay ---------- */
@@ -176,7 +177,7 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  if(s.end){/* one line a second, on the hits of the final bit */const h=0,on=(id,at)=>{const e=$(id);if(e&&lt>=at)e.classList.add('on')};on('trle1',h);on('trle4',h+2*TRL.BEAT);on('trle2',h+4*TRL.BEAT);on('trle3',h+6*TRL.BEAT)}
  /* keep the clock on the music; the track carries its own stop and final bit */
  const a=TRL.aud;if(a&&TRL.opt.music){const E=TRL.shots[TRL.shots.length-1];
-  if(!TRL.cut&&TRL.fz==null&&a.readyState>=2&&!a.paused){const d=a.currentTime-TRL.MO-T;if(Math.abs(d)>.3){if(!a.seeking&&performance.now()-(TRL.seekT||0)>2500){TRL.seekT=performance.now();try{a.currentTime=TRL.MO+T}catch(e){}}}else TRL.t0-=d*1000*.08}}
+  if(!TRL.cut&&TRL.fz==null&&a.readyState>=2&&!a.paused){const d=a.currentTime-TRL.MO-T;/* the picture follows the music: seeking the audio mid-trailer is what made it glitch */if(Math.abs(d)>.3)TRL.t0-=d*1000;else TRL.t0-=d*1000*.08}}
  /* the beat minigame: hit in the middle, like a good player */
  if(s.rec&&mode=='rec'&&rec&&!rec.st&&Math.abs(rec.pos-.5)<.035&&!rec.cd)try{recHit()}catch(e){}
  /* the Mix step: hold when the level is under the band, let go when it is over */
