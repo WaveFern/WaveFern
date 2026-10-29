@@ -1,6 +1,6 @@
-# WaveFern Records: full wiki
+# WaveFern Studios: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.0.2. WaveFern Records is a free 3D open-world music career sim that runs in the browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.0.2. WaveFern Studios is a free 3D open-world music career sim that runs in the browser at https://wavefern.com/.
 
 ---
 
@@ -64,8 +64,8 @@ Genres and genre focus
 Instagrime
 Mentors
 References
-^ 72-tutorial.js. WaveFern Records source code, game v47.9.0.
-^ 02-data.js. WaveFern Records source code, game v47.9.0.
+^ 72-tutorial.js. WaveFern Studios source code, game v47.9.0.
+^ 02-data.js. WaveFern Studios source code, game v47.9.0.
 Category: Getting started
 
 ---
@@ -99,8 +99,8 @@ Touch
 On a phone or tablet a joystick appears bottom left, with buttons for sprint and interact. Menus, the phone and the computer work by tapping.
 
 References
-^ 07-input-loop.js. WaveFern Records source code, game v47.9.0.
-^ 154-touch-controls.js. WaveFern Records source code, game v47.9.0.
+^ 07-input-loop.js. WaveFern Studios source code, game v47.9.0.
+^ 154-touch-controls.js. WaveFern Studios source code, game v47.9.0.
 Category: Getting started
 
 ---
@@ -142,9 +142,9 @@ See also
 Food and energy
 Monthly listeners and followers
 References
-^ 29-v26.js. WaveFern Records source code, game v47.9.0.
-^ 07-input-loop.js. WaveFern Records source code, game v47.9.0.
-^ 04-house.js. WaveFern Records source code, game v47.9.0.
+^ 29-v26.js. WaveFern Studios source code, game v47.9.0.
+^ 07-input-loop.js. WaveFern Studios source code, game v47.9.0.
+^ 04-house.js. WaveFern Studios source code, game v47.9.0.
 Category: Getting started
 
 ---
@@ -164,8 +164,8 @@ The pause menu can export a save code (starts with FW3-). Paste it back in to lo
 If a save ever fails to load it is kept as a recoverable backup instead of being lost. Backups show under Recovered backups on the career screen: press Recover, or drag one onto a slot.
 Band careersBand rooms keep a separate band career for each room, on your device. It never touches your two career slots or your cloud save.
 References
-^ 12-save-load.js. WaveFern Records source code, game v47.9.0.
-^ 86-google-signin.js. WaveFern Records source code, game v47.9.0.
+^ 12-save-load.js. WaveFern Studios source code, game v47.9.0.
+^ 86-google-signin.js. WaveFern Studios source code, game v47.9.0.
 Category: About the game
 
 ---
@@ -235,9 +235,9 @@ Song quality
 Genres and genre focus
 Band rooms
 References
-^ 165-song-menu.js. WaveFern Records source code, game v47.9.0.
-^ 34-studio-minigames.js. WaveFern Records source code, game v47.9.0.
-^ 130-song-session.js. WaveFern Records source code, game v47.9.0.
+^ 165-song-menu.js. WaveFern Studios source code, game v47.9.0.
+^ 34-studio-minigames.js. WaveFern Studios source code, game v47.9.0.
+^ 130-song-session.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -317,9 +317,9 @@ Gramophone Awards
 Studio gear
 Collabs, fees and haggling
 References
-^ 34-studio-minigames.js. WaveFern Records source code, game v47.9.0.
-^ 29-v26.js. WaveFern Records source code, game v47.9.0.
-^ 52-gear-shop-plus.js. WaveFern Records source code, game v47.9.0.
+^ 34-studio-minigames.js. WaveFern Studios source code, game v47.9.0.
+^ 29-v26.js. WaveFern Studios source code, game v47.9.0.
+^ 52-gear-shop-plus.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -377,9 +377,9 @@ Pick a family you like and stick with it for a while. Hopping between sounds cos
 A HOT genre is a nice bonus for one day. It is not worth breaking a long run in your family for.
 If you want to switch sound, do it gradually through a genre in the same family.
 References
-^ 02-data.js. WaveFern Records source code, game v47.9.0.
-^ 166-genre-focus.js. WaveFern Records source code, game v47.9.0.
-^ 67-beats.js. WaveFern Records source code, game v47.9.0.
+^ 02-data.js. WaveFern Studios source code, game v47.9.0.
+^ 166-genre-focus.js. WaveFern Studios source code, game v47.9.0.
+^ 67-beats.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -415,9 +415,9 @@ See Rivals for the list of rivals.
 See also
 Rivals
 References
-^ 165-song-menu.js. WaveFern Records source code, game v47.9.0.
-^ 132-808-hats.js. WaveFern Records source code, game v47.9.0.
-^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Records source code, game v47.9.0.
+^ 165-song-menu.js. WaveFern Studios source code, game v47.9.0.
+^ 132-808-hats.js. WaveFern Studios source code, game v47.9.0.
+^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -485,9 +485,9 @@ Catalogue halo
 Gphone
 Radio and TV
 References
-^ 29-v26.js. WaveFern Records source code, game v47.9.0.
-^ 02-data.js. WaveFern Records source code, game v47.9.0.
-^ 166-genre-focus.js. WaveFern Records source code, game v47.9.0.
+^ 29-v26.js. WaveFern Studios source code, game v47.9.0.
+^ 02-data.js. WaveFern Studios source code, game v47.9.0.
+^ 166-genre-focus.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -528,7 +528,7 @@ Gphone
 Radio and TV
 Promotions
 References
-^ 29-v26.js. WaveFern Records source code, game v47.9.0.
+^ 29-v26.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -546,10 +546,10 @@ For the first 14 days, track 1 gets up to +60% streams and the other tracks up t
 Albums show on your Spotifly artist page.
 TipPut your best song as track 1: it gets the biggest boost.
 References
-^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Records source code, game v47.9.0.
-^ 98-spotifly-artist-page.js. WaveFern Records source code, game v47.9.0.
-^ 96-album-song-picker.js. WaveFern Records source code, game v47.9.0.
-^ 112-cover-art.js. WaveFern Records source code, game v47.9.0.
+^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Studios source code, game v47.9.0.
+^ 98-spotifly-artist-page.js. WaveFern Studios source code, game v47.9.0.
+^ 96-album-song-picker.js. WaveFern Studios source code, game v47.9.0.
+^ 112-cover-art.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -670,10 +670,10 @@ If an artist barely moves on price, do not waste rounds lowballing them.
 Artists who message you pay you. Saying yes to a few early on is easy money and new fans.
 The feature is worth more when the song itself is good, so do not spend big on a collab you rush.
 References
-^ 75-collab-fees-dms.js. WaveFern Records source code, game v47.9.0.
-^ 33-haggle.js. WaveFern Records source code, game v47.9.0.
-^ 29-v26.js. WaveFern Records source code, game v47.9.0.
-^ 54-skyline-meetings.js. WaveFern Records source code, game v47.9.0.
+^ 75-collab-fees-dms.js. WaveFern Studios source code, game v47.9.0.
+^ 33-haggle.js. WaveFern Studios source code, game v47.9.0.
+^ 29-v26.js. WaveFern Studios source code, game v47.9.0.
+^ 54-skyline-meetings.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -691,7 +691,7 @@ Campaign	5	×2	$150 + $0.006 × listeners	3-12 + 2% of listeners
 Blitz	7	×3	$600 + $0.015 × listeners	3-12 + 4% of listeners
 TipA promotion multiplies the song's normal daily streams, so it is worth most on a strong, fresh song in a HOT genre.
 References
-^ 83-promotions.js. WaveFern Records source code, game v47.9.0.
+^ 83-promotions.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -710,7 +710,7 @@ age factor = 0.4 + 0.6 × 0.985^days since release
 Because it's split across the catalogue, the total stays about the same however many songs you have. Hit and viral songs don't get it. It does nothing early on, when your listeners are small.
 
 References
-^ 108-catalogue-halo.js. WaveFern Records source code, game v47.9.0.
+^ 108-catalogue-halo.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -733,10 +733,10 @@ See also
 Promotions
 Albums
 References
-^ 37-spotifly.js. WaveFern Records source code, game v47.9.0.
-^ 98-spotifly-artist-page.js. WaveFern Records source code, game v47.9.0.
-^ 111-spotifly-browse.js. WaveFern Records source code, game v47.9.0.
-^ 109-analytics.js. WaveFern Records source code, game v47.9.0.
+^ 37-spotifly.js. WaveFern Studios source code, game v47.9.0.
+^ 98-spotifly-artist-page.js. WaveFern Studios source code, game v47.9.0.
+^ 111-spotifly-browse.js. WaveFern Studios source code, game v47.9.0.
+^ 109-analytics.js. WaveFern Studios source code, game v47.9.0.
 Category: Music
 
 ---
@@ -778,8 +778,8 @@ Your first day
 Studio gear
 Promotions
 References
-^ 29-v26.js. WaveFern Records source code, game v47.9.0.
-^ 02-data.js. WaveFern Records source code, game v47.9.0.
+^ 29-v26.js. WaveFern Studios source code, game v47.9.0.
+^ 02-data.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1003,9 +1003,9 @@ Some upgrades are locked behind fame. Plan for them before you have the money.
 See also
 Song quality
 References
-^ 02-data.js. WaveFern Records source code, game v47.9.0.
-^ 52-gear-shop-plus.js. WaveFern Records source code, game v47.9.0.
-^ 101-economy-labels.js. WaveFern Records source code, game v47.9.0.
+^ 02-data.js. WaveFern Studios source code, game v47.9.0.
+^ 52-gear-shop-plus.js. WaveFern Studios source code, game v47.9.0.
+^ 101-economy-labels.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1092,8 +1092,8 @@ See also
 Monthly listeners and followers
 Jewellery
 References
-^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Records source code, game v47.9.0.
-^ 136-fame-350.js. WaveFern Records source code, game v47.9.0.
+^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Studios source code, game v47.9.0.
+^ 136-fame-350.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1112,8 +1112,8 @@ Mentor 3	120	Write honest songs. A plain story lands harder than a fancy one.
 Mentor 4	400	Obsess over the mix. Details make the record.
 Mentor 5	1000	Experiment fearlessly with tone and texture.
 References
-^ 02-data.js. WaveFern Records source code, game v47.9.0.
-^ 06-computer.js. WaveFern Records source code, game v47.9.0.
+^ 02-data.js. WaveFern Studios source code, game v47.9.0.
+^ 06-computer.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1154,8 +1154,8 @@ The first labels to call are the weakest deals. Waiting for a better label can p
 A label takes its cut every single night, so a big advance is not always the better deal over time.
 Keep your reputation up: the best labels will not look at you without it.
 References
-^ 101-economy-labels.js. WaveFern Records source code, game v47.9.0.
-^ 106-label-hq-soon.js. WaveFern Records source code, game v47.9.0.
+^ 101-economy-labels.js. WaveFern Studios source code, game v47.9.0.
+^ 106-label-hq-soon.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1201,7 +1201,7 @@ Walk or run 3,000-6,000 m
 Weeks run day 1-7, 8-14 and so on. The night after a day still counts for that day, so overnight streams land in the right week. Each set never has two quests of the same kind.
 
 References
-^ 133-quests.js. WaveFern Records source code, game v47.9.0.
+^ 133-quests.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1232,7 +1232,7 @@ Mentors, a home and pets all add quality, so they help here too.
 A win puts a Gramophone Trophy in your Storage: furniture that isn't sold anywhere.
 
 References
-^ 110-awards.js. WaveFern Records source code, game v47.9.0.
+^ 110-awards.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1257,9 +1257,9 @@ Bigger Record labels need a minimum reputation.
 See also
 Record labels
 References
-^ 75-collab-fees-dms.js. WaveFern Records source code, game v47.9.0.
-^ 71-festival-booking.js. WaveFern Records source code, game v47.9.0.
-^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Records source code, game v47.9.0.
+^ 75-collab-fees-dms.js. WaveFern Studios source code, game v47.9.0.
+^ 71-festival-booking.js. WaveFern Studios source code, game v47.9.0.
+^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1276,7 +1276,7 @@ Vex Valentine Kid Kaboom Nyla Knox Rowdy Rae Big Mood Marcus Tito Thunder Mina M
 See also
 Extras: diss tracks, 808s and hi hats
 References
-^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Records source code, game v47.9.0.
+^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1295,7 +1295,7 @@ Prime-time drive show	$900	+50%	+200
 National TV special	$20,000	+60%	+5,000
 Stadium tour ad	$250,000	+80%	+60,000
 References
-^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Records source code, game v47.9.0.
+^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1308,7 +1308,7 @@ From the WaveFern Wiki
 Billboards beside the main roads rotate every 10 seconds through roster artists with 5,000+ monthly listeners. Once you reach 10,000 monthly listeners, your own name joins the rotation.[1]
 
 References
-^ 81-billboards.js. WaveFern Records source code, game v47.9.0.
+^ 81-billboards.js. WaveFern Studios source code, game v47.9.0.
 Category: Career
 
 ---
@@ -1379,8 +1379,8 @@ Book the biggest stage your fame allows. The crowd and pay grow fast with stage 
 Put your best songs in the setlist. The crowd notices quality.
 Arrive at the stage a little early so you do not miss your slot.
 References
-^ 70-festival.js. WaveFern Records source code, game v47.9.0.
-^ 71-festival-booking.js. WaveFern Records source code, game v47.9.0.
+^ 70-festival.js. WaveFern Studios source code, game v47.9.0.
+^ 71-festival-booking.js. WaveFern Studios source code, game v47.9.0.
 Category: Live and touring
 
 ---
@@ -1404,7 +1404,7 @@ Build a setlist from released songs and whole albums. Each song lasts 30-55 in-g
 Editing or cancelling is free while the festival is 2+ days away. Cancelling later costs 2 reputation.
 On the day, be at your stage's steps during your slot. Miss it and the slot is given away, and you lose 3 reputation.
 References
-^ 71-festival-booking.js. WaveFern Records source code, game v47.9.0.
+^ 71-festival-booking.js. WaveFern Studios source code, game v47.9.0.
 Category: Live and touring
 
 ---
@@ -1442,10 +1442,10 @@ TipStranded abroad with no money? Swiftwing gives you a free seat home.
 Screenshots
 The airport entrance.
 References
-^ 138-flights.js. WaveFern Records source code, game v47.9.0.
-^ 139-airport.js. WaveFern Records source code, game v47.9.0.
-^ 137-travel.js. WaveFern Records source code, game v47.9.0.
-^ 135-destinations.js. WaveFern Records source code, game v47.9.0.
+^ 138-flights.js. WaveFern Studios source code, game v47.9.0.
+^ 139-airport.js. WaveFern Studios source code, game v47.9.0.
+^ 137-travel.js. WaveFern Studios source code, game v47.9.0.
+^ 135-destinations.js. WaveFern Studios source code, game v47.9.0.
 Category: Live and touring
 
 ---
@@ -1519,8 +1519,8 @@ Production costs a lot at first, so save it for the stadiums.
 See also
 Flights and the airport
 References
-^ 146-world-tour.js. WaveFern Records source code, game v47.9.0.
-^ 135-destinations.js. WaveFern Records source code, game v47.9.0.
+^ 146-world-tour.js. WaveFern Studios source code, game v47.9.0.
+^ 135-destinations.js. WaveFern Studios source code, game v47.9.0.
 Category: Live and touring
 
 ---
@@ -1552,7 +1552,7 @@ score = 0.12 + 0.5 × minigames + 0.18 × crowd hype + 0.1 × song quality + 0.0
 Between songs you talk to the crowd. Greeting them in the local language works best (+0.16 hype). A stadium show has an intermission and an encore and runs 6-10 in-game hours.
 
 References
-^ 151-tour-shows.js. WaveFern Records source code, game v47.9.0.
+^ 151-tour-shows.js. WaveFern Studios source code, game v47.9.0.
 Category: Live and touring
 
 ---
@@ -1589,9 +1589,9 @@ sw	Nyama choma $10 / +15 · Mandazi $3 / +5 · Chai $2 / +3
 id	Nasi goreng $6 / +10 · Satay $7 / +9 · Es teh $2 / +3
 en	Hot dog $5 / +7 · Pizza slice $5 / +8 · Iced coffee $5 / +4
 References
-^ 150-tour-cities.js. WaveFern Records source code, game v47.9.0.
-^ 152-tour-city-life.js. WaveFern Records source code, game v47.9.0.
-^ 160-tour-shop-menus.js. WaveFern Records source code, game v47.9.0.
+^ 150-tour-cities.js. WaveFern Studios source code, game v47.9.0.
+^ 152-tour-city-life.js. WaveFern Studios source code, game v47.9.0.
+^ 160-tour-shop-menus.js. WaveFern Studios source code, game v47.9.0.
 Category: Live and touring
 
 ---
@@ -1619,9 +1619,9 @@ Each day rolls its weather: Sunny, Rain, Fog, Thunderstorm. About 90% of days ar
 Screenshots
 The world map, with the taxi buttons.
 References
-^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Records source code, game v47.9.0.
-^ 89-taxi-once.js. WaveFern Records source code, game v47.9.0.
-^ 32-map-zoom.js. WaveFern Records source code, game v47.9.0.
+^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Studios source code, game v47.9.0.
+^ 89-taxi-once.js. WaveFern Studios source code, game v47.9.0.
+^ 32-map-zoom.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1645,9 +1645,9 @@ Car	Price	Top speed
 ■ Apex Sports	$25,000	80 mph
 ■ Phantom GT	$90,000	120 mph
 References
-^ 14-world-fame-cars-pets-collabs.js. WaveFern Records source code, game v47.9.0.
-^ 63-car-speed.js. WaveFern Records source code, game v47.9.0.
-^ 18-browser-venues-appointments-roads.js. WaveFern Records source code, game v47.9.0.
+^ 14-world-fame-cars-pets-collabs.js. WaveFern Studios source code, game v47.9.0.
+^ 63-car-speed.js. WaveFern Studios source code, game v47.9.0.
+^ 18-browser-venues-appointments-roads.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1669,9 +1669,9 @@ See also
 Furniture and storage
 Wall paint
 References
-^ 14-world-fame-cars-pets-collabs.js. WaveFern Records source code, game v47.9.0.
-^ 15-homes-shop-interiors-hover-previews.js. WaveFern Records source code, game v47.9.0.
-^ 95-property-no-starter.js. WaveFern Records source code, game v47.9.0.
+^ 14-world-fame-cars-pets-collabs.js. WaveFern Studios source code, game v47.9.0.
+^ 15-homes-shop-interiors-hover-previews.js. WaveFern Studios source code, game v47.9.0.
+^ 95-property-no-starter.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1727,10 +1727,10 @@ Toy basket	$30	Pets
 Plus 46 colour and style variants (armchairs, sofas, beds, rugs, beanbags, prints...).
 
 References
-^ 10-apps-shop-furniture.js. WaveFern Records source code, game v47.9.0.
-^ 104-furniture-storage.js. WaveFern Records source code, game v47.9.0.
-^ 158-placement-overhaul.js. WaveFern Records source code, game v47.9.0.
-^ 79-amazoom-detail.js. WaveFern Records source code, game v47.9.0.
+^ 10-apps-shop-furniture.js. WaveFern Studios source code, game v47.9.0.
+^ 104-furniture-storage.js. WaveFern Studios source code, game v47.9.0.
+^ 158-placement-overhaul.js. WaveFern Studios source code, game v47.9.0.
+^ 79-amazoom-detail.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1745,7 +1745,7 @@ Repaint the walls of your home for $40 a colour.[1]
 Oat Sand Wheat Latte Peach clay Clay Dusty rose Heather Mist Denim Sea glass Teal grey Sage Eucalyptus Olive grey Stone Greige Linen
 
 References
-^ 123-property-polish.js. WaveFern Records source code, game v47.9.0.
+^ 123-property-polish.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1931,9 +1931,9 @@ Glow Kicks	Shoes	$180
 Rain Boots	Shoes	$65
 Tassel Loafers	Shoes	$290
 References
-^ 22-v8-clothes-wardrobe-big-catalogues-pixel.js. WaveFern Records source code, game v47.9.0.
-^ 50-threadz-new-drop.js. WaveFern Records source code, game v47.9.0.
-^ 61-threadz-mega-drop.js. WaveFern Records source code, game v47.9.0.
+^ 22-v8-clothes-wardrobe-big-catalogues-pixel.js. WaveFern Studios source code, game v47.9.0.
+^ 50-threadz-new-drop.js. WaveFern Studios source code, game v47.9.0.
+^ 61-threadz-mega-drop.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1960,7 +1960,7 @@ High top fade	$80
 Pixie cut	$45
 Long waves	$75
 References
-^ 90-barbershop.js. WaveFern Records source code, game v47.9.0.
+^ 90-barbershop.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1979,9 +1979,9 @@ Good Boy Dog	$250
 Polly Parrot	$400
 Foxy	$900
 References
-^ 14-world-fame-cars-pets-collabs.js. WaveFern Records source code, game v47.9.0.
-^ 58-pets.js. WaveFern Records source code, game v47.9.0.
-^ 35-parrot-flight.js. WaveFern Records source code, game v47.9.0.
+^ 14-world-fame-cars-pets-collabs.js. WaveFern Studios source code, game v47.9.0.
+^ 58-pets.js. WaveFern Studios source code, game v47.9.0.
+^ 35-parrot-flight.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -1999,8 +1999,8 @@ Guard 1	$800	50%	2.5%
 Guard 2	$1,800	10%	0.5%
 Guard 3	$4,000	none	0%
 References
-^ 14-world-fame-cars-pets-collabs.js. WaveFern Records source code, game v47.9.0.
-^ 92-fan-robbery.js. WaveFern Records source code, game v47.9.0.
+^ 14-world-fame-cars-pets-collabs.js. WaveFern Studios source code, game v47.9.0.
+^ 92-fan-robbery.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2021,7 +2021,7 @@ Iced platinum set	$30,000
 See also
 Fame levels
 References
-^ 14-world-fame-cars-pets-collabs.js. WaveFern Records source code, game v47.9.0.
+^ 14-world-fame-cars-pets-collabs.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2047,8 +2047,8 @@ Guards with you	Fans let through	Thief chance
 2	10%	0.5%
 3	none	0%
 References
-^ 14-world-fame-cars-pets-collabs.js. WaveFern Records source code, game v47.9.0.
-^ 92-fan-robbery.js. WaveFern Records source code, game v47.9.0.
+^ 14-world-fame-cars-pets-collabs.js. WaveFern Studios source code, game v47.9.0.
+^ 92-fan-robbery.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2157,9 +2157,9 @@ See also
 Park Fields Festival
 Tour cities
 References
-^ 10-apps-shop-furniture.js. WaveFern Records source code, game v47.9.0.
-^ 14-world-fame-cars-pets-collabs.js. WaveFern Records source code, game v47.9.0.
-^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Records source code, game v47.9.0.
+^ 10-apps-shop-furniture.js. WaveFern Studios source code, game v47.9.0.
+^ 14-world-fame-cars-pets-collabs.js. WaveFern Studios source code, game v47.9.0.
+^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2185,9 +2185,9 @@ Gphone 16	$2,000	+17%	+53	Bigger photo boost · +17% streams
 Gphone 17	$2,250	+19%	+67	Instant shutter · +19% streams
 Gphone 18	$2,500	+22%	+85	Best camera · +22% streams
 References
-^ 115-gphone.js. WaveFern Records source code, game v47.9.0.
-^ 116-gphone-plus.js. WaveFern Records source code, game v47.9.0.
-^ 118-gphone-apps.js. WaveFern Records source code, game v47.9.0.
+^ 115-gphone.js. WaveFern Studios source code, game v47.9.0.
+^ 116-gphone-plus.js. WaveFern Studios source code, game v47.9.0.
+^ 118-gphone-apps.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2203,9 +2203,9 @@ See also
 Gphone
 Promotions
 References
-^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Records source code, game v47.9.0.
-^ 103-instagrime-icons-trees.js. WaveFern Records source code, game v47.9.0.
-^ 83-promotions.js. WaveFern Records source code, game v47.9.0.
+^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern Studios source code, game v47.9.0.
+^ 103-instagrime-icons-trees.js. WaveFern Studios source code, game v47.9.0.
+^ 83-promotions.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2235,9 +2235,9 @@ pawfinder.wf: book a pet
 bodyguards.wf: book a guard
 Threadz: clothes
 References
-^ 06-computer.js. WaveFern Records source code, game v47.9.0.
-^ 10-apps-shop-furniture.js. WaveFern Records source code, game v47.9.0.
-^ 11-os-v2.js. WaveFern Records source code, game v47.9.0.
+^ 06-computer.js. WaveFern Studios source code, game v47.9.0.
+^ 10-apps-shop-furniture.js. WaveFern Studios source code, game v47.9.0.
+^ 11-os-v2.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2257,9 +2257,9 @@ Big Vee is pinned by default. Text a question in plain words and Big Vee answers
 See also
 Collabs, fees and haggling
 References
-^ 76-messages-plus.js. WaveFern Records source code, game v47.9.0.
-^ 78-big-vee-smarter.js. WaveFern Records source code, game v47.9.0.
-^ 102-messaging.js. WaveFern Records source code, game v47.9.0.
+^ 76-messages-plus.js. WaveFern Studios source code, game v47.9.0.
+^ 78-big-vee-smarter.js. WaveFern Studios source code, game v47.9.0.
+^ 102-messaging.js. WaveFern Studios source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2303,7 +2303,7 @@ Connection
 Players connect browser to browser. When a direct link can't be made (school networks, strict mobile data), the game switches to a relay after 9 seconds, so everyone still shares one room.
 
 References
-^ 161-multiplayer.js. WaveFern Records source code, game v47.9.0.
+^ 161-multiplayer.js. WaveFern Studios source code, game v47.9.0.
 Category: Multiplayer
 
 ---
@@ -2324,8 +2324,8 @@ Low	4	30	a quarter	off	near
 Auto starts on High and steps down while the game runs slowly, remembering the level it settled on. Graphics settings are saved per device, never in your career.
 
 References
-^ 122-graphics.js. WaveFern Records source code, game v47.9.0.
-^ 09-settings-effects.js. WaveFern Records source code, game v47.9.0.
+^ 122-graphics.js. WaveFern Studios source code, game v47.9.0.
+^ 09-settings-effects.js. WaveFern Studios source code, game v47.9.0.
 Category: About the game
 
 ---
@@ -2642,7 +2642,7 @@ v28.9.0	Days are a little longer: a full day now lasts 12 minutes instead of 10 
 v28.8.0	More places to meet artists. Besides Skyline Tower, outside your house and by the shops, artists can now meet you at Pulse Records HQ (floor 3, Mixing Suites), the City Cafe, the Music Store, the Radio Station or in Central Park, and they really wait there. Each artist suggests a place, and you can change it in Messages with the new Meet at menu, or just ask in the chat ("can we meet at the cafe instead?"). The City Cafe and the Music Store now have their own doors on city towers, with signs, and show up on the map. When you walk into a building where an artist is waiting, you are told where to find them.
 v28.7.2	Fixed city glitches. Junctions no longer have a flickering dotted line across them (the pavement ran on under the junction and showed its edge). City shops whose front had been cut back no longer leave their door standing out on the pavement. Two parked cars that were stretched across a pedestrian crossing are gone, and so are the street lamps and trees that stood on the road. Tree pits in the city no longer flicker with the paving lines, and kerbs, awnings and window sills no longer flicker at their edges. The City Plaza fountain is now a round stone fountain with two bowls in the middle of the square (it was a stretched water square touching the kerb), and you can no longer walk through it. Trees vary a little in height, so trees next to each other no longer flicker where they overlap. The grass now carries on under the farm, the school and the sports field instead of ending in thin air.
 v28.7.1	Fixed: when you met an artist in Skyline Tower, nobody was there. Artists now really wait on floor 5 (Recording Floor) by the sofas, with a gold ring on the floor around them, and the lobby tells you which floor they are on. Walk up to them and the meeting chat with its three replies opens by itself (E works too). Artists who meet you outside your house or by the shops are still there as before.
-v28.7.0	Sharper logos and prints on clothes. Logos and graphics are now painted on the clothes instead of built from coloured blocks, so they look crisp on your character and in the Threadz shop and wardrobe pictures. The Graphic Tee has a sunset-and-palms print with SUNSET CLUB lettering and a small print under the back collar. The Sports Jersey says FERNS 23 on the front and has your artist name and a big 23 on the back, with a star on the sleeve. The Varsity Jacket has a chenille W on the chest, WAVEFERN Records lettering across the back and a 26 on the sleeve. The Classic Tee has a small fern leaf on the chest, the Polo Shirt an embroidered sailboat, the Cap a stitched WF, the Snapback FRESH lettering and a gold sticker on the brim, the Beanie and Pom Beanie a woven THREADZ label, and the Trucker Cap a BIG RIG CO. mountain patch. Prints change colour to stand out on whatever colour you pick.
+v28.7.0	Sharper logos and prints on clothes. Logos and graphics are now painted on the clothes instead of built from coloured blocks, so they look crisp on your character and in the Threadz shop and wardrobe pictures. The Graphic Tee has a sunset-and-palms print with SUNSET CLUB lettering and a small print under the back collar. The Sports Jersey says FERNS 23 on the front and has your artist name and a big 23 on the back, with a star on the sleeve. The Varsity Jacket has a chenille W on the chest, WAVEFERN Studios lettering across the back and a 26 on the sleeve. The Classic Tee has a small fern leaf on the chest, the Polo Shirt an embroidered sailboat, the Cap a stitched WF, the Snapback FRESH lettering and a gold sticker on the brim, the Beanie and Pom Beanie a woven THREADZ label, and the Trucker Cap a BIG RIG CO. mountain patch. Prints change colour to stand out on whatever colour you pick.
 v28.6.2	Fixed: the door of Skyline Tower stood out on the pavement, away from the building, and you had to step into the road to go in. The door, its sign and the way in now sit on the tower's front, under the shop canopy (marked ENTRANCE), and leaving puts you back on the pavement in front of it.
 v28.6.1	Fixed: entering the garage, the radio station or Skyline Tower (and the city cafe and music store) put you in the wrong room, and leaving dropped you at a city tower. The three city towers you can enter were taking the shop slots those buildings use, so the game mixed them up. Every building now opens its own room and you leave by its own door. Also fixed some city glitches: 3rd Avenue is no longer paved over by the City Plaza, so cars no longer drive across the square, and the fountain is no longer stretched onto the pavement. When a tower turns see-through so you can see yourself behind it, its ledges, roof, shop front and door now turn see-through as well instead of hanging in the air. Tall towers near the camera are no longer sliced off diagonally.
 v28.6.0	Much more detailed studio gear. Guitars and basses now have round bodies, necks with frets and inlays, headstocks with tuners, strings, soundholes or f-holes, pickups, knobs and stands. Keyboards and synths have real black and white keys, knobs, screens and wooden end cheeks, and the Modular wall is full of modules and patch cables. Mics have grilles, shock mounts and pop filters (the Tube mic gets its own power supply). Speakers and monitors have cones, tweeters and ports. The drum kits are proper kits (practice pad, e-drum rack with pads, or a full acoustic kit with toms, snare, hi-hat and cymbals). DJ decks have platters, tonearms, mixers, faders and lights. Foam panels have a wedge surface, posters have artwork, and the Street team gets a neon sign. The new gear (interface, headphones, monitors, sampler, pedals, vocal rack, console, ring light and cameras, bass traps and diffusers) sits on a producer desk under the window and around the room. Chairs have wheels, armrests and a gold throne. The shop previews show the same detailed models. The studio is merged into a few meshes so it stays fast. Basic furniture (sofa, tables, shelf, plant, TV, fridge, rug, lamp) also gets a little more detail.
@@ -2651,7 +2651,7 @@ v28.4.0	Gearhouse has 11 new gear lines with 3 upgrades each (33 in total): Head
 v28.3.0	More detailed clothes on your character: side and shoulder seams, hems and cuffs, crew necks and collars, hoodie drawstrings and pocket edges, zips with pulls, polo buttons, cable-knit fronts, a number on the Sports Jersey, jacket zips, welt pockets and cuffs, denim stitching and copper buttons, coat buttons and belts, fur hood trim on the Parka, belts with buckles, belt loops, back and front pockets on trousers, contrast stitching on jeans, shoe soles, laces and side logos, padded hi-top collars, Chelsea boot elastic, work boot toe caps, glossy leather boots, cap buttons and panel seams, beanie ribbing, snapback stickers, cushioned headphones, chain links and scarf fringe. An open jacket now shows the top you are wearing underneath instead of plain white. Fixed: Slides and some new shoes could show the old plain shoe under them.
 v28.2.0	A more detailed town and city. Roads have kerbs, paving slabs, white edge lines, zebra crossings and stop lines at every junction, and the centre dashes near junctions are no longer stretched. Pavements have street lamps, bins, hydrants, benches, trees, planters, bike racks, parking meters, bus stops and green street-name signs at junctions. Houses get window frames, shutters, door steps, porch lights, gutters and side windows, and their fence, hedge or low wall, gate path, mailbox and flowers now sit on the property line instead of on the pavement. City towers get shop windows, striped awnings, shop signs, floor ledges and rooftop parapets, AC units, stair huts and water tanks. The world map and minimap show parks, the lake, farm fields, pavements, centre lines, house and tower outlines, trees and road names. Collisions and car routes are unchanged.
 v28.1.0	Threadz new drop: 34 more clothes. Tops: Button-up Shirt, Graphic Tee, Turtleneck, Baseball Tee, Flannel Shirt, Crop Top. Jackets: Varsity, Leather, Windbreaker, Blazer, Sherpa. Bottoms: Ripped Skinny Jeans, Track Pants, Cargo Shorts, Pleated Skirt, Overalls. Shoes: Slides, Platform Sneakers, Loafers, Basketball Hi-tops, Cowboy Boots, Canvas Low-tops. Hats: Trucker Cap, Fedora, Pom Beanie, Visor, Cowboy Hat, Flat Cap. Extras: Backpack, Crossbody Bag, Wristwatch, Hoop Earrings, Round Glasses, Bandana. Each has its own look on your character and comes in every colour. Premium pieces unlock at Fame Level 10, 21 or 35 and the shop shows a lock until then. Fixed: the top faces of shop previews sometimes showed the wrong colour.
-v28.0.0	The music streaming app on the computer is called Spotifly again (the game is still WaveFern Records). It has a new logo, a green circle with three black lines on a black tile, on its desktop icon, window, taskbar button, sidebar, setup page and the Spotifly Team messages. The green wallpaper now says spotifly with the logo, and news posts come from Spotifly Music News. Saves are unchanged.
+v28.0.0	The music streaming app on the computer is called Spotifly again (the game is still WaveFern Studios). It has a new logo, a green circle with three black lines on a black tile, on its desktop icon, window, taskbar button, sidebar, setup page and the Spotifly Team messages. The green wallpaper now says spotifly with the logo, and news posts come from Spotifly Music News. Saves are unchanged.
 v27.9.0	Messages has its own look: a coral-to-violet header with its own logo, a dark plum chat list, a warm cream chat with round speech bubbles (white for them, a pink-to-violet gradient for you), rounded-square profile pictures with a colourful ring, a pill-shaped message box and Send button, and a matching window title bar. Everything works the same as before.
 v27.8.0	Polly Parrot now flies instead of walking. It hovers at about head height, bobs up and down, flaps its wings and follows you through the air, tilting forward as it speeds up. At home it flies around and only folds its wings when it settles on a perch, cat tree, bed or bowl. Parrots out with people in the city fly next to them too.
 v27.7.0	Days are longer: a full day now lasts 10 minutes instead of 3, so you can record about 7-8 songs in one day (one song, with all four steps and uploading it, takes a bit over a minute). Daytime and night are both 5 minutes. Energy still refills by the same amount per day, and streams still build up over the whole day, so daily earnings are unchanged.
@@ -2721,7 +2721,7 @@ Source: https://wavefern.com/wiki/secrets/
 Secrets
 From the WaveFern Wiki
 
-There is a secret code somewhere in WaveFern Records. What it is, where it goes and what it does is a mystery.
+There is a secret code somewhere in WaveFern Studios. What it is, where it goes and what it does is a mystery.
 
 This wiki will not say any more than that. Good luck.
 
@@ -2733,11 +2733,11 @@ Source: https://wavefern.com/wiki/credits/
 
 Credits
 From the WaveFern Wiki
-WaveFern Records
+WaveFern Studios
 Game	James Hutchinson and Rowan Burton
 Music	Rowan Burton
 
-WaveFern Records was made by James Hutchinson and Rowan Burton.
+WaveFern Studios was made by James Hutchinson and Rowan Burton.
 
 Game
 
@@ -2887,7 +2887,7 @@ Source: https://wavefern.com/wiki/contact/
 Contact
 From the WaveFern Wiki
 
-Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Records.
+Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Studios.
 
 Your name
 Your email (only if you want a reply)
@@ -2948,6 +2948,6 @@ Genres and genre focus
 Extras: diss tracks, 808s and hi hats
 Credits
 References
-^ 67-beats.js. WaveFern Records source code, game v47.9.0.
-^ 132-808-hats.js. WaveFern Records source code, game v47.9.0.
+^ 67-beats.js. WaveFern Studios source code, game v47.9.0.
+^ 132-808-hats.js. WaveFern Studios source code, game v47.9.0.
 Category: Music

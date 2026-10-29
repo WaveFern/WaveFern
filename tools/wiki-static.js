@@ -29,12 +29,12 @@ function links(h){return h
  .replace(/ on[a-z]+="[^"]*"/g,'')
  .replace(/<button class="?tg"?[^>]*>[^<]*<\/button>/g,'')}
 
-function shell(p,pages,cats,article,ver){const title=p.id=='home'?'WaveFern Wiki – WaveFern Records game guide':p.t+' – WaveFern Wiki',canon=SITE+url(p.id),
+function shell(p,pages,cats,article,ver){const title=p.id=='home'?'WaveFern Wiki – WaveFern Studios game guide':p.t+' – WaveFern Wiki',canon=SITE+url(p.id),
  desc=p.desc.length>300?p.desc.slice(0,297).replace(/\s+\S*$/,'')+'...':p.desc,
  side=`<div class=panel><h3>Navigation</h3><a href="/wiki/"${p.id=='home'?' class=on':''}>Main page</a><a href="/wiki/versions/">Recent changes</a><a href="/">Play the game</a>`+
   cats.map(c=>`<h3><a href="/wiki/cat-${c.id}/">${esc(c.t)}</a></h3>`+pages.filter(x=>x.cat==c.id&&!x.hide).map(x=>`<a href="${url(x.id)}"${x.id==p.id?' class=on':''}>${esc(x.t)}</a>`).join('')).join('')+'</div>',
- crumbs=[{n:'WaveFern Records',u:SITE+'/'},{n:'Wiki',u:SITE+'/wiki/'}];if(p.id!='home')crumbs.push({n:p.t,u:canon});
- const ld={'@context':'https://schema.org','@graph':[{'@type':'Article','headline':p.t,'description':desc,'url':canon,'inLanguage':'en','isPartOf':{'@type':'WebSite','name':'WaveFern Wiki','url':SITE+'/wiki/'},'about':{'@type':'VideoGame','name':'WaveFern Records','url':SITE+'/'},'image':p.img?SITE+p.img:SITE+'/og-image.png'},
+ crumbs=[{n:'WaveFern Studios',u:SITE+'/'},{n:'Wiki',u:SITE+'/wiki/'}];if(p.id!='home')crumbs.push({n:p.t,u:canon});
+ const ld={'@context':'https://schema.org','@graph':[{'@type':'Article','headline':p.t,'description':desc,'url':canon,'inLanguage':'en','isPartOf':{'@type':'WebSite','name':'WaveFern Wiki','url':SITE+'/wiki/'},'about':{'@type':'VideoGame','name':'WaveFern Studios','url':SITE+'/'},'image':p.img?SITE+p.img:SITE+'/og-image.png'},
   {'@type':'BreadcrumbList','itemListElement':crumbs.map((c,i)=>({'@type':'ListItem','position':i+1,'name':c.n,'item':c.u}))}]};
  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <!-- Made by tools/wiki-static.js from the interactive wiki. Edit wiki/pages*.js, not this file. -->
@@ -51,11 +51,11 @@ function shell(p,pages,cats,article,ver){const title=p.id=='home'?'WaveFern Wiki
 </head><body>
 <header id="top">
  <button id="menu" aria-label="Pages" onclick="document.getElementById('side').classList.toggle('on')">☰</button>
- <a id="logo" href="/wiki/" class="px">WAVEFERN WIKI<small>The WaveFern Records guide</small></a>
+ <a id="logo" href="/wiki/" class="px">WAVEFERN WIKI<small>The WaveFern Studios guide</small></a>
  <a class="btn go play" href="/">Play</a>
 </header>
 <div id="wrap"><nav id="side" aria-label="Pages">${side}</nav><main id="main">${article}</main></div>
-<footer>Written for WaveFern Records ${esc(ver)}. Tables are generated from the game's data. <a href="/wiki/#/${p.id}">Open this page in the interactive wiki</a></footer>
+<footer>Written for WaveFern Studios ${esc(ver)}. Tables are generated from the game's data. <a href="/wiki/#/${p.id}">Open this page in the interactive wiki</a></footer>
 </body></html>
 `}
 
@@ -73,7 +73,7 @@ function shell(p,pages,cats,article,ver){const title=p.id=='home'?'WaveFern Wiki
   await pg.waitForFunction(id=>{const a=document.querySelector('#side a.on');return id.startsWith('cat-')||a&&a.getAttribute('href')=='#/'+id},p.id).catch(()=>{});
   const r=await pg.evaluate(()=>{const a=document.querySelector('#main article');a.querySelectorAll('nav.tabs,style').forEach(n=>n.remove());
    const html=a.outerHTML;a.querySelectorAll('nav.toc').forEach(n=>n.remove());const text=a.innerText,lead=a.querySelector('p.lead')||a.querySelector('p');return{html,text,lead:lead?lead.textContent:''}});
-  p.desc=strip(p.sum&&p.sum.length>60?p.sum:(r.lead||p.sum||p.t));if(p.id=='home')p.desc='The WaveFern Records wiki: every mechanic of the free browser music career sim, from recording songs and streams to labels, festivals, the World Tour and multiplayer band rooms.';
+  p.desc=strip(p.sum&&p.sum.length>60?p.sum:(r.lead||p.sum||p.t));if(p.id=='home')p.desc='The WaveFern Studios wiki: every mechanic of the free browser music career sim, from recording songs and streams to labels, festivals, the World Tour and multiplayer band rooms.';
   out.push(Object.assign(p,{html:links(r.html),text:r.text}))}
  await b.close();srv.close();
  if(errs.length)console.warn('page errors:',errs.slice(0,5));
@@ -96,6 +96,6 @@ function shell(p,pages,cats,article,ver){const title=p.id=='home'?'WaveFern Wiki
   listed.map(p=>`- [${p.t}](${SITE}/wiki/${p.id}/): ${p.desc}`).join('\n')+'\n<!-- /wiki pages -->';
  fs.writeFileSync(lt,/<!-- wiki pages[\s\S]*<!-- \/wiki pages -->/.test(ls)?ls.replace(/<!-- wiki pages[\s\S]*<!-- \/wiki pages -->/,list):ls.trimEnd()+'\n\n'+list+'\n');
 
- fs.writeFileSync(path.join(ROOT,'llms-full.txt'),`# WaveFern Records: full wiki\n\n> Every page of the WaveFern Wiki (${SITE}/wiki/) as plain text, for game ${info.ver}. WaveFern Records is a free 3D open-world music career sim that runs in the browser at ${SITE}/.\n\n`+
+ fs.writeFileSync(path.join(ROOT,'llms-full.txt'),`# WaveFern Studios: full wiki\n\n> Every page of the WaveFern Wiki (${SITE}/wiki/) as plain text, for game ${info.ver}. WaveFern Studios is a free 3D open-world music career sim that runs in the browser at ${SITE}/.\n\n`+
   listed.map(p=>`---\n\nSource: ${SITE}/wiki/${p.id}/\n\n`+p.text.replace(/\n{3,}/g,'\n\n').trim()).join('\n\n')+'\n');
  console.log('wrote',out.length-1,'static wiki pages, sitemap.xml, llms.txt and llms-full.txt for',info.ver)})().catch(e=>{console.error(e);process.exit(1)});

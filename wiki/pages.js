@@ -33,7 +33,7 @@ function dykList(){const a=DYK(),n=a.length,o=[];for(let i=0;i<4;i++)o.push(a[(D
 page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide).length,ps=PAGES.filter(p=>!p.hide&&p.cat!='meta'),day=Math.floor(Date.now()/864e5),fa=ps[day%ps.length];
  let lead='';try{const m=/class=lead>([\s\S]*?)<\/p>/.exec(fa.body());lead=m?m[1]:''}catch(e){}TID=0;
  const news=typeof VERSION_HISTORY!='undefined'?VERSION_HISTORY.slice(0,4):[];
- return `<div class=welcome><p class=w1>Welcome to WaveFern Wiki</p><p>the guide to <a href="../">WaveFern Records</a> that explains how the game works, from the first song to a world tour.</p><p class=m>${n} articles, written for game ${esc(D.version||'')}.</p></div>
+ return `<div class=welcome><p class=w1>Welcome to WaveFern Wiki</p><p>the guide to <a href="../">WaveFern Studios</a> that explains how the game works, from the first song to a world tour.</p><p class=m>${n} articles, written for game ${esc(D.version||'')}.</p></div>
  <div class=mp><div>
   <section class=mpb><h2>Today's featured article</h2><p><b>${fa.t}</b>. ${lead} (<a href="#/${fa.id}">Full article</a>)</p></section>
   <section class=mpb><h2>Did you know</h2><ul id=dyk>${dykList()}</ul><p class=more><a href="#" onclick="return dykMore()">More facts</a></p></section>

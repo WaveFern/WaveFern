@@ -1,8 +1,8 @@
-# WaveFern Records
+# WaveFern Studios
 
-> WaveFern Records is a free 3D open-world music career sim in your browser. Create a character, record songs and albums in your studio, release them on Spotifly and grow your fame, then explore a big open-world 3D city on foot or by car, buy houses, cars and clothes, and meet other artists. No download. It is a free browser music career game for rappers, singers, producers and bands: make an artist, record songs, release them on Spotifly, tour the world, and play multiplayer band rooms with up to 4 friends.
+> WaveFern Studios is a free 3D open-world music career sim in your browser. Create a character, record songs and albums in your studio, release them on Spotifly and grow your fame, then explore a big open-world 3D city on foot or by car, buy houses, cars and clothes, and meet other artists. No download. It is a free browser music career game for rappers, singers, producers and bands: make an artist, record songs, release them on Spotifly, tour the world, and play multiplayer band rooms with up to 4 friends.
 
-WaveFern Records is a fictional 3D open-world browser game built with Three.js (plain JavaScript, no install). Real artists named in-game are inspiration references only, with no affiliation or endorsement.
+WaveFern Studios is a fictional 3D open-world browser game built with Three.js (plain JavaScript, no install). Real artists named in-game are inspiration references only, with no affiliation or endorsement.
 
 ## Links
 
@@ -66,9 +66,9 @@ WaveFern Records is a fictional 3D open-world browser game built with Three.js (
 - [Settings and graphics](https://wavefern.com/wiki/settings/): Settings opens from the main menu or the pause menu. Under Graphics pick a preset or your own mix.[1]
 - [Version history](https://wavefern.com/wiki/versions/): The game is on v49.0.2. This list is read live from the game, so it is always current.
 - [About this wiki](https://wavefern.com/wiki/about-wiki/): This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by tools/wiki-data.js each time the site is published, so it can't fall behind.
-- [Secrets](https://wavefern.com/wiki/secrets/): There is a secret code somewhere in WaveFern Records. What it is, where it goes and what it does is a mystery.
-- [Credits](https://wavefern.com/wiki/credits/): WaveFern Records was made by James Hutchinson and Rowan Burton.
+- [Secrets](https://wavefern.com/wiki/secrets/): There is a secret code somewhere in WaveFern Studios. What it is, where it goes and what it does is a mystery.
+- [Credits](https://wavefern.com/wiki/credits/): WaveFern Studios was made by James Hutchinson and Rowan Burton.
 - [Frequently asked questions](https://wavefern.com/wiki/faq/): Short answers to common questions. Each one links to the page with the full details.
-- [Contact](https://wavefern.com/wiki/contact/): Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Records.
+- [Contact](https://wavefern.com/wiki/contact/): Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Studios.
 - [How Spotifly songs sound](https://wavefern.com/wiki/song-audio/): How the game makes a playable track for every song you record.
 <!-- /wiki pages -->
