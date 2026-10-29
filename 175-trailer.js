@@ -66,25 +66,23 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
   /* the Randomize button flicks through looks (no pointer), landing on the look the rest of the trailer uses */
   acts:[...[.1,.4,.7,1,1.3].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[1.6,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
  {sc:'Card: start',d:2,pre:1,card:'$100. A LAPTOP.<br>ZERO FANS.'},
- {sc:'Artist name',d:4,pre:1,show:['ui'],pz:['pc',1.35,1.4,[[0,'4% 12%'],[.58,'4% 12%'],[.7,'96% 12%'],[.88,'96% 12%'],[.98,'4% 12%']]],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
-  acts:[[.2,()=>trlClick(()=>$('an'),.8,()=>{const i=$('an');if(i)i.focus();trlType(()=>$('an'),TRL.name||'WaveFern',()=>setTimeout(()=>trlClick(()=>trlQ('#pc button',/Create profile/),.7),200))})]]},
  /* on your own in the studio: the Mix step, holding the level in the green band */
- {sc:'First take',d:4,pre:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(2);rec.wait=0;rec.cdn=0;rec.cgo=0;rec.x.lv=.45}catch(e){}},mix:1},
+ {sc:'First take',d:6,pre:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(2);rec.wait=0;rec.cdn=0;rec.cgo=0;rec.x.lv=.45;rec.x.dur=9}catch(e){}},mix:1},
 /* the first song and its first few listeners */
  {sc:'First streams',d:4,pre:1,show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
- {sc:'Message an artist',d:8,pre:1,show:['ui'],pz:['pc',1.45,1.2,[[0,'90% 96%'],[.58,'90% 96%'],[.74,'100% 42%'],[1,'100% 42%']]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+ {sc:'Message an artist',d:8,pre:1,show:['ui'],pz:['pc',1.45,1.2,[[0,'90% 96%'],[.58,'90% 96%'],[.74,'100% 42%'],[1,'100% 42%']]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   acts:/* type, then send once the message is written, and hold on the sent message */
   [[.3,()=>trlClick(()=>$('cin'),.8,()=>{const i=$('cin');if(i)i.focus();trlType(()=>$('cin'),'love your stuff. collab?',()=>setTimeout(()=>trlClick(()=>trlQ('#pc button',/^Send$/),.7),350))})]]},
- {sc:'Collab meeting',d:6,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
+ {sc:'Collab meeting',d:8,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
    /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o)}catch(e){}}},zoom:6,
-  acts:[[.4,()=>trlClick(()=>trlQ('#ui .mto'),.8)],[2.4,()=>trlClick(()=>trlQ('#ui .mto'),.8)],[4.2,()=>trlClick(()=>trlQ('#ui .mto'),.8)]]},
+  acts:[[.6,()=>trlClick(()=>trlQ('#ui .mto'),.9)],[3.2,()=>trlClick(()=>trlQ('#ui .mto'),.9)],[5.8,()=>trlClick(()=>trlQ('#ui .mto'),.9)]]},
  {sc:'Card: how far',d:5.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
  /* the black half second before the drop hides the heavy setup: the star career and the festival's first build */
  {sc:'Silence',d:.5,card:' ',acts:[[.02,()=>{try{trlStar();trlStage(4);trlClear()}catch(e){}}]]},
  /* the drop: the city from above, the one shot not tied to the player */
  {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},
- {sc:'Collab session',d:B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
- {sc:'Recording',d:2*B,plq:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0)}catch(e){}},rec:1},
+ {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
+ {sc:'Recording',d:2*B,plq:1,show:['ui','hud','mg'],set(){trlClear();/* you are alone in the room while the plaques go up */const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0)}catch(e){}},rec:1},
  /* zero fans to millions: the listener and follower numbers count up */
 /* the climb: each Spotifly check-in picks up where the last one left off, so you have millions by the tour */
  {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[1284,48200],followers:[37,6900],fame:[3,12]})}},
@@ -116,11 +114,15 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
 /* text-heavy shots push in on the screen so they read on a phone: pz = [element id, scale from, scale to, origin or [[u, origin], ...] keys to pan along] */
 function trlZoom(s){const z=s&&s.pz,e=z&&$(z[0]);if(TRL.pzEl&&TRL.pzEl!==e){TRL.pzEl.style.transform='';TRL.pzEl.style.transformOrigin=''}TRL.pzEl=e||null;if(!e)return;
  const u=Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)),k=u*u*(3-2*u);let o=z[3];if(Array.isArray(o)){const K=o;let j=0;while(j<K.length-2&&u>=K[j+1][0])j++;const a=K[j],b=K[Math.min(j+1,K.length-1)],v=Math.max(0,Math.min(1,(u-a[0])/((b[0]-a[0])||1))),q=v*v*(3-2*v),A=a[1].split(' ').map(parseFloat),B=b[1].split(' ').map(parseFloat);o=A.map((x,i)=>(x+(B[i]-x)*q).toFixed(2)+'%').join(' ')}e.style.transformOrigin=o;e.style.transform='scale('+(z[1]+(z[2]-z[1])*k).toFixed(4)+')'}
-function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Collab session');if(!c)return;
+/* plays the Mix step like a person: reacts to where the band was about a fifth of a second ago, lets the level drift past it before correcting, and now and then holds on too long */
+function trlMixHand(dt){const x=rec.x,M=TRL.mix=TRL.mix||{q:[],h:0,slip:0};M.q.push([x.t,x.c]);while(M.q.length>1&&M.q[1][0]<=x.t-.2)M.q.shift();const c=M.q[0][1];
+ if(M.slip>0){M.slip-=dt;MGH=M.h;return}if(Math.random()<dt*.2){M.slip=.25+Math.random()*.2;M.h=Math.random()<.5?1:0;MGH=M.h;return}
+ if(M.h&&x.lv>c+.05)M.h=0;else if(!M.h&&x.lv<c-.05)M.h=1;MGH=M.h}
+function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Recording');if(!c)return;
  const n=Math.max(0,Math.min(12,Math.floor((T-c.t)/(2*TRL.BEAT)+1e-3)+1));if(TRL.pwN===n)return;TRL.pwN=n;trlWallClear();if(!n)return;
  /* same layout as the game's plaque wall (174-career-depth.js), built here so a new one lands exactly every second, on the hits */
  const G=TRL.pw=new THREE.Group(),C=['#e6b422','#d8dde3','#9be7ff','#1ed760'],bx=(w,h,d,col,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col}));m.position.set(x,y,z);G.add(m)};
- for(let i=0;i<n;i++){const col=C[[0,0,1,1,2,3][Math.min(i,5)]],x=15.3-(i%6)*.82,y=i<6?2.3:1.45,z=.03;bx(.66,.8,.05,'#141414',x,y,z);bx(.56,.7,.02,col,x,y,z+.03);
+ for(let i=0;i<n;i++){const col=C[Math.min(i,3)],x=15.3-(i%6)*.82,y=i<6?2.3:1.45,z=.03;bx(.66,.8,.05,'#141414',x,y,z);bx(.56,.7,.02,col,x,y,z+.03);
   const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),new THREE.MeshLambertMaterial({color:col=='#d8dde3'?'#f4f4f4':col}));d.rotation.x=Math.PI/2;d.position.set(x,y+.08,z+.05);G.add(d);bx(.07,.07,.02,'#141414',x,y+.08,z+.065);bx(.4,.08,.02,'#f4f1e8',x,y-.24,z+.05)}
  scene.add(G)}
 function trlWallClear(){const G=TRL.pw;if(!G)return;scene.remove(G);G.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});TRL.pw=null}
@@ -191,9 +193,10 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  const a=TRL.aud;if(a&&TRL.opt.music){const E=TRL.shots[TRL.shots.length-1];
   if(!TRL.cut&&TRL.fz==null&&a.readyState>=2&&!a.paused){const d=a.currentTime-TRL.MO-T;/* the picture follows the music: seeking the audio mid-trailer is what made it glitch */if(Math.abs(d)>.3)TRL.t0-=d*1000;else TRL.t0-=d*1000*.08}}
  /* the beat minigame: hit in the middle, like a good player */
- if(s.rec&&mode=='rec'&&rec&&!rec.st&&Math.abs(rec.pos-.5)<.035&&!rec.cd)try{recHit()}catch(e){}
+ /* the beat bar: a good player, not a perfect one, hitting a little early or late */
+ if(s.rec&&mode=='rec'&&rec&&!rec.st&&!rec.cd){if(TRL.bt==null)TRL.bt=.5+(Math.random()-.5)*.1;if(Math.abs(rec.pos-TRL.bt)<.02){TRL.bt=null;try{recHit()}catch(e){}}}
  /* the Mix step: hold when the level is under the band, let go when it is over */
- if(s.mix&&mode=='rec'&&rec&&rec.st==2&&rec.x)MGH=rec.x.lv<rec.x.c?1:0;
+ if(s.mix&&mode=='rec'&&rec&&rec.st==2&&rec.x)trlMixHand(dt);
  /* in the studio a plaque goes up on the wall on every beat */
  if(s.plq)trlPlaques(T)}
 function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);{const n=$('trlnote');if(n)n.style.opacity=s.cam?.7:0}
