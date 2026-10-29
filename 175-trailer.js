@@ -61,35 +61,32 @@ function trlShow(){if(TRL.showOn)return;TRL.showOn=1;try{trlStar();if(!DCITY.on|
 function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  const L=[
  /* before the drop: short bursts of the real start of a career, each fading to black, between cards that set up the game and what stands in your way */
- {sc:'Card: bedroom',d:3,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
- {sc:'Make a character',d:2,pre:1,cap:'MAKE YOUR ARTIST',show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
+ {sc:'Card: bedroom',d:4,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
+ {sc:'Make a character',d:5.5,pre:1,cap:'1|MAKE YOUR ARTIST',show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
   /* the Randomize button flicks through looks (no pointer), landing on the look the rest of the trailer uses */
-  acts:[...[.1,.4,.7,1,1.3].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[1.6,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
+  acts:[...[.2,.7,1.2,1.7,2.2,2.7,3.2,3.7,4.2].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[4.7,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
  /* the loop, step by step, with a caption naming each one so a new player sees how the game is played */
- /* 1. walk up to the mic in your room, pick a genre, and play the Beat step (hit the green) */
- {sc:'Record',d:9,pre:1,cap:'1|RECORD SONGS',show:['ui','hud','mg'],set(){trlClear();trlName();S.t=200;S.energy=100;mode='play';trlPut(12.2,6.3,Math.PI);trlKeys('dw')},zoom:5.5,rec:1,
-  acts:[[1.1,()=>trlKeys('')],[1.45,()=>{try{recMenu()}catch(e){}}],[1.9,()=>trlClick(()=>trlQ('#ui button',/^Hip-Hop/),.6,e=>{e.click();if(rec){rec.cdn=1;rec.goal=12}})],[3.3,()=>{TRL.cur.el.style.opacity=0}]]},
- /* 2. upload it on the laptop */
- {sc:'Release',d:3.5,pre:1,cap:'2|RELEASE THEM',show:['ui'],set(){trlClear();trlName();S.t=230;S.drafts=[{id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48}];openPC();app=1;smo=0;pg='upload';pcR()},pz:['pc',1.35,1.5,'30% 22%'],
+ /* 2. making a song: the Lyrics step, always pressing the word that rhymes */
+ {sc:'Record',d:6.5,pre:1,cap:'2|RECORD SONGS',show:['ui','hud','mg'],set(){trlClear();trlName();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(1);rec.wait=0;rec.cdn=0;rec.cgo=0}catch(e){}},zoom:5.5,
+  acts:[[.35,trlLyr],[2.1,trlLyr],[3.85,trlLyr],[5.6,trlLyr]]},
+ {sc:'Release',d:3.5,pre:1,cap:'3|RELEASE THEM',show:['ui'],set(){trlClear();trlName();S.t=230;S.drafts=[{id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48}];openPC();app=1;smo=0;pg='upload';pcR()},pz:['pc',1.35,1.5,'30% 22%'],
   acts:[[.35,()=>trlClick(()=>trlQ('#pc .ng button',/^Upload$/),.75)]]},
- {sc:'First streams',d:4,pre:1,cap:'3|GAIN FANS',show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
- {sc:'Message an artist',d:7,pre:1,cap:'4|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.1,'34% 93%',1.9],[.44,'34% 93%',1.9],[.53,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+ {sc:'First streams',d:4,pre:1,cap:'4|GAIN FANS',show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
+ {sc:'Message an artist',d:7,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.1,'34% 93%',1.9],[.44,'34% 93%',1.9],[.53,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   /* everything on the trailer clock so the zooms meet it: type, send, their answer */
   acts:[[.3,()=>trlClick(()=>$('cin'),.7,()=>{const i=$('cin');if(i)i.focus()})],[1.1,()=>trlType(()=>$('cin'),TRL.msg)],
    [2.3,()=>{const i=$('cin');if(TRL.typ&&i){i.value=TRL.msg;TRL.typ=null}trlClick(()=>trlQ('#pc button',/^Send$/),.55)}],
    [4.5,()=>{const m=trlConv();TY=0;m.log.push({f:'a',t:'yooo I was hoping you would ask. lets cook 🔥 studio this week?',d:S.day});pcR()}]]},
- {sc:'Collab meeting',d:8.5,pre:1,cap:'4|COLLAB WITH ARTISTS',show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
-   /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o);MEET.n=3}catch(e){}}},zoom:6,
-  /* three exchanges, each answered with the reply this artist's personality likes best */
-  tick(){trlMeetOpts()},acts:[[.6,trlMeet],[3.2,trlMeet],[5.8,trlMeet]]},
- {sc:'Card: how far',d:2.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
+ {sc:'Collab meeting',d:5.5,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
+   /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o);MEET.n=2}catch(e){}}},zoom:6,
+  /* two quick exchanges, each answered with the reply this artist's personality likes best */
+  tick(){trlMeetOpts()},acts:[[.5,trlMeet],[2.5,trlMeet]]},
+ {sc:'Card: how far',d:3.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
  /* the black half second before the drop hides the heavy setup: the star career and the festival's first build */
  {sc:'Silence',d:.5,card:' ',acts:[[.02,()=>{try{trlStar();trlStage(4);trlClear()}catch(e){}}]]},
  /* the drop: the city from above, the one shot not tied to the player */
  {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},
  {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
- /* a cutscene of your studio wall, a plaque going up on each hit */
- {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
  /* zero fans to millions: the listener and follower numbers count up */
 /* the climb: each Spotifly check-in picks up where the last one left off, so you have millions by the tour */
  {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[1284,48200],followers:[37,6900],fame:[3,12]})}},
@@ -108,6 +105,8 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Festival: Main Stage',d:2*b,show:[],set(){trlStage(1)},tick(){trlCrowd(60000)}},
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
  {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.5,1.7,'24% 16%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
+ /* the plaques come once the streams are in the millions: a cutscene of your studio wall, one going up on each hit */
+ {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},pz:['pc',1.2,1.32,'50% 45%'],acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
  {sc:'Card: tour',d:2*B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo',{quiet:1})}catch(e){console.error(e)}}]]},
  /* the game's own arrival flyover, with its city title */
@@ -159,7 +158,10 @@ function trlMove(get,dur,cb){const c=TRL.cur;if(!c)return;const e=get();if(!e){i
  c.f=[c.x,c.y];c.to=[r.left+r.width*(.42+Math.random()*.16),r.top+r.height*(.45+Math.random()*.15)];c.bend=(Math.random()-.5)*.35;c.t0=TRL.T;c.d=dur;c.cb=cb;c.el.style.opacity=1}
 function trlClick(get,dur,after){trlMove(get,dur,()=>{const c=TRL.cur;c.el.classList.add('pr');setTimeout(()=>c.el.classList.remove('pr'),110);const e=get();if(e){if(after)after(e);else e.click()}})}
 /* the step caption at the top: 'n|TEXT' shows a numbered step, plain text shows on its own */
-function trlCap(s){const e=$('trlcap');if(!e)return;const c=s&&s.cap||'';if(e.dataset.c!==c){e.dataset.c=c;const [a,b]=c.includes('|')?c.split('|'):['',c];e.innerHTML=(a?`<i>${a}</i>`:'')+esc(b);e.classList.remove('pop');void e.offsetWidth;if(c)e.classList.add('pop')}e.style.display=c?'flex':'none'}
+function trlCap(s){const e=$('trlcap');if(!e)return;const c=s&&s.cap||'';if(e.dataset.c!==c){e.dataset.c=c;const [a,b]=c.includes('|')?c.split('|'):['',c];e.innerHTML=(a?`<i>${a}</i>`:'')+`<span>${esc(b)}</span>`;e.classList.remove('pop');void e.offsetWidth;if(c)e.classList.add('pop')}e.style.display=c?'flex':'none'}
+/* Lyrics: moves to the word that rhymes and presses it, waiting out the last line's feedback first */
+function trlLyr(){const l=rec&&rec.st==1&&rec.l;if(!l)return;if(l.fb>0)return setTimeout(trlLyr,60);const i=l.items[l.i].opts.indexOf(l.items[l.i].right);
+ trlClick(()=>document.querySelectorAll('#mg .mgo button')[i],.5,()=>{if(rec&&rec.l===l&&!(l.fb>0))mgPress(i)})}
 /* collab meeting: how a reply lands with this artist, the same sum meetPick makes */
 function trlMeetD(t){const M=MEET,p=M.a[5];let d=PREF[p][t];if(t=='cocky'&&S.listeners<M.a[2])d--;if(t=='hype'&&S.t>=300&&(p=='chill'||p=='shy'))d--;if(t=='pro'&&M.m.neg&&p=='formal')d++;return d}
 function trlMeetBest(){const M=MEET;let b=0;M.opts.forEach((o,i)=>{if(trlMeetD(o[0])>trlMeetD(M.opts[b][0]))b=i});return b}
@@ -194,8 +196,8 @@ body.trlon>*:not(#c):not(#trl):not(.trlv){visibility:hidden!important}body.trlon
 #trl .qpq{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);text-align:center;font-family:'Silkscreen',ui-monospace,monospace;display:none;z-index:2;white-space:nowrap}
 #trl .qpq b{display:block;font-size:clamp(28px,4.6vw,76px);line-height:1.05;text-shadow:4px 4px 0 #000}#trl .qpq small{display:block;margin-top:.5em;font-size:clamp(13px,1.5vw,24px);color:#fff;text-shadow:2px 2px 0 #000}
 #trl .qpq.pop b{animation:qpqp .35s cubic-bezier(.2,1.6,.4,1)}@keyframes qpqp{0%{transform:scale(1.6);opacity:0}100%{transform:scale(1);opacity:1}}
-#trl .qcap{position:absolute;left:50%;top:6%;transform:translateX(-50%);display:none;align-items:center;gap:.5em;font-family:'Silkscreen',ui-monospace,monospace;font-size:clamp(22px,3.3vw,54px);color:#fff;text-shadow:3px 3px 0 #000;white-space:nowrap;z-index:2}
-#trl .qcap i{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;background:#2fe68a;color:#06210f;text-shadow:none;border:3px solid #000;box-shadow:4px 4px 0 #000}
+#trl .qcap{position:absolute;left:50%;top:6%;transform:translateX(-50%);display:none;align-items:stretch;font-family:'Silkscreen',ui-monospace,monospace;font-size:clamp(22px,3.3vw,54px);line-height:1;color:#06210f;background:#2fe68a;border:3px solid #000;box-shadow:5px 5px 0 #000;white-space:nowrap;z-index:2}
+#trl .qcap span{padding:.28em .55em .22em}#trl .qcap i{font-style:normal;display:flex;align-items:center;padding:0 .45em;background:#06210f;color:#2fe68a}
 #trl .qcap.pop{animation:qcapp .3s cubic-bezier(.2,1.5,.4,1)}@keyframes qcapp{0%{transform:translateX(-50%) scale(1.4);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
 #trl .qfd{position:absolute;inset:0;background:#000;opacity:0;z-index:5}
 #trl .qhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;text-align:center;line-height:1.6}
