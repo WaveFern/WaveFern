@@ -330,13 +330,17 @@ function trlPlay(k){const n=$('trln'),s=$('trls');
  /* scenes after the creator need a career: make the fresh one now, and the star one for scenes after the drop */
  if(TRL.k0>1){trlFresh();trlName()}if(TRL.shots[TRL.k0].t>=TRL.DROP)trlStar();
  document.body.classList.add('trlon');const o=trlOverlay();const blk=$('trlblk');blk.style.display='flex';blk.innerHTML='';
- const h=document.createElement('div');h.className='qhint box';h.id='trlh';h.innerHTML='<b>Ready.</b> Start your screen recording, then press <b>Space</b>.<br><small class=m>Esc stops the trailer.</small>';o.appendChild(h);
- const go=e=>{if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();removeEventListener('keydown',go,true);return trlStop()}if(e.key!==' '&&e.key!=='Enter')return;e.preventDefault();e.stopImmediatePropagation();removeEventListener('keydown',go,true);trlRoll()};
+ const h=document.createElement('div');h.className='qhint box';h.id='trlh';h.innerHTML='<b>Ready.</b> Start your screen recording, then press <b>Space</b>.<br><small class=m>The trailer goes full screen and starts. Esc stops it.</small>';o.appendChild(h);
+ const go=e=>{if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();removeEventListener('keydown',go,true);return trlStop()}if(e.key!==' '&&e.key!=='Enter')return;e.preventDefault();e.stopImmediatePropagation();removeEventListener('keydown',go,true);trlFull();trlRoll()};
  addEventListener('keydown',go,true)}
 function trlRoll(){const h=$('trlh');if(h)h.remove();const s0=TRL.shots[TRL.k0];
  setTimeout(()=>{TRL.t0=performance.now()-s0.t*1000;TRL.run=1;TRL.i=-1;
   if(TRL.opt.music){try{const a=TRL.aud=TRL.aud||new Audio(TRL.SRC);a.muted=false;a.volume=1;const sync=()=>{try{a.currentTime=TRL.MO+Math.max(0,(performance.now()-TRL.t0)/1000)}catch(e){}};
    if(a.readyState>=1)sync();else a.addEventListener('loadedmetadata',sync,{once:true});a.play().catch(()=>{})}catch(e){}}},700)}
+/* true full screen on the key press that starts it (browsers only allow it on a key or click), with no browser bars;
+   the game resizes to the screen while the trailer waits its 0.7s to roll */
+function trlFull(){try{const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen({navigationUI:'hide'}).catch(()=>{});else if(d.webkitRequestFullscreen)d.webkitRequestFullscreen()}catch(e){}
+ document.documentElement.style.overflow=document.body.style.overflow='hidden';scrollTo(0,0)}
 function trlStop(){TRL.run=0;try{if(TRL.aud)TRL.aud.pause()}catch(e){}location.reload()}
 /* the trailer page opens the menu once the game has booted to its title screen */
 /* it goes straight to the Ready card; wavefern.com/trailer/?menu still opens the scene menu */
