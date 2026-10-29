@@ -64,10 +64,10 @@ ${H2('Walking and stamina')}<p>You walk at 3.3 m/s and sprint at 6.5 m/s. Sprint
 ${H2('Touch')}<p>On a phone or tablet a joystick appears bottom left, with buttons for sprint and interact. Menus, the phone and the computer work by tapping.</p>`});
 
 page('days','Days, time and energy','start',{e:'⏰',sum:'How long a day lasts, energy, sleeping and passing out.',src:['29-v26.js','07-input-loop.js','04-house.js'],kw:'clock sleep bed pass out energy night',body:()=>`
-${IB('A game day','⏰',[['Real time','12 minutes'],['Starts','06:00'],['Night','20:00 to 06:00'],['Pass out','06:00, with 70% energy'],['Song cost','15 energy']])}
+${IB('A game day','⏰',[['Real time','12 minutes'],['Starts','06:00'],['Night','20:00 to 06:00'],['Pass out','06:00, with 70% energy'],['Song cost','15 energy (1 less per chair level)']])}
 <p class=lead>A full in-game day lasts 12 real minutes, from 06:00 to 06:00 the next morning. About nine songs fit in one day.</p>
 ${H2('The clock')}<p>The first half of the day runs from 06:00 to 20:00; the second half is night, from 20:00 to 06:00. The clock keeps running while the computer or phone is open.</p>
-${H2('Energy')}${ul(['You wake with 100 energy after sleeping in your bed.','Recording a song costs 15 energy (7.5 for your part in a collab). A festival set costs 15 and a tour show 25.','Energy slowly comes back by itself during the day, about 36 over a full day.',`Food tops it up: the corner shop, City Cafe, ${L('food','Goober Eats')} and festival stalls.`])}
+${H2('Energy')}${ul(['You wake with 100 energy after sleeping in your bed.','Recording a song costs 15 energy (1 less per level of chair; 7.5 for your part in a collab). A festival set costs 15 and a tour show 25.','Energy slowly comes back by itself during the day, about 36 over a full day.',`Food tops it up: the corner shop, City Cafe, ${L('food','Goober Eats')} and festival stalls.`])}
 ${H2('Sleeping')}<p>You can only go to bed at night (after 20:00), or earlier if your energy is under 15. Sleeping ends the day: yesterday's streams are paid, your ${L('listeners','monthly listeners')} are updated, every genre's hype is rerolled and new messages arrive.</p>
 ${N('If you are still awake at 06:00 you pass out where you stand and wake with only 70 energy.','warn','Passing out')}
 ${H2('What happens overnight')}${ul(['Streams for the day are completed and paid at the stream rate (after any label cut).','Interest decays by 10% and gains 6% for each song you released that day.','Monthly listeners and followers update (followers grow by 5% of the day\'s streams).','Genre hype rerolls between ×0.8 and ×1.3.','A new mentor may unlock, artists may DM you, labels may make offers, and new quests roll.'])}`});
@@ -78,25 +78,27 @@ ${H2('How saving works')}${ul(['The game autosaves to your browser as you play.'
 ${N('Band rooms keep a separate band career for each room, on your device. It never touches your two career slots or your cloud save.','','Band careers')}`});
 
 /* ===================== Music ===================== */
-page('recording','Recording a song','music',{e:'🎙️',sum:'The Make a song screen and the three minigames: Beat, Lyrics and Mix.',src:['165-song-menu.js','34-studio-minigames.js','130-song-session.js'],kw:'mic studio minigame beat lyrics mix rhyme countdown',body:()=>`
-${IB('Recording','🎙️',[['Where','The mic in any studio'],['Energy','15'],['Needs','An artist name'],['Steps','Beat · Lyrics · Mix'],['Time','About 80 seconds']])}
+page('recording','Recording a song','music',{e:'🎙️',sum:'The Make a song screen and the three minigames: Beat, Lyrics and Mix.',src:['165-song-menu.js','34-studio-minigames.js','130-song-session.js','176-game-feel.js'],kw:'mic studio minigame beat lyrics mix rhyme countdown perfect combo streak gear',body:()=>`
+${IB('Recording','🎙️',[['Where','The mic in any studio'],['Energy','15 (less with a better chair)'],['Needs','An artist name'],['Steps','Beat · Lyrics · Mix'],['Time','About 80 seconds']])}
 <p class=lead>Walk to the mic and press ${K('E')} to open <b>Make a song</b>. Pick a genre (and, if you like, ${L('extras','extras')}), then play three short minigames. How well you play decides a big part of the song's ${L('song-quality','quality')}.</p>
 ${H2('The Make a song screen')}${ul([`A grid of the ${(D.genres||[]).length} ${L('genres','genres')}. A genre marked <span class="tag g">HOT</span> has hype above ×1.12 today and earns more streams; <span class="tag r">COLD</span> is below ×0.92.`,`Each genre shows its ${L('genres/genre-focus','genre focus')} percentage: how much your fans will reward (or punish) that choice.`,`An <b>Extras</b> drop-down holds the diss track, 808 and hi hat options. See ${L('extras')}.`])}
-<p>Every step starts with an animated <b>3, 2, 1, GO</b> countdown; nothing counts until it is over.</p>
-${H2('1. Beat')}<p>A marker swings along a bar. Hit it when it is inside the green zone (within 8% of the centre). Six good hits finish the step. Each hit speeds the marker up by 5%. You get three goes: every miss uses one, and running out scraps the take.</p>
+<p>Every step starts with an animated <b>3, 2, 1, GO</b> countdown; nothing counts until it is over. The countdown also names any ${L('gear')} helping you in that step (see <b>Gear you can feel</b> below).</p>
+${H2('1. Beat')}<p>A marker swings along a bar. Hit it when it is inside the green zone (within 8% of the centre, wider with a better microphone, and a little wider for your first three songs). Six good hits finish the step. Each hit speeds the marker up by 5%. You get three goes (plus one per level of drums): every miss uses one, and running out scraps the take.</p><p>Each hit is rated by how close to the centre it lands: <b>Perfect</b> (the middle third of the zone), <b>Great</b> or <b>Good</b>. Hits in a row build a combo, each one a note higher. Every Perfect adds 0.5 quality (up to +3).</p>
 ${H2('2. Lyrics')}<p>Pick the word that rhymes with the one shown (keys 1-3 or tap). There are five lines and the game adapts to you:</p>
 ${T(['Level','Difficulty','Time per line','Traps'],[['Easy','under 0.35','about 8 s','any other word'],['Tricky','0.35 to 0.7','about 5-6 s','words that look like the answer'],['Hard','0.7 and up','down to 3.5 s','longer rhymes, near-rhymes as traps']])}
-<p>The time limit is <code>8 − 4.5 × difficulty</code> seconds. A right answer is worth <code>0.85 + 0.3 × difficulty</code> points, so harder lines count for more. Half your level carries over to the next session.</p>
-${H2('3. Mix')}<p>Hold ${K('Space')} (or hold the mouse) to raise the level, let go to drop it. The level rises at 1.15 per second and falls at 0.95. Keep it within 0.1 of the moving green band for 6 seconds.</p>
+<p>The time limit is <code>8 − 4.5 × difficulty</code> seconds. A right answer is worth <code>0.85 + 0.3 × difficulty</code> points, so harder lines count for more. Half your level carries over to the next session. Right answers in a row build a streak, and a better guitar or keyboard helps (see below).</p>
+${H2('3. Mix')}<p>Hold ${K('Space')} (or hold the mouse) to raise the level, let go to drop it. The level rises at 1.15 per second and falls at 0.95. Keep it within 0.1 of the moving green band for 6 seconds. While the level is in the green the beat fills out, the header counts the share of the take in the green, and every full second held there counts up.</p>
 ${FX('mix score = min(1, time in band ÷ 6 s × 1.15)')}
+${H2('Gear you can feel','gear-feel')}<p>Besides its quality points, some gear changes how a step plays. All of it is per level:</p>${T(['Gear','Step','What changes'],[['Microphone','Beat','The green zone is 1.2% wider each side'],['Drums','Beat','+1 go'],['Guitar','Lyrics','+0.5 s on every line'],['Keyboard','Lyrics','One wrong word fades out after 70%, 50% or 30% of the time'],['Acoustics','Mix','The green band is 0.02 wider each side'],['Headphones','Mix','The level moves 10% more slowly, so it is easier to hold steady'],['Mixing desk','Mix','The band drifts 10% more slowly'],['Chair','Every song','Costs 1 less energy']])}
 ${H2('Session grade')}${T(['Average of Lyrics and Mix','Grade'],[['0.9 and up','Studio magic'],['0.7 to 0.9','Solid session'],['0.45 to 0.7','Rough around the edges'],['below 0.45','Messy take']])}
-<p>The finished draft waits on your laptop. Give it a title and release it from Spotifly › Upload, or use <b>Upload all</b> to release every titled draft at once.</p>
+<p>The results screen shows your Perfect hits and says how the song compares with your last one and your best. The finished draft waits on your laptop. Give it a title and release it from Spotifly › Upload, or use <b>Upload all</b> to release every titled draft at once.</p>
 ${N(`In a ${L('band-rooms','band room')} the middle step depends on your instrument: only vocalists rhyme. Guitar, bass, drums and keys play their own part.`,'','Bands')}`});
 
 page('song-quality','Song quality','music',{e:'⭐',sum:'How a song\'s quality score is calculated.',src:['34-studio-minigames.js','29-v26.js','52-gear-shop-plus.js'],kw:'quality score q experience formula',body:()=>{const g=D.gear||[];
  return `<p class=lead>Every song gets a quality score. Quality drives almost everything: daily ${L('streams')}, the chance of a hit, ${L('festival')} crowds and ${L('awards')}.</p>
 ${H2('The formula')}${FX(`quality = max(3, round( <b>experience</b> × (
-    random 8-14
+    random 7-12
+  + 0.5 per Perfect beat hit (up to 3)
   + 16 × <b>session</b>            (average of Lyrics and Mix, 0-1)
   + <b>gear points</b>             (see below)
   + 3 if you own a home      + 1 per pet you own

@@ -24,7 +24,7 @@ finishRec=function(){if(!rec)return;if(rec.st===0)return mgStage(1);mgFinish()};
 
 function mgStage(n){snd('pop');rec.st=n;rec.wait=n<3?1:0;rec.wt=0;
  if(n==1){const g=mgShuf(MG_RH.slice()).slice(0,4);rec.l={i:0,ok:0,lim:7,fb:0,pk:-1,items:g.map(w=>{const ok=w.filter(x=>!MG_NEAR[x]),base=ok[0],right=pick(ok.slice(1)),pool=MG_RH.filter(o=>o!==w).flat().filter(x=>!MG_NEAR[x]);const wr=mgShuf(pool).slice(0,2);return{base,right,opts:mgShuf([right,...wr])}}),t:0}}
- else if(n==2)rec.x={t:0,dur:6,lv:.15,in:0,c:.5};
+ else if(n==2)rec.x={t:0,ts:0,dur:6,lv:.15,in:0,c:.5,bw:.1,sp:1,rt:1};
  else mgFinish()}
 
 /* ---- Lyrics: pick the word that rhymes before the timer runs out ---- */
@@ -32,12 +32,13 @@ function mgAnswer(p){const l=rec.l,it=l.items[l.i];l.pk=p;l.fb=1;if(p>=0&&it.opt
 function mgLyrTick(dt){const l=rec.l;if(l.fb>0){l.fb-=dt;if(l.fb<=0){l.pk=-1;l.t=0;if(++l.i>=l.items.length){rec.sc.l=l.ok/l.items.length;mgStage(2)}}return}l.t+=dt;if(l.t>=l.lim)mgAnswer(-1)}
 function mgPress(p){if(!rec||mode!='rec')return;if(rec.st==1){const l=rec.l;if(l.fb>0)return;mgAnswer(p)}}
 
-/* ---- Mix: hold to raise the level, let go to drop it, keep it in the moving green band ---- */
-function mgMixTick(dt){const x=rec.x,hold=keys[' ']||keys.e||keys.enter||MGH;x.t+=dt;x.lv=Math.max(0,Math.min(1,x.lv+(hold?1.15:-.95)*dt));
- x.c=Math.max(.15,Math.min(.85,.5+.28*Math.sin(x.t*.9)+.1*Math.sin(x.t*2.2+1)));if(Math.abs(x.lv-x.c)<.1)x.in+=dt;
+/* ---- Mix: hold to raise the level, let go to drop it, keep it in the moving green band ----
+   v49.24.0: bw (half the band's width), sp (how fast the band drifts) and rt (how fast the level moves) come from your gear (176-game-feel.js) */
+function mgMixTick(dt){const x=rec.x,hold=keys[' ']||keys.e||keys.enter||MGH;x.t+=dt;x.ts=(x.ts||0)+dt*(x.sp||1);x.lv=Math.max(0,Math.min(1,x.lv+(hold?1.15:-.95)*dt*(x.rt||1)));
+ x.c=Math.max(.15,Math.min(.85,.5+.28*Math.sin(x.ts*.9)+.1*Math.sin(x.ts*2.2+1)));x.inb=Math.abs(x.lv-x.c)<(x.bw||.1);if(x.inb)x.in+=dt;
  if(x.t>=x.dur){rec.sc.x=Math.min(1,x.in/x.dur*1.15);mgStage(3)}}
 
-function mgFinish(){chime();const sc=rec.sc,l=sc.l||0,x=sc.x||0,avg=(l+x)/2,q=Math.max(3,Math.round(expF()*(R(8,14)+avg*16+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.gear.keys||0)*3+(S.gear.drums||0)*3+(S.gear.booth||0)*5+(S.home||0)*3+S.pets.length+mentors()*2+Math.max(0,8-rec.miss)))),
+function mgFinish(){chime();const sc=rec.sc,l=sc.l||0,x=sc.x||0,avg=(l+x)/2,q=Math.max(3,Math.round(expF()*(R(7,12)+Math.min(3,(rec.pf||0)*.5)+avg*16+S.gear.chair*4+S.gear.mic*8+S.gear.guitar*6+(S.gear.keys||0)*3+(S.gear.drums||0)*3+(S.gear.booth||0)*5+(S.home||0)*3+S.pets.length+mentors()*2+Math.max(0,8-rec.miss)))),
  d={id:S.nid++,title:rec.diss?'No Love For '+rec.diss.split(' ')[0]:pick(A)+' '+pick(Bn),g:rec.g,q,diss:rec.diss};S.drafts.push(d);S.made=Math.max(S.made||0,S.songs.length+S.drafts.length-1)+1;updateVersion();const miss=rec.miss;rec=null;mode='menu';mgDraw();
  const pc=v=>Math.round(v*100)+'%',grade=avg>=.9?'Studio magic ✨':avg>=.7?'Solid session':avg>=.45?'Rough around the edges':'Messy take';
  $('ui').innerHTML=`<div class="box modal"><h2>Song recorded! 🎵</h2><p class=m>${esc(d.g)} · mix quality ${q} · ${grade}</p><div class=cards><div class=card>Beat<b>${miss?miss+' miss'+(miss>1?'es':''):'Clean'}</b></div><div class=card>Lyrics<b>${pc(l)}</b></div><div class=card>Mix<b>${pc(x)}</b></div></div><p>Give it a title:</p><input id=tin maxlength=32 value="${esc(d.title)}" onkeydown="if(event.key=='Enter')saveT(${d.id})"><div class=row2><button class=go onclick="saveT(${d.id})">Save to drafts</button></div><p class=m><small>Upload it from the computer. You can still edit the title there.</small></p></div>`;setTimeout(()=>{const i=$('tin');i&&(i.focus(),i.select())},50)}
@@ -66,5 +67,5 @@ function mgDraw(){let el=$('mg');const on=mode=='rec'&&rec&&rec.st!=null;documen
  if(rec.st==0){/* sit just above the beat bar's HUD panel */const hb=document.querySelector('#hud .hb.modal');if(hb){const b=Math.round(innerHeight-hb.getBoundingClientRect().top+6)+'px';if(el.style.bottom!=b)el.style.bottom=b}}
  else if(rec.wait){}
  else if(rec.st==1){const l=rec.l,it=l.items[l.i],tm=$('mgtm');if(tm)tm.style.width=Math.max(0,100-l.t/l.lim*100)+'%';el.querySelectorAll('.mgo button').forEach((b,i)=>{b.classList.toggle('ok',l.fb>0&&it.opts[i]==it.right);b.classList.toggle('no',l.fb>0&&i==l.pk&&it.opts[i]!=it.right)})}
- else if(rec.st==2){const x=rec.x,b=$('mgband'),k=$('mgknob'),tm=$('mgtm');if(b)b.style.left=(x.c-.1)*100+'%';if(k){k.style.left=x.lv*100+'%';k.style.background=Math.abs(x.lv-x.c)<.1?'#2fe68a':'#fff'}if(tm)tm.style.width=Math.max(0,100-x.t/x.dur*100)+'%'}}
+ else if(rec.st==2){const x=rec.x,w=x.bw||.1,b=$('mgband'),k=$('mgknob'),tm=$('mgtm');if(b){b.style.left=(x.c-w)*100+'%';b.style.width=w*200+'%'}if(k){k.style.left=x.lv*100+'%';k.style.background=Math.abs(x.lv-x.c)<w?'#2fe68a':'#fff'}if(tm)tm.style.width=Math.max(0,100-x.t/x.dur*100)+'%'}}
 {const u=update;update=function(dt){u(dt);mgDraw()}}

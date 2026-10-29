@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.22.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.24.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -114,7 +114,7 @@ Real time	12 minutes
 Starts	06:00
 Night	20:00 to 06:00
 Pass out	06:00, with 70% energy
-Song cost	15 energy
+Song cost	15 energy (1 less per chair level)
 
 A full in-game day lasts 12 real minutes, from 06:00 to 06:00 the next morning. About nine songs fit in one day.[1]
 
@@ -124,7 +124,7 @@ The first half of the day runs from 06:00 to 20:00; the second half is night, fr
 
 Energy
 You wake with 100 energy after sleeping in your bed.
-Recording a song costs 15 energy (7.5 for your part in a collab). A festival set costs 15 and a tour show 25.
+Recording a song costs 15 energy (1 less per level of chair; 7.5 for your part in a collab). A festival set costs 15 and a tour show 25.
 Energy slowly comes back by itself during the day, about 36 over a full day.
 Food tops it up: the corner shop, City Cafe, Goober Eats and festival stalls.
 Sleeping
@@ -176,7 +176,7 @@ Recording a song
 From the WaveFern Wiki
 Recording
 Where	The mic in any studio
-Energy	15
+Energy	15 (less with a better chair)
 Needs	An artist name
 Steps	Beat · Lyrics · Mix
 Time	About 80 seconds
@@ -189,11 +189,13 @@ A grid of the 9 genres. A genre marked HOT has hype above ×1.12 today and earns
 Each genre shows its genre focus percentage: how much your fans will reward (or punish) that choice.
 An Extras drop-down holds the diss track, 808 and hi hat options. See Extras: diss tracks, 808s and hi hats.
 
-Every step starts with an animated 3, 2, 1, GO countdown; nothing counts until it is over.
+Every step starts with an animated 3, 2, 1, GO countdown; nothing counts until it is over. The countdown also names any Studio gear helping you in that step (see Gear you can feel below).
 
 1. Beat
 
-A marker swings along a bar. Hit it when it is inside the green zone (within 8% of the centre). Six good hits finish the step. Each hit speeds the marker up by 5%. You get three goes: every miss uses one, and running out scraps the take.
+A marker swings along a bar. Hit it when it is inside the green zone (within 8% of the centre, wider with a better microphone, and a little wider for your first three songs). Six good hits finish the step. Each hit speeds the marker up by 5%. You get three goes (plus one per level of drums): every miss uses one, and running out scraps the take.
+
+Each hit is rated by how close to the centre it lands: Perfect (the middle third of the zone), Great or Good. Hits in a row build a combo, each one a note higher. Every Perfect adds 0.5 quality (up to +3).
 
 2. Lyrics
 
@@ -204,13 +206,26 @@ Easy	under 0.35	about 8 s	any other word
 Tricky	0.35 to 0.7	about 5-6 s	words that look like the answer
 Hard	0.7 and up	down to 3.5 s	longer rhymes, near-rhymes as traps
 
-The time limit is 8 − 4.5 × difficulty seconds. A right answer is worth 0.85 + 0.3 × difficulty points, so harder lines count for more. Half your level carries over to the next session.
+The time limit is 8 − 4.5 × difficulty seconds. A right answer is worth 0.85 + 0.3 × difficulty points, so harder lines count for more. Half your level carries over to the next session. Right answers in a row build a streak, and a better guitar or keyboard helps (see below).
 
 3. Mix
 
-Hold Space (or hold the mouse) to raise the level, let go to drop it. The level rises at 1.15 per second and falls at 0.95. Keep it within 0.1 of the moving green band for 6 seconds.
+Hold Space (or hold the mouse) to raise the level, let go to drop it. The level rises at 1.15 per second and falls at 0.95. Keep it within 0.1 of the moving green band for 6 seconds. While the level is in the green the beat fills out, the header counts the share of the take in the green, and every full second held there counts up.
 
 mix score = min(1, time in band ÷ 6 s × 1.15)
+Gear you can feel
+
+Besides its quality points, some gear changes how a step plays. All of it is per level:
+
+Gear	Step	What changes
+Microphone	Beat	The green zone is 1.2% wider each side
+Drums	Beat	+1 go
+Guitar	Lyrics	+0.5 s on every line
+Keyboard	Lyrics	One wrong word fades out after 70%, 50% or 30% of the time
+Acoustics	Mix	The green band is 0.02 wider each side
+Headphones	Mix	The level moves 10% more slowly, so it is easier to hold steady
+Mixing desk	Mix	The band drifts 10% more slowly
+Chair	Every song	Costs 1 less energy
 Session grade
 Average of Lyrics and Mix	Grade
 0.9 and up	Studio magic
@@ -218,7 +233,7 @@ Average of Lyrics and Mix	Grade
 0.45 to 0.7	Rough around the edges
 below 0.45	Messy take
 
-The finished draft waits on your laptop. Give it a title and release it from Spotifly › Upload, or use Upload all to release every titled draft at once.
+The results screen shows your Perfect hits and says how the song compares with your last one and your best. The finished draft waits on your laptop. Give it a title and release it from Spotifly › Upload, or use Upload all to release every titled draft at once.
 
 BandsIn a band room the middle step depends on your instrument: only vocalists rhyme. Guitar, bass, drums and keys play their own part.
 Screenshots
@@ -233,11 +248,13 @@ See also
 Extras: diss tracks, 808s and hi hats
 Song quality
 Genres and genre focus
+Studio gear
 Band rooms
 References
 ^ 165-song-menu.js. WaveFern source code, game v47.9.0.
 ^ 34-studio-minigames.js. WaveFern source code, game v47.9.0.
 ^ 130-song-session.js. WaveFern source code, game v47.9.0.
+^ 176-game-feel.js. WaveFern source code, game v47.9.0.
 Category: Music
 
 ---
@@ -251,7 +268,8 @@ Every song gets a quality score. Quality drives almost everything: daily Streams
 
 The formula
 quality = max(3, round( experience × (
-    random 8-14
+    random 7-12
+  + 0.5 per Perfect beat hit (up to 3)
   + 16 × session            (average of Lyrics and Mix, 0-1)
   + gear points             (see below)
   + 3 if you own a home      + 1 per pet you own
@@ -2335,9 +2353,11 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.22.0. This list is read live from the game, so it is always current.
+The game is on v49.24.0. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.24.0	Game feel: no new features, but playing feels better. Beat hits are rated Perfect, Great or Good with a combo and a note that climbs with it, and each Perfect adds a little quality. Lyrics answers in a row build a streak, and quick ones say so. In Mix the beat fills out while you hold the level in the green, and each second locked in counts up. The song's beat swells when you play well. The results screen counts your quality up, shows your Perfect hits and tells you when a song beats your last one or your best. Gear now changes how you play as well as adding quality: a better mic widens the Beat green zone, drums give extra goes, guitar gives more time per lyric line, a keyboard fades out a wrong word, acoustics widen the Mix band, headphones make the level smoother, a mixing desk slows the band, and a better chair makes songs cost less energy. The Gear shop and the countdown before each step say what your gear does. Your first three songs get a slightly wider Beat zone while you learn. The morning results count up, say when it was your best day yet, and show how close you are to the next listener milestone and your next plaque. A new career gets a toast for its first stream, 10 streams and 100 streams. The recording bar no longer redraws the whole screen overlay every frame.
+v49.23.0	Trailer: a dopamine pass. After the drop the picture punches in on every beat and hits on every cut, with big flashes and shakes on the drop, the main stage, the stadium and the title. Confetti bursts when each plaque goes up, when each Spotifly count lands, on right answers in the lyrics and the collab meeting, at the main stage and stadium, and on the end card. Gain fans is now a restaged results screen (marked non-gameplay) like the game's new day screen: DAY 2 and each card slam in on the beat, the numbers climb, and the listener count lands with a burst. No sleep scene.
 v49.22.0	Wiki: the Credits page has a new section, The name, on how WaveFern was nearly called FernWave and the idea behind that name. The FAQ answers why the game is called WaveFern.
 v49.21.0	Trailer: "How far can you go?" is now 4 seconds into the drop, a word every two beats (HOW, FAR, CAN YOU, GO?). The opening steps were retimed so every cut lands on a bar line: 0:04 artist, 0:10 record, 0:16 release (as the drums come in), 0:20 fans, 0:26 message, 0:32 meeting, 0:36 the card. The plaque wall is a dark charcoal instead of cream.
 v49.20.1	The last leftover old name in the version history now says WaveFern, and the wiki's title screen picture shows the WaveFern name.

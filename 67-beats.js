@@ -470,7 +470,8 @@ function beatsBarTick(dt){rec.t+=dt;rec.cd=Math.max(0,rec.cd-dt);rec.fl=Math.max
  const b=Math.max(0,Beats.beat()),spb=60/Beats.bpm(),T=1/(.9*Math.pow(1.05,rec.hits)),n=[1,2,4].reduce((a,c)=>Math.abs(Math.log(c*spb/T))<Math.abs(Math.log(a*spb/T))?c:a);
  if(rec.bb==null){rec.bn=n;rec.bb=Math.round(b+.5*n)}else if(n!=rec.bn){const k=Math.round((b-rec.bb)/rec.bn),bc=rec.bb+k*rec.bn;rec.bb=k%2?bc-n:bc;rec.bn=n}
  let ph=((b-rec.bb)/rec.bn+.5)%2;if(ph<0)ph+=2;rec.pos=ph<1?ph:2-ph;rec.dir=ph<1?1:-1}
-if(typeof recTick=='function'){const t0=recTick;recTick=function(dt){if(rec&&rec.bp&&Beats.playing()){Beats.setIntensity(rec.st==1?.3:rec.st==2?.6:rec.st==3?1:.8);if(!rec.st)return beatsBarTick(dt)}return t0.apply(this,arguments)}}
+if(typeof recTick=='function'){const t0=recTick;recTick=function(dt){if(rec&&rec.bp&&Beats.playing()){/* v49.24.0: the beat swells when you play well (rec.swell, set by 176-game-feel.js) and fills out while the Mix level is in the green */
+ Beats.setIntensity(Math.min(1,(rec.st==1?.3:rec.st==2?(rec.x&&rec.x.inb?.85:.4):rec.st==3?1:.8)+(rec.swell||0)));if(!rec.st)return beatsBarTick(dt)}return t0.apply(this,arguments)}}
 /* the beat's seed goes with the draft and the uploaded song, so the released song sounds like the session */
 if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,s8=rec&&rec.s8,hh=rec&&rec.hh,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.bs=bs;if(s8!=null){d.s8=s8;d.hh=hh}}const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
 if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}}}catch(e){}return r}}
