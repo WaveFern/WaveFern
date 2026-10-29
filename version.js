@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.18.0';
+const GAME_VERSION='v49.18.1';
 const VERSION_HISTORY=[
+ {v:'v49.18.1',n:'The game no longer names the 3D library it is built on: the "Made with" line is gone from the title screen, and the wiki credits, site description and notes no longer mention it. Nothing about how the game plays or looks changes.'},
  {v:'v49.18.0',n:'Trailer: the step captions are now one green strip with black text. Five steps: 1 Make your artist (longer, more looks), 2 Record songs (now the Lyrics step, always picking the rhyme), 3 Release them, 4 Gain fans, 5 Collab with artists (the meeting is two quick exchanges). The plaque cutscene moved after the millions of listeners, so the Billions Club plaque no longer comes before 50K.'},
  {v:'v49.17.0',n:'Trailer: the opening now shows how the game is played, one numbered step at a time with a caption: 1 Record songs (walk to the mic, pick a genre, hit the green), 2 Release them (upload on the laptop), 3 Gain fans (listeners counting up), 4 Collab with artists (message them, then meet and pick the replies they like best). The furniture shot is gone. Each plaque on the studio wall is named as it goes up (Gold, Platinum, Diamond, Billions Club, with its stream count).'},
  {v:'v49.16.0',n:'Trailer: the message is just "collab?" and the camera no longer zooms in on the reply. A new shot places furniture in your room, so the "How far can you go?" card is shorter. The plaques are now a cutscene of your studio wall, each one lifted into place on the hit. Instagrime gets floating hearts over the post, marked as non-gameplay footage.'},

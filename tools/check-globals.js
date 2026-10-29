@@ -19,7 +19,7 @@ function need(m){for(const p of [m,'/opt/node-tools/node_modules/'+m,path.join(p
 const acorn=need('acorn'),escope=need('eslint-scope');
 const ROOT=path.join(__dirname,'..'),ALL=process.argv.includes('--all');
 const BROWSER=new Set(require('./browser-globals.json'));
-/* names that exist only in some browsers or are created by external scripts (three.js, Firebase, Google) */
+/* names that exist only in some browsers or are created by external scripts (the 3D library, Firebase, Google) */
 ['THREE','firebase','google','gtag','dataLayer','webkitAudioContext','webkitRequestAnimationFrame','mozRequestAnimationFrame',
  'InstallTrigger','safari','opera','chrome','netscape','globalThis','undefined','NaN','Infinity','arguments'].forEach(n=>BROWSER.add(n));
 

@@ -1,6 +1,6 @@
 # WaveFern Studios – Music Career Sim (split version)
 
-Open `index.html` in a browser (needs internet for Three.js and the font).
+Open `index.html` in a browser (needs internet for the 3D library and the font).
 
 - `css/style.css` – all styles
 - `js/01…27-*.js` – the game code, split by section and loaded in order (keep the order in `index.html`)

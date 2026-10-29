@@ -154,7 +154,7 @@ ${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.
 <p>Play the whole soundtrack here. It keeps playing while you read other pages.</p>
 ${ostTable()}
 <p>The songs you make in the game are a separate thing: see ${L('song-audio','How Spotifly songs sound')}.</p>
-${H2('Built with')}<p>The game runs in the browser with Three.js. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});
+${H2('Built with')}<p>The game runs in any modern browser with JavaScript and WebGL, with nothing to install. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});
 
 /* ===================== FAQ: questions new players tend to ask, answered as pointers and advice ===================== */
 const Q=(q,a)=>`<h3>${q}</h3><p>${a}</p>`;

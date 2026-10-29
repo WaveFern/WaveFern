@@ -2,7 +2,7 @@
 /* Wiki data snapshot (v47.3.0): boots the game headless and copies its own tables (gear, artists, cars, homes, labels,
    festival stages, destinations, fame levels and more) into wiki/data.js, so the wiki's tables always match the game.
    Run from the repo root:  node tools/wiki-data.js
-   It serves the repo itself on a free port. THREE_JS=/path/to/three.min.js serves three.js r128 locally when the CDN is
+   It serves the repo itself on a free port. THREE_JS=/path/to/three.min.js serves the 3D library (r128) locally when the CDN is
    blocked; CHROME=/path/to/chrome uses that browser instead of Playwright's own. The deploy workflow runs it before
    upload; if it fails there, the committed wiki/data.js is published as it is. */
 const fs=require('fs'),path=require('path'),http=require('http'),vm=require('vm');

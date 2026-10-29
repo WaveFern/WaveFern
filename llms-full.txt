@@ -2762,7 +2762,7 @@ The songs you make in the game are a separate thing: see How Spotifly songs soun
 
 Built with
 
-The game runs in the browser with Three.js. Band rooms use PeerJS, and cloud saves use Google sign-in.
+The game runs in any modern browser with JavaScript and WebGL, with nothing to install. Band rooms use PeerJS, and cloud saves use Google sign-in.
 
 See also
 How Spotifly songs sound

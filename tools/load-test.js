@@ -2,7 +2,7 @@
 /* Headless load test (v41.1.0): boots the game in every installed Playwright browser, starts a new career,
    walks a few steps, opens each phone app and saves, then prints any page errors.
    Serve the repo first, e.g.  npx http-server -p 8080 -c-1 .   then  node tools/load-test.js [url]
-   THREE_JS=/path/to/three.min.js serves three.js r128 locally when the CDN is blocked.
+   THREE_JS=/path/to/three.min.js serves the 3D library (r128) locally when the CDN is blocked.
    BREAK=97-weather.js replaces that file with one that throws, to check one broken file doesn't stop the game. */
 const fs=require('fs');
 let pw;for(const p of ['playwright','/opt/node-tools/node_modules/playwright'])try{pw=require(p);break}catch(e){}
