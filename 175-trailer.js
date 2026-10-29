@@ -318,7 +318,7 @@ function trlPlay(k){const n=$('trln'),s=$('trls');
  /* scenes after the creator need a career: make the fresh one now, and the star one for scenes after the drop */
  if(TRL.k0>1){trlFresh();trlName()}if(TRL.shots[TRL.k0].t>=TRL.DROP)trlStar();
  document.body.classList.add('trlon');const o=trlOverlay();const blk=$('trlblk');blk.style.display='flex';blk.innerHTML='';
- const h=document.createElement('div');h.className='qhint box';h.id='trlh';h.innerHTML='<b>Ready.</b> Start your screen recording, then press <b>Space</b> or tap the screen.<br><small class=m>Esc stops it.</small>';o.appendChild(h);
+ const h=document.createElement('div');h.className='qhint box';h.id='trlh';h.innerHTML='<b>Ready.</b> Start your screen recording, then press <b>Space</b> or tap the screen.<br><small class=m>F: full screen · Esc stops it.</small>';o.appendChild(h);
  /* Space or Enter starts it, or a tap or click (phones and tablets have no Space key) */
  const off=()=>{removeEventListener('keydown',go,true);removeEventListener('pointerdown',tap,true)},
   go=e=>{if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();off();return trlStop()}if(e.key!==' '&&e.key!=='Enter')return;e.preventDefault();e.stopImmediatePropagation();off();trlFull();trlRoll()},
@@ -335,5 +335,7 @@ function trlFull(){try{const d=document.documentElement;if(!document.fullscreenE
 function trlStop(){TRL.run=0;try{if(TRL.aud)TRL.aud.pause()}catch(e){}location.reload()}
 /* the trailer page opens the menu once the game has booted to its title screen */
 /* it goes straight to the Ready card; wavefern.com/trailer/?menu still opens the scene menu */
-function trlReady(){trlCSS();/* full screen straight away where the browser allows it, otherwise on the first click or key press */trlFull();['pointerdown','keydown'].forEach(t=>addEventListener(t,()=>{if(!document.fullscreenElement)trlFull()},{capture:true}));TRL.shots=trlShots();if(!TRL.aud)fetch(TRL.SRC).then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});trlPlay(0)}
+function trlReady(){trlCSS();/* full screen straight away where the browser allows it, otherwise on the first click or key press */trlFull();['pointerdown','keydown'].forEach(t=>addEventListener(t,()=>{if(!document.fullscreenElement)trlFull()},{capture:true}));
+ /* F toggles full screen on the trailer page (and never reaches the game, where F is furniture mode) */
+ addEventListener('keydown',e=>{if(e.key.toLowerCase()!='f'||e.repeat||/INPUT|TEXTAREA/.test(e.target.tagName))return;e.preventDefault();e.stopImmediatePropagation();if(document.fullscreenElement){try{document.exitFullscreen()}catch(x){}}else trlFull()},{capture:true});TRL.shots=trlShots();if(!TRL.aud)fetch(TRL.SRC).then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});trlPlay(0)}
 if(TRL.on){const w=setInterval(()=>{if(typeof mode!='undefined'&&mode=='title'&&$('ttl')&&!$('load')){clearInterval(w);/[?&]menu\b/.test(location.search)?trlMenu():trlReady()}},300)}
