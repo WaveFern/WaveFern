@@ -32,8 +32,26 @@ function slotKey(n){return SAVE_PRE+'save_'+(n||BOOT_SLOT)}
 const BK_MAX=12;
 function bakKeep(code,why){if(!code)return true;try{let e=0;for(let k=1;k<=BK_MAX;k++){const b=localStorage.getItem('fw_bak_'+k);if(b===code)return true;if(!b&&!e)e=k}
  const k=e||BK_MAX;localStorage.setItem('fw_bak_'+k,code);localStorage.setItem('fw_bakw_'+k,why||'');return true}catch(e){return false}}
+/* v49.24.8: the trailer page (wavefern.com/trailer, or ?trailer) never writes a career, a backup, the slot choice, the account or
+   the cloud mark. Before this the save on closing or hiding the tab still ran there and put the trailer's career over the player's. */
+const FW_TRL=!!(window.FW_TRAILER||/[?&]trailer\b/.test(location.search));
+if(FW_TRL){const si=Storage.prototype.setItem,ri=Storage.prototype.removeItem,no=k=>/^fw_(u_.+?_)?(save|bak|bakw|slot|cloud|acct)/.test(String(k));
+ Storage.prototype.setItem=function(k,v){if(this===localStorage&&no(k))return;return si.call(this,k,v)};
+ Storage.prototype.removeItem=function(k){if(this===localStorage&&no(k))return;return ri.call(this,k)}}
+/* a career the trailer made: its songs use the trailer's own ids (900000 and up), which the game never hands out */
+function isTrlCareer(code){try{const x=scDecode(code).S;return!!x&&(x.songs||[]).some(q=>q&&q.id>=9e5&&q.id<9e5+100)}catch(e){return false}}
+/* v49.24.8: put back any career the trailer overwrote. When the trailer saved over a slot, the game had already kept the career
+   that was there as a backup ("Backup from career N"), and that goes back in the slot. A trailer career with no backup is cleared */
+function trlRepair(){if(FW_TRL)return;try{for(const n of [1,2]){const k=slotKey(n),c=localStorage.getItem(k);if(!c||!isTrlCareer(c))continue;
+  /* backups fill the first free spot, so the latest one kept for this slot has the highest number */
+  let best=null,bd=0,bk=0;for(let i=1;i<=BK_MAX;i++){const b=localStorage.getItem('fw_bak_'+i),w=localStorage.getItem('fw_bakw_'+i)||'';if(!b||isTrlCareer(b)||w!='Backup from career '+n)continue;
+   try{bd=scDecode(b).S.day||0}catch(e){continue}best=b;bk=i}
+  if(!best){localStorage.removeItem(k);continue}
+  localStorage.setItem(k,best);localStorage.removeItem('fw_bak_'+bk);localStorage.removeItem('fw_bakw_'+bk);
+  try{const a=scDecode(best).S.artist||'your career';sessionStorage.setItem('fw_msg','Restored '+a+' (Day '+bd+'). The trailer page had saved over it, sorry about that.')}catch(e){}}}catch(e){console.warn('trailer repair',e)}}
 try{const o=localStorage.getItem('fw_save');if(o){if(!localStorage.getItem('fw_save_1'))localStorage.setItem('fw_save_1',o);localStorage.removeItem('fw_save')}}catch(e){}
 function slotInfo(n){try{const c=localStorage.getItem(slotKey(n));if(!c)return null;let a='',d=0;try{const x=scDecode(c).S;a=x.artist||'';d=x.day||0}catch(e){}return{artist:a,day:d}}catch(e){return null}}
+trlRepair();
 let lastWrote=null;
 /* v26.145.2: the same career at the same or an earlier day (e.g. the first re-save in a new code format) is not backed up, so it can't push out a real backup */
 function sameCareer(old){try{const o=scDecode(old).S;return o.artist==S.artist&&(o.day||0)<=(S.day||0)}catch(e){return false}}

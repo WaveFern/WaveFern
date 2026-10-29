@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.24.7';
+const GAME_VERSION='v49.24.8';
 const VERSION_HISTORY=[
+ {v:'v49.24.8',n:'Fix: opening wavefern.com/trailer could replace your career. The save that runs when a tab is hidden or closed still ran on the trailer page and wrote the trailer\'s career over yours. The trailer page now cannot write any career, backup or cloud data at all. And when the game opens, any career the trailer wrote is swapped back for your own career, which the game had kept as a backup at that moment, with a message saying it was restored.'},
  {v:'v49.24.7',n:'Trailer: new mix of the soundtrack with an added instrument. Same timing, so every cut still lands where it did.'},
  {v:'v49.24.6',n:'Trailer: F toggles full screen on the trailer page at any time, and the Ready card says so.'},
  {v:'v49.24.5',n:'Trailer: much gentler zooms on the laptop shots (about 1.1 to 1.2 times instead of up to 1.9) and only a light pull toward the numbers. On a phone in landscape the counts still stay in view.'},
