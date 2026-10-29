@@ -79,16 +79,19 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Collab session',d:B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
  {sc:'Recording',d:2*B,plq:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0)}catch(e){}},rec:1},
  /* zero fans to millions: the listener and follower numbers count up */
- {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.95))}},
+/* the climb: each Spotifly check-in picks up where the last one left off, so you have millions by the tour */
+ {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[1284,48200],followers:[37,6900],fame:[3,12]})}},
  /* the internet is watching: your new single blowing up on Instagrime */
- {sc:'Instagrime',d:B,show:['ui'],set(){trlClear();openPC();app='ig';const q={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap:'new single out now. 26 million streams in a week, thank you',day:S.day,l:1284000};S.igPosts.push(q);igp=q;igv='post';smo=0;pcR()},pz:['pc',1.3,1.42,'50% 40%'],
-  tick(u){trlCount(Math.min(1,u/.7));const m=document.querySelector('#pc .mn'),k=Math.max(0,Math.min(1,(u-.25)/.6));if(m)m.scrollTop=Math.round(330*k*k*(3-2*k))}},
+ {sc:'Instagrime',d:B,show:['ui'],set(){trlClear();openPC();app='ig';const q={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap:'new single out now. 50k streams already, thank you',day:S.day,l:21400};S.igPosts.push(q);igp=q;igv='post';smo=0;pcR()},pz:['pc',1.3,1.42,'50% 40%'],
+  tick(u){trlCount(Math.min(1,u/.7),{likes:[0,21400]});const m=document.querySelector('#pc .mn'),k=Math.max(0,Math.min(1,(u-.25)/.6));if(m)m.scrollTop=Math.round(330*k*k*(3-2*k))}},
   {sc:'Fern Road',d:B,show:[],set(){trlClear();S.t=272;trlPut(44,14.2,Math.PI/2);trlKeys('ds')},cam:u=>{const x=P.x;return{p:[x+7.5,1.25,20.5],l:[x,1.2,14.2],f:42}}},
- {sc:'Drive',d:2*B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlKeys('w')}}},
+ {sc:'Drive',d:B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlKeys('w')}}},
  {sc:'Gphone',d:2*b,show:['ph'],set(){trlClear();S.t=268;trlPut(40,14.2,Math.PI/2);try{openPhone()}catch(e){}}},
-  {sc:'Crew',d:2*b,crew:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlKeys('ds')},zoom:5.5},
- {sc:'Festival',d:3*B,show:[],set(){trlClear();trlFestDay();S.t=392;trlPut(364,-100,0);try{festStartBooked({n:1,slot:3,songs:S.songs.slice(-4).map(s=>s.id)})}catch(e){console.error(e)}}},
+ {sc:'Crew',d:2*b,crew:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlKeys('ds')},zoom:5.5},
+ {sc:'Spotifly: 180K',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.3,1.45,'30% 20%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[48200,640000],followers:[6900,182000],fame:[12,58]})}},
+ {sc:'Festival',d:2*B,show:[],set(){trlClear();trlFestDay();S.t=392;trlPut(364,-100,0);try{festStartBooked({n:1,slot:3,songs:S.songs.slice(-4).map(s=>s.id)})}catch(e){console.error(e)}}},
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
+ {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.5,1.7,'24% 16%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},pz:['pc',1.2,1.32,'50% 45%'],acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
  {sc:'Card: tour',d:2*B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo',{quiet:1})}catch(e){console.error(e)}}]]},
  /* the game's own arrival flyover, with its city title */
@@ -112,7 +115,11 @@ function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Collab session');if(!c)r
 function trlWallClear(){const G=TRL.pw;if(!G)return;scene.remove(G);G.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});TRL.pw=null}
 /* counts the listener and follower numbers on screen up from zero */
 function trlCount(u,o){const k=1-Math.pow(1-u,3),pc=$('pc');if(!pc)return;const w=document.createTreeWalker(pc,NodeFilter.SHOW_TEXT);let n;
- while(n=w.nextNode()){const m=/^\s*([\d,]+)(\s+(monthly listeners|followers|likes))\s*$/.exec(n.nodeValue);if(!m)continue;if(n.trlN==null)n.trlN=o&&o[m[3]]!=null?o[m[3]]:+m[1].replace(/,/g,'');n.nodeValue=Math.round(n.trlN*k).toLocaleString()+m[2]}}
+ /* o maps a label to a target, or to [from, to]; without o the number on screen counts up from zero */
+ const val=(key,real)=>{const t=o&&o[key]!=null?o[key]:real;return Math.round(Array.isArray(t)?t[0]+(t[1]-t[0])*k:t*k)};
+ while(n=w.nextNode()){if(n.trlT==null)n.trlT=n.nodeValue;const v=n.trlT;let m=/^(\s*)([\d,]+)(\s+(monthly listeners|followers|likes))\s*$/.exec(v);
+  if(m){n.nodeValue=m[1]+val(m[4],+m[2].replace(/,/g,'')).toLocaleString()+m[3];continue}
+  m=/^(\s*Fame Level\s+)(\d+)(.*)$/.exec(v);if(m&&o&&o.fame)n.nodeValue=m[1]+val('fame',+m[2])+m[3]}}
 function trlCam(A,B2,e){return u=>{const k=(e||trlE.s)(u),m=(a,b)=>a.map((v,i)=>v+(b[i]-v)*k);return{p:m(A[0],B2[0]),l:m(A[1],B2[1]),f:A[2]+(B2[2]-A[2])*k}}}
 
 /* ---------- a fresh career for the trailer, so no real save is ever used ---------- */

@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.10.0';
+const GAME_VERSION='v49.11.0';
 const VERSION_HISTORY=[
+ {v:'v49.11.0',n:'Trailer: your rise is now gradual. Three Spotifly check-ins through the montage each pick up where the last left off (1K to 48K, 48K to 640K, 640K to 3.8M listeners, with followers and Fame Level climbing too), and the Instagrime post sits at 21K likes, so you have millions by the time you take it on tour. The drive and festival shots are shorter to make room.'},
  {v:'v49.10.0',n:'Trailer: the character creator now flicks through looks with the Randomize button (no pointer). The opening shows the climb from nothing: naming yourself, a first song in the studio (the Mix step), then your first 1,284 listeners and 37 followers counting up. The Money runs out card is gone, and How far can you go? is one card. When the music cuts out at 1:16 the picture snaps to black until the end card at 1:20.'},
  {v:'v49.9.2',n:'Trailer: the studio plaques go up once a second, on the hits, Gold to Billions Club, and the end card text lands on the beat, one line a second from 1:20.'},
  {v:'v49.9.1',n:'Trailer: the studio plaques now go up exactly on each beat (the game only rebuilt its plaque wall every 2 seconds, so the trailer puts up its own).'},
