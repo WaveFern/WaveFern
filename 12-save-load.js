@@ -44,8 +44,10 @@ function isTrlCareer(code){try{const x=scDecode(code).S;return!!x&&(x.songs||[])
    that was there as a backup ("Backup from career N"), and that goes back in the slot. A trailer career with no backup is cleared */
 function trlRepair(){if(FW_TRL)return;try{for(const n of [1,2]){const k=slotKey(n),c=localStorage.getItem(k);if(!c||!isTrlCareer(c))continue;
   /* backups fill the first free spot, so the latest one kept for this slot has the highest number */
-  let best=null,bd=0,bk=0;for(let i=1;i<=BK_MAX;i++){const b=localStorage.getItem('fw_bak_'+i),w=localStorage.getItem('fw_bakw_'+i)||'';if(!b||isTrlCareer(b)||w!='Backup from career '+n)continue;
-   try{bd=scDecode(b).S.day||0}catch(e){continue}best=b;bk=i}
+  /* the latest one labelled for this slot wins; failing that, the latest real career in the backups that is not already in a slot */
+  const inSlot=[1,2].map(m=>{try{return scDecode(localStorage.getItem(slotKey(m))).S.artist}catch(e){return null}});
+  let best=null,bd=0,bk=0,lab=false;for(let i=1;i<=BK_MAX;i++){const b=localStorage.getItem('fw_bak_'+i),w=localStorage.getItem('fw_bakw_'+i)||'';if(!b||isTrlCareer(b))continue;
+   let x;try{x=scDecode(b).S}catch(e){continue}const mine=w=='Backup from career '+n;if(lab&&!mine)continue;if(!mine&&inSlot.includes(x.artist))continue;best=b;bk=i;bd=x.day||0;lab=lab||mine}
   if(!best){localStorage.removeItem(k);continue}
   localStorage.setItem(k,best);localStorage.removeItem('fw_bak_'+bk);localStorage.removeItem('fw_bakw_'+bk);
   try{const a=scDecode(best).S.artist||'your career';sessionStorage.setItem('fw_msg','Restored '+a+' (Day '+bd+'). The trailer page had saved over it, sorry about that.')}catch(e){}}}catch(e){console.warn('trailer repair',e)}}
