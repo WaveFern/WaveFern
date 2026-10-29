@@ -10,8 +10,8 @@
    Nothing is saved in trailer mode: it runs on a fresh career, and your own careers and cloud save are never touched. */
 const TRL={on:!!(window.FW_TRAILER||/[?&]trailer\b/.test(location.search)),run:0,T:0,t0:0,i:-1,shots:[],len:0,
  opt:{music:1,cap:1},name:'',song:'Night Bus',aud:null,zoom:0,cur:null,typ:null,scr:null,art:-1,
- SRC:'assets/trailer.mp3',MO:0,DROP:24,BAR:2,BEAT:.5};
-/* the trailer track (120 BPM): a quiet build to 0:24, the drop, a breakdown at 0:56, back in at 1:08, a final bit at 1:20 */
+ SRC:'assets/trailer.mp3',MO:0,DROP:40,BAR:2,BEAT:.5};
+/* the trailer track (120 BPM): drums in at 0:16, the drop at 0:40, a breakdown at 1:12, back in at 1:24, a dead stop at 1:32, a final bit at 1:36 */
 
 /* ---------- all game audio is muted on the trailer page: only the trailer track plays ---------- */
 if(TRL.on){
@@ -55,23 +55,23 @@ function trlShow(){if(TRL.showOn)return;TRL.showOn=1;try{trlStar();if(!DCITY.on|
 function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  const L=[
  /* before the drop: short bursts of the real start of a career, each fading to black, between cards that set up the game and what stands in your way */
- {sc:'Card: bedroom',d:2.5,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
- {sc:'Make a character',d:3,pre:1,show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
+ {sc:'Card: bedroom',d:4,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
+ {sc:'Make a character',d:6,pre:1,show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
   /* the Randomize button flicks through looks (no pointer), landing on the look the rest of the trailer uses */
-  acts:[...[.1,.35,.6,.85,1.1,1.35,1.6,1.85,2.1,2.35].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[2.6,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
+  acts:[...[.15,.55,.95,1.35,1.75,2.15,2.55,2.95,3.35,3.75,4.15,4.55,4.95].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[5.35,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
  {sc:'Card: start',d:2,pre:1,card:'$100. A LAPTOP.<br>ZERO FANS.'},
- {sc:'Artist name',d:3,pre:1,show:['ui'],pz:['pc',1.35,1.4,[[0,'4% 12%'],[.6,'4% 12%'],[.74,'96% 12%'],[.84,'96% 12%'],[.97,'4% 12%']]],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
-  acts:[[.1,()=>trlClick(()=>$('an'),.45,()=>{const i=$('an');if(i)i.focus()})],[.6,()=>trlType(()=>$('an'),TRL.name||'WaveFern')],[2,()=>trlClick(()=>trlQ('#pc button',/Create profile/),.4)]]},
+ {sc:'Artist name',d:4,pre:1,show:['ui'],pz:['pc',1.35,1.4,[[0,'4% 12%'],[.62,'4% 12%'],[.74,'96% 12%'],[.86,'96% 12%'],[.97,'4% 12%']]],set(){trlClear();trlHome();S.t=40;trlPut(6,2.9,Math.PI);S.artist='';openPC();app=1;smo=0;pcR()},
+  acts:[[.1,()=>trlClick(()=>$('an'),.45,()=>{const i=$('an');if(i)i.focus()})],[.7,()=>trlType(()=>$('an'),TRL.name||'WaveFern')],[2.75,()=>trlClick(()=>trlQ('#pc button',/Create profile/),.45)]]},
  /* on your own in the studio: the Mix step, holding the level in the green band */
- {sc:'First take',d:2,pre:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(2);rec.wait=0;rec.cdn=0;rec.cgo=0;rec.x.lv=.45}catch(e){}},mix:1},
+ {sc:'First take',d:4,pre:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(2);rec.wait=0;rec.cdn=0;rec.cgo=0;rec.x.lv=.45}catch(e){}},mix:1},
 /* the first song and its first few listeners */
- {sc:'First streams',d:2,pre:1,show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
- {sc:'Message an artist',d:2.5,pre:1,show:['ui'],pz:['pc',1.22,1.3,'62% 62%'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
-  acts:[[.1,()=>trlClick(()=>$('cin'),.4,()=>{const i=$('cin');if(i)i.focus()})],[.5,()=>trlType(()=>$('cin'),'love your stuff. collab?')],[1.85,()=>trlClick(()=>trlQ('#pc button',/^Send$/),.35)]]},
- {sc:'Collab meeting',d:3.5,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
+ {sc:'First streams',d:4,pre:1,show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
+ {sc:'Message an artist',d:4,pre:1,show:['ui'],pz:['pc',1.22,1.3,'62% 62%'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+  acts:[[.2,()=>trlClick(()=>$('cin'),.5,()=>{const i=$('cin');if(i)i.focus()})],[.8,()=>trlType(()=>$('cin'),'love your stuff. collab?')],[2.9,()=>trlClick(()=>trlQ('#pc button',/^Send$/),.45)]]},
+ {sc:'Collab meeting',d:6,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
    /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o)}catch(e){}}},zoom:6,
-  acts:[[.3,()=>trlClick(()=>trlQ('#ui .mto'),.55)]]},
- {sc:'Card: how far',d:3,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
+  acts:[[.4,()=>trlClick(()=>trlQ('#ui .mto'),.6)],[2.4,()=>trlClick(()=>trlQ('#ui .mto'),.6)],[4.3,()=>trlClick(()=>trlQ('#ui .mto'),.6)]]},
+ {sc:'Card: how far',d:5.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
  {sc:'Silence',d:.5,card:' '},
  /* the drop: the city from above, the one shot not tied to the player */
  {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},

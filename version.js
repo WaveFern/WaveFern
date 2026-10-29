@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.11.1';
+const GAME_VERSION='v49.12.0';
 const VERSION_HISTORY=[
+ {v:'v49.12.0',n:'Trailer: the new, longer soundtrack (1:44) is in, and the trailer is cut to it. The opening now runs 40 seconds so every early shot has room: the bedroom card, randomizing a character, $100 and a laptop, naming yourself, a first song, your first listeners, messaging an artist and the full collab meeting, then How far can you go? before the drop at 0:40. The breakdown is at 1:12, Tokyo at 1:16, the stadium at 1:24, black at 1:32 and the end card at 1:36.'},
  {v:'v49.11.1',n:'Trailer: the Internet is watching card is gone (the collab meeting gets its time), and the fades in and out of black before the drop are quicker so less of each shot is lost.'},
  {v:'v49.11.0',n:'Trailer: your rise is now gradual. Three Spotifly check-ins through the montage each pick up where the last left off (1K to 48K, 48K to 640K, 640K to 3.8M listeners, with followers and Fame Level climbing too), and the Instagrime post sits at 21K likes, so you have millions by the time you take it on tour. The drive and festival shots are shorter to make room.'},
  {v:'v49.10.0',n:'Trailer: the character creator now flicks through looks with the Randomize button (no pointer). The opening shows the climb from nothing: naming yourself, a first song in the studio (the Mix step), then your first 1,284 listeners and 37 followers counting up. The Money runs out card is gone, and How far can you go? is one card. When the music cuts out at 1:16 the picture snaps to black until the end card at 1:20.'},
