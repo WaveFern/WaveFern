@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.15.0';
+const GAME_VERSION='v49.16.0';
 const VERSION_HISTORY=[
+ {v:'v49.16.0',n:'Trailer: the message is just "collab?" and the camera no longer zooms in on the reply. A new shot places furniture in your room, so the "How far can you go?" card is shorter. The plaques are now a cutscene of your studio wall, each one lifted into place on the hit. Instagrime gets floating hearts over the post, marked as non-gameplay footage.'},
  {v:'v49.15.0',n:'The game is now called WaveFern Studios (title screen, page titles, wiki and trailer end card). Trailer: the stage 4 to 1 festival run is now the game\'s own gameplay view, with the crowd growing on each stage. The message scene zooms in on the message as you type it, pulls back as you send, then zooms in on their reply, with quick smooth keyframes.'},
  {v:'v49.14.1',n:'Trailer: wavefern.com/trailer now goes straight to the Ready card (press Space to roll) instead of the scene menu. The menu is still at wavefern.com/trailer/?menu.'},
  {v:'v49.14.0',n:'Trailer: the opening is now the character, a first song (the Mix step), your first listeners, then you message an artist yourself (the chat starts empty, you ask to collab and they say yes), then the collab meeting. Naming yourself on Spotifly is gone. The plaques go up while you record alone in your studio, one a second. The Mix step is played like a person, reacting a moment late, drifting off the band and correcting, and the beat bar hits are a little early or late instead of dead centre.'},
