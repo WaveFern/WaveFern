@@ -68,8 +68,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'First streams',d:2,pre:1,show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
  {sc:'Message an artist',d:2.5,pre:1,show:['ui'],pz:['pc',1.22,1.3,'62% 62%'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   acts:[[.1,()=>trlClick(()=>$('cin'),.4,()=>{const i=$('cin');if(i)i.focus()})],[.5,()=>trlType(()=>$('cin'),'love your stuff. collab?')],[1.85,()=>trlClick(()=>trlQ('#pc button',/^Send$/),.35)]]},
- {sc:'Card: internet',d:1.5,pre:1,card:'THE INTERNET<br>IS WATCHING.'},
- {sc:'Collab meeting',d:2,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
+ {sc:'Collab meeting',d:3.5,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
    /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o)}catch(e){}}},zoom:6,
   acts:[[.3,()=>trlClick(()=>trlQ('#ui .mto'),.55)]]},
  {sc:'Card: how far',d:3,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
@@ -186,7 +185,7 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  if(s.plq)trlPlaques(T)}
 function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);
  /* the build: every burst and card fades up from black and back down into it */
- {const f=$('trlfd');if(f){let o=0;if(s.pre){const lt=TRL.T-s.t,fi=s.card?.25:.3,fo=s.card?.3:.45;o=Math.max(0,1-lt/fi,1-(s.d-lt)/fo)}f.style.opacity=Math.min(1,o)}}
+ {const f=$('trlfd');if(f){let o=0;if(s.pre){const lt=TRL.T-s.t,fi=s.card?.15:.15,fo=s.card?.2:.25;o=Math.max(0,1-lt/fi,1-(s.d-lt)/fo)}f.style.opacity=Math.min(1,o)}}
  if(s.cam){const c=s.cam(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)));const C=TRL.cam=TRL.cam||new THREE.PerspectiveCamera(45,1,.1,2600);C.position.set(...c.p);C.lookAt(...c.l);C.fov=c.f;C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}if(s.tick)s.tick(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)))}
 {const u0=update;update=function(dt){if(TRL.run){try{trlPre(dt)}catch(e){console.error('trailer',e)}}u0(dt);if(TRL.run){try{trlPost(dt)}catch(e){console.error('trailer',e)}}}}
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){const s=TRL.run&&TRL.shots[TRL.i];if(s&&s.cam&&TRL.cam&&sc===scene&&c===cam)return r0(sc,TRL.cam);return r0(sc,c)}}
