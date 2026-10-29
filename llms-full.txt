@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.20.1. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.22.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -2335,9 +2335,11 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.20.1. This list is read live from the game, so it is always current.
+The game is on v49.22.0. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.22.0	Wiki: the Credits page has a new section, The name, on how WaveFern was nearly called FernWave and the idea behind that name. The FAQ answers why the game is called WaveFern.
+v49.21.0	Trailer: "How far can you go?" is now 4 seconds into the drop, a word every two beats (HOW, FAR, CAN YOU, GO?). The opening steps were retimed so every cut lands on a bar line: 0:04 artist, 0:10 record, 0:16 release (as the drums come in), 0:20 fans, 0:26 message, 0:32 meeting, 0:36 the card. The plaque wall is a dark charcoal instead of cream.
 v49.20.1	The last leftover old name in the version history now says WaveFern, and the wiki's title screen picture shows the WaveFern name.
 v49.20.0	Trailer: every opening step is 4 seconds on the bars, and "How far can you go?" holds until the drop. Gain fans is now the morning results after a night's sleep (streams and listeners counting up) instead of a second laptop page. The plaques hang on a clean cream wall that runs past both edges of the shot. The main stage stays solid in the festival crowd shot. On the street, people near your path step over to the building side, so you never walk into anyone.
 v49.19.0	The game is called just WaveFern everywhere: the title screen, loading screen, trailer end card, wiki and every page title. Page titles, descriptions and share previews now say what WaveFern is (a free music career game you play in your browser), and the share picture shows the new name.
@@ -2766,12 +2768,19 @@ From the WaveFern Wiki
 WaveFern
 Game	James Hutchinson and Rowan Burton
 Music	Rowan Burton
+First name	FernWave
 
 WaveFern was made by James Hutchinson and Rowan Burton.
 
 Game
 
 James Hutchinson and Rowan Burton.
+
+The name
+
+WaveFern was nearly called FernWave. James forgot the name and called the game WaveFern instead (with Rowan), and WaveFern stuck.
+
+The idea behind FernWave: a fern starts as a tiny curled-up shoot and slowly unfurls into something big, the way a career in the game starts with one song in your bedroom. The wave is the sound wave of the music.
 
 Soundtrack
 
@@ -2896,6 +2905,10 @@ There is a secret code. That is all this wiki will say. See Secrets.
 Who made the game?
 
 James Hutchinson and Rowan Burton. See Credits.
+
+Why is it called WaveFern?
+
+It was nearly called FernWave, until that name was forgotten. See The name.
 
 See also
 Your first day

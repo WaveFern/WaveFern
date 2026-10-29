@@ -146,10 +146,12 @@ Object.entries(FIGS).forEach(([k,v])=>{const p=byId(k);if(p)p.figs=v});
 page('secrets','Secrets','meta',{sum:'Things the game does not tell you.',kw:'secret code cheat hidden mystery',body:()=>`
 <p class=lead>There is a secret code somewhere in WaveFern. What it is, where it goes and what it does is a mystery.</p>
 <p>This wiki will not say any more than that. Good luck.</p>`});
-page('credits','Credits','meta',{sum:'Who made WaveFern.',kw:'credits made by james rowan music soundtrack fl studio surge arminator tumfy',body:()=>`
-${IB('WaveFern','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton']])}
+page('credits','Credits','meta',{sum:'Who made WaveFern.',kw:'credits made by james rowan music soundtrack fl studio surge arminator tumfy name fernwave fern wave why called',body:()=>`
+${IB('WaveFern','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton'],['First name','FernWave']])}
 <p class=lead>WaveFern was made by James Hutchinson and Rowan Burton.</p>
 ${H2('Game')}<p>James Hutchinson and Rowan Burton.</p>
+${H2('The name','name')}<p>WaveFern was nearly called FernWave. James forgot the name and called the game WaveFern instead (with Rowan), and WaveFern stuck.</p>
+<p>The idea behind FernWave: a fern starts as a tiny curled-up shoot and slowly unfurls into something big, the way a career in the game starts with one song in your bedroom. The wave is the sound wave of the music.</p>
 ${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.image-line.com/fl-studio/" target=_blank rel=noopener>FL Studio</a>, using its stock plugins, and <a href="https://surge-synthesizer.github.io/" target=_blank rel=noopener>Surge XT</a>, <a href="https://www.looperman.com/free-music-software/detail/krakli-software-arminator-2" target=_blank rel=noopener>Arminator 2</a> plus <a href="https://tumfy.net/" target=_blank rel=noopener>tumfy</a>'s free kits.</p>
 <p>Play the whole soundtrack here. It keeps playing while you read other pages.</p>
 ${ostTable()}
@@ -186,7 +188,8 @@ ${Q('The game is slow on my computer.',`Open Settings and pick a lower graphics 
 ${Q('How do I play with friends?',`Pick Multiplayer on the main menu and create or join a band room with a code. You need to be signed in with Google. See ${L('band-rooms','Band rooms')}.`)}
 ${H2('Other')}
 ${Q('Is there a cheat code?',`There is a secret code. That is all this wiki will say. See ${L('secrets')}.`)}
-${Q('Who made the game?',`James Hutchinson and Rowan Burton. See ${L('credits')}.`)}`});
+${Q('Who made the game?',`James Hutchinson and Rowan Burton. See ${L('credits')}.`)}
+${Q('Why is it called WaveFern?',`It was nearly called FernWave, until that name was forgotten. See ${L('credits/name','The name')}.`)}`});
 
 /* ===================== Contact: a form that sends through Web3Forms, so the address never appears on the site.
    CONTACT_KEY is the Web3Forms access key (safe to be public). While it is empty the page says the form is not open yet. */
