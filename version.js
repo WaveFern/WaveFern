@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.9.2';
+const GAME_VERSION='v49.10.0';
 const VERSION_HISTORY=[
+ {v:'v49.10.0',n:'Trailer: the character creator now flicks through looks with the Randomize button (no pointer). The opening shows the climb from nothing: naming yourself, a first song in the studio (the Mix step), then your first 1,284 listeners and 37 followers counting up. The Money runs out card is gone, and How far can you go? is one card. When the music cuts out at 1:16 the picture snaps to black until the end card at 1:20.'},
  {v:'v49.9.2',n:'Trailer: the studio plaques go up once a second, on the hits, Gold to Billions Club, and the end card text lands on the beat, one line a second from 1:20.'},
  {v:'v49.9.1',n:'Trailer: the studio plaques now go up exactly on each beat (the game only rebuilt its plaque wall every 2 seconds, so the trailer puts up its own).'},
  {v:'v49.9.0',n:'Trailer: in the studio after the drop, a plaque goes up on the wall on every beat of the song, Gold to Platinum to Diamond to Billions Club, until the wall is full. The solo studio shot before the drop now plays the Mix step (holding the level in the green band) instead of the beat bar. The soundtrack is unchanged.'},
