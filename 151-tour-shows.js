@@ -131,6 +131,8 @@ function enterConcourse(C){snd('pop');D.goRoom('conc',1104,10.5,Math.PI);say((C.
 function backstage(C,k){const why=canStart(C,k);if(why&&!/^Shows start|^Too tired/.test(why)){snd('err');return say('Security: "'+why+'"')}D.goRoom('dress',1178,8.6,Math.PI);say(why?why:'Your dressing room. Plan the show at the setlist board, then walk out on stage.')}
 function clubDoor(C){const why=canStart(C,'club');if(why&&!/^Shows start|^Too tired/.test(why)){snd('err');return say('Door staff: "'+why+'"')}prepUI(C,'club',0)}
 D.startShow=k=>{const C=D.C;if(C)startShow(C,k)};
+/* the trailer cuts in after the walk-out: skip the countdown so the first song is already playing */
+D.showSkipIntro=()=>{if(SH&&SH.state=='intro')SH.stT=STATES.intro};
 
 /* ---------- the venue for the show (built when the show starts, taken down after) ---------- */
 const AX=2400,AZ=0;/* local position of the show venue */

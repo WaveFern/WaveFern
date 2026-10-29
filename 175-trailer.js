@@ -114,7 +114,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Card: tour',d:2*B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo',{quiet:1})}catch(e){console.error(e)}}]]},
  /* the game's own arrival flyover, with its city title */
  {sc:'Tokyo',d:4*B,show:['dscut'],set(){/* the city is built under the card; arriving again just runs the flyover */try{DCITY.arrive('tyo')}catch(e){console.error(e)}},acts:[[4*B-.8,()=>{trlShow();const k=$('trlblk');if(k)k.innerHTML=''}]],/* a beat of black while the show loads, before the stadium slams in */tick(u){if(u>=1-.8/(4*B)){const k=$('trlblk');if(k)k.style.display='flex'}}},
- {sc:'Stadium',d:2*B,show:[],set(){if(mode!='dshow')trlShow()},/* hold black until the show is up */tick(){const k=$('trlblk');if(k)k.style.display=mode=='dshow'?'none':'flex'},cam:u=>{const k=trlE.s(u);/* from the crowd, pushing in on you on stage */return{p:[P.x+3.2-k*2.2,2.1-k*.3,P.z+16-k*9],l:[P.x,2.3,P.z],f:44}}},
+ {sc:'Stadium',d:2*B,show:[],set(){if(mode!='dshow')trlShow()},/* hold black until the show is up */tick(){const k=$('trlblk');if(k)k.style.display=mode=='dshow'?'none':'flex';try{DCITY.showSkipIntro()}catch(e){}},cam:u=>{const k=trlE.s(u);/* from just over the crowd's heads, pushing in on you on stage */return{p:[P.x+3.2-k*2.2,3.8-k*.9,P.z+16-k*9],l:[P.x,2.4,P.z],f:44}}},
  {sc:'Stadium wide',d:2*B,show:[],set(){trlShow()},cam:u=>{const k=trlE.s(u);/* rising back over the whole crowd */return{p:[P.x-6+k*14,4+k*24,P.z+24+k*40],l:[P.x,3,P.z+6],f:52}}},
  /* the music cuts out at 1:16: snap to black until the final bit */
  {sc:'Black',d:2*B,card:' '},
@@ -196,11 +196,11 @@ function trlDay(s){const e=$('trlday');if(!e)return;if(!s||!s.day){if(e.dataset.
  const lt=TRL.T-s.t,b=TRL.BEAT;if(e.dataset.on!=String(s.t)){e.dataset.on=String(s.t);e.style.display='block';
   e.innerHTML=`<div class="dbox"><h2>☀ Day 2</h2><p>Yesterday's results, paid now:</p><div class="dcards">
    <div class="dc"><small>Streams</small><b id="trldS">+0</b></div><div class="dc"><small>Earned</small><b id="trldE">$0.00</b></div>
-   <div class="dc"><small>Monthly listeners</small><b id="trldL">0 → 0</b><i id="trldN">+0</i></div><div class="dc"><small>Interest</small><b>6%</b></div></div>
+   <div class="dc"><small>Monthly listeners</small><b id="trldL">0 → 0</b><i id="trldN">+0</i></div><div class="dc"><small>Interest</small><b id="trldI">0%</b></div></div>
    <p class="dm">1 new release boosted interest. Streams build up through the day and faster at night.</p><span class="dgo">Start the day</span></div>`}
  const x=e.querySelector('.dbox');if(x)x.classList.toggle('in',lt>=0);e.querySelectorAll('.dc').forEach((c,i)=>c.classList.toggle('in',lt>=(1+i)*b));
  const k=Math.max(0,Math.min(1,(lt-5*b)/(5*b))),c=1-Math.pow(1-k,3),f=n=>Math.round(n*c).toLocaleString(),set=(id,t)=>{const y=$(id);if(y)y.textContent=t};
- set('trldS','+'+f(1840));set('trldE','$'+(7.36*c).toFixed(2));set('trldL','0 → '+f(1284));set('trldN','+'+f(1284));
+ set('trldS','+'+f(1840));set('trldE','$'+(7.36*c).toFixed(2));set('trldL','0 → '+f(1284));set('trldN','+'+f(1284));set('trldI',Math.round(38*c)+'%');
  const L=e.querySelectorAll('.dc')[2];if(L)L.classList.toggle('hit',k>=1)}
 /* people on the pavement step aside for you: anyone near the line you are walking drifts over to the building side of it
    (behind you from the camera, so nobody blocks the shot), and fans stay put. On a shot's first frame they are already there. */
