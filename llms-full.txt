@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.24.13. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.24.14. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -2353,9 +2353,10 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.24.13. This list is read live from the game, so it is always current.
+The game is on v49.24.14. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.24.14	Wiki: source file names in References are plain text now, without links out to the code.
 v49.24.13	Wiki: The name section on the Credits page is shorter and no longer says who first came up with FernWave.
 v49.24.12	Fix: the trailer page no longer loads Google sign-in, so it can never upload its career over your cloud save, and a cloud save that is a trailer career is never loaded (this device uploads your real career over it). The profile picture falls back to your initial if Google does not send the image. Trailer: no cars in your lane on the drive shot.
 v49.24.11	Trailer: the Day 2 screen now shows monthly listeners going from 946 to 2,230 and interest at 84%.

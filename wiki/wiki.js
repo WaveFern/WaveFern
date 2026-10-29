@@ -30,7 +30,7 @@ const T=(cols,rows,o={})=>{const id='t'+(++TID);
  const body=rows.map(r=>'<tr>'+r.map((c,i)=>{const k=Array.isArray(cols[i])?cols[i][1]:'',[h,v]=Array.isArray(c)?c:[c,c];return `<td class="${k=='n'?'n':''}" data-v="${esc(typeof v=='number'?v:String(v).replace(/<[^>]+>/g,''))}">${h}</td>`}).join('')+'</tr>').join('');
  return (o.filter?`<div class=tf><input data-f="${id}" placeholder="Filter ${rows.length} rows..." aria-label="Filter table"><span class=m></span></div>`:'')+
   `<div class="tw${o.tall?' tall':''}"><table class=t id=${id}><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`};
-const src=f=>`<a href="https://github.com/WaveFern/WaveFern/blob/main/${f}" target=_blank rel=noopener><code>${f}</code></a>`;
+const src=f=>`<code>${f}</code>`;
 
 /* game helpers */
 const fameAt=lv=>(D.fame&&D.fame.starts[lv-1])||0;
