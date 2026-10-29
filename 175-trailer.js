@@ -299,9 +299,12 @@ function trlPlay(k){const n=$('trln'),s=$('trls');
  /* scenes after the creator need a career: make the fresh one now, and the star one for scenes after the drop */
  if(TRL.k0>1){trlFresh();trlName()}if(TRL.shots[TRL.k0].t>=TRL.DROP)trlStar();
  document.body.classList.add('trlon');const o=trlOverlay();const blk=$('trlblk');blk.style.display='flex';blk.innerHTML='';
- const h=document.createElement('div');h.className='qhint box';h.id='trlh';h.innerHTML='<b>Ready.</b> Start your screen recording, then press <b>Space</b>.<br><small class=m>Esc stops it.</small>';o.appendChild(h);
- const go=e=>{if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();removeEventListener('keydown',go,true);return trlStop()}if(e.key!==' '&&e.key!=='Enter')return;e.preventDefault();e.stopImmediatePropagation();removeEventListener('keydown',go,true);trlFull();trlRoll()};
- addEventListener('keydown',go,true)}
+ const h=document.createElement('div');h.className='qhint box';h.id='trlh';h.innerHTML='<b>Ready.</b> Start your screen recording, then press <b>Space</b> or tap the screen.<br><small class=m>Esc stops it.</small>';o.appendChild(h);
+ /* Space or Enter starts it, or a tap or click (phones and tablets have no Space key) */
+ const off=()=>{removeEventListener('keydown',go,true);removeEventListener('pointerdown',tap,true)},
+  go=e=>{if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();off();return trlStop()}if(e.key!==' '&&e.key!=='Enter')return;e.preventDefault();e.stopImmediatePropagation();off();trlFull();trlRoll()},
+  tap=e=>{e.preventDefault();e.stopImmediatePropagation();off();trlFull();trlRoll()};
+ addEventListener('keydown',go,true);addEventListener('pointerdown',tap,true)}
 function trlRoll(){const h=$('trlh');if(h)h.remove();const s0=TRL.shots[TRL.k0];
  setTimeout(()=>{TRL.t0=performance.now()-s0.t*1000;TRL.run=1;TRL.i=-1;
   if(TRL.opt.music){try{const a=TRL.aud=TRL.aud||new Audio(TRL.SRC);a.muted=false;a.volume=1;const sync=()=>{try{a.currentTime=TRL.MO+Math.max(0,(performance.now()-TRL.t0)/1000)}catch(e){}};
