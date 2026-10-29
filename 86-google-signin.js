@@ -11,7 +11,7 @@ const FB_CFG={
  appId:'1:696041816952:web:d3ce1fbc7a33e36f8ebe8d',
  measurementId:'G-4PMWS9D7BV'
 };
-const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey);
+const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL;
 let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
@@ -82,7 +82,9 @@ function csCheck(){const uid=FBU&&FBU.uid;if(!uid)return;
 /* b is the same career as a and at least as far along, so replacing a with b loses nothing */
 function csCovers(a,b){if(!a||a==b)return true;try{const x=scDecode(a).S,y=scDecode(b).S;return x.artist==y.artist&&(y.day||0)>=(x.day||0)}catch(e){return false}}
 function csAhead(a,b){try{const x=scDecode(a).S,y=scDecode(b).S;return x.artist==y.artist&&(x.day||0)>(y.day||0)}catch(e){return false}}
-function csLoad(c){const uid=FBU&&FBU.uid;if(!csReady())return setTimeout(()=>{if(FBU&&FBU.uid==uid)csLoad(c)},700);
+/* v49.24.12: the trailer page used to upload its own career over a signed-in player's cloud save. A cloud save that is a trailer
+   career is never loaded: this device keeps its career and uploads it over the trailer one instead */
+function csLoad(c){const uid=FBU&&FBU.uid;if(c&&isTrlCareer(c.code)){CLD.ok=1;csSetMark(c.t);fbRedraw();setTimeout(()=>csPush(1),50);return}if(!csReady())return setTimeout(()=>{if(FBU&&FBU.uid==uid)csLoad(c)},700);
  let cur=null;try{cur=csGame()?saveCode():localStorage.getItem(slotKey())}catch(e){}
  if(cur&&!csCovers(cur,c.code)&&!bakKeep(cur,'Kept before your cloud save loaded')){CLD.err='No room to back up this career, so the cloud save was not loaded.';return fbRedraw()}
  if(mode=='pause')resumeGame();loadCode(c.code);if(!FBU)return;CLD.ok=1;CLD.last=c.code;csSetMark(c.t);autoSave();say('☁ Loaded your cloud save (Day '+c.day+')');fbRedraw()}
@@ -105,7 +107,7 @@ const TT={on:0,game:0};
 function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionStorage.removeItem('fw_msg');say(m)}}catch(e){}}
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
- const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'Cloud save on':'Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><span><b>Guest</b><small>Saves on this device</small></span></div>`;
+ const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:${esc(JSON.stringify((nm[0]||'?').toUpperCase()))}}))">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'Cloud save on':'Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><span><b>Guest</b><small>Saves on this device</small></span></div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN</h1><div class=px>Music Career Sim</div><div class=ttbx>
   <button class=go onclick="ttWorlds()" ${busy?'disabled':''}>${busy?'Loading your save…':'Play'}</button>
   <button onclick="ttSet()">Settings</button><button onclick="ttWiki()">Wiki</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game</div></div>`}

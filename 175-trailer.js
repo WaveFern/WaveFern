@@ -28,7 +28,14 @@ function trlKeys(k){for(const q in keys)delete keys[q];(k||'').split('').forEach
 function trlQ(sel,re){const L=[...document.querySelectorAll(sel)];return re?L.find(e=>re.test(e.textContent.trim())):L[0]}
 /* keep the way clear: nobody walks into the player and no car is in the lane while driving */
 function trlPath(L){TRL.hid=TRL.hid||[];[typeof NPC!='undefined'?NPC:[],typeof VPED!='undefined'?VPED:[]].forEach(A=>A.forEach(n=>{if(n.m&&n.m.visible&&Math.abs(n.z-P.z)<2.2&&Math.abs(n.x-P.x)<L){n.m.visible=false;TRL.hid.push(n)}}))}
-function trlRoad(c){try{TRAF.forEach(t=>{if(Math.abs(t.z-c.z)<4&&t.x>c.x-30&&t.x<c.x+140)t.x+=600})}catch(e){}trlPath(60)}
+/* v49.24.12: no car is ever in your lane on the drive shot. Any car on your side of the road, or on a side street about to cross it,
+   from just behind you to well past the end of the shot goes to a far-off street, on the first frame and every frame after, so one turning in ahead never reaches you */
+function trlLane(c){try{TRAF.forEach(t=>{if(t===c)return;const dz=Math.abs(t.z-c.z),g=(t.x-c.x)*Math.sign(Math.sin(c.h)||1);if(dz>14||g<-12||g>160)return;
+  /* oncoming cars in the other lane stay; anything in your lane or coming out of a side street goes */
+  if(dz>1.5&&dz<7&&Math.cos((t.h||0)-c.h)<-.7)return;
+  if(t.e&&typeof TG2!='undefined'&&TG2.E.length){for(let k=0;k<20;k++){const[a,e]=pick(TG2.E);t.a=a;t.e=e;t.t=R(0,e.len);carPos(t);if(Math.hypot(t.x-c.x,t.z-c.z)>220)break}t.s=0;t.h=Math.atan2(t.e.ux,t.e.uz);if(t.m)t.m.rotation.y=t.h}else t.x+=600;
+  if(t.m)t.m.position.set(t.x,t.m.position.y,t.z)})}catch(e){}}
+function trlRoad(c){trlLane(c);trlPath(60)}
 /* the game's own on-stage view; the crowd is held at a size that grows from a few dozen in the tent to a packed Main Stage */
 function trlCrowd(c){const f=FEST.set;if(!f)return;f.T=f.C=c;if(f.st&&f.st.cr){f.st.cr.C=c}}
 function trlStage(n){trlClear();trlFestDay();S.t=392;S.energy=100;const s=FSTG.find(q=>q.n==n);if(s)trlPut(s.ix,s.iz,0);try{festStartBooked({n,slot:3,songs:S.songs.slice(-4).map(x=>x.id)})}catch(e){console.error(e)}}
@@ -97,7 +104,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Instagrime',d:B,show:['ui'],set(){trlClear();openPC();app='ig';const q={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap:'new single out now. 50k streams already, thank you',day:S.day,l:21400};S.igPosts.push(q);igp=q;igv='post';smo=0;pcR()},pz:['pc',1.08,1.16,'50% 40%'],ng:1,hearts:1,
   tick(u){trlCount(Math.min(1,u/.7),{likes:[0,21400]});const m=document.querySelector('#pc .mn'),k=Math.max(0,Math.min(1,(u-.25)/.6));if(m)m.scrollTop=Math.round(330*k*k*(3-2*k))}},
   {sc:'Fern Road',d:B,walk:1,show:[],set(){trlClear();S.t=272;trlPut(44,14.2,Math.PI/2);trlPath(30);trlKeys('ds')},cam:u=>{const x=P.x;return{p:[x+7.5,1.25,20.5],l:[x,1.2,14.2],f:42}}},
- {sc:'Drive',d:B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlRoad(c);trlKeys('w')}}},
+ {sc:'Drive',d:B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlRoad(c);trlKeys('w')}},tick(){if(dr)trlLane(dr)}},
  {sc:'Gphone',d:2*b,show:['ph'],set(){trlClear();S.t=268;trlPut(40,14.2,Math.PI/2);try{openPhone()}catch(e){}}},
  {sc:'Crew',d:2*b,crew:1,walk:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlPath(30);trlKeys('ds')},zoom:5.5},
  {sc:'Spotifly: 180K',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.1,1.2,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[48200,640000],followers:[6900,182000],fame:[12,58]})}},
