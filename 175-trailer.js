@@ -71,9 +71,8 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
   acts:[[.3,trlLyr],[2.05,trlLyr],[3.8,trlLyr]]},
  {sc:'Release',d:4,pre:1,cap:'3|RELEASE THEM',show:['ui'],set(){trlClear();trlName();S.t=230;S.drafts=[{id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48}];openPC();app=1;smo=0;pg='upload';pcR()},pz:['pc',1.35,1.5,'30% 22%'],
   acts:[[.35,()=>trlClick(()=>trlQ('#pc .ng button',/^Upload$/),.75)]]},
- /* 4. a night's sleep, and the morning results: the streams and listeners the song brought in */
- {sc:'First streams',d:6,pre:1,cap:'4|GAIN FANS',show:['ui'],set(){trlClear();trlName();S.t=330;S.energy=40;trlPut(3.4,2.9,Math.PI);if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:0,today:0})},
-  acts:[[.15,()=>{try{sleepNow()}catch(e){}}]],tick(u){trlMorning(Math.max(0,Math.min(1,(u-.22)/.45)))}},
+ /* 4. the new day's results, restaged for the trailer (marked non-gameplay): the same cards as the game's morning screen, slammed in on the beat */
+ {sc:'First streams',d:6,pre:1,cap:'4|GAIN FANS',ng:1,day:1,show:[],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:0,today:0})}},
  {sc:'Message an artist',d:6,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.08,'34% 93%',1.9],[.45,'34% 93%',1.9],[.55,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   /* everything on the trailer clock so the zooms meet it: type, send, their answer */
   acts:[[.2,()=>trlClick(()=>$('cin'),.5,()=>{const i=$('cin');if(i)i.focus()})],[.9,()=>trlType(()=>$('cin'),TRL.msg)],
@@ -138,7 +137,7 @@ function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Recording');if(!c)return
   const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),new THREE.MeshLambertMaterial({color:col=='#d8dde3'?'#f4f4f4':col}));d.rotation.x=Math.PI/2;d.position.set(x,y+.08,z+.05);H.add(d);bx(.07,.07,.02,'#141414',x,y+.08,z+.065);bx(.4,.08,.02,'#f4f1e8',x,y-.24,z+.05)}
  TRL.pwL.position.y=-.55;scene.add(G);
  /* what each plaque is, as it goes up */
- const P=[['GOLD','1M'],['PLATINUM','10M'],['DIAMOND','100M'],['BILLIONS CLUB','1B']][Math.min(n-1,3)],q=$('trlpq');if(q){q.innerHTML=`<b style="color:${C[Math.min(n-1,3)]}">${P[0]} PLAQUE</b><small>"${esc(TRL.song||'Night Bus')}" · ${P[1]} STREAMS</small>`;q.classList.remove('pop');void q.offsetWidth;q.classList.add('pop')}}
+ const P=[['GOLD','1M'],['PLATINUM','10M'],['DIAMOND','100M'],['BILLIONS CLUB','1B']][Math.min(n-1,3)],q=$('trlpq');if(q){q.innerHTML=`<b style="color:${C[Math.min(n-1,3)]}">${P[0]} PLAQUE</b><small>"${esc(TRL.song||'Night Bus')}" · ${P[1]} STREAMS</small>`;q.classList.remove('pop');void q.offsetWidth;q.classList.add('pop')}trlFlash(.35);trlShake(.35);trlConfetti(.5,.3,70,1)}
 function trlWallClear(){const G=TRL.pw;TRL.pwL=null;if(!G)return;scene.remove(G);G.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});TRL.pw=null}
 /* counts the listener and follower numbers on screen up from zero */
 function trlCount(u,o){const k=1-Math.pow(1-u,3),pc=$('pc');if(!pc)return;const w=document.createTreeWalker(pc,NodeFilter.SHOW_TEXT);let n;
@@ -165,16 +164,52 @@ function trlClick(get,dur,after){trlMove(get,dur,()=>{const c=TRL.cur;c.el.class
 function trlCap(s){const e=$('trlcap');if(!e)return;const c=s&&s.cap||'';if(e.dataset.c!==c){e.dataset.c=c;const [a,b]=c.includes('|')?c.split('|'):['',c];e.innerHTML=(a?`<i>${a}</i>`:'')+`<span>${esc(b)}</span>`;e.classList.remove('pop');void e.offsetWidth;if(c)e.classList.add('pop')}e.style.display=c?'flex':'none'}
 /* Lyrics: moves to the word that rhymes and presses it, waiting out the last line's feedback first */
 function trlLyr(){const l=rec&&rec.st==1&&rec.l;if(!l)return;if(l.fb>0)return setTimeout(trlLyr,60);const i=l.items[l.i].opts.indexOf(l.items[l.i].right);
- trlClick(()=>document.querySelectorAll('#mg .mgo button')[i],.5,()=>{if(rec&&rec.l===l&&!(l.fb>0))mgPress(i)})}
+ trlClick(()=>document.querySelectorAll('#mg .mgo button')[i],.5,e=>{if(rec&&rec.l===l&&!(l.fb>0)){mgPress(i);const r=e.getBoundingClientRect();trlConfetti((r.left+r.width/2)/innerWidth,r.top/innerHeight,28,.6);trlFlash(.12)}})}
 /* collab meeting: how a reply lands with this artist, the same sum meetPick makes */
 function trlMeetD(t){const M=MEET,p=M.a[5];let d=PREF[p][t];if(t=='cocky'&&S.listeners<M.a[2])d--;if(t=='hype'&&S.t>=300&&(p=='chill'||p=='shy'))d--;if(t=='pro'&&M.m.neg&&p=='formal')d++;return d}
 function trlMeetBest(){const M=MEET;let b=0;M.opts.forEach((o,i)=>{if(trlMeetD(o[0])>trlMeetD(M.opts[b][0]))b=i});return b}
 /* each new set of replies is dealt again until one of them is a good answer, so every pick can land */
 function trlMeetOpts(){const M=MEET;if(!M||M.k>=M.n||M.rk===M.k)return;M.rk=M.k;let n=0;while(trlMeetD(M.opts[trlMeetBest()][0])<1&&n++<30)M.opts=mtOpts();meetR()}
-function trlMeet(){if(!MEET)return;trlMeetOpts();const i=trlMeetBest();trlClick(()=>document.querySelectorAll('#ui .mto')[i],.7)}
-/* the morning results after the first release, counting up to the trailer's numbers */
-function trlMorning(k){const C=[...document.querySelectorAll('#ui .card')];if(!C.length)return;const e=1-Math.pow(1-k,3),f=n=>Math.round(n*e).toLocaleString(),set=(lbl,txt)=>{const c=C.find(c=>c.firstChild&&c.firstChild.textContent==lbl),b=c&&c.querySelector('b');if(b)b.textContent=txt;const m=c&&c.querySelector('small');if(m&&lbl=='Monthly listeners')m.textContent='+'+f(1284)};
- set('Streams','+'+f(1840));set('Earned','$'+(7.36*e).toFixed(2));set('Monthly listeners','0 → '+f(1284))}
+function trlMeet(){if(!MEET)return;trlMeetOpts();const i=trlMeetBest();trlClick(()=>document.querySelectorAll('#ui .mto')[i],.7,e=>{const r=e.getBoundingClientRect();e.click();trlConfetti((r.left+r.width/2)/innerWidth,r.top/innerHeight,30,.6);trlFlash(.12)})}
+/* Gain fans: the morning results as a trailer card. Title on the downbeat, a card on each of the next three beats, the numbers
+   climb for two bars, and the listener count lands with a burst */
+function trlDay(s){const e=$('trlday');if(!e)return;if(!s||!s.day){if(e.dataset.on){e.dataset.on='';e.style.display='none';e.innerHTML=''}return}
+ const lt=TRL.T-s.t,b=TRL.BEAT;if(e.dataset.on!=String(s.t)){e.dataset.on=String(s.t);e.style.display='block';
+  e.innerHTML=`<div class="dray"></div><div class="dwrap"><div class="dhd"><span class="dsun">☀</span> DAY 2</div><p class="dsub">YESTERDAY'S RESULTS</p><div class="dcards">
+   <div class="dc"><small>STREAMS</small><b id="trldS">+0</b></div><div class="dc"><small>EARNED</small><b id="trldE">$0.00</b></div>
+   <div class="dc dbig"><small>MONTHLY LISTENERS</small><b id="trldL">0</b><i id="trldN">+0 FANS</i></div></div></div>`}
+ const on=(q,at)=>{const x=e.querySelector(q);if(x&&lt>=at&&!x.classList.contains('in')){x.classList.add('in');trlFlash(.18);trlShake(.25)}};
+ on('.dhd',0);on('.dsub',b);[...e.querySelectorAll('.dc')].forEach((c,i)=>{if(lt>=(2+i)*b&&!c.classList.contains('in')){c.classList.add('in');trlFlash(.15);trlShake(.3)}});
+ const k=Math.max(0,Math.min(1,(lt-5*b)/(4*b))),c=1-Math.pow(1-k,3),f=n=>Math.round(n*c).toLocaleString(),set=(id,t)=>{const x=$(id);if(x)x.textContent=t};
+ set('trldS','+'+f(1840));set('trldE','$'+(7.36*c).toFixed(2));set('trldL',f(1284));set('trldN','+'+f(37)+' FANS');
+ const big=e.querySelector('.dbig');if(big&&k>=1&&!big.classList.contains('pop')){big.classList.add('pop');trlFlash(.45);trlShake(.5);const r=big.getBoundingClientRect();trlConfetti((r.left+r.width/2)/innerWidth,(r.top+r.height/2)/innerHeight,90,1)}
+ const ry=e.querySelector('.dray');if(ry)ry.style.transform=`translate(-50%,-50%) rotate(${(lt*14).toFixed(1)}deg)`}
+
+/* ---------- the juice: flashes, punches, shakes and confetti on the music, on top of the picture ---------- */
+const TRL_CC=['#2fe68a','#ffd23f','#ff4a9a','#6ad5ff','#ffffff','#b07aff'];
+function trlFlash(a){const F=TRL.fx=TRL.fx||{fl:0,sh:0,pu:0,p:[]};F.fl=Math.max(F.fl,a)}
+function trlShake(a){const F=TRL.fx=TRL.fx||{fl:0,sh:0,pu:0,p:[]};F.sh=Math.max(F.sh,a)}
+/* x, y: where on screen (0-1); n pieces; sp: how hard they fly */
+function trlConfetti(x,y,n,sp){const F=TRL.fx=TRL.fx||{fl:0,sh:0,pu:0,p:[]};for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(250+Math.random()*650)*(sp||1);
+ F.p.push({x:x*innerWidth,y:y*innerHeight,vx:Math.cos(a)*v,vy:Math.sin(a)*v-420*(sp||1),s:5+Math.random()*7,r:Math.random()*6,vr:(Math.random()-.5)*14,c:TRL_CC[i%TRL_CC.length],l:1.6+Math.random()*1.2})}}
+function trlFX(dt,s){const F=TRL.fx=TRL.fx||{fl:0,sh:0,pu:0,p:[]},T=TRL.T,b=TRL.BEAT;dt=Math.min(.05,dt||.016);
+ /* a hit on every cut after the drop, bigger on the drop, the main stage, the stadium and the title */
+ if(TRL.fxI!==TRL.i){TRL.fxI=TRL.i;const n=s.sc;if(!s.card&&T>=TRL.DROP-.01&&T<92){trlFlash(.22);trlShake(.2)}
+  if(s.drop){trlFlash(1);trlShake(.8)}if(n=='Festival: Main Stage'){trlFlash(.6);trlShake(.6);trlConfetti(.5,.35,140,1.2)}
+  if(n=='Stadium'){trlFlash(.85);trlShake(.7);trlConfetti(.2,.3,90,1.1);trlConfetti(.8,.3,90,1.1)}
+  if(s.end){trlFlash(.9);trlShake(.6)}if(n.startsWith('Festival: ')&&n!='Festival: Main Stage')trlShake(.35)}
+ /* the beat: the picture punches in on every beat while the music is at full tilt, harder on each bar */
+ const hot=T>=TRL.DROP&&T<72||T>=84&&T<92;const bi=Math.floor((T-TRL.DROP)/b+1e-3);if(hot&&bi!==F.bi){F.bi=bi;F.pu=bi%4==0?1:.5;if(T>=84&&bi%4==0)trlConfetti(Math.random()*.6+.2,.25,40,.9)}
+ if(s.end&&F.eb!==s.t){const lt=T-s.t;if(lt>=0&&F.el!==Math.floor(lt/(2*b))&&lt<8*b){F.el=Math.floor(lt/(2*b));trlShake(.35);trlFlash(.25);if(F.el==0)trlConfetti(.5,.4,160,1.3)}}
+ /* a burst as each Spotifly count lands */
+ if(s.sc.startsWith('Spotifly')&&F.sp!==s.t&&T-s.t>=s.d*.93){F.sp=s.t;trlConfetti(.3,.3,70,1);trlFlash(.3);trlShake(.3)}
+ F.fl*=Math.exp(-dt*7);F.sh*=Math.exp(-dt*9);F.pu*=Math.exp(-dt*10);
+ const fl=$('trlfl');if(fl)fl.style.opacity=F.fl<.01?0:Math.min(1,F.fl).toFixed(3);
+ const c=$('c');if(c){const k=F.sh*18,sx=(Math.random()-.5)*k,sy=(Math.random()-.5)*k,z=1+F.pu*.035;c.style.transform=F.sh<.01&&F.pu<.01?'':`translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) scale(${z.toFixed(4)})`}
+ const cv=$('trlcf');if(!cv)return;if(cv.width!==innerWidth||cv.height!==innerHeight){cv.width=innerWidth;cv.height=innerHeight}const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);
+ F.p=F.p.filter(q=>(q.l-=dt)>0);F.p.forEach(q=>{q.vy+=1100*dt;q.vx*=Math.exp(-dt*1.6);q.vy*=Math.exp(-dt*1.2);q.x+=q.vx*dt;q.y+=q.vy*dt;q.r+=q.vr*dt;
+  g.save();g.translate(q.x,q.y);g.rotate(q.r);g.globalAlpha=Math.min(1,q.l*2);g.fillStyle=q.c;g.fillRect(-q.s/2,-q.s/4,q.s,q.s/2);g.restore()})}
+
 /* people on the pavement step aside for you: anyone near the line you are walking drifts over to the building side of it
    (behind you from the camera, so nobody blocks the shot), and fans stay put. On a shot's first frame they are already there. */
 function trlMakeWay(){const f=TRL.mw!==TRL.i;TRL.mw=TRL.i;NPC.forEach(n=>{const dx=n.x-P.x;if(dx<-2||dx>10||Math.abs(n.z-P.z)>2.2){if(n.trlZ0!=null&&Math.abs(dx)>14){n.z0=n.trlZ0;n.trlZ0=null}return}
@@ -211,13 +246,26 @@ body.trlon>*:not(#c):not(#trl):not(.trlv){visibility:hidden!important}body.trlon
 #trl .qcap{position:absolute;left:50%;top:6%;transform:translateX(-50%);display:none;align-items:stretch;font-family:'Silkscreen',ui-monospace,monospace;font-size:clamp(22px,3.3vw,54px);line-height:1;color:#06210f;background:#2fe68a;border:3px solid #000;box-shadow:5px 5px 0 #000;white-space:nowrap;z-index:2}
 #trl .qcap span{padding:.28em .55em .22em}#trl .qcap i{font-style:normal;display:flex;align-items:center;padding:0 .45em;background:#06210f;color:#2fe68a}
 #trl .qcap.pop{animation:qcapp .3s cubic-bezier(.2,1.5,.4,1)}@keyframes qcapp{0%{transform:translateX(-50%) scale(1.4);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+#trl .qcf{position:absolute;inset:0;z-index:3;pointer-events:none}#trl .qfl{position:absolute;inset:0;background:#fff;opacity:0;z-index:4;pointer-events:none;mix-blend-mode:screen}
+#trl .qday{position:absolute;inset:0;display:none;z-index:1;overflow:hidden;background:radial-gradient(circle at 50% 42%,#14402d 0%,#08160f 55%,#000 100%);font-family:'Silkscreen',ui-monospace,monospace;color:#e8f3ec;text-align:center}
+#trl .qday .dray{position:absolute;left:50%;top:42%;width:240vmax;height:240vmax;background:repeating-conic-gradient(rgba(47,230,138,.10) 0deg 9deg,transparent 9deg 22deg);transform:translate(-50%,-50%)}
+#trl .qday .dwrap{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:min(1100px,92vw)}
+#trl .qday .dhd{font-size:clamp(48px,9vw,150px);line-height:1;color:#ffd23f;text-shadow:5px 5px 0 #6b4a00,10px 10px 0 #000;opacity:0}#trl .qday .dsun{display:inline-block;animation:dspin 6s linear infinite}
+#trl .qday .dsub{font-size:clamp(14px,1.8vw,28px);letter-spacing:.12em;margin:.6em 0 1.2em;opacity:0;color:#bfe9d2}
+#trl .qday .dcards{display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:clamp(10px,1.6vw,26px)}
+#trl .qday .dc{background:#151a17;border:4px solid #000;box-shadow:8px 8px 0 #000,0 0 0 2px #2fe68a inset;padding:clamp(12px,1.6vw,26px);text-align:left;opacity:0}
+#trl .qday .dc small{display:block;font-size:clamp(11px,1.1vw,18px);color:#8aa094;letter-spacing:.08em}#trl .qday .dc b{display:block;font-size:clamp(26px,3.6vw,62px);color:#2fe68a;margin-top:.25em;text-shadow:3px 3px 0 #000}
+#trl .qday .dc i{display:block;font-style:normal;font-size:clamp(13px,1.4vw,22px);color:#ffd23f;margin-top:.3em}
+#trl .qday .dbig{background:#10241a}#trl .qday .dbig.pop{animation:dpop .45s cubic-bezier(.2,1.8,.4,1);box-shadow:8px 8px 0 #000,0 0 0 3px #2fe68a inset,0 0 60px rgba(47,230,138,.55)}
+#trl .qday .in{opacity:1;animation:dslam .32s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes dslam{0%{transform:scale(2.2) rotate(-4deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}@keyframes dpop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}@keyframes dspin{to{transform:rotate(360deg)}}
 #trl .qfd{position:absolute;inset:0;background:#000;opacity:0;z-index:5}
 #trl .qhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;text-align:center;line-height:1.6}
 #trlm{position:fixed;inset:0;z-index:2147483001;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}#trlm .box{width:min(720px,94vw);max-height:92vh;overflow:auto}
 #trlm .trlsc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}#trlm .trlsc button{text-align:left;padding:8px 10px;font-size:13px}#trlm .trlsc small{display:block;opacity:.65}
 #trlm label{display:block;margin:6px 0}#trlm input[type=text]{width:100%;margin-top:4px}#trlm .row2{margin-top:12px}`;document.head.appendChild(st)}
 function trlOverlay(){let o=$('trl');if(o)o.remove();o=document.createElement('div');o.id='trl';
- o.innerHTML=`<div class="qblk" id="trlblk"></div><div class="qfd" id="trlfd"></div><div class="qpq" id="trlpq"></div><div class="qcap" id="trlcap"></div><div class="qnote" id="trlnote">Non-gameplay footage</div><div class="qcur" id="trlcur"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M2 2 L2 24 L7.5 18.5 L11.5 27.5 L15 26 L11 17.2 L18.5 17.2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
+ o.innerHTML=`<div class="qblk" id="trlblk"></div><div class="qfd" id="trlfd"></div><canvas class="qcf" id="trlcf"></canvas><div class="qfl" id="trlfl"></div><div class="qday" id="trlday"></div><div class="qpq" id="trlpq"></div><div class="qcap" id="trlcap"></div><div class="qnote" id="trlnote">Non-gameplay footage</div><div class="qcur" id="trlcur"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M2 2 L2 24 L7.5 18.5 L11.5 27.5 L15 26 L11 17.2 L18.5 17.2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
  document.body.appendChild(o);TRL.cur={el:$('trlcur'),x:innerWidth*.62,y:innerHeight*.7,t0:null};return o}
 function trlShowOnly(ids){document.querySelectorAll('.trlv').forEach(e=>{if(!(ids||[]).includes(e.id))e.classList.remove('trlv')});(ids||[]).forEach(id=>{const e=$(id);if(e)e.classList.add('trlv')})}
 
@@ -244,7 +292,7 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  if(s.mix&&mode=='rec'&&rec&&rec.st==2&&rec.x)trlMixHand(dt);
  /* in the studio a plaque goes up on the wall on every beat */
  if(s.plq)trlPlaques(T);if(s.walk)trlMakeWay()}
-function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);trlHearts(s);{const q=$('trlpq');if(q)q.style.display=s.plq?'block':'none'}trlCap(s);{const n=$('trlnote');if(n)n.style.opacity=s.cam||s.ng?.7:0}
+function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);trlHearts(s);trlDay(s);try{trlFX(dt,s)}catch(e){}{const q=$('trlpq');if(q)q.style.display=s.plq?'block':'none'}trlCap(s);{const n=$('trlnote');if(n)n.style.opacity=s.cam||s.ng?.7:0}
  /* the build: every burst and card fades up from black and back down into it */
  {const f=$('trlfd');if(f){let o=0;if(s.pre){const lt=TRL.T-s.t,fi=s.card?.15:.15,fo=s.card?.2:.25;o=Math.max(0,1-lt/fi,1-(s.d-lt)/fo)}f.style.opacity=Math.min(1,o)}}
  if(s.cam){const c=s.cam(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)));const C=TRL.cam=TRL.cam||new THREE.PerspectiveCamera(45,1,.1,2600);C.position.set(...c.p);C.lookAt(...c.l);C.fov=c.f;C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}if(s.tick)s.tick(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)))}

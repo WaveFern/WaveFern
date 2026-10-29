@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.22.0';
+const GAME_VERSION='v49.23.0';
 const VERSION_HISTORY=[
+ {v:'v49.23.0',n:'Trailer: a dopamine pass. After the drop the picture punches in on every beat and hits on every cut, with big flashes and shakes on the drop, the main stage, the stadium and the title. Confetti bursts when each plaque goes up, when each Spotifly count lands, on right answers in the lyrics and the collab meeting, at the main stage and stadium, and on the end card. Gain fans is now a restaged results screen (marked non-gameplay) like the game\'s new day screen: DAY 2 and each card slam in on the beat, the numbers climb, and the listener count lands with a burst. No sleep scene.'},
  {v:'v49.22.0',n:'Wiki: the Credits page has a new section, The name, on how WaveFern was nearly called FernWave and the idea behind that name. The FAQ answers why the game is called WaveFern.'},
  {v:'v49.21.0',n:'Trailer: "How far can you go?" is now 4 seconds into the drop, a word every two beats (HOW, FAR, CAN YOU, GO?). The opening steps were retimed so every cut lands on a bar line: 0:04 artist, 0:10 record, 0:16 release (as the drums come in), 0:20 fans, 0:26 message, 0:32 meeting, 0:36 the card. The plaque wall is a dark charcoal instead of cream.'},
  {v:'v49.20.1',n:'The last leftover old name in the version history now says WaveFern, and the wiki\'s title screen picture shows the WaveFern name.'},
