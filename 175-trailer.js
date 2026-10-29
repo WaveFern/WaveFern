@@ -61,27 +61,27 @@ function trlShow(){if(TRL.showOn)return;TRL.showOn=1;try{trlStar();if(!DCITY.on|
 function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  const L=[
  /* before the drop: short bursts of the real start of a career, each fading to black, between cards that set up the game and what stands in your way */
- {sc:'Card: bedroom',d:4,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
- {sc:'Make a character',d:2,pre:1,show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
+ {sc:'Card: bedroom',d:3,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
+ {sc:'Make a character',d:2,pre:1,cap:'MAKE YOUR ARTIST',show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
   /* the Randomize button flicks through looks (no pointer), landing on the look the rest of the trailer uses */
   acts:[...[.1,.4,.7,1,1.3].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[1.6,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
- {sc:'Card: start',d:2,pre:1,card:'$100. A LAPTOP.<br>ZERO FANS.'},
- /* on your own in the studio: the Mix step, holding the level in the green band */
- {sc:'First take',d:6,pre:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(2);rec.wait=0;rec.cdn=0;rec.cgo=0;rec.x.lv=.45;rec.x.dur=9}catch(e){}},mix:1},
-/* the first song and its first few listeners */
- {sc:'First streams',d:4,pre:1,show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
- {sc:'Message an artist',d:7,pre:1,show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.1,'34% 93%',1.9],[.44,'34% 93%',1.9],[.53,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+ /* the loop, step by step, with a caption naming each one so a new player sees how the game is played */
+ /* 1. walk up to the mic in your room, pick a genre, and play the Beat step (hit the green) */
+ {sc:'Record',d:9,pre:1,cap:'1|RECORD SONGS',show:['ui','hud','mg'],set(){trlClear();trlName();S.t=200;S.energy=100;mode='play';trlPut(12.2,6.3,Math.PI);trlKeys('dw')},zoom:5.5,rec:1,
+  acts:[[1.1,()=>trlKeys('')],[1.45,()=>{try{recMenu()}catch(e){}}],[1.9,()=>trlClick(()=>trlQ('#ui button',/^Hip-Hop/),.6,e=>{e.click();if(rec){rec.cdn=1;rec.goal=12}})],[3.3,()=>{TRL.cur.el.style.opacity=0}]]},
+ /* 2. upload it on the laptop */
+ {sc:'Release',d:3.5,pre:1,cap:'2|RELEASE THEM',show:['ui'],set(){trlClear();trlName();S.t=230;S.drafts=[{id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48}];openPC();app=1;smo=0;pg='upload';pcR()},pz:['pc',1.35,1.5,'30% 22%'],
+  acts:[[.35,()=>trlClick(()=>trlQ('#pc .ng button',/^Upload$/),.75)]]},
+ {sc:'First streams',d:4,pre:1,cap:'3|GAIN FANS',show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
+ {sc:'Message an artist',d:7,pre:1,cap:'4|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.1,'34% 93%',1.9],[.44,'34% 93%',1.9],[.53,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   /* everything on the trailer clock so the zooms meet it: type, send, their answer */
   acts:[[.3,()=>trlClick(()=>$('cin'),.7,()=>{const i=$('cin');if(i)i.focus()})],[1.1,()=>trlType(()=>$('cin'),TRL.msg)],
    [2.3,()=>{const i=$('cin');if(TRL.typ&&i){i.value=TRL.msg;TRL.typ=null}trlClick(()=>trlQ('#pc button',/^Send$/),.55)}],
    [4.5,()=>{const m=trlConv();TY=0;m.log.push({f:'a',t:'yooo I was hoping you would ask. lets cook 🔥 studio this week?',d:S.day});pcR()}]]},
- {sc:'Collab meeting',d:8,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
-   /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o)}catch(e){}}},zoom:6,
-  acts:[[.6,()=>trlClick(()=>trlQ('#ui .mto'),.9)],[3.2,()=>trlClick(()=>trlQ('#ui .mto'),.9)],[5.8,()=>trlClick(()=>trlQ('#ui .mto'),.9)]]},
- /* back home, the money from the first songs goes on the room: furniture placed for real, in the game's own placing mode */
- {sc:'Furnish',d:4,pre:1,show:['ui'],set(){trlClear();S.t=170;trlPut(9,8,Math.PI);S.apps=S.apps||{};S.apps.amz=1;S.inv=Object.assign(S.inv||{},{sofa:1,tv:1,plant:1,lamp:1,shelf:1});mode='play';try{buildMode()}catch(e){}},
-  tick(){const c=TRL.cur;if(c&&c.t0!=null){mouse.x=c.x/innerWidth*2-1;mouse.y=-c.y/innerHeight*2+1}},
-  acts:[[.15,()=>trlFurn('sofa',10,6.5,.75)],[1.4,()=>trlFurn('tv',10,3.6,.7)],[2.6,()=>trlFurn('plant',12.6,6.5,.6)]]},
+ {sc:'Collab meeting',d:8.5,pre:1,cap:'4|COLLAB WITH ARTISTS',show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
+   /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o);MEET.n=3}catch(e){}}},zoom:6,
+  /* three exchanges, each answered with the reply this artist's personality likes best */
+  tick(){trlMeetOpts()},acts:[[.6,trlMeet],[3.2,trlMeet],[5.8,trlMeet]]},
  {sc:'Card: how far',d:2.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
  /* the black half second before the drop hides the heavy setup: the star career and the festival's first build */
  {sc:'Silence',d:.5,card:' ',acts:[[.02,()=>{try{trlStar();trlStage(4);trlClear()}catch(e){}}]]},
@@ -133,7 +133,9 @@ function trlPlaques(T){const c=TRL.shots.find(x=>x.sc=='Recording');if(!c)return
  const G=TRL.pw=new THREE.Group(),C=['#e6b422','#d8dde3','#9be7ff','#1ed760'];
  for(let i=0;i<n;i++){const H=new THREE.Group(),bx=(w,h,d,col,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col}));m.position.set(x,y,z);H.add(m)};G.add(H);TRL.pwL=H;const col=C[Math.min(i,3)],x=15.3-(i%6)*.82,y=i<6?2.3:1.45,z=.03;bx(.66,.8,.05,'#141414',x,y,z);bx(.56,.7,.02,col,x,y,z+.03);
   const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),new THREE.MeshLambertMaterial({color:col=='#d8dde3'?'#f4f4f4':col}));d.rotation.x=Math.PI/2;d.position.set(x,y+.08,z+.05);H.add(d);bx(.07,.07,.02,'#141414',x,y+.08,z+.065);bx(.4,.08,.02,'#f4f1e8',x,y-.24,z+.05)}
- TRL.pwL.position.y=-.55;scene.add(G)}
+ TRL.pwL.position.y=-.55;scene.add(G);
+ /* what each plaque is, as it goes up */
+ const P=[['GOLD','1M'],['PLATINUM','10M'],['DIAMOND','100M'],['BILLIONS CLUB','1B']][Math.min(n-1,3)],q=$('trlpq');if(q){q.innerHTML=`<b style="color:${C[Math.min(n-1,3)]}">${P[0]} PLAQUE</b><small>"${esc(TRL.song||'Night Bus')}" · ${P[1]} STREAMS</small>`;q.classList.remove('pop');void q.offsetWidth;q.classList.add('pop')}}
 function trlWallClear(){const G=TRL.pw;TRL.pwL=null;if(!G)return;scene.remove(G);G.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});TRL.pw=null}
 /* counts the listener and follower numbers on screen up from zero */
 function trlCount(u,o){const k=1-Math.pow(1-u,3),pc=$('pc');if(!pc)return;const w=document.createTreeWalker(pc,NodeFilter.SHOW_TEXT);let n;
@@ -156,9 +158,14 @@ function trlSw(row,i){const R=[...document.querySelectorAll('#cre .sw')][row];re
 function trlMove(get,dur,cb){const c=TRL.cur;if(!c)return;const e=get();if(!e){if(cb)cb(null);return}const r=e.getBoundingClientRect();
  c.f=[c.x,c.y];c.to=[r.left+r.width*(.42+Math.random()*.16),r.top+r.height*(.45+Math.random()*.15)];c.bend=(Math.random()-.5)*.35;c.t0=TRL.T;c.d=dur;c.cb=cb;c.el.style.opacity=1}
 function trlClick(get,dur,after){trlMove(get,dur,()=>{const c=TRL.cur;c.el.classList.add('pr');setTimeout(()=>c.el.classList.remove('pr'),110);const e=get();if(e){if(after)after(e);else e.click()}})}
-/* furniture: picks the item up from storage, carries it with the pointer to a spot in the room, and places it */
-function trlFurn(t,x,z,dur){try{holdItem(t)}catch(e){}const v=new THREE.Vector3(x,0,z).project(cam),sx=(v.x+1)/2*innerWidth,sy=(1-v.y)/2*innerHeight;
- trlMove(()=>({getBoundingClientRect:()=>({left:sx,top:sy,width:0,height:0})}),dur,()=>{const c=TRL.cur;c.el.classList.add('pr');setTimeout(()=>c.el.classList.remove('pr'),110);try{PBdo('place')}catch(e){}})}
+/* the step caption at the top: 'n|TEXT' shows a numbered step, plain text shows on its own */
+function trlCap(s){const e=$('trlcap');if(!e)return;const c=s&&s.cap||'';if(e.dataset.c!==c){e.dataset.c=c;const [a,b]=c.includes('|')?c.split('|'):['',c];e.innerHTML=(a?`<i>${a}</i>`:'')+esc(b);e.classList.remove('pop');void e.offsetWidth;if(c)e.classList.add('pop')}e.style.display=c?'flex':'none'}
+/* collab meeting: how a reply lands with this artist, the same sum meetPick makes */
+function trlMeetD(t){const M=MEET,p=M.a[5];let d=PREF[p][t];if(t=='cocky'&&S.listeners<M.a[2])d--;if(t=='hype'&&S.t>=300&&(p=='chill'||p=='shy'))d--;if(t=='pro'&&M.m.neg&&p=='formal')d++;return d}
+function trlMeetBest(){const M=MEET;let b=0;M.opts.forEach((o,i)=>{if(trlMeetD(o[0])>trlMeetD(M.opts[b][0]))b=i});return b}
+/* each new set of replies is dealt again until one of them is a good answer, so every pick can land */
+function trlMeetOpts(){const M=MEET;if(!M||M.k>=M.n||M.rk===M.k)return;M.rk=M.k;let n=0;while(trlMeetD(M.opts[trlMeetBest()][0])<1&&n++<30)M.opts=mtOpts();meetR()}
+function trlMeet(){if(!MEET)return;trlMeetOpts();const i=trlMeetBest();trlClick(()=>document.querySelectorAll('#ui .mto')[i],.9)}
 /* likes floating up off an Instagrime post: a trailer flourish, flagged as non-gameplay */
 function trlHearts(s){let h=$('trlhrt');if(!h){h=document.createElement('div');h.id='trlhrt';$('trl').appendChild(h)}if(!s||!s.hearts){if(h.innerHTML)h.innerHTML='';return}
  if(!h.innerHTML){let r=7;const rn=()=>(r=(r*9301+49297)%233280)/233280;h.innerHTML=Array.from({length:28},()=>`<i data-t="${(rn()*.75).toFixed(3)}" data-x="${(56+rn()*30).toFixed(1)}" data-w="${((rn()-.5)*9).toFixed(1)}" style="font-size:${Math.round(22+rn()*30)}px">\u2764</i>`).join('')}
@@ -184,13 +191,19 @@ body.trlon>*:not(#c):not(#trl):not(.trlv){visibility:hidden!important}body.trlon
 #trl .qcur{position:absolute;left:0;top:0;width:22px;height:30px;opacity:0;z-index:3}#trl .qcur svg{display:block;transform-origin:2px 2px;transition:transform .08s}#trl .qcur.pr svg{transform:scale(.86)}
 #trl .qnote{position:absolute;left:22px;bottom:18px;font:12px/1 ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#fff;opacity:0;text-shadow:0 1px 2px #000;z-index:4}
 #trlhrt{position:absolute;inset:0;z-index:2}#trlhrt i{position:absolute;font-style:normal;color:#ff3d6e;text-shadow:0 2px 0 #8a0f33,0 0 14px rgba(255,61,110,.6);opacity:0}
+#trl .qpq{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);text-align:center;font-family:'Silkscreen',ui-monospace,monospace;display:none;z-index:2;white-space:nowrap}
+#trl .qpq b{display:block;font-size:clamp(28px,4.6vw,76px);line-height:1.05;text-shadow:4px 4px 0 #000}#trl .qpq small{display:block;margin-top:.5em;font-size:clamp(13px,1.5vw,24px);color:#fff;text-shadow:2px 2px 0 #000}
+#trl .qpq.pop b{animation:qpqp .35s cubic-bezier(.2,1.6,.4,1)}@keyframes qpqp{0%{transform:scale(1.6);opacity:0}100%{transform:scale(1);opacity:1}}
+#trl .qcap{position:absolute;left:50%;top:6%;transform:translateX(-50%);display:none;align-items:center;gap:.5em;font-family:'Silkscreen',ui-monospace,monospace;font-size:clamp(22px,3.3vw,54px);color:#fff;text-shadow:3px 3px 0 #000;white-space:nowrap;z-index:2}
+#trl .qcap i{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;background:#2fe68a;color:#06210f;text-shadow:none;border:3px solid #000;box-shadow:4px 4px 0 #000}
+#trl .qcap.pop{animation:qcapp .3s cubic-bezier(.2,1.5,.4,1)}@keyframes qcapp{0%{transform:translateX(-50%) scale(1.4);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
 #trl .qfd{position:absolute;inset:0;background:#000;opacity:0;z-index:5}
 #trl .qhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;text-align:center;line-height:1.6}
 #trlm{position:fixed;inset:0;z-index:2147483001;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}#trlm .box{width:min(720px,94vw);max-height:92vh;overflow:auto}
 #trlm .trlsc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}#trlm .trlsc button{text-align:left;padding:8px 10px;font-size:13px}#trlm .trlsc small{display:block;opacity:.65}
 #trlm label{display:block;margin:6px 0}#trlm input[type=text]{width:100%;margin-top:4px}#trlm .row2{margin-top:12px}`;document.head.appendChild(st)}
 function trlOverlay(){let o=$('trl');if(o)o.remove();o=document.createElement('div');o.id='trl';
- o.innerHTML=`<div class="qblk" id="trlblk"></div><div class="qfd" id="trlfd"></div><div class="qnote" id="trlnote">Non-gameplay footage</div><div class="qcur" id="trlcur"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M2 2 L2 24 L7.5 18.5 L11.5 27.5 L15 26 L11 17.2 L18.5 17.2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
+ o.innerHTML=`<div class="qblk" id="trlblk"></div><div class="qfd" id="trlfd"></div><div class="qpq" id="trlpq"></div><div class="qcap" id="trlcap"></div><div class="qnote" id="trlnote">Non-gameplay footage</div><div class="qcur" id="trlcur"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M2 2 L2 24 L7.5 18.5 L11.5 27.5 L15 26 L11 17.2 L18.5 17.2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
  document.body.appendChild(o);TRL.cur={el:$('trlcur'),x:innerWidth*.62,y:innerHeight*.7,t0:null};return o}
 function trlShowOnly(ids){document.querySelectorAll('.trlv').forEach(e=>{if(!(ids||[]).includes(e.id))e.classList.remove('trlv')});(ids||[]).forEach(id=>{const e=$(id);if(e)e.classList.add('trlv')})}
 
@@ -217,7 +230,7 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  if(s.mix&&mode=='rec'&&rec&&rec.st==2&&rec.x)trlMixHand(dt);
  /* in the studio a plaque goes up on the wall on every beat */
  if(s.plq)trlPlaques(T)}
-function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);trlHearts(s);{const n=$('trlnote');if(n)n.style.opacity=s.cam||s.ng?.7:0}
+function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);trlHearts(s);{const q=$('trlpq');if(q)q.style.display=s.plq?'block':'none'}trlCap(s);{const n=$('trlnote');if(n)n.style.opacity=s.cam||s.ng?.7:0}
  /* the build: every burst and card fades up from black and back down into it */
  {const f=$('trlfd');if(f){let o=0;if(s.pre){const lt=TRL.T-s.t,fi=s.card?.15:.15,fo=s.card?.2:.25;o=Math.max(0,1-lt/fi,1-(s.d-lt)/fo)}f.style.opacity=Math.min(1,o)}}
  if(s.cam){const c=s.cam(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)));const C=TRL.cam=TRL.cam||new THREE.PerspectiveCamera(45,1,.1,2600);C.position.set(...c.p);C.lookAt(...c.l);C.fov=c.f;C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}if(s.tick)s.tick(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)))}
