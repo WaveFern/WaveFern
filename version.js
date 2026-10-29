@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.20.1';
+const GAME_VERSION='v49.21.0';
 const VERSION_HISTORY=[
+ {v:'v49.21.0',n:'Trailer: "How far can you go?" is now 4 seconds into the drop, a word every two beats (HOW, FAR, CAN YOU, GO?). The opening steps were retimed so every cut lands on a bar line: 0:04 artist, 0:10 record, 0:16 release (as the drums come in), 0:20 fans, 0:26 message, 0:32 meeting, 0:36 the card. The plaque wall is a dark charcoal instead of cream.'},
  {v:'v49.20.1',n:'The last leftover old name in the version history now says WaveFern, and the wiki\'s title screen picture shows the WaveFern name.'},
  {v:'v49.20.0',n:'Trailer: every opening step is 4 seconds on the bars, and "How far can you go?" holds until the drop. Gain fans is now the morning results after a night\'s sleep (streams and listeners counting up) instead of a second laptop page. The plaques hang on a clean cream wall that runs past both edges of the shot. The main stage stays solid in the festival crowd shot. On the street, people near your path step over to the building side, so you never walk into anyone.'},
  {v:'v49.19.0',n:'The game is called just WaveFern everywhere: the title screen, loading screen, trailer end card, wiki and every page title. Page titles, descriptions and share previews now say what WaveFern is (a free music career game you play in your browser), and the share picture shows the new name.'},

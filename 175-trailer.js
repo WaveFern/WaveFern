@@ -62,30 +62,32 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  const L=[
  /* before the drop: short bursts of the real start of a career, each fading to black, between cards that set up the game and what stands in your way */
  {sc:'Card: bedroom',d:4,pre:1,card:'EVERY STAR STARTED<br>IN A BEDROOM.'},
- {sc:'Make a character',d:4,pre:1,cap:'1|MAKE YOUR ARTIST',show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
+ {sc:'Make a character',d:6,pre:1,cap:'1|MAKE YOUR ARTIST',show:['ui'],set(){trlFresh(1);TT.on=0;try{pauseOverlay(0)}catch(e){}PAUSED=0;mode='creator';creatorUI()},
   /* the Randomize button flicks through looks (no pointer), landing on the look the rest of the trailer uses */
-  acts:[...[.2,.55,.9,1.25,1.6,1.95,2.3,2.65,3].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[3.35,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
- /* the loop, step by step, four seconds each on the bars, with a caption naming each one so a new player sees how the game is played */
+  acts:[...[.2,.6,1,1.4,1.8,2.2,2.6,3,3.4,3.8,4.2,4.6].map(t=>[t,()=>{try{rnd()}catch(e){}}]),[5,()=>{try{CPK.k=null;ch={skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5};refresh();creatorUI()}catch(e){}}]]},
+ /* the loop, step by step, every cut on a bar line (a bar is 2s at 120 BPM), with a caption naming each one so a new player sees how the game is played */
  /* 2. making a song: the Lyrics step, always pressing the word that rhymes */
- {sc:'Record',d:4,pre:1,cap:'2|RECORD SONGS',show:['ui','hud','mg'],set(){trlClear();trlName();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(1);rec.wait=0;rec.cdn=0;rec.cgo=0}catch(e){}},zoom:5.5,
-  acts:[[.3,trlLyr],[2.05,trlLyr]]},
+ {sc:'Record',d:6,pre:1,cap:'2|RECORD SONGS',show:['ui','hud','mg'],set(){trlClear();trlName();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(1);rec.wait=0;rec.cdn=0;rec.cgo=0}catch(e){}},zoom:5.5,
+  acts:[[.3,trlLyr],[2.05,trlLyr],[3.8,trlLyr]]},
  {sc:'Release',d:4,pre:1,cap:'3|RELEASE THEM',show:['ui'],set(){trlClear();trlName();S.t=230;S.drafts=[{id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48}];openPC();app=1;smo=0;pg='upload';pcR()},pz:['pc',1.35,1.5,'30% 22%'],
   acts:[[.35,()=>trlClick(()=>trlQ('#pc .ng button',/^Upload$/),.75)]]},
  /* 4. a night's sleep, and the morning results: the streams and listeners the song brought in */
- {sc:'First streams',d:4,pre:1,cap:'4|GAIN FANS',show:['ui'],set(){trlClear();trlName();S.t=330;S.energy=40;trlPut(3.4,2.9,Math.PI);if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:0,today:0})},
-  acts:[[.15,()=>{try{sleepNow()}catch(e){}}]],tick(u){trlMorning(Math.max(0,Math.min(1,(u-.3)/.55)))}},
- {sc:'Message an artist',d:4,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.1,'34% 93%',1.9],[.5,'34% 93%',1.9],[.62,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+ {sc:'First streams',d:6,pre:1,cap:'4|GAIN FANS',show:['ui'],set(){trlClear();trlName();S.t=330;S.energy=40;trlPut(3.4,2.9,Math.PI);if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:0,today:0})},
+  acts:[[.15,()=>{try{sleepNow()}catch(e){}}]],tick(u){trlMorning(Math.max(0,Math.min(1,(u-.22)/.45)))}},
+ {sc:'Message an artist',d:6,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],/* quick keyframed zooms: in on the message as you type it, back out as it sends, so their answer lands in the full chat */pz:['pc',1,1,[[0,'50% 50%',1],[.08,'34% 93%',1.9],[.45,'34% 93%',1.9],[.55,'50% 50%',1],[1,'50% 50%',1]]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);/* you message them first, so the chat starts empty */const m=trlConv();m.unread=0;m.log=[];openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   /* everything on the trailer clock so the zooms meet it: type, send, their answer */
-  acts:[[.12,()=>trlClick(()=>$('cin'),.4,()=>{const i=$('cin');if(i)i.focus()})],[.7,()=>trlType(()=>$('cin'),TRL.msg)],
-   [1.6,()=>{const i=$('cin');if(TRL.typ&&i){i.value=TRL.msg;TRL.typ=null}trlClick(()=>trlQ('#pc button',/^Send$/),.4)}],
-   [2.9,()=>{const m=trlConv();TY=0;m.log.push({f:'a',t:'yooo I was hoping you would ask. lets cook 🔥 studio this week?',d:S.day});pcR()}]]},
+  acts:[[.2,()=>trlClick(()=>$('cin'),.5,()=>{const i=$('cin');if(i)i.focus()})],[.9,()=>trlType(()=>$('cin'),TRL.msg)],
+   [2.2,()=>{const i=$('cin');if(TRL.typ&&i){i.value=TRL.msg;TRL.typ=null}trlClick(()=>trlQ('#pc button',/^Send$/),.45)}],
+   [3.8,()=>{const m=trlConv();TY=0;m.log.push({f:'a',t:'yooo I was hoping you would ask. lets cook 🔥 studio this week?',d:S.day});pcR()}]]},
  {sc:'Collab meeting',d:4,pre:1,cap:'5|COLLAB WITH ARTISTS',show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
    /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o);MEET.n=2}catch(e){}}},zoom:6,
   /* two quick exchanges, each answered with the reply this artist's personality likes best */
   tick(){trlMeetOpts()},acts:[[.3,trlMeet],[1.9,trlMeet]]},
- {sc:'Card: how far',d:11.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
- /* the black half second before the drop hides the heavy setup: the star career and the festival's first build */
- {sc:'Silence',d:.5,card:' ',acts:[[.02,()=>{try{trlStar();trlStage(4);trlClear()}catch(e){}}]]},
+ /* four seconds to the drop, a word every two beats; the music's own half second of silence sits under the last one,
+    and the heavy setup for after the drop (the star career and the festival's first build) runs behind it */
+ {sc:'Card: how far',d:4,card:'<span>HOW</span><br><span>FAR</span><br><span>CAN YOU</span><br><span>GO?</span>',
+  tick(){const k=Math.floor((TRL.T-this.t)/(2*TRL.BEAT)+1e-3);document.querySelectorAll('#trlblk .qcard span').forEach((e,i)=>e.style.visibility=i<=k?'visible':'hidden')},
+  acts:[[3.55,()=>{try{trlStar();trlStage(4);trlClear()}catch(e){}}]]},
  /* the drop: the city from above, the one shot not tied to the player */
  {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},
  {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
@@ -108,7 +110,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
  {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.5,1.7,'24% 16%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
  /* the plaques come once the streams are in the millions: a cutscene of your studio wall, one going up on each hit */
- {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI);/* a clean cream wall behind the plaques, wide and tall enough that no outside shows past its ends */const w=TRL.wall=new THREE.Mesh(new THREE.PlaneGeometry(14,4.4),new THREE.MeshLambertMaterial({color:'#efe6d2',polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));w.position.set(14,2.2,.004);scene.add(w)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
+ {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI);/* a dark charcoal wall behind the plaques, wide and tall enough that no outside shows past its ends */const w=TRL.wall=new THREE.Mesh(new THREE.PlaneGeometry(14,4.4),new THREE.MeshLambertMaterial({color:'#2c2b31',polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));w.position.set(14,2.2,.004);scene.add(w)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},pz:['pc',1.2,1.32,'50% 45%'],acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
  {sc:'Card: tour',d:2*B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo',{quiet:1})}catch(e){console.error(e)}}]]},
  /* the game's own arrival flyover, with its city title */
