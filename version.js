@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.19.0';
+const GAME_VERSION='v49.20.0';
 const VERSION_HISTORY=[
+ {v:'v49.20.0',n:'Trailer: every opening step is 4 seconds on the bars, and "How far can you go?" holds until the drop. Gain fans is now the morning results after a night\'s sleep (streams and listeners counting up) instead of a second laptop page. The plaques hang on a clean cream wall that runs past both edges of the shot. The main stage stays solid in the festival crowd shot. On the street, people near your path step over to the building side, so you never walk into anyone.'},
  {v:'v49.19.0',n:'The game is called just WaveFern again, on the title screen, loading screen, trailer end card, wiki and every page title. Page titles, descriptions and share previews now say what WaveFern is (a free music career game you play in your browser), and the share picture shows the new name.'},
  {v:'v49.18.1',n:'The game no longer names the 3D library it is built on: the "Made with" line is gone from the title screen, and the wiki credits, site description and notes no longer mention it. Nothing about how the game plays or looks changes.'},
  {v:'v49.18.0',n:'Trailer: the step captions are now one green strip with black text. Five steps: 1 Make your artist (longer, more looks), 2 Record songs (now the Lyrics step, always picking the rhyme), 3 Release them, 4 Gain fans, 5 Collab with artists (the meeting is two quick exchanges). The plaque cutscene moved after the millions of listeners, so the Billions Club plaque no longer comes before 50K.'},
