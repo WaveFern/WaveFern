@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.19.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.20.1. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -2335,15 +2335,17 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.19.0. This list is read live from the game, so it is always current.
+The game is on v49.20.1. This list is read live from the game, so it is always current.
 
 Version	What changed
-v49.19.0	The game is called just WaveFern again, on the title screen, loading screen, trailer end card, wiki and every page title. Page titles, descriptions and share previews now say what WaveFern is (a free music career game you play in your browser), and the share picture shows the new name.
+v49.20.1	The last leftover old name in the version history now says WaveFern, and the wiki's title screen picture shows the WaveFern name.
+v49.20.0	Trailer: every opening step is 4 seconds on the bars, and "How far can you go?" holds until the drop. Gain fans is now the morning results after a night's sleep (streams and listeners counting up) instead of a second laptop page. The plaques hang on a clean cream wall that runs past both edges of the shot. The main stage stays solid in the festival crowd shot. On the street, people near your path step over to the building side, so you never walk into anyone.
+v49.19.0	The game is called just WaveFern everywhere: the title screen, loading screen, trailer end card, wiki and every page title. Page titles, descriptions and share previews now say what WaveFern is (a free music career game you play in your browser), and the share picture shows the new name.
 v49.18.1	The game no longer names the 3D library it is built on: the "Made with" line is gone from the title screen, and the wiki credits, site description and notes no longer mention it. Nothing about how the game plays or looks changes.
 v49.18.0	Trailer: the step captions are now one green strip with black text. Five steps: 1 Make your artist (longer, more looks), 2 Record songs (now the Lyrics step, always picking the rhyme), 3 Release them, 4 Gain fans, 5 Collab with artists (the meeting is two quick exchanges). The plaque cutscene moved after the millions of listeners, so the Billions Club plaque no longer comes before 50K.
 v49.17.0	Trailer: the opening now shows how the game is played, one numbered step at a time with a caption: 1 Record songs (walk to the mic, pick a genre, hit the green), 2 Release them (upload on the laptop), 3 Gain fans (listeners counting up), 4 Collab with artists (message them, then meet and pick the replies they like best). The furniture shot is gone. Each plaque on the studio wall is named as it goes up (Gold, Platinum, Diamond, Billions Club, with its stream count).
 v49.16.0	Trailer: the message is just "collab?" and the camera no longer zooms in on the reply. A new shot places furniture in your room, so the "How far can you go?" card is shorter. The plaques are now a cutscene of your studio wall, each one lifted into place on the hit. Instagrime gets floating hearts over the post, marked as non-gameplay footage.
-v49.15.0	The game is now called WaveFern Studios (title screen, page titles, wiki and trailer end card). Trailer: the stage 4 to 1 festival run is now the game's own gameplay view, with the crowd growing on each stage. The message scene zooms in on the message as you type it, pulls back as you send, then zooms in on their reply, with quick smooth keyframes.
+v49.15.0	The game is now called WaveFern (title screen, page titles, wiki and trailer end card). Trailer: the stage 4 to 1 festival run is now the game's own gameplay view, with the crowd growing on each stage. The message scene zooms in on the message as you type it, pulls back as you send, then zooms in on their reply, with quick smooth keyframes.
 v49.14.1	Trailer: wavefern.com/trailer now goes straight to the Ready card (press Space to roll) instead of the scene menu. The menu is still at wavefern.com/trailer/?menu.
 v49.14.0	Trailer: the opening is now the character, a first song (the Mix step), your first listeners, then you message an artist yourself (the chat starts empty, you ask to collab and they say yes), then the collab meeting. Naming yourself on Spotifly is gone. The plaques go up while you record alone in your studio, one a second. The Mix step is played like a person, reacting a moment late, drifting off the band and correcting, and the beat bar hits are a little early or late instead of dead centre.
 v49.13.0	Trailer: the festival goes from the Fresh Fern Tent to The Pit, the Riverside Stage and the Main Stage, one stage a second on the beat, each seen from behind its crowd so you watch it grow. The messages shot follows the typing up close, then pulls back to show your message land and the artist reply (a reply written for the trailer). No car is in your lane when you drive and nobody is in your way when you walk. Cinematic camera shots carry a small Non-gameplay footage note, and the heavy setup before the drop now happens during the half second of black.
