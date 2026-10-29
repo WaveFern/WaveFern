@@ -1,4 +1,9 @@
-# WaveFern Studios – Music Career Sim (split version)
+# WaveFern – free music career game in your browser
+
+Play the WaveFern game free at **[wavefern.com](https://wavefern.com/)** (no download). Guide: [WaveFern Wiki](https://wavefern.com/wiki/).
+
+## The code (split version)
+
 
 Open `index.html` in a browser (needs internet for the 3D library and the font).
 

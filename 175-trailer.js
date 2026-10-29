@@ -212,7 +212,7 @@ function trlShowOnly(ids){document.querySelectorAll('.trlv').forEach(e=>{if(!(id
 /* ---------- running ---------- */
 function trlEnter(k){const s=TRL.shots[k];TRL.i=k;TRL.typ=null;TRL.scr=null;TRL.zoom=s.zoom||0;
  const blk=$('trlblk');TRL.cur.t0=null;TRL.cur.cb=null;TRL.cur.el.style.opacity=0;
- if(s.card||s.end){blk.style.display='flex';blk.innerHTML=s.card?(TRL.opt.cap?`<div class="qcard">${s.card}</div>`:''):`<div class="qend"><h1 id="trle1">WAVEFERN<br>STUDIOS</h1><p id="trle4" class="qtag">A MUSIC CAREER GAME</p><p id="trle2">FREE IN YOUR BROWSER</p><p id="trle3">WAVEFERN.COM</p></div>`}
+ if(s.card||s.end){blk.style.display='flex';blk.innerHTML=s.card?(TRL.opt.cap?`<div class="qcard">${s.card}</div>`:''):`<div class="qend"><h1 id="trle1">WAVEFERN</h1><p id="trle4" class="qtag">A MUSIC CAREER GAME</p><p id="trle2">FREE IN YOUR BROWSER</p><p id="trle3">WAVEFERN.COM</p></div>`}
  else{blk.style.display='none';blk.innerHTML='';try{s.set&&s.set()}catch(e){console.error('trailer shot '+s.sc,e)}}
  s.done=(s.acts||[]).map(()=>0);trlShowOnly(s.show);
  /* bodyguards only walk with you in the crew shot, so they never crowd the others */

@@ -144,11 +144,11 @@ Object.entries(FIGS).forEach(([k,v])=>{const p=byId(k);if(p)p.figs=v});
 
 /* ===================== Secrets and credits ===================== */
 page('secrets','Secrets','meta',{sum:'Things the game does not tell you.',kw:'secret code cheat hidden mystery',body:()=>`
-<p class=lead>There is a secret code somewhere in WaveFern Studios. What it is, where it goes and what it does is a mystery.</p>
+<p class=lead>There is a secret code somewhere in WaveFern. What it is, where it goes and what it does is a mystery.</p>
 <p>This wiki will not say any more than that. Good luck.</p>`});
-page('credits','Credits','meta',{sum:'Who made WaveFern Studios.',kw:'credits made by james rowan music soundtrack fl studio surge arminator tumfy',body:()=>`
-${IB('WaveFern Studios','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton']])}
-<p class=lead>WaveFern Studios was made by James Hutchinson and Rowan Burton.</p>
+page('credits','Credits','meta',{sum:'Who made WaveFern.',kw:'credits made by james rowan music soundtrack fl studio surge arminator tumfy',body:()=>`
+${IB('WaveFern','',[['Game','James Hutchinson and Rowan Burton'],['Music','Rowan Burton']])}
+<p class=lead>WaveFern was made by James Hutchinson and Rowan Burton.</p>
 ${H2('Game')}<p>James Hutchinson and Rowan Burton.</p>
 ${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.image-line.com/fl-studio/" target=_blank rel=noopener>FL Studio</a>, using its stock plugins, and <a href="https://surge-synthesizer.github.io/" target=_blank rel=noopener>Surge XT</a>, <a href="https://www.looperman.com/free-music-software/detail/krakli-software-arminator-2" target=_blank rel=noopener>Arminator 2</a> plus <a href="https://tumfy.net/" target=_blank rel=noopener>tumfy</a>'s free kits.</p>
 <p>Play the whole soundtrack here. It keeps playing while you read other pages.</p>
@@ -192,7 +192,7 @@ ${Q('Who made the game?',`James Hutchinson and Rowan Burton. See ${L('credits')}
    CONTACT_KEY is the Web3Forms access key (safe to be public). While it is empty the page says the form is not open yet. */
 const CONTACT_KEY='06696629-392c-46ce-8e33-57c060b74007';
 page('contact','Contact','meta',{sum:'Send a message to the people who make the game.',kw:'contact email message feedback bug report help',body:()=>CONTACT_KEY?`
-<p class=lead>Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern Studios.</p>
+<p class=lead>Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern.</p>
 <form id=cform class=cform>
 <label>Your name<input name=name maxlength=40 required></label>
 <label>Your email <span class=m>(only if you want a reply)</span><input name=email type=email maxlength=120></label>

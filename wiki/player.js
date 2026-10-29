@@ -26,7 +26,7 @@ function plSync(){const b=document.getElementById('pbar'),a=PL.a,on=!a.paused;
  document.querySelectorAll('.ost tr[data-i]').forEach(r=>{const me=+r.dataset.i==PL.i;r.classList.toggle('on',me);const k=r.querySelector('button');if(k)k.textContent=me&&on?'Pause':'Play'})}
 function plPlay(i){const a=PL.a;if(i!==PL.i){PL.i=i;a.src=OST[i][1];a.currentTime=0}
  plBar();document.body.classList.add('hasbar');a.play().catch(()=>{});
- if('mediaSession' in navigator)try{navigator.mediaSession.metadata=new MediaMetadata({title:OST[i][0],artist:'Rowan Burton',album:'WaveFern Studios soundtrack'})}catch(e){}
+ if('mediaSession' in navigator)try{navigator.mediaSession.metadata=new MediaMetadata({title:OST[i][0],artist:'Rowan Burton',album:'WaveFern soundtrack'})}catch(e){}
  plSync()}
 function plToggle(){if(PL.i<0)return plPlay(0);PL.a.paused?plPlay(PL.i):PL.a.pause()}
 window.plRow=i=>{i==PL.i&&!PL.a.paused?PL.a.pause():plPlay(i)};

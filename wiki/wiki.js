@@ -53,7 +53,7 @@ function withRef(body,p){if(!p.src)return body;const k=body.indexOf('class=lead'
 /* "See also": every other page this one links to */
 function seeAlso(body,p){const ids=[];body.replace(/href="#\/([a-z0-9-]+)/g,(m,i)=>{if(i!==p.id&&i!=='home'&&!/^cat-/.test(i)&&byId(i)&&!ids.includes(i))ids.push(i)});
  return ids.length?H2('See also','see-also')+`<ul class=also>${ids.slice(0,10).map(i=>{const q=byId(i);return `<li><a href="#/${i}">${q.t}</a></li>`}).join('')}</ul>`:''}
-function refs(p){return p.src?H2('References','references')+`<ol class=refs>${p.src.map(f=>`<li><b>^</b> ${src(f)}. <i>WaveFern Studios</i> source code, game ${esc(D.version||'')}.</li>`).join('')}</ol>`:''}
+function refs(p){return p.src?H2('References','references')+`<ol class=refs>${p.src.map(f=>`<li><b>^</b> ${src(f)}. <i>WaveFern</i> source code, game ${esc(D.version||'')}.</li>`).join('')}</ol>`:''}
 /* the Source and History tabs */
 function srcTab(p){return `<p>This article was written from the following files of the game's code. Each link opens the file on GitHub.</p>`+
  (p.src?`<ul>${p.src.map(f=>`<li>${src(f)}</li>`).join('')}</ul>`:'<p>This article is not tied to particular files.</p>')+
@@ -88,7 +88,7 @@ function render(){const h=decodeURIComponent(location.hash.replace(/^#\/?/,'')),
     <div class=from>From the WaveFern Wiki</div>
     ${main}
     ${p.id=='home'?'':`<div class=cats>${isCat?`<a href="#/home">Main page</a>`:`Category: ${c?`<a href="#/cat-${c.id}">${c.t}</a>`:''}`}</div>`}</article>`}
-  document.title=(p&&p.id!='home'?p.t+' - ':'')+'WaveFern Wiki'}
+  document.title=p&&p.id!='home'?p.t+' – WaveFern Game Wiki':'WaveFern Wiki – Guide to the WaveFern Music Career Game'}
  $('main').innerHTML=html;$('side').innerHTML='<div class=panel>'+sideHTML(id||'home')+'</div>';$('side').classList.remove('on');
  const a=$('side').querySelector('a.on'),sd=$('side');sd.scrollTop=a?Math.max(0,a.offsetTop-sd.clientHeight/2):0;
  document.dispatchEvent(new CustomEvent('wiki:render',{detail:{page:cur&&!cur.hide?cur:null,id:id||'home'}}));
