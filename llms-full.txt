@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.24.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.24.13. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -2353,9 +2353,22 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.24.0. This list is read live from the game, so it is always current.
+The game is on v49.24.13. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.24.13	Wiki: The name section on the Credits page is shorter and no longer says who first came up with FernWave.
+v49.24.12	Fix: the trailer page no longer loads Google sign-in, so it can never upload its career over your cloud save, and a cloud save that is a trailer career is never loaded (this device uploads your real career over it). The profile picture falls back to your initial if Google does not send the image. Trailer: no cars in your lane on the drive shot.
+v49.24.11	Trailer: the Day 2 screen now shows monthly listeners going from 946 to 2,230 and interest at 84%.
+v49.24.10	Fix: the career restore after the trailer bug now also uses backups that were saved under a different label, taking the latest real career in the backups that is not already in a career slot.
+v49.24.9	Trailer polish: interest on the Day 2 screen counts up to 38% instead of sitting at 6%. The Tokyo stadium cuts in with the first song already playing (NIGHT BUS on the big screen, pyro going) instead of the show's 6-second countdown, and the push-in on stage starts just above the crowd's heads so nobody blocks the lens.
+v49.24.8	Fix: opening wavefern.com/trailer could replace your career. The save that runs when a tab is hidden or closed still ran on the trailer page and wrote the trailer's career over yours. The trailer page now cannot write any career, backup or cloud data at all. And when the game opens, any career the trailer wrote is swapped back for your own career, which the game had kept as a backup at that moment, with a message saying it was restored.
+v49.24.7	Trailer: new mix of the soundtrack with an added instrument. Same timing, so every cut still lands where it did.
+v49.24.6	Trailer: F toggles full screen on the trailer page at any time, and the Ready card says so.
+v49.24.5	Trailer: much gentler zooms on the laptop shots (about 1.1 to 1.2 times instead of up to 1.9) and only a light pull toward the numbers. On a phone in landscape the counts still stay in view.
+v49.24.4	Trailer: the laptop zooms now follow the real thing on screen (the listener and follower counts, the message box, the Upload row) and pull it to the middle, zooming less if it would not fit, so nothing is cropped on a phone in landscape. On short screens the Spotifly page scrolls so the counts are in view.
+v49.24.3	Trailer: tapping the screen on the Ready card starts it too, so it works on phones and tablets with no Space key.
+v49.24.2	Trailer: the flashes, beat punches, shakes and confetti are gone. The Gain fans screen now looks like the game's own new day box (Day 2, the four result cards and Start the day) over your room, with the cards coming in on the beat and the numbers counting up. The trailer page asks for full screen as soon as it opens, and again on the first click or key press if the browser said no.
+v49.24.1	Trailer: pressing Space on the Ready card now puts the page into true full screen (no browser bars or scrollbars) before the trailer rolls.
 v49.24.0	Game feel: no new features, but playing feels better. Beat hits are rated Perfect, Great or Good with a combo and a note that climbs with it, and each Perfect adds a little quality. Lyrics answers in a row build a streak, and quick ones say so. In Mix the beat fills out while you hold the level in the green, and each second locked in counts up. The song's beat swells when you play well. The results screen counts your quality up, shows your Perfect hits and tells you when a song beats your last one or your best. Gear now changes how you play as well as adding quality: a better mic widens the Beat green zone, drums give extra goes, guitar gives more time per lyric line, a keyboard fades out a wrong word, acoustics widen the Mix band, headphones make the level smoother, a mixing desk slows the band, and a better chair makes songs cost less energy. The Gear shop and the countdown before each step say what your gear does. Your first three songs get a slightly wider Beat zone while you learn. The morning results count up, say when it was your best day yet, and show how close you are to the next listener milestone and your next plaque. A new career gets a toast for its first stream, 10 streams and 100 streams. The recording bar no longer redraws the whole screen overlay every frame.
 v49.23.0	Trailer: a dopamine pass. After the drop the picture punches in on every beat and hits on every cut, with big flashes and shakes on the drop, the main stage, the stadium and the title. Confetti bursts when each plaque goes up, when each Spotifly count lands, on right answers in the lyrics and the collab meeting, at the main stage and stadium, and on the end card. Gain fans is now a restaged results screen (marked non-gameplay) like the game's new day screen: DAY 2 and each card slam in on the beat, the numbers climb, and the listener count lands with a burst. No sleep scene.
 v49.22.0	Wiki: the Credits page has a new section, The name, on how WaveFern was nearly called FernWave and the idea behind that name. The FAQ answers why the game is called WaveFern.

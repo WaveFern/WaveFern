@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.24.12';
+const GAME_VERSION='v49.24.13';
 const VERSION_HISTORY=[
+ {v:'v49.24.13',n:'Wiki: The name section on the Credits page is shorter and no longer says who first came up with FernWave.'},
  {v:'v49.24.12',n:'Fix: the trailer page no longer loads Google sign-in, so it can never upload its career over your cloud save, and a cloud save that is a trailer career is never loaded (this device uploads your real career over it). The profile picture falls back to your initial if Google does not send the image. Trailer: no cars in your lane on the drive shot.'},
  {v:'v49.24.11',n:'Trailer: the Day 2 screen now shows monthly listeners going from 946 to 2,230 and interest at 84%.'},
  {v:'v49.24.10',n:'Fix: the career restore after the trailer bug now also uses backups that were saved under a different label, taking the latest real career in the backups that is not already in a career slot.'},
