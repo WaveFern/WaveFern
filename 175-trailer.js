@@ -1,5 +1,5 @@
 /* ===== v49.4.0: the game trailer (wavefern.com/trailer) =====
-   wavefern.com/trailer opens the game in trailer mode (trailer/index.html loads the game with FW_TRAILER set). A menu lets you
+   wavefern.com/?trailer opens the game in trailer mode (wavefern.com/trailer now shows the YouTube trailer). A menu lets you
    play a scripted trailer, about 75 seconds, made to be screen recorded. It is real gameplay in the game's own camera:
    the title screen, making a character, picking an artist name, messaging an artist, the collab meeting and session, the
    recording minigame, Spotifly, walking the city, driving, the wardrobe, the Gphone, the map, a Main Stage festival set,

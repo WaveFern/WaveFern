@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.25.0';
+const GAME_VERSION='v49.25.1';
 const VERSION_HISTORY=[
+ {v:'v49.25.1',n:'wavefern.com/trailer now plays the official trailer from YouTube, with a Play free button. The recordable in-game trailer is still at wavefern.com/?trailer.'},
  {v:'v49.25.0',n:'A livelier start and a calmer Big Vee. New artists are picked up by Fresh Finds, Spotifly\'s playlist for new artists: while you have under 3,000 monthly listeners each song gets extra plays (about 30 on release day for a first song, more for better songs), fading out as your own fans grow. Your first release gets a welcome message, and the morning results say how many streams came from the playlist. Make a song: the Mood and Length options are gone, and Extras has a new Sub-genre picker with every genre\'s beat styles (Boom Bap, UK Drill, House and more); pick one and recording that genre uses it, and the song keeps that beat. Big Vee: his box now shows over the laptop too, with one line saying what to click, he no longer says the rest is up to you just before popping up again, and after the basics he waits at least 45 seconds between tips. Tips off now also keeps the small helper tips quiet.'},
  {v:'v49.24.14',n:'Wiki: source file names in References are plain text now, without links out to the code.'},
  {v:'v49.24.13',n:'Wiki: The name section on the Credits page is shorter and no longer says who first came up with FernWave.'},
