@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.14.0';
+const GAME_VERSION='v49.14.1';
 const VERSION_HISTORY=[
+ {v:'v49.14.1',n:'Trailer: wavefern.com/trailer now goes straight to the Ready card (press Space to roll) instead of the scene menu. The menu is still at wavefern.com/trailer/?menu.'},
  {v:'v49.14.0',n:'Trailer: the opening is now the character, a first song (the Mix step), your first listeners, then you message an artist yourself (the chat starts empty, you ask to collab and they say yes), then the collab meeting. Naming yourself on Spotifly is gone. The plaques go up while you record alone in your studio, one a second. The Mix step is played like a person, reacting a moment late, drifting off the band and correcting, and the beat bar hits are a little early or late instead of dead centre.'},
  {v:'v49.13.0',n:'Trailer: the festival goes from the Fresh Fern Tent to The Pit, the Riverside Stage and the Main Stage, one stage a second on the beat, each seen from behind its crowd so you watch it grow. The messages shot follows the typing up close, then pulls back to show your message land and the artist reply (a reply written for the trailer). No car is in your lane when you drive and nobody is in your way when you walk. Cinematic camera shots carry a small Non-gameplay footage note, and the heavy setup before the drop now happens during the half second of black.'},
  {v:'v49.12.1',n:'Trailer: fixed the music glitching. The trailer used to jump the music to catch up with the picture when they drifted apart, and now the picture follows the music instead. The character randomizing is 2 seconds, the message is typed in full and only sent once it is written, with time to see it land and the reply start, and the pointer moves more slowly with a short pause before each click.'},

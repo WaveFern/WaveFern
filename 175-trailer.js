@@ -244,4 +244,6 @@ function trlRoll(){const h=$('trlh');if(h)h.remove();const s0=TRL.shots[TRL.k0];
    if(a.readyState>=1)sync();else a.addEventListener('loadedmetadata',sync,{once:true});a.play().catch(()=>{})}catch(e){}}},700)}
 function trlStop(){TRL.run=0;try{if(TRL.aud)TRL.aud.pause()}catch(e){}location.reload()}
 /* the trailer page opens the menu once the game has booted to its title screen */
-if(TRL.on){const w=setInterval(()=>{if(typeof mode!='undefined'&&mode=='title'&&$('ttl')&&!$('load')){clearInterval(w);trlMenu()}},300)}
+/* it goes straight to the Ready card; wavefern.com/trailer/?menu still opens the scene menu */
+function trlReady(){trlCSS();TRL.shots=trlShots();if(!TRL.aud)fetch(TRL.SRC).then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});trlPlay(0)}
+if(TRL.on){const w=setInterval(()=>{if(typeof mode!='undefined'&&mode=='title'&&$('ttl')&&!$('load')){clearInterval(w);/[?&]menu\b/.test(location.search)?trlMenu():trlReady()}},300)}
