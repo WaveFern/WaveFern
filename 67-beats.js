@@ -465,7 +465,9 @@ setInterval(songSeeds,500);
 /* recording: the song's beat plays under all four steps; the Beat bar sweeps in time with it */
 if(typeof startRec=='function'){const s0=startRec;startRec=function(i){s0.apply(this,arguments);try{if(rec&&mode=='rec'){rec.bs=(Math.random()*4294967296)>>>0;
  const pk=(typeof S=='object'&&S&&S.bpick)||{};rec.s8=pk.s8!=null?pk.s8:'auto';rec.hh=pk.hh!=null?pk.hh:'auto';
- rec.bp=!!Beats.play({genre:rec.g,seed:rec.bs,s8:rec.s8,hh:rec.hh},{owner:'rec',form:'rec',intensity:.8,pads:1,alive:()=>!!rec&&mode=='rec'})}}catch(e){console.error('beats rec',e)}}}
+ /* v49.25.0: the sub-genre picked in Extras (132-808-hats.js), if it is for this genre */
+ const sp=typeof subPick=='function'?subPick():null;rec.sty=sp&&sp.g==rec.g?sp.i:null;
+ rec.bp=!!Beats.play({genre:rec.g,seed:rec.bs,s8:rec.s8,hh:rec.hh,style:rec.sty},{owner:'rec',form:'rec',intensity:.8,pads:1,alive:()=>!!rec&&mode=='rec'})}}catch(e){console.error('beats rec',e)}}}
 function beatsBarTick(dt){rec.t+=dt;rec.cd=Math.max(0,rec.cd-dt);rec.fl=Math.max(0,rec.fl-dt);
  const b=Math.max(0,Beats.beat()),spb=60/Beats.bpm(),T=1/(.9*Math.pow(1.05,rec.hits)),n=[1,2,4].reduce((a,c)=>Math.abs(Math.log(c*spb/T))<Math.abs(Math.log(a*spb/T))?c:a);
  if(rec.bb==null){rec.bn=n;rec.bb=Math.round(b+.5*n)}else if(n!=rec.bn){const k=Math.round((b-rec.bb)/rec.bn),bc=rec.bb+k*rec.bn;rec.bb=k%2?bc-n:bc;rec.bn=n}
@@ -473,8 +475,8 @@ function beatsBarTick(dt){rec.t+=dt;rec.cd=Math.max(0,rec.cd-dt);rec.fl=Math.max
 if(typeof recTick=='function'){const t0=recTick;recTick=function(dt){if(rec&&rec.bp&&Beats.playing()){/* v49.24.0: the beat swells when you play well (rec.swell, set by 176-game-feel.js) and fills out while the Mix level is in the green */
  Beats.setIntensity(Math.min(1,(rec.st==1?.3:rec.st==2?(rec.x&&rec.x.inb?.85:.4):rec.st==3?1:.8)+(rec.swell||0)));if(!rec.st)return beatsBarTick(dt)}return t0.apply(this,arguments)}}
 /* the beat's seed goes with the draft and the uploaded song, so the released song sounds like the session */
-if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,s8=rec&&rec.s8,hh=rec&&rec.hh,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.bs=bs;if(s8!=null){d.s8=s8;d.hh=hh}}const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
-if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}}}catch(e){}return r}}
+if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,s8=rec&&rec.s8,hh=rec&&rec.hh,sty=rec&&rec.sty,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.bs=bs;if(s8!=null){d.s8=s8;d.hh=hh}if(sty!=null)d.style=sty}const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
+if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}if(x&&d.style!=null&&x.style==null)x.style=d.style}}catch(e){}return r}}
 
 /* Spotifly: a play button on each song on your artist page */
 {const st=document.createElement('style');st.textContent='.sr .bpl{width:24px;height:24px;padding:0;margin:0;border-radius:50%;border:0;background:#1db954;color:#000;font-size:10px;line-height:24px;cursor:pointer;box-shadow:none}.sr .bpl:hover{transform:scale(1.08)}.sr.bon{background:#1db95422}.sr.bon b{color:#1db954}';document.head.appendChild(st)}

@@ -1,7 +1,6 @@
 /* ---------- v49.2.0: deeper career ----------
-   - Song direction: on the Make a song screen pick a Mood (Balanced, Hype, Chill, Emotional) and a Length (Radio, Short,
-     Long) before the genre. Saved on the draft and song as sd ('mood|length'); it shapes daily streams (planOf), quality
-     and followers. The 9 genres are unchanged. Choice kept in S.sdir for the next song.
+   - Song direction (removed in v49.25.0): songs made before then may have a Mood and Length, saved as sd ('mood|length');
+     it still shapes their daily streams (planOf), quality and followers. New songs have none.
    - Plaques: a song passing 1M / 10M / 100M / 1B streams (Gold, Platinum, Diamond, Billions Club) gets a plaque in the
      mail (a Spotifly Team message and a card) and it hangs on the studio wall. State: song.pq (tiers given), S.plq list.
    - Legacy goals for the late game, paid once (S.leg). Goals an old save already meets are marked done quietly.
@@ -18,17 +17,8 @@ const mail=b=>{try{if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'Spotif
 const card=(k,t,s,n)=>{try{glCard(k,t,s);snd('chime');setTimeout(()=>snd('cash'),180);glBurst(n||30)}catch(e){}};
 
 /* ===== song direction ===== */
-const SDIR={m:[['bal','Balanced','Steady streams'],['hype','Hype','Big first days, fades faster'],['chill','Chill','Slow start, streams for longer'],['deep','Emotional','Wins you extra followers']],
- l:[['radio','Radio','Standard length'],['short','Short','Catchy: +10% streams, a bit lower quality'],['long','Long','Ambitious: higher quality, 8% fewer streams']]};
-const sdGet=()=>{const d=S.sdir||{};return{m:SDIR.m.some(x=>x[0]==d.m)?d.m:'bal',l:SDIR.l.some(x=>x[0]==d.l)?d.l:'radio'}};
-const sdNote=()=>{const d=sdGet();return SDIR.m.find(x=>x[0]==d.m)[2]+' · '+SDIR.l.find(x=>x[0]==d.l)[2]};
-window.sdPick=(k,v)=>{S.sdir=Object.assign(sdGet(),{[k]:v});document.querySelectorAll('.sdir button[data-k='+k+']').forEach(b=>b.classList.toggle('go',b.dataset.v==v));const n=document.getElementById('sdn');if(n)n.textContent=sdNote();try{snd('click')}catch(e){}};
-{const st=document.createElement('style');st.textContent=`.sdir{margin:4px 0 10px;padding:8px 10px;background:#0b0f0d99;border:2px solid #2a352e}.sdir .sdr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:3px 0}
-.sdir .sdr>span{width:64px;font-size:12px;color:var(--m)}.sdir button{padding:5px 10px;font-size:12px}.sdir small{display:block;color:#ffd27a;margin-top:4px}`;document.head.appendChild(st)}
-{const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const box=document.querySelector('#ui .box.modal'),gen=box&&box.querySelector('.gen');if(gen&&!box.querySelector('.sdir')){const d=sdGet(),el=document.createElement('div');el.className='sdir';
-  el.innerHTML=[['m','Mood'],['l','Length']].map(([k,l])=>`<div class=sdr><span>${l}</span>${SDIR[k].map(([v,t])=>`<button data-k=${k} data-v=${v} class="${d[k]==v?'go':''}" onclick="sdPick('${k}','${v}')">${t}</button>`).join('')}</div>`).join('')+`<small id=sdn>${sdNote()}</small>`;
-  const lb=box.querySelector('.recl');(lb||gen).before(el)}}catch(e){console.error('song direction',e)}return r}}
-{const s0=startRec;startRec=function(){const r=s0.apply(this,arguments);try{if(rec){const d=sdGet();rec.sd=d.m+'|'+d.l}}catch(e){}return r}}
+/* v49.25.0: the Mood and Length pickers are gone from the Make a song screen, so new songs have no sd. Songs and drafts
+   that already have one keep its effect below. */
 if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const sd=rec&&rec.sd,n=S.drafts.length;const r=f0.apply(this,arguments);
  try{if(sd&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.sd=sd;const l=sd.split('|')[1],q=l=='long'?5:l=='short'?-4:0;if(q&&isFinite(+d.q))d.q=Math.max(1,Math.min(100,+d.q+q))}}catch(e){}return r}}
 {const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),sd=d&&d.sd,n0=S.songs.length;const r=u0.apply(this,arguments);

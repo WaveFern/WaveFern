@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.24.14. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.25.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -26,24 +26,12 @@ Sleep in your bed to end the day. Overnight, yesterday's Streams are paid out an
 Spend the money on Studio gear so your next songs are better, and repeat.
 The tutorial
 
-Big Vee, your manager, walks you through the first steps. Each step pays a little cash and each chapter a bit more:
+Big Vee, your manager, walks you through the basics: walk, pick your artist name, record a song and release it. A glowing line on the ground leads you to each place, and on the laptop his box shows over the screen and the button to click is outlined. After the basics he only drops in now and then, when you find something new (your first DM, the street, a car, a shop, the airport...), with at least 45 seconds between tips.
 
-Chapter	Step	Goal
-1	Find your feet	Walk around. Hold Shift to sprint.
-1	Pick a stage name	Laptop (E) > Spotifly: choose your artist name.
-1	Cut a track	Mic in the studio (E): pick a genre, beat four mini games.
-1	Drop it	Laptop > Spotifly > Upload: release your song.
-2	Check your DMs	Open Messages on the laptop.
-2	Upgrade the rig	Gearshop on the laptop: buy something cheap, like Headphones ($120).
-2	Fresh drip	Browser > Clothes (Threadz): buy any piece, from $12.
-2	Put it on	Wardrobe in your bedroom (E): wear it.
-2	Touch grass	Walk out the front door.
-2	Sleep it off	Go to bed (E) when it is night or you are out of energy.
-3	Know your world	Press N for the map. Scroll or +/- to zoom.
-3	Wheels and fame	Listen to Big Vee.
-3	Book a gig	Open FestivalApp on the laptop.
-3	Back it up	Esc > Settings > Get save code. Keep it safe.
-RewardsEvery step pays $3, every chapter $10, and finishing the whole tutorial $20 more. You can skip it from the pause menu, and you still get the $150 starting gift.
+Tips offPress Tips off on his box, or use the pause menu, and he stays quiet (so do the small helper tips). Turn them back on from the pause menu. You get the $150 starting gift either way.
+
+Your first release is added to Spotifly's Fresh Finds playlist, so your first songs get real plays from day one.
+
 Early goals
 Record a few songs in one genre family: the genre focus bonus rewards a steady sound.
 Buy a better microphone first: it gives the most quality per level.
@@ -187,7 +175,7 @@ The Make a song screen.
 The Make a song screen
 A grid of the 9 genres. A genre marked HOT has hype above ×1.12 today and earns more streams; COLD is below ×0.92.
 Each genre shows its genre focus percentage: how much your fans will reward (or punish) that choice.
-An Extras drop-down holds the diss track, 808 and hi hat options. See Extras: diss tracks, 808s and hi hats.
+An Extras drop-down holds the diss track, 808 and hi hat options. See Extras: sub-genres, diss tracks, 808s and hi hats.
 
 Every step starts with an animated 3, 2, 1, GO countdown; nothing counts until it is over. The countdown also names any Studio gear helping you in that step (see Gear you can feel below).
 
@@ -245,7 +233,7 @@ Do not rush the Beat step. A clean run with no misses adds more than you would t
 The Lyrics step gets harder as you get better at it. Harder lines are worth more, so it evens out.
 In the Mix step, small taps keep the level steadier than long holds.
 See also
-Extras: diss tracks, 808s and hi hats
+Extras: sub-genres, diss tracks, 808s and hi hats
 Song quality
 Genres and genre focus
 Studio gear
@@ -404,10 +392,24 @@ Category: Music
 
 Source: https://wavefern.com/wiki/extras/
 
-Extras: diss tracks, 808s and hi hats
+Extras: sub-genres, diss tracks, 808s and hi hats
 From the WaveFern Wiki
 
-Open Extras on the Make a song screen to choose a diss track, your 808 and your hi hats.[1]
+Open Extras on the Make a song screen to choose a sub-genre, a diss track, your 808 and your hi hats.[1]
+
+Sub-genre
+
+Every genre has its own beat styles, like Boom Bap for Hip-Hop or UK Drill for Rap. Surprise me (the default) lets each song pick one at random. Or pick a sub-genre from the list, grouped by genre: its genre button on the Make a song screen shows the sub-genre name, and recording that genre uses it. Recording any other genre still gets a surprise. Your pick is remembered for the next song and saved with each song, so it keeps that beat. It changes how the song sounds, not its quality or streams.
+
+Hip-Hop: Boom Bap, Jazz Rap, G-Funk, Soul Chop, Southern Bounce, Breakbeat
+Rap: Trap, UK Drill, NY Drill, Rage, Plugg, Phonk
+Pop: Dance Pop, Synth-pop, Pop Ballad, Tropical, Bedroom Pop, Disco Pop
+Rock: Garage Rock, Punk, Arena Rock, Hard Rock Riff, Indie Rock, Grunge
+R&B: Slow Jam, Neo-Soul, Trap Soul, New Jack Swing, Alt R&B, Afro R&B
+Lo-fi: Chillhop, Jazzhop, Rainy Day, Lo-fi Bossa, Sleepy, Tape Beat
+Country: Train Beat, Honky Tonk, Country Ballad, Country Pop, Bluegrass, Country Trap
+Electronic: House, Techno, Trance, Drum & Bass, Dubstep, Synthwave, Future Bass
+Latin: Reggaeton, Latin Trap, Bachata, Salsa, Cumbia, Latin Pop
 
 808 and hi hats
 
@@ -431,10 +433,12 @@ On release, interest changes by somewhere between −8% and +25%.
 See Rivals for the list of rivals.
 
 See also
+Genres and genre focus
 Rivals
 References
 ^ 165-song-menu.js. WaveFern source code, game v47.9.0.
 ^ 132-808-hats.js. WaveFern source code, game v47.9.0.
+^ 67-beats.js. WaveFern source code, game v47.9.0.
 ^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern source code, game v47.9.0.
 Category: Music
 
@@ -466,6 +470,15 @@ daily = quality × 0.36 × random(0.75-1.25)
       × 1.5 on release day
 
 On top of that, a collab brings the featured artist's fans: about 1% of their monthly listeners a day, decaying the same way.
+
+Fresh Finds
+
+While you have under 3,000 monthly listeners, Spotifly's Fresh Finds playlist for new artists plays your songs too. Each song gets extra daily streams on top of the formula above, and the morning results say how many came from the playlist:
+
+fresh finds = 28 × (1 − listeners ÷ 3,000) × age decay × clamp(quality ÷ 10, 0.6, 2.2)
+      × random(0.8-1.2) × 1.5 on release day          (still under the cap)
+
+So an average first song gets about 30 extra streams on release day. The playlist fades out as your own fans grow, and is gone by 3,000 monthly listeners.
 
 Other boosts that stack on top: Promotions, album tracks, the catalogue halo, your Gphone model and Radio and TV slots.
 
@@ -506,6 +519,7 @@ References
 ^ 29-v26.js. WaveFern source code, game v47.9.0.
 ^ 02-data.js. WaveFern source code, game v47.9.0.
 ^ 166-genre-focus.js. WaveFern source code, game v47.9.0.
+^ 177-early-game.js. WaveFern source code, game v47.9.0.
 Category: Music
 
 ---
@@ -1292,7 +1306,7 @@ You can make a diss track about any of these rivals.[1]
 Vex Valentine Kid Kaboom Nyla Knox Rowdy Rae Big Mood Marcus Tito Thunder Mina Marble Jax Jetstream
 
 See also
-Extras: diss tracks, 808s and hi hats
+Extras: sub-genres, diss tracks, 808s and hi hats
 References
 ^ 21-v7-albums-rivals-instagrime-profiles-sit.js. WaveFern source code, game v47.9.0.
 Category: Career
@@ -2353,9 +2367,10 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.24.14. This list is read live from the game, so it is always current.
+The game is on v49.25.0. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.25.0	A livelier start and a calmer Big Vee. New artists are picked up by Fresh Finds, Spotifly's playlist for new artists: while you have under 3,000 monthly listeners each song gets extra plays (about 30 on release day for a first song, more for better songs), fading out as your own fans grow. Your first release gets a welcome message, and the morning results say how many streams came from the playlist. Make a song: the Mood and Length options are gone, and Extras has a new Sub-genre picker with every genre's beat styles (Boom Bap, UK Drill, House and more); pick one and recording that genre uses it, and the song keeps that beat. Big Vee: his box now shows over the laptop too, with one line saying what to click, he no longer says the rest is up to you just before popping up again, and after the basics he waits at least 45 seconds between tips. Tips off now also keeps the small helper tips quiet.
 v49.24.14	Wiki: source file names in References are plain text now, without links out to the code.
 v49.24.13	Wiki: The name section on the Credits page is shorter and no longer says who first came up with FernWave.
 v49.24.12	Fix: the trailer page no longer loads Google sign-in, so it can never upload its career over your cloud save, and a cloud save that is a trailer career is never loaded (this device uploads your real career over it). The profile picture falls back to your initial if Google does not send the image. Trailer: no cars in your lane on the drive shot.
@@ -3005,7 +3020,7 @@ The sounds
 Most of the sounds are made in code with the browser's audio engine: drums, basses, keys, plucked guitars and synths. On top of that, some sounds are recorded samples:
 
 Melodic one-shots (keys, basses, bells, brass, plucks, flutes, strings and more). Each song picks one sample per instrument from its seed, so a bass never changes sound halfway through.
-The recorded 808s and hi hats you can pick under Extras when you make a song (see Extras: diss tracks, 808s and hi hats).
+The recorded 808s and hi hats you can pick under Extras when you make a song (see Extras: sub-genres, diss tracks, 808s and hi hats).
 
 Some of these sounds come from tumfy's free kits.
 
@@ -3022,7 +3037,7 @@ The background music you hear while walking around is different: that is the gam
 
 See also
 Genres and genre focus
-Extras: diss tracks, 808s and hi hats
+Extras: sub-genres, diss tracks, 808s and hi hats
 Credits
 References
 ^ 67-beats.js. WaveFern source code, game v47.9.0.

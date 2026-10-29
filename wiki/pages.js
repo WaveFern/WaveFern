@@ -52,9 +52,9 @@ ${H2('Gameplay')}<ol>
 <li>Back at the laptop, open Spotifly › Upload, give the draft a title and release it. Streams start right away.</li>
 <li>Sleep in your bed to end the day. Overnight, yesterday's ${L('streams')} are paid out and your ${L('listeners','monthly listeners')} update.</li>
 <li>Spend the money on ${L('gear')} so your next songs are better, and repeat.</li></ol>
-${H2('The tutorial')}<p>Big Vee, your manager, walks you through the first steps. Each step pays a little cash and each chapter a bit more:</p>
-${T(['Chapter','Step','Goal'],(D.tutorial||[]).map(t=>[t.c+1,t.n,esc(t.o||'')]),{tall:1})}
-${N('Every step pays $3, every chapter $10, and finishing the whole tutorial $20 more. You can skip it from the pause menu, and you still get the $150 starting gift.','tip','Rewards')}
+${H2('The tutorial')}<p>Big Vee, your manager, walks you through the basics: walk, pick your artist name, record a song and release it. A glowing line on the ground leads you to each place, and on the laptop his box shows over the screen and the button to click is outlined. After the basics he only drops in now and then, when you find something new (your first DM, the street, a car, a shop, the airport...), with at least 45 seconds between tips.</p>
+${N('Press <b>Tips off</b> on his box, or use the pause menu, and he stays quiet (so do the small helper tips). Turn them back on from the pause menu. You get the $150 starting gift either way.','tip','Tips off')}
+<p>Your first release is added to Spotifly's ${L('streams/fresh-finds','Fresh Finds')} playlist, so your first songs get real plays from day one.</p>
 ${H2('Early goals')}${ul([`Record a few songs in one ${L('genres','genre family')}: the ${L('genres','genre focus')} bonus rewards a steady sound.`,`Buy a better ${L('gear','microphone')} first: it gives the most quality per level.`,`Install ${L('instagrime','Instagrime')} and post once a day for followers.`,`Reach 10 monthly listeners to unlock your first ${L('mentors','mentor')}.`])}`});
 
 page('controls','Controls','start',{e:'⌨️',sum:'Keyboard, mouse and touch controls.',src:['07-input-loop.js','154-touch-controls.js'],kw:'keys keyboard wasd shift sprint',body:()=>`
@@ -129,8 +129,10 @@ ${T(['Your last five releases','Focus'],[['All in other families (genre hopping)
 ${N('Your very first release has nothing to compare against, so its focus is ×1. A toast tells you when a release gets +5% or more, or −5% or less.','')}
 ${N('Pick one family and stay in it for most of your releases. You can still switch: the penalty fades as your last five releases fill up with the new family.','tip')}`}});
 
-page('extras','Extras: diss tracks, 808s and hi hats','music',{e:'🥁',sum:'The Extras options on the Make a song screen.',src:['165-song-menu.js','132-808-hats.js','21-v7-albums-rivals-instagrime-profiles-sit.js'],kw:'808 hi hat hats diss track drums extras',body:()=>{const cap=s=>s[0].toUpperCase()+s.slice(1);
- return `<p class=lead>Open <b>Extras</b> on the Make a song screen to choose a diss track, your 808 and your hi hats.</p>
+page('extras','Extras: sub-genres, diss tracks, 808s and hi hats','music',{e:'🥁',sum:'The Extras options on the Make a song screen.',src:['165-song-menu.js','132-808-hats.js','67-beats.js','21-v7-albums-rivals-instagrime-profiles-sit.js'],kw:'808 hi hat hats diss track drums extras sub-genre subgenre style beat style',body:()=>{const cap=s=>s[0].toUpperCase()+s.slice(1);
+ return `<p class=lead>Open <b>Extras</b> on the Make a song screen to choose a sub-genre, a diss track, your 808 and your hi hats.</p>
+${H2('Sub-genre','sub-genre')}<p>Every ${L('genres','genre')} has its own beat styles, like Boom Bap for Hip-Hop or UK Drill for Rap. <b>Surprise me</b> (the default) lets each song pick one at random. Or pick a sub-genre from the list, grouped by genre: its genre button on the Make a song screen shows the sub-genre name, and recording that genre uses it. Recording any other genre still gets a surprise. Your pick is remembered for the next song and saved with each song, so it keeps that beat. It changes how the song sounds, not its quality or streams.</p>
+<p>${Object.keys(D.styles||{}).map(g=>`<b>${esc(g)}</b>: ${(D.styles[g]||[]).join(', ')}`).join('<br>')}</p>
 ${H2('808 and hi hats')}<p>Both pickers offer <b>Auto</b> (the genre's own pick), <b>Built-in</b> (the classic synthesised sound) or one of the named samples. Your choice is remembered for the next song and saved with each song, so it plays the same every time. They change how the song sounds, not its quality.</p>
 <h3>808s (${(D.drums||{}).s808?D.drums.s808.length:0})</h3><p>${((D.drums||{}).s808||[]).map(x=>tag(cap(x))).join(' ')}</p>
 <h3>Hi hats (${(D.drums||{}).hats?D.drums.hats.length:0})</h3><p>${((D.drums||{}).hats||[]).map(x=>tag(cap(x))).join(' ')}</p>
@@ -138,7 +140,7 @@ ${H2('Diss tracks','diss')}<p>Tick <b>Diss track</b> and pick a rival to make a 
 ${ul(['On release, interest changes by somewhere between −8% and +25%.','2 to 5 days later the rival answers. That moves interest by −12% to +20% and your reputation by −2 to +3.'])}
 <p>See ${L('rivals')} for the list of rivals.</p>`}});
 
-page('streams','Streams','music',{e:'📈',sum:'The full daily streams formula, decay, caps, hits and viral songs.',src:['29-v26.js','02-data.js','166-genre-focus.js'],kw:'streams formula plays daily decay hit viral cap payout',body:()=>{const p=D.pace||{},f=D.perf||{};
+page('streams','Streams','music',{e:'📈',sum:'The full daily streams formula, decay, caps, hits and viral songs.',src:['29-v26.js','02-data.js','166-genre-focus.js','177-early-game.js'],kw:'streams formula plays daily decay hit viral cap payout fresh finds playlist',body:()=>{const p=D.pace||{},f=D.perf||{};
  return `${IB('Streams','📈',[['Pay per stream','$'+(D.tune||{}).payRate],['Paid','Every morning'],['Night speed','×2'],['Hit chance','about '+pct(f.hitP||.08)],['Viral chance','about '+(100*(f.viralP||0)).toFixed(2)+'%']])}
 <p class=lead>Every released song earns streams every day. Streams build up through the day (twice as fast at night) and are paid the next morning at <b>$${(D.tune||{}).payRate} per stream</b>, minus any ${L('labels','label')} cut.</p>
 ${H2('Daily streams')}${FX(`daily = quality × ${p.base} × random(0.75-1.25)
@@ -152,6 +154,8 @@ ${H2('Daily streams')}${FX(`daily = quality × ${p.base} × random(0.75-1.25)
       × <b>focus</b>       genre focus (see Genres)
       × 1.5 on release day`)}
 <p>On top of that, a ${L('collabs','collab')} brings the featured artist's fans: about 1% of their monthly listeners a day, decaying the same way.</p>
+${H2('Fresh Finds','fresh-finds')}<p>While you have under 3,000 monthly listeners, Spotifly's <b>Fresh Finds</b> playlist for new artists plays your songs too. Each song gets extra daily streams on top of the formula above, and the morning results say how many came from the playlist:</p>${FX(`fresh finds = 28 × (1 − listeners ÷ 3,000) × age decay × clamp(quality ÷ 10, 0.6, 2.2)
+      × random(0.8-1.2) × 1.5 on release day          (still under the cap)`)}<p>So an average first song gets about 30 extra streams on release day. The playlist fades out as your own fans grow, and is gone by 3,000 monthly listeners.</p>
 <p>Other boosts that stack on top: ${L('promotions')}, ${L('albums','album')} tracks, the ${L('halo','catalogue halo')}, your ${L('gphone','Gphone')} model and ${L('radio')} slots.</p>
 ${H2('Interest')}<p>Interest is a 0-100% measure of how much people are talking about you. Each morning it drops by 10%, then gains 6% for every song you released yesterday. Albums, radio and diss tracks also move it. Releasing steadily keeps it high.</p>
 <p>Whether a song is a hit, goes viral or is normal is rolled <b>once, on its release day</b>.</p>${H2('Hits','hits')}${FX(`hit chance = ${f.hitP} × clamp(quality ÷ ${f.hitQRef}, ${f.hitQMin}, ${f.hitQMax})
