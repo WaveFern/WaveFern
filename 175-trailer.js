@@ -26,7 +26,13 @@ const trlEsc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 function trlPut(x,z,rot){P.x=x;P.z=z;P.rot=rot||0;camT.x=x;camT.z=z;if(P.mesh)P.mesh.visible=true}
 function trlKeys(k){for(const q in keys)delete keys[q];(k||'').split('').forEach(c=>keys[c]=1)}
 function trlQ(sel,re){const L=[...document.querySelectorAll(sel)];return re?L.find(e=>re.test(e.textContent.trim())):L[0]}
-function trlClear(){trlKeys('');try{if(mode=='drive')exitDrive()}catch(e){}try{closePhone()}catch(e){}try{if(FEST.view)festViewOff()}catch(e){}
+/* keep the way clear: nobody walks into the player and no car is in the lane while driving */
+function trlPath(L){TRL.hid=TRL.hid||[];[typeof NPC!='undefined'?NPC:[],typeof VPED!='undefined'?VPED:[]].forEach(A=>A.forEach(n=>{if(n.m&&n.m.visible&&Math.abs(n.z-P.z)<2.2&&Math.abs(n.x-P.x)<L){n.m.visible=false;TRL.hid.push(n)}}))}
+function trlRoad(c){try{TRAF.forEach(t=>{if(Math.abs(t.z-c.z)<4&&t.x>c.x-30&&t.x<c.x+140)t.x+=600})}catch(e){}trlPath(60)}
+/* from behind each stage's crowd, pulled back as far as that crowd goes, so it grows from the tent to the Main Stage */
+function trlStageCam(n,u){const s=FSTG.find(q=>q.n==n),a=s.area,D=a[3]-s.zf,k=trlE.s(u);return{p:[s.cx+(k-.5)*D*.18,4+D*.32-k*1.2,a[3]+D*.28-k*2],l:[s.cx,s.H*.35,s.zf-1],f:46}}
+function trlStage(n){trlClear();trlFestDay();S.t=392;S.energy=100;const s=FSTG.find(q=>q.n==n);if(s)trlPut(s.ix,s.iz,0);try{festStartBooked({n,slot:3,songs:S.songs.slice(-4).map(x=>x.id)})}catch(e){console.error(e)}}
+function trlClear(){trlKeys('');(TRL.hid||[]).forEach(n=>{if(n.m)n.m.visible=true});TRL.hid=[];try{if(mode=='drive')exitDrive()}catch(e){}try{closePhone()}catch(e){}try{if(FEST.view)festViewOff()}catch(e){}
  try{const m=$('fsg');if(m)m.remove()}catch(e){}if(FEST.set)FEST.set=null;try{if(IN)leaveShop()}catch(e){}
  rec=null;MEET=null;$('ui').innerHTML='';if(mode!='dshow')mode='play';PAUSED=0;if(P.mesh)P.mesh.visible=true}
 function trlHome(){try{if(DCITY.on)DCITY.leave(1)}catch(e){}}
@@ -66,14 +72,15 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'First take',d:4,pre:1,show:['ui','hud','mg'],set(){trlClear();S.t=200;S.energy=100;trlPut(12.2,2.3,Math.PI);try{startRec(0);mgStage(2);rec.wait=0;rec.cdn=0;rec.cgo=0;rec.x.lv=.45}catch(e){}},mix:1},
 /* the first song and its first few listeners */
  {sc:'First streams',d:4,pre:1,show:['ui'],set(){trlClear();trlName();S.t=230;if(!S.songs.some(x=>x.title==TRL.song))S.songs.push({id:9e5+50,title:TRL.song,g:'Hip-Hop',q:48,day:S.day,streams:1840,today:212});S.followers=Math.max(S.followers||0,37);openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.45,1.6,'22% 14%'],tick(u){trlCount(Math.min(1,u/.9),{'monthly listeners':1284,followers:37})}},
- {sc:'Message an artist',d:8,pre:1,show:['ui'],pz:['pc',1.22,1.3,'100% 60%'],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
+ {sc:'Message an artist',d:8,pre:1,show:['ui'],pz:['pc',1.45,1.2,[[0,'90% 96%'],[.58,'90% 96%'],[.74,'100% 42%'],[1,'100% 42%']]],set(){trlClear();trlName();S.t=60;trlPut(6,2.9,Math.PI);const m=trlConv();m.unread=0;openPC();app='msg';S.chat=m.id;smo=0;pcR()},
   acts:/* type, then send once the message is written, and hold on the sent message */
   [[.3,()=>trlClick(()=>$('cin'),.8,()=>{const i=$('cin');if(i)i.focus();trlType(()=>$('cin'),'love your stuff. collab?',()=>setTimeout(()=>trlClick(()=>trlQ('#pc button',/^Send$/),.7),350))})]]},
  {sc:'Collab meeting',d:6,pre:1,show:['ui'],set(){trlClear();trlName();S.t=150;const m=trlConv();m.state=1;try{syncArt()}catch(e){}const o=ART_M.find(q=>q.i===trlArtist());
    /* meet on the street outside your house rather than inside a venue */if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z);trlPut(o.x-2.6,o.z+.5,Math.PI/2);try{collab(o)}catch(e){}}},zoom:6,
   acts:[[.4,()=>trlClick(()=>trlQ('#ui .mto'),.8)],[2.4,()=>trlClick(()=>trlQ('#ui .mto'),.8)],[4.2,()=>trlClick(()=>trlQ('#ui .mto'),.8)]]},
  {sc:'Card: how far',d:5.5,pre:1,card:'HOW FAR<br>CAN YOU GO?'},
- {sc:'Silence',d:.5,card:' '},
+ /* the black half second before the drop hides the heavy setup: the star career and the festival's first build */
+ {sc:'Silence',d:.5,card:' ',acts:[[.02,()=>{try{trlStar();trlStage(4);trlClear()}catch(e){}}]]},
  /* the drop: the city from above, the one shot not tied to the player */
  {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},
  {sc:'Collab session',d:B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
@@ -84,12 +91,16 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  /* the internet is watching: your new single blowing up on Instagrime */
  {sc:'Instagrime',d:B,show:['ui'],set(){trlClear();openPC();app='ig';const q={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap:'new single out now. 50k streams already, thank you',day:S.day,l:21400};S.igPosts.push(q);igp=q;igv='post';smo=0;pcR()},pz:['pc',1.3,1.42,'50% 40%'],
   tick(u){trlCount(Math.min(1,u/.7),{likes:[0,21400]});const m=document.querySelector('#pc .mn'),k=Math.max(0,Math.min(1,(u-.25)/.6));if(m)m.scrollTop=Math.round(330*k*k*(3-2*k))}},
-  {sc:'Fern Road',d:B,show:[],set(){trlClear();S.t=272;trlPut(44,14.2,Math.PI/2);trlKeys('ds')},cam:u=>{const x=P.x;return{p:[x+7.5,1.25,20.5],l:[x,1.2,14.2],f:42}}},
- {sc:'Drive',d:B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlKeys('w')}}},
+  {sc:'Fern Road',d:B,show:[],set(){trlClear();S.t=272;trlPut(44,14.2,Math.PI/2);trlPath(30);trlKeys('ds')},cam:u=>{const x=P.x;return{p:[x+7.5,1.25,20.5],l:[x,1.2,14.2],f:42}}},
+ {sc:'Drive',d:B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlRoad(c);trlKeys('w')}}},
  {sc:'Gphone',d:2*b,show:['ph'],set(){trlClear();S.t=268;trlPut(40,14.2,Math.PI/2);try{openPhone()}catch(e){}}},
- {sc:'Crew',d:2*b,crew:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlKeys('ds')},zoom:5.5},
+ {sc:'Crew',d:2*b,crew:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlPath(30);trlKeys('ds')},zoom:5.5},
  {sc:'Spotifly: 180K',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.3,1.45,'30% 20%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[48200,640000],followers:[6900,182000],fame:[12,58]})}},
- {sc:'Festival',d:2*B,show:[],set(){trlClear();trlFestDay();S.t=392;trlPut(364,-100,0);try{festStartBooked({n:1,slot:3,songs:S.songs.slice(-4).map(s=>s.id)})}catch(e){console.error(e)}}},
+ /* the festival: from the smallest stage to the Main Stage, one stage a second, the crowd growing each time */
+ {sc:'Festival: Fresh Fern Tent',d:2*b,show:[],set(){trlStage(4)},cam:u=>trlStageCam(4,u)},
+ {sc:'Festival: The Pit',d:2*b,show:[],set(){trlStage(3)},cam:u=>trlStageCam(3,u)},
+ {sc:'Festival: Riverside',d:2*b,show:[],set(){trlStage(2)},cam:u=>trlStageCam(2,u)},
+ {sc:'Festival: Main Stage',d:2*b,show:[],set(){trlStage(1)},cam:u=>trlStageCam(1,u)},
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
  {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.5,1.7,'24% 16%'],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},pz:['pc',1.2,1.32,'50% 45%'],acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
@@ -152,13 +163,14 @@ body.trlon>*:not(#c):not(#trl):not(.trlv){visibility:hidden!important}body.trlon
 #trl .qend p.qtag{font-size:clamp(18px,2.4vw,40px);color:#2fe68a;margin-top:1.1em}
 #trl .qend p{font-family:'Silkscreen',ui-monospace,monospace;margin:.9em 0 0;font-size:clamp(14px,1.7vw,28px);color:#e8f3ec;visibility:hidden}#trl .qend .on{visibility:visible}
 #trl .qcur{position:absolute;left:0;top:0;width:22px;height:30px;opacity:0;z-index:3}#trl .qcur svg{display:block;transform-origin:2px 2px;transition:transform .08s}#trl .qcur.pr svg{transform:scale(.86)}
+#trl .qnote{position:absolute;left:22px;bottom:18px;font:12px/1 ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#fff;opacity:0;text-shadow:0 1px 2px #000;z-index:4}
 #trl .qfd{position:absolute;inset:0;background:#000;opacity:0;z-index:5}
 #trl .qhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;text-align:center;line-height:1.6}
 #trlm{position:fixed;inset:0;z-index:2147483001;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}#trlm .box{width:min(720px,94vw);max-height:92vh;overflow:auto}
 #trlm .trlsc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}#trlm .trlsc button{text-align:left;padding:8px 10px;font-size:13px}#trlm .trlsc small{display:block;opacity:.65}
 #trlm label{display:block;margin:6px 0}#trlm input[type=text]{width:100%;margin-top:4px}#trlm .row2{margin-top:12px}`;document.head.appendChild(st)}
 function trlOverlay(){let o=$('trl');if(o)o.remove();o=document.createElement('div');o.id='trl';
- o.innerHTML=`<div class="qblk" id="trlblk"></div><div class="qfd" id="trlfd"></div><div class="qcur" id="trlcur"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M2 2 L2 24 L7.5 18.5 L11.5 27.5 L15 26 L11 17.2 L18.5 17.2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
+ o.innerHTML=`<div class="qblk" id="trlblk"></div><div class="qfd" id="trlfd"></div><div class="qnote" id="trlnote">Non-gameplay footage</div><div class="qcur" id="trlcur"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M2 2 L2 24 L7.5 18.5 L11.5 27.5 L15 26 L11 17.2 L18.5 17.2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
  document.body.appendChild(o);TRL.cur={el:$('trlcur'),x:innerWidth*.62,y:innerHeight*.7,t0:null};return o}
 function trlShowOnly(ids){document.querySelectorAll('.trlv').forEach(e=>{if(!(ids||[]).includes(e.id))e.classList.remove('trlv')});(ids||[]).forEach(id=>{const e=$(id);if(e)e.classList.add('trlv')})}
 
@@ -184,7 +196,7 @@ function trlPre(dt){TRL.T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000;co
  if(s.mix&&mode=='rec'&&rec&&rec.st==2&&rec.x)MGH=rec.x.lv<rec.x.c?1:0;
  /* in the studio a plaque goes up on the wall on every beat */
  if(s.plq)trlPlaques(T)}
-function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);
+function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowOnly(s.show);trlZoom(s);{const n=$('trlnote');if(n)n.style.opacity=s.cam?.7:0}
  /* the build: every burst and card fades up from black and back down into it */
  {const f=$('trlfd');if(f){let o=0;if(s.pre){const lt=TRL.T-s.t,fi=s.card?.15:.15,fo=s.card?.2:.25;o=Math.max(0,1-lt/fi,1-(s.d-lt)/fo)}f.style.opacity=Math.min(1,o)}}
  if(s.cam){const c=s.cam(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)));const C=TRL.cam=TRL.cam||new THREE.PerspectiveCamera(45,1,.1,2600);C.position.set(...c.p);C.lookAt(...c.l);C.fov=c.f;C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}if(s.tick)s.tick(Math.max(0,Math.min(1,(TRL.T-s.t)/s.d)))}
@@ -192,6 +204,8 @@ function trlPost(dt){trlPointer();const s=TRL.shots[TRL.i];if(!s)return;trlShowO
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){const s=TRL.run&&TRL.shots[TRL.i];if(s&&s.cam&&TRL.cam&&sc===scene&&c===cam)return r0(sc,TRL.cam);return r0(sc,c)}}
 /* in the few cinematic shots every building stays solid (the game fades the ones in front of the player) */
 {const f0=fadeT;fadeT=function(dt){const s=TRL.run&&TRL.shots[TRL.i];if(s&&s.cam){try{CT.forEach(b=>{b.mat.opacity=1;b.mat.depthWrite=true;if(b.dm){b.dm.opacity=1;b.dm.depthWrite=true}})}catch(e){}return}return f0.apply(this,arguments)}}
+/* the artist's answer in the messages shot is written for the trailer */
+{const r0=reply;reply=function(m,t){if(TRL.run){TY=0;m.log.push({f:'a',t:'yooo I was hoping you would ask. lets cook 🔥 studio this week?',d:S.day});return}return r0.apply(this,arguments)}}
 {const v0=window.VIEWX;window.VIEWX=function(){if(TRL.run&&TRL.zoom&&['play','cut'].includes(mode))return TRL.zoom;return typeof v0=='function'?v0():0}}
 /* nothing is saved in trailer mode, and nothing is loaded over the trailer's career */
 {const a0=autoSave;autoSave=function(){if(TRL.on)return;return a0.apply(this,arguments)}}
