@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.24.10';
+const GAME_VERSION='v49.24.11';
 const VERSION_HISTORY=[
+ {v:'v49.24.11',n:'Trailer: the Day 2 screen now shows monthly listeners going from 946 to 2,230 and interest at 84%.'},
  {v:'v49.24.10',n:'Fix: the career restore after the trailer bug now also uses backups that were saved under a different label, taking the latest real career in the backups that is not already in a career slot.'},
  {v:'v49.24.9',n:'Trailer polish: interest on the Day 2 screen counts up to 38% instead of sitting at 6%. The Tokyo stadium cuts in with the first song already playing (NIGHT BUS on the big screen, pyro going) instead of the show\'s 6-second countdown, and the push-in on stage starts just above the crowd\'s heads so nobody blocks the lens.'},
  {v:'v49.24.8',n:'Fix: opening wavefern.com/trailer could replace your career. The save that runs when a tab is hidden or closed still ran on the trailer page and wrote the trailer\'s career over yours. The trailer page now cannot write any career, backup or cloud data at all. And when the game opens, any career the trailer wrote is swapped back for your own career, which the game had kept as a backup at that moment, with a message saying it was restored.'},

@@ -92,7 +92,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
  /* zero fans to millions: the listener and follower numbers count up */
 /* the climb: each Spotifly check-in picks up where the last one left off, so you have millions by the tour */
- {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[1284,48200],followers:[37,6900],fame:[3,12]})}},
+ {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[2230,48200],followers:[37,6900],fame:[3,12]})}},
  /* the internet is watching: your new single blowing up on Instagrime */
  {sc:'Instagrime',d:B,show:['ui'],set(){trlClear();openPC();app='ig';const q={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap:'new single out now. 50k streams already, thank you',day:S.day,l:21400};S.igPosts.push(q);igp=q;igv='post';smo=0;pcR()},pz:['pc',1.08,1.16,'50% 40%'],ng:1,hearts:1,
   tick(u){trlCount(Math.min(1,u/.7),{likes:[0,21400]});const m=document.querySelector('#pc .mn'),k=Math.max(0,Math.min(1,(u-.25)/.6));if(m)m.scrollTop=Math.round(330*k*k*(3-2*k))}},
@@ -196,11 +196,11 @@ function trlDay(s){const e=$('trlday');if(!e)return;if(!s||!s.day){if(e.dataset.
  const lt=TRL.T-s.t,b=TRL.BEAT;if(e.dataset.on!=String(s.t)){e.dataset.on=String(s.t);e.style.display='block';
   e.innerHTML=`<div class="dbox"><h2>☀ Day 2</h2><p>Yesterday's results, paid now:</p><div class="dcards">
    <div class="dc"><small>Streams</small><b id="trldS">+0</b></div><div class="dc"><small>Earned</small><b id="trldE">$0.00</b></div>
-   <div class="dc"><small>Monthly listeners</small><b id="trldL">0 → 0</b><i id="trldN">+0</i></div><div class="dc"><small>Interest</small><b id="trldI">0%</b></div></div>
+   <div class="dc"><small>Monthly listeners</small><b id="trldL">946 → 946</b><i id="trldN">+0</i></div><div class="dc"><small>Interest</small><b id="trldI">0%</b></div></div>
    <p class="dm">1 new release boosted interest. Streams build up through the day and faster at night.</p><span class="dgo">Start the day</span></div>`}
  const x=e.querySelector('.dbox');if(x)x.classList.toggle('in',lt>=0);e.querySelectorAll('.dc').forEach((c,i)=>c.classList.toggle('in',lt>=(1+i)*b));
  const k=Math.max(0,Math.min(1,(lt-5*b)/(5*b))),c=1-Math.pow(1-k,3),f=n=>Math.round(n*c).toLocaleString(),set=(id,t)=>{const y=$(id);if(y)y.textContent=t};
- set('trldS','+'+f(1840));set('trldE','$'+(7.36*c).toFixed(2));set('trldL','0 → '+f(1284));set('trldN','+'+f(1284));set('trldI',Math.round(38*c)+'%');
+ set('trldS','+'+f(1840));set('trldE','$'+(7.36*c).toFixed(2));set('trldL','946 → '+(946+Math.round(1284*c)).toLocaleString());set('trldN','+'+f(1284));set('trldI',Math.round(84*c)+'%');
  const L=e.querySelectorAll('.dc')[2];if(L)L.classList.toggle('hit',k>=1)}
 /* people on the pavement step aside for you: anyone near the line you are walking drifts over to the building side of it
    (behind you from the camera, so nobody blocks the shot), and fans stay put. On a shot's first frame they are already there. */
