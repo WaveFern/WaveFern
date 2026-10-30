@@ -27,9 +27,10 @@ const TIPS=[
  ['quest',()=>S.day>=2,'Your PC has a Quests app: finish all three daily quests for a cash reward every day.'],
  ['ig',()=>(S.songs||[]).length>=1&&!(S.igPosts||[]).length,'Post on Instagrime (Gphone, press G) to turn listeners into followers.'],
  ['gear',()=>(+S.money||0)>=600&&(S.songs||[]).length>=1,'Better studio gear makes better songs. Open the Browser on your PC and visit the Gearshop.']];
-function tip(t){const d=document.createElement('div');d.className='tipT';d.innerHTML='<b>Tip</b> '+esc(t);$('toast').appendChild(d);snd('ping');setTimeout(()=>d.remove(),8000)}
+/* through Pops so a pause hides and freezes it like every other pop-up (v49.38.0) */
+function tip(t){Pops.show('tip|'+t,d=>{d.className='tipT';d.innerHTML='<b>Tip</b> '+esc(t)},8000,'ping')}
 let lastTip=0;
-function tipTick(){if(!live()||mode!='play'||PAUSED||(S.tut&&(S.tut.on||S.tut.x)))return;const now=performance.now();if(now-lastTip<45000)return;S.tips=S.tips||{};
+function tipTick(){if(!live()||mode!='play'||PAUSED||(S.tut&&(S.tut.on||S.tut.x)))return;const now=performance.now()-Pops.pzMs();if(now-lastTip<45000)return;S.tips=S.tips||{};
  for(const[id,ok,t]of TIPS){if(S.tips[id])continue;let y=false;try{y=ok()}catch(e){}if(y){S.tips[id]=1;lastTip=now;tip(t);return}}}
 {const st=document.createElement('style');st.textContent='#toast .tipT{border-color:#ffd27a!important;max-width:min(420px,88vw)}#toast .tipT b{font:10px Silkscreen,ui-monospace,monospace;color:#ffd27a;letter-spacing:1px;margin-right:6px}';document.head.appendChild(st)}
 setInterval(()=>{try{msTick()}catch(e){}try{tipTick()}catch(e){}},2000);
