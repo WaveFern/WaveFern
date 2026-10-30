@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.25.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.27.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -1598,7 +1598,8 @@ Every destination becomes a city you can walk around when you land: signs in the
 
 Landmark selfie: once a day per city, for 30 + √listeners × 0.25 followers and an Instagrime post.
 Hotel: check in at reception and sleep in your room. You wake up there.
-Shops: restaurants, cafés, convenience stores, souvenir shops (postcards, snow globes, T-shirts, fridge magnets) and record shops.
+Shops: every shopfront opens the room its sign names, in any language: restaurants (pizza, tacos, sushi, noodles, burgers and grills serve their own dishes), cafés and tea houses, bakeries, markets, ice cream and juice bars, convenience stores, bars, souvenir shops (postcards, snow globes, T-shirts, fridge magnets), record shops, bookshops, boutiques and sneaker shops (real clothes for your wardrobe), pharmacies, florists, barbers (the haircut menu), laundromats, electronics shops, beauty shops, massage parlours, bike shops (ride across town), cinemas, arcades and karaoke bars.
+Once a day per city: hand a bouquet to a fan (15 + √listeners × 0.15 followers), sing at karaoke (20 + √listeners × 0.2), play your song on an electronics shop's demo speakers (8 + √listeners × 0.1) or set an arcade high score (10 + √listeners × 0.1).
 Street food
 
 Food stalls sell local dishes by language. Drinks also refill stamina.
@@ -2367,9 +2368,12 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.25.0. This list is read live from the game, so it is always current.
+The game is on v49.27.0. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.27.0	Tour city shops are what their sign says. Walking into a Laundry, a Pizza place, a 寿司 bar or a music shop abroad used to drop you into a random room (a corner shop, a souvenir shop, a bookshop) selling the wrong things. Now every shopfront in every language opens the matching room, and the same shop always opens the same room. Fourteen new rooms: a bakery, a laundromat (wash your clothes or sit and wait), a barber (the haircut menu), a florist (hand a bouquet to a fan once a day), a cinema (watch a film, popcorn), an arcade (cabinets, a claw machine, a dance machine), a karaoke bar (sing once a day for new followers), a bar with mocktails, a jukebox and a pool table, a market (fruit, cheese for a fromagerie), an electronics shop (play your song on the demo speakers), an ice cream and juice bar, a massage parlour, a beauty shop and a bike shop (ride across town). Restaurants serve what the sign says (pizza, tacos, sushi, noodles, burgers, grill), tea houses serve tea, bookshops sell books, boutiques, sneaker and vintage shops sell real clothes for your wardrobe and pharmacies sell remedies. Fixes: the rooms no longer float in a field of grass, the top-left box names the shop you are in instead of saying Outside, and the shelves in the stores and pharmacies are no longer white on white.
+v49.26.0	Instagrime photos now look like you. Every drawn post is a real photo of your 3D character (same hair, face, clothes, hat and glasses) posed for the scene: mic up on a stage with your name on the screen, headphones on in the studio, a peace sign on a rooftop at night or sunset, waving in the park, a mirror selfie for a fit check, leaning on a car, a pet at your feet, or holding your new record next to its cover. Collab posts show both of you, and feed posts from other accounts get the same treatment. Profile pictures in Instagrime and the artist pictures in Messages are now detailed head-and-shoulders portraits. Artist DMs are richer: their first messages, collab asks, music talk and check-ins mention your latest song and its streams, your last post, your look, what they notice in your genre and theirs (the 808s, the hook, the drop...), and the track they are working on.
+v49.25.1	wavefern.com/trailer now plays the official trailer from YouTube, with a Play free button. The recordable in-game trailer is still at wavefern.com/?trailer.
 v49.25.0	A livelier start and a calmer Big Vee. New artists are picked up by Fresh Finds, Spotifly's playlist for new artists: while you have under 3,000 monthly listeners each song gets extra plays (about 30 on release day for a first song, more for better songs), fading out as your own fans grow. Your first release gets a welcome message, and the morning results say how many streams came from the playlist. Make a song: the Mood and Length options are gone, and Extras has a new Sub-genre picker with every genre's beat styles (Boom Bap, UK Drill, House and more); pick one and recording that genre uses it, and the song keeps that beat. Big Vee: his box now shows over the laptop too, with one line saying what to click, he no longer says the rest is up to you just before popping up again, and after the basics he waits at least 45 seconds between tips. Tips off now also keeps the small helper tips quiet.
 v49.24.14	Wiki: source file names in References are plain text now, without links out to the code.
 v49.24.13	Wiki: The name section on the Credits page is shorter and no longer says who first came up with FernWave.
