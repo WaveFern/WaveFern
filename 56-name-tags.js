@@ -23,9 +23,11 @@ const NTAG={box:null,list:[]};
 function ntBox(){if(NTAG.box)return NTAG.box;const d=document.createElement('div');d.id='ntags';const h=document.getElementById('hud');document.body.insertBefore(d,h||document.body.firstChild);return NTAG.box=d}
 {const st=document.createElement('style');st.textContent=
  '#ntags{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}'+
- '#ntags .nt{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font:700 14px/1.25 "Trebuchet MS",Verdana,"DejaVu Sans",system-ui,sans-serif;color:#fff;background:rgba(10,14,18,.86);padding:3px 10px 4px;border-radius:999px;border:1.5px solid rgba(255,255,255,.28);box-shadow:0 2px 0 rgba(0,0,0,.45);text-shadow:0 1px 0 #000,0 0 2px #000;letter-spacing:.2px;will-change:transform}'+
- '#ntags .nt.art{border-color:#ffd84a;color:#fff6c8;background:rgba(40,30,6,.9)}'+
- '#ntags .nt.art:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#ffd84a;margin-right:6px;vertical-align:1px;box-shadow:0 0 6px #ffd84a}';
+ /* v50.0.0: in the game's own style: the pixel font on a dark panel with a hard black edge and drop shadow, and a little pixel tail */
+ '#ntags .nt{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font:400 13px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#e8f3ec;background:#0b0f0d;padding:4px 7px 3px;border:2px solid #000;box-shadow:inset 0 0 0 1px #2a352e,2px 2px 0 #0009;will-change:transform}'+
+ '#ntags .nt:after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-3px;width:6px;height:4px;background:#000}'+
+ '#ntags .nt.art{color:#ffd84a;box-shadow:inset 0 0 0 1px #ffd84a,2px 2px 0 #0009}'+
+ '#ntags .nt.art:before{content:"";display:inline-block;width:5px;height:5px;background:#ffd84a;margin-right:5px;vertical-align:1px}';
  document.head.appendChild(st)}
 const NTV=new THREE.Vector3();
 /* attached to the scene and every parent visible (the label itself is hidden: its page tag is drawn instead) */

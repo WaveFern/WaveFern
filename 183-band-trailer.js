@@ -37,6 +37,8 @@ function bPlace(){const pl=BB.place,L=mates(),z=BM.ME.zone||'o';
   else if(pl=='bunks'){const o=[[3,1.3,1.4],[3,4.7,1.75],[3.4,3.6,1.6]][i];m.x=o[0];m.z=o[1];m.r=o[2]}
   else if(pl=='stage'){const a=OFF[m.inst],b=OFF[BB.pov],ox=a[0]-b[0],oz=a[1]-b[1],r=P.rot||0;m.x=P.x+ox*Math.cos(r)+oz*Math.sin(r);m.z=P.z-ox*Math.sin(r)+oz*Math.cos(r);m.r=r}
   else if(pl=='street'){const o=[[1.2,-.4,-Math.PI/2],[-1.2,-.3,Math.PI/2],[0,-1.2,0]][i];m.x=P.x+o[0];m.z=P.z+o[1];m.r=o[2]}});
+ /* a name is enough over a head in a trailer: the instrument shows in the shot (the game's tags read Name · Instrument) */
+ if(typeof NTAG!='undefined')NTAG.list.forEach(t=>{const x=t.el.textContent;if(x.includes(' · '))t.el.textContent=x.split(' · ')[0]});
  /* on a shot's first frames they are already in place (the game's figures glide to where a player is, which would slide them through each other) */
  if(BB.si!==TRL.i){BB.si=TRL.i;BB.sn=0}if(BB.sn++<3)L.forEach(m=>{const a=BM.AV[m.id];if(a)a.g.position.set(m.x,0,m.z)});
  /* on a stage they stand on its floor, as you do (an emote's hop is on top of that) */
@@ -104,10 +106,10 @@ trlShots=function(){const M={};trlShots0().forEach(s=>M[s.sc]=s);const b=BEAT,B=
    mates().forEach((m,i)=>m.rd={k:'rec',g:0,title:TRL.song,ts:i+1})},
   acts:[[.45,()=>trlClick(()=>trlQ('#mpb button',/Ready to record/),.85)]]},
  /* everyone plays their part: each bandmate's own minigame */
- {sc:'Drums',d:B,cap:'MILA|DRUMS',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('dr')},tick:bPlay},
- {sc:'Guitar',d:B,cap:'KAI|GUITAR',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('gt')},tick:bPlay},
- {sc:'Bass',d:B,cap:'THEO|BASS',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('bs')},tick:bPlay},
- {sc:'Vocals',d:B,cap:'SKY|VOCALS',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('vo')},acts:[[.15,trlLyr],[1.05,trlLyr]]},
+ {sc:'Drums',d:B,cap:'DRUMS',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('dr')},tick:bPlay},
+ {sc:'Guitar',d:B,cap:'GUITAR',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('gt')},tick:bPlay},
+ {sc:'Bass',d:B,cap:'BASS',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('bs')},tick:bPlay},
+ {sc:'Vocals',d:B,cap:'VOCALS',show:['ui','hud','mg'],place:'studio',zoom:5,set(){bRec('vo')},acts:[[.15,trlLyr],[1.05,trlLyr]]},
  /* out in town together */
  {sc:'Band walk',d:B,walk:1,show:[],place:'follow',set(){trlClear();bPov('vo');S.t=272;trlPut(44,14.2,Math.PI/2);trlPath(30);trlKeys('ds')},cam:u=>{const x=P.x;return{p:[x+4.6,1.5,18.8],l:[x-1.3,1.1,14.3],f:44}}},
  {sc:'Emotes',d:B,show:[],place:'street',zoom:5,set(){trlClear();bPov('vo');S.t=276;trlPut(56,14.2,0);trlPath(12);
