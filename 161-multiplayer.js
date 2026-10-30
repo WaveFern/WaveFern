@@ -599,7 +599,7 @@ addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)
 #emw button{position:absolute;transform:translate(-50%,-50%);width:92px;height:76px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;background:#0b0f0de6;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;transition:transform .12s}
 #emw button:hover,#emw button:focus{transform:translate(-50%,-50%) scale(1.12);box-shadow:inset 0 0 0 2px var(--g),4px 4px 0 #0008}#emw button b{font-size:28px;line-height:1}#emw button small{font-size:11px;color:var(--t)}
 #emw .emc{position:absolute;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;background:#0b0f0de6;border:3px solid #000;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:Silkscreen,ui-monospace,monospace;color:var(--g)}
-.emf{position:fixed;z-index:4;pointer-events:none;font-size:30px;transform:translate(-50%,-100%);text-shadow:2px 2px 0 #000;animation:emfp .35s ease-out}
+.emf{position:fixed;z-index:4;pointer-events:none;font-size:52px;transform:translate(-50%,-100%);text-shadow:2px 2px 0 #000;animation:emfp .35s ease-out}
 @keyframes emfp{0%{transform:translate(-50%,-100%) scale(.2)}70%{transform:translate(-50%,-100%) scale(1.25)}100%{transform:translate(-50%,-100%) scale(1)}}`;document.head.appendChild(st)}
 
 /* ===== band collabs: every artist chat is shared, the whole band records the collab together, and the song is linked ===== */

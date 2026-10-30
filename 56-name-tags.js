@@ -23,11 +23,11 @@ const NTAG={box:null,list:[]};
 function ntBox(){if(NTAG.box)return NTAG.box;const d=document.createElement('div');d.id='ntags';const h=document.getElementById('hud');document.body.insertBefore(d,h||document.body.firstChild);return NTAG.box=d}
 {const st=document.createElement('style');st.textContent=
  '#ntags{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}'+
- /* v49.33.0: in the game's own style: the pixel font on a dark panel with a hard black edge and drop shadow, and a little pixel tail */
- '#ntags .nt{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font:400 13px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#e8f3ec;background:#0b0f0d;padding:4px 7px 3px;border:2px solid #000;box-shadow:inset 0 0 0 1px #2a352e,2px 2px 0 #0009;will-change:transform}'+
- '#ntags .nt:after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-3px;width:6px;height:4px;background:#000}'+
- '#ntags .nt.art{color:#ffd84a;box-shadow:inset 0 0 0 1px #ffd84a,2px 2px 0 #0009}'+
- '#ntags .nt.art:before{content:"";display:inline-block;width:5px;height:5px;background:#ffd84a;margin-right:5px;vertical-align:1px}';
+ /* v49.33.0: in the game's own style (v49.33.1: bigger): the pixel font on a dark panel with a hard black edge and drop shadow, and a little pixel tail */
+ '#ntags .nt{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font:400 18px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#e8f3ec;background:#0b0f0d;padding:6px 10px 5px;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,3px 3px 0 #0009;will-change:transform}'+
+ '#ntags .nt:after{content:"";position:absolute;left:50%;bottom:-9px;margin-left:-4px;width:8px;height:6px;background:#000}'+
+ '#ntags .nt.art{color:#ffd84a;box-shadow:inset 0 0 0 2px #ffd84a,3px 3px 0 #0009}'+
+ '#ntags .nt.art:before{content:"";display:inline-block;width:7px;height:7px;background:#ffd84a;margin-right:7px;vertical-align:2px}';
  document.head.appendChild(st)}
 const NTV=new THREE.Vector3();
 /* attached to the scene and every parent visible (the label itself is hidden: its page tag is drawn instead) */
