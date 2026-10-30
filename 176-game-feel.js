@@ -112,7 +112,7 @@ function countUp(el,from,to,ms,fmt,tick){if(!el)return;const t0=performance.now(
   const cs=box.querySelector('.cards');if(cs)cs.classList.add('fxcards'),cs.querySelectorAll('.card').forEach((c,i)=>c.style.animationDelay=(.15+i*.14)+'s');
   const bc=cs&&[...cs.querySelectorAll('.card')].find(c=>c.firstChild&&c.firstChild.textContent=='Beat'),bb=bc&&bc.querySelector('b');if(bb&&pf)bb.insertAdjacentHTML('beforeend','<small>'+pf+' perfect</small>');
   const p=box.querySelector('p.m');if(p){p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality <b id=fxq>'+d.q+'</b>');countUp($('fxq'),0,d.q,700,null,()=>note(1,.03))}
-  let line='';if(best>0&&d.q>best){line=`<p class="fxline best">⭐ New best! Your highest quality song yet (was ${best})</p>`;setTimeout(()=>{arp(5);glBurst(34)},650)}
+  let line='';if(best>0&&d.q>best){line=`<p class="fxline best">New best! Your highest quality song yet (was ${best})</p>`;setTimeout(()=>{arp(5);glBurst(34)},650)}
   else if(last&&d.q>qOf(last))line=`<p class="fxline" style="color:var(--g)">▲ ${d.q-qOf(last)} better than your last song</p>`;
   else if(best>0&&!band)line=`<p class="fxline m">Your best is ${best}.</p>`;
   if(line&&p)p.insertAdjacentHTML('afterend',line);
@@ -141,7 +141,7 @@ function nextGoals(){const out=[],L=+S.listeners||0,i=LM.findIndex(t=>L<t);
    setTimeout(()=>box.querySelectorAll('.fxgoal i[data-w]').forEach(i=>i.style.width=i.dataset.w+'%'),350)}}catch(e){console.error('feel morning',e)}return r}}
 
 /* ---------- a new career's first streams ---------- */
-const FST=[[1,t=>'🎧 Your first stream! Someone just played "'+t+'".'],[10,()=>'🎧 10 streams already. Every song you release adds more.'],[100,()=>'🎧 100 streams! People are finding your music.']];
+const FST=[[1,t=>'Your first stream! Someone just played "'+t+'".'],[10,()=>'10 streams already. Every song you release adds more.'],[100,()=>'100 streams! People are finding your music.']];
 setInterval(()=>{try{if(TR()||typeof S!='object'||!S||!S.artist||!Array.isArray(S.songs)||document.getElementById('load')||mode=='load'||mode=='title')return;
  const n=+S.streams||0;if(S.fst==null){S.fst=FST.filter(f=>n>=f[0]).length;return}if(S.fst>=FST.length||n<FST[S.fst][0])return;
  const loud=mode=='play'||mode=='pc'||mode=='drive';while(S.fst<FST.length&&n>=FST[S.fst][0])S.fst++;if(!loud)return;const top=S.songs.slice().sort((a,b)=>(b.streams||0)-(a.streams||0))[0];say(FST[S.fst-1][1](top?top.title:'your song'));note(4,.06)}catch(e){}},1500);

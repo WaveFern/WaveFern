@@ -5,8 +5,8 @@
    and the chance a fan who asks is a thief is 5% / 2.5% / 0.5% / 0%. */
 const ROB={p:[.05,.025,.005,0],cut:.35};
 const robChance=()=>ROB.p[Math.min(3,S.gs=='follow'?S.guards|0:0)];/* chance a fan who got through and asks for an autograph is a thief */
-function fanRob(n){const t=+(S.money*ROB.cut).toFixed(2);n.st=2;n.cool=25;n.fan=false;if(t<=0)return;S.money=+(S.money-t).toFixed(2);snd('err');say('🚨 A fake fan stole '+$$(t)+' from you!');
- if(mode!='play')return;mode='menu';const g=S.gs=='follow'?S.guards|0:0;$('ui').innerHTML=`<div id=rob class="box modal" style="width:min(400px,92vw);text-align:center"><h2>🚨 You got robbed!</h2><p>That "fan" was not after an autograph. While you signed, they grabbed <b>${$$(t)}</b> (35% of your cash) and ran off into the crowd.</p><p class=m>You have ${$$(S.money)} left.${g<3?' More bodyguards with you means fewer robberies.':''}</p><button class=go onclick="closeUI()">Ugh, okay</button></div>`}
+function fanRob(n){const t=+(S.money*ROB.cut).toFixed(2);n.st=2;n.cool=25;n.fan=false;if(t<=0)return;S.money=+(S.money-t).toFixed(2);snd('err');say('A fake fan stole '+$$(t)+' from you!');
+ if(mode!='play')return;mode='menu';const g=S.gs=='follow'?S.guards|0:0;$('ui').innerHTML=`<div id=rob class="box modal" style="width:min(400px,92vw);text-align:center"><h2>You got robbed!</h2><p>That "fan" was not after an autograph. While you signed, they grabbed <b>${$$(t)}</b> (35% of your cash) and ran off into the crowd.</p><p class=m>You have ${$$(S.money)} left.${g<3?' More bodyguards with you means fewer robberies.':''}</p><button class=go onclick="closeUI()">Ugh, okay</button></div>`}
 /* signing an autograph is the only moment a fake fan can rob you */
 {const s0=sign;sign=function(n){if(n&&n.fan&&Math.random()<robChance())return fanRob(n);return s0(n)}}
 /* bodyguards decide which fans get through to ask for an autograph: all of them with no guards, 50% with 1, 10% with 2,

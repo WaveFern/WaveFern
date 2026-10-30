@@ -9,58 +9,60 @@
 (function(){
 if(typeof smR!='function')return;
 
-/* family: the overall look; k: the small line above the name; i: the shop's icon; then the colours */
+/* A title can name its shop with an empty <i data-k=KIND></i> (179-tour-shop-kinds.js does), used when the room does not say.
+   family: the overall look; k: the small line above the name; i: the shop's pixel icon; then the colours */
 const TH={
- flowers:{f:'pastel',k:'Florist · fresh today',i:'💐',bg:'#fff4f8',ink:'#4a2a3a',ac:'#e0558f',ac2:'#6fae6a',card:'#ffffff',aw:'#f7a8c8'},
- bakery:{f:'paper',k:'Bakery · baked this morning',i:'🥐',bg:'#fbf1de',ink:'#4a2c14',ac:'#b8662e',ac2:'#e8c88a',card:'#fffaf0',aw:'#d98a4a'},
- food:{f:'paper',k:'Restaurant · menu',i:'🍽',bg:'#fbf5e6',ink:'#2a1a12',ac:'#a8242f',ac2:'#e8c070',card:'#fffdf6',aw:'#a8242f'},
- cafe:{f:'chalk',k:'Café · on the board',i:'☕',bg:'#26332c',ink:'#f2efe4',ac:'#ffd27a',ac2:'#9ad0b8',card:'#2e3c34',aw:'#7a5232'},
- bar:{f:'neon',k:'Bar · tonight',i:'🍹',bg:'#140c1c',ink:'#f4e8ff',ac:'#ff4fa8',ac2:'#4fd8ff',card:'#1e1428',aw:'#ff4fa8'},
- arcade:{f:'neon',k:'Arcade · insert coin',i:'🕹',bg:'#0a0a1a',ink:'#e8f4ff',ac:'#3ad0ff',ac2:'#ff3a9a',card:'#141430',aw:'#3ad0ff'},
- karaoke:{f:'neon',k:'Karaoke · sing it loud',i:'🎤',bg:'#160a22',ink:'#fbeaff',ac:'#ff6ad5',ac2:'#ffd23d',card:'#22102e',aw:'#ff6ad5'},
- cinema:{f:'neon',k:'Cinema · now showing',i:'🍿',bg:'#1a0a10',ink:'#fff4e0',ac:'#ffd23d',ac2:'#e8343c',card:'#2a1018',aw:'#e8343c'},
- records:{f:'neon',k:'Record shop · local artists',i:'💿',bg:'#120e1c',ink:'#f2ecff',ac:'#b07aff',ac2:'#ffd23d',card:'#1e1830',aw:'#b07aff'},
- tech:{f:'clean',k:'Electronics · demo models on',i:'🔌',bg:'#f2f5f9',ink:'#14202e',ac:'#2f7de1',ac2:'#14202e',card:'#ffffff',aw:'#2f7de1'},
- pharm:{f:'clean',k:'Pharmacy · open late',i:'💊',bg:'#f4fbf7',ink:'#16352a',ac:'#1fa060',ac2:'#e8f6ee',card:'#ffffff',aw:'#1fa060'},
- laundry:{f:'clean',k:'Laundromat · wash & dry',i:'🫧',bg:'#eef6fc',ink:'#173450',ac:'#3b82f6',ac2:'#cfe6fb',card:'#ffffff',aw:'#3b82f6'},
- conv:{f:'clean',k:'Corner shop · open 24 hours',i:'🛒',bg:'#f6f7f9',ink:'#1e2226',ac:'#e8473a',ac2:'#ffd23d',card:'#ffffff',aw:'#e8473a'},
- sweets:{f:'pastel',k:'Sweet shop · treats',i:'🍨',bg:'#fff0f6',ink:'#5a1f3e',ac:'#e84a8a',ac2:'#7ad0c8',card:'#ffffff',aw:'#ff9ac4'},
- beauty:{f:'pastel',k:'Beauty · testers are free',i:'💄',bg:'#fff3f7',ink:'#4a1a32',ac:'#c0397a',ac2:'#e8c040',card:'#ffffff',aw:'#f4b8d0'},
- spa:{f:'pastel',k:'Massage · relax',i:'🪷',bg:'#f6efe4',ink:'#3a2a1a',ac:'#a8743a',ac2:'#8aa88a',card:'#fffaf2',aw:'#c8a878'},
- cloth:{f:'boutique',k:'Boutique · new season',i:'👕',bg:'#fafafa',ink:'#111111',ac:'#111111',ac2:'#c8a050',card:'#ffffff',aw:'#111111'},
- barber:{f:'boutique',k:'Barber · walk-ins welcome',i:'💈',bg:'#f8f6f2',ink:'#1a1a1a',ac:'#c0392b',ac2:'#2f4a8a',card:'#ffffff',aw:'#c0392b'},
- jewel:{f:'boutique',k:'Jeweller · hand-polished',i:'💎',bg:'#14110c',ink:'#f6eedc',ac:'#d8b25a',ac2:'#f6eedc',card:'#1e1a12',aw:'#d8b25a',dark:1},
- market:{f:'kraft',k:'Market · all fresh today',i:'🧺',bg:'#e9d7b4',ink:'#3a2410',ac:'#3a7a2a',ac2:'#e8473a',card:'#f6ead0',aw:'#3a7a2a'},
- souv:{f:'kraft',k:'Gifts & souvenirs',i:'🎁',bg:'#e6cfa4',ink:'#3a2410',ac:'#c0392b',ac2:'#2f6fb5',card:'#fff6e4',aw:'#c0392b'},
- books:{f:'kraft',k:'Bookshop · local writers',i:'📚',bg:'#efe2c8',ink:'#2a1c10',ac:'#7a1f2b',ac2:'#2a5a3a',card:'#fbf3e2',aw:'#7a1f2b'},
- bikes:{f:'kraft',k:'Bike shop · rentals',i:'🚲',bg:'#e4e8de',ink:'#1a2a1a',ac:'#2a7a4a',ac2:'#ffd23d',card:'#f8faf4',aw:'#2a7a4a'},
- radio:{f:'neon',k:'On air',i:'📻',bg:'#101418',ink:'#eaf4ff',ac:'#ff4a3a',ac2:'#ffd23d',card:'#1a2028',aw:'#ff4a3a'},
- fest:{f:'paper',k:'Festival food · festival prices',i:'🎪',bg:'#fff4d6',ink:'#3a2208',ac:'#e8541e',ac2:'#2a8acf',card:'#fffbee',aw:'#e8541e'},
- office:{f:'clean',k:'Lobby kiosk',i:'☕',bg:'#f2f2f4',ink:'#1e1e24',ac:'#3a3a48',ac2:'#c8a050',card:'#ffffff',aw:'#3a3a48'},
- shop:{f:'paper',k:'Shop',i:'🛍',bg:'#f8f2e6',ink:'#2a2018',ac:'#2f6fb5',ac2:'#e8c070',card:'#fffdf8',aw:'#2f6fb5'}};
+ flowers:{f:'pastel',k:'Florist · fresh today',i:'flower',bg:'#fff4f8',ink:'#4a2a3a',ac:'#e0558f',ac2:'#6fae6a',card:'#ffffff',aw:'#f7a8c8'},
+ bakery:{f:'paper',k:'Bakery · baked this morning',i:'bread',bg:'#fbf1de',ink:'#4a2c14',ac:'#b8662e',ac2:'#e8c88a',card:'#fffaf0',aw:'#d98a4a'},
+ food:{f:'paper',k:'Restaurant · menu',i:'plate',bg:'#fbf5e6',ink:'#2a1a12',ac:'#a8242f',ac2:'#e8c070',card:'#fffdf6',aw:'#a8242f'},
+ cafe:{f:'chalk',k:'Café · on the board',i:'cup',bg:'#26332c',ink:'#f2efe4',ac:'#ffd27a',ac2:'#9ad0b8',card:'#2e3c34',aw:'#7a5232'},
+ bar:{f:'neon',k:'Bar · tonight',i:'glass',bg:'#140c1c',ink:'#f4e8ff',ac:'#ff4fa8',ac2:'#4fd8ff',card:'#1e1428',aw:'#ff4fa8'},
+ arcade:{f:'neon',k:'Arcade · insert coin',i:'joy',bg:'#0a0a1a',ink:'#e8f4ff',ac:'#3ad0ff',ac2:'#ff3a9a',card:'#141430',aw:'#3ad0ff'},
+ karaoke:{f:'neon',k:'Karaoke · sing it loud',i:'mic',bg:'#160a22',ink:'#fbeaff',ac:'#ff6ad5',ac2:'#ffd23d',card:'#22102e',aw:'#ff6ad5'},
+ cinema:{f:'neon',k:'Cinema · now showing',i:'popcorn',bg:'#1a0a10',ink:'#fff4e0',ac:'#ffd23d',ac2:'#e8343c',card:'#2a1018',aw:'#e8343c'},
+ records:{f:'neon',k:'Record shop · local artists',i:'disc',bg:'#120e1c',ink:'#f2ecff',ac:'#b07aff',ac2:'#ffd23d',card:'#1e1830',aw:'#b07aff'},
+ tech:{f:'clean',k:'Electronics · demo models on',i:'plug',bg:'#f2f5f9',ink:'#14202e',ac:'#2f7de1',ac2:'#14202e',card:'#ffffff',aw:'#2f7de1'},
+ pharm:{f:'clean',k:'Pharmacy · open late',i:'cross',bg:'#f4fbf7',ink:'#16352a',ac:'#1fa060',ac2:'#e8f6ee',card:'#ffffff',aw:'#1fa060'},
+ laundry:{f:'clean',k:'Laundromat · wash & dry',i:'bubble',bg:'#eef6fc',ink:'#173450',ac:'#3b82f6',ac2:'#cfe6fb',card:'#ffffff',aw:'#3b82f6'},
+ conv:{f:'clean',k:'Corner shop · open 24 hours',i:'cart',bg:'#f6f7f9',ink:'#1e2226',ac:'#e8473a',ac2:'#ffd23d',card:'#ffffff',aw:'#e8473a'},
+ sweets:{f:'pastel',k:'Sweet shop · treats',i:'cone',bg:'#fff0f6',ink:'#5a1f3e',ac:'#e84a8a',ac2:'#7ad0c8',card:'#ffffff',aw:'#ff9ac4'},
+ beauty:{f:'pastel',k:'Beauty · testers are free',i:'spark',bg:'#fff3f7',ink:'#4a1a32',ac:'#c0397a',ac2:'#e8c040',card:'#ffffff',aw:'#f4b8d0'},
+ spa:{f:'pastel',k:'Massage · relax',i:'leaf',bg:'#f6efe4',ink:'#3a2a1a',ac:'#a8743a',ac2:'#8aa88a',card:'#fffaf2',aw:'#c8a878'},
+ cloth:{f:'boutique',k:'Boutique · new season',i:'shirt',bg:'#fafafa',ink:'#111111',ac:'#111111',ac2:'#c8a050',card:'#ffffff',aw:'#111111'},
+ barber:{f:'boutique',k:'Barber · walk-ins welcome',i:'scissors',bg:'#f8f6f2',ink:'#1a1a1a',ac:'#c0392b',ac2:'#2f4a8a',card:'#ffffff',aw:'#c0392b'},
+ jewel:{f:'boutique',k:'Jeweller · hand-polished',i:'gem',bg:'#14110c',ink:'#f6eedc',ac:'#d8b25a',ac2:'#f6eedc',card:'#1e1a12',aw:'#d8b25a',dark:1},
+ market:{f:'kraft',k:'Market · all fresh today',i:'basket',bg:'#e9d7b4',ink:'#3a2410',ac:'#3a7a2a',ac2:'#e8473a',card:'#f6ead0',aw:'#3a7a2a'},
+ souv:{f:'kraft',k:'Gifts & souvenirs',i:'gift',bg:'#e6cfa4',ink:'#3a2410',ac:'#c0392b',ac2:'#2f6fb5',card:'#fff6e4',aw:'#c0392b'},
+ books:{f:'kraft',k:'Bookshop · local writers',i:'book',bg:'#efe2c8',ink:'#2a1c10',ac:'#7a1f2b',ac2:'#2a5a3a',card:'#fbf3e2',aw:'#7a1f2b'},
+ bikes:{f:'kraft',k:'Bike shop · rentals',i:'bike',bg:'#e4e8de',ink:'#1a2a1a',ac:'#2a7a4a',ac2:'#ffd23d',card:'#f8faf4',aw:'#2a7a4a'},
+ radio:{f:'neon',k:'On air',i:'radio',bg:'#101418',ink:'#eaf4ff',ac:'#ff4a3a',ac2:'#ffd23d',card:'#1a2028',aw:'#ff4a3a'},
+ fest:{f:'paper',k:'Festival food · festival prices',i:'tent',bg:'#fff4d6',ink:'#3a2208',ac:'#e8541e',ac2:'#2a8acf',card:'#fffbee',aw:'#e8541e'},
+ office:{f:'clean',k:'Lobby kiosk',i:'cup',bg:'#f2f2f4',ink:'#1e1e24',ac:'#3a3a48',ac2:'#c8a050',card:'#ffffff',aw:'#3a3a48'},
+ shop:{f:'paper',k:'Shop',i:'bag',bg:'#f8f2e6',ink:'#2a2018',ac:'#2f6fb5',ac2:'#e8c070',card:'#fffdf8',aw:'#2f6fb5'}};
 
 /* which theme: the tour city room you are in, then words in the title or the greeting */
 const ROOMK={books:'books',cloth:'cloth',pharm:'pharm',conv:'conv',souv:'souv',records:'records',food:'food',cafe:'cafe',office:'office'};
 function themeKey(t){const tt=String(t||'').replace(/<[^>]*>/g,' '),g=String(typeof GR=='string'?GR:'');
  try{const D=window.DCITY;if(D&&D.on&&D.room){const k=D.room.key;if(TH[k])return k;if(ROOMK[k])return ROOMK[k]}}catch(e){}
+ const hk=String(t||'').match(/<i data-k=(\w+)><\/i>/);if(hk&&TH[hk[1]])return hk[1];
  const T=[[/festival prices/i,'fest'],[/jewel/i,'jewel'],[/radio|on the air/i,'radio'],[/corner shop|^store\b/i,'conv'],[/caf[eé]|coffee|☕/i,'cafe'],[/souvenir/i,'souv'],[/record/i,'records'],
   [/^\s*food\b|restaurant|🍽/i,'food'],[/💐|flower|florist/i,'flowers'],[/🥐|bakery|bagel/i,'bakery'],[/📚|book/i,'books'],[/💊|pharm/i,'pharm'],[/👕|👟|boutique|vintage|thrift|sneaker/i,'cloth'],[/🍿|cinema/i,'cinema'],[/🍹|\bbar\b/i,'bar'],[/🧺|market/i,'market'],[/🍨|🍬|🥤|ice cream|sweet|juice/i,'sweets'],[/🔌|electr/i,'tech'],[/💄|beauty/i,'beauty']];
  for(const[r,k]of T)if(r.test(tt))return k;for(const[r,k]of T)if(r.test(g))return k;return'shop'}
 
-/* an icon for each item, from its name */
-const IC=[[/rose/i,'🌹'],[/bouquet/i,'💐'],[/potted|plant|cactus/i,'🪴'],[/tulip/i,'🌷'],[/sunflower/i,'🌻'],
- [/croissant|cornetto|pain au/i,'🥐'],[/baguette|bread|loaf|roll|sourdough|naan|chapati|roti|focaccia|rye/i,'🥖'],[/bagel|pretzel/i,'🥯'],[/cake|castella|strudel|pie|tart|muffin|mooncake|lapis|princess/i,'🍰'],[/bun|melon pan|anpan|cinnamon|cardamom|scone/i,'🧁'],
- [/pizza|margherita|pepperoni/i,'🍕'],[/taco|quesadilla|al pastor/i,'🌮'],[/burger/i,'🍔'],[/fries|chips/i,'🍟'],[/hot dog/i,'🌭'],[/sushi|nigiri|maki/i,'🍣'],[/ramen|udon|noodle|pho|soup/i,'🍜'],[/gyoza|dumpling|samosa|mandazi/i,'🥟'],[/grill|skewer|meat|kebab|satay|chicken/i,'🍢'],[/rice|bento/i,'🍱'],[/salad/i,'🥗'],[/sandwich|toastie|toast/i,'🥪'],[/snack|crackers|nuts|nachos|knots/i,'🥨'],[/popcorn/i,'🍿'],
- [/churro|brownie|fudge|toffee|baklava|kunafa|jalebi|barfi|gulab|mochi|dorayaki|taiyaki|hotteok|brigadeiro|alfajor|turr|sweet/i,'🍬'],[/ice cream|scoop|cone|gelato|sundae|bingsu/i,'🍨'],[/milkshake|smoothie/i,'🥤'],[/a[cç]a[ií]/i,'🫐'],[/coconut/i,'🥥'],[/mango/i,'🥭'],[/fruit|apple/i,'🍎'],[/cheese|fromage/i,'🧀'],
- [/coffee|flat white|latte|espresso|kopi/i,'☕'],[/tea|chai|oolong|jasmine/i,'🍵'],[/juice|lemonade|soda|horchata|drink|cola|water|mocktail/i,'🧃'],[/energy|bolt bull/i,'⚡'],
- [/throat|tablet|vitamin|remedy|medicine/i,'💊'],[/book|poetry|novel/i,'📕'],[/phrasebook|guide|map/i,'🗺'],[/notebook|lyric/i,'📓'],
- [/adapter|charger|power bank/i,'🔋'],[/earbud|headphone/i,'🎧'],[/phone case|phone/i,'📱'],[/perfume|tester/i,'🌸'],[/lip/i,'💋'],[/glitter/i,'✨'],
- [/postcard/i,'💌'],[/snow globe/i,'🔮'],[/t-shirt|tee|shirt|top/i,'👕'],[/magnet/i,'🧲'],[/shoe|sneaker|boot|trainer/i,'👟'],[/jacket|coat|hoodie/i,'🧥'],[/hat|cap|beanie/i,'🧢'],[/jeans|trousers|pants|shorts|skirt/i,'👖'],[/dress/i,'👗'],
- [/ring/i,'💍'],[/chain|necklace|pendant/i,'📿'],[/watch/i,'⌚'],[/grill|tooth|teeth/i,'😁'],[/earring|stud|diamond/i,'💎'],
- [/shout|slot|show|special|ad\b|tour/i,'📣'],[/sign copies|sign/i,'✍'],[/wash|dry/i,'🫧'],[/ticket|film/i,'🎟'],[/massage/i,'💆']];
+/* an icon for each item, from its name (a pixel sprite from 00-pixel-icons.js) */
+const IC=[[/rose/i,'flower'],[/bouquet/i,'flower'],[/potted|plant|cactus/i,'flower'],[/tulip/i,'flower'],[/sunflower/i,'flower'],
+ [/croissant|cornetto|pain au/i,'bread'],[/baguette|bread|loaf|roll|sourdough|naan|chapati|roti|focaccia|rye/i,'bread'],[/bagel|pretzel/i,'bread'],[/cake|castella|strudel|pie|tart|muffin|mooncake|lapis|princess/i,'cake'],[/bun|melon pan|anpan|cinnamon|cardamom|scone/i,'cake'],
+ [/pizza|margherita|pepperoni/i,'plate'],[/taco|quesadilla|al pastor/i,'plate'],[/burger/i,'plate'],[/fries|chips/i,'plate'],[/hot dog/i,'plate'],[/sushi|nigiri|maki/i,'plate'],[/ramen|udon|noodle|pho|soup/i,'plate'],[/gyoza|dumpling|samosa|mandazi/i,'plate'],[/grill|skewer|meat|kebab|satay|chicken/i,'plate'],[/rice|bento/i,'plate'],[/salad/i,'plate'],[/sandwich|toastie|toast/i,'plate'],[/snack|crackers|nuts|nachos|knots/i,'plate'],[/popcorn/i,'popcorn'],
+ [/churro|brownie|fudge|toffee|baklava|kunafa|jalebi|barfi|gulab|mochi|dorayaki|taiyaki|hotteok|brigadeiro|alfajor|turr|sweet/i,'candy'],[/ice cream|scoop|cone|gelato|sundae|bingsu/i,'cone'],[/milkshake|smoothie/i,'drink'],[/a[cç]a[ií]/i,'fruit'],[/coconut/i,'fruit'],[/mango/i,'fruit'],[/fruit|apple/i,'fruit'],[/cheese|fromage/i,'plate'],
+ [/coffee|flat white|latte|espresso|kopi/i,'cup'],[/tea|chai|oolong|jasmine/i,'cup'],[/juice|lemonade|soda|horchata|drink|cola|water|mocktail/i,'drink'],[/energy|bolt bull/i,'bolt'],
+ [/throat|tablet|vitamin|remedy|medicine/i,'cross'],[/book|poetry|novel/i,'book'],[/phrasebook|guide|map/i,'map'],[/notebook|lyric/i,'book'],
+ [/adapter|charger|power bank/i,'plug'],[/earbud|headphone/i,'phones'],[/phone case|phone/i,'phone'],[/perfume|tester/i,'spark'],[/lip/i,'spark'],[/glitter/i,'spark'],
+ [/postcard/i,'letter'],[/snow globe/i,'gift'],[/t-shirt|tee|shirt|top/i,'shirt'],[/magnet/i,'gift'],[/shoe|sneaker|boot|trainer/i,'shoe'],[/jacket|coat|hoodie/i,'shirt'],[/hat|cap|beanie/i,'hat'],[/jeans|trousers|pants|shorts|skirt/i,'shirt'],[/dress/i,'shirt'],
+ [/ring/i,'ring'],[/chain|necklace|pendant/i,'ring'],[/watch/i,'ring'],[/grill|tooth|teeth/i,'gem'],[/earring|stud|diamond/i,'gem'],
+ [/shout|slot|show|special|ad\b|tour/i,'mega'],[/sign copies|sign/i,'pen'],[/wash|dry/i,'bubble'],[/ticket|film/i,'ticket'],[/massage/i,'leaf']];
 /* whole words only (with an optional plural), so "copies" is not a pie and "Phone" is not pho */
 IC.forEach(p=>{p[0]=new RegExp('\\b(?:'+p[0].source+')(?:e?s)?(?![a-z])','i')});
-IC.unshift(...[[/\b(?:throat|tablet|vitamin|remed|medicine)/i,'💊']]);
+IC.unshift(...[[/\b(?:throat|tablet|vitamin|remed|medicine)/i,'cross']]);
 const icon=(n,d)=>{const t=String(n).replace(/<[^>]*>/g,'');for(const[r,e]of IC)if(r.test(t))return e;return d};
 
 /* a quote from the greeting: Name: "words" */
@@ -69,7 +71,7 @@ const STATUS=/^(Owned|Yours|Worn|Buy the earlier)/;
 
 const fmt=n=>+n?$$(n):'Free';
 smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.error('shop menu',e);it=[]}
- const key=themeKey(o.t),T=TH[key]||TH.shop,raw=String(o.t||''),em=raw.match(/^\s*(\p{Extended_Pictographic}️?)\s*/u),title=em?raw.slice(em[0].length):raw,ic=em?em[1]:T.i,q=quote(GR);
+ const key=themeKey(o.t),T=TH[key]||TH.shop,raw=String(o.t||''),em=raw.match(/^\s*(\p{Extended_Pictographic}️?)\s*/u),title=em?raw.slice(em[0].length):raw,ic=pxIcon(T.i),q=quote(GR);
  const old=document.querySelector('.shx .shx-list'),st=old?old.scrollTop:0;
  const vars=`--bg:${T.bg};--ink:${T.ink};--ac:${T.ac};--ac2:${T.ac2};--card:${T.card};--aw:${T.aw}`;
  $('ui').innerHTML=`<div class="modal shx shx-${T.f} shx-k-${key}${T.dark?' shx-dark':''}" style="${vars}" role=dialog>
@@ -77,7 +79,7 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
  <div class=shx-hd><div class=shx-ic>${ic}</div><div class=shx-tt><div class=shx-kk>${T.k}</div><h2>${title}</h2></div><div class=shx-cash><small>Your money</small><b>${$$(S.money)}</b></div></div>
  ${q.say?`<div class=shx-say>${q.who?`<b>${q.who}</b>`:''}<i>${q.say}</i></div>`:''}
  <div class=shx-list>${it.map((x,i)=>{const sub=String(x[2]==null?'':x[2]),own=sub=='Owned',stat=STATUS.test(sub),poor=!own&&+x[1]>S.money;
-  return`<button class="shx-it${own?' own':''}${poor?' poor':''}" ${own?'disabled':''} onclick="smC(${i})"><span class=shx-ii>${icon(x[0],T.i)}</span><span class=shx-n><b>${x[0]}</b>${sub?`<small class="${stat?'st':''}">${sub}</small>`:''}</span><span class=shx-dt></span><span class=shx-p>${own?'Owned ✓':fmt(x[1])}</span></button>`}).join('')}</div>
+  return`<button class="shx-it${own?' own':''}${poor?' poor':''}" ${own?'disabled':''} onclick="smC(${i})"><span class=shx-ii>${pxIcon(icon(x[0],T.i))}</span><span class=shx-n><b>${x[0]}</b>${sub?`<small class="${stat?'st':''}">${sub}</small>`:''}</span><span class=shx-dt></span><span class=shx-p>${own?'Owned ✓':fmt(x[1])}</span></button>`}).join('')}</div>
  <div class=shx-ft><span class=shx-tip>${it.length} on offer · tap a row to buy</span><button class=shx-x onclick="closeUI()">Leave</button></div></div>`;
  const nl=document.querySelector('.shx .shx-list');if(nl&&st)nl.scrollTop=st};
 

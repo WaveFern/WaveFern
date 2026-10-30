@@ -55,12 +55,12 @@ let L=null,LP=null,LS=null;
 function snap(){return{d:S.day,rec:(S.drafts||[]).length+(S.songs||[]).length,rel:(S.songs||[]).length,post:(S.igPosts||[]).length,alb:Array.isArray(S.albums)?S.albums.length:0,msg:meCount(),st:+S.streams||0,earn:+S.earn||0,fol:+S.followers||0}}
 function add(set,ev){if(!set)return;set.list.forEach(q=>{if(q.ok)return;let v=0;
  if(q.k=='hq')v=ev.songs.filter(s=>(+s.q||0)>=q.q).length;else v=ev[q.k]||0;
- if(v>0){q.p=Math.min(q.t,(+q.p||0)+v);if(q.p>=q.t){q.ok=1;try{say('✅ Quest done: '+q.n)}catch(e){}}}})}
+ if(v>0){q.p=Math.min(q.t,(+q.p||0)+v);if(q.p>=q.t){q.ok=1;try{say('Quest done: '+q.n)}catch(e){}}}})}
 function pay(set,kind){if(!set||set.paid||!set.list.length||!set.list.every(q=>q.ok))return;set.paid=1;const Q=S.quests;if(kind=='d')Q.nd++;else Q.nw++;
  S.money=+(S.money+set.r).toFixed(2);
  try{glCard(kind=='d'?'DAILY QUESTS COMPLETE':'WEEKLY QUESTS COMPLETE','+$'+fmt(set.r),kind=='d'?'All 3 done. New quests tomorrow.':'All 3 done. New quests next week.')}catch(e){}
  try{snd('chime');setTimeout(()=>snd('cash'),200)}catch(e){}try{tutBurst(innerWidth/2,innerHeight*.3,kind=='d'?28:50)}catch(e){}
- try{say((kind=='d'?'📜 Daily':'🏆 Weekly')+' quests complete: +$'+fmt(set.r))}catch(e){}}
+ try{say((kind=='d'?'Daily':'Weekly')+' quests complete: +$'+fmt(set.r))}catch(e){}}
 function tick(){try{if(!S||!S.artist||!Array.isArray(S.songs))return;if(!S.apps||typeof S.apps!='object')S.apps={};if(!S.apps.quests)S.apps.quests=1;
  if(!S.quests||!S.quests.d)st();const Q=S.quests,c=snap();
  if(!L||LS!==S||c.d<L.d||c.d>L.d+1){L=c;LS=S;st();return}/* first tick, or a different save was loaded */

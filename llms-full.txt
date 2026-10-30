@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.28.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.43.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -1596,7 +1596,7 @@ From the WaveFern Wiki
 
 Every destination becomes a city you can walk around when you land: signs in the local language, its own colours and traffic, an airport, a hotel, shops, a club and a stadium.[1]
 
-Landmark selfie: once a day per city, for 30 + √listeners × 0.25 followers and an Instagrime post.
+Landmark selfie: once a day per city, for 30 + √listeners × 0.25 followers.
 Hotel: check in at reception and sleep in your room. You wake up there.
 Shops: every shopfront opens the room its sign names, in any language: restaurants (pizza, tacos, sushi, noodles, burgers and grills serve their own dishes), cafés and tea houses, bakeries, markets, ice cream and juice bars, convenience stores, bars, souvenir shops (postcards, snow globes, T-shirts, fridge magnets), record shops, bookshops, boutiques and sneaker shops (real clothes for your wardrobe), pharmacies, florists, barbers (the haircut menu), laundromats, electronics shops, beauty shops, massage parlours, bike shops (ride across town), cinemas, arcades and karaoke bars. Each shopfront has a window display of what it sells, and each counter opens a menu in the shop's own style (a florist's card, a bakery's paper menu, a café chalkboard, neon for bars, arcades and record shops, and so on).
 Once a day per city: hand a bouquet to a fan (15 + √listeners × 0.15 followers), sing at karaoke (20 + √listeners × 0.2), play your song on an electronics shop's demo speakers (8 + √listeners × 0.1) or set an arcade high score (10 + √listeners × 0.1).
@@ -2232,13 +2232,23 @@ From the WaveFern Wiki
 
 Instagrime is a $400 app. Post once a day for 2-8 new followers. Photos from your Gphone camera can be posted too, for more followers with a better phone. Promotions are bought here.[1]
 
+Posts about you
+
+Once you have a song out, other people post about you: friends share your first tracks, fans put your songs on repeat or bump into you in the city (you are in the photo), and fan pages appear as you grow. A diss track sets the feed off for about a week: fans pick sides, gossip pages cover it, the rival posts back before their response track, and everyone argues about who won once it lands. The latest 30 posts about you are kept in the Tagged tab on your account.
+
+Influencers
+
+You follow 8 big accounts (skye.daily, popwatch, tourmode.tara, drip.report, thepetpals, cozyroom.mila, dex.lifts and carspotter.jay). Their pictures sit in a row at the top of the feed, 3 of them post on every refresh, and their profiles show a verified tick, a bio and millions of followers. Once you reach about 10,000 listeners they start posting your songs too.
+
 See also
 Gphone
 Promotions
+Rivals
 References
 ^ 16-big-world-fame-chat-instagrime-v2.js. WaveFern source code, game v47.9.0.
 ^ 103-instagrime-icons-trees.js. WaveFern source code, game v47.9.0.
 ^ 83-promotions.js. WaveFern source code, game v47.9.0.
+^ 189-instagrime-talk.js. WaveFern source code, game v47.9.0.
 Category: City life
 
 ---
@@ -2312,11 +2322,11 @@ From the main menu pick Multiplayer: create a room, or join one with a friend's 
 
 Instruments
 Instrument	Their recording step
-🎤 Vocals	Lyrics
-🎸 Guitar	Riff
-🔊 Bass	Groove
-🥁 Drums	Drums
-🎹 Keys	Melody
+Vocals	Lyrics
+Guitar	Riff
+Bass	Groove
+Drums	Drums
+Keys	Melody
 
 You pick your instrument the first time you join, and keep it for that band career. Everyone spawns in the studio, which has every member's instrument.
 
@@ -2329,7 +2339,7 @@ If one member runs out of goes, the take is scrapped for everyone.
 If the host leaves, the room closes and the others carry on alone.
 Emotes
 
-Press B for the emote wheel: 👋 Wave · 🕺 Dance · 👏 Clap · 🙌 Cheer · 😂 Laugh · 🎸 Air guitar · 🌀 Spin · ❤️ Love.
+Press B for the emote wheel: Wave · Dance · Clap · Cheer · Laugh · Air guitar · Spin · Love.
 
 Connection
 
@@ -2368,9 +2378,31 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.28.0. This list is read live from the game, so it is always current.
+The game is on v49.43.0. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.43.0	Far fewer emoji. Menus, buttons, headings, pop-ups and the wiki now use plain words, so text looks the same on every phone and computer. Where an icon still helps it is a little pixel sprite in the game's style: shop menus and every item in them, the touch buttons, the band instrument picker, locked World Tour stops and pinned chats. Emotes over heads are unchanged.
+v49.42.0	Plaques go to your Storage instead of hanging themselves on the studio wall. Press F at home, pick a plaque from the Furniture tab and hang it on any wall in your house, upstairs too. Plaques sit up on the wall, so they can go above your bed, desk or sofa, and they turn to face the room on their own. Each one shows its song title and stream count. Plaques you already earned are waiting in Storage.
+v49.41.0	The Swiftwing flight map is sharp now. It draws real country outlines at your screen's full resolution instead of big blocky squares, and you can move around it: drag to pan, mouse wheel, pinch or the + / - buttons to zoom in up to x8 (x1, the whole world, is as far out as it goes). City names show up once you zoom in, and picking a region like Europe flies the map there. The map you watch during a flight is sharp too and zooms in on your route.
+v49.40.0	A sharper, nicer world map. It now draws at your screen's full resolution on textured grass, with shaded buildings, round trees, a shoreline on the lake, round pins and labels that never pile on top of each other, a white arrow showing which way you face, a compass and a scale bar. You can no longer zoom out below 1x, so the map always fills its frame.
+v49.39.1	The Spotifly Now playing panel is back to its normal size. The new Spotifly notifications had borrowed its look by mistake and stretched it across the page.
+v49.39.0	People on Instagrime post about you. Once you have a song out, friends share it, fans put it on repeat or bump into you in the city (you are in the photo), and fan pages appear as you grow. A diss track sets the feed off for about a week: fans pick sides, gossip pages cover it, the rival posts back, and after the response track everyone argues about who won. Posts about you are kept in a new Tagged tab on your account. You also follow 8 big influencers: their pictures sit in a row at the top of the feed, 3 of them post on every refresh, their profiles have a verified tick, a bio and millions of followers, and once you are big they post your songs too.
+v49.38.0	Pausing keeps the game quiet. While paused no pop-ups, cards, tips or the update notice come in, and no pop-up sounds play. Pop-ups already on screen hide and keep the time they had left for when you resume. Anything that happened while paused waits, repeats merged and only the latest few kept, and comes in one at a time after you resume. Tips no longer count down while paused. Things you click in the pause menu still show their message.
+v49.37.0	Walk around the stage. During a festival set and a stadium or club show abroad, WASD, the arrows, the touch joystick or the gamepad stick walk you around the stage (up is towards the crowd), and an invisible barrier keeps you from walking off it. In a stadium you can walk down the catwalk to the B-stage yourself. The mic stand stays where it is: step away and you take the mic off the stand and hold it up to your mouth as you walk, and it goes back on the stand when you return to your spot. Tour shows now have a mic stand too. The guitarist and bassist on tour and a featured artist on a collab song wander around the stage now and then too, much less than you. The festival camera follows you sideways, and tour show cameras cut to the shot from behind you while you walk.
+v49.36.0	Less explaining. Making a song no longer tells you what your gear does: the countdown before each step, the results screen and the toast after buying gear stay quiet, the genre screen drops its line about fans and a steady sound, and the beat, lyrics and mix hints are shorter. New Upgrades button on the Make a song screen: it lists everything you own (gear, homes, pets, mentors) with the quality, streams and studio effect each one gives. Shorter genre focus and awards text too.
+v49.35.0	Spotifly Team messages now live in the Spotifly app instead of Messages: a Notifications page on the computer (in the sidebar) and an Alerts tab in the Gphone app, in Spotifly's dark green and black. A new one pops a Spotifly notification card in the top right corner that opens the page when clicked, and the Spotifly icon, taskbar button and Gphone tile show how many are unread. Old saves move their Spotifly messages over when they load.
+v49.34.0	Instagrime only posts when you do. Releasing a song or album, playing a tour show or festival set and taking a selfie no longer post for you. Posting is worth it now: a post lifts all your streams by 15% for the rest of the day and 8% the next day. Leave it quiet for more than 3 days and your streams slip a little, 1% a day and never more than 5%, until you post again. Your Instagrime account shows the current effect next to the post buttons.
+v49.33.1	Bigger name tags over people and bigger emote icons over heads, so both read at a glance.
+v49.33.0	Name tags over people are in the game's own style: the pixel font on a dark panel with a black edge, a drop shadow and a little pixel tail (artists keep their gold). Multiplayer trailer: tags show only names and the recording captions only the instrument, so each two second shot is quick to read.
+v49.32.2	Multiplayer trailer: in the recording shots the bandmates no longer slide through each other. Each one is already standing at their own instrument when the shot starts, the one recording stays at their instrument instead of walking to the mic, and bass stands a step back from guitar.
+v49.32.1	Multiplayer trailer: the screen goes black when the song stops at 0:48, and the end card comes in on its last bit at 0:56.
+v49.32.0	Famous artists are now parodies you can still recognise: Taylor Swiff, Drakeo, Billie Eyelash, The Weekdayz, Kanya East and over 100 more, in Messages, collabs, Spotifly Browse, mentors and the awards. Their looks and numbers are the same, and old saves switch to the new names when they load.
+v49.31.0	The multiplayer trailer (wavefern.com/mtrailer) has its own song, made for it. The drop comes at 0:16 on the band in the studio, and the end card lands as the song stops at 0:48, so the trailer is now 64 seconds.
+v49.30.1	Legal pages: a Privacy Policy (wavefern.com/privacy), Terms of Use (/terms) and a Legal and credits page (/legal) saying the game is fiction, in-game brands are parodies and real artists are fictionalised. They are linked from the title screen and the site footers. Analytics now asks first: Google Analytics only loads after you press Allow, and you can still change it in Settings > Game.
+v49.30.0	The multiplayer band trailer has its own address: wavefern.com/mtrailer. Its studio and bedroom shots are now real rooms, with full walls, a ceiling, foam panels, a band poster and an ON AIR light, so you no longer see through the house. The band panel is zoomed in so "3/4 members ready" can be read, and emote icons sit over heads in the camera shots.
+v49.29.2	The vertical trailer (wavefern.com/vtrailer) and the band trailer (?trailer=band) play the new trailer2 mix of the music. The main trailer keeps its mix.
+v49.29.1	Vertical trailer at wavefern.com/vtrailer: the in-game trailer in a 9:16 frame for Shorts, TikTok and Reels, with bigger words and wider shots in the tall frame. F or the first tap makes it full screen.
+v49.29.0	A band trailer for YouTube: wavefern.com/?trailer=band plays a 68 second multiplayer trailer made of real band room gameplay. Make a room, a friend joins with the code, the band records together (drums, guitar, bass and vocals, each on their own minigame), walks the town, does emotes, sleeps in the bunk beds, shares one Spotifly account and plays the festival Main Stage. It plays with no network and saves nothing. Name tags over people now also show in the trailer's camera shots.
 v49.28.0	Shops look the part. The menu that opens at a counter is no longer the same green and black box everywhere: it is dressed as the shop you are in, with an icon and a price tag for every item, and you tap the row to buy. A florist's pastel card under a striped awning, a bakery's paper menu, a café chalkboard in a wooden frame, a restaurant's printed menu, neon for the bar, arcade, karaoke bar, cinema, record shop and radio station, clean white for the pharmacy, laundromat, electronics and corner shops, black and white for boutiques, the barber and the jeweller, and kraft paper for markets, bookshops, souvenir and bike shops. Tour cities: the flicker on shopfronts and in shops is gone (thousands of parts sat exactly on top of each other and fought as the camera moved). Every shopfront has a lit window ledge showing what it sells, a door with a glass panel, a handle and an OPEN light, and a menu board, flower stand, fruit crate or bike on the pavement. Inside, shops have wood, stone or checked floors, panelled walls with a rail, pendant lights and a rug, and the florist's stand no longer piles its pots into each other. Amazoom: the glitchy models are rebuilt (the grandfather clock's top no longer floats, the drum kit, guitar stand, cat tree, bin, gaming chair, side table, lamps, armchairs and sofas are clean, solid models) and there are 15 new items: a neon music note sign, a vinyl wall shelf, a turntable deck, a synth on a stand, a studio mic, a retro arcade cabinet, a jukebox, a lava lamp, a fiddle-leaf fig, a hanging egg chair, an electric fireplace, an RGB gaming PC setup, an espresso cart, a popcorn machine and a bonsai. The lava lamp, fireplace, popcorn machine and PC fans move.
 v49.27.0	Tour city shops are what their sign says. Walking into a Laundry, a Pizza place, a 寿司 bar or a music shop abroad used to drop you into a random room (a corner shop, a souvenir shop, a bookshop) selling the wrong things. Now every shopfront in every language opens the matching room, and the same shop always opens the same room. Fourteen new rooms: a bakery, a laundromat (wash your clothes or sit and wait), a barber (the haircut menu), a florist (hand a bouquet to a fan once a day), a cinema (watch a film, popcorn), an arcade (cabinets, a claw machine, a dance machine), a karaoke bar (sing once a day for new followers), a bar with mocktails, a jukebox and a pool table, a market (fruit, cheese for a fromagerie), an electronics shop (play your song on the demo speakers), an ice cream and juice bar, a massage parlour, a beauty shop and a bike shop (ride across town). Restaurants serve what the sign says (pizza, tacos, sushi, noodles, burgers, grill), tea houses serve tea, bookshops sell books, boutiques, sneaker and vintage shops sell real clothes for your wardrobe and pharmacies sell remedies. Fixes: the rooms no longer float in a field of grass, the top-left box names the shop you are in instead of saying Outside, and the shelves in the stores and pharmacies are no longer white on white.
 v49.26.0	Instagrime photos now look like you. Every drawn post is a real photo of your 3D character (same hair, face, clothes, hat and glasses) posed for the scene: mic up on a stage with your name on the screen, headphones on in the studio, a peace sign on a rooftop at night or sunset, waving in the park, a mirror selfie for a fit check, leaning on a car, a pet at your feet, or holding your new record next to its cover. Collab posts show both of you, and feed posts from other accounts get the same treatment. Profile pictures in Instagrime and the artist pictures in Messages are now detailed head-and-shoulders portraits. Artist DMs are richer: their first messages, collab asks, music talk and check-ins mention your latest song and its streams, your last post, your look, what they notice in your genre and theirs (the 808s, the hook, the drop...), and the track they are working on.
@@ -2660,7 +2692,7 @@ v34.2.1	Fixed the computer freezing: one broken chat, app or saved setting could
 v34.2.0	Your own pictures: upload a picture for your Spotifly profile (artist page), your Instagrime profile (Account) or as an Instagrime photo post (Account > Photo post, with your own caption; still one post a day). Every upload is pixelated to match the game: profile pictures become 32x32 and photo posts 48x36, both in 16 colours. Use drawn avatar switches back. Pictures are stored small (under 1.3 KB each) so saves and save codes stay short; your 40 newest photo posts keep their photo. Saves still load.
 v34.1.0	Promotions reworked: Instagrime > Account > Promotions has three packages. Boost (1.5x streams for 3 days), Campaign (2x for 5 days) and Blitz (3x for 7 days). The price follows your monthly listeners: $40 + $0.002, $150 + $0.006 and $600 + $0.015 per monthly listener, so the bigger you are the more it costs. A promotion starts straight away and brings followers. Each promotion shows its stats before, during and after (song streams per day, monthly listeners, followers), a daily chart and the extra streams it brought in, and you get a message when it is over. Saves still load.
 v34.0.0	More to spend on later in your career: a free Label HQ app in the App Barn lets you hire a manager (+10% streams per level), a producer (+4 song quality), a PR team (cheaper, longer promotions), marketing (+20% hit chance) and build out your studio (+5 song quality). Each has four levels from $5,000 to $30,000,000 that unlock with fame. The Apex Sports now costs $25,000, the Phantom GT $90,000, the Hillside Villa $75,000 and the Penthouse Loft $250,000. Early prices are unchanged and anything you already own stays yours. Saves still load.
-v33.9.0	Song performance: higher quality songs stream clearly better, and collabs get a bigger boost the more popular the collaborator and the better the song. Each release has about an 8% chance to be a 🔥 HIT (3 to 6 times its normal streams; better songs hit more often) and a very rare chance to go 🚀 VIRAL (at most 0.3%, for the best songs): at least 5,000,000 streams plus a big extra based on your monthly listeners, over two weeks. You get a pop-up, a Spotifly Team message and a tag on the song. Saves still load.
+v33.9.0	Song performance: higher quality songs stream clearly better, and collabs get a bigger boost the more popular the collaborator and the better the song. Each release has about an 8% chance to be a HIT (3 to 6 times its normal streams; better songs hit more often) and a very rare chance to go VIRAL (at most 0.3%, for the best songs): at least 5,000,000 streams plus a big extra based on your monthly listeners, over two weeks. You get a pop-up, a Spotifly Team message and a tag on the song. Saves still load.
 v33.8.0	Spotifly: Delete song is now a bin icon on the song's own row (it still asks first). You can play unreleased drafts on the Upload tab before you upload them. Playing a draft does not count streams or earnings. Saves still load.
 v33.7.0	More beat samples: 35 more recorded one-shots join the beats. Flutes, strings and a synth are new sounds for melodies and chords, and the bass, bell, brass, key and pluck sounds are wider. Each sample is pitched to the song's key. Drums and the main soundtrack are unchanged. Saves still load.
 v33.6.0	Beats use real recorded one-shots: bass, bell, brass, keys, lead, piano and pluck sounds are pitched to each song's key for basslines, chords and hook melodies. Drums and the main soundtrack are unchanged. Until the samples load, the old synth sounds play. Saves still load.

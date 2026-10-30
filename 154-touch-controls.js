@@ -61,8 +61,8 @@ function build(){if(ui)return;css();ui=document.createElement('div');ui.id='tch'
  ui.innerHTML=`<div id=tchj><div class=tjb><div class=tjk></div></div></div><div id=tchb>
 <button class=tu data-k=e aria-label="Use (E)"><i>E</i>Use</button>
 <button class=tr2 data-run=1 aria-label="Run (Shift)"><i>»</i>Run</button>
-<button class=tfs data-fs=1 aria-label="Full screen"><i>⛶</i>Full</button>
-<div class=tcol><button data-k=n data-w=map aria-label="Map (N)"><i>🗺</i>Map</button><button data-k=g data-w=ph aria-label="Phone (G)"><i>📱</i>Phone</button><button data-k=f data-w=st aria-label="Storage (F)"><i>📦</i>Store</button><button data-k=Escape data-w=pz aria-label="Pause (Esc)"><i>⏸</i>Pause</button></div></div>`;
+<button class=tfs data-fs=1 aria-label="Full screen"><i>${pxIcon('full')}</i>Full</button>
+<div class=tcol><button data-k=n data-w=map aria-label="Map (N)"><i>${pxIcon('map')}</i>Map</button><button data-k=g data-w=ph aria-label="Phone (G)"><i>${pxIcon('phone')}</i>Phone</button><button data-k=f data-w=st aria-label="Storage (F)"><i>${pxIcon('box')}</i>Store</button><button data-k=Escape data-w=pz aria-label="Pause (Esc)"><i>${pxIcon('pause')}</i>Pause</button></div></div>`;
  document.body.appendChild(ui);base=ui.querySelector('#tchj');knob=ui.querySelector('.tjk');
  ui.addEventListener('contextmenu',e=>e.preventDefault());
  /* joystick: the finger that lands on it owns it until it lifts; the knob is clamped to the ring */
@@ -81,7 +81,7 @@ function build(){if(ui)return;css();ui=document.createElement('div');ui.id='tch'
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
 const fsOk=()=>{const d=document,r=d.documentElement;return !!((d.fullscreenEnabled||d.webkitFullscreenEnabled)&&(r.requestFullscreen||r.webkitRequestFullscreen))};
 function toggleFs(){const d=document,r=d.documentElement;try{if(fsEl()){(d.exitFullscreen||d.webkitExitFullscreen).call(d)}else{const q=(r.requestFullscreen||r.webkitRequestFullscreen).call(r,{navigationUI:'hide'});if(q&&q.catch)q.catch(()=>{});try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})}catch(_){}}}catch(_){}}
-function fsMark(){if(!ui)return;const b=ui.querySelector('.tfs');if(b)b.innerHTML=fsEl()?'<i>✕</i>Exit':'<i>⛶</i>Full'}
+function fsMark(){if(!ui)return;const b=ui.querySelector('.tfs');if(b)b.innerHTML=fsEl()?'<i>✕</i>Exit':'<i>'+pxIcon('full')+'</i>Full'}
 ['fullscreenchange','webkitfullscreenchange'].forEach(e=>document.addEventListener(e,fsMark));
 function jMove(e){const R=base.querySelector('.tjb').getBoundingClientRect().width*.5*.72;let dx=e.clientX-jc[0],dy=e.clientY-jc[1];const d=Math.hypot(dx,dy)||1,c=Math.min(d,R);
  knob.style.transform=`translate(${dx/d*c}px,${dy/d*c}px)`;const m=c/R,x=dx/d*m,y=dy/d*m;

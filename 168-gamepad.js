@@ -39,7 +39,7 @@ let mAcc=0,mT=0;
 addEventListener('mousemove',e=>{if(!e.isTrusted||!act)return;const n=performance.now();if(n-mT>250)mAcc=0;mT=n;mAcc+=Math.abs(e.movementX)+Math.abs(e.movementY);if(mAcc>40){mAcc=0;offPad()}},true);
 addEventListener('keydown',e=>{if(e.isTrusted)offPad()},true);
 addEventListener('touchstart',()=>offPad(),true);
-addEventListener('gamepadconnected',e=>{try{fam=famOf(e.gamepad&&e.gamepad.id);say('🎮 Controller connected: left stick to move, '+N_('A')+' to interact, '+N_('Start')+' to pause.')}catch(_){}});
+addEventListener('gamepadconnected',e=>{try{fam=famOf(e.gamepad&&e.gamepad.id);say('Controller connected: left stick to move, '+N_('A')+' to interact, '+N_('Start')+' to pause.')}catch(_){}});
 addEventListener('gamepaddisconnected',()=>{freeAll();offPad()});
 
 /* ---- focus ring for menus ---- */

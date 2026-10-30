@@ -348,8 +348,8 @@ function festPoi(){let p=POIS.find(q=>q.fest);if(!p){p=[FEST.X0+14,FEST.GZ-2,'',
 /* one check per frame: did the day change? */
 function festSync(){if(!FEST.lg){FEST.lg=new THREE.Group();scene.add(FEST.lg)}const ph=festPhase();if(ph!==FEST.ph||S.day!==FEST.day){festApply(ph);festNotice()}}
 function festNotice(){if(FEST.seen[S.day]||mode=='load'||mode=='creator'||!S.artist)return;FEST.seen[S.day]=1;const ph=FEST.ph;
- if(ph=='fest'){const b=fBk().find(q=>q.day==S.day&&!q.st);setTimeout(()=>say('🎪 Park Fields Festival is on today, east of Park Avenue!'+(b?' You play Stage '+b.n+' at '+fHM(FSLOT[b.slot][0])+'.':' 4 stages, food and a bar.')),1200)}
- else if(ph=='build')setTimeout(()=>say('🚧 A crew is building Park Fields Festival east of Park Avenue. It opens tomorrow (Day '+festNext(S.day)+').'),1200)}
+ if(ph=='fest'){const b=fBk().find(q=>q.day==S.day&&!q.st);setTimeout(()=>say('Park Fields Festival is on today, east of Park Avenue!'+(b?' You play Stage '+b.n+' at '+fHM(FSLOT[b.slot][0])+'.':' 4 stages, food and a bar.')),1200)}
+ else if(ph=='build')setTimeout(()=>say('A crew is building Park Fields Festival east of Park Avenue. It opens tomorrow (Day '+festNext(S.day)+').'),1200)}
 
 /* ---- 8. interactions ---- */
 function festInts(){const a=[],ph=FEST.ph;if(!ph||IN||HIN)return a;if(P.x<FEST.X0-12||P.x>FEST.X1+6||P.z<FEST.Z0-6||P.z>FEST.Z1+6)return a;
@@ -364,7 +364,7 @@ function festShop(k){const f=FFOOD.find(q=>q[0]==k);if(!f)return;GR=f[1]+': '+FG
   if(S.money<m[1]){snd('err');return say('Not enough money for that.')}if(!m[3]&&S.energy>=100){snd('err');return say('You are already full of energy.')}
   S.money=+(S.money-m[1]).toFixed(2);S.energy=Math.min(100,S.energy+m[2]);if(m[3]){S.stam=100;S.exh=0}updateVersion();snd('eat');say((m[3]?'Refreshing! ':'Yum! ')+m[0]+' · +'+m[2]+' energy')})}
 function festInfo(){snd('pop');mode='menu';const lv=festLv(),F=festS(),k=festSlotAt();
- $('ui').innerHTML=`<div class="box modal"><h2>🎪 Park Fields Festival · Day ${S.day}</h2><p class=m>You are Fame Level ${lv}. ${clk()} now. To play, book a slot on <b>FestivalApp</b> (free, on your computer) at least 2 days before a festival.</p>
+ $('ui').innerHTML=`<div class="box modal"><h2>Park Fields Festival · Day ${S.day}</h2><p class=m>You are Fame Level ${lv}. ${clk()} now. To play, book a slot on <b>FestivalApp</b> (free, on your computer) at least 2 days before a festival.</p>
   <div style="max-height:52vh;overflow:auto">${FSTG.slice().reverse().map(s=>{const p=F.p[s.n];
   return`<div class=ng style="display:block"><b style="color:${s.col}">Stage ${s.n}</b> · ${s.name} <small class=m>· Fame Level ${s.req} · pay x${s.mult}${p?' · you played to '+p.c.toLocaleString()+' people for '+$$(p.pay):''}</small><br>
    <small>${FSLOT.map((sl,i)=>{const a=festSlotAct(S.day,s.n,i),now=i==k;return`<span style="display:inline-block;margin:2px 10px 0 0;${now?'color:#ffe066;font-weight:bold':a.you?'color:#2fe68a;font-weight:bold':'opacity:.8'}">${fHM(sl[0])} ${esc(a.you?'YOU':a.name)}${now?' (now)':''}</span>`}).join('')}</small></div>`}).join('')}</div>
@@ -518,8 +518,8 @@ function festEnd(quit){const set=FEST.set;if(!set||set.end)return;set.end=1;cons
  F.p[s.n]={c,pay:set.pay,sc:Math.round(avg*100),song:set.list[0].title,n:full,d:S.day};
  
  updateVersion();festBoardDraw();chime();
- const lis=Math.round(set.str/(S.mlDiv||3.5)),grade=avg>=.85?'Legendary set 🔥':avg>=.65?'Great show':avg>=.45?'Decent set':'Tough crowd',ttl=quit?'You left the stage early':set.fin==2&&full<set.list.length?'Time\'s up! '+grade:grade;mode='menu';
- $('ui').innerHTML=`<div class="box modal"><h2>🎪 ${ttl}</h2><p class=m>Stage ${s.n} · ${s.name} · ${full} of ${set.list.length} songs played${set.sc.length?' · '+set.sc.length+' crowd moments, '+Math.round(avg*100)+'% average':''}</p>
+ const lis=Math.round(set.str/(S.mlDiv||3.5)),grade=avg>=.85?'Legendary set':avg>=.65?'Great show':avg>=.45?'Decent set':'Tough crowd',ttl=quit?'You left the stage early':set.fin==2&&full<set.list.length?'Time\'s up! '+grade:grade;mode='menu';
+ $('ui').innerHTML=`<div class="box modal"><h2>${ttl}</h2><p class=m>Stage ${s.n} · ${s.name} · ${full} of ${set.list.length} songs played${set.sc.length?' · '+set.sc.length+' crowd moments, '+Math.round(avg*100)+'% average':''}</p>
   <div class=cards><div class=card>Crowd<b>${c.toLocaleString()}</b><small>${gain>=0?'+':''}${gain.toLocaleString()} during your set</small></div><div class=card>Paid<b>${$$(set.pay)}</b><small>$${FSONG_PAY.toFixed(2)} x ${s.mult} x crowd, per song</small></div><div class=card>Streams<b>+${set.str.toLocaleString()}</b><small>about +${lis.toLocaleString()} monthly listeners tomorrow</small></div><div class=card>Followers<b>+${set.fol.toLocaleString()}</b></div></div>
   <div style="max-height:22vh;overflow:auto;margin:6px 0">${set.done.map((d,i)=>`<div class=ng><span style="flex:1">${i+1}. "${esc(d.t)}"${d.f<1?' <small class=m>(cut short, '+Math.round(d.f*100)+'%)</small>':''}</span><small class=m>${d.c.toLocaleString()} people · ${$$(d.pay)}</small></div>`).join('')}</div>
   <div class=row2><button class=go onclick="festLeave()">Leave the stage</button></div></div>`}
@@ -560,8 +560,8 @@ function festTick(dt){festSync();if(FEST.set&&FEST.set.end&&mode=='play')festLea
   FSTG.forEach(s=>{rect(s.x0,s.zb,s.x1,s.zf,'#1d1d22');rect(s.x0,s.zf-.6,s.x1,s.zf,s.col)});FFOOD.forEach(f=>{const[,,fx,fz,,col,kind]=f;const r=kind=='bar'?[fx-4,fz-5,fx+1,fz+5]:kind=='van'?[fx-1,fz-2.2,fx+1,fz+3.4]:[fx-.7,fz-1.1,fx+.7,fz+1.1];rect(r[0],r[1],r[2],r[3],col)});
   if(!mini&&k>.9){x.font='bold 9px monospace';x.fillStyle='#fff';FSTG.forEach(s=>x.fillText(String(s.n),sx(s.cx)-3,sz(s.zf)+(s.d*kz>14?-3:9)))}}
  else if(ph){FSTG.forEach(s=>{x.strokeStyle='#d0d0d0';x.lineWidth=1;x.strokeRect(sx(s.x0),sz(s.zb),s.w*kx,s.d*kz)});rect(229,GZ-13.4,235,GZ-10.6,'#e8e8ec')}}}
-{const b0=bigMap;bigMap=function(){b0();if(!FEST.ph||!$('bm'))return;const r=document.querySelector('#ui .row2');if(!r)return;const bt=document.createElement('button');bt.textContent=FEST.ph=='fest'?'Taxi to Festival 🎪':'Taxi to Festival';bt.onclick=()=>taxi(FEST.X0-3.5,FEST.GZ);r.insertBefore(bt,r.lastElementChild)}}
+{const b0=bigMap;bigMap=function(){b0();if(!FEST.ph||!$('bm'))return;const r=document.querySelector('#ui .row2');if(!r)return;const bt=document.createElement('button');bt.textContent=FEST.ph=='fest'?'Taxi to Festival':'Taxi to Festival';bt.onclick=()=>taxi(FEST.X0-3.5,FEST.GZ);r.insertBefore(bt,r.lastElementChild)}}
 {const w0=wakeUp;wakeUp=function(auto){w0(auto);try{const ph=festPhaseOf(S.day),bx=document.querySelector('#ui .box');if(!ph||!bx)return;const h=bx.querySelector('h2');
  const bk=fBk().filter(b=>b.day==S.day&&!b.st),mine=bk.map(b=>'Stage '+b.n+' at '+fHM(FSLOT[b.slot][0])).join(' and ');
- const t=ph=='fest'?'🎪 <b>Park Fields Festival is on today</b>, east of Park Avenue. '+(mine?'<b>You play '+mine+'.</b> Be at the steps of the stage in time!':'Book a slot on FestivalApp (on your computer) at least 2 days before a festival to play. Grab some food.'):ph=='build'?'🚧 A crew is building <b>Park Fields Festival</b> east of Park Avenue. It opens tomorrow.':'🚛 The festival crew is taking Park Fields down today. Next festival: Day '+festNext(S.day)+'.';
+ const t=ph=='fest'?'<b>Park Fields Festival is on today</b>, east of Park Avenue. '+(mine?'<b>You play '+mine+'.</b> Be at the steps of the stage in time!':'Book a slot on FestivalApp (on your computer) at least 2 days before a festival to play. Grab some food.'):ph=='build'?'A crew is building <b>Park Fields Festival</b> east of Park Avenue. It opens tomorrow.':'The festival crew is taking Park Fields down today. Next festival: Day '+festNext(S.day)+'.';
  const p=document.createElement('p');p.style.cssText='background:#2b1240;border:2px solid #ff6ad5;padding:6px 8px;margin:6px 0';p.innerHTML=t;h?h.after(p):bx.prepend(p);FEST.seen[S.day]=1}catch(e){}}}

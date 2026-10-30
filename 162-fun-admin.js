@@ -11,7 +11,7 @@
 const LIVE=['play','drive','rec','cut','phone'];
 const F={wx:'',size:'',speed:'',moon:0,disco:0,head:0,spin:0,drunk:0};
 const W={list:[],kind:'',cyc:0,ci:0,fl:0,nf:3,shake:0,jy:0,jv:0,hue:0,beat:0,grp:null};
-const WX=[['duck','🦆','Rubber ducks'],['conf','🎊','Confetti'],['money','💸','Money rain'],['snow','❄️','Blizzard'],['meteor','☄️','Meteors'],['storm','⛈','Mega storm'],['chaos','🌈','Crazy weather']];
+const WX=[['duck','','Rubber ducks'],['conf','','Confetti'],['money','','Money rain'],['snow','','Blizzard'],['meteor','','Meteors'],['storm','','Mega storm'],['chaos','','Crazy weather']];
 const mats={},mat=c=>mats[c]||(mats[c]=new THREE.MeshLambertMaterial({color:c}));
 const bx=(g,w,h,d,c,x=0,y=0,z=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);g.add(m);return m};
 const rnd=(a,b)=>a+Math.random()*(b-a),pk=a=>a[Math.random()*a.length|0];
@@ -81,11 +81,11 @@ function car(k){if(!ok())return;if(IN||(mode!='play'&&mode!='phone'))return say(
  try{closePhone()}catch(e){}if(mode!='play')return;
  const by=CARS.map((c,i)=>i).sort((a,b)=>CARS[a].p-CARS[b].p),i=k<1?by[0]:by[by.length-1];
  const m=mkS(carb(i));m.scale.setScalar(1.5*k);m.position.set(P.x,0,P.z);scene.add(m);const c={i,m,x:P.x,z:P.z,h:P.rot||0,v:0,fxk:k};PK.push(c);dr=c;P.mesh.visible=k<1;mode='drive';
- say(k<1?'🚗 Tiny car! Press E to hop out.':'🚌 Giant car! Press E to hop out.')}
+ say(k<1?'Tiny car! Press E to hop out.':'Giant car! Press E to hop out.')}
 function clearCars(){try{if(mode=='drive'&&dr&&dr.fxk)exitDrive();PK=PK.filter(c=>{if(c.fxk){scene.remove(c.m);return false}return true})}catch(e){console.error(e)}}
 function reset(quiet){F.wx=F.size=F.speed='';F.moon=F.disco=F.head=F.spin=F.drunk=0;setKind('');W.jy=W.jv=0;W.fl=0;W.shake=0;clearCars();
  try{if(P.mesh){P.mesh.scale.setScalar(1);bigHead(P.mesh,false)}NPC.forEach(n=>{if(n.m){bigHead(n.m,false);n.m.position.y=0}});lamps.forEach(l=>l.color.set(0xffffff));cam.zoom=1;cam.updateProjectionMatrix()}catch(e){}
- if(!quiet){say('✨ Everything is back to normal.');if(mode=='phone')phR()}}
+ if(!quiet){say('Everything is back to normal.');if(mode=='phone')phR()}}
 /* ---- v46.0.0: sharing with the band room ----
    The admin sends its effect state (weather, size, car, disco, big heads) to the room every few seconds; the host relays it.
    Others only accept it from a member the room knows is an admin. It is memory only: it expires 9s after the last message
@@ -105,7 +105,7 @@ function avFx(){try{const M=window.MPFX;if(!M)return;const A=M.av();for(const id
   if(cr&&!CX[id]&&CARS[ex.ci]){const m=mkS(carb(ex.ci));m.scale.setScalar(1.5*cr/k);a.g.add(m);CX[id]={m,k:cr,i:ex.ci}}
   if(CX[id]&&CX[id].m.parent!==a.g)delete CX[id]}}catch(e){}}
 /* ---- the app ---- */
-const NAMES={giant:'🍄 Giant you',tiny:'🐜 Tiny you',slow:'🐌 Slow-mo',hyper:'⏩ Hyper speed',moon:'🦘 Moon jump',disco:'🪩 Disco party',head:'🤯 Big heads',spin:'🌀 Spin cycle',drunk:'🥴 Drunk camera'};
+const NAMES={giant:'Giant you',tiny:'Tiny you',slow:'Slow-mo',hyper:'Hyper speed',moon:'Moon jump',disco:'Disco party',head:'Big heads',spin:'Spin cycle',drunk:'Drunk camera'};
 window.WFUN={
  wx:k=>{if(!ok())return;F.wx=F.wx==k?'':k;W.cyc=0;if(k=='chaos')W.ci=0;if(!F.wx)setKind('');phR()},
  set:(g,k)=>{if(!ok())return;F[g]=F[g]==k?'':k;phR();say(F[g]?NAMES[k]+' on':NAMES[k]+' off')},
@@ -114,11 +114,11 @@ window.WFUN={
 const ic=(()=>{try{const r=['..KKKKKK..','.KPPPPPPK.','KPPWPPWPPK','KPPPPPPPPK','KPWWWWWWPK','KPPPPPPPPK','.KPPPPPPK.','..KKKKKK..'],p={K:'#1a0a2e',P:'#ff4fd8',W:'#fff3a8'},c=document.createElement('canvas');c.width=10;c.height=8;const x=c.getContext('2d');r.forEach((l,y)=>[...l].forEach((h,i)=>{if(p[h]){x.fillStyle=p[h];x.fillRect(i,y,1,1)}}));return c.toDataURL()}catch(e){return''}})();
 GP_TITLE.fun='Admin fun';
 const btn=(on,oc,t,sub)=>`<button class="${on?'go':''}" style="text-align:left;padding:6px 8px;flex:1 1 44%" onclick="${oc}">${t}${sub?`<br><small class=m>${sub}</small>`:''}</button>`;
-function body(){return`<div class=phs2><div class=pcd><h3>🌦 CRAZY WEATHER</h3><div class=pbt>${WX.map(w=>btn(F.wx==w[0],`WFUN.wx('${w[0]}')`,w[1]+' '+w[2])).join('')}</div></div>
- <div class=pcd><h3>📏 SIZE AND SPEED</h3><div class=pbt>${btn(F.size=='giant',"WFUN.set('size','giant')",NAMES.giant)}${btn(F.size=='tiny',"WFUN.set('size','tiny')",NAMES.tiny)}${btn(F.speed=='slow',"WFUN.set('speed','slow')",NAMES.slow)}${btn(F.speed=='hyper',"WFUN.set('speed','hyper')",NAMES.hyper)}</div></div>
- <div class=pcd><h3>🚗 CARS</h3><div class=pbt>${btn(0,'WFUN.car(0.4)','🚗 Tiny car','Spawns one under you')}${btn(0,'WFUN.car(3)','🚌 Giant car','Spawns one under you')}</div></div>
- <div class=pcd><h3>🎉 PARTY</h3><div class=pbt>${btn(F.moon,"WFUN.tog('moon')",NAMES.moon,'Space to jump')}${btn(F.disco,"WFUN.tog('disco')",NAMES.disco)}${btn(F.head,"WFUN.tog('head')",NAMES.head)}${btn(F.spin,"WFUN.tog('spin')",NAMES.spin)}${btn(F.drunk,"WFUN.tog('drunk')",NAMES.drunk)}</div></div>
- <button class=go style="width:100%" onclick="WFUN.reset()">✨ Reset everything</button><p class=sub>Admin only. Nothing here is saved.</p></div>`}
+function body(){return`<div class=phs2><div class=pcd><h3>CRAZY WEATHER</h3><div class=pbt>${WX.map(w=>btn(F.wx==w[0],`WFUN.wx('${w[0]}')`,w[2])).join('')}</div></div>
+ <div class=pcd><h3>SIZE AND SPEED</h3><div class=pbt>${btn(F.size=='giant',"WFUN.set('size','giant')",NAMES.giant)}${btn(F.size=='tiny',"WFUN.set('size','tiny')",NAMES.tiny)}${btn(F.speed=='slow',"WFUN.set('speed','slow')",NAMES.slow)}${btn(F.speed=='hyper',"WFUN.set('speed','hyper')",NAMES.hyper)}</div></div>
+ <div class=pcd><h3>CARS</h3><div class=pbt>${btn(0,'WFUN.car(0.4)','Tiny car','Spawns one under you')}${btn(0,'WFUN.car(3)','Giant car','Spawns one under you')}</div></div>
+ <div class=pcd><h3>PARTY</h3><div class=pbt>${btn(F.moon,"WFUN.tog('moon')",NAMES.moon,'Space to jump')}${btn(F.disco,"WFUN.tog('disco')",NAMES.disco)}${btn(F.head,"WFUN.tog('head')",NAMES.head)}${btn(F.spin,"WFUN.tog('spin')",NAMES.spin)}${btn(F.drunk,"WFUN.tog('drunk')",NAMES.drunk)}</div></div>
+ <button class=go style="width:100%" onclick="WFUN.reset()">Reset everything</button><p class=sub>Admin only. Nothing here is saved.</p></div>`}
 {const b0=phBody;phBody=function(){if(PH.app!='fun')return b0.apply(this,arguments);if(!ok()){PH.app='home';return b0.apply(this,arguments)}if(PH.loading)return b0.apply(this,arguments);return body()}}
 {const r0=phR;phR=function(){try{const i=GP_APPS.findIndex(a=>a[0]=='fun'),a=ok();if(a&&i<0)GP_APPS.push(['fun','Admin',()=>ic,'#ff4fd8']);if(!a&&i>=0)GP_APPS.splice(i,1)}catch(e){}return r0.apply(this,arguments)}}
 /* v46.2.1: only the admin spawns into a band room with the best Gphone (the band character's own save, never the career saves) */

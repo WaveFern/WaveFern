@@ -17,7 +17,7 @@ function haloCatchUp(){if(S.cu2!==undefined||!S.songs)return;if(!S.songs.length)
   if(x>0){s.streams=(s.streams||0)+x;tot+=x}});
  if(!(tot>0))return;const e=+(tot*PAY_RATE).toFixed(2);S.streams=(S.streams||0)+tot;S.money=+((S.money||0)+e).toFixed(2);S.earn=(S.earn||0)+e;
  try{mlInit();S.monthStreams=(S.monthStreams||0)+tot;S.listeners=Math.max(S.listeners||0,Math.floor(S.monthStreams/(S.mlDiv||3)))}catch(x){}
- try{say('📈 Catalogue boost: +'+tot.toLocaleString()+' streams across your songs, paid out now: '+$$(e))}catch(x){}
+ try{say('Catalogue boost: +'+tot.toLocaleString()+' streams across your songs, paid out now: '+$$(e))}catch(x){}
  try{snd('chime')}catch(x){}
  if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'Spotifly Team',body:'Your whole catalogue got a boost: +'+tot.toLocaleString()+' extra streams across your songs, worth '+$$(e)+', paid out now.',state:9,unread:1,day:S.day})}
 {const u0=update;update=function(dt){try{if(typeof S!='undefined'&&S&&S.songs&&mode=='play')haloCatchUp()}catch(e){console.error('catch-up failed',e)}return u0.apply(this,arguments)}}

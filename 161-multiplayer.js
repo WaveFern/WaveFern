@@ -31,8 +31,8 @@ function tabLock(){const rd=()=>{try{return JSON.parse(localStorage.getItem(TABK
  const l=rd();if(l&&l.id!==TABID&&Date.now()-l.t<9000)return false;
  const beat=()=>{if(NET.closed)return;const c=rd();if(c&&c.id!==TABID&&Date.now()-c.t<9000){dupTab();return}try{localStorage.setItem(TABK,JSON.stringify({id:TABID,t:Date.now()}))}catch(e){}};
  beat();setInterval(beat,3000);addEventListener('pagehide',()=>{const c=rd();if(c&&c.id===TABID)try{localStorage.removeItem(TABK)}catch(e){}});return true}
-const INS={vo:{n:'Vocals',e:'🎤',st:'Lyrics'},gt:{n:'Guitar',e:'🎸',st:'Riff'},bs:{n:'Bass',e:'🔊',st:'Groove'},dr:{n:'Drums',e:'🥁',st:'Drums'},ky:{n:'Keys',e:'🎹',st:'Melody'}};
-const IK=Object.keys(INS),iName=k=>INS[k]?INS[k].e+' '+INS[k].n:'?';
+const INS={vo:{n:'Vocals',ic:'mic',st:'Lyrics'},gt:{n:'Guitar',ic:'guitar',st:'Riff'},bs:{n:'Bass',ic:'speaker',st:'Groove'},dr:{n:'Drums',ic:'drum',st:'Drums'},ky:{n:'Keys',ic:'keys',st:'Melody'}};
+const IK=Object.keys(INS),iName=k=>INS[k]?INS[k].n:'?';
 /* where each instrument stands in the studio (x, z, facing) and its offset on a festival stage */
 const SPOT={vo:[12.2,2.3,Math.PI],gt:[14.3,2.3,Math.PI],bs:[14.9,3.6,Math.PI/2],dr:[10.8,3.1,Math.PI],ky:[10.2,4.2,0]};
 const STOFF={vo:[0,0],gt:[-1.5,.2],bs:[1.5,.2],dr:[0,-1.3],ky:[2.8,.1]};
@@ -92,7 +92,7 @@ function fullMsg(){snd('err');const o=document.getElementById('mpli');if(o)o.rem
 window.mpContinue=()=>{if(needLogin())return;snd('click');const x=lsGet()[0];if(!x)return;enter(Object.assign({},x))};
 window.mpPlay=()=>ttPlay();
 window.mpLeave=()=>{snd('click');try{autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.reload()};
-function insBtns(taken,lock){return`<div class=mpins>${IK.map(k=>{const off=(taken||[]).includes(k)||(lock&&lock!=k);return`<button class="${U.inst==k?'on':''}" ${off?'disabled':''} onclick="mpPick('${k}')">${INS[k].e}<br><small>${INS[k].n}</small></button>`}).join('')}</div>`}
+function insBtns(taken,lock){return`<div class=mpins>${IK.map(k=>{const off=(taken||[]).includes(k)||(lock&&lock!=k);return`<button class="${U.inst==k?'on':''}" ${off?'disabled':''} onclick="mpPick('${k}')">${pxIcon(INS[k].ic)}<br><small>${INS[k].n}</small></button>`}).join('')}</div>`}
 window.mpPick=k=>{snd('click');U.inst=k;document.querySelectorAll('.mpins button').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick')==`mpPick('${k}')`))};
 window.mpCreateUI=()=>{if(needLogin())return;snd('click');TT.sel=1;U.inst='vo';const mine=lsGet().filter(x=>x.host);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Create a room</h2><p class=m>Up to ${MAXN} players live in one house as a band. Everyone picks one instrument and keeps it. Your friends join with the room code.</p>
@@ -450,7 +450,7 @@ addEventListener('keydown',e=>{if(mode!='rec'||!rec||!rec.ig||rec.wait||rec.cdn>
 let IGK='';
 function igDraw(){let el=$('mg');if(!el){el=document.createElement('div');el.id='mg';document.body.appendChild(el)}document.body.classList.add('mgon');const g=rec.ig;
  const strip='<div class=mgs>'+MG_N.map((n,i)=>i==1?'<b>2. '+n+'</b>':(i+1)+'. '+n).join(' → ')+'</div>',key=g.k+(g.r||0);
- if(key!==IGK||MGK!=='ig'){IGK=key;MGK='ig';el.className='box mpig';el.style.bottom='';let h=strip+`<b>${INS[g.k].e} ${INS[g.k].st}</b> <small class=m id=mpis></small><div class=fb id=mpfb></div>`;
+ if(key!==IGK||MGK!=='ig'){IGK=key;MGK='ig';el.className='box mpig';el.style.bottom='';let h=strip+`<b>${INS[g.k].st}</b> <small class=m id=mpis></small><div class=fb id=mpfb></div>`;
   if(g.k=='dr')h+=`<div class=lanes id=mpln></div><div class=pads>${DRN.map((n,i)=>`<button class=pad style="--c:${PADC[i]}" onpointerdown="mpIg(${i})">${i+1}<br><small>${n}</small></button>`).join('')}</div>`;
   else if(g.k=='gt')h+=`<div class=pads>${STR.map((n,i)=>`<button class=pad style="--c:${PADC[i]}" onpointerdown="mpIg(${i})">${i+1}<br><small>${n} string</small></button>`).join('')}</div><div class=bar style="width:100%;height:8px;margin-top:8px"><i id=mgtm></i></div>`;
   else if(g.k=='bs')h+=`<div class=ring><b></b><i id=mprg></i></div><div class=dots id=mpdt></div><button class="go mphit" onpointerdown="mpIg(0)">Hit (Space)</button>`;
@@ -488,7 +488,8 @@ if(MPS){const k=MPS.inst,T={gt:{hype:'Shred a solo!',call:'Play the riff back!',
 #mpb .mpr{display:flex;gap:6px;margin-top:3px;align-items:baseline}#mpb .mpr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mpb .ok{color:var(--g)}
 #mpb .mps{margin-top:6px;padding-top:6px;border-top:1px solid #2a352e}#mpb button{padding:4px 8px;font-size:12px;margin:4px 4px 0 0}
 body.fston #mpb,body.mgon #mpb,body.dsshow #mpb{display:none}
-.mpins{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 12px}.mpins button{padding:8px 2px;line-height:1.3}.mpins button.on{background:var(--g);color:#04120a}
+.mpins{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 12px}.mpins button{padding:8px 2px;line-height:1.3}
+.mpins .pxi{font-size:22px}.mpins button.on{background:var(--g);color:#04120a}
 .mpig .fb{min-height:18px;font-weight:bold;color:#f5c542;margin:4px 0}
 .mpig .lanes{position:relative;height:150px;margin:6px 0;background:#0a0d0b;border:2px solid #000;overflow:hidden}
 .mpig .hl{position:absolute;left:0;right:0;top:134px;height:4px;background:#ffffff66}.mpig .nt{position:absolute;width:19%;height:12px;border:2px solid #000}
@@ -503,7 +504,7 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
  const L=list(),me=L.length?L:[ME],n=me.length,head=`<div class=mph onclick="mpTog()"><span><b>${esc(MPS.band||'Band')}</b> <small class=m>Room ${esc(MPS.code)}${NET.fb?' · relay':''}</small></span><small class=m>${PMIN?'▸':'▾'}</small></div>`;
  let h=head;if(!PMIN){
   if(!online())h+=`<div class=m style="margin-top:4px">${NET.closed?'Not in the room.':NET.on||NET.tries?'Room offline. Reconnecting…':'Connecting to the room…'} You play ${iName(MPS.inst)}.</div>`;
-  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].e:''} <small class=m>${esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');
+  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].n:''} <small class=m>${esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');
    if(n>1){const rr=me.filter(m=>m.rd&&m.rd.k=='rec');if(rr.length){h+=`<div class=mps>Recording${rr[0].rd.title?' "'+esc(rr[0].rd.title)+'"':''}: <b>${rr.length}/${n} members ready</b>`;
      const away=me.filter(m=>!m.studio).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not in the studio: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='rec'?'<br><button onclick="mpUnready()">Not ready</button>':ME.studio?'<br><button class=go onclick="mpRecReady()">Ready to record</button>':'<br><small class=m>Go to the studio to join the take.</small>';h+='</div>'}
@@ -514,7 +515,7 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
     const ld=me.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);if(ld){const fr=me.filter(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n);h+=`<div class=mps>Stage ${ld.rd.n} set: <b>${fr.length}/${n} members ready</b>`;
      const away=me.filter(m=>m.stg!=ld.rd.n).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not at Stage ${ld.rd.n}: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='fest'?(ME.rd.lead?'<br><button onclick="mpUnready()">Cancel the set</button>':'<br><button onclick="mpUnready()">Not ready</button>'):ME.stg==ld.rd.n?`<br><button class=go onclick="mpFestReady(${ld.rd.n})">Ready to play</button>`:`<br><small class=m>Go to Stage ${ld.rd.n} at the festival.</small>`;h+='</div>'}}}}
- if(!PMIN)h+='<div class=mps><button onclick="emWheel()">😀 Emotes (B)</button></div>';
+ if(!PMIN)h+='<div class=mps><button onclick="emWheel()">Emotes (B)</button></div>';
  if(h!==PK){PK=h;el.innerHTML=h}}
 
 /* ===== v45.5.0: band room fixes, shared artist account, linked band songs ===== */

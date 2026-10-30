@@ -19,5 +19,5 @@ function igbNow(){(S.songs||[]).forEach(s=>{if(s.pd!==S.day)return;const n=Math.
 /* a nudge on the first morning the account goes stale */
 {const w0=wakeUp;wakeUp=function(){const r=w0.apply(this,arguments);try{if(igbOn()&&(S.songs||[]).length&&igbIdle()==IGB.grace+1)setTimeout(()=>{try{say('Your Instagrime has gone quiet. Post to get your streams moving again.')}catch(e){}},2500)}catch(e){}return r}}
 function igbTag(){if(!igbOn())return'';const m=igbM();if(m==1)return'';const p=Math.round((m-1)*100);
- return ` <span style="font-size:12px;padding:3px 8px;border-radius:10px;background:${p>0?'#1e3a26':'#3a2a1e'};color:${p>0?'#7dffa0':'#ffb27d'}">${p>0?'🔥 +'+p+'% streams':'💤 '+p+'% streams'}</span>`}
+ return ` <span style="font-size:12px;padding:3px 8px;border-radius:10px;background:${p>0?'#1e3a26':'#3a2a1e'};color:${p>0?'#7dffa0':'#ffb27d'}">${p>0?'+'+p+'% streams':''+p+'% streams'}</span>`}
 {const ig0=PA.ig;PA.ig=function(){let h=ig0.apply(this,arguments);try{if(igv=='acct'){const t=igbTag();if(t){const k=h.indexOf('Photo post</button>')>=0?'Photo post</button>':'>New post</button>';h=h.replace(k,k+t)}}}catch(e){}return h}}

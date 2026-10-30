@@ -116,7 +116,7 @@ D.landmark=function(C,bk){const f=LM[C.id];if(!f)return false;const G=D.mkG(),Gw
 function selfie(C,name){S.dcity=S.dcity||{};const k=C.id+'|'+S.day,done=(S.dcity.selfie||[]).includes(k);snd('pop');try{chime()}catch(e){}
  if(done)return say('Another photo at the '+name.replace(/^the /,'')+'. Your fans already saw today\'s.');
  S.dcity.selfie=(S.dcity.selfie||[]).filter(x=>(x.split('|')[1]|0)>=S.day-30).concat(k);const f=Math.round(30+Math.sqrt(S.listeners||0)*.25);S.followers=(S.followers||0)+f;
- say('📸 Selfie at the '+name.replace(/^the /,'')+' · +'+f.toLocaleString()+' followers')}
+ say('Selfie at the '+name.replace(/^the /,'')+' · +'+f.toLocaleString()+' followers')}
 
 /* ---------- rooms ---------- */
 const RM=D.RM={lobby:[1240,0,22,14],room:[1290,0,16,12],food:[1320,0,14,10],cafe:[1350,0,12,9],conv:[1380,0,12,10],souv:[1410,0,12,9],records:[1440,0,12,10],office:[1470,0,16,12],books:[1300,-30,14,11],cloth:[1330,-30,14,11],pharm:[1360,-30,12,10]};
@@ -248,11 +248,11 @@ function hotelRooms(C){const s=C.s,hn=(C.spots.hotel&&C.spots.hotel.n)||'Hotel',
 function price(C){return Math.round(60+(C.d.venue?C.d.venue.tix:60)*1.2)}
 function hasKey(C){const k=S.dcity&&S.dcity.key;return !!k&&k.id===C.id&&k.day===S.day}
 function checkIn(C){if(hasKey(C)){snd('pop');return say('Reception: "You are already checked in. The lift is to your right."')}const p=price(C);mode='menu';
- $('ui').innerHTML=`<div class="box modal"><h2>🏨 ${esc((C.spots.hotel&&C.spots.hotel.n)||'Hotel')}</h2><p class=m>${clk()} · You have ${$$(S.money)}.</p><p>${esc(D.words(C.s.lang).hi)}! A room for tonight is ${$$(p)}. Sleep in your room and you wake up there in the morning.</p><div class=row2><button class=go onclick="DCITY.hotelKey(${p})">Check in · ${$$(p)}</button><button onclick="closeUI()">Not now</button></div></div>`}
+ $('ui').innerHTML=`<div class="box modal"><h2>${esc((C.spots.hotel&&C.spots.hotel.n)||'Hotel')}</h2><p class=m>${clk()} · You have ${$$(S.money)}.</p><p>${esc(D.words(C.s.lang).hi)}! A room for tonight is ${$$(p)}. Sleep in your room and you wake up there in the morning.</p><div class=row2><button class=go onclick="DCITY.hotelKey(${p})">Check in · ${$$(p)}</button><button onclick="closeUI()">Not now</button></div></div>`}
 D.hotelKey=p=>{const C=D.C;if(!C)return closeUI();if(S.money<p){snd('err');return say('Not enough money for a room.')}S.money=+(S.money-p).toFixed(2);S.dcity.key={id:C.id,day:S.day};closeUI();snd('cash');say('Checked in! Take the lift to your room.')};
 function lift(C){if(!hasKey(C)){snd('err');return say('Reception first: check in to get your room key.')}D.fade(()=>{D.goRoom('room',RM.room[0]+10,RM.room[1]+10.6,Math.PI)},()=>say('Your room. The bed is by the window.'))}
 function bed(C){if(!hasKey(C)){snd('err');return say('Check in at reception to sleep here tonight.')}if(S.t<240){snd('err');return say('It is too early to sleep. Come back in the evening.')}D.hotelWakeRoom=1;sleepNow(0)}
-function tv(C){const n=['Tonight on the news: '+(S.artist||'a rising star')+' is in '+(C.d.city||C.d.country)+'!','A cooking show about '+(D.food(C.id)[0]||['local food'])[0]+'.','The weather: '+(C.s.snow?'cold':'warm')+' and clear tomorrow.','A music chart show. One of your songs flashes past!'];snd('pop');say('📺 '+pick(n))}
+function tv(C){const n=['Tonight on the news: '+(S.artist||'a rising star')+' is in '+(C.d.city||C.d.country)+'!','A cooking show about '+(D.food(C.id)[0]||['local food'])[0]+'.','The weather: '+(C.s.snow?'cold':'warm')+' and clear tomorrow.','A music chart show. One of your songs flashes past!'];snd('pop');say(pick(n))}
 /* waking up abroad: in your room if you slept there, otherwise in the lobby */
 D.hotelWake=function(auto){const C=D.C;if(!C||!C.rooms.room)return false;const inRoom=D.hotelWakeRoom&&!auto;D.hotelWakeRoom=0;
  if(inRoom){D.goRoom('room',RM.room[0]+7.6,RM.room[1]+5.6,0);say('Good morning, '+(C.d.city||C.d.country)+'!')}else{D.goRoom('lobby',RM.lobby[0]+4,RM.lobby[1]+11.6,0);if(auto)say('You fell asleep on a sofa in the hotel lobby.')}return true};
@@ -276,6 +276,6 @@ D.tp=function(id){if(!S.cheat)return;const T=window.TRAVEL;if(!T)return;if(typeo
 {const b0=phBody;phBody=function(){if(PH.app!='tp')return b0.apply(this,arguments);if(!S.cheat){PH.app='home';return b0.apply(this,arguments)}
  const here=window.TRAVEL?TRAVEL.loc():'home',by={};WT_DEST.forEach(d=>{(by[d.cont]=by[d.cont]||[]).push(d)});
  const btn=(id,t)=>`<button style="display:block;width:100%;text-align:left;margin:3px 0;${id==here?'opacity:.5':''}" onclick="DCITY.tp('${id}')">${esc(t)}${id==here?' · you are here':''}</button>`;
- return`<div style="padding:10px"><p class=m style="margin:0 0 6px">Test mode: tap a city to jump there.</p>${btn('home','🏠 Home')}${Object.keys(by).map(k=>`<h3 style="margin:10px 0 2px">${esc((typeof WT_CONT!='undefined'&&WT_CONT[k]&&WT_CONT[k].n)||k)}</h3>`+by[k].map(d=>btn(d.id,wtPlace(d))).join('')).join('')}</div>`}}
+ return`<div style="padding:10px"><p class=m style="margin:0 0 6px">Test mode: tap a city to jump there.</p>${btn('home','Home')}${Object.keys(by).map(k=>`<h3 style="margin:10px 0 2px">${esc((typeof WT_CONT!='undefined'&&WT_CONT[k]&&WT_CONT[k].n)||k)}</h3>`+by[k].map(d=>btn(d.id,wtPlace(d))).join('')).join('')}</div>`}}
 {const r0=phR;phR=function(){try{const i=GP_APPS.findIndex(a=>a[0]=='tp');if(S.cheat&&i<0)GP_APPS.push(['tp','Teleport',()=>IC.tp,'#7a2ad0']);if(!S.cheat&&i>=0)GP_APPS.splice(i,1)}catch(e){}return r0.apply(this,arguments)}}
 })();

@@ -15,7 +15,7 @@ function giftApply(g){const m=gNum(g.money),st=gNum(g.streams),ls=gNum(g.listene
  if(st){S.streams=(S.streams||0)+st;S.monthStreams=(S.monthStreams||0)+st}
  if(ls){S.monthStreams=(S.monthStreams||0)+ls*(S.mlDiv||3);S.listeners=(S.listeners||0)+ls}
  const p=[];if(m)p.push('<b>$'+m.toLocaleString()+'</b>');if(st)p.push('<b>+'+st.toLocaleString()+'</b> streams');if(ls)p.push('<b>+'+ls.toLocaleString()+'</b> monthly listeners');
- return`<div style="margin:8px 0"><h3>🎁 A gift from ${esc(g.from||'WaveFern')}!</h3>${g.msg?`<p>“${esc(g.msg)}”</p>`:''}<p>${p.join(' · ')||'A little something'}</p></div>`}
+ return`<div style="margin:8px 0"><h3>A gift from ${esc(g.from||'WaveFern')}!</h3>${g.msg?`<p>“${esc(g.msg)}”</p>`:''}<p>${p.join(' · ')||'A little something'}</p></div>`}
 function giftShow(html){mode='menu';snd('chime');$('ui').innerHTML=`<div id=gift class="box modal" style="width:min(400px,92vw);text-align:center;max-height:80vh;overflow:auto">${html}<button class=go onclick="closeUI()">Thanks!</button></div>`}
 function giftCheck(){if(typeof FBU=='undefined'||typeof CLD=='undefined'||!FBU||!CLD.ok||mode!='play'||PAUSED||GFT.busy)return;S.gifts=S.gifts||[];const uid=FBU.uid;
  const g=GIFTS.find(x=>x.uid==uid&&!S.gifts.includes(x.id));

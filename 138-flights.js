@@ -52,7 +52,7 @@ function book(f){const e=canBook(f);if(e){try{snd('err')}catch(x){}say(e);return
  t.tickets.push(tk);if(t.tickets.length>60)t.tickets=t.tickets.filter(k=>k.st=='booked').concat(t.tickets.filter(k=>k.st!='booked').slice(-40));
  try{snd('cash')}catch(x){}try{updateVersion()}catch(x){}
  try{glCard('BOOKED · '+tk.fl,code(tk.from)+' ✈ '+code(tk.to),'Gate '+tk.gate+' · boards '+T.hm(tk.dep-BOARD)+' · gate closes '+T.hm(tk.dep-CLOSE))}catch(x){}
- say('✈ Booked '+tk.fl+' to '+T.place(tk.to)+'. Be at Gate '+tk.gate+' before '+T.hm(tk.dep-CLOSE)+'.');return tk}
+ say('Booked '+tk.fl+' to '+T.place(tk.to)+'. Be at Gate '+tk.gate+' before '+T.hm(tk.dep-CLOSE)+'.');return tk}
 function refundOf(tk){return tk.dep-T.now()>CANCEL_CUT?Math.round(tk.price*REFUND*100)/100:0}
 function cancel(id){const tk=T.st().tickets.find(k=>k.id==id);if(!tk||tk.st!='booked'||tk.bt)return;const r=refundOf(tk);
  if(!(r>0)){try{snd('err')}catch(x){}return say('Too late to cancel: within 2 hours of departure.')}
@@ -61,13 +61,13 @@ function ckWin(tk){const m=tk.dep-T.now();return m<=CK_OPEN&&m>CK_CLOSE}
 function checkIn(id){const tk=T.st().tickets.find(k=>k.id==id);if(!tk||tk.st!='booked')return;if(tk.ck)return say('Already checked in. Seat '+tk.seat+'.');
  const m=tk.dep-T.now();if(m>CK_OPEN){try{snd('err')}catch(x){}return say('Check-in opens 24 hours before departure.')}
  if(m<=CK_CLOSE){try{snd('err')}catch(x){}return say('Check-in closed 45 minutes before departure.')}
- tk.ck=1;try{snd('chime')}catch(x){}say('🎫 Checked in. Boarding pass for '+tk.fl+', seat '+tk.seat+', Gate '+tk.gate+'.')}
+ tk.ck=1;try{snd('chime')}catch(x){}say('Checked in. Boarding pass for '+tk.fl+', seat '+tk.seat+', Gate '+tk.gate+'.')}
 /* missed flights: once the gate closes on a ticket that was not boarded, it is lost */
 function missTick(){try{if(!S||!S.artist||!S.travel)return;if(typeof mode!='undefined'&&(mode=='load'||mode=='creator'))return;const n=T.now();
  T.st().tickets.forEach(tk=>{if(tk.st=='booked'&&!tk.bt&&n>=tk.dep-CLOSE){tk.st='missed';T.emit('missed',tk);
   try{snd('err')}catch(x){}
   try{glCard('MISSED FLIGHT',tk.fl+' to '+T.city(tk.to),'The gate closed at '+T.hm(tk.dep-CLOSE)+'. The ticket is lost. Book again in Swiftwing.')}catch(x){}
-  say('✈ You missed '+tk.fl+' to '+T.place(tk.to)+'. The ticket is lost (no refund). Book a new flight in Swiftwing.')}})}catch(e){console.error('flights',e)}}
+  say('You missed '+tk.fl+' to '+T.place(tk.to)+'. The ticket is lost (no refund). Book a new flight in Swiftwing.')}})}catch(e){console.error('flights',e)}}
 /* never stranded abroad: in a terminal abroad with no flight out and too little money for any flight home,
    Swiftwing gives you a free seat on the next flight home */
 function rescue(){try{if(!S||!S.artist||!S.travel||!T.abroad())return;const w=typeof window.apWhere=='function'?window.apWhere():'';if(!w||w=='cabin')return;
@@ -75,7 +75,7 @@ function rescue(){try{if(!S||!S.artist||!S.travel||!T.abroad())return;const w=ty
  if((+S.money||0)>=Math.min(...L.map(price)))return;const f=L[0],t=T.st(),id='T'+(t.nid++);
  t.tickets.push({id,fl:f.fl,from:f.from,to:'home',dep:f.dep,arr:f.arr,hrs:f.hrs,gate:f.gate,seat:seatFor(id+S.day),price:0,st:'booked',bd:S.day,ck:0,bt:0,free:1});
  try{glCard('FREE SEAT HOME',f.fl+' to '+T.city('home'),'You cannot afford a flight, so Swiftwing put you on the '+T.hm(f.dep)+' flight home for free. Check in, then Gate '+f.gate+'.')}catch(x){}
- say('✈ Swiftwing gave you a free seat home: '+f.fl+' at '+T.hm(f.dep)+', Gate '+f.gate+'. Check in at a desk first.')}catch(e){console.error('flights rescue',e)}}
+ say('Swiftwing gave you a free seat home: '+f.fl+' at '+T.hm(f.dep)+', Gate '+f.gate+'. Check in at a desk first.')}catch(e){console.error('flights rescue',e)}}
 setInterval(missTick,500);setInterval(rescue,2000);
 Object.assign(T,{flights,upcoming,fStatus,route,code,book,cancel,checkIn,ckWin,price,refundOf,canBook,
  RULES:{BOARD,FINAL,CLOSE,CK_OPEN,CK_CLOSE,BOOK_CUT,CANCEL_CUT,REFUND,GATES},AIRLINE,
@@ -279,19 +279,19 @@ function hud(){let e=document.getElementById('swhud');const on=S&&S.artist&&type
  if(!e){css();e=document.createElement('div');e.id='swhud';document.body.appendChild(e)}
  const cl=tk.dep-CLOSE-n,here=tk.from==T.loc(),inAp=typeof window.apWhere=='function'?window.apWhere():'',
   step=tk.bt?(window.apCabinHint?window.apCabinHint(tk):'On board · find seat '+tk.seat):!here?'You are not at the departure airport!':inAp=='air'||inAp=='gate'?(n>=tk.dep-BOARD?'Boarding now at Gate '+tk.gate:'Boarding at Gate '+tk.gate+' opens '+T.hm(tk.dep-BOARD)):inAp=='land'?(tk.ck?'Go through security, then to Gate '+tk.gate:'Check in at a Swiftwing desk, then security'):'Go to '+T.apName(tk.from)+(tk.ck?'':' and check in');
- const h=`✈ <b>${tk.fl}</b> to ${esc(T.city(tk.to))} · Gate ${tk.gate} · gate closes <b>${T.hm(tk.dep-CLOSE)}</b>${tk.bt?'':' ('+T.left(tk.dep-CLOSE)+')'}<small>${esc(step)}</small>`;
+ const h=`<b>${tk.fl}</b> to ${esc(T.city(tk.to))} · Gate ${tk.gate} · gate closes <b>${T.hm(tk.dep-CLOSE)}</b>${tk.bt?'':' ('+T.left(tk.dep-CLOSE)+')'}<small>${esc(step)}</small>`;
  e.className=!tk.bt&&cl<60?'warn':'';if(e.innerHTML!=h)e.innerHTML=h;e.style.display='block'}
 setInterval(()=>{try{hud()}catch(x){}},400);
 
 /* ---- sleeping through a flight: warn first ---- */
 {const q0=sleepQ;sleepQ=function(){q0.apply(this,arguments);try{const end=(S.day+1)*1440+360,L=T.active().filter(k=>!k.bt&&k.dep-CLOSE<end+120),bx=document.querySelector('#ui .box');
  if(L.length&&bx){const p=document.createElement('p');p.style.cssText='background:#3a1410;border:2px solid #ff6b4a;padding:6px 8px;margin:6px 0';
-  p.innerHTML='✈ <b>You have '+(L.length>1?L.length+' flights':'a flight')+' soon:</b> '+L.map(k=>esc(k.fl)+' to '+esc(T.city(k.to))+', gate closes '+T.hm(k.dep-CLOSE)).join('; ')+'. You wake at 06:00. If the gate closes before you get there, the ticket is lost.';
+  p.innerHTML='<b>You have '+(L.length>1?L.length+' flights':'a flight')+' soon:</b> '+L.map(k=>esc(k.fl)+' to '+esc(T.city(k.to))+', gate closes '+T.hm(k.dep-CLOSE)).join('; ')+'. You wake at 06:00. If the gate closes before you get there, the ticket is lost.';
   const h=bx.querySelector('h2');h?h.after(p):bx.prepend(p)}}catch(e){}}}
 /* morning card */
 {const w0=wakeUp;wakeUp=function(){w0.apply(this,arguments);try{const L=T.active().filter(k=>k.dep-T.now()<1440),bx=document.querySelector('#ui .box');if(!L.length||!bx)return;
  const p=document.createElement('p');p.style.cssText='background:#0b2a5b;border:2px solid #ff6b4a;padding:6px 8px;margin:6px 0';
- p.innerHTML='✈ <b>Flights today:</b> '+L.map(k=>esc(k.fl)+' '+esc(T.apName(k.from))+' → '+esc(T.city(k.to))+', Gate '+k.gate+', gate closes '+T.hm(k.dep-CLOSE)).join('<br>');
+ p.innerHTML='<b>Flights today:</b> '+L.map(k=>esc(k.fl)+' '+esc(T.apName(k.from))+' → '+esc(T.city(k.to))+', Gate '+k.gate+', gate closes '+T.hm(k.dep-CLOSE)).join('<br>');
  const h=bx.querySelector('h2');h?h.after(p):bx.prepend(p)}catch(e){}}}
 window.SWAPP=SW;
 })();

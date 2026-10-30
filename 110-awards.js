@@ -127,7 +127,7 @@ function awTalk(){if(mode!='play')return;const A=awS(),sg=(S.songs||[]).slice().
  else body=`<p>"${esc(S.artist)}! You're on the list. Which of your songs are we submitting for <b>Song of the Year</b>?"</p>
   <select id=awsel style="width:100%;margin:6px 0;padding:8px;font-size:15px">${sg.slice(0,12).map((s,k)=>`<option value="${s.id}">${esc(s.title)} · score ${awSongScore(s)}${k?'':' (your strongest)'}</option>`).join('')}</select>
   <p class=m>Score: mix quality plus a streams bonus. One song wins.</p>`;
- mode='menu';$('ui').innerHTML=`<div class="box modal" style="width:min(520px,94vw);border:3px solid #c9a227;background:#14091c"><h2 style="color:#f6d86a">🏆 Gramophone Awards · Guest list</h2><p class=m>${A.tries?`Ceremonies attended: ${A.tries} · Trophies won: ${A.wins}`:'The biggest night in music.'}</p>${body}
+ mode='menu';$('ui').innerHTML=`<div class="box modal" style="width:min(520px,94vw);border:3px solid #c9a227;background:#14091c"><h2 style="color:#f6d86a">Gramophone Awards · Guest list</h2><p class=m>${A.tries?`Ceremonies attended: ${A.tries} · Trophies won: ${A.wins}`:'The biggest night in music.'}</p>${body}
   <div class=row2>${sg.length&&!w?'<button class=go onclick="awGo()">Take your seat · Start the ceremony</button>':''}<button onclick="closeUI()">Not now</button></div></div>`}
 function awGo(){const sel=$('awsel'),song=(S.songs||[]).find(s=>s.id==(sel&&sel.value));if(!song||awWait()>0)return;const A=awS();A.last=S.day;A.tries++;closeUI();mode='menu';awPlay(awField(song),song)}
 
@@ -210,7 +210,7 @@ function awShow(F0,song){
  wrap.innerHTML=`<div id=awfade style="position:absolute;inset:0;background:#000;opacity:1;transition:opacity .8s"></div><div style="position:absolute;left:0;right:0;top:0;height:7%;background:#000"></div><div style="position:absolute;left:0;right:0;bottom:0;height:7%;background:#000"></div>
  <div style="position:absolute;left:3%;top:9%;display:flex;gap:10px;align-items:center;font-size:clamp(11px,1.6vw,16px)"><span style="background:#c0141c;color:#fff;padding:3px 8px">LIVE</span><span style="color:#f6d86a;text-shadow:0 0 6px #000">THE ${NTH}TH GRAMOPHONE AWARDS</span></div>
  <div id=awcap style="position:absolute;left:50%;bottom:10%;transform:translateX(-50%);width:min(860px,92vw);box-sizing:border-box;background:rgba(10,5,18,.9);border:3px solid #c9a227;border-radius:4px;padding:10px 16px;pointer-events:auto;cursor:pointer;display:none"><div id=awwho style="color:#f6d86a;font-size:clamp(11px,1.5vw,15px);margin-bottom:4px"></div><div id=awtxt style="color:#fff;font:600 clamp(14px,2.1vw,22px)/1.35 ui-monospace,Menlo,Consolas,monospace;min-height:1.35em"></div><div style="text-align:right;color:#8a7a50;font-size:11px">click or space ▸</div></div>
- <button id=awskip style="position:absolute;right:3%;top:9%;pointer-events:auto;opacity:.85">Skip ⏭</button><div id=awres style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78);pointer-events:auto"></div>`;
+ <button id=awskip style="position:absolute;right:3%;top:9%;pointer-events:auto;opacity:.85">Skip</button><div id=awres style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78);pointer-events:auto"></div>`;
  document.body.appendChild(wrap);O.wrap=wrap;
  const $c=id=>wrap.querySelector('#'+id);
  /* camera shots */
@@ -273,7 +273,7 @@ function awShow(F0,song){
  const finish=()=>{if(A.end)return;A.end=true;A.clap=0;A.free=null;hint.style.display='none';mk.visible=false;const R2=awS();let won=!!WIN.sc&&WIN.you;
   const rows=F0.field.map((x,i)=>`<tr style="${x.you?'color:#7fe3ff;font-weight:bold':''}"><td>${i+1}</td><td>${esc(x.n)}</td><td style="opacity:.8">${esc(x.t)}</td><td align=right>${x.sc}</td></tr>`).join('');
   if(won){S.inv=S.inv||{};S.inv.trophy=(S.inv.trophy||0)+1;R2.wins++}R2.hist.push({day:S.day,won:!!won,w:WIN.n,sc:F0.me,top:WIN.sc});
-  const r=$c('awres');r.style.display='flex';$c('awcap').style.display='none';r.innerHTML=`<div style="background:#14091c;border:3px solid #c9a227;border-radius:6px;padding:20px 26px;max-width:min(580px,94vw);color:#fff;text-align:center"><h2 style="color:#f6d86a;margin:0 0 8px">${won?'🏆 YOU WON SONG OF THE YEAR!':'Song of the Year: '+esc(WIN.n)}</h2>
+  const r=$c('awres');r.style.display='flex';$c('awcap').style.display='none';r.innerHTML=`<div style="background:#14091c;border:3px solid #c9a227;border-radius:6px;padding:20px 26px;max-width:min(580px,94vw);color:#fff;text-align:center"><h2 style="color:#f6d86a;margin:0 0 8px">${won?'YOU WON SONG OF THE YEAR!':'Song of the Year: '+esc(WIN.n)}</h2>
    <p style="margin:4px 0 10px;opacity:.9;font:14px/1.4 ui-monospace,monospace">${won?'A Gramophone Trophy has been added to your Storage. Place it in your house from the Storage menu.':'You were beaten out. A song with better mix quality and more streams gives you a shot next time.'}</p>
    <table style="width:100%;border-collapse:collapse;font:14px ui-monospace,monospace;text-align:left"><tr style="opacity:.6"><td></td><td>Artist</td><td>Song</td><td align=right>Score</td></tr>${rows}</table><button id=awlv class=go style="margin-top:14px;padding:10px 22px;font-size:15px">Leave</button></div>`;
   $c('awlv').onclick=()=>awEnd(won)};

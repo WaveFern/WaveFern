@@ -535,7 +535,7 @@ function dsShop(C,sp){const d=C.d,F=D.food(C.id),place=d.city||d.country;
  shopModal(esc(sp.n)+' <small class=m>· '+esc(place)+'</small>',()=>menu.map(m=>[m[0],m[1],'+'+m[2]+' energy'+(m[3]?' · refills stamina':'')]),i=>{const m=menu[i];if(S.money<m[1]){snd('err');return say('Not enough money for that.')}if(!m[3]&&S.energy>=100){snd('err');return say('You are already full of energy.')}
   S.money=+(S.money-m[1]).toFixed(2);S.energy=Math.min(100,S.energy+m[2]);if(m[3]){S.stam=100;S.exh=0}snd('eat');say('Yum! '+m[0]+' · +'+m[2]+' energy')})}
 function dsHotel(C){const price=Math.round(60+(C.d.venue?C.d.venue.tix:60)*1.2);mode='menu';
- $('ui').innerHTML=`<div class="box modal"><h2>🏨 ${esc(C.spots.hotel.n)}</h2><p class=m>${clk()} · You have ${$$(S.money)}.</p><p>Rest in the lobby for an hour (+15 energy), or take a room for the night and sleep until morning. You wake up here, in ${esc(C.d.city||C.d.country)}.</p>
+ $('ui').innerHTML=`<div class="box modal"><h2>${esc(C.spots.hotel.n)}</h2><p class=m>${clk()} · You have ${$$(S.money)}.</p><p>Rest in the lobby for an hour (+15 energy), or take a room for the night and sleep until morning. You wake up here, in ${esc(C.d.city||C.d.country)}.</p>
  <div class=row2><button onclick="DCITY.hotelRest()">Rest 1 hour (free)</button><button class=go onclick="DCITY.hotelSleep(${price})">Sleep here · ${$$(price)}</button><button onclick="closeUI()">Leave</button></div></div>`}
 D.hotelRest=()=>{closeUI();S.t=Math.min(599,S.t+(S.t<300?21:30));S.energy=Math.min(100,S.energy+15);snd('pop');say('You rested in the lobby · +15 energy · '+clk())};
 D.hotelSleep=p=>{if(S.money<p){snd('err');return say('Not enough money for a room.')}S.money=+(S.money-p).toFixed(2);closeUI();sleepNow(0)};
@@ -554,10 +554,10 @@ function dsMapPaint(x,sx,sz,k,mini){const C=D.C;if(!C)return;const s=C.s,R0=(a,b
  R0(C.air.x0,C.air.z0,C.air.x1,C.air.z1,'#c8d4e0');R0(C.plaza.x0,C.plaza.z0,C.plaza.x1,C.plaza.z1,'#b8b0a0');
  x.fillStyle='#e8e4dc';x.beginPath();x.ellipse(sx(C.st.x),sz(C.st.z),C.st.a*k,C.st.b*k,0,0,7);x.fill();x.fillStyle='#4a9a4a';x.beginPath();x.ellipse(sx(C.st.x),sz(C.st.z),C.st.a*.55*k,C.st.b*.55*k,0,0,7);x.fill();
  const pin=(p,col,t)=>{if(!p)return;const X=sx(p.x),Z=sz(p.z);x.fillStyle=col;x.fillRect(X-4,Z-4,8,8);x.strokeStyle='#000';x.lineWidth=1;x.strokeRect(X-4,Z-4,8,8);if(!mini&&t){x.font='bold 11px monospace';x.fillStyle='#fff';x.textAlign='left';x.fillText(t,X+7,Z+4)}};
- pin(C.spots.air,'#5aa9ff','✈ Airport');pin({x:C.st.x,z:C.st.z+C.st.b+2},'#ff4f9a','🏟 '+((C.d.venue&&C.d.venue.n)||'Stadium'));pin(C.spots.hotel,'#ffd23d','Hotel');pin(C.spots.club,'#b07aff','♪ '+((C.d.club&&C.d.club.n)||'Club'));if(C.spots.land)pin(C.spots.land,'#ffd23d','★ '+(C.spots.land.n||'Landmark'));if(!mini)C.shops.forEach(sp=>pin(sp,'#2fe68a',''))}
+ pin(C.spots.air,'#5aa9ff','Airport');pin({x:C.st.x,z:C.st.z+C.st.b+2},'#ff4f9a',((C.d.venue&&C.d.venue.n)||'Stadium'));pin(C.spots.hotel,'#ffd23d','Hotel');pin(C.spots.club,'#b07aff','♪ '+((C.d.club&&C.d.club.n)||'Club'));if(C.spots.land)pin(C.spots.land,'#ffd23d','★ '+(C.spots.land.n||'Landmark'));if(!mini)C.shops.forEach(sp=>pin(sp,'#2fe68a',''))}
 D.mapPaint=dsMapPaint;
 function dsBigMap(){const C=D.C;mode='menu';const d=C.d;
- $('ui').innerHTML=`<div class="box modal" style="width:min(780px,96vw)"><h2>🗺 ${esc(wtPlace(d))}</h2><canvas id=dsmap width=760 height=420 style="width:100%;display:block;border:2px solid #000;image-rendering:pixelated"></canvas>
+ $('ui').innerHTML=`<div class="box modal" style="width:min(780px,96vw)"><h2>${esc(wtPlace(d))}</h2><canvas id=dsmap width=760 height=420 style="width:100%;display:block;border:2px solid #000;image-rendering:pixelated"></canvas>
  <p class=m>You are the white arrow. ${D.hint?esc(D.hint()):''}</p><div class=row2><button onclick="DCITY.taxi(${C.spots.air.x},${C.spots.air.z},'the airport')">Taxi to the airport</button><button onclick="DCITY.taxi(${C.st.x},${C.st.z+C.st.b+4},'the stadium')">Taxi to ${esc((d.venue&&d.venue.n)||'the stadium')}</button>${C.spots.club?`<button onclick="DCITY.taxi(${C.spots.club.x},${C.spots.club.z+1},'the club')">Taxi to ${esc((d.club&&d.club.n)||'the club')}</button>`:''}${C.spots.hotel?`<button onclick="DCITY.taxi(${C.spots.hotel.x},${C.spots.hotel.z+1},'the hotel')">Taxi to the hotel</button>`:''}<button onclick="closeUI()">Close</button></div></div>`;
  const c=$('dsmap'),x=c.getContext('2d'),k=Math.min(760/(C.W+150),420/(C.zMax+80)),ox=(760-(C.W+150)*k)/2+120*k,oz=40*k;x.fillStyle='#223';x.fillRect(0,0,760,420);
  dsMapPaint(x,v=>ox+v*k,v=>oz+v*k,k,false);const px=ox+(P.x-OX)*k,pz=oz+(P.z-OZ)*k;x.fillStyle='#fff';x.strokeStyle='#000';x.beginPath();x.arc(px,pz,5,0,7);x.fill();x.stroke()}
@@ -660,7 +660,7 @@ function dsTick(dt){const C=D.C;if(!C)return;const t=performance.now()/1000,px=P
  if(D.view&&D.view.tick)D.view.tick(dt);
  dsHud()}
 function dsHud(){let h=$('dshud');const show=inCity()&&(mode=='play')&&!D.view;if(!show){if(h)h.style.display='none';return}if(!h){h=document.createElement('div');h.id='dshud';h.className='hb';document.body.appendChild(h)}h.style.display='';
- const C=D.C,where=D.room?(D.room.o.name||''):'',t=`<b class=px>📍 ${esc(wtPlace(C.d))}</b>${where?' · '+esc(where):''} · ${clk()}<small class=m>${esc(D.hint?D.hint():'Press N for the city map.')}</small>`;if(h.dataset.h!=t){h.dataset.h=t;h.innerHTML=t}}
+ const C=D.C,where=D.room?(D.room.o.name||''):'',t=`<b class=px>${esc(wtPlace(C.d))}</b>${where?' · '+esc(where):''} · ${clk()}<small class=m>${esc(D.hint?D.hint():'Press N for the city map.')}</small>`;if(h.dataset.h!=t){h.dataset.h=t;h.innerHTML=t}}
 {const u0=update;update=function(dt){u0(dt);if(D.on){try{dsTick(dt)}catch(e){if(!D.err){D.err=1;console.error('tour city',e)}}}else{const h=$('dshud');if(h)h.style.display='none'}}}
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(D.view&&D.view.cam&&c===cam)return r0(sc,D.view.cam);return r0(sc,c)}}
 {const m0=mmDraw;mmDraw=function(){if(!inCity())return m0();const show=['play','build'].includes(mode);mm.style.display=ml.style.display=show&&!D.room?'block':'none';if(!show||D.room)return;

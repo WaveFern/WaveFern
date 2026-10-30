@@ -122,7 +122,7 @@ function buildOut(){if(AP.og)return;const G=xgNew(),og=AP.og=new THREE.Group();s
  const run=mkPlane({tail:'#ff6b4a'});run.rotation.y=-Math.PI/2;run.position.set(-220,0,146);run.visible=false;og.add(run);AP.anim.push({k:'rw',m:run,t:0});
  const tug=new THREE.Group();{const t=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.1,2.4),pm('#f5c542'));t.position.y=.6;tug.add(t);for(let i=1;i<=3;i++){const c=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.2,2.2),pm(i%2?'#4a5868':'#5b6b7c'));c.position.set(0,.7,-i*2.8);tug.add(c)}}
  tug.position.set(-460,0,104);og.add(tug);AP.anim.push({k:'tug',m:tug,t:0});
- POIS.push([-322,20,'Airport ✈','#7fd4ff']);
+ POIS.push([-322,20,'Airport','#7fd4ff']);
  WB[0]=Math.min(WB[0],-345)}
 function fadeAll(dt,L){const px=P.x,pz=P.z;(L||AP.fadeM).forEach(f=>{const [x0,z0,x1,z1,h]=f.b;let lo=0,hi=(h-1)/13;const r=(p,a,c)=>{const t1=(a-p)/16,t2=(c-p)/16;lo=Math.max(lo,Math.min(t1,t2));hi=Math.min(hi,Math.max(t1,t2))};r(px,x0,x1);r(pz,z0,z1);
  const tg=lo<hi?.15:1,m=f.m;m.opacity+=(tg-m.opacity)*Math.min(1,dt*6);m.depthWrite=m.opacity>.95})}
@@ -169,7 +169,7 @@ function buildTerm(){if(AP.grp)return;const G=xgNew(),g=AP.grp=new THREE.Group()
  /* landside departures board on the left wall, seats, kiosk, plants */
  AP.boards.push({m:pl(g,null,11,5.4,u(.06),2.9,w(48),Math.PI/2),n:9,title:'DEPARTURES',cv:null});
  [[56,50.5],[56,53.5],[66,50.5],[66,53.5]].forEach(([a,b])=>{for(let i=0;i<4;i++){bx(.8,.45,.8,'#1565d8',a-1.5+i,.23,b);bx(.8,.6,.15,'#0b2a5b',a-1.5+i,.65,b-.35)}col(a-2,b-.5,a+2,b+.45)});
- bx(6,1.1,2,'#6b4a32',67,.55,38.6,'#e9dcc6');bx(6,1.6,.3,'#4a3324',67,.8,37.4);col(64,37.2,70,39.7);fd(sign(g,5,1,'BEAN THERE ☕',u(67),2.3,w(37.2),0,{bg:'#4a3324',fg:'#ffe0b0'}),u(64.5),w(37.1),u(69.5),w(37.3),2.8);
+ bx(6,1.1,2,'#6b4a32',67,.55,38.6,'#e9dcc6');bx(6,1.6,.3,'#4a3324',67,.8,37.4);col(64,37.2,70,39.7);fd(sign(g,5,1,'BEAN THERE',u(67),2.3,w(37.2),0,{bg:'#4a3324',fg:'#ffe0b0'}),u(64.5),w(37.1),u(69.5),w(37.3),2.8);
  [[3,54],[70,54],[3,38],[30,52],[42,52]].forEach(([a,b])=>{bx(1,.8,1,'#8a6a4a',a,.4,b);bx(1.3,1.2,1.3,'#2e8b57',a,1.4,b);col(a-.5,b-.5,a+.5,b+.5)});
  AP.signs.push({k:'wel',m:fd(sign(g,16,1.5,'WELCOME',u(36),4.6,w(55.8),0,{bg:'#ffffff',fg:'#0b2a5b',bar:'#ff6b4a'}),u(28),w(55.7),u(44),w(55.9),5.4)});
  /* --- security --- */
@@ -257,8 +257,8 @@ function relabel(){const id=here(),d=T.dest(id),lg=d&&d.lang||'en',nm=T.apName(i
 function apEnter(where){buildTerm();try{if(typeof closePhone=='function')closePhone()}catch(e){}
  fade(()=>{IN={i:AP.idx,x:AX,w:AW,d:AD};P.sit=null;if(AP.loc!==here())relabel();
   P.x=AX+36;P.z=AZ+(where=='arr'?50:52.6);P.rot=Math.PI;camT.x=P.x;camT.z=P.z;AP.lastV=P.z-AZ;
-  if(where=='arr'){const d=T.here();say(d?'🛬 Welcome to '+T.place(here())+'! Local time '+T.local(T.now(),here())+'.':'🛬 Welcome home to '+T.apName('home')+'.')}
-  else if(!S.travel.seen.ap){S.travel.seen.ap=1;say('✈ Check in at a Swiftwing desk, go through security, then find your gate. Book flights at the ticket desk.')}},
+  if(where=='arr'){const d=T.here();say(d?'Welcome to '+T.place(here())+'! Local time '+T.local(T.now(),here())+'.':'Welcome home to '+T.apName('home')+'.')}
+  else if(!S.travel.seen.ap){S.travel.seen.ap=1;say('Check in at a Swiftwing desk, go through security, then find your gate. Book flights at the ticket desk.')}},
   where=='arr'?'':T.apName(here()),where=='arr'?'':'Departures · check-in · gates 1-6')}
 window.apEnter=apEnter;
 function apLeave(){if(T.abroad()){IN=null;if(T.emit('exitAirport',here()))return;apEnter('front');setTimeout(()=>say('The streets of '+T.city(here())+' are not open yet. Book a flight at the ticket desk.'),1100);return}
@@ -267,7 +267,7 @@ function apLeave(){if(T.abroad()){IN=null;if(T.emit('exitAirport',here()))return
 /* ================= security ================= */
 const secOK=()=>!!T.pass();
 let secSay=0;function secMsg(){const n=performance.now();if(n-secSay<2500)return;secSay=n;const tk=T.active().find(k=>k.from==here());try{snd('err')}catch(e){}
- say(!tk?'🛂 Security: you need a boarding pass. Book a flight at the ticket desk first.':!tk.ck?(T.ckWin(tk)?'🛂 Security: check in first (Swiftwing desks 1-4, by the entrance), then come back.':tk.dep-T.now()>RU.CK_OPEN?'🛂 Too early: check-in for '+tk.fl+' opens '+T.hm(tk.dep-RU.CK_OPEN)+'.':'🛂 Check-in for '+tk.fl+' has closed.'):'🛂 Your flight has closed.')}
+ say(!tk?'Security: you need a boarding pass. Book a flight at the ticket desk first.':!tk.ck?(T.ckWin(tk)?'Security: check in first (Swiftwing desks 1-4, by the entrance), then come back.':tk.dep-T.now()>RU.CK_OPEN?'Too early: check-in for '+tk.fl+' opens '+T.hm(tk.dep-RU.CK_OPEN)+'.':'Check-in for '+tk.fl+' has closed.'):'Your flight has closed.')}
 
 /* ================= gates and boarding ================= */
 function gateTk(i){const n=T.now();return T.active().find(k=>k.from==here()&&k.gate==i&&k.dep-n<1440)}
@@ -279,7 +279,7 @@ function gateUse(i){const tk=gateTk(i),n=T.now();if(!tk){const o=T.active().find
  board(tk)}
 function board(tk){if(AP.busy)return;AP.busy=1;try{snd('chime')}catch(e){}
  fade(()=>{AP.busy=0;tk.bt=1;AP.tk=tk;AP.ph='board';buildCabin();IN={i:AP.cidx,x:CX,w:CW,d:CD};P.sit=null;P.x=CX+2.4;P.z=AZ+3;P.rot=Math.PI/2;camT.x=P.x;camT.z=P.z;placeSeatMarker(tk);
-  say('🎫 Welcome aboard '+tk.fl+' to '+T.city(tk.to)+'. Your seat is '+tk.seat+' (follow the arrow). The plane leaves when you sit down.')},'Boarding '+tk.fl,'Gate '+tk.gate+' → '+T.place(tk.to))}
+  say('Welcome aboard '+tk.fl+' to '+T.city(tk.to)+'. Your seat is '+tk.seat+' (follow the arrow). The plane leaves when you sit down.')},'Boarding '+tk.fl,'Gate '+tk.gate+' → '+T.place(tk.to))}
 
 /* ================= cabin ================= */
 const ROWU=r=>4.6+(r-1)*1.4,SEATV={A:.7,B:1.3,C:1.9,D:4.1,E:4.7,F:5.3};
@@ -308,7 +308,7 @@ function buildCabin(){if(AP.cgrp)return;const G=xgNew(),g=AP.cgrp=new THREE.Grou
 function placeSeatMarker(tk){const r=parseInt(tk.seat),L=tk.seat.slice(-1);AP.cnpc.forEach(n=>n.c.g.visible=n.seat!=tk.seat);if(AP.seatM){AP.seatM.visible=true;AP.seatM.position.set(CX+ROWU(r),1.9,AZ+SEATV[L]);AP.seatM.userData={r,L}}}
 function seatXZ(tk){const r=parseInt(tk.seat),L=tk.seat.slice(-1);return{x:CX+ROWU(r),z:AZ+SEATV[L],ax:CX+ROWU(r),az:AZ+3}}
 function sitDown(){const tk=AP.tk;if(!tk||AP.ph!='board')return;const s=seatXZ(tk);P.sit={x:s.x,z:s.z};P.rot=-Math.PI/2;if(AP.seatM)AP.seatM.visible=false;try{snd('pop')}catch(e){}
- AP.ph='sit';say('🔒 Seatbelt on. The doors close and '+tk.fl+' pushes back...');setTimeout(()=>{if(AP.ph=='sit')takeOff()},1800)}
+ AP.ph='sit';say('Seatbelt on. The doors close and '+tk.fl+' pushes back...');setTimeout(()=>{if(AP.ph=='sit')takeOff()},1800)}
 function cabinInts(){const a=[],tk=AP.tk;if(!tk)return a;const s=seatXZ(tk);
  if(AP.ph=='board')a.push({x:s.ax,z:s.az,r:1.3,l:'Sit in '+tk.seat+' (your seat)',a:sitDown});
  a.push({x:CX+2.4,z:AZ+4.8,r:1.5,l:AP.ph=='landed'?'Exit the plane':'Front door · the plane leaves when you sit in '+tk.seat,a:()=>{if(AP.ph=='landed')exitPlane();else say('Find seat '+tk.seat+' (the yellow arrow) and sit down to take off.')}});
@@ -325,7 +325,7 @@ function takeOff(){const tk=AP.tk;if(!tk)return;AP.ph='fly';T.emit('depart',tk);
  ${[0,1,2,3,4,5].map(i=>`<div class=cl style="top:${10+i*14}%;width:${120+i*40}px;height:${30+i*6}px;animation-duration:${6+i*1.6}s;animation-delay:-${i*1.3}s"></div>`).join('')}
  <div style="position:relative;font:700 28px ${FONT}">${esc(tk.fl)} · ${esc(T.city(tk.from))} → ${esc(T.city(tk.to))}</div>
  <canvas id=apflc width=720 height=300 style="position:relative;width:min(720px,94vw);aspect-ratio:720/300;border-radius:14px;border:3px solid #0b2a5b;background:#7cc2ff"></canvas>
- <div id=apflt style="position:relative;font:700 18px ${FONT}"></div><div style="position:relative;display:flex;gap:10px"><button onclick="apLand()">Skip ⏭</button></div>`;
+ <div id=apflt style="position:relative;font:700 18px ${FONT}"></div><div style="position:relative;display:flex;gap:10px"><button onclick="apLand()">Skip</button></div>`;
  document.body.appendChild(d);const t0=performance.now(),DUR=8500,A=T.dest(tk.from)||WT_HOME,B=T.dest(tk.to)||WT_HOME;AP.flv=null;
  const step=()=>{if(!document.getElementById('apfly')||AP.ph!='fly')return;const k=Math.min(1,(performance.now()-t0)/DUR),c=document.getElementById('apflc');if(c&&T.paintWorld){const r=c.getBoundingClientRect(),W0=r.width||720,H0=r.height||300,dpr=Math.min(3,window.devicePixelRatio||1),W=Math.round(W0*dpr),H=Math.round(H0*dpr);
   if(c.width!=W||c.height!=H){c.width=W;c.height=H}const x=c.getContext('2d'),pa=T.proj(A.lat,A.lon),pb=T.proj(B.lat,B.lon);
@@ -343,11 +343,11 @@ function takeOff(){const tk=AP.tk;if(!tk)return;AP.ph='fly';T.emit('depart',tk);
 window.apLand=function(){const tk=AP.tk;if(!tk||AP.ph!='fly')return;const d=document.getElementById('apfly');if(d)d.remove();
  tk.st='flown';tk.bt=0;AP.ph='landed';T.st().loc=tk.to||'home';const arr=AP.arrT||T.now(),end=(S.day+1)*1440+360;
  const s=seatXZ(tk);P.sit=null;P.x=s.ax;P.z=s.az;P.rot=Math.PI;camT.x=P.x;camT.z=P.z;AP.cnpc.forEach(n=>n.c.g.visible=true);if(AP.seatM)AP.seatM.visible=false;
- const msg='🛬 Landed in '+T.place(tk.to)+(tk.to!='home'?' · local time '+T.local(arr,tk.to):'')+'. Exit at the front door.';
+ const msg='Landed in '+T.place(tk.to)+(tk.to!='home'?' · local time '+T.local(arr,tk.to):'')+'. Exit at the front door.';
  if(arr>=end){AP.pend=arr;S.t=599.9;try{sleepNow(0)}catch(e){console.error(e)}setTimeout(()=>say(msg),1600)}
  else{S.t=Math.max(+S.t||0,Math.min(599.5,T.tOf(arr-S.day*1440)));try{closeUI()}catch(e){mode='play'}say(msg)}};
 {const w0=wakeUp;wakeUp=function(){w0.apply(this,arguments);try{if(AP.pend){const a=AP.pend;AP.pend=null;S.t=Math.max(0,Math.min(599.5,T.tOf(a-S.day*1440)));
- const bx=document.querySelector('#ui .box');if(bx){const p=document.createElement('p');p.style.cssText='background:#0b2a5b;border:2px solid #ff6b4a;padding:6px 8px;margin:6px 0';p.innerHTML='✈ You slept on the plane. It is now <b>'+clk()+'</b>.';const h=bx.querySelector('h2');h?h.after(p):bx.prepend(p)}}}catch(e){}}}
+ const bx=document.querySelector('#ui .box');if(bx){const p=document.createElement('p');p.style.cssText='background:#0b2a5b;border:2px solid #ff6b4a;padding:6px 8px;margin:6px 0';p.innerHTML='You slept on the plane. It is now <b>'+clk()+'</b>.';const h=bx.querySelector('h2');h?h.after(p):bx.prepend(p)}}}catch(e){}}}
 function exitPlane(){const tk=AP.tk;fade(()=>{AP.ph=null;AP.tk=null;IN=null;P.sit=null;if(!T.arrive(tk.to,tk))apEnter('arr')},'',)}
 
 /* ================= hooks ================= */
@@ -362,7 +362,7 @@ function termInts(){const a=[],u=v=>AX+v,w=v=>AZ+v,tk=T.active().find(k=>k.from=
  a.push({x:u(62),z:w(48.8),r:1.8,l:'Ask at Information',a:info});
  a.push({x:u(1.4),z:w(48),r:2.6,l:'Read the departures board',a:()=>{SWAPP.tab='dep';swDesk()}});
  a.push({x:u(36),z:w(31),r:2.4,l:'Read the departures board',a:()=>{SWAPP.tab='dep';swDesk()}});
- LANES.forEach((x,i)=>a.push({x:u(x),z:w(SECV+1.6),r:1.3,l:secOK()?'Security lane '+(i+1)+' · walk through':'Security · boarding pass needed',a:()=>secOK()?say('🛂 Walk through the arch. Have a good flight!'):(secSay=0,secMsg())}));
+ LANES.forEach((x,i)=>a.push({x:u(x),z:w(SECV+1.6),r:1.3,l:secOK()?'Security lane '+(i+1)+' · walk through':'Security · boarding pass needed',a:()=>secOK()?say('Walk through the arch. Have a good flight!'):(secSay=0,secMsg())}));
  a.push({x:u(67),z:w(40.2),r:1.6,l:'Buy at Bean There',a:()=>shop('bean')},{x:u(23),z:w(18.6),r:1.8,l:'Buy at Cloud Nine Coffee',a:()=>shop('c9')},{x:u(64),z:w(18.6),r:2,l:'Buy at Runway Burgers',a:()=>shop('rb')},{x:u(5),z:w(22.2),r:1.6,l:'Browse the Sky Shop',a:()=>shop('sky')},{x:u(50),z:w(18.1),r:1.6,l:'Buy at Pages',a:()=>shop('pg')});
  for(let i=1;i<=6;i++){a.push({x:u(GU(i)),z:w(1.5),r:1.7,l:gateLbl(i),a:()=>gateUse(i)});a.push({x:u(GU(i)+3.4),z:w(5.7),r:1.3,l:'Talk to the Gate '+i+' agent',a:()=>{const t=gateTk(i);say(t?'"'+t.fl+' to '+T.city(t.to)+': boarding '+T.hm(t.dep-RU.BOARD)+', the gate closes '+T.hm(t.dep-RU.CLOSE)+'. Seat '+t.seat+'."':'"This gate is not for your flight'+(tk?'. Yours is Gate '+tk.gate:'')+'."')}});
   [-3,-1,1].forEach(k=>a.push({x:u(GU(i)+k),z:w(7.9),r:.6,l:'Sit down',a:()=>sitOn(u(GU(i)+k),w(7.6),0)}))}
@@ -389,13 +389,13 @@ function tick(dt){AP.t+=dt;outTick(dt);
  T.active().forEach(k=>{if(k.bt&&(!AP.tk||AP.tk.id!=k.id))k.bt=0});
  if(t){if(AP.loc!==here())relabel();const f=nf();if(AP.light)AP.light.intensity=.95*f;fadeAll(dt,AP.fadeI);npcTick(dt);
   if(AP.t-(AP.bt||0)>1){AP.bt=AP.t;AP.boards.forEach(drawBoard);AP.gates.forEach(drawGate)}
-  const v=P.z-AZ;if(AP.lastV!=null&&AP.lastV>=SECV&&v<SECV){const lane=LANES.find(x=>Math.abs(P.x-AX-x)<1.2);if(lane!=null){const m=AP.doorM.find(q=>q.k=='sec'&&Math.abs(q.m.position.x-AX-lane)<.1);if(m)m.t=1.2;try{snd('chime')}catch(e){}const tk=T.pass();say('🛂 Security ✓'+(tk?' Now go to Gate '+tk.gate+'.':''))}}AP.lastV=v;
+  const v=P.z-AZ;if(AP.lastV!=null&&AP.lastV>=SECV&&v<SECV){const lane=LANES.find(x=>Math.abs(P.x-AX-x)<1.2);if(lane!=null){const m=AP.doorM.find(q=>q.k=='sec'&&Math.abs(q.m.position.x-AX-lane)<.1);if(m)m.t=1.2;try{snd('chime')}catch(e){}const tk=T.pass();say('Security ✓'+(tk?' Now go to Gate '+tk.gate+'.':''))}}AP.lastV=v;
   AP.doorM.forEach(q=>{if(q.k=='sec'){q.t=Math.max(0,q.t-dt);q.m.material.color.set(q.t>0?'#56f08a':secOK()?'#2fae5a':'#c0392b')}else{const tk=gateTk(q.i),open=tk&&T.now()>=tk.dep-RU.BOARD&&T.now()<tk.dep-RU.CLOSE;q.m.position.y=1.3+(open?2.5:0)*0+0;q.m.scale.x=open?.15:1}});
   if(AP.tug){AP.tug.position.x=AX-10+((AP.t*5)%(AW+20))}
   if(AP.jets)AP.jets.forEach((j,i)=>{const tk=gateTk(i+1);j.visible=!!tk||(hsh2(here()+i+S.day)%3!=0)})}
  if(c){const f=nf();if(AP.clight)AP.clight.intensity=.15+.8*f;if(AP.seatM&&AP.seatM.visible)AP.seatM.position.y=1.9+Math.sin(AP.t*4)*.15;
   const fa=AP.fa;if(fa){fa.ph+=dt*8;fa.x+=fa.d*.6*dt;if(fa.x>CW-2)fa.d=-1;if(fa.x<1.2)fa.d=1;fa.c.g.position.set(CX+fa.x,0,AZ+3);fa.c.g.rotation.y=fa.d>0?Math.PI/2:-Math.PI/2;const s=Math.sin(fa.ph)*.5;fa.c.legs[0].rotation.x=s;fa.c.legs[1].rotation.x=-s}
-  const tk=AP.tk;if(tk&&AP.ph=='board'&&T.now()>=tk.dep&&mode=='play'){say('👩‍✈️ "Please take your seat, we are leaving."');const s=seatXZ(tk);P.x=s.ax;P.z=s.az;sitDown()}
+  const tk=AP.tk;if(tk&&AP.ph=='board'&&T.now()>=tk.dep&&mode=='play'){say('"Please take your seat, we are leaving."');const s=seatXZ(tk);P.x=s.ax;P.z=s.az;sitDown()}
   /* standing up from a seat in the cabin always puts you in the aisle */
   if(P.sit&&AP.ph=='landed'){P.sit=null}}}
 const hsh2=s=>{let h=7;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return h};
@@ -410,7 +410,7 @@ window.VIEWX=()=>typeof mode!='undefined'&&mode=='play'?(inT()?12:inC()?8:0):0;
  rect(OUT.x0,OUT.z0,OUT.x1,OUT.z1,'#dfe4ea');rect(-299,33,-265,59,'#5a5d64');rect(-299,-19,-265,7,'#5a5d64');rect(-284,106,-280,110,'#e4e8ee');
  if(!mini||kx>.5){x.strokeStyle='#0b2a5b';x.lineWidth=1;x.strokeRect(sx(OUT.x0),sz(OUT.z0),(OUT.x1-OUT.x0)*kx,(OUT.z1-OUT.z0)*kz)}
  if(!mini){x.save();x.fillStyle='#0b2a5b';x.font='bold '+Math.max(10,Math.min(18,kx*14))+'px monospace';x.textAlign='center';x.fillText('✈ AIRPORT',sx((OUT.x0+OUT.x1)/2),sz(20));x.font=Math.max(9,Math.min(12,kx*9))+'px monospace';x.fillStyle='#eee';x.fillText('Runway',sx(-400),sz(147));x.restore()}}catch(e){}}}
-{const b0=bigMap;bigMap=function(){b0();try{if(!$('bm')||T.abroad())return;const r=document.querySelector('#ui .row2');if(!r)return;const bt=document.createElement('button');bt.textContent='Taxi to Airport ✈';bt.onclick=()=>taxi(OUT.fx+6,OUT.fz);r.insertBefore(bt,r.lastElementChild)}catch(e){}}}
+{const b0=bigMap;bigMap=function(){b0();try{if(!$('bm')||T.abroad())return;const r=document.querySelector('#ui .row2');if(!r)return;const bt=document.createElement('button');bt.textContent='Taxi to Airport';bt.onclick=()=>taxi(OUT.fx+6,OUT.fz);r.insertBefore(bt,r.lastElementChild)}catch(e){}}}
 /* bridge to the destination cities (DCITY, 137-tour-cities.js) when it is loaded: it builds each city and its airport */
 {const DC=()=>window.DCITY&&typeof window.DCITY=='object'?window.DCITY:null,
  put=(f,id)=>{const d=DC();if(!d)return false;try{const fn=d[f]||d.arrive;return typeof fn=='function'&&fn.call(d,id)!==false}catch(e){console.error('DCITY '+f,e);return false}};

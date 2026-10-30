@@ -66,7 +66,7 @@ setInterval(()=>{try{const el=$('tdlg');
  else if(Date.now()>TD.wait)tutLine()}catch(e){}},32);
 /* ----- DMs from the guide in Messages ----- */
 function tutDM(t){let m=S.msgs.find(x=>x.g);if(!m){m={id:S.nid++,from:VEE,body:t,state:9,g:1,log:[],unread:0};S.msgs.push(m)}
- if(m.log.some(x=>x.t==t))return;m.log.push({f:'a',t,d:S.day});m.body=t;m.unread=1;say('💬 '+VEE+' sent you a DM')}
+ if(m.log.some(x=>x.t==t))return;m.log.push({f:'a',t,d:S.day});m.body=t;m.unread=1;say(''+VEE+' sent you a DM')}
 /* ----- tips -----
    b: one of the basics (shown in order, each waits for the last one's goal). when: the moment it is useful.
    go: an optional goal: w = an interaction label to point at, at() = a spot, hl() = a laptop / menu element to outline,
@@ -121,7 +121,7 @@ function tutShow(t){const T=S.tut;T.seen[t.k]=1;TUTLAST=Date.now();if(t.k=='free
 function tutDone(t){const T=S.tut;T.goal=null;T.gb=null;tutClr();snd('chime');tutBub(['Sick!','Now we cooking.','That is the stuff.','Look at you go.','Legend behaviour.'][Math.random()*5|0]);
  if(t.b)tutBurst(innerWidth/2,innerHeight-150,30)}
 function tutStart(){const o=S.tut||{};S.tut={v:2,on:1,seen:{},f:{},g:o.g||0,goal:null};
- if(!S.tut.g){S.tut.g=1;S.money=+(S.money+TUT_GIFT).toFixed(2);say('🎁 Big Vee gave you $'+TUT_GIFT+' for gear and clothes')}TUTLAST=0}
+ if(!S.tut.g){S.tut.g=1;S.money=+(S.money+TUT_GIFT).toFixed(2);say('Big Vee gave you $'+TUT_GIFT+' for gear and clothes')}TUTLAST=0}
 function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.x=1;S.tut.goal=null;tutClr();tutSayEnd(1);say('Tips off. Turn them back on from the pause menu.')}
 function tutClr(){document.querySelectorAll('.tutHL').forEach(e=>e.classList.remove('tutHL'))}
 const tutTip=k=>TIPS.find(t=>t.k==k);

@@ -130,7 +130,7 @@ try{IC.wtour=mkIc(['...BBBB...','..BGGBBB..','.BGGGBBGB.','BBGGBBGGGB','BBBGBBBG
 APPD.wtour={n:'World Tour',p:PRICE,d:'Plan a world tour: a zoomable world map, every country and city you can play, their stadiums, ticket prices and fame needed, and a setlist for each show. Opens in the App Barn at Fame Level '+NEED+'. Pay once, keep it for good.'};
 
 /* App Barn: locked below Fame 275, with the price and what it does shown either way */
-{const s0=PA.store;PA.store=function(){let h=s0.apply(this,arguments);try{if(!own()&&fl()<NEED)h=h.replace(/<button class=go[^>]*onclick="inst\('wtour'\)">[^<]*<\/button>/,`<button disabled title="Reach Fame Level ${NEED}">🔒 Fame Level ${NEED} · ${fm(PRICE)}</button>`)}catch(e){}return h}}
+{const s0=PA.store;PA.store=function(){let h=s0.apply(this,arguments);try{if(!own()&&fl()<NEED)h=h.replace(/<button class=go[^>]*onclick="inst\('wtour'\)">[^<]*<\/button>/,`<button disabled title="Reach Fame Level ${NEED}">Fame Level ${NEED} · ${fm(PRICE)}</button>`)}catch(e){}return h}}
 {const i0=inst;inst=function(k){if(k=='wtour'&&!own()&&fl()<NEED){snd2('err');return say('World Tour opens at Fame Level '+NEED+'. You are Level '+fl()+'.')}const had=own(),r=i0.apply(this,arguments);if(k=='wtour'&&!had&&own()){st();say('World Tour unlocked for good. Open it from the desktop.')}return r}}
 /* tell the player once when it unlocks */
 setInterval(()=>{try{if(!S||!S.artist)return;const T=st();if(!T.told&&!own()&&fl()>=NEED){T.told=1;say('Fame Level '+NEED+'! The World Tour app is now in the App Barn ('+fm(PRICE)+').')}}catch(e){}},2000);
@@ -205,7 +205,7 @@ function head(){const T=st();return`<div class=wh><img src="${IC.wtour}" alt="">
  <div class=wst><span class=pill>Fame <b>${fl()}</b>/${typeof FAME_MAX!='undefined'?FAME_MAX:350}</span><span class=pill>Balance <b>${fm(S.money)}</b></span></div></div>
  <div class=tabs>${[['map','Map'],['tour','My tour'+(T.stops.length?' ('+T.stops.length+')':'')],['done','Shows played']].map(t=>`<button class="${U.tab==t[0]?'on':''}" onclick="wtxTab('${t[0]}')">${t[1]}</button>`).join('')}</div>`}
 function destCard(d){const T=st(),inT=T.stops.some(s=>s.d===d.id),lv=fl(),cc=WT_CONT[d.cont].c,tr=trav(),here=tr.at===d.id;
- const vrow=(v,lab)=>`<div class=rw><span>${lab}</span><span>${E(v.n)}</span></div><div class=rw><span>Crowd · ticket</span><span>${fmt(v.cap)} · ${fm(v.tix)}</span></div><div class=rw><span>Fame needed</span><span class="${lv>=v.fame?'okc':'lk'}">${lv>=v.fame?'✓ ':'🔒 '}Level ${v.fame}</span></div>`;
+ const vrow=(v,lab)=>`<div class=rw><span>${lab}</span><span>${E(v.n)}</span></div><div class=rw><span>Crowd · ticket</span><span>${fmt(v.cap)} · ${fm(v.tix)}</span></div><div class=rw><span>Fame needed</span><span class="${lv>=v.fame?'okc':'lk'}">${lv>=v.fame?'✓ ':''}Level ${v.fame}</span></div>`;
  const L=T.stops.map(s=>wtDest(s.d)),swap=!inT&&L.some(x=>x.country===d.country)&&!L.every(x=>x.country===d.country);
  const full=!inT&&!swap&&T.stops.length>=MAXS,low=lv<Math.min(d.venue.fame,d.club.fame);
  return`<div class=dc style="--cc:${cc}"><b class=cn>${E(d.city||d.country+' (country show)')}</b>${d.city?'':`<div class=m2>No big city here: you play a smaller town with its own stadium.</div>`}
@@ -238,7 +238,7 @@ function tourPage(){const T=st();if(!T.stops.length)return`<div class=pan><h2>No
  U.set=Math.min(U.set,T.stops.length-1);const cur=T.stops[U.set],cd=wtDest(cur.d),str=setStrength(cur),lv=fl();
  const tks=T.stops.map((s,i)=>{const d=wtDest(s.d),dn=T.done[s.d+'|venue']||T.done[s.d+'|club'],est=pay(s.d,'venue',.75),ok=lv>=d.venue.fame;
   return`<div class="tk${i==U.set?' on':''}${dn?' dn':''}" style="--cc:${WT_CONT[d.cont].c}"><div class=tn>${i+1}</div><div class=tb2 onclick="wtxSet(${i})" style="cursor:pointer"><b>${E(wtPlace(d))}</b>
-  <div class=m3>${E(d.venue.n)} · ${fmt(d.venue.cap)} seats · ${ok?'about '+fm(est.money)+' a show':'🔒 needs Fame '+d.venue.fame+' (smaller show: '+E(d.club.n)+')'}</div><div class=m3>${s.songs.length?s.songs.length+' songs'+(s.alb!=null?' · album':''):'No setlist yet'} · ${d.hrs}h flight from ${fm(d.fare)}${dn?' · ✓ played day '+dn.day:''}</div></div>
+  <div class=m3>${E(d.venue.n)} · ${fmt(d.venue.cap)} seats · ${ok?'about '+fm(est.money)+' a show':'needs Fame '+d.venue.fame+' (smaller show: '+E(d.club.n)+')'}</div><div class=m3>${s.songs.length?s.songs.length+' songs'+(s.alb!=null?' · album':''):'No setlist yet'} · ${d.hrs}h flight from ${fm(d.fare)}${dn?' · ✓ played day '+dn.day:''}</div></div>
   <div class=ta><button title="Move up" onclick="wtxMove(${i},-1)">▲</button><button title="Move down" onclick="wtxMove(${i},1)">▼</button><button title="Remove" onclick="wtxRm('${s.d}')">✕</button></div></div>`}).join('');
  const SL=songs().slice().sort((a,b)=>(b.streams||0)-(a.streams||0)),AL=albums();
  const ed=`<div class=pan><h2>Setlist · ${E(cd.city||cd.country)}<small>${cur.songs.length}/${MAXSONGS} songs. Better songs, more of them and bigger hits fill more seats.</small></h2>
@@ -250,7 +250,7 @@ function tourPage(){const T=st();if(!T.stops.length)return`<div class=pan><h2>No
 function donePage(){const L=st().log.slice().reverse();if(!L.length)return`<div class=pan><h2>No shows yet<small>Shows you play on tour are listed here, with the crowd and what you earned.</small></h2></div>`;
  const tot=L.reduce((a,r)=>a+(+r.money||0),0);
  return`<div class=pan><h2>Shows played<small>${L.length} shows · ${fm(tot)} earned. A venue can book you again ${COOL} days after you play it.</small></h2><table><tr><th>Day</th><th>Where</th><th>Crowd</th><th>Earned</th><th>Fans</th></tr>${L.map(r=>{const d=wtDest(r.d),v=venueOf(d,r.kind);return`<tr><td>${r.day}</td><td>${E(wtPlace(d))}<br><span class=m2>${E(v?v.n:'')}</span></td><td>${fmt(r.att||0)}</td><td>${fm(r.money||0)}</td><td>+${fmt(r.fol||0)}</td></tr>`}).join('')}</table></div>`}
-function lockPage(){const lv=fl();return`<div class=lock><div class=big>🔒</div><h2 style="font:18px Silkscreen,monospace;color:#ffcc4d">World Tour is locked</h2><p class=m2>${lv<NEED?'It opens in the App Barn at Fame Level '+NEED+'. You are Level '+lv+'.':'Buy it in the App Barn for '+fm(PRICE)+'.'}</p></div>`}
+function lockPage(){const lv=fl();return`<div class=lock><div class=big>${pxIcon('lock')}</div><h2 style="font:18px Silkscreen,monospace;color:#ffcc4d">World Tour is locked</h2><p class=m2>${lv<NEED?'It opens in the App Barn at Fame Level '+NEED+'. You are Level '+lv+'.':'Buy it in the App Barn for '+fm(PRICE)+'.'}</p></div>`}
 function page(){css();st();const b=!own()?lockPage():U.tab=='tour'?tourPage():U.tab=='done'?donePage():mapPage();return`<div class=wtx>${head()}${b}</div>`}
 PA.wtour=()=>{try{return page()}catch(e){console.error('World Tour',e);return'<p>World Tour hit a snag. Close it and try again.</p>'}};
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('wtxmn',app=='wtour'&&!!m.querySelector('.wtx'));if(app=='wtour'&&$('wtxsvg')){hook();requestAnimationFrame(()=>{try{decorate()}catch(e){}})}}catch(e){console.error('World Tour',e)}return r}}

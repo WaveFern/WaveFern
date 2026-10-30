@@ -46,7 +46,7 @@ function render(){if(!T)return;const{C,sp}=T,d=C.d,place=d.city||d.country,pal=d
   <div class=tsm-grid>${it.map((x,i)=>`<div class="tsm-it${x.own?' own':''}"><div class=tsm-tag>${$$(x.p)}</div><canvas class=tsm-pv data-k="f:${x.k}" width=128 height=128></canvas><b>${esc(x.n)}</b><small>${x.own?'Yours · in Storage at home':'Goes to your Storage at home'}</small><button class=go ${x.own?'disabled':''} onclick="TSM.buy(${i})">${x.own?'Owned':'Buy · '+$$(x.p)}</button></div>`).join('')}</div>
   <div class=tsm-ft>Money ${money}${leave}</div></div>`}
  else{const it=menuItems(C,sp),cf=sp.k=='cafe';
-  h=`<div class="modal tsm ${cf?'cf':'rs'}" style="${vars}"><div class=tsm-hd><div class=tsm-k>${cf?'☕ Café · today':'~ '+esc(place)+' ~'}</div><h2>${esc(sp.n||(cf?'Café':'Restaurant'))}</h2><div class=tsm-g>"${esc(hi)}!"</div></div>
+  h=`<div class="modal tsm ${cf?'cf':'rs'}" style="${vars}"><div class=tsm-hd><div class=tsm-k>${cf?'Café · today':'~ '+esc(place)+' ~'}</div><h2>${esc(sp.n||(cf?'Café':'Restaurant'))}</h2><div class=tsm-g>"${esc(hi)}!"</div></div>
   <div class=tsm-sec>${cf?'On the board':'Menu'}</div>${it.map((m,i)=>{const full=!m[3]&&S.energy>=100,poor=S.money<m[1];
    return`<button class="tsm-row${full||poor?' off':''}" onclick="TSM.eat(${i})"><span class=tsm-n>${esc(m[0])}<small>+${m[2]} energy${m[3]?' · refills stamina':''}${full?' · you are full':poor?' · not enough money':''}</small></span><span class=tsm-dots></span><span class=tsm-p>${$$(m[1])}</span></button>`}).join('')}
   <div class=tsm-ft>Energy <span>${Math.round(S.energy)}/100</span> · Money ${money}${leave}</div></div>`}

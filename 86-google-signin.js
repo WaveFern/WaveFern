@@ -35,11 +35,11 @@ function csGuestCode(){try{const s=+localStorage.getItem('fw_slot')==2?2:1;retur
    asks: start a new career or keep the current one (either way the chosen save is then saved to the account). */
 function fbSignedIn(u){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}csCheck()}
 function csAsk(){const uid=FBU&&FBU.uid;if(!uid)return;if(!CLD.asking){CLD.asking=1;CLD.pre=mode}let a='';try{a=scDecode(csGuestCode()).S.artist||''}catch(e){}
- $('ui').innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>☁ New Google account</h2><p>This Google account has no career yet. Bring your career from this device${a?' ('+esc(a)+')':''} into it, or start a new one?</p><p class=m><small>Bringing it copies it: the original stays on this device for when you play signed out.</small></p><div class=row2><button class=go onclick="csPick(1)">Bring my career</button><button onclick="csPick(2)">Start a new career</button></div></div>`}
+ $('ui').innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>New Google account</h2><p>This Google account has no career yet. Bring your career from this device${a?' ('+esc(a)+')':''} into it, or start a new one?</p><p class=m><small>Bringing it copies it: the original stays on this device for when you play signed out.</small></p><div class=row2><button class=go onclick="csPick(1)">Bring my career</button><button onclick="csPick(2)">Start a new career</button></div></div>`}
 function csPick(k){const uid=FBU&&FBU.uid;if(!uid)return;snd('click');CLD.asking=0;
  if(k==2){csSetMark(0);try{localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0,fresh:1}))}catch(e){}CLD.ok=1;fbSignInBack();return fbRedraw()}
  const c=csGuestCode();if(!c){CLD.ok=1;fbSignInBack();return fbRedraw()}
- wiping=true;try{localStorage.setItem(slotKey(),c);localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0}));sessionStorage.setItem('fw_go','1');sessionStorage.setItem('fw_msg','☁ Your career is now on your Google account')}catch(e){wiping=false;return say('No room to copy your career.')}
+ wiping=true;try{localStorage.setItem(slotKey(),c);localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0}));sessionStorage.setItem('fw_go','1');sessionStorage.setItem('fw_msg','Your career is now on your Google account')}catch(e){wiping=false;return say('No room to copy your career.')}
  location.reload()}
 function csWipe(uid,msg){if(!bakKeep(localStorage.getItem(slotKey()),'Kept before a new career started'))return;wiping=true;try{localStorage.removeItem(slotKey());localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
 const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem(CS_KEY,JSON.stringify({uid,t}))}catch(e){}};
@@ -50,7 +50,7 @@ function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FB
   throw e})}).catch(e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
 /* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
 function fbSignInAsk(){snd('click');const prev=mode,fresh=prev=='creator'||(prev=='title'&&!TT.game);CLD.pre=prev;
- $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>🔑 Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>Each Google account has its own careers. Signing in shows that account's careers, and signing out brings back the ones on this device, so nothing is replaced. A brand new account can bring your current career with it.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">📋 Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
+ $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>Each Google account has its own careers. Signing in shows that account's careers, and signing out brings back the ones on this device, so nothing is replaced. A brand new account can bring your current career with it.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
 function fbCopy(){const t=$('fbsc');t.value=saveCode();t.style.display='block';t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Save code copied'),()=>say('Copy the code from the box'))}catch(e){say('Copy the code from the box')}}
 function fbSignInBack(){const prev=CLD.pre;CLD.pre=null;if(prev=='title'){mode='title';titleUI()}else if(prev=='creator'){mode='creator';creatorUI()}else if(prev=='pause'){mode='pause';pauseUI()}else closeUI()}
 function fbSignInGo(){fbSignInBack();fbSignIn()}
@@ -87,7 +87,7 @@ function csAhead(a,b){try{const x=scDecode(a).S,y=scDecode(b).S;return x.artist=
 function csLoad(c){const uid=FBU&&FBU.uid;if(c&&isTrlCareer(c.code)){CLD.ok=1;csSetMark(c.t);fbRedraw();setTimeout(()=>csPush(1),50);return}if(!csReady())return setTimeout(()=>{if(FBU&&FBU.uid==uid)csLoad(c)},700);
  let cur=null;try{cur=csGame()?saveCode():localStorage.getItem(slotKey())}catch(e){}
  if(cur&&!csCovers(cur,c.code)&&!bakKeep(cur,'Kept before your cloud save loaded')){CLD.err='No room to back up this career, so the cloud save was not loaded.';return fbRedraw()}
- if(mode=='pause')resumeGame();loadCode(c.code);if(!FBU)return;CLD.ok=1;CLD.last=c.code;csSetMark(c.t);autoSave();say('☁ Loaded your cloud save (Day '+c.day+')');fbRedraw()}
+ if(mode=='pause')resumeGame();loadCode(c.code);if(!FBU)return;CLD.ok=1;CLD.last=c.code;csSetMark(c.t);autoSave();say('Loaded your cloud save (Day '+c.day+')');fbRedraw()}
 function csPush(force){if(!FBU||!CLD.ok||CLD.busy||!FBF||['creator','load'].includes(mode)||(mode=='title'&&!TT.game)||wiping)return Promise.resolve();
  const code=saveCode();if(code==CLD.last&&!force)return Promise.resolve();if(code.length>1e6){CLD.err='Your save is too big for the cloud.';return Promise.resolve()}
  const t=Date.now(),uid=FBU.uid;CLD.busy=1;
@@ -151,7 +151,7 @@ function ttDel(n){const i=slotInfo(n)||(n==curSlot()&&TT.game?{artist:S.artist}:
 {const t1=titleUI;titleUI=function(){if(TT.sel&&TT.on)return ttWorlds();return t1.apply(this,arguments)}}
 function ttSet(){mode='pause';settings();SP='title'}
 function saveQuit(){snd('click');autoSave();TT.game=1;
- if(FBU&&CLD.ok)csPush(1).then(r=>say(r?'☁ Saved to your Google account':CLD.err||'Saved on this device'));else say(FBU&&CLD.err?CLD.err:'Saved on this device');
+ if(FBU&&CLD.ok)csPush(1).then(r=>say(r?'Saved to your Google account':CLD.err||'Saved on this device'));else say(FBU&&CLD.err?CLD.err:'Saved on this device');
  PS='';titleOpen()}
 {const cs0=closeSet;closeSet=function(){cs0();if(mode=='title')titleUI()}
  const lc=loadCode;loadCode=function(c){const t=TT.on;lc(c);if(t&&mode=='play'){TT.game=1;titleOpen()}}

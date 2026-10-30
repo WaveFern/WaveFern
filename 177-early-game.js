@@ -21,12 +21,12 @@ const qm=s=>Math.max(.6,Math.min(2.2,(+s.q||0)/10));
 {const u0=upl;upl=function(id){const n0=S.songs.length,r=u0.apply(this,arguments);
  try{if(!TR()&&S.songs.length>n0&&!S.ff&&fade()>0){S.ff=1;const s=S.songs[S.songs.length-1];
   if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'Spotifly Team',body:'Welcome to Spotifly! "'+s.title+'" has been added to Fresh Finds, our playlist for new artists. It brings your songs extra plays while you build your first fans. Release more and every song gets its turn.',state:9,unread:1,day:S.day});
-  setTimeout(()=>{try{say('🌱 "'+s.title+'" was added to Fresh Finds: extra plays while you are new')}catch(e){}},1200)}}catch(e){}return r}}
+  setTimeout(()=>{try{say('"'+s.title+'" was added to Fresh Finds: extra plays while you are new')}catch(e){}},1200)}}catch(e){}return r}}
 
 /* the morning results: how much of last night came from the playlist */
 {const w0=wakeUp;wakeUp=function(){let ff=0;try{const d=S.day;(S.songs||[]).forEach(s=>{if(s.pd===d)ff+=+s.ffx||0})}catch(e){}
  const r=w0.apply(this,arguments);
  try{if(ff>0&&!TR()){const box=document.querySelector('#ui .box.modal'),cards=box&&box.querySelector('.cards');
-  if(cards){const p=document.createElement('p');p.className='m';p.style.margin='6px 0';p.innerHTML='🌱 Fresh Finds playlist: <b style="color:var(--g)">'+ff.toLocaleString()+'</b> of these streams. It fades out as your own fans grow.';cards.after(p)}}}catch(e){}
+  if(cards){const p=document.createElement('p');p.className='m';p.style.margin='6px 0';p.innerHTML='Fresh Finds playlist: <b style="color:var(--g)">'+ff.toLocaleString()+'</b> of these streams. It fades out as your own fans grow.';cards.after(p)}}}catch(e){}
  return r}}
 })();

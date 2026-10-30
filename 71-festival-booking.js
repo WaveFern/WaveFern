@@ -49,8 +49,8 @@ function festCanBook(day,n,k){const s=fStage(n),lv=festLv();
 /* missed slots, reminders (checked twice a second) */
 function festBkCheck(){if(!S||!S.artist||mode=='load'||mode=='creator')return;const m=festMins();
  fBk().forEach(b=>{if(b.st)return;const s=fStage(b.n),sl=FSLOT[b.slot],now=FEST.set&&FEST.set.bk===b;
-  if(!now&&(S.day>b.day||S.day==b.day&&m>=sl[1]-1)){b.st=2;S.rep=(S.rep||0)-3;updateVersion();snd('err');say('⚠️ You missed your slot on '+s.name+' (Day '+b.day+', '+fHM(sl[0])+'). The festival gave it away. Reputation -3.');try{festBoardDraw()}catch(e){}return}
-  if(S.day==b.day&&!b.rem&&m>=sl[0]-60&&m<sl[0]){b.rem=1;say('🎤 Your set on Stage '+b.n+' ('+s.name+') starts at '+fHM(sl[0])+'. Head to the steps of the stage!')}});
+  if(!now&&(S.day>b.day||S.day==b.day&&m>=sl[1]-1)){b.st=2;S.rep=(S.rep||0)-3;updateVersion();snd('err');say('You missed your slot on '+s.name+' (Day '+b.day+', '+fHM(sl[0])+'). The festival gave it away. Reputation -3.');try{festBoardDraw()}catch(e){}return}
+  if(S.day==b.day&&!b.rem&&m>=sl[0]-60&&m<sl[0]){b.rem=1;say('Your set on Stage '+b.n+' ('+s.name+') starts at '+fHM(sl[0])+'. Head to the steps of the stage!')}});
  /* keep the list short: pending ones and the last 8 finished ones */
  const L=fBk(),old=L.filter(b=>b.st);if(old.length>8){const drop=new Set(old.slice(0,old.length-8));S.festBk=L.filter(b=>!drop.has(b))}}
 /* the label at the steps of a stage */
@@ -82,10 +82,10 @@ function fappHome(){const L=fBk(),up=L.filter(b=>!b.st).sort((a,b)=>a.day-b.day|
   <h3>Upcoming festivals</h3>${fe}
   <details class=m style="font-size:12px;margin-top:10px"><summary>How it works</summary>book a free slot on a stage your Fame Level allows, at least 2 days before the festival. A slot is 4 in-game hours; fill it with up to 4 hours of songs (each song lasts 30-55 min) or whole albums. On the day, be at the steps of the stage during your slot. You're paid ${$$(FSONG_PAY)} x the stage multiplier for every person in the crowd after each song. Miss your slot and you lose 3 reputation.</details>`}
 function fappFest(){const d=FAPP.d,lv=festLv(),dd=d-S.day;
- const rows=FSTG.map(s=>{const ok=lv>=s.req;return`<div class=fa-h><b style="color:${s.col}">Stage ${s.n}</b><br>${s.name}<br><small class=m>Fame Lv ${s.req} · pay x${s.mult}<br>${ok?'crowd about '+festC0(s).toLocaleString():'🔒 locked for you'}</small></div>`+FSLOT.map((sl,k)=>{const a=festSlotAct(d,s.n,k),e=festCanBook(d,s.n,k);
+ const rows=FSTG.map(s=>{const ok=lv>=s.req;return`<div class=fa-h><b style="color:${s.col}">Stage ${s.n}</b><br>${s.name}<br><small class=m>Fame Lv ${s.req} · pay x${s.mult}<br>${ok?'crowd about '+festC0(s).toLocaleString():'locked for you'}</small></div>`+FSLOT.map((sl,k)=>{const a=festSlotAct(d,s.n,k),e=festCanBook(d,s.n,k);
   if(a.you)return`<div class="fa-c you"><b>YOU</b><br>${a.bk.songs.length} songs · ${fDurS(festSetMins(a.bk.songs))}<br><button onclick="fappEdit(${a.bk.id})">Setlist</button></div>`;
   if(a.taken)return`<div class="fa-c tk"><small class=m>${fSlotS(k)}</small><br><b>${esc(a.name)}</b><br><small class=m>taken</small></div>`;
-  return`<div class="fa-c free"><small>${fSlotS(k)}</small><br><b>Free</b><br>${e?`<small style="opacity:.75">${!ok?'🔒 Fame Lv '+s.req:dd<2?'closed':festBkOn(d,s.n)?'1 slot per stage':'you play elsewhere'}</small> <button onclick="fappPick(${d},${s.n},${k})">Book</button>`:`<button class=go onclick="fappPick(${d},${s.n},${k})">Book</button>`}</div>`}).join('')}).join('');
+  return`<div class="fa-c free"><small>${fSlotS(k)}</small><br><b>Free</b><br>${e?`<small style="opacity:.75">${!ok?'Fame Lv '+s.req:dd<2?'closed':festBkOn(d,s.n)?'1 slot per stage':'you play elsewhere'}</small> <button onclick="fappPick(${d},${s.n},${k})">Book</button>`:`<button class=go onclick="fappPick(${d},${s.n},${k})">Book</button>`}</div>`}).join('')}).join('');
  return`<p><button onclick="fappGo('home')">◀ Back</button> <b style="font-size:16px">Day ${d} line-up</b> <span class=m>· ${dd==0?'today':dd==1?'tomorrow':'in '+dd+' days'}${dd<2?' · bookings closed':''}</span></p>
   <div class=fa-grid><div></div>${FSLOT.map(sl=>`<div class=fa-t>${fHM(sl[0])}-${fHM(sl[1])}</div>`).join('')}${rows}</div>`}
 function fappPick(d,n,k){const e=festCanBook(d,n,k);if(e)return fappErr(e);FAPP={v:'set',d,n,k,songs:[],edit:0};snd('pop');pcR()}
@@ -107,11 +107,11 @@ function fappSet(){const s=fStage(FAPP.n),L=FAPP.songs,tot=festSetMins(L),left=F
    <p class=m style="font-size:12px">${left>0?fDurS(left)+' left in the slot. ':'Slot full. '}If the setlist is shorter than the slot, you're done when the last song ends. Collabs bring the featured artist on stage for that song.</p>
    <button class=go onclick="fappConfirm()">${FAPP.edit?'Save setlist':'Confirm booking (free)'}</button></div>
   <div><h3 style="margin:4px 0">Your songs</h3><div class=fa-l>${sg.length?sg.map(x=>{const inn=L.includes(x.id),over=!inn&&festDur(x)>left;return`<div class=fa-r style="${inn||over?'opacity:.5':''}"><span style="flex:1">${esc(x.title)}${x.ft?` <small style="color:#f5c542">feat. ${esc(x.ft)}</small>`:''}<br><small class=m>${esc(x.g||'')} · q${x.q||0} · ${festDur(x)} min</small></span><button onclick="fappAdd(${x.id})">${inn?'Added':'+ Add'}</button></div>`}).join(''):'<p class=m>Release some songs first.</p>'}</div>
-   ${al.length?`<h3 style="margin:8px 0 4px">Albums</h3><div class=fa-l>${al.map(a=>{const ids=a.songs.filter(i=>S.songs.some(x=>x.id==i));return`<div class=fa-r><span style="flex:1">💿 ${esc(a.name)}<br><small class=m>${ids.length} songs · ${fDurS(festSetMins(ids))}</small></span><button onclick="fappAddAl(${a.id})">+ Album</button></div>`}).join('')}</div>`:''}</div></div>`}
+   ${al.length?`<h3 style="margin:8px 0 4px">Albums</h3><div class=fa-l>${al.map(a=>{const ids=a.songs.filter(i=>S.songs.some(x=>x.id==i));return`<div class=fa-r><span style="flex:1">${esc(a.name)}<br><small class=m>${ids.length} songs · ${fDurS(festSetMins(ids))}</small></span><button onclick="fappAddAl(${a.id})">+ Album</button></div>`}).join('')}</div>`:''}</div></div>`}
 function fappConfirm(){const L=FAPP.songs;if(!L||!L.length)return fappErr('Add at least one song to your setlist.');const tot=festSetMins(L);if(tot>FSET_MAX)return fappErr('Your setlist is '+fDurS(tot)+'. The limit is 4 hours.');const s=fStage(FAPP.n);
  
  if(FAPP.edit){const b=fBk().find(x=>x.id==FAPP.edit);if(!b||b.st)return fappErr('That booking is no longer open.');if(FEST.set&&FEST.set.bk===b)return fappErr('You are playing that set right now!');b.songs=L.slice();say('Setlist saved: '+L.length+' songs, '+fDurS(tot)+'.')}
- else{const e=festCanBook(FAPP.d,FAPP.n,FAPP.k);if(e)return fappErr(e);fBk().push({id:S.nid++,day:FAPP.d,n:FAPP.n,slot:FAPP.k,songs:L.slice(),st:0,bd:S.day});say('🎪 Booked! Stage '+s.n+' ('+s.name+'), Day '+FAPP.d+' at '+fHM(FSLOT[FAPP.k][0])+'. '+L.length+' songs, '+fDurS(tot)+'.')}
+ else{const e=festCanBook(FAPP.d,FAPP.n,FAPP.k);if(e)return fappErr(e);fBk().push({id:S.nid++,day:FAPP.d,n:FAPP.n,slot:FAPP.k,songs:L.slice(),st:0,bd:S.day});say('Booked! Stage '+s.n+' ('+s.name+'), Day '+FAPP.d+' at '+fHM(FSLOT[FAPP.k][0])+'. '+L.length+' songs, '+fDurS(tot)+'.')}
  updateVersion();chime();FAPP={v:'home'};pcR();try{festBoardDraw()}catch(e){}}
 function fappCancel(id,yes){const b=fBk().find(x=>x.id==id);if(!b||b.st)return;if(!yes){FAPP.cx=id;return pcR()}
  const late=b.day-S.day<2;S.festBk=fBk().filter(x=>x!==b);if(late)S.rep=(S.rep||0)-2;updateVersion();snd('pop');say('Booking cancelled'+(late?' (late, reputation -2).':'.'));FAPP={v:'home'};pcR();try{festBoardDraw()}catch(e){}}
@@ -190,7 +190,7 @@ function festFlareSpawnTick(dt){FFL.next-=dt;if(FFL.next>0)return;const set=FEST
 /* ---- 6. the booking chip on the festival day, and the per-frame hook ---- */
 function festBkChip(){let el=$('fbk');const b=FEST.ph=='fest'&&mode=='play'&&!FEST.set?fBk().find(q=>q.day==S.day&&!q.st):null;if(!b){if(el)el.remove();return}
  if(!el){el=document.createElement('div');el.id='fbk';el.className='hb';document.body.appendChild(el)}const m=festMins(),sl=FSLOT[b.slot],s=fStage(b.n);
- const h=m<sl[0]?`🎤 Your set: <b style="color:${s.col}">Stage ${b.n}</b> at ${fHM(sl[0])} · in ${fDurS(sl[0]-m)}`:`🎤 <b>You're on now!</b> Go to the steps of <b style="color:${s.col}">Stage ${b.n}</b> · slot ends ${fHM(sl[1])}`;if(el.dataset.h!=h){el.dataset.h=h;el.innerHTML=h}}
+ const h=m<sl[0]?`Your set: <b style="color:${s.col}">Stage ${b.n}</b> at ${fHM(sl[0])} · in ${fDurS(sl[0]-m)}`:`<b>You're on now!</b> Go to the steps of <b style="color:${s.col}">Stage ${b.n}</b> · slot ends ${fHM(sl[1])}`;if(el.dataset.h!=h){el.dataset.h=h;el.innerHTML=h}}
 let FBT=0;
 function festBookTick(dt){FBT-=dt;if(FBT<=0){FBT=.5;festBkCheck();festBkChip();if(S&&S.artist&&S.apps&&!S.apps.fest&&!S.festApp){S.apps.fest=1;S.festApp=1}}
  if(FEST.ph=='fest'&&FEST.grp.fest&&FEST.grp.fest.visible){festNpcTick(dt,FEST.t);festShoutTick(dt);festFlareSpawnTick(dt)}festFlareTick(dt);

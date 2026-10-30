@@ -17,7 +17,7 @@ function taxiBack(){if(IN)return;const T=taxiDay();if(!T.go||T.back)return;const
 /* the map: before the trip every destination, after it only the ride back, after that nothing until tomorrow */
 {const b0=bigMap;bigMap=function(){b0();const r=document.querySelector('#ui .row2');if(!$('bm')||!r)return;const T=taxiDay(),tb=[...r.querySelectorAll('button')].filter(b=>/^Taxi/.test(b.textContent));
  const note=document.createElement('p');note.className='m';note.style.margin='6px 0 0';
- if(!T.go)note.textContent='🚕 Taxi: one trip a day. Pick one place, then you can ride back once.';
- else{tb.forEach(b=>b.remove());if(!T.back){const bt=document.createElement('button');bt.textContent='🚕 Taxi back'+(T.fl?' to '+T.fl:'');bt.onclick=taxiBack;r.insertBefore(bt,r.lastElementChild);note.textContent='🚕 Your taxi took you'+(T.to?' to '+T.to:'')+' today. It can take you back once.'}
-  else note.textContent='🚕 You used your taxi today, there and back. A new one comes tomorrow.'}
+ if(!T.go)note.textContent='Taxi: one trip a day. Pick one place, then you can ride back once.';
+ else{tb.forEach(b=>b.remove());if(!T.back){const bt=document.createElement('button');bt.textContent='Taxi back'+(T.fl?' to '+T.fl:'');bt.onclick=taxiBack;r.insertBefore(bt,r.lastElementChild);note.textContent='Your taxi took you'+(T.to?' to '+T.to:'')+' today. It can take you back once.'}
+  else note.textContent='You used your taxi today, there and back. A new one comes tomorrow.'}
  r.before(note)}}
