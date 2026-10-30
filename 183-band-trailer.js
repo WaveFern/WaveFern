@@ -1,6 +1,6 @@
 /* ===== v49.29.0: the band trailer (wavefern.com/?trailer=band) =====
-   A second trailer, 68 seconds, made for YouTube: multiplayer band rooms. It runs on the trailer mode in 175-trailer.js
-   (same pointer, cards, captions, cameras and end card) and the same track, started 24 seconds in so the drop lands at 0:16, skipping its breakdown at 0:48.
+   A second trailer, 64 seconds, made for YouTube: multiplayer band rooms. It runs on the trailer mode in 175-trailer.js
+   (same pointer, cards, captions, cameras and end card) with its own track (assets/trailer-band.mp3, 120 BPM): the drop at 0:16, the end card as it stops at 0:48.
    The band room is played with no network: 161-multiplayer.js sets up a room (FERN5, The Ferns) with no sign-in, and three
    made-up bandmates (Kai on guitar, Mila on drums, Theo on bass) stand, walk and play next to you through the real band code:
    their name tags, the band panel, the four instrument minigames, emotes, the bunk beds, the band's Spotifly account and a band set
@@ -8,12 +8,8 @@
    own screen. wavefern.com/mtrailer (or ?trailer=band) plays it; add ?menu for the scene menu. Nothing is saved, as in the main trailer. */
 if(TRL.on&&window.MPT){
 const BM=MPT,BEAT=TRL.BEAT,BAR=TRL.BAR;
-/* v49.29.2: the band trailer and the vertical trailer use the trailer2 mix of the track (same timing) */
-Object.assign(TRL,{band:1,MO:24,DROP:16,song:'Neon Rain',SRC:'assets/trailer2.mp3'});
-/* the track plays from 0:24 to 1:12, then skips its breakdown and plays on from 1:24 (at 0:48 in this trailer) */
-const JUMP=48,MO2=36;
-{const p0=trlPre;trlPre=function(dt){const T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000,mo=T<JUMP?24:MO2,a=TRL.aud;
- if(TRL.MO!==mo){TRL.MO=mo;if(a&&TRL.opt.music&&!a.paused)try{a.currentTime=T+mo}catch(e){}}return p0.apply(this,arguments)}}
+/* v49.31.0: the band trailer has its own song, made for it: 120 BPM, the drop at 0:16 and the stop at 0:48 */
+Object.assign(TRL,{band:1,MO:0,DROP:16,song:'Neon Rain',SRC:'assets/trailer-band.mp3'});
 /* the band: you sing, and the camera can follow any of them */
 const BAND=[{id:'me',nm:'Sky',inst:'vo',look:{skin:5,eyes:0,mouth:0,hair:1,hc:0,top:1,tc:0,pc:6,body:.4,hgt:.5}},
  {id:'b1',nm:'Kai',inst:'gt',look:{skin:1,eyes:4,mouth:3,hair:3,hc:7,top:2,tc:6,pc:4,body:.5,hgt:.7}},
@@ -114,20 +110,16 @@ trlShots=function(){const M={};trlShots0().forEach(s=>M[s.sc]=s);const b=BEAT,B=
  {sc:'Bunk beds',d:B,show:[],place:'bunks',set(){trlClear();bRoom('bedroom');bPov('vo');S.t=200;trlPut(3.4,2.4,1.55);bEm([['b3','wave',.2]])},
   cam:trlCam([[7.6,2.5,3.2],[1,1.1,3],58],[[7.1,2.2,3],[1,1.1,3],54],trlE.s)},
  /* one Spotifly account for the band, its picture drawn with all four of you */
- {sc:'Band Spotifly',d:B,show:['ui'],place:'off',set(){trlClear();bAccount();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[4800,182000],followers:[60,24000],fame:[4,58]})}},
+ {sc:'Band Spotifly',d:B,show:['ui'],place:'off',set(){trlClear();bAccount();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[4800,1200000],followers:[60,310000],fame:[4,120]})}},
  /* a band set: the smaller stage, then the Main Stage, the band around you */
  {sc:'Festival: The Pit',d:2*b,show:[],place:'stage',set(){bStage(3)},tick(){trlCrowd(600)}},
  {sc:'Festival: Main Stage',d:2*b,show:[],place:'stage',set(){bStage(1)},tick(){trlCrowd(60000)}},
- Object.assign({},M['Festival crowd'],{place:'stage',set(){trlClear();bPov('vo');S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true}}),
- Object.assign({},M['Spotifly: millions'],{place:'off',set(){trlClear();bAccount();openPC();app=1;smo=0;pg='home';pcR()},tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[182000,3800000],followers:[24000,1200000],fame:[58,209]})}}),
- Object.assign({},M['Recording'],{place:'off'}),
- /* the music skips its breakdown into the last section: the band on the Main Stage, then out over the crowd from behind them */
+ /* the last section: the band on the Main Stage, then out over the crowd from behind them; the end card comes in as the song stops */
  {sc:'Band on stage',d:2*B,show:[],place:'stage',set(){bStage(1);bEm([['b1','guitar',.6],['b3','dance',1.8],['b2','cheer',2.6]])},tick(){trlCrowd(60000)},
   cam:u=>{const k=trlE.s(u),Y=P.mesh?P.mesh.position.y:0;return{p:[P.x+2.6-k*1.6,Y+2.1-k*.3,P.z+7.5-k*2.6],l:[P.x+.5,Y+1.1,P.z-.4],f:52}}},
  {sc:'Band and crowd',d:2*B,show:[],place:'stage',set(){if(mode!='fest')bStage(1);bEm([['b1','cheer',.2],['b2','cheer',.3],['b3','cheer',.4]])},tick(){trlCrowd(60000)},
   acts:[[.25,()=>{try{emPick('cheer')}catch(e){}}]],cam:u=>{const k=trlE.s(u),Y=P.mesh?P.mesh.position.y:0;return{p:[P.x-.9+k*.4,Y+3.1+k*1,P.z-4.4-k*.6],l:[P.x+.3,Y+.4,P.z+14],f:60}}},
- Object.assign({},M['Black'],{place:'off'}),
- Object.assign({},M['End card'],{place:'off'})];
+ Object.assign({},M['End card'],{d:16,place:'off'})];
  let t=0;L.forEach((s,i)=>{s.k=i;s.t=t;t+=s.d;s.done=null});TRL.len=t;return L};
 /* the end card says what this trailer is about */
 {const e0=trlEnter;trlEnter=function(k){e0.apply(this,arguments);const s=TRL.shots[k];BB.place=s&&s.place||'off';const q=$('trle4');if(q)q.textContent='PLAY AS A BAND WITH FRIENDS'}}
