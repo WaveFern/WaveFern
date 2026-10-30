@@ -631,6 +631,7 @@ function cmRecv(d,from){const r=d.m;if(!r||typeof r!='object'||typeof r.a!='numb
  try{if(mode=='pc')pcR()}catch(e){}}
 
 /* v46.0.0: lets the admin fun effects (162-fun-admin.js) ride on the room: send, who is in the room, their avatars */
+window.MPI=()=>MPS&&MPF?MPS.inst:'';/* your instrument while you play a band set (188-stage-walk.js) */
 window.MPFX={on:()=>online(),send:o=>send(o),mem:()=>MB,av:()=>AV};
 /* the band trailer drives the room itself: who plays what, a band take on any instrument, a band set, the join screen */
 if(MPTR){ME.id='me';MB.me=ME;NET.on=1;const MG1=[MG_N[1],MG_HOW[1]];

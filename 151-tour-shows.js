@@ -304,6 +304,8 @@ function showFx(dt){const H=SH,A=H.A,t=H.t,T=A.stage,k=H.k,hy=H.hype;
   P.arms[1].rotation.x=-2.2+Math.sin(t*4)*.12;P.arms[0].rotation.x=hy>.7&&Math.sin(t*.7)>.2?-2.9:-.3+Math.sin(t*2.1*Math.PI)*.3;P.legs[0].rotation.x=Math.sin(t*2.1*Math.PI)*.12;P.legs[1].rotation.x=-P.legs[0].rotation.x}
  if(A.ft){const o=A.ft;o.g.rotation.y=Math.sin(t*.8+1)*.2;o.arms[0].rotation.x=-2.2+Math.sin(t*4+1)*.12;o.arms[1].rotation.x=hy>.6?-2.9:-.4}
  A.band.forEach((b,i)=>{const a=b.o.arms,s=t*(b.role=='drum'?9:4)+i;if(b.role=='drum'){a[0].rotation.x=-1+Math.sin(s)*.6;a[1].rotation.x=-1-Math.sin(s)*.6}else if(b.role=='keys'){a[0].rotation.x=a[1].rotation.x=-1.2+Math.sin(s*2)*.1}else{a[0].rotation.x=-1.1;a[1].rotation.x=-.8+Math.sin(s*2)*.4;b.o.g.rotation.y=Math.sin(t*.6+i)*.3}});
+ /* v49.37.0: you can walk around the stage; the band and a featured artist wander now and then (188-stage-walk.js) */
+ if(window.STW&&H.state!='inter'){const w=STW.show(H,dt,px,pz);if(w){px=w.x;pz=w.z}}
  if(A.spot){const dx=px-A.spot.position.x,dy=(T.h+1)-A.spot.position.y,dz=pz-A.spot.position.z;A.spot.rotation.set(0,0,0);A.spot.lookAt(A.g.position.x+px,T.h+1,A.g.position.z+pz);A.spot.material.opacity=hide?0:.07+.05*hy}
  if(FOL&&typeof FOL!='undefined')try{FOL.forEach(f=>{if(f.m)f.m.visible=false})}catch(e){}
  if((A.scT=(A.scT||0)+dt)>.12){A.scT=0;screenDraw()}}
@@ -322,6 +324,8 @@ function screenDraw(force){const H=SH,A=H.A,x=A.scrTex.userData.x,W=1024,Hh=384,
 const SHOTS={venue:['back','wide','front','side','orbit','crowd','cat'],club:['back','front','wide','side']};
 function showCam(dt){const H=SH,c=H.cam,A=H.A,T=A.stage,t=H.t,k=H.k,ax=OX+AX,az=OZ+AZ,px=P.x-ax,pz=P.z-az;H.shotT-=dt;
  if(H.shotT<=0){const L=SHOTS[k].filter(s=>s!=H.shot&&(s!='cat'||H.cat));H.shot=H.state=='intro'?(H.stT<3?'orbit':'wide'):H.mg?pick(['back','back','front','wide']):pick(L);H.shotT=H.state=='intro'?3:R(5,9)}
+ /* while you walk, cut to a shot from behind you so the controls match the picture */
+ if(H.state!='intro'&&window.STW&&STW.walking()&&!['back','wide','cat'].includes(H.shot)){H.shot='back';H.shotT=R(5,9)}
  const v=new THREE.Vector3(),L2=new THREE.Vector3(),s=H.shot,sw=Math.sin(t*.37)*.4;
  if(s=='back'){v.set(px+sw,T.h+2.8,pz-(k=='venue'?6.5:3.2));L2.set(px+sw*.4,T.h+.4,pz+30)}
  else if(s=='wide'){v.set(Math.sin(t*.05)*8,k=='venue'?32:5.5,k=='venue'?52:11);L2.set(0,k=='venue'?8:2,T.z)}
@@ -381,6 +385,8 @@ D.showOn=()=>!!SH;D.show=()=>SH;
 
 /* ---------- keys, styles, hint, game hooks ---------- */
 addEventListener('keydown',e=>{if(mode!='dshow'||!SH||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key;e.stopImmediatePropagation();
+ /* v49.37.0: walking keys still reach the shared key map, for walking around the stage (188-stage-walk.js) */
+ if(/^(w|a|s|d|shift|arrow(up|down|left|right))$/.test(k.toLowerCase())){keys[k.toLowerCase()]=1;if(k.startsWith('Arrow'))e.preventDefault()}
  if(k=='Escape'){return showEnd(1)}if(e.repeat)return;const n=parseInt(k);
  if(SH.state=='talk'&&n>=1&&n<=3)return talkPick(n-1);if(SH.state=='encq'&&(n==1||n==2))return encore(n==1);
  if(k==' '||k=='Enter'||k.toLowerCase()=='e'){e.preventDefault();W2(festMgPress,-1)}else if(n>=1&&n<=4)W2(festMgPress,n-1)},true);

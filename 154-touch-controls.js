@@ -16,7 +16,7 @@ const setK=(k,v)=>{if(typeof keys=='undefined')return;if(v){keys[k]=1;jk[k]=1}el
 function css(){if(document.getElementById('tchcss'))return;const s=document.createElement('style');s.id='tchcss';s.textContent=`
 body.tch{--tjs:clamp(104px,30vmin,150px);--tbb:clamp(56px,16vmin,76px);--tbs:clamp(38px,10.5vmin,48px);--tsl:max(16px,env(safe-area-inset-left,0px));--tsr:max(16px,env(safe-area-inset-right,0px));--tsb:max(16px,env(safe-area-inset-bottom,0px));touch-action:manipulation;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 body.tch #c{touch-action:none}
-#tch{display:none}body.tch #tch{display:block}#tch.off{display:none!important}
+#tch{display:none}body.tch #tch{display:block}#tch.off{display:none!important}#tch.tstg #tchb{display:none}
 #tch *{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
 #tchj{position:fixed;z-index:50;left:calc(var(--tsl) - 12px);bottom:calc(var(--tsb) - 12px);width:calc(var(--tjs) + 24px);height:calc(var(--tjs) + 24px);padding:12px}
 #tchj .tjb{position:relative;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,#16201bcc 0,#0b0f0dcc 70%);border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;opacity:.82;transition:opacity .15s}
@@ -97,9 +97,11 @@ addEventListener('pointerdown',e=>{if(e.pointerType=='touch')enable()},true);
 /* show the controls only while walking, driving or walking at the awards; keep Run held while it is on */
 const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function'&&!(typeof S!='undefined'&&S&&S.noPhone),st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};
 let lastSig='';
-setInterval(()=>{if(!act||!ui)return;const m=M(),ok=(m=='play'||m=='drive'||m=='cutawd')&&typeof S!='undefined'&&S&&!document.getElementById('load');
+/* v49.37.0: on stage (a festival set or a tour show) only the joystick shows, for walking around the stage, and it hides while a crowd game is up */
+const onStage=m=>{try{if(m=='fest')return typeof FEST!='undefined'&&FEST.view&&FEST.set&&!FEST.set.end&&!FEST.set.mg;if(m=='dshow'){const H=DCITY.show&&DCITY.show();return!!(H&&!H.mg&&!H.end)}}catch(_){}return false};
+setInterval(()=>{if(!act||!ui)return;const m=M(),stg=onStage(m),ok=(m=='play'||m=='drive'||m=='cutawd'||stg)&&typeof S!='undefined'&&S&&!document.getElementById('load');
  if(!ok){if(!ui.classList.contains('off')){ui.classList.add('off');relAll()}if(typeof keys!='undefined'&&runOn&&keys.shift&&m!='pause')delete keys.shift;return}
- ui.classList.remove('off');document.body.classList.toggle('tdrv',m=='drive');
+ ui.classList.remove('off');document.body.classList.toggle('tdrv',m=='drive');ui.classList.toggle('tstg',!!stg);
  if(typeof keys!='undefined'){if(runOn&&m=='play')keys.shift=1;else if(runOn)delete keys.shift}
  const nr=typeof near!='undefined'&&near,sig=m+'|'+(nr?1:0)+'|'+W.st(m)+'|'+W.ph(m);if(sig==lastSig)return;lastSig=sig;
  const u=ui.querySelector('.tu');u.classList.toggle('hot',!!(nr||m=='drive'));
