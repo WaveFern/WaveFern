@@ -3,9 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v50.0.0';
+const GAME_VERSION='v49.33.0';
 const VERSION_HISTORY=[
- {v:'v50.0.0',n:'Name tags over people are in the game\'s own style: the pixel font on a dark panel with a black edge, a drop shadow and a little pixel tail (artists keep their gold). Multiplayer trailer: tags show only names and the recording captions only the instrument, so each two second shot is quick to read.'},
+ {v:'v49.33.0',n:'Name tags over people are in the game\'s own style: the pixel font on a dark panel with a black edge, a drop shadow and a little pixel tail (artists keep their gold). Multiplayer trailer: tags show only names and the recording captions only the instrument, so each two second shot is quick to read.'},
  {v:'v49.32.2',n:'Multiplayer trailer: in the recording shots the bandmates no longer slide through each other. Each one is already standing at their own instrument when the shot starts, the one recording stays at their instrument instead of walking to the mic, and bass stands a step back from guitar.'},
  {v:'v49.32.1',n:'Multiplayer trailer: the screen goes black when the song stops at 0:48, and the end card comes in on its last bit at 0:56.'},
  {v:'v49.32.0',n:'Famous artists are now parodies you can still recognise: Taylor Swiff, Drakeo, Billie Eyelash, The Weekdayz, Kanya East and over 100 more, in Messages, collabs, Spotifly Browse, mentors and the awards. Their looks and numbers are the same, and old saves switch to the new names when they load.'},

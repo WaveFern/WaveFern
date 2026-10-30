@@ -23,7 +23,7 @@ const NTAG={box:null,list:[]};
 function ntBox(){if(NTAG.box)return NTAG.box;const d=document.createElement('div');d.id='ntags';const h=document.getElementById('hud');document.body.insertBefore(d,h||document.body.firstChild);return NTAG.box=d}
 {const st=document.createElement('style');st.textContent=
  '#ntags{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}'+
- /* v50.0.0: in the game's own style: the pixel font on a dark panel with a hard black edge and drop shadow, and a little pixel tail */
+ /* v49.33.0: in the game's own style: the pixel font on a dark panel with a hard black edge and drop shadow, and a little pixel tail */
  '#ntags .nt{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font:400 13px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#e8f3ec;background:#0b0f0d;padding:4px 7px 3px;border:2px solid #000;box-shadow:inset 0 0 0 1px #2a352e,2px 2px 0 #0009;will-change:transform}'+
  '#ntags .nt:after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-3px;width:6px;height:4px;background:#000}'+
  '#ntags .nt.art{color:#ffd84a;box-shadow:inset 0 0 0 1px #ffd84a,2px 2px 0 #0009}'+
