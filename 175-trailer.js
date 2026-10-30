@@ -116,7 +116,7 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
  {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.24,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
  /* the plaques come once the streams are in the millions: a cutscene of your studio wall, one going up on each hit */
- {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI);/* a dark charcoal wall behind the plaques, wide and tall enough that no outside shows past its ends */const w=TRL.wall=new THREE.Mesh(new THREE.PlaneGeometry(14,4.4),new THREE.MeshLambertMaterial({color:'#2c2b31',polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));w.position.set(14,2.2,.004);scene.add(w)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
+ {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI);/* a dark charcoal wall behind the plaques, wide and tall enough that no outside shows past its ends */const w=TRL.wall=new THREE.Mesh(new THREE.PlaneGeometry(14,4.4),new THREE.MeshLambertMaterial({color:'#2c2b31',polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));w.position.set(14,2.2,.004);if(innerHeight>innerWidth)w.scale.set(1.3,4,1);scene.add(w)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},pz:['pc',1.04,1.1,'50% 45%'],acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
  {sc:'Card: tour',d:2*B,card:'THEN TAKE IT<br>ON TOUR.',acts:[[.05,()=>{trlClear();trlStar();S.t=392;try{if(DCITY.on)DCITY.leave(1);DCITY.arrive('tyo',{quiet:1})}catch(e){console.error(e)}}]]},
  /* the game's own arrival flyover, with its city title */
@@ -258,7 +258,15 @@ body.trlon>*:not(#c):not(#trl):not(.trlv){visibility:hidden!important}body.trlon
 #trl .qhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;text-align:center;line-height:1.6}
 #trlm{position:fixed;inset:0;z-index:2147483001;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}#trlm .box{width:min(720px,94vw);max-height:92vh;overflow:auto}
 #trlm .trlsc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}#trlm .trlsc button{text-align:left;padding:8px 10px;font-size:13px}#trlm .trlsc small{display:block;opacity:.65}
-#trlm label{display:block;margin:6px 0}#trlm input[type=text]{width:100%;margin-top:4px}#trlm .row2{margin-top:12px}`;document.head.appendChild(st)}
+#trlm label{display:block;margin:6px 0}#trlm input[type=text]{width:100%;margin-top:4px}#trlm .row2{margin-top:12px}
+ /* v49.29.1: tall (9:16) frame for wavefern.com/vtrailer: bigger words, since the width is a third of a landscape screen */
+ @media (max-aspect-ratio:1/1){#trl .qcard{font-size:clamp(26px,8.4vw,72px)}#trl .qcap{font-size:clamp(18px,5.6vw,54px);top:5%}
+  #trl .qend h1{font-size:clamp(42px,15vw,140px)}#trl .qend p.qtag{font-size:clamp(16px,4.6vw,40px)}#trl .qend p{font-size:clamp(13px,3.4vw,28px)}
+  #trl .qpq b{font-size:clamp(24px,7.6vw,76px)}#trl .qpq small{font-size:clamp(12px,3vw,24px)}#trl .qday .dbox{width:94vw;font-size:clamp(12px,3.2vw,18px)}}`;document.head.appendChild(st)}
+/* v49.29.1: in a tall frame every 3D view is widened, so a shot framed for a wide screen still shows most of what it was framed on
+   (the vertical field of view grows by up to 1.9x; side to side it then covers about two thirds of the landscape shot) */
+if(TRL.on){const R0=renderer.render.bind(renderer);renderer.render=function(sc,c){const a=innerWidth/innerHeight;if(!(a<1&&c&&c.isPerspectiveCamera))return R0(sc,c);
+ const f=c.fov,k=Math.min(1.9,16/9/a*.6);c.fov=Math.min(110,2*Math.atan(Math.tan(f*Math.PI/360)*k)*360/Math.PI);c.updateProjectionMatrix();try{return R0(sc,c)}finally{c.fov=f;c.updateProjectionMatrix()}}}
 function trlOverlay(){let o=$('trl');if(o)o.remove();o=document.createElement('div');o.id='trl';
  o.innerHTML=`<div class="qblk" id="trlblk"></div><div class="qfd" id="trlfd"></div><div class="qday" id="trlday"></div><div class="qpq" id="trlpq"></div><div class="qcap" id="trlcap"></div><div class="qnote" id="trlnote">Non-gameplay footage</div><div class="qcur" id="trlcur"><svg width="22" height="30" viewBox="0 0 22 30"><path d="M2 2 L2 24 L7.5 18.5 L11.5 27.5 L15 26 L11 17.2 L18.5 17.2 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
  document.body.appendChild(o);TRL.cur={el:$('trlcur'),x:innerWidth*.62,y:innerHeight*.7,t0:null};return o}
@@ -337,12 +345,14 @@ function trlRoll(){const h=$('trlh');if(h)h.remove();const s0=TRL.shots[TRL.k0];
    if(a.readyState>=1)sync();else a.addEventListener('loadedmetadata',sync,{once:true});a.play().catch(()=>{})}catch(e){}}},700)}
 /* true full screen on the key press that starts it (browsers only allow it on a key or click), with no browser bars;
    the game resizes to the screen while the trailer waits its 0.7s to roll */
-function trlFull(){try{const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen({navigationUI:'hide'}).catch(()=>{});else if(d.webkitRequestFullscreen)d.webkitRequestFullscreen()}catch(e){}
+/* v49.29.1: inside the 9:16 frame of wavefern.com/vtrailer, full screen is the whole page around the frame */
+function trlDoc(){try{if(parent!==window&&parent.fwVFull)return parent.document}catch(e){}return document}
+function trlFull(){try{const D=trlDoc(),d=D.documentElement;if(!D.fullscreenElement&&d.requestFullscreen)d.requestFullscreen({navigationUI:'hide'}).catch(()=>{});else if(d.webkitRequestFullscreen)d.webkitRequestFullscreen()}catch(e){}
  document.documentElement.style.overflow=document.body.style.overflow='hidden';scrollTo(0,0)}
 function trlStop(){TRL.run=0;try{if(TRL.aud)TRL.aud.pause()}catch(e){}location.reload()}
 /* the trailer page opens the menu once the game has booted to its title screen */
 /* it goes straight to the Ready card; wavefern.com/trailer/?menu still opens the scene menu */
 function trlReady(){trlCSS();/* full screen straight away where the browser allows it, otherwise on the first click or key press */trlFull();['pointerdown','keydown'].forEach(t=>addEventListener(t,()=>{if(!document.fullscreenElement)trlFull()},{capture:true}));
  /* F toggles full screen on the trailer page (and never reaches the game, where F is furniture mode) */
- addEventListener('keydown',e=>{if(e.key.toLowerCase()!='f'||e.repeat||/INPUT|TEXTAREA/.test(e.target.tagName))return;e.preventDefault();e.stopImmediatePropagation();if(document.fullscreenElement){try{document.exitFullscreen()}catch(x){}}else trlFull()},{capture:true});TRL.shots=trlShots();if(!TRL.aud)fetch(TRL.SRC).then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});trlPlay(0)}
+ addEventListener('keydown',e=>{if(e.key.toLowerCase()!='f'||e.repeat||/INPUT|TEXTAREA/.test(e.target.tagName))return;e.preventDefault();e.stopImmediatePropagation();if(trlDoc().fullscreenElement){try{trlDoc().exitFullscreen()}catch(x){}}else trlFull()},{capture:true});TRL.shots=trlShots();if(!TRL.aud)fetch(TRL.SRC).then(r=>r.blob()).then(b=>{if(!TRL.aud){TRL.aud=new Audio(URL.createObjectURL(b));TRL.aud.preload='auto'}}).catch(()=>{});trlPlay(0)}
 if(TRL.on){const w=setInterval(()=>{if(typeof mode!='undefined'&&mode=='title'&&$('ttl')&&!$('load')){clearInterval(w);/[?&]menu\b/.test(location.search)?trlMenu():trlReady()}},300)}
