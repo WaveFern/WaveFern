@@ -516,7 +516,7 @@ function festEnd(quit){const set=FEST.set;if(!set||set.end)return;set.end=1;cons
  const c=Math.round(set.C),avg=set.sc.length?set.sc.reduce((a,b)=>a+b,0)/set.sc.length:.5,gain=c-set.start,full=set.done.filter(d=>d.f>=1).length,F=festS();
  set.bk.st=1;set.bk.res={c,pay:set.pay,n:full,str:set.str};
  F.p[s.n]={c,pay:set.pay,sc:Math.round(avg*100),song:set.list[0].title,n:full,d:S.day};
- try{(S.igPosts=S.igPosts||[]).push({id:S.nid++,mine:1,u:S.artist,cfg:{...ch},cap:'Played '+full+' song'+(full==1?'':'s')+' on '+s.name+' at Park Fields Festival to '+c.toLocaleString()+' people! 🎪',day:S.day,l:Math.round(c*R(.05,.15))+RI(3,12)})}catch(e){}
+ 
  updateVersion();festBoardDraw();chime();
  const lis=Math.round(set.str/(S.mlDiv||3.5)),grade=avg>=.85?'Legendary set 🔥':avg>=.65?'Great show':avg>=.45?'Decent set':'Tough crowd',ttl=quit?'You left the stage early':set.fin==2&&full<set.list.length?'Time\'s up! '+grade:grade;mode='menu';
  $('ui').innerHTML=`<div class="box modal"><h2>🎪 ${ttl}</h2><p class=m>Stage ${s.n} · ${s.name} · ${full} of ${set.list.length} songs played${set.sc.length?' · '+set.sc.length+' crowd moments, '+Math.round(avg*100)+'% average':''}</p>

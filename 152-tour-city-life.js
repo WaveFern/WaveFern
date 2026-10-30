@@ -116,8 +116,7 @@ D.landmark=function(C,bk){const f=LM[C.id];if(!f)return false;const G=D.mkG(),Gw
 function selfie(C,name){S.dcity=S.dcity||{};const k=C.id+'|'+S.day,done=(S.dcity.selfie||[]).includes(k);snd('pop');try{chime()}catch(e){}
  if(done)return say('Another photo at the '+name.replace(/^the /,'')+'. Your fans already saw today\'s.');
  S.dcity.selfie=(S.dcity.selfie||[]).filter(x=>(x.split('|')[1]|0)>=S.day-30).concat(k);const f=Math.round(30+Math.sqrt(S.listeners||0)*.25);S.followers=(S.followers||0)+f;
- try{(S.igPosts=S.igPosts||[]).push({id:S.nid++,mine:1,u:S.artist,cfg:{...ch},cap:'At the '+name.replace(/^the /,'')+' in '+(C.d.city||C.d.country)+' 📸',day:S.day,l:Math.round(f*R(1.5,3))})}catch(e){}
- say('📸 Selfie at the '+name.replace(/^the /,'')+' posted · +'+f.toLocaleString()+' followers')}
+ say('📸 Selfie at the '+name.replace(/^the /,'')+' · +'+f.toLocaleString()+' followers')}
 
 /* ---------- rooms ---------- */
 const RM=D.RM={lobby:[1240,0,22,14],room:[1290,0,16,12],food:[1320,0,14,10],cafe:[1350,0,12,9],conv:[1380,0,12,10],souv:[1410,0,12,9],records:[1440,0,12,10],office:[1470,0,16,12],books:[1300,-30,14,11],cloth:[1330,-30,14,11],pharm:[1360,-30,12,10]};

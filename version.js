@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.33.1';
+const GAME_VERSION='v49.34.0';
 const VERSION_HISTORY=[
+ {v:'v49.34.0',n:'Instagrime only posts when you do. Releasing a song or album, playing a tour show or festival set and taking a selfie no longer post for you. Posting is worth it now: a post lifts all your streams by 15% for the rest of the day and 8% the next day. Leave it quiet for more than 3 days and your streams slip a little, 1% a day and never more than 5%, until you post again. Your Instagrime account shows the current effect next to the post buttons.'},
  {v:'v49.33.1',n:'Bigger name tags over people and bigger emote icons over heads, so both read at a glance.'},
  {v:'v49.33.0',n:'Name tags over people are in the game\'s own style: the pixel font on a dark panel with a black edge, a drop shadow and a little pixel tail (artists keep their gold). Multiplayer trailer: tags show only names and the recording captions only the instrument, so each two second shot is quick to read.'},
  {v:'v49.32.2',n:'Multiplayer trailer: in the recording shots the bandmates no longer slide through each other. Each one is already standing at their own instrument when the shot starts, the one recording stays at their instrument instead of walking to the mic, and bass stands a step back from guitar.'},

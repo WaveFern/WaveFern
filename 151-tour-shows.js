@@ -368,7 +368,7 @@ function showEnd(quit){const H=SH;if(!H||H.end)return;if(quit&&H.state=='song'&&
  const played=H.done.map(d=>S.songs.find(x=>x.id===d.id)).filter(Boolean);if(played.length){const per=Math.round(res.str/played.length);played.forEach(s=>{try{if(typeof planOf=='function')planOf(s)}catch(e){}s.streams=(s.streams||0)+per;s.today=(s.today||0)+per;S.streams+=per;S.monthStreams=(S.monthStreams||0)+per})}
  try{if(typeof wtShowDone=='function')wtShowDone(H.C.id,H.k,res)}catch(e){console.error('wtShowDone',e)}
  S.dcity.shows=(S.dcity.shows||[]).concat([{c:H.C.id,k:H.k,d:S.day,att:res.att,pay:res.money,sc:Math.round(score*100)}]).slice(-60);
- const v=vOf(H.C.d,H.k);try{(S.igPosts=S.igPosts||[]).push({id:S.nid++,mine:1,u:S.artist,cfg:{...ch},cap:'Played '+v.n+' in '+(H.C.d.city||H.C.d.country)+' to '+res.att.toLocaleString()+' people! '+D.words(H.C.s.lang).ty+' 🏟',day:S.day,l:Math.round(res.att*R(.05,.15))+RI(3,12)})}catch(e){}
+ const v=vOf(H.C.d,H.k);
  try{updateVersion()}catch(e){}try{chime()}catch(e){}
  const grade=quit?'You left the stage early':score>=.85?'Legendary show 🔥':score>=.68?'Huge night':score>=.5?'Solid show':'Tough crowd';mode='menu';const lis=Math.round(res.str/(S.mlDiv||3.5));
  $('ui').innerHTML=`<div class="box modal"><h2>🏟 ${grade}</h2><p class=m>${esc(v.n)} · ${esc(wtPlace(H.C.d))} · ${full} of ${H.list.length} songs · ${H.sc.length} crowd moments${H.sc.length?', '+Math.round(mg*100)+'% average':''} · score ${Math.round(score*100)}${H.fin==2?' · cut short by the curfew':''}</p>
