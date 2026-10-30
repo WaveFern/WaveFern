@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.31.0';
+const GAME_VERSION='v49.32.0';
 const VERSION_HISTORY=[
+ {v:'v49.32.0',n:'Famous artists are now parodies you can still recognise: Taylor Swiff, Drakeo, Billie Eyelash, The Weekdayz, Kanya East and over 100 more, in Messages, collabs, Spotifly Browse, mentors and the awards. Their looks and numbers are the same, and old saves switch to the new names when they load.'},
  {v:'v49.31.0',n:'The multiplayer trailer (wavefern.com/mtrailer) has its own song, made for it. The drop comes at 0:16 on the band in the studio, and the end card lands as the song stops at 0:48, so the trailer is now 64 seconds.'},
  {v:'v49.30.1',n:'Legal pages: a Privacy Policy (wavefern.com/privacy), Terms of Use (/terms) and a Legal and credits page (/legal) saying the game is fiction, in-game brands are parodies and real artists are fictionalised. They are linked from the title screen and the site footers. Analytics now asks first: Google Analytics only loads after you press Allow, and you can still change it in Settings > Game.'},
  {v:'v49.30.0',n:'The multiplayer band trailer has its own address: wavefern.com/mtrailer. Its studio and bedroom shots are now real rooms, with full walls, a ceiling, foam panels, a band poster and an ON AIR light, so you no longer see through the house. The band panel is zoomed in so "3/4 members ready" can be read, and emote icons sit over heads in the camera shots.'},
