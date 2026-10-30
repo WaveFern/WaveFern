@@ -1,6 +1,6 @@
 /* ===== v49.29.0: the band trailer (wavefern.com/?trailer=band) =====
    A second trailer, 64 seconds, made for YouTube: multiplayer band rooms. It runs on the trailer mode in 175-trailer.js
-   (same pointer, cards, captions, cameras and end card) with its own track (assets/trailer-band.mp3, 120 BPM): the drop at 0:16, the end card as it stops at 0:48.
+   (same pointer, cards, captions, cameras and end card) with its own track (assets/trailer-band.mp3, 120 BPM): the drop at 0:16, black as it stops at 0:48 and the end card on its last bit at 0:56.
    The band room is played with no network: 161-multiplayer.js sets up a room (FERN5, The Ferns) with no sign-in, and three
    made-up bandmates (Kai on guitar, Mila on drums, Theo on bass) stand, walk and play next to you through the real band code:
    their name tags, the band panel, the four instrument minigames, emotes, the bunk beds, the band's Spotifly account and a band set
@@ -119,7 +119,9 @@ trlShots=function(){const M={};trlShots0().forEach(s=>M[s.sc]=s);const b=BEAT,B=
   cam:u=>{const k=trlE.s(u),Y=P.mesh?P.mesh.position.y:0;return{p:[P.x+2.6-k*1.6,Y+2.1-k*.3,P.z+7.5-k*2.6],l:[P.x+.5,Y+1.1,P.z-.4],f:52}}},
  {sc:'Band and crowd',d:2*B,show:[],place:'stage',set(){if(mode!='fest')bStage(1);bEm([['b1','cheer',.2],['b2','cheer',.3],['b3','cheer',.4]])},tick(){trlCrowd(60000)},
   acts:[[.25,()=>{try{emPick('cheer')}catch(e){}}]],cam:u=>{const k=trlE.s(u),Y=P.mesh?P.mesh.position.y:0;return{p:[P.x-.9+k*.4,Y+3.1+k*1,P.z-4.4-k*.6],l:[P.x+.3,Y+.4,P.z+14],f:60}}},
- Object.assign({},M['End card'],{d:16,place:'off'})];
+ /* the song stops at 0:48 and rings out: black, then the end card on its last bit at 0:56 */
+ Object.assign({},M['Black'],{d:8,place:'off'}),
+ Object.assign({},M['End card'],{d:8,place:'off'})];
  let t=0;L.forEach((s,i)=>{s.k=i;s.t=t;t+=s.d;s.done=null});TRL.len=t;return L};
 /* the end card says what this trailer is about */
 {const e0=trlEnter;trlEnter=function(k){e0.apply(this,arguments);const s=TRL.shots[k];BB.place=s&&s.place||'off';const q=$('trle4');if(q)q.textContent='PLAY AS A BAND WITH FRIENDS'}}
