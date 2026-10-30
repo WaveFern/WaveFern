@@ -18,8 +18,7 @@ function stamp(s){if(!s||s.cf!=null)return;if(S.cfStart==null)S.cfStart=S.day;s.
 window.GFOCUS={fam,famName:g=>FAMN[FAM[g]]||g,next:g=>focus(S.songs.slice(-5),g)};
 /* stamp on release and tell the player */
 {const u0=upl;upl=function(id){const n0=S.songs.length,r=u0.apply(this,arguments);try{if(S.songs.length>n0){const s=S.songs[S.songs.length-1];stamp(s);
- const p=Math.round((s.cf-1)*100);if(p>=5)say('Genre focus: +'+p+'% streams on this song. Fans love your steady '+FAMN[FAM[s.g]]+' sound.');
- else if(p<=-5)say('Genre hop: '+p+'% streams on this song. Your fans expected more '+(()=>{const l=S.songs.slice(-6,-1);return l.length?FAMN[FAM[l[l.length-1].g]]||l[l.length-1].g:'of the same'})()+'.')}}catch(e){console.error('genre focus',e)}return r}}
+ const p=Math.round((s.cf-1)*100);if(p>=5)say('Genre focus: +'+p+'% streams');else if(p<=-5)say('Genre hop: '+p+'% streams')}}catch(e){console.error('genre focus',e)}return r}}
 /* every day's streams use the song's focus */
 {const po=planOf;planOf=function(s){const fresh=s&&s.pd!==S.day,v=po.apply(this,arguments);if(!fresh||!(v>0))return v;stamp(s);const m=s.cf;if(!(m>0)||m===1)return v;
  const x=(s.vx||0)+(s.fx||0),n=v-x;if(!(n>0))return v;

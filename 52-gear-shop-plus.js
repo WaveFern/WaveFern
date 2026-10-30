@@ -28,7 +28,7 @@ const gearLock=k=>{const G=GEAR[k],l=gl(k),t=G.fl?G.fl[l]:-1;return l<3&&t>=0&&f
 
 /* the bonus: new gear adds quality to every song you finish recording, and the content kit adds streams */
 {const mf0=mgFinish;mgFinish=function(){const n0=S.nid;mf0.apply(this,arguments);const d=S.drafts[S.drafts.length-1];if(!d||d.id!==n0)return;const b=gearQx();if(!b)return;d.q+=b;
- const p=document.querySelector('#ui .modal p.m');if(p)p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality '+d.q+' <span style="color:var(--g)">(+'+b+' studio gear)</span>')}}
+ const p=document.querySelector('#ui .modal p.m');if(p)p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality '+d.q)}}
 {const po=planOf;planOf=function(s){const fresh=s.pd!==S.day,v=po(s),m=gearSx();if(!fresh||!(m>0)||!(v>0))return v;const x=(s.vx||0)+(s.fx||0),n=v-x,cap=songCap(s)-x;s.pv=x+Math.max(n,Math.min(Math.round(n*(1+m)),Math.round(cap)));return s.pv}}
 
 /* the shop, in sections */

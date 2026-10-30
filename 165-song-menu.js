@@ -8,8 +8,8 @@ let XO=0;
 const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{lay()}catch(e){console.error('song menu',e)}return r};
 function lay(){const box=document.querySelector('#ui .box.modal'),gen=box&&box.querySelector('.gen');if(!gen||box.classList.contains('recm'))return;
  box.classList.add('recm');gen.classList.add('recg');
- const h=box.querySelector('h2');if(h){h.textContent='Make a song';const last=S.songs&&S.songs[S.songs.length-1];
-  h.insertAdjacentHTML('afterend',`<div class=recl>Pick a genre</div>${last&&window.GFOCUS?`<div class=recy>Your sound: <b>${esc(GFOCUS.famName(last.g))}</b>. Fans reward a steady sound, so staying in it earns more streams.</div>`:''}`)}
+ const h=box.querySelector('h2');if(h){h.textContent='Make a song';
+  h.insertAdjacentHTML('afterend','<div class=recl>Pick a genre</div>')}
  gen.querySelectorAll('button').forEach(b=>{const t=b.textContent,up=/ ▲$/.test(t),dn=/ ▼$/.test(t),nm=up||dn?t.slice(0,-2):t;
   /* the pixel font draws & like $, so R&B keeps a plain ampersand */
   /* v47.0.0: how this genre fits your recent releases (166-genre-focus.js) */

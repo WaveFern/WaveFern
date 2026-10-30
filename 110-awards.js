@@ -126,7 +126,7 @@ function awTalk(){if(mode!='play')return;const A=awS(),sg=(S.songs||[]).slice().
  else if(w>0)body=`<p>"Welcome back, ${esc(S.artist)}! The next ceremony is in <b>${w}</b> day${w==1?'':'s'}. Do enjoy the champagne."</p>`;
  else body=`<p>"${esc(S.artist)}! You're on the list. Which of your songs are we submitting for <b>Song of the Year</b>?"</p>
   <select id=awsel style="width:100%;margin:6px 0;padding:8px;font-size:15px">${sg.slice(0,12).map((s,k)=>`<option value="${s.id}">${esc(s.title)} · score ${awSongScore(s)}${k?'':' (your strongest)'}</option>`).join('')}</select>
-  <p class=m>Your score is the song's mix quality plus a bonus for its streams. The big names are all in the room. Only one song wins, and they don't give it to you for turning up.</p>`;
+  <p class=m>Score: mix quality plus a streams bonus. One song wins.</p>`;
  mode='menu';$('ui').innerHTML=`<div class="box modal" style="width:min(520px,94vw);border:3px solid #c9a227;background:#14091c"><h2 style="color:#f6d86a">🏆 Gramophone Awards · Guest list</h2><p class=m>${A.tries?`Ceremonies attended: ${A.tries} · Trophies won: ${A.wins}`:'The biggest night in music.'}</p>${body}
   <div class=row2>${sg.length&&!w?'<button class=go onclick="awGo()">Take your seat · Start the ceremony</button>':''}<button onclick="closeUI()">Not now</button></div></div>`}
 function awGo(){const sel=$('awsel'),song=(S.songs||[]).find(s=>s.id==(sel&&sel.value));if(!song||awWait()>0)return;const A=awS();A.last=S.day;A.tries++;closeUI();mode='menu';awPlay(awField(song),song)}

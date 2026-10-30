@@ -13,8 +13,8 @@
    Gear you can feel (each line still adds its quality as before): Microphone widens the Beat green zone, Drums give an extra go,
    Guitar adds 0.5 s to each Lyrics line, Keyboard fades out a wrong word part way through each line, Acoustics widen the Mix
    band, Headphones make the Mix level move more smoothly, the Mixing desk slows the Mix band's drift, and each Chair level makes
-   a song cost 1 less energy. All per level. The Gear shop says what each one changes, and the countdown before a step names the
-   gear helping you in it. The first three songs get a slightly wider Beat zone while you learn.
+   a song cost 1 less energy. All per level. The Gear shop and the Upgrades list on the Make a song screen (187-upgrades.js) say what each one
+   changes. The first three songs get a slightly wider Beat zone while you learn.
    Progress
    - The morning results count up (as they do in the trailer), say when it was your best day yet, and show progress bars to
      the next monthly listener milestone and, later on, to your closest song's next plaque.
@@ -26,7 +26,6 @@
 const TR=()=>typeof TRL!='undefined'&&TRL.on;
 const gv=k=>(S&&S.gear&&+S.gear[k])||0;
 const calm=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
-const gname=k=>{try{return GEAR[k].lv[gv(k)]}catch(e){return k}};
 
 /* ---------- styles ---------- */
 {const st=document.createElement('style');st.textContent=`
@@ -59,10 +58,8 @@ const rectOf=sel=>{const e=typeof sel=='string'?document.querySelector(sel):sel;
 /* ---------- gear you can feel ---------- */
 const GF={mic:'Beat: a wider green zone each level',drums:'Beat: +1 go each level',guitar:'Lyrics: +0.5 s on every line each level',keys:'Lyrics: a wrong word fades out, sooner each level',
  booth:'Mix: a wider green band each level',phones:'Mix: the level moves more smoothly each level',desk:'Mix: the green band drifts slower each level',chair:'Every song costs 1 less energy each level'};
-/* which gear helps in which step, and the short name the countdown uses */
-const GFS={0:['mic','drums'],1:['guitar','keys'],2:['booth','phones','desk']};
-const GFT={mic:'wider green',guitar:'more time',keys:'a wrong word fades',booth:'wider band',phones:'smoother level',desk:'slower band'};
 window.gFeel=k=>GF[k]?'<small class=gfeel>In the studio: '+GF[k]+'</small>':'';
+window.GFEEL=GF;
 const KFADE=[0,.7,.5,.3];
 const isNew=()=>{try{return mgNew()}catch(e){return false}};
 {const s0=startRec;startRec=function(){const e0=S.energy;const r=s0.apply(this,arguments);
@@ -71,11 +68,6 @@ const isNew=()=>{try{return mgNew()}catch(e){return false}};
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const c=Math.min(gv('chair'),3);if(c){const h=document.querySelector('#ui .box.modal .rech');if(h)h.innerHTML=h.innerHTML.replace('Costs 15 energy','Costs '+(15-c)+' energy')}}catch(e){}return r}}
 {const i0=mgItem;mgItem=function(){const it=i0.apply(this,arguments);try{const g=gv('guitar');if(g&&it)it.lim=Math.round((it.lim+.5*g)*10)/10}catch(e){}return it}}
 {const s0=mgStage;mgStage=function(n){const r=s0.apply(this,arguments);try{if(n==2&&rec&&rec.x){const x=rec.x;x.bw=.1+.02*gv('booth');x.rt=1-.1*gv('phones');x.sp=1-.1*gv('desk');x.lk=0}}catch(e){}return r}}
-{const b0=buy;buy=function(k){const l=gv(k);const r=b0.apply(this,arguments);try{if(gv(k)>l&&GF[k])setTimeout(()=>say('🎛 You will feel it in the studio. '+GF[k].replace(/,? (sooner )?each level$/,'')),600)}catch(e){}return r}}
-/* the countdown names the gear helping in the step that is about to start */
-function cdPerks(){const el=$('mgcd'),s=el&&el.querySelector('small');if(!s||s.dataset.fx||!rec)return;s.dataset.fx=1;
- const L=(GFS[rec.st]||[]).filter(k=>gv(k)>0).map(k=>gname(k)+': '+(k=='drums'?'+'+gv(k)+' go'+(gv(k)>1?'es':''):GFT[k]));
- if(rec.st==0&&isNew())L.push('learning: wider green');if(L.length)s.insertAdjacentHTML('beforeend','<i>'+esc(L.join(' · '))+'</i>')}
 
 /* ---------- Beat: Perfect / Great / Good, combo ---------- */
 const BJ=[['PERFECT','#ffd27a'],['GREAT','#2fe68a'],['GOOD','#9fd8ff']];
@@ -106,7 +98,7 @@ function mixTick(dt){const x=rec.x,m=$('mg');if(!x||!m)return;m.classList.toggle
  else x.lk=0}
 
 /* ---------- every frame ---------- */
-{const u=update;update=function(dt){u(dt);if(mode!='rec'||!rec)return;try{if(rec.swell>0)rec.swell=Math.max(0,rec.swell-dt*.6);cdPerks();
+{const u=update;update=function(dt){u(dt);if(mode!='rec'||!rec)return;try{if(rec.swell>0)rec.swell=Math.max(0,rec.swell-dt*.6);
  if(rec.wait||rec.cdn>0||rec.ig)return;if(rec.st==1&&rec.l)keysFade();else if(rec.st==2)mixTick(dt)}catch(e){}}}
 
 /* ---------- results: the end of a session is the moment people remember ---------- */
@@ -122,7 +114,7 @@ function countUp(el,from,to,ms,fmt,tick){if(!el)return;const t0=performance.now(
   const p=box.querySelector('p.m');if(p){p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality <b id=fxq>'+d.q+'</b>');countUp($('fxq'),0,d.q,700,null,()=>note(1,.03))}
   let line='';if(best>0&&d.q>best){line=`<p class="fxline best">⭐ New best! Your highest quality song yet (was ${best})</p>`;setTimeout(()=>{arp(5);glBurst(34)},650)}
   else if(last&&d.q>qOf(last))line=`<p class="fxline" style="color:var(--g)">▲ ${d.q-qOf(last)} better than your last song</p>`;
-  else if(best>0&&!band)line=`<p class="fxline m">Your best is ${best}. Perfect beats, quick rhymes and a steady mix push it higher.</p>`;
+  else if(best>0&&!band)line=`<p class="fxline m">Your best is ${best}.</p>`;
   if(line&&p)p.insertAdjacentHTML('afterend',line);
   if(/Studio magic/.test(box.textContent)&&!(best>0&&d.q>best))setTimeout(()=>{arp(4);glBurst(20)},650)}catch(e){console.error('feel results',e)}return r}}
 
