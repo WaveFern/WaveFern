@@ -3,7 +3,7 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.35.0';
+const GAME_VERSION='v49.36.0';
 const VERSION_HISTORY=[
  {v:'v49.36.0',n:'Less explaining. Making a song no longer tells you what your gear does: the countdown before each step, the results screen and the toast after buying gear stay quiet, the genre screen drops its line about fans and a steady sound, and the beat, lyrics and mix hints are shorter. New Upgrades button on the Make a song screen: it lists everything you own (gear, homes, pets, mentors) with the quality, streams and studio effect each one gives. Shorter genre focus and awards text too.'},
  {v:'v49.35.0',n:'Spotifly Team messages now live in the Spotifly app instead of Messages: a Notifications page on the computer (in the sidebar) and an Alerts tab in the Gphone app, in Spotifly\'s dark green and black. A new one pops a Spotifly notification card in the top right corner that opens the page when clicked, and the Spotifly icon, taskbar button and Gphone tile show how many are unread. Old saves move their Spotifly messages over when they load.'},
