@@ -15,8 +15,16 @@ const walls=()=>upst()?cols.concat(ANX.cw||[]):cols;
 /* does an item of type t fit at x,z facing r? (skip = index in PL to ignore) */
 function valid(t,x,z,r,skip){const f=F[t],c=fb(t,x,z,r),R=room();let ok=c[0]>=R[0]-1e-6&&c[1]>=R[1]-1e-6&&c[2]<=R[2]+1e-6&&c[3]<=R[3]+1e-6;
  if(ok&&!f.f){const o=q=>c[0]<q[2]&&c[2]>q[0]&&c[1]<q[3]&&c[3]>q[1];
-  ok=!(walls().some(o)||dyn.some(o)||PL.some((q,i)=>i!=skip&&!F[q.t].f&&o(fb(q.t,q.x,q.z,q.r)))||o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
+  /* wall items hang above furniture, so they only bump into walls and other wall items */
+  ok=!(walls().some(o)||!f.wall&&dyn.some(o)||PL.some((q,i)=>i!=skip&&!F[q.t].f&&!F[q.t].wall==!f.wall&&o(fb(q.t,q.x,q.z,q.r)))||!f.wall&&o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
+ if(ok&&f.wall)ok=backOn(t,x,z,r);
  return ok}
+/* v49.42.0: wall items (plaques) only fit with their back flat against a room wall or a low wall */
+function backOn(t,x,z,r){const c=fb(t,x,z,r),R=room(),e=.03,ov=(a0,a1,b0,b1)=>a0<b1&&a1>b0;
+ return r==0?Math.abs(c[1]-R[1])<e||walls().some(q=>Math.abs(c[1]-q[3])<e&&ov(c[0],c[2],q[0],q[2]))
+  :r==2?Math.abs(c[3]-R[3])<e||walls().some(q=>Math.abs(c[3]-q[1])<e&&ov(c[0],c[2],q[0],q[2]))
+  :r==1?Math.abs(c[0]-R[0])<e||walls().some(q=>Math.abs(c[0]-q[2])<e&&ov(c[1],c[3],q[1],q[3]))
+  :Math.abs(c[2]-R[2])<e||walls().some(q=>Math.abs(c[2]-q[0])<e&&ov(c[1],c[3],q[1],q[3]))}
 
 /* where the item ends up for a ground point px,pz: grid, clamp into the room, then snap flush to walls/furniture */
 function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
@@ -28,7 +36,7 @@ function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
    if(Math.abs(R[1]+d/2-z)<bz){bz=Math.abs(R[1]+d/2-z);nz=R[1]+d/2;wall[1]=-1}
    if(Math.abs(R[3]-d/2-z)<bz){bz=Math.abs(R[3]-d/2-z);nz=R[3]-d/2;wall[1]=1}
    const rects=walls().filter(q=>q[2]>R[0]&&q[0]<R[2]&&q[3]>R[1]&&q[1]<R[3]);
-   if(!f.f)PL.forEach((q,i)=>{if(i!=skip&&!F[q.t].f)rects.push(fb(q.t,q.x,q.z,q.r))});
+   if(!f.f)PL.forEach((q,i)=>{if(i!=skip&&!F[q.t].f&&!F[q.t].wall==!f.wall)rects.push(fb(q.t,q.x,q.z,q.r))});
    rects.forEach(q=>{const nearZ=z-d/2<q[3]+T&&z+d/2>q[1]-T,nearX=x-w/2<q[2]+T&&x+w/2>q[0]-T;
     if(nearZ)[q[2]+w/2,q[0]-w/2].forEach(v=>{const e=Math.abs(v-x);if(e<bx){bx=e;nx=v;wall[0]=0}});
     if(nearX)[q[3]+d/2,q[1]-d/2].forEach(v=>{const e=Math.abs(v-z);if(e<bz){bz=e;nz=v;wall[1]=0}})});
@@ -37,6 +45,8 @@ function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
  let[x,z]=run();
  /* back to the wall: furniture backs sit at -z when r=0, -x when r=1, +z when r=2, +x when r=3 */
  if(s.turn&&!man&&!f.f&&wall){const want=wall[1]==-1?0:wall[1]==1?2:wall[0]==-1?1:wall[0]==1?3:null;if(want!=null&&want!=r){r=want;[x,z]=run()}}
+ /* a wall item turns its back to whichever wall it is up against */
+ if(f.wall&&!backOn(t,x,z,r))for(const r2 of[r,(r+1)%4,(r+2)%4,(r+3)%4].slice(1)){const r0=r;r=r2;const[x2,z2]=run();if(backOn(t,x2,z2,r2)){x=x2;z=z2;break}r=r0}
  return{x,z,r}}
 
 /* ---- ghost follows the pointer; green = fits, red = does not ---- */
@@ -56,7 +66,7 @@ function hilite(i){const b=new THREE.Box3().setFromObject(PL[i].m),sz=b.getSize(
   return r}}
 
 /* ---- actions ---- */
-function place(){if(!hold)return;if(!gp.ok){snd('err');return say('It does not fit there. Move it or turn it.')}
+function place(){if(!hold)return;if(!gp.ok){snd('err');return say(F[hold].wall?'Hang it on a wall: move it right up against one, back to the wall.':'It does not fit there. Move it or turn it.')}
  const t=hold,m=mkF(t);m.position.set(gp.x,0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t,x:gp.x,z:gp.z,r:gp.r,m});snd('thunk');
  moving=null;if(S.inv[t]>0){S.inv[t]--;man=false}else{hold=null;clrGhost();sel=PL.length-1}buildUI()}
 function pickUp(i){const q=PL[i];if(!q||hold)return;if(q.t=='desk'){snd('err');return say('Your desk is part of the house. Upgrade it in the Gear shop.')}

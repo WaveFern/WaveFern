@@ -2,7 +2,7 @@
    - Song direction (removed in v49.25.0): songs made before then may have a Mood and Length, saved as sd ('mood|length');
      it still shapes their daily streams (planOf), quality and followers. New songs have none.
    - Plaques: a song passing 1M / 10M / 100M / 1B streams (Gold, Platinum, Diamond, Billions Club) gets a plaque in the
-     mail (a Spotifly Team message and a card) and it hangs on the studio wall. State: song.pq (tiers given), S.plq list.
+     mail (a Spotifly Team message and a card) and it goes to Storage, to hang anywhere at home (v49.42.0). State: song.pq (tiers given), S.plq list.
    - Legacy goals for the late game, paid once (S.leg). Goals an old save already meets are marked done quietly.
    - Music friends: each collab with an artist deepens your bond (Friend 1, Close friend 3, Best friend 5 songs together).
      Friends charge less to collab, and close friends share your new releases (a day of boosted streams).
@@ -46,14 +46,28 @@ let bandDay=-1;
 /* ===== plaques ===== */
 const PQ=[[1e6,'Gold','#e6b422'],[1e7,'Platinum','#d8dde3'],[1e8,'Diamond','#9be7ff'],[1e9,'Billions Club','#1ed760']];
 function plaqueTick(){if(!live())return;S.plq=Array.isArray(S.plq)?S.plq:[];
- for(const s of S.songs){const n=PQ.filter(p=>(s.streams||0)>=p[0]).length,had=s.pq||0;if(n>had){const p=PQ[had];s.pq=had+1;S.plq.push({s:s.title,t:p[1],c:p[2],n:p[0],d:S.day});
-  mail('Congratulations! "'+s.title+'" passed '+fmt(p[0])+' streams. Your '+p[1]+' plaque is in the mail, and it is already hanging on your studio wall.');
-  if(!document.getElementById('glr'))card('PLAQUE IN THE MAIL',p[1]+' plaque','"'+s.title+'" · '+fmt(p[0])+' streams',40+had*15);plaqueWall();return}}}
-let PW=null,PWn=-1;
-function plaqueWall(){try{const L=S.plq||[];if(PW&&PWn===L.length)return;PWn=L.length;if(PW){scene.remove(PW);PW=null}if(!L.length)return;PW=new THREE.Group();
- L.slice(-12).forEach((p,i)=>{const x=15.3-(i%6)*.82,y=i<6?2.3:1.45,z=.03;B(PW,.66,.8,.05,'#141414',x,y,z);B(PW,.56,.7,.02,p.c,x,y,z+.03);
-  const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),M(p.c=='#d8dde3'?'#f4f4f4':p.c));d.rotation.x=Math.PI/2;d.position.set(x,y+.08,z+.05);PW.add(d);B(PW,.07,.07,.02,'#141414',x,y+.08,z+.065);B(PW,.4,.08,.02,'#f4f1e8',x,y-.24,z+.05)});
- scene.add(PW)}catch(e){console.warn('plaques',e)}}
+ for(const s of S.songs){const n=PQ.filter(p=>(s.streams||0)>=p[0]).length,had=s.pq||0;if(n>had){const p=PQ[had];s.pq=had+1;S.plq.push({s:s.title,t:p[1],c:p[2],n:p[0],d:S.day});S.plqs=1;S.inv=S.inv||{};S.inv[PQK(S.plq.length-1)]=1;
+  mail('Congratulations! "'+s.title+'" passed '+fmt(p[0])+' streams. Your '+p[1]+' plaque has arrived in your Storage. Press F at home to hang it wherever you like.');
+  if(!document.getElementById('glr'))card('PLAQUE IN THE MAIL',p[1]+' plaque','"'+s.title+'" · '+fmt(p[0])+' streams · in your Storage',40+had*15);return}}}
+/* v49.42.0: a plaque goes to Storage (Furniture tab) and the player hangs it where they like with the usual placing tools.
+   Each plaque is its own furniture type plq_<index in S.plq>, defined on F as a hidden getter so it is not sold on Amazoom.
+   Old saves that had plaques on the automatic wall get them all in Storage once (S.plqs). */
+const PQK=i=>'plq_'+i,PQC={};
+function plqF(i){const p=(S.plq||[])[i]||{s:'',t:'Gold',c:'#e6b422'},k=p.t+'|'+p.s+'|'+p.c;if(PQC[i]&&PQC[i].k===k)return PQC[i].f;
+ const c=p.c,y=1.7,z=-.035,b=[[.66,.8,.05,'#141414',0,y,z],[.56,.7,.02,c,0,y,z+.03],[.07,.07,.02,'#141414',0,y+.08,z+.065]];
+ const f={n:p.t+' plaque: “'+String(p.s).replace(/[<>&"']/g,'')+'”',p:0,w:.7,d:.12,b,xd:1,wall:1,fx:g=>{try{const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),M(c=='#d8dde3'?'#f4f4f4':c));d.rotation.x=Math.PI/2;d.position.set(0,y+.08,z+.05);g.add(d);
+  const cv=document.createElement('canvas');cv.width=256;cv.height=52;const x=cv.getContext('2d');x.fillStyle='#f4f1e8';x.fillRect(0,0,256,52);x.fillStyle='#141414';x.textAlign='center';x.textBaseline='middle';
+  let fs=22;x.font='bold '+fs+'px sans-serif';while(fs>10&&x.measureText(p.s).width>240){fs--;x.font='bold '+fs+'px sans-serif'}x.fillText(p.s,128,18);x.font='14px sans-serif';x.fillText(p.t.toUpperCase()+' · '+fmt(p.n||0)+' STREAMS',128,40);
+  const tx=new THREE.CanvasTexture(cv),l=new THREE.Mesh(new THREE.PlaneGeometry(.46,.094),new THREE.MeshBasicMaterial({map:tx}));l.position.set(0,y-.24,z+.042);g.add(l)}catch(e){}}};
+ PQC[i]={k,f};return f}
+for(let i=0;i<600;i++)if(!(PQK(i) in F))Object.defineProperty(F,PQK(i),{get:()=>plqF(i),set(){},enumerable:false,configurable:true});
+/* plaques hang high, so a click on the plaque itself picks it, not only its footprint on the floor */
+if(typeof hovFind=='function'){const h0=hovFind;hovFind=function(){try{if(mode=='build'&&PL.some(q=>/^plq_/.test(q.t))){RC.setFromCamera(mouse,cam);
+  const ms=[];PL.forEach((q,i)=>{if(/^plq_/.test(q.t)&&q.m)ms.push([q.m,i])});const hit=RC.intersectObjects(ms.map(a=>a[0]),true)[0];
+  if(hit){let o=hit.object;while(o&&!ms.some(a=>a[0]===o))o=o.parent;const e=ms.find(a=>a[0]===o);if(e)return e[1]}}}catch(e){}return h0.apply(this,arguments)}}
+function plaqueStore(){if(!live()||S.plqs)return;S.plqs=1;S.inv=S.inv||{};const n=(S.plq||[]).length;
+ for(let i=0;i<n;i++)if(!(S.inv[PQK(i)]>0)&&!PL.some(q=>q.t==PQK(i)))S.inv[PQK(i)]=1;
+ if(n)mail('Your '+n+' plaque'+(n>1?'s are':' is')+' now in your Storage (press F at home). Hang '+(n>1?'them':'it')+' wherever you like in your house.')}
 
 /* ===== legacy goals ===== */
 const LG=[['s25','Release 25 songs',()=>S.songs.length,25,2000],['s100','Release 100 songs',()=>S.songs.length,100,15000],
@@ -96,12 +110,12 @@ function legPage(){S.leg=S.leg||{};const c=collabs(),fr=Object.entries(c).sort((
  return`<div class=qst><div class=qh><img src="${IC.quests}"><div><h1>LEGACY</h1><small>Big goals, plaques and the people you make music with</small></div></div>
  <div class=qtabs><button onclick="qstTab('d')">Daily</button><button onclick="qstTab('w')">Weekly</button><button class=on onclick="qstTab('l')">Legacy</button></div>
  <h3 style="margin:6px 0">Legacy goals</h3>${goals}
- <h3 style="margin:14px 0 6px">Plaques (${pl.length})</h3>${pl.length?pl.map(p=>`<div class=qc><div class=qs style="background:${p.c};color:#111">★</div><div class=qn><b>${esc(p.t)} · ${esc(p.s)}</b><div class=qv>${fmt(p.n)} streams · Day ${p.d}</div></div></div>`).join(''):'<div class=qf>A song that passes 1M streams earns a Gold plaque, sent in the mail and hung in your studio.</div>'}
+ <h3 style="margin:14px 0 6px">Plaques (${pl.length})</h3>${pl.length?pl.map(p=>`<div class=qc><div class=qs style="background:${p.c};color:#111">★</div><div class=qn><b>${esc(p.t)} · ${esc(p.s)}</b><div class=qv>${fmt(p.n)} streams · Day ${p.d}</div></div></div>`).join(''):'<div class=qf>A song that passes 1M streams earns a Gold plaque, sent to your Storage so you can hang it in your house.</div>'}
  <h3 style="margin:14px 0 6px">Music friends</h3>${fr.length?fr.map(([n,k])=>{const lv=bondLv(k);return`<div class=qc><div class=qs>${lv}</div><div class=qn><b>${esc(n)} · ${bondName(k)}</b><div class=qv>${k} song${k>1?'s':''} together · ${['','10% off collabs','20% off collabs, shares your releases','30% off collabs, often shares your releases'][lv]}</div></div></div>`}).join(''):'<div class=qf>Collab with an artist to become friends: friends charge less, close friends share your new songs.</div>'}
  <div class=qf>Lost tapes found: ${Object.keys(S.tapes||{}).length} / ${TAPES} · pink cassettes on the city pavements. Green ones are daily street moments.</div></div>`}
 if(typeof PA=='object'&&PA.quests){const q0=PA.quests;PA.quests=function(){const Q=S.quests||{},h=q0.apply(this,arguments);/* the original also loads the Quests styles */if(Q.tab=='l'){try{return legPage()}catch(e){console.error('Legacy',e)}}
  return h.replace(/(<div class=qtabs>[\s\S]*?)(<\/div>)/,'$1<button onclick="qstTab(\'l\')">Legacy</button>$2')}}
 {const t0=window.qstTab;window.qstTab=t=>{if(t=='l'){(S.quests=S.quests||{}).tab='l';try{snd('click')}catch(e){}pcR();return}return t0(t)}}
 
-setInterval(()=>{try{plaqueTick()}catch(e){}try{legTick()}catch(e){}try{if(live()&&PWn!==(S.plq||[]).length)plaqueWall()}catch(e){}},2000);
+setInterval(()=>{try{plaqueTick()}catch(e){}try{legTick()}catch(e){}try{plaqueStore()}catch(e){}},2000);
 })();

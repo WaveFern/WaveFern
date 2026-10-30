@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.41.0';
+const GAME_VERSION='v49.42.0';
 const VERSION_HISTORY=[
+ {v:'v49.42.0',n:'Plaques go to your Storage instead of hanging themselves on the studio wall. Press F at home, pick a plaque from the Furniture tab and hang it on any wall in your house, upstairs too. Plaques sit up on the wall, so they can go above your bed, desk or sofa, and they turn to face the room on their own. Each one shows its song title and stream count. Plaques you already earned are waiting in Storage.'},
  {v:'v49.41.0',n:'The Swiftwing flight map is sharp now. It draws real country outlines at your screen\'s full resolution instead of big blocky squares, and you can move around it: drag to pan, mouse wheel, pinch or the + / - buttons to zoom in up to x8 (x1, the whole world, is as far out as it goes). City names show up once you zoom in, and picking a region like Europe flies the map there. The map you watch during a flight is sharp too and zooms in on your route.'},
  {v:'v49.40.0',n:'A sharper, nicer world map. It now draws at your screen\'s full resolution on textured grass, with shaded buildings, round trees, a shoreline on the lake, round pins and labels that never pile on top of each other, a white arrow showing which way you face, a compass and a scale bar. You can no longer zoom out below 1x, so the map always fills its frame.'},
  {v:'v49.39.1',n:'The Spotifly Now playing panel is back to its normal size. The new Spotifly notifications had borrowed its look by mistake and stretched it across the page.'},
