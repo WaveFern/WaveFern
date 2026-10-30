@@ -110,7 +110,11 @@ function css(){if($('swcss'))return;const s=document.createElement('style');s.id
 .swa button[disabled]{opacity:.45;cursor:default;pointer-events:none}
 .swa .swfrom{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.swa select{font:inherit;padding:6px 8px;border-radius:9px;border:2px solid #b9d3f2;background:#fff;color:#0b2a5b}
 .swa .swmap{position:relative;border-radius:14px;overflow:hidden;background:#7cc2ff;border:2px solid #0b2a5b22}
-.swa .swmap canvas{display:block;width:100%;height:auto;touch-action:none;cursor:pointer}
+.swa .swmap canvas{display:block;width:100%;height:auto;aspect-ratio:1000/493;touch-action:none;cursor:grab}
+.swa .swzm{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.swa .swzm button{all:unset;cursor:pointer;width:30px;height:30px;line-height:30px;text-align:center;border-radius:9px;background:#ffffffe6;color:#0b2a5b;font-weight:700;font-size:18px;box-shadow:0 2px 0 #0b2a5b33}.swa .swzm button:hover{background:#fff}
+.swa .swzm span{font-size:11px;font-weight:700;color:#0b2a5b;background:#ffffffb0;border-radius:6px;padding:1px 5px}
+.swa .swmh{position:absolute;left:8px;bottom:6px;font-size:11px;color:#0b2a5b;background:#ffffffa0;border-radius:6px;padding:1px 6px;pointer-events:none}
 .swa .swtip{position:absolute;pointer-events:none;background:#0b2a5b;color:#fff;font-size:12px;padding:4px 8px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-130%);display:none}
 .swa .swch{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .swa .swch button{all:unset;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:999px;background:#fff;border:2px solid #d6e6f8;color:#0b2a5b}.swa .swch button.on{border-color:#ff6b4a;color:#ff6b4a;font-weight:700}
@@ -150,7 +154,7 @@ function bookPage(){const O=origins();if(!O.includes(SW.from))SW.from=O[0];const
  const list=places().filter(p=>p!=from&&(!C||(T.dest(p)&&T.dest(p).cont==C)||(C=='home'&&p=='home')));
  const R=to=>route(from,to),d0=T.dayOf(T.now());
  let h=`<div class=swc><div class=swfrom><b>From</b><select onchange="swFrom(this.value)">${O.map(o=>`<option value="${o}" ${o==from?'selected':''}>${esc(T.apName(o))} (${code(o)})</option>`).join('')}</select><span class=m2>${from==T.loc()?'You are here.':'Where a booked flight lands.'}</span></div>
- <div class=swmap><canvas id=swmapc width=540 height=225></canvas><div class=swtip id=swtip></div></div>
+ <div class=swmap><canvas id=swmapc width=1000 height=493></canvas><div class=swtip id=swtip></div><div class=swzm><button onclick="swZoom(1)" title="Zoom in">+</button><button onclick="swZoom(-1)" title="Zoom out">−</button><button onclick="swZoom(0)" title="Whole world">⤢</button><span id=swzl>x1</span></div><div class=swmh>Drag to move · scroll or pinch to zoom</div></div>
  <div class=swch><button class="${!C?'on':''}" onclick="swCont('')">All</button>${from!='home'?`<button class="${C=='home'?'on':''}" onclick="swCont('home')">Home</button>`:''}${Object.keys(WT_CONT).map(k=>`<button class="${C==k?'on':''}" onclick="swCont('${k}')">${WT_CONT[k].n}</button>`).join('')}</div>
  <div class=swdl>${list.map(p=>{const r=R(p);return`<button class="swd ${SW.to==p?'on':''}" onclick="swTo('${p}')"><b>${p=='home'?'Home · '+HOME_AP:esc(T.city(p))}</b><small>${p=='home'?'':(T.dest(p).city?esc(T.dest(p).country):'Country stop')+' · '}${r.hrs} h · from ${fmtM(r.fare*.88)}</small></button>`}).join('')}</div></div>`;
  if(SW.to&&SW.to!=from){const to=SW.to,r=R(to);let fl=[];for(let i=0;i<DAYS;i++)fl=fl.concat(flights(from,d0+i).filter(f=>f.to==to));
@@ -182,7 +186,7 @@ function page(ctx){css();SW.ctx=ctx;let b='';try{b=SW.tab=='trips'?tripsPage():S
 function rr(){if(SW.ctx=='ph'&&$('ph'))phR();else if(SW.ctx=='desk'&&$('swdk'))swDesk();else if(typeof mode!='undefined'&&mode=='pc'&&app=='sw')pcR()}
 window.swTab=t=>{SW.tab=t;SW.conf=null;try{snd('click')}catch(e){}rr()};
 window.swFrom=v=>{SW.from=v;SW.to=null;SW.conf=null;rr()};
-window.swCont=c=>{SW.cont=c;rr()};
+window.swCont=c=>{SW.cont=c;SW.fit=c;rr()};
 window.swTo=(p,b)=>{if(b){SW.tab='book';SW.from=T.loc()}SW.to=p;SW.conf=null;try{snd('click')}catch(e){}rr();setTimeout(()=>{const e=document.getElementById('swfls');if(e&&e.scrollIntoView)e.scrollIntoView({block:'nearest',behavior:'smooth'})},30)};
 const findF=k=>{const [ft,dep]=k.split('#'),[from,to]=ft.split('>');return flights(from,T.dayOf(+dep)).find(f=>f.to==to)};
 window.swConf=k=>{SW.conf=k||null;rr()};
@@ -197,27 +201,76 @@ PA.sw=()=>page('pc');
 try{if(typeof GP_APPS!='undefined'&&!GP_APPS.some(a=>a[0]=='sw')){GP_APPS.push(['sw','Swiftwing',()=>IC.sw,'#1565d8']);if(typeof GP_TITLE!='undefined')GP_TITLE.sw='Swiftwing'}
  if(typeof phBody=='function'){const b0=phBody;phBody=function(){if(typeof PH!='undefined'&&PH.app=='sw')return`<div class=phx>${page('ph')}</div>`;return b0.apply(this,arguments)}}}catch(e){console.error('swiftwing phone',e)}
 
-/* ---- the world map: land mask (Natural Earth 110m, 2 degrees a cell, lat 80..-70) with a pin per place ---- */
-const MASK='11.2.4.3.1.5.4.o.g.5.11.4.12,u.2.a.1.2.5.4.r.h.1.16.2.11,y.3.3.1.1.1.1.6.b.j.12.2.d.d.d.3.1.2.f,s.3.1.1.3.1.3.1.1.2.1.4.1.2.a.h.11.2.c.l.1.2.q,1.4y.1,8.2o.4.c.3.1.2.1.1b.1.5,3.2u.6.1.1.1.c.1.1h,0.2.2.2t.2.1.1.1.1y,8.11.9.2.1.1.7.4.p.5.2.27,7.7.1.s.8.4.b.3.o.6.2.1v.2.1.1.4.4,9.4.8.m.8.4.2.1.z.6.3.1n.5.1.3.1.9,b.1.b.m.7.7.s.2.5.1.1.2.3.1m.9.4.8,8.1.g.o.2.a.p.3.5.1.5.1m.a.3.9,p.o.2.b.n.2.1.2.2.1y.6.1.b,q.10.q.2.1.1x.1.1.i,r.1.1.r.1.1.3.2.q.1z.1.1.i,s.u.5.1.p.1y.2.1.i,s.s.1.2.u.7.1.8.2.1.1.5.2.16.m,s.r.u.7.3.2.2.5.6.4.2.15.3.2.i,s.q.w.4.4.1.2.2.1.4.1.a.2.12.5.1.j,s.o.x.5.8.1.1.2.1.c.2.w.4.1.6.1.j,t.n.z.2.4.3.1.1.6.b.2.y.2.2.3.2.k,u.m.z.8.7.1.3.1.1.16.3.1.2.4.k,v.j.10.a.c.16.5.2.n,w.h.10.e.1.4.1.1a.t,y.8.7.1.z.t.1.10.t,x.1.1.6.8.1.x.o.1.7.2.x.u,y.1.1.5.16.o.2.7.1.1.5.r.u,11.4.7.2.w.q.1.b.5.n.2.1.t,11.4.4.2.4.1.t.s.1.9.6.9.2.8.10,12.4.2.2.8.1.r.r.2.8.7.6.5.6.1.1.z,14.6.10.r.2.6.a.4.6.7.6.1.t,18.4.x.t.1.4.c.3.9.5.6.1.t,1a.2.y.t.1.1.e.3.9.6.5.1.t,1b.1.4.4.q.u.2.2.c.2.9.1.2.2.8.1.r,1c.1.1.1.1.8.n.w.d.1.1.1.8.1.2.1.11,1f.a.n.v.f.1.l.1.r,1f.d.l.2.1.1.4.l.o.1.1.2.5.2.v,1f.e.u.i.q.1.1.1.4.3.v,1e.f.u.h.r.2.4.4.1.1.t,1e.h.r.h.t.2.3.4.6.2.n,1e.k.p.f.v.2.2.3.1.2.3.1.1.1.1.3.j,1d.n.o.e.w.1.8.1.7.4.h,1e.n.n.e.x.3.d.5.4.1.b,1f.l.o.e.12.1.3.1.7.2.1.1.6.1.9,1f.k.q.d.1y,1g.j.p.e.4.1.14.3.3.1.i,1g.j.p.e.4.1.11.6.3.2.a.1.6,1i.g.q.d.3.3.10.8.2.2.h,1j.f.q.c.4.3.10.c.h,1j.f.r.b.4.2.y.h.7.1.7,1j.d.t.b.4.2.x.i.f,1j.b.v.a.5.1.y.j.e,1j.b.w.8.15.k.d,1i.b.x.8.15.k.d,1i.b.y.6.17.j.d,1i.a.z.5.18.4.5.9.e,1i.7.2f.1.a.6.b.1.3,1h.9.2q.5.c.1.2,1h.6.3a.2.1,1h.4.1.1.2v.2.c.2.2,1i.4.2x.1.b.2.3,1h.4.39.2.4,1h.4.3f,1g.4.1w.1.1j,1g.3.3h,1h.3.3g,1i.2.3g,50,50,50,50,1m.1.3d,1k.2.1l.4.f.1.5.9.2.c.h,1k.2.1d.1.2.f.4.13.c';
-let MK=null;function mask(){if(MK)return MK;MK=MASK.split(',').map(r=>{const o=[];let v=0;r.split('.').forEach(n=>{for(let i=parseInt(n,36);i>0;i--)o.push(v);v^=1});return o});return MK}
-const mx=(lon,W)=>(lon+180)/360*W,my=(lat,H)=>(80-lat)/150*H;
+/* ---- the world map: vector country shapes (WT_MAP in 145-world-map-data.js, Natural Earth 110m, Miller projection), drawn at the
+   screen's real pixel density so it stays sharp at any size. Drag to move; mouse wheel, pinch or the + / - buttons zoom from x1
+   (the whole world, the furthest out it goes) up to x8. Picking a region in the chips flies the map to it. ---- */
+let SHP=null;
+function shapes(){if(SHP)return SHP;const o=[];try{WT_MAP.c.forEach(r=>{try{o.push(new Path2D(r[3]))}catch(e){}})}catch(e){return o}return SHP=o}
+const mlat=l=>1.25*Math.log(Math.tan(Math.PI/4+.4*l*Math.PI/180));
+function proj(lat,lon){const M=WT_MAP,Y0=mlat(M.lat0),Y1=mlat(M.lat1);return[(lon+180)/360*M.W,(Y0-mlat(Math.max(M.lat1-10,Math.min(M.lat0,lat))))/(Y0-Y1)*M.H]}
+/* a view is {cx,cy,z}: the map point in the middle and the zoom. k = css px per map unit for a canvas cssW wide */
+function clampV(v,cw,chh){const M=WT_MAP;v.z=Math.max(1,Math.min(ZMAX,v.z||1));const k=cw*v.z/M.W,w=cw/k,h=chh/k;
+ v.cx=w>=M.W?M.W/2:Math.max(w/2,Math.min(M.W-w/2,v.cx));v.cy=h>=M.H?M.H/2:Math.max(h/2,Math.min(M.H-h/2,v.cy));return k}
+const ZMAX=8;
+/* paint sea, grid and land onto x (any size), with map units -> device px: dev = o + map*s. lw = device px per css px */
+function paintWorld(x,s,ox,oy,W,H,lw){const M=WT_MAP;x.setTransform(1,0,0,1,0,0);
+ const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#8fd0ff');g.addColorStop(1,'#62b2f5');x.fillStyle=g;x.fillRect(0,0,W,H);
+ x.setTransform(s,0,0,s,ox,oy);x.strokeStyle='#ffffff40';x.lineWidth=lw/s;x.beginPath();
+ for(let lo=-180;lo<=180;lo+=15){const a=proj(0,lo)[0];x.moveTo(a,0);x.lineTo(a,M.H)}
+ for(let la=-45;la<=75;la+=15){const b=proj(la,0)[1];x.moveTo(0,b);x.lineTo(M.W,b)}x.stroke();
+ const L=shapes();x.fillStyle='#f4efe2';L.forEach(p=>x.fill(p));x.strokeStyle='#b9ad92';x.lineWidth=.8*lw/s;x.lineJoin='round';L.forEach(p=>x.stroke(p));
+ x.setTransform(1,0,0,1,0,0)}
+/* fit a view around map points (array of [x,y]) for a canvas cw x chh css px */
+function fitV(pts,cw,chh,pad){const M=WT_MAP;if(!pts.length)return{cx:M.W/2,cy:M.H/2,z:1};let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.forEach(p=>{x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1])});
+ const w=Math.max(60,x1-x0)*(pad||1.5),h=Math.max(30,y1-y0)*(pad||1.5),z=Math.min(M.W/w,(M.W*chh/cw)/h);const v={cx:(x0+x1)/2,cy:(y0+y1)/2,z};clampV(v,cw,chh);return v}
 let PINS=[];
-function drawMap(){const c=document.getElementById('swmapc');if(!c)return;const x=c.getContext('2d'),W=c.width,H=c.height,M=mask(),cw=W/180,ch=H/75;
- x.fillStyle='#7cc2ff';x.fillRect(0,0,W,H);x.fillStyle='#8ccaff';for(let i=0;i<W;i+=18)x.fillRect(i,0,1,H);
+const mview=()=>SW.mv||(SW.mv={cx:500,cy:246.5,z:1});
+function drawMap(){const c=document.getElementById('swmapc');if(!c)return;const r=c.getBoundingClientRect();if(!r.width||!r.height)return;
+ const dpr=Math.min(3,window.devicePixelRatio||1),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);if(c.width!=W||c.height!=H){c.width=W;c.height=H}
  const from=SW.from||T.loc(),hov=SW.hov,cont=SW.cont;
- M.forEach((row,r)=>row.forEach((v,k)=>{if(v){x.fillStyle='#f4efe2';x.fillRect(Math.floor(k*cw),Math.floor(r*ch),Math.ceil(cw),Math.ceil(ch))}}));
- PINS=places().map(p=>{const d=ll(p);return{p,x:mx(d.lon,W),y:my(d.lat,H)}});
+ if(SW.fit!=null){const f=SW.fit;SW.fit=null;const L=places().filter(p=>{const d=T.dest(p);return f=='home'?p=='home':d&&d.cont==f}).map(p=>{const d=ll(p);return proj(d.lat,d.lon)});
+  SW.mv=f?fitV(L,r.width,r.height,1.35):{cx:500,cy:246.5,z:1}}
+ const v=mview(),k=clampV(v,r.width,r.height),ox=r.width/2-v.cx*k,oy=r.height/2-v.cy*k,x=c.getContext('2d');
+ paintWorld(x,k*dpr,ox*dpr,oy*dpr,W,H,dpr);x.setTransform(dpr,0,0,dpr,0,0);
+ PINS=places().map(p=>{const d=ll(p),q=proj(d.lat,d.lon);return{p,x:ox+q[0]*k,y:oy+q[1]*k}});
  const A=PINS.find(q=>q.p==from),B=SW.to&&PINS.find(q=>q.p==SW.to);
- if(A&&B){x.strokeStyle='#ff6b4a';x.lineWidth=2;x.setLineDash([5,4]);x.beginPath();x.moveTo(A.x,A.y);x.quadraticCurveTo((A.x+B.x)/2,Math.min(A.y,B.y)-30,B.x,B.y);x.stroke();x.setLineDash([])}
- PINS.forEach(q=>{const d=T.dest(q.p),dim=cont&&(cont=='home'?q.p!='home':!d||d.cont!=cont),on=q.p==SW.to||q.p==hov,me=q.p==from;
-  x.globalAlpha=dim?.3:1;x.fillStyle=me?'#0b2a5b':d?WT_CONT[d.cont].c:'#2fe68a';x.strokeStyle='#0b2a5b';x.lineWidth=on?2.5:1.2;
-  x.beginPath();x.arc(q.x,q.y,on?6:me?5:4,0,7);x.fill();x.stroke();x.globalAlpha=1});
- if(A){x.font='bold 11px Trebuchet MS,Arial';x.fillStyle='#0b2a5b';x.fillText(from=='home'?'You · Home':'You',A.x+7,A.y+4)}
- if(!c.dataset.on){c.dataset.on=1;const pick=e=>{const r=c.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*H/r.height;let b=null,bd=12;PINS.forEach(q=>{const dd=Math.hypot(q.x-px,q.y-py);if(dd<bd&&q.p!=(SW.from||T.loc())){bd=dd;b=q}});return b};
-  c.addEventListener('pointermove',e=>{const q=pick(e),tip=document.getElementById('swtip');const k=q?q.p:null;if(k!=SW.hov){SW.hov=k;drawMap()}
-   if(tip){if(q){const r=c.getBoundingClientRect();tip.style.display='block';tip.style.left=(q.x*r.width/W)+'px';tip.style.top=(q.y*r.height/H)+'px';const rt=route(SW.from||T.loc(),q.p);tip.textContent=T.place(q.p)+' · '+rt.hrs+' h · from '+fmtM(rt.fare*.88)}else tip.style.display='none'}});
-  c.addEventListener('pointerleave',()=>{SW.hov=null;const tip=document.getElementById('swtip');if(tip)tip.style.display='none';drawMap()});
-  c.addEventListener('click',e=>{const q=pick(e);if(q)swTo(q.p)})}}
+ if(A&&B){const dd=Math.hypot(B.x-A.x,B.y-A.y);x.strokeStyle='#ff6b4a';x.lineWidth=2.5;x.lineCap='round';x.setLineDash([6,5]);x.beginPath();x.moveTo(A.x,A.y);x.quadraticCurveTo((A.x+B.x)/2,Math.min(A.y,B.y)-Math.min(90,dd*.22),B.x,B.y);x.stroke();x.setLineDash([])}
+ const big=Math.min(1.4,.9+v.z*.08),names=v.z>=2.4,lab=[];x.textBaseline='middle';x.lineJoin='round';
+ PINS.forEach(q=>{if(q.x<-20||q.y<-20||q.x>r.width+20||q.y>r.height+20)return;const d=T.dest(q.p),dim=cont&&(cont=='home'?q.p!='home':!d||d.cont!=cont),on=q.p==SW.to||q.p==hov,me=q.p==from;
+  x.globalAlpha=dim?.3:1;x.fillStyle=me?'#0b2a5b':d?WT_CONT[d.cont].c:'#2fe68a';x.strokeStyle='#0b2a5b';x.lineWidth=on?2.5:1.4;
+  x.beginPath();x.arc(q.x,q.y,(on?6.5:me?5.5:4.5)*big,0,7);x.fill();x.stroke();
+  if(names&&!me&&!dim||on&&!me)lab.push({q,on});x.globalAlpha=1});
+ /* city names once zoomed in: the picked / hovered one first, then any that do not overlap one already drawn */
+ const box=[];if(A)box.push([A.x+6,A.y-8,A.x+150,A.y+8]);lab.sort((a,b)=>b.on-a.on).forEach(l=>{const q=l.q,t=T.city(q.p);x.font=(l.on?'bold ':'')+'12px Trebuchet MS,Arial';
+  const bx=[q.x+6,q.y-8,q.x+10+x.measureText(t).width,q.y+8];if(!l.on&&box.some(o=>bx[0]<o[2]&&bx[2]>o[0]&&bx[1]<o[3]&&bx[3]>o[1]))return;box.push(bx);
+  x.strokeStyle='#ffffffd0';x.lineWidth=3;x.strokeText(t,q.x+8,q.y);x.fillStyle='#0b2a5b';x.fillText(t,q.x+8,q.y)});
+ if(A){x.font='bold 12px Trebuchet MS,Arial';const t=from=='home'?'You · Home':'You · '+T.city(from);x.strokeStyle='#ffffffd0';x.lineWidth=3;x.strokeText(t,A.x+9,A.y);x.fillStyle='#0b2a5b';x.fillText(t,A.x+9,A.y)}
+ const zl=document.getElementById('swzl');if(zl)zl.textContent='x'+(Math.round(v.z*10)/10);
+ if(!c.dataset.on){c.dataset.on=1;const P=new Map();let drag=false,pinch=null,down=null;
+  const pt=e=>{const b=c.getBoundingClientRect();return{x:e.clientX-b.left,y:e.clientY-b.top,w:b.width,h:b.height}};
+  const pick=e=>{const p=pt(e);let b=null,bd=e.pointerType=='touch'?22:14;PINS.forEach(q=>{const dd=Math.hypot(q.x-p.x,q.y-p.y);if(dd<bd&&q.p!=(SW.from||T.loc())){bd=dd;b=q}});return b};
+  const tipOff=()=>{const tip=document.getElementById('swtip');if(tip)tip.style.display='none'};
+  c.addEventListener('pointerdown',e=>{P.set(e.pointerId,pt(e));try{c.setPointerCapture(e.pointerId)}catch(x){}
+   if(P.size==1){down=pt(e);drag=false}else if(P.size==2){const[a,b]=[...P.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1};drag=true;tipOff()}});
+  c.addEventListener('pointermove',e=>{const p=pt(e);
+   if(P.has(e.pointerId)){const o=P.get(e.pointerId);P.set(e.pointerId,p);
+    if(P.size>=2&&pinch){const[a,b]=[...P.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1;zoomAt((a.x+b.x)/2,(a.y+b.y)/2,d/pinch.d,p.w,p.h);pinch.d=d;return}
+    if(!drag&&down&&Math.hypot(p.x-down.x,p.y-down.y)>5){drag=true;c.style.cursor='grabbing';SW.hov=null;tipOff()}
+    if(drag){const v=mview(),k=clampV(v,p.w,p.h);v.cx-=(p.x-o.x)/k;v.cy-=(p.y-o.y)/k;drawMap()}return}
+   const q=pick(e),tip=document.getElementById('swtip');const kk=q?q.p:null;if(kk!=SW.hov){SW.hov=kk;drawMap()}
+   if(tip){if(q){tip.style.display='block';tip.style.left=q.x+'px';tip.style.top=q.y+'px';const rt=route(SW.from||T.loc(),q.p);tip.textContent=T.place(q.p)+' · '+rt.hrs+' h · from '+fmtM(rt.fare*.88)}else tip.style.display='none'}});
+  const up=e=>{const was=P.has(e.pointerId),tap=was&&!drag&&P.size==1&&e.type=='pointerup';P.delete(e.pointerId);if(P.size<2)pinch=null;if(!P.size){c.style.cursor='';down=null}
+   if(tap){const q=pick(e);drag=false;if(q)swTo(q.p)}else if(!P.size)drag=false};
+  c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+  c.addEventListener('pointerleave',e=>{if(P.size)return;SW.hov=null;tipOff();drawMap()});
+  c.addEventListener('wheel',e=>{e.preventDefault();const p=pt(e);zoomAt(p.x,p.y,Math.exp(-Math.max(-120,Math.min(120,e.deltaY*(e.deltaMode?33:1)))*.0025),p.w,p.h)},{passive:false});
+  c.addEventListener('dblclick',e=>{const p=pt(e);zoomAt(p.x,p.y,2,p.w,p.h)})}}
+/* zoom by f around css point (px,py), keeping the map point under it in place */
+function zoomAt(px,py,f,cw,chh){const v=mview(),k=clampV(v,cw,chh),mx=v.cx+(px-cw/2)/k,my=v.cy+(py-chh/2)/k;v.z=Math.max(1,Math.min(ZMAX,v.z*f));
+ const k2=cw*v.z/WT_MAP.W;v.cx=mx-(px-cw/2)/k2;v.cy=my-(py-chh/2)/k2;drawMap()}
+window.swZoom=d=>{const c=document.getElementById('swmapc');if(!c)return;const r=c.getBoundingClientRect();if(!d){SW.mv={cx:500,cy:246.5,z:1};drawMap()}else zoomAt(r.width/2,r.height/2,d>0?1.6:1/1.6,r.width,r.height)};
+window.addEventListener('resize',()=>{try{if(document.getElementById('swmapc'))drawMap()}catch(e){}});
+T.paintWorld=paintWorld;T.proj=proj;T.fitView=fitV;T.clampView=clampV;
 
 /* ---- HUD strip: the next flight, its gate and the time left ---- */
 function hud(){let e=document.getElementById('swhud');const on=S&&S.artist&&typeof mode!='undefined'&&(mode=='play'||mode=='drive'||mode=='phone');
@@ -240,5 +293,5 @@ setInterval(()=>{try{hud()}catch(x){}},400);
  const p=document.createElement('p');p.style.cssText='background:#0b2a5b;border:2px solid #ff6b4a;padding:6px 8px;margin:6px 0';
  p.innerHTML='✈ <b>Flights today:</b> '+L.map(k=>esc(k.fl)+' '+esc(T.apName(k.from))+' → '+esc(T.city(k.to))+', Gate '+k.gate+', gate closes '+T.hm(k.dep-CLOSE)).join('<br>');
  const h=bx.querySelector('h2');h?h.after(p):bx.prepend(p)}catch(e){}}}
-window.SWAPP=SW;T.mask=mask;
+window.SWAPP=SW;
 })();

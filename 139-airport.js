@@ -324,18 +324,20 @@ function takeOff(){const tk=AP.tk;if(!tk)return;AP.ph='fly';T.emit('depart',tk);
  d.innerHTML=`<style>#apfly .cl{position:absolute;background:#fff;border-radius:999px;opacity:.75;filter:blur(1px);animation:apcl linear infinite}@keyframes apcl{from{transform:translateX(110vw)}to{transform:translateX(-40vw)}}#apfly button{all:unset;cursor:pointer;background:#ff6b4a;color:#fff;font-weight:700;padding:8px 18px;border-radius:10px;box-shadow:0 3px 0 #c84528}</style>
  ${[0,1,2,3,4,5].map(i=>`<div class=cl style="top:${10+i*14}%;width:${120+i*40}px;height:${30+i*6}px;animation-duration:${6+i*1.6}s;animation-delay:-${i*1.3}s"></div>`).join('')}
  <div style="position:relative;font:700 28px ${FONT}">${esc(tk.fl)} · ${esc(T.city(tk.from))} → ${esc(T.city(tk.to))}</div>
- <canvas id=apflc width=720 height=300 style="position:relative;width:min(720px,94vw);border-radius:14px;border:3px solid #0b2a5b;background:#7cc2ff"></canvas>
+ <canvas id=apflc width=720 height=300 style="position:relative;width:min(720px,94vw);aspect-ratio:720/300;border-radius:14px;border:3px solid #0b2a5b;background:#7cc2ff"></canvas>
  <div id=apflt style="position:relative;font:700 18px ${FONT}"></div><div style="position:relative;display:flex;gap:10px"><button onclick="apLand()">Skip ⏭</button></div>`;
- document.body.appendChild(d);const t0=performance.now(),DUR=8500,A=T.dest(tk.from)||WT_HOME,B=T.dest(tk.to)||WT_HOME,M=T.mask?T.mask():null;
- const step=()=>{if(!document.getElementById('apfly')||AP.ph!='fly')return;const k=Math.min(1,(performance.now()-t0)/DUR),c=document.getElementById('apflc');if(c){const x=c.getContext('2d'),W=720,H=300,cw=W/180,ch=H/75;
-  x.fillStyle='#7cc2ff';x.fillRect(0,0,W,H);if(M){x.fillStyle='#f4efe2';M.forEach((row,r)=>row.forEach((v,q)=>{if(v)x.fillRect(Math.floor(q*cw),Math.floor(r*ch),Math.ceil(cw),Math.ceil(ch))}))}
-  const px=l=>(l+180)/360*W,py=l=>(80-l)/150*H,ax=px(A.lon),ay=py(A.lat),bx2=px(B.lon),by=py(B.lat),mx=(ax+bx2)/2,my=Math.min(ay,by)-50;
-  const Q=t=>[(1-t)*(1-t)*ax+2*(1-t)*t*mx+t*t*bx2,(1-t)*(1-t)*ay+2*(1-t)*t*my+t*t*by];
+ document.body.appendChild(d);const t0=performance.now(),DUR=8500,A=T.dest(tk.from)||WT_HOME,B=T.dest(tk.to)||WT_HOME;AP.flv=null;
+ const step=()=>{if(!document.getElementById('apfly')||AP.ph!='fly')return;const k=Math.min(1,(performance.now()-t0)/DUR),c=document.getElementById('apflc');if(c&&T.paintWorld){const r=c.getBoundingClientRect(),W0=r.width||720,H0=r.height||300,dpr=Math.min(3,window.devicePixelRatio||1),W=Math.round(W0*dpr),H=Math.round(H0*dpr);
+  if(c.width!=W||c.height!=H){c.width=W;c.height=H}const x=c.getContext('2d'),pa=T.proj(A.lat,A.lon),pb=T.proj(B.lat,B.lon);
+  /* sharp vector map (138-flights.js), framed on the route */
+  if(!AP.flv)AP.flv=T.fitView([pa,pb],W0,H0,1.7);const v=AP.flv,s=T.clampView(v,W0,H0),ox=W0/2-v.cx*s,oy=H0/2-v.cy*s;T.paintWorld(x,s*dpr,ox*dpr,oy*dpr,W,H,dpr);x.setTransform(dpr,0,0,dpr,0,0);
+  const ax=ox+pa[0]*s,ay=oy+pa[1]*s,bx2=ox+pb[0]*s,by=oy+pb[1]*s,mx=(ax+bx2)/2,my=Math.min(ay,by)-Math.min(80,Math.hypot(bx2-ax,by-ay)*.22);
+  const Q=t=>[(1-t)*(1-t)*ax+2*(1-t)*t*mx+t*t*bx2,(1-t)*(1-t)*ay+2*(1-t)*t*my+t*t*by];x.lineCap='round';
   x.strokeStyle='#0b2a5b55';x.lineWidth=2;x.setLineDash([6,5]);x.beginPath();x.moveTo(ax,ay);x.quadraticCurveTo(mx,my,bx2,by);x.stroke();x.setLineDash([]);
-  x.strokeStyle='#ff6b4a';x.lineWidth=3;x.beginPath();x.moveTo(ax,ay);for(let i=1;i<=30;i++){const p=Q(k*i/30);x.lineTo(p[0],p[1])}x.stroke();
-  [[ax,ay],[bx2,by]].forEach(p=>{x.fillStyle='#0b2a5b';x.beginPath();x.arc(p[0],p[1],5,0,7);x.fill()});
+  x.strokeStyle='#ff6b4a';x.lineWidth=3;x.beginPath();x.moveTo(ax,ay);for(let i=1;i<=40;i++){const p=Q(k*i/40);x.lineTo(p[0],p[1])}x.stroke();
+  [[ax,ay],[bx2,by]].forEach(p=>{x.fillStyle='#0b2a5b';x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.arc(p[0],p[1],5.5,0,7);x.fill();x.stroke()});
   const p=Q(k),p2=Q(Math.min(1,k+.01));x.save();x.translate(p[0],p[1]);x.rotate(Math.atan2(p2[1]-p[1],p2[0]-p[0]));x.font='26px serif';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#0b2a5b';x.fillText('✈',0,0);x.restore();
-  x.font='bold 13px '+FONT;x.fillStyle='#0b2a5b';x.fillText(T.city(tk.from),ax+8,ay-8);x.fillText(T.city(tk.to),bx2+8,by-8)}
+  x.font='bold 13px '+FONT;x.lineJoin='round';[[T.city(tk.from),ax,ay],[T.city(tk.to),bx2,by]].forEach(q=>{x.strokeStyle='#ffffffd0';x.lineWidth=3;x.strokeText(q[0],q[1]+8,q[2]-8);x.fillStyle='#0b2a5b';x.fillText(q[0],q[1]+8,q[2]-8)})}
   const now=dep+(arr-dep)*k,e=document.getElementById('apflt');if(e)e.textContent=`${T.hm(now)} · ${Math.round((1-k)*tk.hrs*60)} min to go${tk.to!='home'?' · local time there '+T.local(now,tk.to):''}`;
   if(k>=1)apLand();else requestAnimationFrame(step)};requestAnimationFrame(step)}
 window.apLand=function(){const tk=AP.tk;if(!tk||AP.ph!='fly')return;const d=document.getElementById('apfly');if(d)d.remove();
