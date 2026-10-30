@@ -583,7 +583,7 @@ function emPlay(k){emClose();if(!EMK[k]||mode!='play'||!P.mesh)return;if(LEM)emR
 function emTick(dt){if(LEM){LEM.t+=dt;const mv=Math.hypot(P.x-LEM.x,P.z-LEM.z)>.05;if(mv||mode!='play'||!P.mesh||!emApply(LEM,P,P.mesh,P.rot,P.mesh.position.y)){if(P.mesh)emReset(P,P.mesh);LEM=null}}
  for(let i=EF.length-1;i>=0;i--){const f=EF[i];f.t+=dt;if(f.t>2.2||!f.g.parent){f.el.remove();EF.splice(i,1);continue}
   const on=f.g.visible&&!(typeof FEST!='undefined'&&FEST.view)&&['play','menu','drive'].includes(mode);f.el.style.display=on?'':'none';if(!on)continue;
-  EV.set(f.g.position.x,f.g.position.y+2.5+f.t*.5,f.g.position.z).project(cam);f.el.style.left=((EV.x+1)/2*innerWidth)+'px';f.el.style.top=((1-EV.y)/2*innerHeight)+'px';f.el.style.opacity=Math.min(1,(2.2-f.t)/.6)}
+  EV.set(f.g.position.x,f.g.position.y+2.5+f.t*.5,f.g.position.z).project((typeof NTAG!='undefined'&&NTAG.cam)||cam);f.el.style.left=((EV.x+1)/2*innerWidth)+'px';f.el.style.top=((1-EV.y)/2*innerHeight)+'px';f.el.style.opacity=Math.min(1,(2.2-f.t)/.6)}
  if($('emw')&&mode!='play')emClose()}
 {const u0=update;update=function(dt){u0.apply(this,arguments);try{emTick(dt)}catch(e){console.error('emote',e)}}}
 function emClose(){const w=$('emw');if(w)w.remove()}

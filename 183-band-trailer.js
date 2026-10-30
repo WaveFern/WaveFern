@@ -5,7 +5,7 @@
    made-up bandmates (Kai on guitar, Mila on drums, Theo on bass) stand, walk and play next to you through the real band code:
    their name tags, the band panel, the four instrument minigames, emotes, the bunk beds, the band's Spotifly account and a band set
    at the festival. In the minigame shots the camera follows whoever is playing, so each one is a bandmate's
-   own screen. wavefern.com/?trailer=band&menu opens the scene menu. Nothing is saved, as in the main trailer. */
+   own screen. wavefern.com/mtrailer (or ?trailer=band) plays it; add ?menu for the scene menu. Nothing is saved, as in the main trailer. */
 if(TRL.on&&window.MPT){
 const BM=MPT,BEAT=TRL.BEAT,BAR=TRL.BAR;
 /* v49.29.2: the band trailer and the vertical trailer use the trailer2 mix of the track (same timing) */
@@ -34,7 +34,7 @@ function bPlace(){const pl=BB.place,L=mates(),z=BM.ME.zone||'o';
   /* the drop shot: in a row by their instruments, facing the camera */
   else if(pl=='front'){const s={dr:[10.9,3.2],gt:[13.6,2.6],bs:[14.9,3.3],vo:[12.2,2.3]}[m.inst];m.x=s[0];m.z=s[1];m.r=Math.PI}
   else if(pl=='follow'){const o=[[-1.3,-.9],[-1.4,.9],[-2.6,0]][i],r=P.rot;m.x=P.x+Math.sin(r)*o[0]+Math.cos(r)*o[1];m.z=P.z+Math.cos(r)*o[0]-Math.sin(r)*o[1];m.r=r}
-  else if(pl=='bunks'){const o=[[2.3,1.6,.8],[2.5,3.3,.9],[3.6,2.2,.7]][i];m.x=o[0];m.z=o[1];m.r=o[2]}
+  else if(pl=='bunks'){const o=[[3,1.3,1.4],[3,4.7,1.75],[3.4,3.6,1.6]][i];m.x=o[0];m.z=o[1];m.r=o[2]}
   else if(pl=='stage'){const a=OFF[m.inst],b=OFF[BB.pov],ox=a[0]-b[0],oz=a[1]-b[1],r=P.rot||0;m.x=P.x+ox*Math.cos(r)+oz*Math.sin(r);m.z=P.z-ox*Math.sin(r)+oz*Math.cos(r);m.r=r}
   else if(pl=='street'){const o=[[1.2,-.4,-Math.PI/2],[-1.2,-.3,Math.PI/2],[0,-1.2,0]][i];m.x=P.x+o[0];m.z=P.z+o[1];m.r=o[2]}});
  /* on a stage they stand on its floor, as you do (an emote's hop is on top of that) */
@@ -58,6 +58,24 @@ function bPlay(){if(mode!='rec'||!rec)return;const g=rec.ig;if(!g)return;
 function bStage(n){trlClear();trlFestDay();bPov('vo');S.t=392;S.energy=100;const s=FSTG.find(q=>q.n==n);if(s)trlPut(s.ix,s.iz,0);BB.place='stage';
  try{BM.fest({n,slot:3,songs:S.songs.slice(-4).map(x=>x.id)})}catch(e){console.error(e)}}
 
+/* the camera shots inside the house get a real room: the game's walls are cut down so you can see in from above, so the
+   room is closed with full walls and a ceiling (the room's own colours), with a few things on the walls. They go with the shot (TRL.wall) */
+function bSign(t,w,h,bg,fg){const c=document.createElement('canvas');c.width=512;c.height=Math.round(512*h/w);const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,c.width,c.height);
+ x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';let f=c.height*.5;x.font='bold '+f+'px Silkscreen,monospace';while(x.measureText(t).width>c.width*.86&&f>10){f--;x.font='bold '+f+'px Silkscreen,monospace'}
+ x.fillText(t,c.width/2,c.height/2);const tx=new THREE.CanvasTexture(c);return new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tx}))}
+function bRoom(k){if(TRL.wall){scene.remove(TRL.wall)}const g=TRL.wall=new THREE.Group(),H=3.6;scene.add(g);
+ if(k=='studio'){const wc='#5a4a6a';
+  B(g,8.3,H,.2,wc,12,H/2,6.05);B(g,.2,H,6.2,wc,7.95,H/2,3);B(g,.2,H,6.2,wc,16.05,H/2,3);B(g,8.4,.2,6.4,'#2a2530',12,H+.1,3);
+  B(g,8.2,.18,.06,'#3a3044',12,.09,5.93);
+  /* acoustic foam on the back wall, a band poster, an ON AIR light and a warm lamp */
+  for(let i=0;i<5;i++)for(let j=0;j<3;j++)B(g,.55,.55,.1,(i+j)%2?'#2b2b33':'#34343e',9.2+i*.62+(i>2?3.2:0),1.25+j*.62,5.9);
+  const pst=bSign('THE FERNS',1.5,.9,'#2fe68a','#06210f');pst.position.set(12.7,2,5.93);pst.rotation.y=Math.PI;g.add(pst);
+  const oa=bSign('ON AIR',.9,.32,'#2a0b0e','#ff4455');oa.position.set(12.7,3.05,5.93);oa.rotation.y=Math.PI;g.add(oa);
+  const L=new THREE.PointLight(0xffc89a,.6,10);L.position.set(12.4,3,2.6);g.add(L)}
+ else if(k=='bedroom'){const wc='#7a6a8a';
+  B(g,.2,H,6.2,wc,-.05,H/2,3);B(g,8.3,H,.2,wc,4,H/2,-.05);B(g,8.3,H,.2,wc,4,H/2,6.05);B(g,.2,H,6.2,wc,8.05,H/2,3);B(g,8.4,.2,6.4,'#3a3346',4,H+.1,3);
+  const pst=bSign('THE FERNS',1.3,.8,'#2fe68a','#06210f');pst.position.set(.08,2.1,3);pst.rotation.y=Math.PI/2;g.add(pst);
+  const L=new THREE.PointLight(0xffc080,.5,9);L.position.set(4,3,3);g.add(L)}}
 const trlShots0=trlShots;
 trlShots=function(){const M={};trlShots0().forEach(s=>M[s.sc]=s);const b=BEAT,B=BAR;
  const L=[
@@ -76,11 +94,11 @@ trlShots=function(){const M={};trlShots0().forEach(s=>M[s.sc]=s);const b=BEAT,B=
   tick(){const k=Math.floor((TRL.T-this.t)/(2*BEAT)+1e-3);document.querySelectorAll('#trlblk .qcard span').forEach((e,i)=>e.style.visibility=i<=k?'visible':'hidden')},
   acts:[[.1,()=>{try{trlFresh();trlName()}catch(e){}}],[3.55,()=>{try{trlStar();bSetup();trlStage(4);trlClear()}catch(e){console.error(e)}}]]},
  /* the drop: the whole band in the studio, each at their instrument with their name over their head */
- {sc:'Band studio',d:2*B,drop:1,show:[],place:'front',set(){trlClear();bPov('vo');bAccount();S.t=200;const s=BM.SPOT.vo;trlPut(s[0],s[1],s[2]);
+ {sc:'Band studio',d:2*B,drop:1,show:[],place:'front',set(){trlClear();bRoom('studio');bPov('vo');bAccount();S.t=200;const s=BM.SPOT.vo;trlPut(s[0],s[1],s[2]);
    bEm([['b1','guitar',.4],['b2','cheer',1.6],['b3','dance',.9]])},
   cam:trlCam([[12.4,3.3,.3],[12.8,.8,4],70],[[12.8,2.5,.4],[12.9,1,3.7],62],trlE.o)},
  /* the band panel: three of four ready, then you */
- {sc:'Band ready',d:B,show:['mpb'],place:'studio',zoom:6,set(){trlClear();bPov('vo');S.t=200;trlPut(12.6,3.4,0);
+ {sc:'Band ready',d:B,show:['mpb'],place:'studio',zoom:6,pz:['mpb',1.55,1.7,'0% 100%'],set(){trlClear();bPov('vo');S.t=200;trlPut(12.6,3.4,0);
    mates().forEach((m,i)=>m.rd={k:'rec',g:0,title:TRL.song,ts:i+1})},
   acts:[[.45,()=>trlClick(()=>trlQ('#mpb button',/Ready to record/),.85)]]},
  /* everyone plays their part: each bandmate's own minigame */
@@ -93,8 +111,8 @@ trlShots=function(){const M={};trlShots0().forEach(s=>M[s.sc]=s);const b=BEAT,B=
  {sc:'Emotes',d:B,show:[],place:'street',zoom:5,set(){trlClear();bPov('vo');S.t=276;trlPut(56,14.2,0);trlPath(12);
    bEm([['b1','cheer',.05],['b2','dance',.3],['b3','heart',.55]])},tick(){trlPath(10)},acts:[[.15,()=>{try{emPick('dance')}catch(e){}}]]},
  /* one house: bunk beds for the band */
- {sc:'Bunk beds',d:B,show:[],place:'bunks',set(){trlClear();bPov('vo');S.t=200;trlPut(3.6,4.1,.8);bEm([['b3','wave',.2]])},
-  cam:trlCam([[6.4,3.2,6.4],[1.6,.9,2.8],48],[[5.8,2.6,5.6],[1.6,1,3],46],trlE.s)},
+ {sc:'Bunk beds',d:B,show:[],place:'bunks',set(){trlClear();bRoom('bedroom');bPov('vo');S.t=200;trlPut(3.4,2.4,1.55);bEm([['b3','wave',.2]])},
+  cam:trlCam([[7.6,2.5,3.2],[1,1.1,3],58],[[7.1,2.2,3],[1,1.1,3],54],trlE.s)},
  /* one Spotifly account for the band, its picture drawn with all four of you */
  {sc:'Band Spotifly',d:B,show:['ui'],place:'off',set(){trlClear();bAccount();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[4800,182000],followers:[60,24000],fame:[4,58]})}},
  /* a band set: the smaller stage, then the Main Stage, the band around you */

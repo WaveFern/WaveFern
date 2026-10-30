@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.29.2';
+const GAME_VERSION='v49.30.0';
 const VERSION_HISTORY=[
+ {v:'v49.30.0',n:'The multiplayer band trailer has its own address: wavefern.com/mtrailer. Its studio and bedroom shots are now real rooms, with full walls, a ceiling, foam panels, a band poster and an ON AIR light, so you no longer see through the house. The band panel is zoomed in so "3/4 members ready" can be read, and emote icons sit over heads in the camera shots.'},
  {v:'v49.29.2',n:'The vertical trailer (wavefern.com/vtrailer) and the band trailer (?trailer=band) play the new trailer2 mix of the music. The main trailer keeps its mix.'},
  {v:'v49.29.1',n:'Vertical trailer at wavefern.com/vtrailer: the in-game trailer in a 9:16 frame for Shorts, TikTok and Reels, with bigger words and wider shots in the tall frame. F or the first tap makes it full screen.'},
  {v:'v49.29.0',n:'A band trailer for YouTube: wavefern.com/?trailer=band plays a 68 second multiplayer trailer made of real band room gameplay. Make a room, a friend joins with the code, the band records together (drums, guitar, bass and vocals, each on their own minigame), walks the town, does emotes, sleeps in the bunk beds, shares one Spotifly account and plays the festival Main Stage. It plays with no network and saves nothing. Name tags over people now also show in the trailer\'s camera shots.'},
