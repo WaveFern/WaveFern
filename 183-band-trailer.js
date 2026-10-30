@@ -19,20 +19,26 @@ const BB={pov:'vo',place:'studio',em:{}};
 /* the camera follows the band member who plays k: they become the player, and you become a bandmate */
 function bPov(k){BB.pov=k;const me=BAND.find(b=>b.inst==k);ch=JSON.parse(JSON.stringify(me.look));try{refresh()}catch(e){}
  BM.inst(k);for(const id in BM.MB)if(id!='me')delete BM.MB[id];
+ /* the bandmates' figures are rebuilt where they stand, so nobody slides across the room between shots */
+ for(const id in BM.AV){scene.remove(BM.AV[id].g);delete BM.AV[id]}
  BAND.filter(b=>b!==me).forEach((b,i)=>{BM.MB['b'+(i+1)]={id:'b'+(i+1),nm:b.nm,inst:b.inst,look:b.look,x:P.x,z:P.z,r:0,zone:'none',where:'Studio',studio:1,stg:0,rd:null}})}
 /* stage spots: the band's own, with the drummer a step to the side so the festival's camera behind you sees you past them */
 const OFF=Object.assign({},BM.STOFF,{dr:[1,-1.4]});
+/* studio spots: the band's own, with bass a step back so guitar and bass never overlap from the game's camera */
+const STUD=Object.assign({},BM.SPOT,{gt:[14,2.2,Math.PI],bs:[15.2,4.4,Math.PI/2]});
 const mates=()=>Object.values(BM.MB).filter(m=>m.id!='me');
 /* where the bandmates stand: at their instruments, walking behind you, by the bunks, or on stage around you */
 function bPlace(){const pl=BB.place,L=mates(),z=BM.ME.zone||'o';
  L.forEach((m,i)=>{m.zone=pl=='off'?'none':z;
-  if(pl=='studio'){const s=BM.SPOT[m.inst];m.x=s[0];m.z=s[1];m.r=s[2]}
+  if(pl=='studio'){const s=STUD[m.inst];m.x=s[0];m.z=s[1];m.r=s[2]}
   /* the drop shot: in a row by their instruments, facing the camera */
   else if(pl=='front'){const s={dr:[10.9,3.2],gt:[13.6,2.6],bs:[14.9,3.3],vo:[12.2,2.3]}[m.inst];m.x=s[0];m.z=s[1];m.r=Math.PI}
   else if(pl=='follow'){const o=[[-1.3,-.9],[-1.4,.9],[-2.6,0]][i],r=P.rot;m.x=P.x+Math.sin(r)*o[0]+Math.cos(r)*o[1];m.z=P.z+Math.cos(r)*o[0]-Math.sin(r)*o[1];m.r=r}
   else if(pl=='bunks'){const o=[[3,1.3,1.4],[3,4.7,1.75],[3.4,3.6,1.6]][i];m.x=o[0];m.z=o[1];m.r=o[2]}
   else if(pl=='stage'){const a=OFF[m.inst],b=OFF[BB.pov],ox=a[0]-b[0],oz=a[1]-b[1],r=P.rot||0;m.x=P.x+ox*Math.cos(r)+oz*Math.sin(r);m.z=P.z-ox*Math.sin(r)+oz*Math.cos(r);m.r=r}
   else if(pl=='street'){const o=[[1.2,-.4,-Math.PI/2],[-1.2,-.3,Math.PI/2],[0,-1.2,0]][i];m.x=P.x+o[0];m.z=P.z+o[1];m.r=o[2]}});
+ /* on a shot's first frames they are already in place (the game's figures glide to where a player is, which would slide them through each other) */
+ if(BB.si!==TRL.i){BB.si=TRL.i;BB.sn=0}if(BB.sn++<3)L.forEach(m=>{const a=BM.AV[m.id];if(a)a.g.position.set(m.x,0,m.z)});
  /* on a stage they stand on its floor, as you do (an emote's hop is on top of that) */
  const y=pl=='stage'&&P.mesh?P.mesh.position.y:0;for(const id in BM.AV){const g=BM.AV[id].g;g.position.y=(BM.AV[id].em?g.position.y:0)+y}
  /* a bandmate's emote, on cue */
@@ -42,8 +48,8 @@ function bEm(L){BB.em={};L.forEach(([id,k,at])=>{BB.em[id]={k,at:TRL.T+at}})}
 function bAccount(){S.artist='The Ferns';S.mp=Object.assign(S.mp||{},{code:'FERN5',inst:BB.pov,band:'The Ferns',host:1,seen:['vo','gt','dr','bs'],mem:{}});BAND.forEach(b=>S.mp.mem[b.inst]={nm:b.nm,look:b.look})}
 function bSetup(){bPov('vo');bAccount();try{buildStudio()}catch(e){}}
 /* a band take on the minigame of instrument k, started at its first beat */
-function bRec(k){trlClear();bPov(k);bAccount();S.t=200;S.energy=100;const s=BM.SPOT[k];trlPut(s[0],s[1],s[2]);BB.place='studio';
- BM.rec(k,0);if(!rec)return;try{mgStage(1)}catch(e){}rec.wait=0;rec.cdn=0;rec.cgo=0;const g=rec.ig;BB.lt=0;
+function bRec(k){trlClear();bPov(k);bAccount();S.t=200;S.energy=100;const s=STUD[k];trlPut(s[0],s[1],s[2]);BB.place='studio';
+ BM.rec(k,0);trlPut(s[0],s[1],s[2]);if(P.mesh)P.mesh.position.set(P.x,0,P.z);if(!rec)return;try{mgStage(1)}catch(e){}rec.wait=0;rec.cdn=0;rec.cgo=0;const g=rec.ig;BB.lt=0;
  if(g){if(g.k=='dr')g.t=1.05;if(g.k=='gt'){g.R[0]=[0,2,1];g.lt=1.25}if(g.k=='bs')g.t=1.7;if(g.k=='ky')g.lt=0}}
 /* a good player on each instrument */
 function bPlay(){if(mode!='rec'||!rec)return;const g=rec.ig;if(!g)return;

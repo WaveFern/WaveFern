@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.32.1';
+const GAME_VERSION='v49.32.2';
 const VERSION_HISTORY=[
+ {v:'v49.32.2',n:'Multiplayer trailer: in the recording shots the bandmates no longer slide through each other. Each one is already standing at their own instrument when the shot starts, the one recording stays at their instrument instead of walking to the mic, and bass stands a step back from guitar.'},
  {v:'v49.32.1',n:'Multiplayer trailer: the screen goes black when the song stops at 0:48, and the end card comes in on its last bit at 0:56.'},
  {v:'v49.32.0',n:'Famous artists are now parodies you can still recognise: Taylor Swiff, Drakeo, Billie Eyelash, The Weekdayz, Kanya East and over 100 more, in Messages, collabs, Spotifly Browse, mentors and the awards. Their looks and numbers are the same, and old saves switch to the new names when they load.'},
  {v:'v49.31.0',n:'The multiplayer trailer (wavefern.com/mtrailer) has its own song, made for it. The drop comes at 0:16 on the band in the studio, and the end card lands as the song stops at 0:48, so the trailer is now 64 seconds.'},
