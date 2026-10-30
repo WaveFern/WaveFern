@@ -1,23 +1,46 @@
 /* ===== v26.12: zoomable big map =====
    Same picture as the old bigMap (16-big-world...js), drawn through a view transform: zoom (0.5x-4x) and pan offset in
    canvas pixels. Mouse wheel / pinch zoom toward the cursor or the pinch centre, +/- buttons (and +/- keys) zoom toward
-   the middle, drag pans. Roads, lake and buildings scale with the zoom; markers, labels and the player square stay the
+   the middle, drag pans (v49.40.0: never below 1x, so the map always fills the frame). Roads, lake and buildings scale with the zoom; markers, labels and the player square stay the
    same size and sit at their transformed spots. The zoom level is remembered between openings; the view recentres on
    the player each time the map opens. The minimap is untouched. */
-const MAPZ={z:1,ox:0,oy:0,min:.5,max:4,W:760,H:380,L:0}/* L: extra metres of map west of x -138 (v43.5.0: the airport) */;
+const MAPZ={z:1,ox:0,oy:0,min:1,max:4,W:760,H:380,L:0,R:1}/* L: extra metres of map west of x -138 (v43.5.0: the airport) */;
 const mapSX=v=>(v+138+MAPZ.L)*.86,mapSZ=v=>(v+158)*1.15;
 function mapClamp(){const M=MAPZ,w=(M.W+M.L*.86)*M.z,h=M.H*M.z;M.ox=w<=M.W?(M.W-w)/2:Math.min(0,Math.max(M.W-w,M.ox));M.oy=h<=M.H?(M.H-h)/2:Math.min(0,Math.max(M.H-h,M.oy))}
 function mapZoomAt(f,cx,cy){const M=MAPZ,z=Math.min(M.max,Math.max(M.min,M.z*f));if(z==M.z)return;M.ox=cx-(cx-M.ox)*z/M.z;M.oy=cy-(cy-M.oy)*z/M.z;M.z=z;mapClamp();mapDraw()}
 function mapCentre(x,z){const M=MAPZ;M.ox=M.W/2-mapSX(x)*M.z;M.oy=M.H/2-mapSZ(z)*M.z;mapClamp()}
+/* v49.40.0: the big map draws at the screen's real pixel density (R canvas pixels per map pixel), on textured grass,
+   with pins, labels that never overlap, a heading arrow for the player, a compass and a scale bar */
+let MAPGRASS=null;
+function mapGrass(x){if(MAPGRASS)return MAPGRASS;const c=document.createElement('canvas');c.width=c.height=48;const g=c.getContext('2d');g.fillStyle='#3f7a45';g.fillRect(0,0,48,48);
+ let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<150;i++){g.fillStyle=['#458350','#3a7140','#4a8b4f','#37693d'][i%4];g.fillRect(r()*48|0,r()*48|0,r()<.3?2:1,1)}
+ return MAPGRASS=x.createPattern(c,'repeat')}
+function mapPill(x,X,Z,w,h,r){x.beginPath();x.moveTo(X+r,Z);x.arcTo(X+w,Z,X+w,Z+h,r);x.arcTo(X+w,Z+h,X,Z+h,r);x.arcTo(X,Z+h,X,Z,r);x.arcTo(X,Z,X+w,Z,r);x.closePath()}
 function mapDraw(){const c=$('bm');if(!c)return;const x=c.getContext('2d'),M=MAPZ,k=M.z,sx=v=>mapSX(v)*k+M.ox,sz=v=>mapSZ(v)*k+M.oy,kx=.86*k,kz=1.15*k;
- x.setTransform(1,0,0,1,0,0);x.fillStyle='#1d3a21';x.fillRect(0,0,M.W,M.H);x.fillStyle='#3f7a45';x.fillRect(M.ox,M.oy,(M.W+M.L*.86)*k,M.H*k);
+ x.setTransform(M.R,0,0,M.R,0,0);x.imageSmoothingEnabled=true;x.fillStyle='#1d3a21';x.fillRect(0,0,M.W,M.H);
+ const gp=mapGrass(x);try{gp.setTransform(new DOMMatrix([k*.75,0,0,k*.75,M.ox,M.oy]))}catch(e){}x.fillStyle=gp;x.fillRect(M.ox,M.oy,(M.W+M.L*.86)*k,M.H*k);
  /* parks, water, fields, pavements, roads, centre lines, footprints, trees and road names (38-city-detail.js) */
  mapPaint(x,sx,sz,kx,kz,false);
- x.font='10px monospace';POIS.forEach(p=>{const X=sx(p[0]),Z=sz(p[1]);if(X<-80||X>M.W+10||Z<-10||Z>M.H+10)return;x.fillStyle=p[3];x.fillRect(X-3,Z-3,6,6);x.fillStyle='#fff';x.fillText(p[2],X+5,Z+3)});
- const PX=sx(P.x),PZ=sz(P.z);x.fillStyle='#fff';x.fillRect(PX-4,PZ-4,8,8);x.strokeStyle='#000';x.strokeRect(PX-4,PZ-4,8,8);
+ /* places: a pin for each, then labels in order (Home first) wherever they don't cover one already placed */
+ const PX=sx(P.x),PZ=sz(P.z),taken=[[PX-12,PZ-12,PX+12,PZ+12],[0,0,44,44],[0,M.H-34,90,M.H]],hit=r=>taken.some(t=>r[0]<t[2]&&r[2]>t[0]&&r[1]<t[3]&&r[3]>t[1]),pins=[];
+ POIS.forEach(p=>{const X=sx(p[0]),Z=sz(p[1]);if(X<-20||X>M.W+20||Z<-20||Z>M.H+20)return;pins.push([X,Z,p])});
+ pins.forEach(([X,Z,p])=>{x.fillStyle='#0006';x.beginPath();x.arc(X+1,Z+1.5,5,0,7);x.fill();x.fillStyle=p[3];x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.arc(X,Z,4.5,0,7);x.fill();x.stroke();taken.push([X-5,Z-5,X+5,Z+5])});
+ x.font='bold 11px monospace';x.textBaseline='middle';
+ pins.sort((a,b)=>(b[2][2]=='Home')-(a[2][2]=='Home')).forEach(([X,Z,p])=>{const w=x.measureText(p[2]).width+10;for(const[dx,dz]of[[8,-8],[-8-w,-8],[-w/2,7],[-w/2,-23]]){const r=[X+dx,Z+dz,X+dx+w,Z+dz+16];
+  if(r[0]<2||r[2]>M.W-48||r[1]<2||r[3]>M.H-2||hit(r))continue;taken.push(r);x.fillStyle='#0b0f0de0';mapPill(x,r[0],r[1],w,16,5);x.fill();x.fillStyle=p[3];x.fillRect(r[0]+3,r[1]+5,2,6);x.fillStyle='#fff';x.fillText(p[2],r[0]+7,r[1]+8.5);break}});
+ x.textBaseline='alphabetic';
+ /* you: a white arrow pointing the way you face, with a soft ring */
+ const hd=mode=='drive'&&typeof dr!='undefined'&&dr?dr.h:P.rot||0;x.fillStyle='#ffffff40';x.beginPath();x.arc(PX,PZ,12,0,7);x.fill();
+ x.save();x.translate(PX,PZ);x.rotate(-hd);x.beginPath();x.moveTo(0,9);x.lineTo(6.5,-6);x.lineTo(0,-2.5);x.lineTo(-6.5,-6);x.closePath();x.fillStyle='#fff';x.strokeStyle='#000';x.lineWidth=2;x.lineJoin='round';x.stroke();x.fill();x.restore();
+ /* compass and scale bar */
+ x.fillStyle='#0b0f0dd0';x.beginPath();x.arc(24,24,15,0,7);x.fill();x.fillStyle='#e8524a';x.beginPath();x.moveTo(24,11);x.lineTo(28,24);x.lineTo(20,24);x.fill();x.fillStyle='#ddd';x.beginPath();x.moveTo(24,37);x.lineTo(28,24);x.lineTo(20,24);x.fill();
+ x.font='bold 9px monospace';x.textAlign='center';x.fillStyle='#fff';x.fillText('N',24,9.5);
+ const mt=[10,20,25,50,100,200].find(m=>m*kx>=55)||200,bw=mt*kx,bx=12,by=M.H-14;x.fillStyle='#0b0f0dd0';mapPill(x,bx-6,by-15,bw+12,22,5);x.fill();
+ x.fillStyle='#fff';x.fillRect(bx,by,bw,3);x.fillRect(bx,by-4,2,7);x.fillRect(bx+bw-2,by-4,2,7);x.fillText(mt+' m',bx+bw/2,by-5);x.textAlign='start';
+ /* soft edge */const v=x.createLinearGradient(0,0,0,M.H);v.addColorStop(0,'#0003');v.addColorStop(.06,'#0000');v.addColorStop(.94,'#0000');v.addColorStop(1,'#0003');x.fillStyle=v;x.fillRect(0,0,M.W,M.H);
  const zl=$('bmz');if(zl)zl.textContent=(Math.round(k*10)/10)+'x';c.style.cursor=k>1?'grab':'default'}
 function bigMap(){if(mode!='play')return;mode='menu';const d=Math.round(cityX()-P.x),B='width:34px;height:34px;padding:0;font-weight:700';
- $('ui').innerHTML=`<div class="box modal" style="width:min(780px,96vw)"><h2>World map</h2><div style="position:relative"><canvas id=bm width=760 height=380 style="width:100%;display:block;image-rendering:pixelated;border:2px solid #000;touch-action:none"></canvas><div style="position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px;align-items:center"><button style="${B}" title="Zoom in (+)" onclick="mapZoomAt(1.5,MAPZ.W/2,MAPZ.H/2)">+</button><button style="${B}" title="Zoom out (-)" onclick="mapZoomAt(1/1.5,MAPZ.W/2,MAPZ.H/2)">−</button><button style="${B};font-size:11px" title="Reset zoom" onclick="MAPZ.z=1;mapClamp();mapDraw()">1x</button><span id=bmz class=m style="font-size:11px;background:#0b0f0dd9;padding:0 3px"></span></div></div><p class=m>You are the white square. City centre is about ${Math.abs(d)} m ${d>0?'east':'west'}.</p><div class=row2><button onclick="taxi(8,14)">Taxi home</button><button onclick="taxi(95,-44)">Taxi to Park</button><button onclick="taxi(560,20)">Taxi to City</button><button onclick="closeUI()">Close</button></div></div>`;
+ $('ui').innerHTML=`<div class="box modal" style="width:min(780px,96vw)"><h2>World map</h2><div style="position:relative"><canvas id=bm width=760 height=380 style="width:100%;display:block;border:2px solid #000;border-radius:4px;touch-action:none"></canvas><div style="position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px;align-items:center"><button style="${B}" title="Zoom in (+)" onclick="mapZoomAt(1.5,MAPZ.W/2,MAPZ.H/2)">+</button><button style="${B}" title="Zoom out (-)" onclick="mapZoomAt(1/1.5,MAPZ.W/2,MAPZ.H/2)">−</button><button style="${B};font-size:11px" title="Reset zoom" onclick="MAPZ.z=1;mapClamp();mapDraw()">1x</button><span id=bmz class=m style="font-size:11px;background:#0b0f0dd9;padding:0 3px"></span></div></div><p class=m>You are the white arrow. City centre is about ${Math.abs(d)} m ${d>0?'east':'west'}.</p><div class=row2><button onclick="taxi(8,14)">Taxi home</button><button onclick="taxi(95,-44)">Taxi to Park</button><button onclick="taxi(560,20)">Taxi to City</button><button onclick="closeUI()">Close</button></div></div>`;
  const c=$('bm'),pt=new Map();let drag=null,pinch=0;const loc=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*MAPZ.W/r.width,(e.clientY-r.top)*MAPZ.H/r.height]};
  c.addEventListener('wheel',e=>{e.preventDefault();const[a,b]=loc(e);mapZoomAt(Math.exp(-Math.max(-100,Math.min(100,e.deltaY))*.004),a,b)},{passive:false});
  c.addEventListener('pointerdown',e=>{pt.set(e.pointerId,loc(e));try{c.setPointerCapture(e.pointerId)}catch(_){}if(pt.size==1)drag=loc(e);else{drag=null;const[p,q]=[...pt.values()];pinch=Math.hypot(p[0]-q[0],p[1]-q[1])}});
@@ -25,5 +48,5 @@ function bigMap(){if(mode!='play')return;mode='menu';const d=Math.round(cityX()-
   if(pt.size>=2){const[p,q]=[...pt.values()],D=Math.hypot(p[0]-q[0],p[1]-q[1]);if(pinch>0&&D>0)mapZoomAt(D/pinch,(p[0]+q[0])/2,(p[1]+q[1])/2);pinch=D}
   else if(drag){MAPZ.ox+=l[0]-drag[0];MAPZ.oy+=l[1]-drag[1];drag=l;mapClamp();mapDraw();if(MAPZ.z>1)c.style.cursor='grabbing'}});
  const up=e=>{pt.delete(e.pointerId);pinch=0;drag=pt.size==1?[...pt.values()][0]:null;if(MAPZ.z>1)c.style.cursor='grab'};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
- mapCentre(P.x,P.z);mapDraw()}
+ MAPZ.R=Math.min(3,Math.max(2,Math.ceil(devicePixelRatio||1)));c.width=MAPZ.W*MAPZ.R;c.height=MAPZ.H*MAPZ.R;MAPZ.z=Math.max(MAPZ.min,MAPZ.z);mapCentre(P.x,P.z);mapDraw()}
 addEventListener('keydown',e=>{if(!$('bm')||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key;if(k=='+'||k=='=')mapZoomAt(1.5,MAPZ.W/2,MAPZ.H/2);else if(k=='-'||k=='_')mapZoomAt(1/1.5,MAPZ.W/2,MAPZ.H/2)});

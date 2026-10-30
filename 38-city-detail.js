@@ -171,17 +171,27 @@ function mapPaint(x,sx,sz,kx,kz,mini){const W=x.canvas.width,H=x.canvas.height,v
  const rect=(a,c)=>{const X=sx(a[0]),Z=sz(a[1]),w=(a[2]-a[0])*kx,h=(a[3]-a[1])*kz;if(!vis(X,Z,X+w,Z+h))return;x.fillStyle=c;x.fillRect(X,Z,w,h)};
  CTD.areas.forEach(a=>rect(a,a[4]));
  /* lake: rounded */
- {const X=sx(LK[0]),Z=sz(LK[1]),w=(LK[2]-LK[0])*kx,h=(LK[3]-LK[1])*kz,r=Math.min(w,h)*.35;x.fillStyle='#4aa3df';x.beginPath();x.moveTo(X+r,Z);x.arcTo(X+w,Z,X+w,Z+h,r);x.arcTo(X+w,Z+h,X,Z+h,r);x.arcTo(X,Z+h,X,Z,r);x.arcTo(X,Z,X+w,Z,r);x.fill();x.fillStyle='#8fd0f5';x.fillRect(X+w*.2,Z+h*.3,w*.25,Math.max(1,kz*.6))}
+ {const X=sx(LK[0]),Z=sz(LK[1]),w=(LK[2]-LK[0])*kx,h=(LK[3]-LK[1])*kz,r=Math.min(w,h)*.35;x.fillStyle='#4aa3df';x.beginPath();x.moveTo(X+r,Z);x.arcTo(X+w,Z,X+w,Z+h,r);x.arcTo(X+w,Z+h,X,Z+h,r);x.arcTo(X,Z+h,X,Z,r);x.arcTo(X,Z,X+w,Z,r);x.fill();
+  if(mini)x.fillStyle='#8fd0f5',x.fillRect(X+w*.2,Z+h*.3,w*.25,Math.max(1,kz*.6));
+  else{/* big map: sandy shore, deeper middle, ripples */x.strokeStyle='#d8c9a0';x.lineWidth=Math.max(1.5,kx*.9);x.stroke();x.save();x.clip();x.fillStyle='#3b8fca';x.fillRect(X+w*.18,Z+h*.22,w*.64,h*.56);
+   x.strokeStyle='#a9ddf7';x.lineWidth=Math.max(1,kz*.3);for(let i=0;i<4;i++){const a=X+w*(.15+.2*i),b=Z+h*(.25+.15*(i%3));x.beginPath();x.moveTo(a,b);x.lineTo(a+Math.max(4,w*.12),b);x.stroke()}x.restore()}}
  /* trees */
- x.fillStyle='#2e6b35';const ts=Math.max(1.5,1.5*kx);CTD.trees.forEach(t=>{const X=sx(t[0]),Z=sz(t[1]);if(X>-4&&Z>-4&&X<W+4&&Z<H+4)x.fillRect(X-ts/2,Z-ts/2,ts,ts)});
+ x.fillStyle='#2e6b35';const ts=Math.max(1.5,1.5*kx);
+ if(mini||ts<3)CTD.trees.forEach(t=>{const X=sx(t[0]),Z=sz(t[1]);if(X>-4&&Z>-4&&X<W+4&&Z<H+4)x.fillRect(X-ts/2,Z-ts/2,ts,ts)});
+ else{/* big map: round canopies with a shadow and a sunlit top, in three passes so each pass is one path */const on=[];CTD.trees.forEach(t=>{const X=sx(t[0]),Z=sz(t[1]);if(X>-ts&&Z>-ts&&X<W+ts&&Z<H+ts)on.push([X,Z])});const r=ts*.62;
+  [['#0000002e',r*.25,r*.3,r],['#2a6230',0,0,r],['#4d9a4f',-r*.25,-r*.3,r*.5]].forEach(([c,dx,dz,rr])=>{x.fillStyle=c;x.beginPath();on.forEach(([X,Z])=>{x.moveTo(X+dx+rr,Z+dz);x.arc(X+dx,Z+dz,rr,0,Math.PI*2)});x.fill()})}
  /* pavements, then asphalt, then centre lines */
  x.fillStyle='#a8a59c';RH.forEach(h=>rect([h[1],h[0]-PO,h[2],h[0]+PO],'#a8a59c'));RVV.forEach(v=>rect([v[0]-PO,v[1],v[0]+PO,v[2]],'#a8a59c'));
  ROADS.forEach(r=>rect([r[0],r[1],Math.max(r[2],r[0]+2/kx),Math.max(r[3],r[1]+2/kz)],'#3a3d44'));
  if(ROAD_W*kx>=7){x.strokeStyle='#e8d9a0';x.lineWidth=Math.max(1,.18*kx);x.setLineDash([Math.max(2,2.4*kx),Math.max(2,2.6*kx)]);x.beginPath();
   RH.forEach(h=>{x.moveTo(sx(h[1]),sz(h[0]));x.lineTo(sx(h[2]),sz(h[0]))});RVV.forEach(v=>{x.moveTo(sx(v[0]),sz(v[1]));x.lineTo(sx(v[0]),sz(v[2]))});x.stroke();x.setLineDash([])}
  /* building footprints */
- const ol=kx>=1.4;CTD.hfp.forEach(f=>{rect(f,f[4]);if(ol){x.strokeStyle='#0005';x.lineWidth=1;x.strokeRect(sx(f[0]),sz(f[1]),(f[2]-f[0])*kx,(f[3]-f[1])*kz)}});
- BLD.forEach(b=>{rect(b,'#8fa6b8');if(ol){x.strokeStyle='#4d6070';x.lineWidth=1;x.strokeRect(sx(b[0]),sz(b[1]),(b[2]-b[0])*kx,(b[3]-b[1])*kz)}});
+ const ol=kx>=1.4;
+ if(!mini){/* big map: soft drop shadows to the south-east first, so buildings lift off the ground */x.fillStyle='#00000038';const sh=Math.max(1,.5*kx),sv=Math.max(1,.7*kz);
+  CTD.hfp.concat(BLD).forEach(f=>{const X=sx(f[0]),Z=sz(f[1]),w=(f[2]-f[0])*kx,h=(f[3]-f[1])*kz;if(vis(X,Z,X+w+sh,Z+h+sv))x.fillRect(X+sh,Z+sv,w,h)})}
+ const roof=f=>{if(mini||!ol)return;const X=sx(f[0]),Z=sz(f[1]),w=(f[2]-f[0])*kx,h=(f[3]-f[1])*kz;if(!vis(X,Z,X+w,Z+h))return;x.fillStyle='#ffffff2a';x.fillRect(X,Z,w,Math.max(1,Math.min(4,h*.22)));x.fillStyle='#0000001f';x.fillRect(X,Z+h-Math.max(1,Math.min(3,h*.15)),w,Math.max(1,Math.min(3,h*.15)))};
+ CTD.hfp.forEach(f=>{rect(f,f[4]);roof(f);if(ol){x.strokeStyle='#0005';x.lineWidth=1;x.strokeRect(sx(f[0]),sz(f[1]),(f[2]-f[0])*kx,(f[3]-f[1])*kz)}});
+ BLD.forEach(b=>{rect(b,'#8fa6b8');roof(b);if(ol){x.strokeStyle='#4d6070';x.lineWidth=1;x.strokeRect(sx(b[0]),sz(b[1]),(b[2]-b[0])*kx,(b[3]-b[1])*kz)}});
  /* road names */
  if(ROAD_W*kx<7)return;const fs=mini?8:Math.min(13,Math.max(9,Math.round(ROAD_W*kx*.75)));x.font='bold '+fs+'px monospace';x.textAlign='center';x.textBaseline='middle';x.lineWidth=3;x.strokeStyle='#000b';x.fillStyle='#fff';
  const say=(t,X,Z,rot)=>{x.save();x.translate(X,Z);if(rot)x.rotate(-Math.PI/2);x.strokeText(t,0,0);x.fillText(t,0,0);x.restore()};

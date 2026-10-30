@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.39.1';
+const GAME_VERSION='v49.40.0';
 const VERSION_HISTORY=[
+ {v:'v49.40.0',n:'A sharper, nicer world map. It now draws at your screen\'s full resolution on textured grass, with shaded buildings, round trees, a shoreline on the lake, round pins and labels that never pile on top of each other, a white arrow showing which way you face, a compass and a scale bar. You can no longer zoom out below 1x, so the map always fills its frame.'},
  {v:'v49.39.1',n:'The Spotifly Now playing panel is back to its normal size. The new Spotifly notifications had borrowed its look by mistake and stretched it across the page.'},
  {v:'v49.39.0',n:'People on Instagrime post about you. Once you have a song out, friends share it, fans put it on repeat or bump into you in the city (you are in the photo), and fan pages appear as you grow. A diss track sets the feed off for about a week: fans pick sides, gossip pages cover it, the rival posts back, and after the response track everyone argues about who won. Posts about you are kept in a new Tagged tab on your account. You also follow 8 big influencers: their pictures sit in a row at the top of the feed, 3 of them post on every refresh, their profiles have a verified tick, a bio and millions of followers, and once you are big they post your songs too.'},
  {v:'v49.38.0',n:'Pausing keeps the game quiet. While paused no pop-ups, cards, tips or the update notice come in, and no pop-up sounds play. Pop-ups already on screen hide and keep the time they had left for when you resume. Anything that happened while paused waits, repeats merged and only the latest few kept, and comes in one at a time after you resume. Tips no longer count down while paused. Things you click in the pause menu still show their message.'},
