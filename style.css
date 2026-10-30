@@ -158,7 +158,7 @@ body.notags #ntags{display:none}
 #ttl .ttbx p{margin:-4px 0 0}
 #ttl .ttw{background:#0b0f0de6;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,6px 6px 0 #000a;padding:16px;box-sizing:border-box;max-height:calc(100vh - 32px);overflow:auto;animation:ttin .25s steps(4) both}
 #ttl .ttw h2,.pzm h2{font-size:24px;color:var(--g);text-shadow:3px 3px 0 #000}
-#ttl .ttft{position:fixed;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;color:#8aa094;font-size:11px;pointer-events:none;text-shadow:1px 1px 0 #000}
+#ttl .ttft{position:fixed;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;color:#8aa094;font-size:11px;pointer-events:none;text-shadow:1px 1px 0 #000}#ttl .ttft a{color:#8aa094;pointer-events:auto}#ttl .ttft a:hover{color:#2fe68a}
 /* menu buttons: chunky, a ▶ marker on hover, and a smooth eased grow */
 #ttl button,#pzm button{position:relative;border:3px solid #000;box-shadow:inset 0 -4px #0007,3px 3px 0 #000a;transition:transform .22s cubic-bezier(.65,0,.35,1),background .22s cubic-bezier(.65,0,.35,1),box-shadow .22s cubic-bezier(.65,0,.35,1)}
 #ttl .ttbx>button,#ttl .ttw>button,#ttl .ttw .row2 button,#ttl .ttnc button,#pzm button{padding:12px;font-family:'Silkscreen',ui-monospace,monospace;font-size:15px;letter-spacing:1px}

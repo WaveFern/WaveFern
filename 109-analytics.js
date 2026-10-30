@@ -1,15 +1,16 @@
 /* ---------- v26.119: Google Analytics (Firebase Analytics) ----------
    Uses the measurementId in FB_CFG (86-google-signin.js). If it is missing or a PASTE_ placeholder, nothing loads.
    Events carry no personal data: no names, emails, save codes or account ids, only counts like the in-game day.
-   Players can turn it off in Settings > Game (kept in localStorage key fw_an, so it applies to every career on this device). */
-const AN={on:(()=>{try{return localStorage.getItem('fw_an')!=='0'}catch(e){return true}})(),mod:null,an:null,q:[],loading:0};
+   Players can turn it off in Settings > Game (kept in localStorage key fw_an, so it applies to every career on this device).
+   v49.30.1: consent first. Nothing loads until the player answers the notice (fw_an_seen), so new players are off until they allow it. */
+const AN={on:(()=>{try{return localStorage.getItem('fw_an')!=='0'&&!!localStorage.getItem('fw_an_seen')}catch(e){return false}})(),mod:null,an:null,q:[],loading:0};
 const AN_OK=typeof FB_CFG!='undefined'&&!!FB_CFG.measurementId&&!/^PASTE_/.test(FB_CFG.measurementId)&&!/^PASTE_/.test(FB_CFG.apiKey);
 function anLoad(){if(!AN_OK||!AN.on||AN.an||AN.loading)return;AN.loading=1;const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
  Promise.all([import(u+'app.js'),import(u+'analytics.js')]).then(([a,m])=>{const app=a.getApps().length?a.getApp():a.initializeApp(FB_CFG);AN.mod=m;AN.an=m.getAnalytics(app);m.setAnalyticsCollectionEnabled(AN.on);
   const q=AN.q;AN.q=[];if(AN.on)q.forEach(e=>m.logEvent(AN.an,e[0],e[1]))}).catch(()=>{}).finally(()=>{AN.loading=0})}
 function anLog(name,p){if(!AN_OK||!AN.on)return;try{p=Object.assign({game_version:typeof GAME_VERSION!='undefined'?GAME_VERSION:'',day:typeof S!='undefined'&&S&&S.day||0},p);
  if(AN.an)AN.mod.logEvent(AN.an,name,p);else{AN.q.push([name,p]);anLoad()}}catch(e){}}
-function anSet(on){AN.on=!!on;try{localStorage.setItem('fw_an',on?'1':'0')}catch(e){}
+function anSet(on){AN.on=!!on;try{localStorage.setItem('fw_an',on?'1':'0');localStorage.setItem('fw_an_seen','1')}catch(e){}
  if(AN.mod&&AN.an)AN.mod.setAnalyticsCollectionEnabled(AN.on);if(on){anLoad()}else AN.q=[]}
 /* settings toggle, under Settings > Game */
 if(AN_OK&&typeof stBody=='function'){const sb0=stBody;stBody=function(){const h=sb0.apply(this,arguments);if(STAB!='game')return h;
@@ -26,7 +27,7 @@ if(typeof wakeUp=='function'){const o=wakeUp;wakeUp=function(){const r=o.apply(t
 /* one-time notice */
 function anNotice(){let seen=0;try{seen=localStorage.getItem('fw_an_seen')}catch(e){}if(seen||!AN_OK)return;
  const d=document.createElement('div');d.id='annote';d.style.cssText='position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:9999;max-width:min(440px,92vw);background:#14121a;color:#fff;border:2px solid #444;padding:10px 12px;font-size:12px;line-height:1.4';
- d.innerHTML='WaveFern uses Google Analytics to count visits and key game events (like starting a career). No personal data is collected. You can turn it off any time in Settings &gt; Game.<div style="margin-top:8px;display:flex;gap:8px"><button id=anok>OK</button><button id=anoff>Turn off</button></div>';
+ d.innerHTML='Allow anonymous stats? WaveFern can use Google Analytics to count visits and key game events (like starting a career). We send no names, emails or saves. You can change this any time in Settings &gt; Game. <a href="privacy/" target="_blank" rel="noopener" style="color:#2fe68a">Privacy Policy</a><div style="margin-top:8px;display:flex;gap:8px"><button id=anok>Allow</button><button id=anoff>No thanks</button></div>';
  const done=()=>{try{localStorage.setItem('fw_an_seen','1')}catch(e){}d.remove()};
- document.body.appendChild(d);d.querySelector('#anok').onclick=done;d.querySelector('#anoff').onclick=()=>{anSet(false);done()}}
+ document.body.appendChild(d);d.querySelector('#anok').onclick=()=>{done();anSet(true);anLog('game_start')};d.querySelector('#anoff').onclick=()=>{anSet(false);done()}}
 addEventListener('load',()=>{setTimeout(()=>{anNotice();if(AN.on){anLoad();anLog('game_start')}},1500)});
