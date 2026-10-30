@@ -19,7 +19,7 @@ ${T(['Home',['Price','n'],'Notes'],(D.props||[]).map((p,i)=>[p[0],[i?$$(p[1]):''
 ${N(`Decorate with ${L('furniture')} and ${L('paint')}.`,'tip')}`});
 
 page('furniture','Furniture and storage','life',{e:'🛋️',sum:'Every piece of furniture, Amazoom, storage and build mode.',src:['10-apps-shop-furniture.js','104-furniture-storage.js','158-placement-overhaul.js','79-amazoom-detail.js'],kw:'furniture amazoom storage build place rotate sofa bed',body:()=>`
-<p class=lead>Buy furniture on <b>Amazoom</b> (a $250 app). It arrives in Storage. At home press ${K('F')} to open Storage and build mode: place, move and rotate (${K('R')}) pieces.</p>
+<p class=lead>Buy furniture on <b>Amazoom</b> (a $250 app). It arrives in Storage. Some pieces move: the fish tank, the grandfather clock\'s pendulum, the lava lamp, the electric fireplace, the popcorn machine and the gaming PC\'s fans. At home press ${K('F')} to open Storage and build mode: place, move and rotate (${K('R')}) pieces.</p>
 ${T(['Item',['Price','n'],'Amazoom section'],(D.furniture||[]).map(f=>[esc(f.n),[$$(f.p),f.p],f.az||'']),{filter:1,tall:1})}
 <p class=m>Plus ${D.furnitureVariants||0} colour and style variants (armchairs, sofas, beds, rugs, beanbags, prints...).</p>`});
 

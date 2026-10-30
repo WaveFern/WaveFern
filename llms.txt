@@ -49,7 +49,7 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 - [The city and the map](https://wavefern.com/wiki/city/): Your house sits on a quiet street west of the city. Press N for the map: scroll or +/− to zoom.[1]
 - [Cars and the garage](https://wavefern.com/wiki/cars/): Book a car on motors.wf in the laptop browser, then visit Motors to pick it up. You need a garage first ($2,500), which appears beside your house once bought.[1]
 - [Homes](https://wavefern.com/wiki/homes/): Book a viewing on homes.wf, then buy at the Property office. A home gives +3 to every song's quality and +10% reach on streams.[1]
-- [Furniture and storage](https://wavefern.com/wiki/furniture/): Buy furniture on Amazoom (a $250 app). It arrives in Storage. At home press F to open Storage and build mode: place, move and rotate (R) pieces.[1]
+- [Furniture and storage](https://wavefern.com/wiki/furniture/): Buy furniture on Amazoom (a $250 app). It arrives in Storage. Some pieces move: the fish tank, the grandfather clock's pendulum, the lava lamp, the electric fireplace, the popcorn machine and the gaming PC's fans. At home press F to open Storage and build mode: place, move and rotate (R) pieces.[1]
 - [Wall paint](https://wavefern.com/wiki/paint/): Repaint the walls of your home for $40 a colour.[1]
 - [Clothes (Threadz)](https://wavefern.com/wiki/clothes/): Buy clothes on Threadz in the laptop browser and wear them from the wardrobe in your bedroom (E). Every piece comes in 24+ colours.[1]
 - [Barbershop](https://wavefern.com/wiki/barbershop/): The Barbershop in the city restyles you. Classic cuts are $20 and a dye job is $15. Signature styles:[1]
@@ -64,7 +64,7 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 - [Messages and Big Vee](https://wavefern.com/wiki/messages/): Messages holds every chat: artists who DM you (see Collabs, fees and haggling), label offers and Big Vee, your manager. Pin chats to keep them on top, clear them, or press New for suggested people.[1]
 - [Band rooms](https://wavefern.com/wiki/band-rooms/): Up to four friends in one band, how songs and sets work together.
 - [Settings and graphics](https://wavefern.com/wiki/settings/): Settings opens from the main menu or the pause menu. Under Graphics pick a preset or your own mix.[1]
-- [Version history](https://wavefern.com/wiki/versions/): The game is on v49.27.0. This list is read live from the game, so it is always current.
+- [Version history](https://wavefern.com/wiki/versions/): The game is on v49.28.0. This list is read live from the game, so it is always current.
 - [About this wiki](https://wavefern.com/wiki/about-wiki/): This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by tools/wiki-data.js each time the site is published, so it can't fall behind.
 - [Secrets](https://wavefern.com/wiki/secrets/): There is a secret code somewhere in WaveFern. What it is, where it goes and what it does is a mystery.
 - [Credits](https://wavefern.com/wiki/credits/): WaveFern was made by James Hutchinson and Rowan Burton.

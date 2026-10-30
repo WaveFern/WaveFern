@@ -169,9 +169,11 @@ const ROOMS={
  flowers(C,rm){const{x0,z0,w,d,back}=rm,F=['#ff6ad5','#ffe066','#e03a3a','#b07aff','#ff8a30','#ffffff','#e84a6a'];
   const bucket=(x,z,c)=>{rm.box(.5,.5,.5,'#8a9096',x,.25,z);for(let k=0;k<5;k++){rm.box(.04,.6,.04,'#3a8a4a',x-.15+k*.08,.75,z);rm.box(.18,.16,.18,c,x-.15+k*.08,1.08+(k%2)*.08,z+(k%2?.06:-.06))}};
   for(let i=0;i<8;i++)bucket(x0+1.2+i*1.15,back+.5,F[i%F.length]);rm.cols.push([x0+.9,back+.2,x0+10.4,back+.8]);
-  /* a stepped stand in the middle-left */
-  [0,1,2].forEach(s=>{rm.box(2.4-s*.6,.4,1.2-s*.3,'#8a5a32',x0+3,.2+s*.4,z0+4.6,s==0);for(let k=0;k<4-s;k++){rm.box(.3,.3,.3,'#c86a3a',x0+2.2+s*.3+k*.5,.55+s*.4,z0+4.6);rm.box(.34,.26,.34,F[(k+s)%7],x0+2.2+s*.3+k*.5,.83+s*.4,z0+4.6)}});
-  rm.box(.06,1.8,.06,'#3a8a4a',x0+.3,2.6,z0+7);for(let k=0;k<3;k++){rm.box(.06,.6,.06,'#555',x0+1.6+k*2,3.7,z0+6);rm.box(.5,.4,.5,'#c86a3a',x0+1.6+k*2,3.2,z0+6);rm.box(.7,.3,.7,'#4a9a5a',x0+1.6+k*2,3,z0+6)}
+  /* a stepped stand in the middle-left: three tiers going back and up, each with its own row of pots */
+  [0,1,2].forEach(s=>{const z=z0+5.1-s*.5,h=.35+s*.35;rm.box(2.6,h,.5,s%2?'#7a4a2a':'#8a5a32',x0+3,h/2,z,s==0);rm.box(2.64,.05,.54,'#5a3a1e',x0+3,h+.02,z);
+   for(let k=0;k<5;k++){const x=x0+2.05+k*.48;rm.box(.26,.24,.26,'#c86a3a',x,h+.17,z);rm.box(.3,.05,.3,'#a8542a',x,h+.31,z);rm.box(.05,.16,.05,'#3a8a4a',x,h+.42,z);rm.box(.24,.16,.24,F[(k*2+s)%7],x,h+.56,z);rm.box(.1,.1,.1,'#ffe066',x,h+.6,z+.08)}});
+  rm.cols.push([x0+1.7,z0+3.8,x0+4.3,z0+5.4]);
+  rm.box(.06,1.8,.06,'#3a8a4a',x0+.3,2.6,z0+7);for(let k=0;k<3;k++){const x=x0+1.6+k*2;rm.box(.03,.62,.03,'#555',x,3.69,z0+6);rm.box(.5,.32,.5,'#c86a3a',x,3.22,z0+6);rm.box(.56,.12,.56,'#4a9a5a',x,3.42,z0+6);[[-.3,0],[.3,0],[0,-.3],[0,.3]].forEach(([a,b])=>rm.box(.1,.42,.1,'#3a8a4a',x+a,3.05,z0+6+b));rm.box(.14,.14,.14,F[k+2],x,3.5,z0+6)}
   /* the counter with paper and ribbon */
   rm.box(2.6,1,.8,'#a87a4a',x0+w-2.2,.5,z0+5.6,1);rm.box(.8,.12,.8,'#f4e8d0',x0+w-2.8,1.06,z0+5.6);rm.box(.4,.06,.6,'#e84a6a',x0+w-1.8,1.03,z0+5.6);staff(rm,x0+w-2.2,z0+4.6,0);
   for(let i=0;i<4;i++){rm.box(.4,.4,.4,'#8a5a3a',x0+w-.6,.2,z0+7+i*.6);rm.box(.5,.5,.5,'#3a8a4a',x0+w-.6,.6,z0+7+i*.6)}rm.cols.push([x0+w-1,z0+6.6,x0+w,z0+9.4]);
