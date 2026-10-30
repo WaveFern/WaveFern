@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.43.0';
+const GAME_VERSION='v49.44.0';
 const VERSION_HISTORY=[
+ {v:'v49.44.0',n:'Detailed 3D profile pictures everywhere, in a different style for each app. Spotifly artists (Browse, artist pages, your own page and the sidebar) get press shots with a dark stage backdrop and a coloured spotlight instead of the old 16x16 faces. Instagrime pictures are now selfies with a pastel backdrop and a ring light, so they never match the Messages ones. Commenters, the New chat list, meeting pop-ups and Big Vee get 3D pictures too.'},
  {v:'v49.43.0',n:'Far fewer emoji. Menus, buttons, headings, pop-ups and the wiki now use plain words, so text looks the same on every phone and computer. Where an icon still helps it is a little pixel sprite in the game\'s style: shop menus and every item in them, the touch buttons, the band instrument picker, locked World Tour stops and pinned chats. Emotes over heads are unchanged.'},
  {v:'v49.42.0',n:'Plaques go to your Storage instead of hanging themselves on the studio wall. Press F at home, pick a plaque from the Furniture tab and hang it on any wall in your house, upstairs too. Plaques sit up on the wall, so they can go above your bed, desk or sofa, and they turn to face the room on their own. Each one shows its song title and stream count. Plaques you already earned are waiting in Storage.'},
  {v:'v49.41.0',n:'The Swiftwing flight map is sharp now. It draws real country outlines at your screen\'s full resolution instead of big blocky squares, and you can move around it: drag to pan, mouse wheel, pinch or the + / - buttons to zoom in up to x8 (x1, the whole world, is as far out as it goes). City names show up once you zoom in, and picking a region like Europe flies the map there. The map you watch during a flight is sharp too and zooms in on your route.'},
