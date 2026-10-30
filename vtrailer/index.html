@@ -1,13 +1,14 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>WaveFern – Vertical Trailer</title><meta name="robots" content="noindex"><link rel="icon" href="../favicon.svg">
 <!-- v49.29.1: wavefern.com/vtrailer is the in-game trailer (wavefern.com/?trailer) in a 9:16 frame, for Shorts, TikTok and Reels.
+     It plays the trailer2 mix of the music (?vert picks it in 175-trailer.js).
      The game runs in a tall frame centred on black, so it lays itself out for a tall screen; screen record just the frame.
      The frame is the same site, so the trailer inside it makes this whole page full screen (on F, or the first tap or key). -->
 <style>
 html,body{margin:0;height:100%;background:#000;overflow:hidden}
 #f{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:100vh;width:56.25vh;max-width:100vw;max-height:177.78vw;border:0;display:block;background:#000}
 </style></head><body>
-<iframe id="f" src="../?trailer" title="WaveFern vertical trailer"></iframe>
+<iframe id="f" src="../?trailer&amp;vert" title="WaveFern vertical trailer"></iframe>
 <script>(function(){var f=document.getElementById('f');
 function full(){try{var d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen({navigationUI:'hide'}).catch(function(){});else if(d.webkitRequestFullscreen)d.webkitRequestFullscreen()}catch(e){}}
 function tog(){try{if(document.fullscreenElement)document.exitFullscreen();else full()}catch(e){}}

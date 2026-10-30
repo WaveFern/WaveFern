@@ -10,7 +10,7 @@
    Nothing is saved in trailer mode: it runs on a fresh career, and your own careers and cloud save are never touched. */
 const TRL={on:!!(window.FW_TRAILER||/[?&]trailer\b/.test(location.search)),run:0,T:0,t0:0,i:-1,shots:[],len:0,
  opt:{music:1,cap:1},name:'',song:'Night Bus',aud:null,zoom:0,cur:null,typ:null,scr:null,art:-1,
- SRC:'assets/trailer.mp3',MO:0,DROP:40,msg:'collab?',BAR:2,BEAT:.5};
+ SRC:/[?&]vert\b/.test(location.search)?'assets/trailer2.mp3':'assets/trailer.mp3',MO:0,DROP:40,msg:'collab?',BAR:2,BEAT:.5};
 /* the trailer track (120 BPM): drums in at 0:16, the drop at 0:40, a breakdown at 1:12, back in at 1:24, a dead stop at 1:32, a final bit at 1:36 */
 
 /* ---------- all game audio is muted on the trailer page: only the trailer track plays ---------- */

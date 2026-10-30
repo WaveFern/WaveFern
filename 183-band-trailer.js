@@ -8,7 +8,8 @@
    own screen. wavefern.com/?trailer=band&menu opens the scene menu. Nothing is saved, as in the main trailer. */
 if(TRL.on&&window.MPT){
 const BM=MPT,BEAT=TRL.BEAT,BAR=TRL.BAR;
-Object.assign(TRL,{band:1,MO:24,DROP:16,song:'Neon Rain'});
+/* v49.29.2: the band trailer and the vertical trailer use the trailer2 mix of the track (same timing) */
+Object.assign(TRL,{band:1,MO:24,DROP:16,song:'Neon Rain',SRC:'assets/trailer2.mp3'});
 /* the track plays from 0:24 to 1:12, then skips its breakdown and plays on from 1:24 (at 0:48 in this trailer) */
 const JUMP=48,MO2=36;
 {const p0=trlPre;trlPre=function(dt){const T=TRL.fz!=null?TRL.fz:(performance.now()-TRL.t0)/1000,mo=T<JUMP?24:MO2,a=TRL.aud;
