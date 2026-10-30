@@ -36,11 +36,11 @@ function ntTick(){
   const el=document.createElement('div');el.className='nt';el.textContent=s.userData.lt;ntBox().appendChild(el);s.visible=false;NTAG.list.push({s,el,on:false,gone:0})}
  const W=innerWidth,H=innerHeight,show=mode!='pc'&&mode!='sleep'&&mode!='load'&&mode!='creator';
  for(let i=NTAG.list.length-1;i>=0;i--){const t=NTAG.list[i],s=t.s;let on=false;
-  if(show&&ntShown(s)){s.getWorldPosition(NTV);NTV.y+=.12;NTV.project(cam);if(NTV.x>-1.15&&NTV.x<1.15&&NTV.y>-1.15&&NTV.y<1.2){on=true;
+  if(show&&ntShown(s)){s.getWorldPosition(NTV);NTV.y+=.12;NTV.project(NTAG.cam||cam);if(NTV.x>-1.15&&NTV.x<1.15&&NTV.y>-1.15&&NTV.y<1.2){on=true;
    const x=Math.round((NTV.x+1)/2*W),y=Math.round((1-NTV.y)/2*H);if(t.x!==x||t.y!==y){t.x=x;t.y=y;t.el.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-100%)'}
    const art=typeof ART_M!='undefined'&&ART_M.some(o=>o.m===s.parent);if(art!==t.art){t.art=art;t.el.classList.toggle('art',art)}}}
   if(on!==t.on){t.on=on;t.el.style.display=on?'block':'none'}
   /* a person removed from the world for good (an artist after the session, a rebuilt list) drops its tag */
   let o=s.parent;while(o&&o!==scene)o=o.parent;if(!o){if(++t.gone>240){t.el.remove();NTAG.list.splice(i,1)}}else t.gone=0}}
 /* after each frame is drawn, so the tags sit exactly on the camera the frame used */
-{const r0=renderer.render.bind(renderer);renderer.render=function(s,c){r0(s,c);if(s===scene)try{ntTick()}catch(e){}}}
+{const r0=renderer.render.bind(renderer);renderer.render=function(s,c){r0(s,c);if(s===scene)try{NTAG.cam=c;ntTick()}catch(e){}}}

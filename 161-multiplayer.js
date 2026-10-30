@@ -16,9 +16,13 @@ let MPS=null;try{MPS=JSON.parse(sessionStorage.getItem(SK)||'null')}catch(e){}
 if(MPS&&!(MPS.code&&MPS.inst))MPS=null;
 /* v46.1.0: band rooms need a Google sign-in (FW_ACCT is only set by the Google account, never by the anonymous room-list login) */
 if(MPS&&!FW_ACCT){MPS=null;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}}
+/* v49.29.0: the band trailer (wavefern.com/?trailer=band, 183-band-trailer.js) is a band room with no network and no sign-in:
+   made-up bandmates, nothing sent or saved, and your own rooms list is never read or shown */
+const MPTR=/[?&]trailer=band\b/.test(location.search);
+if(MPTR)MPS={code:'FERN5',inst:'vo',band:'The Ferns',host:1,nm:'Sky'};
 const TABK='fw_mp_tab',TABID=(()=>{try{let t=sessionStorage.getItem('fw_mp_tabid');if(!t){t=Math.random().toString(36).slice(2,10);sessionStorage.setItem('fw_mp_tabid',t)}return t}catch(e){return Math.random().toString(36).slice(2,10)}})();
 const acctNm=()=>{try{return localStorage.getItem('fw_acctnm')||''}catch(e){return''}};
-function needLogin(){if(FW_ACCT)return false;snd('err');const o=document.getElementById('mpli');if(o)o.remove();const d=document.createElement('div');d.id='mpli';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
+function needLogin(){if(FW_ACCT||MPTR)return false;snd('err');const o=document.getElementById('mpli');if(o)o.remove();const d=document.createElement('div');d.id='mpli';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Sign in to play with the band</h2><p>Band rooms need a Google account, so your band character is kept safe on your account and each account can only be in a room once.</p>${FB_ON?'<div class=row2><button class=go onclick="document.getElementById(\'mpli\').remove();fbSignInAsk()">Sign in with Google</button><button onclick="document.getElementById(\'mpli\').remove()">Cancel</button></div>':'<p class=m>Sign-in is not available right now.</p><button onclick="document.getElementById(\'mpli\').remove()">OK</button>'}</div>`;document.body.appendChild(d);return true}
 function dupTab(){NET.closed=1;const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000e';
  d.innerHTML='<div class="box modal" style="width:min(380px,92vw)"><h2>Already open</h2><p>This band room is already open in another tab on this browser. Only one tab per account can be in a room.</p><button class=go onclick="mpDupLeave()">Back to menu</button></div>';document.body.appendChild(d)}
@@ -34,7 +38,7 @@ const SPOT={vo:[12.2,2.3,Math.PI],gt:[14.3,2.3,Math.PI],bs:[14.9,3.6,Math.PI/2],
 const STOFF={vo:[0,0],gt:[-1.5,.2],bs:[1.5,.2],dr:[0,-1.3],ky:[2.8,.1]};
 const pid=c=>'wavefern-rm-'+String(c).toLowerCase();
 const newCode=()=>{const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.random()*a.length|0];return s};
-const lsGet=()=>{try{const l=JSON.parse(localStorage.getItem(LK)||'[]');return Array.isArray(l)?l:[]}catch(e){return[]}};
+const lsGet=()=>{if(MPTR)return[];try{const l=JSON.parse(localStorage.getItem(LK)||'[]');return Array.isArray(l)?l:[]}catch(e){return[]}};
 function lsAdd(o){const l=lsGet().filter(x=>!(x.code==o.code&&x.inst==o.inst));l.unshift(Object.assign({t:Date.now()},o));try{localStorage.setItem(LK,JSON.stringify(l.slice(0,8)))}catch(e){}}
 const lastNm=()=>{try{return localStorage.getItem(SAVE_PRE+'mpnm')||''}catch(e){return''}};
 const mpKey=()=>SAVE_PRE+'mp_'+MPS.code+'_'+MPS.inst;
@@ -628,5 +632,12 @@ function cmRecv(d,from){const r=d.m;if(!r||typeof r!='object'||typeof r.a!='numb
 
 /* v46.0.0: lets the admin fun effects (162-fun-admin.js) ride on the room: send, who is in the room, their avatars */
 window.MPFX={on:()=>online(),send:o=>send(o),mem:()=>MB,av:()=>AV};
-if(MPS)setTimeout(start,0);
+/* the band trailer drives the room itself: who plays what, a band take on any instrument, a band set, the join screen */
+if(MPTR){ME.id='me';MB.me=ME;NET.on=1;const MG1=[MG_N[1],MG_HOW[1]];
+ window.MPT={MB,ME,AV,INS,SPOT,STOFF,EMK,emFloat,
+  inst(k){MPS.inst=ME.inst=k;MG_N[1]=k=='vo'?MG1[0]:INS[k].st;MG_HOW[1]=k=='vo'?MG1[1]:IG_HOW[k]},
+  rec(k,g){this.inst(k);MPGO=1;try{startRec(g||0)}finally{MPGO=0}if(rec){rec.band=Object.keys(MB).length}},
+  fest(bk){MPGO=1;MPF=1;try{festStartBooked(bk)}finally{MPGO=0}},
+  join(c,d){U.qok='';qShow(c,d)}}}
+else if(MPS)setTimeout(start,0);
 })();
