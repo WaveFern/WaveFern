@@ -1,8 +1,8 @@
 /* ---------- v49.46.0: pop-up events around the city ----------
    Every day a few things happen around town for a few hours: a block party, a record store signing, a radio
    roadshow, an open mic, a food truck rally or a street photo shoot. Each one is at a real place, from a set time
-   to an end time, and you can do it once. They show on the world map (N) with the time, as a stall with a spinning
-   marker in the street, and in the morning paper. When one opens you get a note.
+   to an end time, and you can do it once. They show on the world map (N) with the time, as a tent with a spinning
+   marker on an open lawn or square, and in the morning paper. When one opens you get a note.
    Every event has its own look (a party flyer, a kraft-paper record shop, an on-air studio, a stage with marquee
    bulbs, a food truck menu board, a camera contact sheet) and a small thing to do:
    - Block party: play one of your songs on the sound system. The crowd reacts to its quality; followers, streams
@@ -17,34 +17,34 @@
 (function(){
 if(typeof S=='undefined'||typeof WORLD=='undefined')return;
 
-/* ---------- places: a spot on the pavement next to each one (x, z) ---------- */
+/* ---------- places: open lawns and squares with room round them (x, z is the middle of the pop-up) ----------
+   v49.47.1: moved off the pavements. Each spot was checked to be clear of buildings, roads and park paths, with room
+   for the tent, a crowd in front and a taxi drop. */
 const PLACES={
- fern:{n:'Fern Road',x:49,z:14.6},
- radio:{n:'the Radio Station',x:70,z:13.8},
- park:{n:'Central Park',x:104,z:-90},
- lake:{n:'the Lake',x:128,z:-91},
- music:{n:'the Music Store',x:517,z:3.2},
- records:{n:'Records on 4th',x:586,z:127.6},
- mall:{n:'Nova Mall',x:658,z:3.6},
- plaza:{n:'City Plaza',x:587,z:39},
- cafe:{n:'City Cafe',x:539,z:70.8},
- tower:{n:'Skyline Tower',x:627,z:72.8},
- awards:{n:'the Gramophone Awards',x:709,z:12}
+ fernm:{n:'Fern Meadow',x:95,z:-28},
+ meadow:{n:'the Park Meadow',x:140,z:-28},
+ avenue:{n:'the Park Avenue lawn',x:178,z:-28},
+ mill:{n:'Mill Road Green',x:440,z:60},
+ harbour:{n:'Harbour Green',x:440,z:104},
+ plaza:{n:'City Plaza',x:574,z:36},
+ east:{n:'East Side Green',x:700,z:60},
+ eastS:{n:'Riverside Green',x:700,z:104}
 };
+const OLDP={fern:'fernm',radio:'avenue',park:'fernm',lake:'meadow',music:'mill',records:'harbour',mall:'east',cafe:'mill',tower:'east',awards:'eastS',lakes:'meadow',parkn:'fernm',parks:'avenue'};
 
 /* ---------- the six kinds ---------- */
 const KINDS={
- party:{n:'Block party',v:'Join the block party',c:'#ffcf3a',c2:'#ff4f8b',icon:'speaker',at:['fern','park','plaza'],
-  blurb:'The street is closed, there is a sound system and the DJ owes you a favour: one song of yours on the speakers.'},
- signing:{n:'Record store signing',v:'Sign at the record store',c:'#c8955a',c2:'#2a1d14',icon:'disc',at:['music','records','mall'],need:1,
-  blurb:'A table, a pen and a queue of fans with copies of your music.'},
- radio:{n:'Radio roadshow',v:'Go on air',c:'#ff3b3b',c2:'#1b1e24',icon:'radio',at:['radio','plaza','mall'],
-  blurb:'Sam from the radio station is broadcasting live from the street and wants three minutes with you.'},
- openmic:{n:'Open mic',v:'Take the open mic',c:'#ffd23d',c2:'#7a1f3a',icon:'mic',at:['cafe','park','plaza'],
+ party:{n:'Block party',v:'Join the block party',c:'#ffcf3a',c2:'#ff4f8b',icon:'speaker',at:['meadow','plaza','mill','eastS'],
+  blurb:'The lawn is roped off, there is a sound system and the DJ owes you a favour: one song of yours on the speakers.'},
+ signing:{n:'Record store signing',v:'Sign at the pop-up record shop',c:'#c8955a',c2:'#2a1d14',icon:'disc',at:['plaza','mill','east'],need:1,
+  blurb:'The record shop set up a tent outside: a table, a pen and a queue of fans with copies of your music.'},
+ radio:{n:'Radio roadshow',v:'Go on air',c:'#ff3b3b',c2:'#1b1e24',icon:'radio',at:['plaza','east','avenue'],
+  blurb:'Sam from the radio station is broadcasting live from the van and wants three minutes with you.'},
+ openmic:{n:'Open mic',v:'Take the open mic',c:'#ffd23d',c2:'#7a1f3a',icon:'mic',at:['fernm','harbour','plaza','avenue'],
   blurb:'A little stage, a mic and whoever walks past. Keep the beat and the hat fills up.'},
- food:{n:'Food truck rally',v:'Visit the food trucks',c:'#e8343c',c2:'#fff4e0',icon:'plate',at:['fern','lake','park','plaza'],
+ food:{n:'Food truck rally',v:'Visit the food trucks',c:'#e8343c',c2:'#fff4e0',icon:'plate',at:['meadow','fernm','harbour','eastS'],
   blurb:'Three trucks parked nose to tail. Cheap, fast and very filling.'},
- shoot:{n:'Street photo shoot',v:'Do the photo shoot',c:'#f2f2f2',c2:'#111111',icon:'spark',at:['tower','lake','awards','park'],
+ shoot:{n:'Street photo shoot',v:'Do the photo shoot',c:'#f2f2f2',c2:'#111111',icon:'spark',at:['avenue','east','harbour','fernm'],
   blurb:'Nadia, a street photographer, has a free half hour and thinks you have a look.'}
 };
 const SLOTS=[[480,720],[720,1020],[1020,1320],[600,900],[840,1140]];/* 08-12, 12-17, 17-22, 10-15, 14-19 */
@@ -70,42 +70,67 @@ function roll(){const d=S.day|0,n=d<=1?1:FL()>=3?3:2,out=[],usedP=new Set(),used
  else if(!(S.songs||[]).length)kinds=kinds.filter(k=>!KINDS[k].need);
  for(const k of kinds){if(out.length>=n)break;const p=shuf(KINDS[k].at).find(p=>!usedP.has(p));if(!p)continue;
   let si=shuf(SLOTS.map((_,i)=>i)).find(i=>!usedS.has(i));if(si===undefined)si=0;usedP.add(p);usedS.add(si);
-  const sl=d<=1?[480,1200]:SLOTS[si];out.push({k,p:d<=1?'fern':p,s:sl[0],e:sl[1],done:0,an:0})}
+  const sl=d<=1?[480,1200]:SLOTS[si];out.push({k,p:d<=1?'meadow':p,s:sl[0],e:sl[1],done:0,an:0})}
  out.sort((a,b)=>a.s-b.s);return out}
-function today(){if(!S.pop||S.pop.d!==S.day)S.pop={d:S.day,ev:roll()};return S.pop.ev}
+function today(){if(!S.pop||S.pop.d!==S.day)S.pop={d:S.day,ev:roll()};S.pop.ev.forEach(v=>{if(!PLACES[v.p])v.p=OLDP[v.p]||KINDS[v.k].at[0]});return S.pop.ev}
 const isOpen=v=>{const m=nowMin();return !v.done&&m>=v.s&&m<v.e};
 const state=v=>v.done?'done':nowMin()<v.s?'soon':nowMin()>=v.e?'over':'open';
 window.popToday=()=>today().map(v=>Object.assign({},v,{name:KINDS[v.k].n,place:PLACES[v.p].n,x:PLACES[v.p].x,z:PLACES[v.p].z,st:state(v)}));
 
-/* ---------- the stall in the street ---------- */
+/* ---------- the pop-up on the lawn ---------- */
 let G=null,BUILT='';
-function stall(v){const K=KINDS[v.k],pl=PLACES[v.p],g=new THREE.Group();g.position.set(pl.x,0,pl.z-1.6);
- /* counter, legs, canopy with stripes, a sign and a spinning marker */
- B(g,2.6,1,1,K.c2=='#fff4e0'?'#d8d0c0':K.c2,0,.5,0);B(g,2.7,.12,1.1,K.c,0,1.02,0);
- [-1.2,1.2].forEach(x=>{B(g,.12,2.2,.12,'#3a3a3a',x,1.1+1,-.4);B(g,.12,2.2,.12,'#3a3a3a',x,1.1+1,.4)});
- for(let i=0;i<5;i++)B(g,.56,.14,1.4,i%2?K.c:'#ffffff',-1.12+i*.56,3.25,0);
- B(g,1.6,.5,.08,K.c2=='#fff4e0'?'#7a2a1a':K.c2,0,2.7,.56);B(g,1.3,.28,.06,'*'+K.c,0,2.7,.61);
- if(v.k=='party'){[-1,1].forEach(x=>{B(g,.6,1.1,.6,'#1a1a1a',x*1.9,.55,.2);B(g,.36,.36,.05,'*'+K.c2,x*1.9,.75,.52)})}
- if(v.k=='openmic'){B(g,.06,1.5,.06,'#222',1.9,.75,.6);B(g,.18,.22,.18,'#444',1.9,1.55,.6)}
- if(v.k=='food'){B(g,1.6,1.4,2.8,'#f4f4f4',-2.4,.9,0);B(g,1.65,.3,2.85,K.c,-2.4,1.2,0);B(g,1.62,.5,1.4,'*#9ad0ff',-2.4,1.6,0)}
- if(v.k=='shoot'){B(g,.06,1.4,.06,'#222',1.9,.7,.6);B(g,.4,.3,.25,'#111',1.9,1.5,.6);B(g,.14,.14,.1,'*#7ad0ff',1.9,1.5,.75)}
- if(v.k=='radio'){B(g,.08,2.6,.08,'#ccc',-1.6,2.3,-.3);B(g,.3,.3,.3,'*#ff3b3b',-1.6,3.7,-.3)}
- if(v.k=='signing'){for(let i=0;i<4;i++)B(g,.5,.5,.04,'#111',-.9+i*.6,1.35,-.3);for(let i=0;i<4;i++)B(g,.14,.14,.05,'*'+K.c,-.9+i*.6,1.35,-.27)}
- const mk=new THREE.Group();B(mk,.5,.5,.5,'*'+K.c,0,0,0);B(mk,.3,.3,.3,'*#ffffff',0,0,0).position.y=.01;mk.rotation.set(Math.PI/4,0,Math.PI/4);mk.position.set(0,4.6,0);g.add(mk);g.userData.mk=mk;
+/* the nearest spot you can stand on (used for the taxi drop and to make sure nobody is ever stuck) */
+function free(x,z,r){r=r||.4;try{if(!hit(x,z,r))return[x,z];for(let d=.5;d<14;d+=.5)for(let i=0;i<16;i++){const a=i/16*Math.PI*2,X=x+Math.cos(a)*d,Z=z+Math.sin(a)*d;if(!hit(X,Z,r))return[X,Z]}}catch(e){}return[x,z]}
+window.popFree=free;
+/* a pop-up: a ground mat, a striped gazebo with a peaked roof, a front banner, a counter, string lights on two posts,
+   a few props for its kind, and a spinning marker over the top. It faces south, towards the camera. */
+const SOLID=[];
+function stall(v){const K=KINDS[v.k],pl=PLACES[v.p],g=new THREE.Group(),c=K.c,c2=K.c2=='#fff4e0'?'#7a2a1a':K.c2,lt=K.c=='#f2f2f2'?'#d8d8d8':K.c;g.position.set(pl.x,0,pl.z);
+ const W=5.2,D=4,H=2.6;
+ B(g,W+2.4,.04,D+3.4,'#d8cba8',0,.02,.6);B(g,W+2,.05,D+3,v.k=='party'?'#3a2a4a':v.k=='food'?'#c8b48a':'#a8382f',0,.04,.6);
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{B(g,.14,H,.14,'#e8e8e8',a*W/2,H/2,b*D/2);B(g,.3,.08,.3,'#555',a*W/2,.06,b*D/2)});
+ /* roof: a striped valance, then four steps up to a point */
+ for(let i=0;i<9;i++){const x=-W/2+W/18+i*W/9;B(g,W/9,.38,.06,i%2?lt:'#ffffff',x,H-.1,D/2+.03);B(g,W/9,.38,.06,i%2?lt:'#ffffff',x,H-.1,-D/2-.03)}
+ for(let i=0;i<7;i++){const z=-D/2+D/14+i*D/7;B(g,.06,.38,D/7,i%2?lt:'#ffffff',W/2+.03,H-.1,z);B(g,.06,.38,D/7,i%2?lt:'#ffffff',-W/2-.03,H-.1,z)}
+ [[1,.12],[.78,.42],[.54,.72],[.3,1.02],[.1,1.3]].forEach(([k,y],i)=>B(g,W*k+.2,.32,D*k+.2,i%2?'#ffffff':lt,0,H+.1+y,0));
+ /* banner on the front */
+ B(g,W*.7,.6,.08,c2,0,H+.55,D/2+.12);B(g,W*.62,.32,.06,'*'+lt,0,H+.55,D/2+.18);
+ /* the counter at the back, and a back wall cloth */
+ B(g,W-.4,H-.4,.06,c2,0,(H-.4)/2,-D/2+.05);
+ if(v.k!='food'){B(g,W*.6,1,.8,'#4a3a2a',0,.5,-D/2+1);B(g,W*.6+.1,.1,.9,lt,0,1.03,-D/2+1)}
+ /* string lights on two posts in front */
+ [-1,1].forEach(a=>{B(g,.1,2.6,.1,'#333',a*(W/2+1.4),1.3,D/2+2.2)});
+ for(let i=0;i<=10;i++){const t=i/10,x=-(W/2+1.4)+t*(W+2.8),y=2.5-Math.sin(t*Math.PI)*.45;B(g,.14,.14,.14,'*'+['#ffd27a','#ff8ad0','#8ad8ff'][i%3],x,y,D/2+2.2)}
+ /* props */
+ if(v.k=='party'){[-1,1].forEach(a=>{B(g,.8,1.5,.7,'#1a1a1a',a*1.6,.75,-D/2+1.1);B(g,.44,.44,.05,'*'+c2,a*1.6,1.05,-D/2+1.47);B(g,.26,.26,.05,'*'+c2,a*1.6,.45,-D/2+1.47)});B(g,1.4,.12,.6,'#222',0,1.12,-D/2+1);B(g,.4,.04,.4,'*#ff4f8b',-.35,1.2,-D/2+1);B(g,.4,.04,.4,'*#3ad0ff',.35,1.2,-D/2+1)}
+ if(v.k=='signing'){for(let i=0;i<5;i++){B(g,.5,.5,.04,'#111',-1.2+i*.6,1.35,-D/2+.75);B(g,.16,.16,.05,'*'+['#e8452c','#ffd23d','#3ad0ff'][i%3],-1.2+i*.6,1.35,-D/2+.79)}B(g,.6,.9,.6,'#6a4a2a',W/2-.6,.45,0);B(g,.5,.1,.5,'#111',W/2-.6,.95,0)}
+ if(v.k=='radio'){B(g,2.6,1.7,1.8,'#f2f2f2',-W/2-2.2,1.05,-.4);B(g,2.62,.4,1.82,'#ff3b3b',-W/2-2.2,1.2,-.4);B(g,.5,.5,1.82,'*#9ad0ff',-W/2-1.3,1.55,-.4);[[-3.1,.9],[-1.3,.9],[-3.1,-1.7],[-1.3,-1.7]].forEach(([x,z])=>B(g,.4,.4,.2,'#111',-W/2+x+.4-.4,.2,z+.4));
+  B(g,.08,2.8,.08,'#ccc',-W/2-2.8,3.3,-.4);B(g,.3,.3,.3,'*#ff3b3b',-W/2-2.8,4.8,-.4);B(g,.9,.3,.05,'*#ff3b3b',0,1.4,-D/2+.62)}
+ if(v.k=='openmic'){B(g,W-.8,.4,D-1.2,'#2a1a1a',0,.2,-.3);B(g,.06,1.5,.06,'#222',0,1.15,.6);B(g,.2,.26,.2,'#555',0,1.95,.6);[-1,1].forEach(a=>B(g,.7,1.1,.6,'#1a1a1a',a*1.9,.95,-1.2));B(g,.6,.16,.6,'#7a4a2a',1.2,.48,1.3)}
+ if(v.k=='food'){[[-1.6,'#e8343c'],[1.6,'#3a9ad0']].forEach(([x,col])=>{B(g,2.2,1.9,1.4,'#f4f4f4',x,1.2,-D/2+.9);B(g,2.22,.35,1.42,col,x,1.5,-D/2+.9);B(g,1.6,.6,.05,'*#9ad0ff',x,1.7,-D/2+1.62);B(g,1.7,.1,.4,'#bbb',x,1.15,-D/2+1.75);
+  [-.7,.7].forEach(w=>B(g,.4,.4,.3,'#222',x+w,.2,-D/2+.9))});B(g,1,.75,.8,'#c8a070',0,.38,1);[-.8,.8].forEach(a=>B(g,.4,.45,.4,'#c8a070',a,.22,1.2))}
+ if(v.k=='shoot'){B(g,W-.8,H-.4,.05,'#f2f2f2',0,(H-.4)/2+.05,-D/2+.15);B(g,W-.8,.05,1.8,'#f2f2f2',0,.08,-D/2+1.05);B(g,.06,1.4,.06,'#222',1.3,.7,1);B(g,.45,.32,.28,'#111',1.3,1.5,1);B(g,.14,.14,.12,'*#7ad0ff',1.3,1.5,.82);
+  B(g,.08,1.9,.08,'#333',-1.7,.95,.2);B(g,.7,.7,.06,'#f8f8f8',-1.7,2,.4);B(g,.5,.5,.04,'*#fff6d8',-1.7,2,.45)}
+ const mk=new THREE.Group();B(mk,.6,.6,.6,'*'+lt,0,0,0);B(mk,.34,.34,.34,'*#ffffff',0,0,0).position.y=.01;mk.rotation.set(Math.PI/4,0,Math.PI/4);mk.position.set(0,5.4,0);g.add(mk);g.userData.mk=mk;
+ /* solid: the counter / truck / van; the front and the inside stay open to walk into */
+ const sol=v.k=='food'?[[-W/2+.2,-D/2,W/2-.2,-D/2+1.7]]:v.k=='radio'?[[-W/2-3.6,-1.4,-W/2-.8,.6],[-W/2+.4,-D/2,W/2-.4,-D/2+1.45]]:[[-W*.3-.1,-D/2,W*.3+.1,-D/2+1.45]];
+ sol.forEach(q=>SOLID.push([pl.x+q[0],pl.z+q[1],pl.x+q[2],pl.z+q[3]]));
  return g}
 const INTS=[];
 function build(){const ev=today(),key=S.day+'|'+ev.map(v=>v.k+v.p+v.done).join(',');if(key===BUILT&&G)return;BUILT=key;
  if(G){WORLD.remove(G);G.traverse(o=>{if(o.geometry&&o.geometry.dispose&&!o.geometry.userData?.shared)try{o.geometry.dispose()}catch(e){}})}
  G=new THREE.Group();G.name='popEvents';WORLD.add(G);
  INTS.splice(0).forEach(o=>{const i=INT.indexOf(o);if(i>=0)INT.splice(i,1)});
+ SOLID.forEach(c=>{const i=cols.indexOf(c);if(i>=0)cols.splice(i,1)});SOLID.length=0;
  ev.forEach((v,i)=>{if(v.done)return;const pl=PLACES[v.p],K=KINDS[v.k],s=stall(v);s.userData.v=v;G.add(s);
-  const o={x:pl.x,z:pl.z,r:2.4,l:K.v,a:()=>openEvent(i),pop:v};INT.push(o);INTS.push(o)})}
+  const o={x:pl.x,z:pl.z+1.2,r:3.4,l:K.v,a:()=>openEvent(i),pop:v};INT.push(o);INTS.push(o)});
+ SOLID.forEach(c=>cols.push(c))}
 /* labels follow the time: "opens 17:00" before, the action while open, gone after */
 function tickInts(){INTS.forEach(o=>{const v=o.pop,K=KINDS[v.k],st=state(v);o.l=st=='open'?K.v:st=='soon'?K.n+' (opens '+hm(v.s)+')':K.n+' (over)'})}
 let spin=0,lastM=-1;
 {const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{
  if(mode=='title'||away())return r;build();tickInts();spin+=dt||0;
- if(G)G.children.forEach(s=>{const v=s.userData.v,m=s.userData.mk;if(!m)return;const st=state(v);m.visible=st!='over';m.rotation.y=spin*1.6;m.position.y=4.6+Math.sin(spin*2.2)*.25;
+ if(G)G.children.forEach(s=>{const v=s.userData.v,m=s.userData.mk;if(!m)return;const st=state(v);m.visible=st!='over';m.rotation.y=spin*1.6;m.position.y=5.4+Math.sin(spin*2.2)*.25;
   m.scale.setScalar(st=='open'?1:.6)});
  /* a note when one opens */
  const m=Math.floor(nowMin());if(m!==lastM){lastM=m;today().forEach(v=>{if(!v.an&&!v.done&&m>=v.s&&m<v.e){v.an=1;const K=KINDS[v.k];
@@ -127,7 +152,14 @@ function drawPins(){const c=$('bm');if(!c||away())return;const x=c.getContext('2
   x.globalAlpha=1});
  x.textBaseline='alphabetic'}
 {const d0=mapDraw;mapDraw=function(){d0.apply(this,arguments);try{drawPins()}catch(e){console.error('pop pins',e)}}}
-window.popGo=function(i){const v=today()[i];if(!v)return;const pl=PLACES[v.p];taxi(pl.x,pl.z+2)};
+/* the taxi drops you right in front of the tent (the map's own taxi works in a different coordinate space, so this
+   one moves you itself, with the same one-trip-a-day rule and fare) */
+window.popGo=function(i){const v=today()[i];if(!v||IN)return;const pl=PLACES[v.p];let T;try{T=taxiDay()}catch(e){T=S.taxi||{}}
+ if(T.back){sn('err');return say('You already used your taxi today. A new one comes tomorrow.')}
+ if(T.go){sn('err');return say('Today\'s taxi only takes you back'+(T.fl?' to '+T.fl:'')+' now.')}
+ const f=free(pl.x,pl.z+4.2),c=Math.round(Math.hypot(P.x-f[0],P.z-f[1])*.06);if((S.money||0)<c){sn('err');return say('Taxi costs $'+c)}
+ const px=P.x,pz=P.z;S.money=+((S.money||0)-c).toFixed(2);P.x=f[0];P.z=f[1];P.rot=Math.PI;try{camT.x=P.x;camT.z=P.z}catch(e){}
+ T.go=1;T.fx=px;T.fz=pz;try{T.fl=taxiSpot(px,pz)||''}catch(e){T.fl=''}T.to=pl.n;save();closeUI();sn('whoosh');say('Taxi fare $'+c+'. Your taxi will wait to take you back once today.')};
 {const b0=bigMap;bigMap=function(){b0.apply(this,arguments);try{if(!$('bm')||away())return;const r=document.querySelector('#ui .row2');if(!r)return;
  const T=S.taxi||{},canTaxi=!(T.d===S.day&&T.go),box=document.createElement('div');box.className='popl';
  box.innerHTML=`<div class=poplh>${ico('mega')} Pop-ups today</div>`+today().map((v,i)=>{const K=KINDS[v.k],st=state(v),pl=PLACES[v.p];
@@ -242,7 +274,7 @@ const POSES=[['Lean on the wall, look away','wall'],['Jump shot, mid-air','jump'
 function shoot(v){const L=shuf(POSES).slice(0,3).map(p=>[p[0],p[1],rnd(.35,1)]);CUR.P=L;
  show(frame(v,`<div class=pefilm></div><p class=pebl>${E(KINDS.shoot.blurb)}</p><div class=pelbl>Pick a pose for frame 1</div>
   <div class=peframes>${L.map((p,i)=>`<button class="peshot ps-${p[1]}" onclick="popPose(${i})"><span class=vf></span><b>${E(p[0])}</b><small>Frame ${String(i+1).padStart(2,'0')}A</small></button>`).join('')}</div><div class=row2><button onclick="closeUI()">Not now</button></div>`))}
-window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.min(1,p[2]+(PLACES[C.v.p].n.includes('Tower')||C.v.p=='awards'?.1:0)),f=gain((15+r*90)*scale());
+window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.min(1,p[2]+(C.v.p=='plaza'||C.v.p=='eastS'?.1:0)),f=gain((15+r*90)*scale());
  const fol=(S.followers||0)+(S.igF||0),likes=Math.round(fol*(.12+r*.3))+ri(10,40),cap=pk(['shot by nadia on the street','no filter, just '+PLACES[C.v.p].n.replace(/^the /,''),'new look, same city','out here today','caught mid-thought']);
  try{S.igPosts=S.igPosts||[];S.igPosts.push({id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap,day:S.day,l:likes})}catch(e){}
  finish(C.v,`<h3>${r>.8?'That is the cover shot':r>.55?'A keeper':'Not your best angle'}</h3><p>Nadia sent you the photo. <i>${E(p[0])}</i> is now on your Instagrime with the caption "${E(cap)}".</p>
