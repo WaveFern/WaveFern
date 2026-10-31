@@ -87,11 +87,11 @@ PG.browse=()=>SFB.a==null?brHome():brArtistPg();
  sb.insertAdjacentHTML('beforeend',`<button class="brnav${pg=='browse'?' on':''}" onclick="pg='browse';pcR()">Browse artists</button>`)}}}catch(e){console.error('spotifly browse',e)}return r}}
 {const st=document.createElement('style');st.textContent=`
 .brh{padding:26px 32px 30px;background:linear-gradient(#1a3a28,#121212 260px);min-height:100%}
-.brs{margin:6px 0 14px}.brin{width:100%;max-width:420px;box-sizing:border-box;background:#242424;border:2px solid #000;color:#fff;border-radius:500px;padding:10px 18px;font:inherit;outline:none}.brin:focus{border-color:#1db954}
-.brf{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}.brp{background:#2a2a2a;color:#fff;border:2px solid #000;box-shadow:none;border-radius:500px;padding:6px 16px;font-weight:700;font-size:13px;cursor:pointer}.brp:hover{background:#3a3a3a}.brp.on{background:#1db954;color:#000}
+.brs{margin:6px 0 14px}.brin{width:100%;max-width:420px;box-sizing:border-box;background:#242424;border:2px solid #000;color:#fff;border-radius:500px;padding:10px 18px;font:inherit;outline:none}.brin:focus{border-color:#a66bff}
+.brf{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}.brp{background:#2a2a2a;color:#fff;border:2px solid #000;box-shadow:none;border-radius:500px;padding:6px 16px;font-weight:700;font-size:13px;cursor:pointer}.brp:hover{background:#3a3a3a}.brp.on{background:#a66bff;color:#000}
 .brg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-bottom:24px}
 .brc{display:flex;flex-direction:column;gap:6px;text-align:left;background:#181818;border:0;box-shadow:none;border-radius:8px;padding:14px;color:#fff;cursor:pointer;min-width:0}.brc:hover{background:#282828}
 .brc .brf2{border-radius:50%}.brc img{width:100%;aspect-ratio:1;image-rendering:pixelated;border:2px solid #000;border-radius:4px}.brc b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.brc small{color:#b3b3b3;font-size:12px;line-height:1.3}
 .brb{background:none;border:0;box-shadow:none;color:#fff;font-weight:700;cursor:pointer;padding:0 0 8px;opacity:.85}.brb:hover{opacity:1;text-decoration:underline}
-.brr .sfs{text-align:right}.brnav.on{color:#1db954}
+.brr .sfs{text-align:right}.brnav.on{color:#a66bff}
 @media (max-width:760px){.brh{padding:18px}.brg{grid-template-columns:repeat(2,1fr)}}`;document.head.appendChild(st)}

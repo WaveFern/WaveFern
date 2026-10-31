@@ -63,7 +63,7 @@ const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];return`<div class=s
 
 /* FPS counter (Settings > Graphics, off by default, saved in fw_gfx as fpsOn) */
 const FPSC={n:0,t:0,el:null};
-function fpsShow(){if(!FPSC.el){FPSC.el=document.createElement('div');FPSC.el.style.cssText='position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:50;pointer-events:none;font:bold 12px monospace;color:#9fe39f;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:4px';document.body.appendChild(FPSC.el)}
+function fpsShow(){if(!FPSC.el){FPSC.el=document.createElement('div');FPSC.el.style.cssText='position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:50;pointer-events:none;font:bold 12px monospace;color:var(--ga,#2fe68a);background:#000;border:2px solid #2e2e2e;padding:1px 8px;border-radius:0';document.body.appendChild(FPSC.el)}
  FPSC.el.style.display=GFX.fpsOn?'block':'none';FPSC.n=0;FPSC.t=0}
 function fpsTick(n){if(!GFX.fpsOn)return;if(!FPSC.el)fpsShow();FPSC.n++;if(!FPSC.t)FPSC.t=n;if(n-FPSC.t>=500){FPSC.el.textContent=Math.round(FPSC.n*1000/(n-FPSC.t))+' FPS';FPSC.n=0;FPSC.t=n}}
 if(GFX.fpsOn)fpsShow();

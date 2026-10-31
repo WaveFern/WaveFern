@@ -509,7 +509,7 @@ if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=r
 if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}if(x&&d.sp&&x.sp==null)x.sp=d.sp;if(x&&d.style!=null&&x.style==null)x.style=d.style}}catch(e){}return r}}
 
 /* WaveFern: a play button on each song on your artist page */
-{const st=document.createElement('style');st.textContent='.sr .bpl{width:24px;height:24px;padding:0;margin:0;border-radius:50%;border:0;background:#1db954;color:#000;font-size:10px;line-height:24px;cursor:pointer;box-shadow:none}.sr .bpl:hover{transform:scale(1.08)}.sr.bon{background:#1db95422}.sr.bon b{color:#1db954}';document.head.appendChild(st)}
+{const st=document.createElement('style');st.textContent='.sr .bpl{width:24px;height:24px;padding:0;margin:0;border-radius:50%;border:0;background:#a66bff;color:#000;font-size:10px;line-height:24px;cursor:pointer;box-shadow:none}.sr .bpl:hover{transform:scale(1.08)}.sr.bon{background:#a66bff22}.sr.bon b{color:#a66bff}';document.head.appendChild(st)}
 function beatsSfRows(){if(typeof app=='undefined'||app!=1||pg!='home'||!S.artist)return;const rows=document.querySelectorAll('#pc .mn .sr');if(!rows.length)return;
  const L=S.songs.slice().sort((a,b)=>b.streams-a.streams||b.id-a.id),sh=(typeof SALL!='undefined'&&SALL)?L:L.slice(0,5),cu=Beats.current();
  rows.forEach((el,i)=>{const s=sh[i],sp=el.firstElementChild;if(!s||!sp)return;const on=!!(cu&&cu.owner=='sf'&&cu.src===s);el.classList.toggle('bon',on);

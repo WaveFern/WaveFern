@@ -49,7 +49,7 @@ input[type=range]::-moz-range-thumb{width:8px;height:12px;background:var(--g);bo
 .win{position:absolute;left:3%;right:3%;top:3%;bottom:54px;display:flex;flex-direction:column;background:#0c0f0d;border:3px solid #000;box-shadow:6px 6px 0 #0007}
 .wt{background:#1b1f1d;padding:5px 10px;display:flex;justify-content:space-between;align-items:center}.wb{flex:1;display:flex;min-height:0}
 .sb{width:160px;background:#000;padding:10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}.sb h3{color:var(--g)}
-.sb button{text-align:left;background:none;border:0;box-shadow:none;color:var(--m)}.sb button.on{color:#fff;background:#1c221e}
+.sb button{text-align:left;background:none;border:0;box-shadow:none;color:var(--m)}.sb button.on{color:#fff;background:#1c1c1c}
 .mn{flex:1;overflow:auto;background:linear-gradient(#17402c,#0c0f0d 260px);padding:18px;user-select:text}
 .ban h1{font-size:30px}.sr{display:grid;grid-template-columns:30px 1fr 110px 70px;gap:8px;padding:8px;align-items:center;border-radius:4px}.sr:hover{background:#ffffff12}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:10px 0}.card{background:#151a17;padding:12px;border-radius:6px}.card b{font-size:20px;color:var(--g);display:block}
@@ -225,7 +225,7 @@ body.notags #ntags{display:none}
 ::-webkit-scrollbar-corner{background:var(--sbk)}
 @media(pointer:coarse){:root{--sbw:10px}}
 /* screens with a look of their own */
-.win.sfw{--sbk:#121212;--sbt:#3a3a3a;--sbh:#1db954;--sbe:#121212;--sbw:10px}
+.win.sfw{--g:#a66bff;--sbk:#121212;--sbt:#3a3a3a;--sbh:#a66bff;--sbe:#121212;--sbw:10px}
 #ph{--sbk:#000;--sbt:#2d4a3c;--sbh:var(--g);--sbe:#000;--sbw:8px}
 .gshop{--sbk:#0f1114;--sbt:#6b5a2a;--sbh:#ffb000;--sbe:#000}
 .bw,.ue,.az,.ig{--sbk:#f1f1f1;--sbt:#c1c1c1;--sbh:#8a8a8a;--sbe:#dcdcdc}
@@ -236,3 +236,40 @@ body.notags #ntags{display:none}
 .tsm.rs{--sbk:#fbf5e6;--sbt:#b98a90;--sbh:#7a1f2b;--sbe:#7a1f2b}
 .shx{--sbk:var(--bg);--sbt:var(--mu,var(--ink));--sbh:var(--ink);--sbe:var(--ink)}
 #ui .box.th{--sbk:var(--bt,var(--bg));--sbt:var(--mu,var(--ac));--sbh:var(--ac);--sbe:var(--ink)}
+
+/* ===== v49.52.0: game UI style (plain black + the player's accent) =====
+   Only a few screens use it: the world map, pause menu, main menu / career list, HUD boxes (monthly listeners, money, energy...) and the
+   waking-up card (any .box.modal.gu). The FPS counter is styled in 122-graphics.js. --ga is the accent the player picks in Settings > Game,
+   --gad a darker shade for scroll thumbs, --gat the text colour that reads on top of it. 198-game-ui.js sets all three. No emoji, no gradients. */
+:root{--ga:#2fe68a;--gad:#1a8a52;--gat:#04120a}
+:is(#ui>.box.modal.gu,#pzm,#ttl,#hud .hb){
+ --g:var(--ga);--bg:#000;--p:#000;--t:#f2f2f2;--m:#9a9a9a;--sbk:#000;--sbt:#3a3a3a;--sbh:var(--ga);--sbe:#000;
+ color:var(--t);
+ &.box,&.hb{background:#000;border:2px solid #2e2e2e;box-shadow:none}
+ &.box.modal,&#pzm{border-color:var(--ga)}
+ h1,h2,h3,.px{color:var(--t)}
+ h2{padding-bottom:6px;border-bottom:2px solid var(--ga)}
+ button{background:#161616;color:var(--t);border:2px solid #2e2e2e;box-shadow:none}
+ button:hover{background:#262626;border-color:var(--ga)}
+ button:active{background:#0c0c0c}
+ button.go{background:var(--ga);color:var(--gat);border-color:var(--ga);font-weight:700}
+ button.go:hover{background:var(--ga);filter:brightness(1.12)}
+ button:disabled{opacity:.4}
+ input,textarea,select{background:#0a0a0a;color:var(--t);border:2px solid #2e2e2e;outline:0}
+ input:focus,textarea:focus,select:focus{border-color:var(--ga)}
+ .card{background:#0f0f0f;border:2px solid #2e2e2e;border-radius:0}
+ .card b,.bar i,.ch i,.fxgoal i{color:var(--ga)}.bar i,.ch i,.fxgoal i{background:var(--ga)}
+ .bar{background:#000;border-color:#2e2e2e}
+ #stt button.on{color:var(--gat);background:var(--ga);border-color:var(--ga)}
+ .so{border-color:#2e2e2e}
+ a{color:var(--ga)}
+ input[type=range]{background:#000;border-color:#2e2e2e!important;box-shadow:none}
+ input[type=range]::-webkit-slider-runnable-track{background:#161616}
+ input[type=range]::-webkit-slider-thumb{background:var(--ga);border-color:#000;box-shadow:none}
+ input[type=range]::-moz-range-track{background:#161616}
+ input[type=range]::-moz-range-thumb{background:var(--ga);border-color:#000}
+ &.box::before{content:none}
+}
+.gaw{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}.gaw i{width:26px;height:26px;border:2px solid #2e2e2e;cursor:pointer;box-sizing:border-box}.gaw i.on{outline:2px solid #fff;outline-offset:1px}
+.gaw input[type=color]{width:34px;height:26px;padding:0;border:2px solid #2e2e2e;background:#000;cursor:pointer;flex:none}
+#pzo{background:rgba(0,0,0,.72);backdrop-filter:none}

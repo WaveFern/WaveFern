@@ -10,6 +10,10 @@ Use this when you add or change UI in any app. It lists the colours, fonts and s
 4. Keep the Silkscreen font for headings and `ui-monospace` for body text in the default look. Apps with their own look name their font in their own section.
 5. Bump `GAME_VERSION` and add a `VERSION_HISTORY` entry in `version.js` with every change (patch for fixes, minor for features).
 
+## Game UI style (`style.css` end, `198-game-ui.js`)
+
+A plain look for a few screens only: the world map, pause menu, main menu and career list, HUD boxes (monthly listeners, money, energy) and the waking-up card. The FPS counter is styled in `122-graphics.js`. Black `#000` panels, `#2e2e2e` borders, no shadows, gradients or emoji. One accent, chosen in Settings > Game (`OPT.accent`, saved in `fw_opt`), lives in `--ga` (`--gad` darker, `--gat` text on top). Inside the scope `--g` is mapped to `--ga`. The scope is the `:is(...)` list at the end of `style.css`: `#ui>.box.modal.gu`, `#pzm`, `#ttl` and `#hud .hb`. To put another screen in it, add the class `gu` to its `box modal`. Every other screen keeps its own look.
+
 ## Shared base (`style.css`)
 
 | Token / class | Value | Used for |
@@ -61,9 +65,10 @@ Root: `.chat.msx`. Tokens live on `.chat.msx`:
 
 ## WaveFern (`37-spotifly.js`, desktop app id `1`)
 
-- Logo: black tile with green `#1ed760` circle and three black bars (SVG `SFLOGO` in `11-os-v2.js`).
+- Accent: violet `#a66bff` (`.win.sfw` sets `--g` to it; play buttons, notifications and scroll thumbs use it). Light violet `#b38cff` for the logo and hover `#bb8cff`.
+- Logo: black tile with violet `#b38cff` circle and three black bars (SVG `SFLOGO` in `11-os-v2.js`).
 - Song row `.sr.sd` adds a 36px column for the delete action: a bin icon button `.bin` (muted `--m`, `--t` on hover, 32px touch target). Keep the bin on the row, not under it.
-- Play buttons `.bpl` are the `#1db954` circle (on song rows and on draft rows `.ng .bpl`).
+- Play buttons `.bpl` are the `#a66bff` circle (on song rows and on draft rows `.ng .bpl`).
 - Wallpaper: `#47b06f` with the wordmark.
 - Artist sidebar `.sb`, heading `.sfh` (logo at 26px beside the text).
 - Otherwise the shared base.
