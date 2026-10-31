@@ -21,8 +21,8 @@ function lay(){const box=document.querySelector('#ui .box.modal'),gen=box&&box.q
  const hint=[...box.children].find(e=>e.tagName=='P'&&e.classList.contains('m')),xs=[];for(let n=gen.nextElementSibling;n&&n!==hint;n=n.nextElementSibling)xs.push(n);
  if(xs.length){const d=document.createElement('details');d.className='recx';d.open=!!XO;
   const sel=box.querySelector('select.dsel:not([data-k])'),diss=sel&&sel.value=='1',on=[];if(diss)on.push('diss track on');
-  xs.forEach(n=>n.querySelectorAll&&n.querySelectorAll('select[data-k]').forEach(s=>{if(s.value!='auto')on.push(s.dataset.k=='sg'?s.options[s.selectedIndex].text:(s.dataset.k=='s8'?'808':'hi hat')+': '+(s.value?s.options[s.selectedIndex].text:'built-in'))}));
-  d.innerHTML=`<summary>Extras<small>${on.length?on.join(' · '):'sub-genre, 808, hi hat, diss track'}</small></summary><div class=recxb></div>`;
+  xs.forEach(n=>n.querySelectorAll&&n.querySelectorAll('select[data-k]').forEach(s=>{if(s.value!='auto')on.push(s.dataset.k=='sg'?s.options[s.selectedIndex].text:(s.dataset.l||(s.dataset.k=='s8'?'808':'hi hat'))+': '+(s.value?s.options[s.selectedIndex].text:'built-in'))}));
+  d.innerHTML=`<summary>Extras<small>${on.length?on.join(' · '):'sub-genre, 808, hi hat, instruments, diss track'}</small></summary><div class=recxb></div>`;
   const body=d.querySelector('.recxb');xs.forEach(n=>body.appendChild(n));gen.after(d);d.addEventListener('toggle',()=>{XO=d.open?1:0})}
  if(hint){hint.classList.add('rech');hint.innerHTML=hint.innerHTML.replace(/▲[^<]*?cold\s*(<br\s*\/?>)?/,'').trim();if(!hint.textContent.trim())hint.style.display='none'}
  const cancel=[...box.children].reverse().find(e=>e.tagName=='BUTTON');if(cancel)cancel.classList.add('recc')}

@@ -56,6 +56,54 @@
   "dur": 3.029
  },
  {
+  "c": "bass",
+  "f": "bass-bowser.mp3",
+  "n": "Bowser",
+  "root": 24,
+  "cents": -23,
+  "dur": 3.762
+ },
+ {
+  "c": "bass",
+  "f": "bass-eazy.mp3",
+  "n": "Eazy",
+  "root": 24,
+  "cents": -5,
+  "dur": 6.034
+ },
+ {
+  "c": "bass",
+  "f": "bass-morty.mp3",
+  "n": "Morty",
+  "root": 36,
+  "cents": -2,
+  "dur": 6.034
+ },
+ {
+  "c": "bass",
+  "f": "bass-reel.mp3",
+  "n": "Reel",
+  "root": 24,
+  "cents": 0,
+  "dur": 5.486
+ },
+ {
+  "c": "bass",
+  "f": "bass-yawn.mp3",
+  "n": "Yawn",
+  "root": 36,
+  "cents": 0,
+  "dur": 5.016
+ },
+ {
+  "c": "bass",
+  "f": "bass-zyadfav.mp3",
+  "n": "Zyadfav",
+  "root": 24,
+  "cents": -7,
+  "dur": 6.034
+ },
+ {
   "c": "bell",
   "f": "bell-domp.mp3",
   "root": 60,
@@ -266,11 +314,235 @@
   "dur": 2.528
  },
  {
+  "c": "key",
+  "f": "key-dadah.mp3",
+  "n": "Dadah",
+  "root": 84,
+  "cents": 0,
+  "dur": 0.862
+ },
+ {
+  "c": "key",
+  "f": "key-flacko.mp3",
+  "n": "Flacko",
+  "root": 60,
+  "cents": -1,
+  "dur": 6.034
+ },
+ {
+  "c": "key",
+  "f": "key-future.mp3",
+  "n": "Future",
+  "root": 60,
+  "cents": 0,
+  "dur": 6.034
+ },
+ {
+  "c": "key",
+  "f": "key-housekeeper.mp3",
+  "n": "Housekeeper",
+  "root": 60,
+  "cents": 5,
+  "dur": 6.034
+ },
+ {
+  "c": "key",
+  "f": "key-neo.mp3",
+  "n": "Neo",
+  "root": 72,
+  "cents": 1,
+  "dur": 6.034
+ },
+ {
+  "c": "key",
+  "f": "key-sun.mp3",
+  "n": "Sun",
+  "root": 60,
+  "cents": -1,
+  "dur": 3.448
+ },
+ {
+  "c": "key",
+  "f": "key-twirl.mp3",
+  "n": "Twirl",
+  "root": 60,
+  "cents": 6,
+  "dur": 6.034
+ },
+ {
+  "c": "key",
+  "f": "key-wonder.mp3",
+  "n": "Wonder",
+  "root": 60,
+  "cents": 4,
+  "dur": 6.034
+ },
+ {
+  "c": "key",
+  "f": "key-worship.mp3",
+  "n": "Worship",
+  "root": 72,
+  "cents": 1,
+  "dur": 3.448
+ },
+ {
   "c": "lead",
   "f": "lead-lezima.mp3",
   "root": 60,
   "cents": 2,
   "dur": 6.688
+ },
+ {
+  "c": "lead",
+  "f": "lead-bug.mp3",
+  "n": "Bug",
+  "root": 72,
+  "cents": 0,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-glow.mp3",
+  "n": "Glow",
+  "root": 60,
+  "cents": 0,
+  "dur": 5.303
+ },
+ {
+  "c": "lead",
+  "f": "lead-ken.mp3",
+  "n": "Ken",
+  "root": 60,
+  "cents": 0,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-madagascar.mp3",
+  "n": "Madagascar",
+  "root": 60,
+  "cents": -1,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-magic.mp3",
+  "n": "Magic",
+  "root": 60,
+  "cents": -2,
+  "dur": 3.762
+ },
+ {
+  "c": "lead",
+  "f": "lead-merch.mp3",
+  "n": "Merch",
+  "root": 72,
+  "cents": 2,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-nova.mp3",
+  "n": "Nova",
+  "root": 72,
+  "cents": 4,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-reap.mp3",
+  "n": "Reap",
+  "root": 48,
+  "cents": -7,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-siren.mp3",
+  "n": "Siren",
+  "root": 60,
+  "cents": 0,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-sting.mp3",
+  "n": "Sting",
+  "root": 60,
+  "cents": -4,
+  "dur": 6.034
+ },
+ {
+  "c": "lead",
+  "f": "lead-usala.mp3",
+  "n": "Usala",
+  "root": 60,
+  "cents": -10,
+  "dur": 6.034
+ },
+ {
+  "c": "pad",
+  "f": "pad-chance.mp3",
+  "n": "Chance",
+  "root": 60,
+  "cents": -5,
+  "dur": 6.034
+ },
+ {
+  "c": "pad",
+  "f": "pad-egypt.mp3",
+  "n": "Egypt",
+  "root": 60,
+  "cents": -2,
+  "dur": 6.034
+ },
+ {
+  "c": "pad",
+  "f": "pad-mellow.mp3",
+  "n": "Mellow",
+  "root": 60,
+  "cents": -1,
+  "dur": 6.034
+ },
+ {
+  "c": "pad",
+  "f": "pad-munich.mp3",
+  "n": "Munich",
+  "root": 60,
+  "cents": -3,
+  "dur": 6.034
+ },
+ {
+  "c": "pad",
+  "f": "pad-order.mp3",
+  "n": "Order",
+  "root": 60,
+  "cents": -1,
+  "dur": 6.034
+ },
+ {
+  "c": "pad",
+  "f": "pad-psg.mp3",
+  "n": "PSG",
+  "root": 60,
+  "cents": 2,
+  "dur": 6.034
+ },
+ {
+  "c": "pad",
+  "f": "pad-pink.mp3",
+  "n": "Pink",
+  "root": 36,
+  "cents": -2,
+  "dur": 3.709
+ },
+ {
+  "c": "pad",
+  "f": "pad-zilla.mp3",
+  "n": "Zilla",
+  "root": 84,
+  "cents": 3,
+  "dur": 2.482
  },
  {
   "c": "piano",
@@ -327,6 +599,86 @@
   "root": 72,
   "cents": -2,
   "dur": 0.424
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-babylon.mp3",
+  "n": "Babylon",
+  "root": 60,
+  "cents": -4,
+  "dur": 1.907
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-beetle.mp3",
+  "n": "Beetle",
+  "root": 60,
+  "cents": -4,
+  "dur": 0.47
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-blitz.mp3",
+  "n": "Blitz",
+  "root": 60,
+  "cents": 8,
+  "dur": 1.907
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-butter.mp3",
+  "n": "Butter",
+  "root": 60,
+  "cents": -5,
+  "dur": 1.907
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-circus.mp3",
+  "n": "Circus",
+  "root": 72,
+  "cents": -19,
+  "dur": 0.522
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-colegio.mp3",
+  "n": "Colegio",
+  "root": 60,
+  "cents": -2,
+  "dur": 0.967
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-nomination.mp3",
+  "n": "Nomination",
+  "root": 60,
+  "cents": 3,
+  "dur": 0.993
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-queso.mp3",
+  "n": "Queso",
+  "root": 60,
+  "cents": -9,
+  "dur": 3.291
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-swirl.mp3",
+  "n": "Swirl",
+  "root": 60,
+  "cents": -1,
+  "dur": 0.522
+ },
+ {
+  "c": "pluck",
+  "f": "pluck-toy.mp3",
+  "n": "Toy",
+  "root": 60,
+  "cents": -1,
+  "dur": 0.601
  },
  {
   "c": "string",
