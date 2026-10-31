@@ -1,4 +1,4 @@
-/* ===== v26.128: Spotifly "Browse artists" =====
+/* ===== v26.128: WaveFern "Browse artists" =====
    Every artist in the game plus ~130 more, famous and made-up (names only; songs and albums are invented). Search or filter by genre, open an artist's
    page to see monthly listeners, Popular songs with streams, albums and an album view, and play their music on the
    procedural beat system. Everything is worked out from the artist's name (a seed), so nothing is saved and the numbers
@@ -76,7 +76,7 @@ function brArtistPg(){const a=brArtist(SFB.a),c=sfCur(),mine=!!(c&&c.src&&c.src.
   <div class=sfbd style="--acc:${a.acc}"><div class=sfact><button class=sfgo aria-label="${pl?'Pause':'Play'}" onclick="brBig(${a.i})">${sfIco(pl?'pause':'play')}</button><button class="sfib${SPQ.sh?' on':''}" title="Shuffle" onclick="sfShuf()">${sfIco('shuf')}</button></div>
   ${ss.map((s,n)=>brRow(a,s,n+1,c)).join('')}</div>`}
  const P=brPop(a).slice(0,SFB.all?10:5);
- return`<div class=sfhd style="--acc:${a.acc}"><img class=sfart src="${brFace(a.i)}" alt=""><div class=sfhi>${back}<h1 class=sfnm>${esc(a.name)}</h1><div class=sfver>${sfIco('ver','sfvi')}<b>Verified by Spotifly</b></div><p class=sfml>${brML(a).toLocaleString()} monthly listeners · ${a.g}</p></div></div>
+ return`<div class=sfhd style="--acc:${a.acc}"><img class=sfart src="${brFace(a.i)}" alt=""><div class=sfhi>${back}<h1 class=sfnm>${esc(a.name)}</h1><div class=sfver>${sfIco('ver','sfvi')}<b>Verified by WaveFern</b></div><p class=sfml>${brML(a).toLocaleString()} monthly listeners · ${a.g}</p></div></div>
  <div class=sfbd style="--acc:${a.acc}"><div class=sfact><button class=sfgo aria-label="${pl?'Pause':'Play'}" onclick="brBig(${a.i})">${sfIco(pl?'pause':'play')}</button><button class="sfib${SPQ.sh?' on':''}" title="Shuffle ${SPQ.sh?'on':'off'}" onclick="sfShuf()">${sfIco('shuf')}</button></div>
  <h2 class=sfh2>Popular</h2>${P.map((s,n)=>brRow(a,s,n+1,c)).join('')}<button class=sfmore onclick="SFB.all=!SFB.all;pcR()">${SFB.all?'Show less':'See more'}</button>
  <h2 class=sfh2>Albums</h2><div class=brg>${a.A.map((al,n)=>`<button class=brc onclick="brSet('al',${n})"><img src="${brIc(al)}" alt=""><b>${esc(al.name)}</b><small>${al.yr} · Album · ${al.songs.length} songs</small></button>`).join('')}</div></div>`}

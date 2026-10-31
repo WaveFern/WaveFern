@@ -61,7 +61,7 @@ function igzAbout(r){const a=S.artist,L=S.listeners||0,songs=(S.songs||[]),last=
   if(!D.resp&&D.age>=1)add({u:R,cfg:lk(R)},igzPick(['Heard "'+T+'". Cute. Response coming soon','Funny how '+a+' needed my name to get streams','Studio tonight. '+a+' asked for this','Not even mad, "'+T+'" was kind of catchy. Still taking you out though'],r),'studio',{rival:R,l:Math.max(50,Math.round((L||10)*(1+r())))})});
  /* everyday buzz, more of it as you grow */
  let n=L<50?(r()<.4?1:0):L<5e3?1:L<5e5?2:3;const age=(S.day||0)-(last.day||0);if(age<=1)n++;
- const small=['My friend '+a+' just put out "'+last.title+'", go give it a listen','Proud of '+a+', "'+last.title+'" is actually good','Found '+a+' on Spotifly today, "'+last.title+'" is a vibe'],
+ const small=['My friend '+a+' just put out "'+last.title+'", go give it a listen','Proud of '+a+', "'+last.title+'" is actually good','Found '+a+' on WaveFern today, "'+last.title+'" is a vibe'],
   mid=['Can not stop playing "'+(top||last).title+'" by '+a,'"'+last.title+'" by '+a+' has been on repeat all week','Who else has "'+(top||last).title+'" stuck in their head','Called it early: '+a+' is going to be huge',a+' is so underrated, "'+last.title+'" proves it'],
   big=[igzF((top||last).streams||0)+' streams on "'+(top||last).title+'". '+a+' is not slowing down','Bought the '+a+' hoodie, no regrets','Waited three hours to see '+a+' and it was worth it','Front row for '+a+' last night, my ears are still ringing'],
   met=['Saw '+a+' in the city today, they were so nice','Ran into '+a+' downtown and got a picture!!','Look who I met today: '+a];

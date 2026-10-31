@@ -2,7 +2,7 @@
    - Song direction (removed in v49.25.0): songs made before then may have a Mood and Length, saved as sd ('mood|length');
      it still shapes their daily streams (planOf), quality and followers. New songs have none.
    - Plaques: a song passing 1M / 10M / 100M / 1B streams (Gold, Platinum, Diamond, Billions Club) gets a plaque in the
-     mail (a Spotifly Team message and a card) and it goes to Storage, to hang anywhere at home (v49.42.0). State: song.pq (tiers given), S.plq list.
+     mail (a WaveFern Team message and a card) and it goes to Storage, to hang anywhere at home (v49.42.0). State: song.pq (tiers given), S.plq list.
    - Legacy goals for the late game, paid once (S.leg). Goals an old save already meets are marked done quietly.
    - Music friends: each collab with an artist deepens your bond (Friend 1, Close friend 3, Best friend 5 songs together).
      Friends charge less to collab, and close friends share your new releases (a day of boosted streams).
@@ -13,7 +13,7 @@
 const FL=()=>{try{return fameLevel()||0}catch(e){return 0}};
 const fmt=n=>n>=1e9?+(n/1e9).toFixed(1)+'B':n>=1e6?+(n/1e6).toFixed(1)+'M':n>=1e4?+(n/1e3).toFixed(1)+'k':Math.floor(n).toLocaleString();
 const live=()=>typeof S=='object'&&S&&S.artist&&Array.isArray(S.songs)&&!document.getElementById('load')&&mode!='load';
-const mail=b=>{try{if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'Spotifly Team',body:b,state:9,unread:1,day:S.day})}catch(e){}};
+const mail=b=>{try{if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'WaveFern Team',body:b,state:9,unread:1,day:S.day})}catch(e){}};
 const card=(k,t,s,n)=>{try{glCard(k,t,s);snd('chime');setTimeout(()=>snd('cash'),180);glBurst(n||30)}catch(e){}};
 
 /* ===== song direction ===== */

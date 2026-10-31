@@ -171,7 +171,7 @@ Rules for every sub:
 **Body:**
 > Play: https://wavefern.com (free, no download, no sign up)
 >
-> You start with $100, a laptop and a tiny studio. Make songs with three quick minigames (beat, lyrics, mix), release them on Spotifly and watch the streams come in each morning. Then buy gear, sign with a label, play festivals, drive around a 3D city and take your music on a world tour.
+> You start with $100, a laptop and a tiny studio. Make songs with three quick minigames (beat, lyrics, mix), release them on WaveFern and watch the streams come in each morning. Then buy gear, sign with a label, play festivals, drive around a 3D city and take your music on a world tour.
 >
 > There's also multiplayer: start a band with up to 4 friends using a room code.
 >
@@ -295,7 +295,7 @@ Business emails are usually on the YouTube channel's About page ("View email add
 >
 > I loved your video on (specific video, one detail from it). I'm James, one of two people making WaveFern, a free music career game that runs in the browser.
 >
-> You start with $100 and a laptop, record songs with quick minigames, release them on an in-game Spotifly and try to go from nobody to Diamond plaques and a world tour. There's also a 4 player band mode with a room code, if you ever play with friends on stream.
+> You start with $100 and a laptop, record songs with quick minigames, release them on an in-game WaveFern and try to go from nobody to Diamond plaques and a world tour. There's also a 4 player band mode with a room code, if you ever play with friends on stream.
 >
 > I think it'd suit a "Day 1 to Day 100" or "becoming a famous rapper" style video. It's free at https://wavefern.com, nothing to install, and here's a 75 second trailer: (YouTube link)
 >

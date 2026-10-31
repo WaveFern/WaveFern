@@ -21,7 +21,7 @@ function msTick(){if(!live())return;if(!S.ms){S.ms={};for(const k in MS)S.ms[k]=
   try{glCard('MILESTONE',big(t)+' '+MS[k][0],n>=4?'You are a star':n>=2?'People are noticing':'Your first fans are here');snd('chime');setTimeout(()=>snd('cash'),180);glBurst(20+n*8)}catch(e){}return}}}
 
 const TIPS=[
- ['song',()=>S.day>=2&&!(S.songs||[]).length,'No songs out yet. Record one in your studio, then release it on Spotifly from your PC. Releases earn streams every night.'],
+ ['song',()=>S.day>=2&&!(S.songs||[]).length,'No songs out yet. Record one in your studio, then release it on WaveFern from your PC. Releases earn streams every night.'],
  ['out',()=>typeof P!='undefined'&&(P.x<0||P.x>16||P.z>12||P.z<0)&&mode=='play'&&!IN,'Press N for the city map: shops, venues and places to visit are all on it.'],
  ['tired',()=>(S.energy??100)<25,'Low energy. Eat something (Eats on your Gphone, or the kitchen) or sleep at your bed.'],
  ['quest',()=>S.day>=2,'Your PC has a Quests app: finish all three daily quests for a cash reward every day.'],

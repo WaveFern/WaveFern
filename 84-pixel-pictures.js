@@ -1,5 +1,5 @@
 /* ===== v26.82: your own pictures, in the game's pixel style =====
-   Upload a picture for your Spotifly profile, your Instagrime profile, or as an Instagrime photo post.
+   Upload a picture for your WaveFern profile, your Instagrime profile, or as an Instagrime photo post.
    Every upload is cropped to fill the frame, shrunk to a small pixel grid (PXS) and cut down to 16 colours (median cut,
    no dithering), so it looks like the rest of the game's pixel art. It is shown scaled up with hard pixel edges.
    Storage: one short string per picture (pxEnc): base64 of [width, height, colour count, palette RGB, 4-bit pixels].
@@ -36,7 +36,7 @@ function pxPick(kind,done){if(!PXIN){PXIN=document.createElement('input');PXIN.t
  PXIN.value='';PXIN.onchange=()=>{const f=PXIN.files&&PXIN.files[0];if(!f)return;if(!/^image\//.test(f.type||'')){snd('err');return say('That file is not a picture.')}
   const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{let c=null;try{const[w,h]=PXS[kind];c=pxFromImage(im,w,h)}catch(e){console.error('picture',e)}URL.revokeObjectURL(u);if(!c){snd('err');return say('Could not read that picture.')}done(c)};
   im.onerror=()=>{URL.revokeObjectURL(u);snd('err');say('Could not read that picture.')};im.src=u};PXIN.click()}
-function pxSetPfp(where){pxPick(where,c=>{S[where=='sp'?'pfpSp':'pfpIg']=c;updateVersion();snd('ping');say((where=='sp'?'Spotifly':'Instagrime')+' profile picture updated.');pcR()})}
+function pxSetPfp(where){pxPick(where,c=>{S[where=='sp'?'pfpSp':'pfpIg']=c;updateVersion();snd('ping');say((where=='sp'?'WaveFern':'Instagrime')+' profile picture updated.');pcR()})}
 function pxResetPfp(where){delete S[where=='sp'?'pfpSp':'pfpIg'];snd('pop');say('Back to your drawn profile picture.');pcR()}
 /* ---- showing them: your drawn avatar is swapped for your upload after each render ---- */
 const PXD={k:null,u:null},pxDef=()=>{const k=JSON.stringify(ch);if(PXD.k!==k){PXD.k=k;PXD.u=pfp(ch)}return PXD.u};

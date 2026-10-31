@@ -1,8 +1,8 @@
 /* ===== v41.3.0: more real artists, and real artists are 10x bigger =====
    1. The most-streamed real artists (spotifystats.com top artists, Oct 2026) join the game's own roster (ART), so they can DM you and
       collab. Appended at the end of ART: saves refer to artists by index, so old saves keep pointing at the same people.
-      Names only: their songs and albums in Spotifly are made up. Looks come from the real-looks table (114-real-looks.js), with new rows here.
-   2. Every real artist (ART rows with a[8] set, plus the real ones in Spotifly Browse) has 10x the monthly listeners, so the top of the
+      Names only: their songs and albums in WaveFern are made up. Looks come from the real-looks table (114-real-looks.js), with new rows here.
+   2. Every real artist (ART rows with a[8] set, plus the real ones in WaveFern Browse) has 10x the monthly listeners, so the top of the
       ladder is much further away. Being featured with a real artist still brings the same fan streams as before (featLis is scaled back
       for them), so collabs do not pay 10x more. Fees barely move: they come from a[3], not the listener count. */
 const REAL_X=10;
@@ -27,7 +27,7 @@ const REAL_NEW=[['Bruno Mars','Pop',129.6e6],['Rihanna','Pop',116.6e6],['Justin 
  REAL_NEW.forEach(([n,g,L])=>{if(have.has(n.toLowerCase()))return;const h=brHash('real|'+n),look=(typeof realLook=='function'&&realLook(n))||lk(n);
   /* fee like the existing stars: Drake charges 200,000 at 60M listeners, scaled by the square root of size */
   ART.push([n,g,Math.round(L),Math.round(200000*Math.sqrt(L/6e7)/1000)*1000,look,M[h%5],'',1,1,.5])})}
-/* the 10x: every real artist in ART, and the real artists that only appear in Spotifly Browse (the rows before the made-up ones) */
+/* the 10x: every real artist in ART, and the real artists that only appear in WaveFern Browse (the rows before the made-up ones) */
 const REAL_SET=new Set();
 ART.forEach(a=>{if(a[8]){a[2]=Math.round(a[2]*REAL_X);REAL_SET.add(a[0])}});
 {const k=BRX.findIndex(x=>x[0]=='Drayke Monroe');BRX.slice(0,k<0?0:k).forEach(x=>{if(x[0]!='Taylor Pardee')x[2]*=REAL_X})}

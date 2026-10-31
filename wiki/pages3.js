@@ -61,7 +61,7 @@ ${T(['Dish','Section',['Price','n'],['Energy','n']],(D.food||[]).map(f=>[`${esc(
 <p>Also: ${L('festival','festival stalls')} and ${L('tour-cities','street food abroad')}.</p>`});
 
 page('gphone','Gphone','life',{e:'',sum:'Phone models, perks and the camera.',src:['115-gphone.js','116-gphone-plus.js','118-gphone-apps.js'],kw:'phone gphone camera photo selfie',body:()=>`
-<p class=lead>Press ${K('G')} to open your phone. You start with a laggy Gphone 8; newer models are sold on Amazoom. Every model has Messages, Spotifly, Instagrime, Eats, Gigs, Camera and Photos. Better models boost every song's streams and make photo posts bring more followers.</p>
+<p class=lead>Press ${K('G')} to open your phone. You start with a laggy Gphone 8; newer models are sold on Amazoom. Every model has Messages, WaveFern, Instagrime, Eats, Gigs, Camera and Photos. Better models boost every song's streams and make photo posts bring more followers.</p>
 ${T([['Model','n'],['Price','n'],['Streams','n'],['Followers per photo post','n'],'Perks'],(D.phones||[]).map(p=>['Gphone '+p.m,[p.p?$$(p.p):'starter',p.p],['+'+pct(p.buzz),p.buzz],['+'+p.post,p.post],esc(p.perks)]))}`});
 
 page('instagrime','Instagrime','life',{e:'',sum:'Posting, followers and promotions.',src:['16-big-world-fame-chat-instagrime-v2.js','103-instagrime-icons-trees.js','83-promotions.js','189-instagrime-talk.js'],kw:'instagrime post followers feed photo influencer tagged diss',body:()=>`
@@ -70,13 +70,13 @@ ${H2('Posts about you')}<p>Once you have a song out, other people post about you
 ${H2('Influencers')}<p>You follow 8 big accounts (skye.daily, popwatch, tourmode.tara, drip.report, thepetpals, cozyroom.mila, dex.lifts and carspotter.jay). Their pictures sit in a row at the top of the feed, 3 of them post on every refresh, and their profiles show a verified tick, a bio and millions of followers. Once you reach about 10,000 listeners they start posting your songs too.</p>`});
 
 page('apps','Computer and apps','life',{e:'',sum:'The laptop, its websites and every app in the App Barn.',src:['06-computer.js','10-apps-shop-furniture.js','11-os-v2.js'],kw:'laptop computer app barn browser website',body:()=>`
-<p class=lead>Press ${K('E')} at your desk to use the laptop: Spotifly, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.</p>
+<p class=lead>Press ${K('E')} at your desk to use the laptop: WaveFern, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.</p>
 ${H2('App Barn')}${T(['App',['Price','n'],'What it does'],Object.values(D.apps||{}).map(a=>[a.n+(a.soon?' '+tag('soon','y'):''),[a.p?$$(a.p):'free',a.p],esc(a.d)]))}
 ${H2('Websites')}${ul(['<b>motors.wf</b>: book a car','<b>homes.wf</b>: book a home viewing','<b>pawfinder.wf</b>: book a pet','<b>bodyguards.wf</b>: book a guard','<b>Threadz</b>: clothes'])}`});
 
 page('messages','Messages and Big Vee','life',{e:'',sum:'Chatting with artists, labels and your manager.',src:['76-messages-plus.js','78-big-vee-smarter.js','102-messaging.js'],kw:'messages chat dm big vee manager',body:()=>`
 <p class=lead>Messages holds every chat: artists who DM you (see ${L('collabs')}), label offers and Big Vee, your manager. Pin chats to keep them on top, clear them, or press <b>New</b> for suggested people.</p>
-${H2('Big Vee')}<p>Big Vee is pinned by default. Text a question in plain words and Big Vee answers from your current save. Topics: controls, making a track, uploading and money, Spotifly, billboards, height, collabs, Messages, gear, clothes, sleep and energy, the map and cars, festivals, fame and saving.</p>`});
+${H2('Big Vee')}<p>Big Vee is pinned by default. Text a question in plain words and Big Vee answers from your current save. Topics: controls, making a track, uploading and money, WaveFern, billboards, height, collabs, Messages, gear, clothes, sleep and energy, the map and cars, festivals, fame and saving.</p>`});
 
 /* ===================== Multiplayer ===================== */
 page('band-rooms','Band rooms','band',{e:'',sum:'Up to four friends in one band, how songs and sets work together.',src:['161-multiplayer.js'],kw:'multiplayer band room friends online code instrument emote relay peer',body:()=>`
@@ -123,7 +123,7 @@ const FIGS={
  'first-day':[['bedroom','Your bedroom on day one: the bed, the wardrobe and the computer desk.'],['creator','The character creator at the start of a new career.']],
  saves:[['title','The main menu, where you pick a career slot.']],
  recording:[['song-menu','The Make a song screen.'],['minigame-beat','The Beat step.'],['minigame-lyrics','The Lyrics step.'],['minigame-mix','The Mix step.']],
- spotifly:[['spotifly','A new artist page on Spotifly.']],
+ spotifly:[['spotifly','A new artist page on WaveFern.']],
  gear:[['gearshop','The Gearshop app on the computer.'],['music-store','The Music Store in the city.']],
  apps:[['app-barn','The App Barn, where you buy apps for the laptop.']],
  messages:[['messages','The Messages app with a few DMs from other artists.']],
@@ -157,7 +157,7 @@ ${H2('The name','name')}<p>WaveFern was nearly called FernWave. James forgot the
 ${H2('Soundtrack')}<p>Rowan Burton made the soundtracks in <a href="https://www.image-line.com/fl-studio/" target=_blank rel=noopener>FL Studio</a>, using its stock plugins, and <a href="https://surge-synthesizer.github.io/" target=_blank rel=noopener>Surge XT</a>, <a href="https://www.looperman.com/free-music-software/detail/krakli-software-arminator-2" target=_blank rel=noopener>Arminator 2</a> plus <a href="https://tumfy.net/" target=_blank rel=noopener>tumfy</a>'s free kits.</p>
 <p>Play the whole soundtrack here. It keeps playing while you read other pages.</p>
 ${ostTable()}
-<p>The songs you make in the game are a separate thing: see ${L('song-audio','How Spotifly songs sound')}.</p>
+<p>The songs you make in the game are a separate thing: see ${L('song-audio','How WaveFern songs sound')}.</p>
 ${H2('Built with')}<p>The game runs in any modern browser with JavaScript and WebGL, with nothing to install. Band rooms use PeerJS, and cloud saves use Google sign-in.</p>`});
 
 /* ===================== FAQ: questions new players tend to ask, answered as pointers and advice ===================== */
@@ -174,7 +174,7 @@ ${Q('My songs are bad. How do I make them better?',`Keep making them. You get be
 ${Q('Why are my streams so low?',`New artists start small. Releasing often keeps interest up, and better songs lift everything else. See ${L('streams')}.`)}
 ${Q('Why did my monthly listeners go down?',`The monthly number is recounted as days pass, so a quiet spell shows up there. Keep releasing and it climbs back. See ${L('listeners','Monthly listeners and followers')}.`)}
 ${Q('How do I get a collab?',`Artists about your size DM you on their own, and you can message artists yourself in Messages. See ${L('collabs','Collabs')}.`)}
-${Q('Can I listen to my songs?',`Yes. Each song has its own beat that plays from your Spotifly artist page. See ${L('song-audio','How Spotifly songs sound')}.`)}
+${Q('Can I listen to my songs?',`Yes. Each song has its own beat that plays from your WaveFern artist page. See ${L('song-audio','How WaveFern songs sound')}.`)}
 ${H2('Career')}
 ${Q('How do I get signed to a label?',`Labels only start writing from day 5, and only once your listeners, streams and reputation are high enough for them. The first offers are rarely the best ones. See ${L('labels','Record labels')}.`)}
 ${Q('How do I go up in fame?',`Fame follows your monthly listeners, so anything that grows your listeners grows your fame. See ${L('fame','Fame levels')} for what each level unlocks.`)}
@@ -243,15 +243,15 @@ document.addEventListener('wiki:render',e=>{if(e.detail.id!='contact')return;con
   catch(x){st.textContent='That did not send. Try again in a minute.'}
   b.disabled=false}});
 
-page('song-audio','How Spotifly songs sound','music',{sum:'How the game makes a playable track for every song you record.',src:['67-beats.js','132-808-hats.js'],kw:'audio beat engine sound play listen spotifly samples 808 hi hat tumfy music',body:()=>`
+page('song-audio','How WaveFern songs sound','music',{sum:'How the game makes a playable track for every song you record.',src:['67-beats.js','132-808-hats.js'],kw:'audio beat engine sound play listen spotifly samples 808 hi hat tumfy music',body:()=>`
 ${IB('Beat engine','',[['Made in','The browser, as it plays'],['Styles',Object.values(D.styles||{}).reduce((a,l)=>a+l.length,0)+' across '+(D.genres||[]).length+' genres'],['Scales','Major or minor'],['Recorded 808s',((D.drums||{}).s808||[]).length],['Recorded hi hats',((D.drums||{}).hats||[]).length]])}
-<p class=lead>Every song you make has its own instrumental that you can play from your Spotifly artist page. The tracks are not stored as audio files. The game writes each one in the browser when you press play, from a few numbers saved with the song.</p>
+<p class=lead>Every song you make has its own instrumental that you can play from your WaveFern artist page. The tracks are not stored as audio files. The game writes each one in the browser when you press play, from a few numbers saved with the song.</p>
 ${H2('One seed per song')}<p>When you record a song it gets a random number called a seed. The seed picks everything about the beat:</p>
 ${ul(['a beat style from the song\'s genre (see '+L('genres')+')','the tempo, within that style\'s range','the key, and a major or minor scale','a chord progression','which drum pattern variations play, and small changes to the drum sounds','a hook melody, made up note by note'])}
 <p>The same seed always gives the same beat, so a song sounds the same every time you play it, on any device. Collabs and band songs get their own seed too.</p>
 ${H2('The sounds')}<p>Most of the sounds are made in code with the browser's audio engine: drums, basses, keys, plucked guitars and synths. On top of that, some sounds are recorded samples:</p>
 ${ul(['Melodic one-shots (keys, basses, bells, brass, plucks, flutes, strings and more). Each song picks one sample per instrument from its seed, so a bass never changes sound halfway through.','The recorded 808s and hi hats you can pick under Extras when you make a song (see '+L('extras')+').'])}
 <p>Some of these sounds come from <a href="https://tumfy.net/" target=_blank rel=noopener>tumfy</a>'s free kits.</p>
-${H2('Song structure')}<p>A song on Spotifly plays an intro, then verses and hooks with a short bridge, and loops after that. A festival or tour set uses a livelier order that gets to the hook sooner, and a recording session plays a short version under the minigames.</p>
-${H2('Where you hear it')}${ul(['Under the minigames while you record','On your Spotifly artist page, with the play button on each song','During festival sets and tour shows, where each song in the setlist plays its own beat'])}
+${H2('Song structure')}<p>A song on WaveFern plays an intro, then verses and hooks with a short bridge, and loops after that. A festival or tour set uses a livelier order that gets to the hook sooner, and a recording session plays a short version under the minigames.</p>
+${H2('Where you hear it')}${ul(['Under the minigames while you record','On your WaveFern artist page, with the play button on each song','During festival sets and tour shows, where each song in the setlist plays its own beat'])}
 <p>The background music you hear while walking around is different: that is the game's soundtrack, made by Rowan Burton (see ${L('credits')}).</p>`});

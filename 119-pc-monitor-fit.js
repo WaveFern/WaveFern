@@ -1,6 +1,6 @@
 /* ===== v41.0.0: the monitor screen keeps a desktop-size layout =====
    In the first-person monitor view the computer screen is laid out at a design size of at least PCFIT.w x PCFIT.h
-   and scaled as a whole to fit inside the monitor, so Spotifly and the other apps never get squished by a small,
+   and scaled as a whole to fit inside the monitor, so WaveFern and the other apps never get squished by a small,
    short or narrow window. It re-fits every time the screen is drawn, when the window or zoom changes, when the
    pause menu or settings redraw the screen, and a moment after the computer opens. The narrow-window CSS rules in
    style.css skip body.pcmode, because the monitor screen is always desktop size. */

@@ -59,7 +59,7 @@ Root: `.chat.msx`. Tokens live on `.chat.msx`:
 - Touch targets are at least 32px tall (chips 32px, buttons 36px, selects 34px). Hover lightens the fill, press scales to 97%, focus shows a pink outline.
 
 
-## Spotifly (`37-spotifly.js`, desktop app id `1`)
+## WaveFern (`37-spotifly.js`, desktop app id `1`)
 
 - Logo: black tile with green `#1ed760` circle and three black bars (SVG `SFLOGO` in `11-os-v2.js`).
 - Song row `.sr.sd` adds a 36px column for the delete action: a bin icon button `.bin` (muted `--m`, `--t` on hover, 32px touch target). Keep the bin on the row, not under it.

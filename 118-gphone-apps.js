@@ -3,7 +3,7 @@
    phone body with bezel, notch, side buttons and a home bar. The Bank, Stats, Maps and Deals apps from v26.146 are gone:
    any savings are paid back to your wallet once (S.sav set to 0), and their nightly interest and deal payouts no longer run.
    Adds the things you used to walk to the computer for, on the phone (G):
-   - Spotifly: name and release your recorded songs, see today's streams and earnings so far.
+   - WaveFern: name and release your recorded songs, see today's streams and earnings so far.
    - Goober Eats: order food (it goes to Storage, as on the computer); from the Gphone 9 you can also eat stored food anywhere.
    - Gigs: the FestivalApp (book festival slots and setlists).
    - Gphone Store: see what each model gives and buy the next one straight from the phone.
@@ -14,7 +14,7 @@ const GP_BUZZ={8:0,9:.02,10:.04,11:.06,12:.08,13:.10,14:.12,15:.15,16:.17,17:.19
 const gpBuzz=()=>GP_BUZZ[phModel()]||0;
 const gpPct=n=>'+'+Math.round((GP_BUZZ[n]||0)*100)+'% streams';
 /* what's new on each model, shown in the Store, on gphone.wf and on the home screen card */
-const GP_NEW={8:['Messages, Spotifly, Instagrime, Eats, Gigs, Camera, Photos'],9:['Eat stored food anywhere','Sharper photos'],10:['Faster apps'],11:['Faster apps','Better camera'],12:['+1 reputation per artist selfie'],13:['Apps open instantly'],14:['Bigger photo boost'],15:['Pro camera'],16:['Bigger photo boost'],17:['Instant shutter'],18:['Best camera']};
+const GP_NEW={8:['Messages, WaveFern, Instagrime, Eats, Gigs, Camera, Photos'],9:['Eat stored food anywhere','Sharper photos'],10:['Faster apps'],11:['Faster apps','Better camera'],12:['+1 reputation per artist selfie'],13:['Apps open instantly'],14:['Bigger photo boost'],15:['Pro camera'],16:['Bigger photo boost'],17:['Instant shutter'],18:['Best camera']};
 Object.keys(GPF).forEach(n=>{GPF[n]=(GP_NEW[n]||[]).concat(GP_BUZZ[n]?[gpPct(n)]:[]).join(' · ')});
 /* ---- fan buzz: more daily streams on every song (same shape as the gear and Label HQ boosts) ---- */
 {const po=planOf;planOf=function(s){const fresh=s&&s.pd!==S.day,v=po.apply(this,arguments);if(!fresh||!(v>0))return v;const m=gpBuzz();if(!(m>0))return v;
@@ -24,11 +24,11 @@ Object.keys(GPF).forEach(n=>{GPF[n]=(GP_NEW[n]||[]).concat(GP_BUZZ[n]?[gpPct(n)]
  IC.gpst=px(['...KKKK...','..KWWWWK..','..KWGGWK..','..KWWWWK..','..KWWWWK..','..KWWWWK..','..KWWWWK..','..KWWWWK..','..KWKKWK..','...KKKK...'],{K:'#0c0f0d',W:'#e8f3ec',G:'#2fe68a'})}
 /* ---- apps: everyday ones first ---- */
 GP_APPS.splice(0,GP_APPS.length,
- ['msg','Messages',()=>IC.msg,'#3b82f6'],['sf','Spotifly',()=>IC.fw,'#000000'],['ig','Instagrime',()=>IC.ig,'#d6249f'],['eats','Eats',()=>IC.eats,'#c8964a'],
+ ['msg','Messages',()=>IC.msg,'#3b82f6'],['sf','WaveFern',()=>IC.fw,'#000000'],['ig','Instagrime',()=>IC.ig,'#d6249f'],['eats','Eats',()=>IC.eats,'#c8964a'],
  ['cam','Camera',()=>IC.cam,'#26302a'],['pho','Photos',()=>IC.pho,'#2a6f97'],['fest','Gigs',()=>IC.fest||IC.os,'#6a3093'],['shop','Store',()=>IC.gpst,'#2fe68a']);
-Object.assign(GP_TITLE,{sf:'Spotifly',eats:'Goober Eats',fest:'Gigs',shop:'Gphone Store'});
-/* ---- Spotifly: release drafts and watch today's streams ---- */
-function gpSf(){if(!S.artist)return`<div class=phs2><div class=pcd><h3>SPOTIFLY</h3><div class=sub>Pick your artist name on the computer first.</div></div></div>`;
+Object.assign(GP_TITLE,{sf:'WaveFern',eats:'Goober Eats',fest:'Gigs',shop:'Gphone Store'});
+/* ---- WaveFern: release drafts and watch today's streams ---- */
+function gpSf(){if(!S.artist)return`<div class=phs2><div class=pcd><h3>WAVEFERN</h3><div class=sub>Pick your artist name on the computer first.</div></div></div>`;
  const D=S.drafts||[],ok=D.filter(d=>(d.title||'').trim()).length,L=(S.songs||[]).slice().sort((a,b)=>(b.today||0)-(a.today||0)),today=L.reduce((a,x)=>a+(x.today||0),0),bz=gpBuzz();
  return`<div class=phs2><div class=prow><div class=pcd><h3>TODAY</h3><div class=big>${gpNum(today)}</div><div class=sub>streams so far</div></div><div class=pcd><h3>EARNED</h3><div class=big style="font-size:20px">${$$(today*.05)}</div><div class=sub>paid tonight</div></div></div>
  <div class=pcd><h3>FAN BUZZ</h3>${bz?`<span class=gptg>${gpPct(phModel())}</span><div class=sub style="margin-top:4px">Your Gphone ${phModel()} adds this to every song's daily streams.</div>`:`<div class=sub>A Gphone 9 or newer adds +2% to +22% to every song's daily streams. Open the Store.</div>`}</div>
@@ -56,10 +56,10 @@ function gpShop(){const m=phModel();
  const h=b0.apply(this,arguments);if(a!='home')return h;
  /* home: badge for songs waiting to release, and the upgrade card opens the Store */
  const m=phModel(),nx=GPH[m+1],dr=(S.drafts||[]).length;let o=h;
- if(dr)o=o.replace(/(<img src="[^"]*">)(Spotifly)/,`$1$2<span class=bd>${dr}</span>`);
+ if(dr)o=o.replace(/(<img src="[^"]*">)(WaveFern)/,`$1$2<span class=bd>${dr}</span>`);
  o=o.replace(/<div class=pnx>[\s\S]*?<\/div><\/div>/,nx?`<div class=pnx onclick="phApp('shop')"><b>Next: Gphone ${m+1} · $${nx[0].toLocaleString()}</b><div class=sub style="color:#8aa094">${esc(GPF[m+1])}. Tap to see every model.</div></div>`:`<div class=pnx onclick="phApp('shop')"><b>You have the best Gphone</b><div class=sub style="color:#8aa094">${gpPct(m)} fan buzz and every app unlocked.</div></div>`);
  return o}}
-/* the Spotifly and Eats screens refresh themselves so stream counts and energy stay live */
+/* the WaveFern and Eats screens refresh themselves so stream counts and energy stay live */
 setInterval(()=>{try{if(mode=='phone'&&PH.app=='sf'&&!PH.loading&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))phR()}catch(e){}},2000);
 /* ---- gphone.wf on the computer: same perk list ---- */
 PA.phones=()=>{const m=phModel();return`<div style="padding:14px"><h1 style="margin:0 0 4px">Gphone</h1><p class=m>You have a <b>Gphone ${m}</b>${GP_BUZZ[m]?' ('+gpPct(m)+' fan buzz)':''}. Each model keeps everything from the one before. Open your phone with G, or buy straight from its Store app.</p><div class=cards style="display:flex;flex-wrap:wrap;gap:10px">${Object.keys(GPH).map(Number).filter(n=>n>8).map(n=>{const g=GPH[n];return`<div class=card style="min-width:190px;flex:1"><b style="font-size:16px">Gphone ${n}</b><br><b style="color:var(--g)">${esc(GPF[n])}</b><br><small class=m>Photos ${g[1]}x${g[2]} · ${g[3]?'shutter lag '+g[3]+'s':'instant shutter'}<br>${GP_LAG[n]>100?'Apps load in '+(GP_LAG[n]/1000).toFixed(1)+'s':'Apps open instantly'}</small><div style="margin:8px 0;font-weight:bold;font-size:18px">$${g[0].toLocaleString()}</div>${n<=m?`<button disabled>${n==m?'You have this':'You have a newer one'}</button>`:`<button class=go ${S.money<g[0]?'disabled':''} onclick="buyPhone(${n})">Buy now</button>`}</div>`}).join('')}</div></div>`};
@@ -149,17 +149,17 @@ phR=function(){let e=document.getElementById('ph');if(!e){e=document.createEleme
 #ph .fa img,#ph .ig img{max-width:100%}#ph .phx{overflow-x:hidden}
 #ph .phv{max-height:60vh;object-fit:contain;box-sizing:border-box}
 `;document.head.appendChild(st)}
-/* ===== v41.3: a live phone, Goober Eats in its own look, Spotifly artist page =====
+/* ===== v41.3: a live phone, Goober Eats in its own look, WaveFern artist page =====
    - The clock keeps running and you can walk (WASD) with the phone open: the game updates as in play, the phone stays up.
      If something takes over (sleep, a cutscene, a shop screen) the phone closes. E still only works with the phone away.
    - Goober Eats uses the computer's white Goober Eats page, sized for the phone (two dishes a row), with your stored food on top.
-   - Spotifly is an artist page: your picture as a big header with your name on it, monthly listeners, Follow, shuffle and play,
+   - WaveFern is an artist page: your picture as a big header with your name on it, monthly listeners, Follow, shuffle and play,
      then Music (Popular songs with play counts), Release (drafts) and Stats tabs. Songs keep playing while the phone is open.
    PH.sft (tab) and PH.sfF (Follow) are not saved. */
 {const u0=update;update=function(dt){if(mode!='phone')return u0.apply(this,arguments);mode='play';
  try{return u0.apply(this,arguments)}finally{if(mode=='play')mode='phone';else{const e=document.getElementById('ph');if(e)e.remove()}}}}
 setInterval(()=>{try{if(mode=='phone'){const b=document.querySelector('#ph .phs b');if(b)b.textContent=clk();const t=document.querySelector('#ph .phk .tm');if(t)t.textContent=clk()}}catch(e){}},1000);
-/* Spotifly music keeps playing while the phone is open (it stopped as soon as you left the computer) */
+/* WaveFern music keeps playing while the phone is open (it stopped as soon as you left the computer) */
 sfStart=function(s,ids){if(!s)return;if(ids)SPQ.ids=ids;try{Beats.setVolume(S.sfVol==null?1:S.sfVol)}catch(e){}
  const p=Beats.play(s,{owner:'sf',alive:()=>mode=='pc'||!!document.getElementById('ph')});if(p&&typeof say=='function')say('Now playing "'+s.title+'" · '+p.style+' · '+p.bpm+' bpm · '+p.key);pcR()};
 /* ---- Goober Eats ---- */
@@ -169,9 +169,9 @@ gpEats=function(){const m=phModel(),en=Math.round(S.energy||0),fd=S.fd||{},has=S
  let h='';try{h=PA.eats()}catch(e){console.error('phone eats',e)}
  /* the 3D dish previews only draw while a computer or wardrobe screen is open; the hidden .wrd marker lets them draw here too */
  return`<i class=wrd style="display:none"></i><div class=gpuew>${h.replace(/<div class=uehero>/,bag+'<div class=uehero>')}</div>`};
-/* ---- Spotifly ---- */
+/* ---- WaveFern ---- */
 function gpSfRow(s,i,c){const on=!!(c&&c.src===s),pl=on&&!c.held;return`<div class="gsr${on?' on':''}" onclick="sfPlayId(${s.id})"><span class=gsn>${pl?sfIco('pause'):i}</span><img src="${sfCover(s)}" alt=""><span class=gst><b>${esc(s.title)}</b><small>${(s.streams||0).toLocaleString()}</small></span><span class=gsd>+${gpNum(s.today)}</span></div>`}
-gpSf=function(){if(!S.artist)return`<div class=phs2><div class=pcd><h3>SPOTIFLY</h3><div class=sub>Pick your artist name on the computer first.</div></div></div>`;
+gpSf=function(){if(!S.artist)return`<div class=phs2><div class=pcd><h3>WAVEFERN</h3><div class=sub>Pick your artist name on the computer first.</div></div></div>`;
  const t=PH.sft||'music',D=S.drafts||[],L=sfOrder(),c=sfCur(),pl=!!(c&&sfIsSong(c)&&!c.held),bz=gpBuzz(),today=L.reduce((a,x)=>a+(x.today||0),0),ok=D.filter(d=>(d.title||'').trim()).length;
  const tab=(k,n)=>`<button class="${t==k?'on':''}" onclick="PH.sft='${k}';phR()">${n}</button>`;
  let body='';

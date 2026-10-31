@@ -1,8 +1,8 @@
-/* ===== v26.110: Instagrime fixes, new Spotifly icon, one blocky tree style =====
+/* ===== v26.110: Instagrime fixes, new WaveFern icon, one blocky tree style =====
    Instagrime: a new account starts with no posts; no food posts; per-song analytics that update live; percentages are capped.
    Trees: blkTree() builds every tree from boxes (shaded layers, a few shapes) for the streets, house, park and festival. */
 
-/* ---- Spotifly icon: an original pixel-art paper-wing fly (not the green circle logo) ---- */
+/* ---- WaveFern icon: an original pixel-art paper-wing fly (not the green circle logo) ---- */
 {const ic=mkIc(['.TTTTTTTT.','TTTTTTTTTT','TWWTTTTWWT','TWLWTTWLWT','TTWWWYWWWT','TTTWWYWWTT','TTWWWYWWWT','TWLWTYTWLT','TWWTTYTTWT','.TTTTYYTT.'],{T:'#0f6b4a',W:'#d9fff0',L:'#7ff0c0',Y:'#ffd23f'});IC.fw=ic}
 
 /* ---- Instagrime ---- */

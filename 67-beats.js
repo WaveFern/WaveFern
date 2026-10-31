@@ -7,7 +7,7 @@
      Beats.stop(fade)  Beats.setIntensity(0..1)  Beats.setVolume(0..1)  Beats.playing()  Beats.current()
      Beats.plan(song)  Beats.beat() (quarter-note position, -1 if idle)  Beats.bpm()  Beats.styles  Beats.render(song, seconds)
    Volume follows the Music slider (VOL, M mutes). Audio only starts after the player has clicked or pressed a key,
-   pauses with the pause menu or a hidden tab, and stops when its owner (recording, festival set, Spotifly) ends. */
+   pauses with the pause menu or a hidden tab, and stops when its owner (recording, festival set, WaveFern) ends. */
 var Beats=(function(){
 'use strict';
 /* ---------- small helpers ---------- */
@@ -434,7 +434,7 @@ function render(src,secs,o){o=o||{};const P=plan(src),sr=o.sampleRate||44100,OC=
 
 return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,+x||0))},setVolume:x=>{uvol=Math.max(0,Math.min(1,+x||0))},
  playing:()=>!!cur,current:()=>cur?Object.assign(info(cur),{owner:cur.owner,src:cur.src,paused:!!cur.paused,held:!!cur.up,intensity:cur.I}):null,
- /* v26.105: the player's own pause (Spotifly's pause buttons). hold(true) pauses the beat where it is, hold(false) carries on from there.
+ /* v26.105: the player's own pause (WaveFern's pause buttons). hold(true) pauses the beat where it is, hold(false) carries on from there.
     The game's pause menu and a hidden tab still pause it on their own. songBeats() = quarter notes in one play-through of a song. */
  hold:on=>{if(cur){cur.up=!!on;tick()}},songBeats:()=>FORMS.song.reduce((a,s)=>a+s[1],0)*4,
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
@@ -478,7 +478,7 @@ if(typeof recTick=='function'){const t0=recTick;recTick=function(dt){if(rec&&rec
 if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,s8=rec&&rec.s8,hh=rec&&rec.hh,sty=rec&&rec.sty,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.bs=bs;if(s8!=null){d.s8=s8;d.hh=hh}if(sty!=null)d.style=sty}const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
 if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}if(x&&d.style!=null&&x.style==null)x.style=d.style}}catch(e){}return r}}
 
-/* Spotifly: a play button on each song on your artist page */
+/* WaveFern: a play button on each song on your artist page */
 {const st=document.createElement('style');st.textContent='.sr .bpl{width:24px;height:24px;padding:0;margin:0;border-radius:50%;border:0;background:#1db954;color:#000;font-size:10px;line-height:24px;cursor:pointer;box-shadow:none}.sr .bpl:hover{transform:scale(1.08)}.sr.bon{background:#1db95422}.sr.bon b{color:#1db954}';document.head.appendChild(st)}
 function beatsSfRows(){if(typeof app=='undefined'||app!=1||pg!='home'||!S.artist)return;const rows=document.querySelectorAll('#pc .mn .sr');if(!rows.length)return;
  const L=S.songs.slice().sort((a,b)=>b.streams-a.streams||b.id-a.id),sh=(typeof SALL!='undefined'&&SALL)?L:L.slice(0,5),cu=Beats.current();

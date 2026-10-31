@@ -45,7 +45,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  await step('creator',async()=>{await js(()=>{ttSlot(1)});await shot('creator',1500)});
  await step('bedroom',async()=>{await js(()=>{confirmChar()});await sleep(1500);await js(()=>{try{tutEnd()}catch(e){}});await shot('bedroom',1200)});
   await js(()=>{openPC();app='1';smo=0;pcR();const i=[...document.querySelectorAll('input')].find(x=>x.placeholder=='Artist name');i.value='Fern Wave';WS.btn(/^Create profile$/);closePC();closeUI()});
- /* recording: the menu and the three minigames, then the song goes up on Spotifly */
+ /* recording: the menu and the three minigames, then the song goes up on WaveFern */
  const record=async(g,title,shots)=>{
   await js(()=>{closeUI();WS.act('Record a song')});if(shots)await shot('song-menu',700);
   await js(g=>WS.btn(new RegExp('^'+g+'$')),g);await sleep(4000);if(shots)await shot('minigame-beat',300);

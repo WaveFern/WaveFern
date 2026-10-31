@@ -305,7 +305,7 @@ function handle(d,id,self){
  if(d.t=='st'){['x','z','r','zone','where','studio','stg','nm','ctry','col'].forEach(k=>{if(d[k]!==undefined)m[k]=d[k]});if(d.look){m.look=d.look}}
  else if(d.t=='rd'){const was=m.rd;m.rd=d.rd||null;if(d.rd&&!was)say(m.nm+(d.rd.k=='rec'?' is ready to record.':d.rd.k=='slp'?' is in bed and wants to sleep.':d.rd.k=='col'?' is ready to record with '+artN(d.rd.a)+'.':' is ready to play Stage '+d.rd.n+'.'))}
  else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q}say(d.c?m.nm+' finished the collab session.':m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
- else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s Spotifly account "'+d.v+'".')}}
+ else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s WaveFern account "'+d.v+'".')}}
  else if(d.t=='em'){const a=AV[id];if(a&&EMK[d.k]&&a.g.visible){a.em={k:d.k,t:0};emFloat(a.g,d.k)}}
  else if(d.t=='rel')relRecv(d,m)
  else if(d.t=='scr')scrRecv(d,m)
@@ -531,7 +531,7 @@ if(MPS)try{const w=scene.children.find(g=>g.isGroup&&g.children[0]&&g.children[0
  if(w){w.rotation.y=Math.PI;w.position.set(8,0,9.3)}const c=cols.find(c=>c[0]==.2&&c[1]==3.7&&c[2]==1&&c[3]==5.1);if(c){c[0]=7;c[1]=4.2;c[2]=7.8;c[3]=5.6}
  const o=INT.find(o=>o.l=='Open wardrobe'&&o.x==1.9);if(o){o.x=6.2;o.z=4.9}}catch(e){console.error('band wardrobe',e)}
 
-/* one Spotifly account for the band: the drawn picture shows every member */
+/* one WaveFern account for the band: the drawn picture shows every member */
 const bandLooks=()=>{const m=S&&S.mp&&S.mp.mem;return m?IK.filter(k=>m[k]&&m[k].look).map(k=>m[k].look):[]};
 let MEMT=0;setInterval(()=>{if(!MPS||!S||!S.mp||mode=='creator'||mode=='load')return;const mem=S.mp.mem=S.mp.mem&&typeof S.mp.mem=='object'?S.mp.mem:{};
  mem[MPS.inst]={nm:myName(),look:myLook()};list().forEach(m=>{if(m.id!==ME.id&&INS[m.inst]&&m.look)mem[m.inst]={nm:m.nm,look:m.look}})},2000);

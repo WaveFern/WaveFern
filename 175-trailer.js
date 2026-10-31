@@ -2,7 +2,7 @@
    wavefern.com/?trailer opens the game in trailer mode (wavefern.com/trailer now shows the YouTube trailer). A menu lets you
    play a scripted trailer, about 75 seconds, made to be screen recorded. It is real gameplay in the game's own camera:
    the title screen, making a character, picking an artist name, messaging an artist, the collab meeting and session, the
-   recording minigame, Spotifly, walking the city, driving, the wardrobe, the Gphone, the map, a Main Stage festival set,
+   recording minigame, WaveFern, walking the city, driving, the wardrobe, the Gphone, the map, a Main Stage festival set,
    the World Tour app, Tokyo and a stadium show, with a few plain title cards and the end card. the trailer track
    plays over it, with the beat dropping on the city reveal; every other game sound and all game music are muted.
    A pointer moves and clicks through the menus like a player would. Each scene can be played on its own (it plays on to
@@ -98,8 +98,8 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'City reveal',d:2*B,drop:1,show:[],set(){trlClear();trlStar();S.t=262;trlPut(590,40,0)},cam:trlCam([[470,74,170],[606,0,40],44],[[520,52,124],[612,0,34],40],trlE.o)},
  {sc:'Collab session',d:B,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist())||ART_M[0];if(o){o.x=13.6;o.z=2.6;o.m.position.set(o.x,0,o.z);o.m.rotation.y=-Math.PI/2;mode='cut';cs2={o,t:0,op:1};trlPut(o.x-1.4,o.z,Math.PI/2)}}},
  /* zero fans to millions: the listener and follower numbers count up */
-/* the climb: each Spotifly check-in picks up where the last one left off, so you have millions by the tour */
- {sc:'Spotifly',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[2230,48200],followers:[37,6900],fame:[3,12]})}},
+/* the climb: each WaveFern check-in picks up where the last one left off, so you have millions by the tour */
+ {sc:'WaveFern',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[2230,48200],followers:[37,6900],fame:[3,12]})}},
  /* the internet is watching: your new single blowing up on Instagrime */
  {sc:'Instagrime',d:B,show:['ui'],set(){trlClear();openPC();app='ig';const q={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap:'new single out now. 50k streams already, thank you',day:S.day,l:21400};S.igPosts.push(q);igp=q;igv='post';smo=0;pcR()},pz:['pc',1.08,1.16,'50% 40%'],ng:1,hearts:1,
   tick(u){trlCount(Math.min(1,u/.7),{likes:[0,21400]});const m=document.querySelector('#pc .mn'),k=Math.max(0,Math.min(1,(u-.25)/.6));if(m)m.scrollTop=Math.round(330*k*k*(3-2*k))}},
@@ -107,14 +107,14 @@ function trlShots(){const B=TRL.BAR,b=TRL.BEAT;
  {sc:'Drive',d:B,show:[],set(){trlClear();S.t=278;trlPut(60,14,0);const c=PK[PK.length-1];if(c){dr=c;c.x=60;c.z=17.4;c.h=Math.PI/2;c.v=14;c.m.position.set(c.x,0,c.z);c.m.rotation.y=c.h;P.mesh.visible=false;mode='drive';trlRoad(c);trlKeys('w')}},tick(){if(dr)trlLane(dr)}},
  {sc:'Gphone',d:2*b,show:['ph'],set(){trlClear();S.t=268;trlPut(40,14.2,Math.PI/2);try{openPhone()}catch(e){}}},
  {sc:'Crew',d:2*b,crew:1,walk:1,show:[],set(){trlClear();S.t=300;trlPut(30,14.2,Math.PI/2);FOL.forEach(f=>{if(!f.home){f.x=P.x+f.ox-1.5;f.z=P.z+f.oz}});trlPath(30);trlKeys('ds')},zoom:5.5},
- {sc:'Spotifly: 180K',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.1,1.2,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[48200,640000],followers:[6900,182000],fame:[12,58]})}},
+ {sc:'WaveFern: 180K',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.1,1.2,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[48200,640000],followers:[6900,182000],fame:[12,58]})}},
  /* the festival, as you play it: from the smallest stage to the Main Stage, one stage a second, the crowd growing each time */
  {sc:'Festival: Fresh Fern Tent',d:2*b,show:[],set(){trlStage(4)},tick(){trlCrowd(90)}},
  {sc:'Festival: The Pit',d:2*b,show:[],set(){trlStage(3)},tick(){trlCrowd(420)}},
  {sc:'Festival: Riverside',d:2*b,show:[],set(){trlStage(2)},tick(){trlCrowd(3200)}},
  {sc:'Festival: Main Stage',d:2*b,show:[],set(){trlStage(1)},tick(){trlCrowd(60000)}},
  {sc:'Festival crowd',d:B,show:[],set(){trlClear();S.t=396;trlPut(364,-112.5,0);P.mesh.visible=true},cam:trlCam([[364,22,-30],[364,2,-104],46],[[364,13,-58],[364,3,-110],48],trlE.s)},
- {sc:'Spotifly: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.24,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
+ {sc:'WaveFern: millions',d:B,show:['ui'],set(){trlClear();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.24,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[640000,3800000],followers:[182000,1200000],fame:[58,209]})}},
  /* the plaques come once the streams are in the millions: a cutscene of your studio wall, one going up on each hit */
  {sc:'Recording',d:2*B,plq:1,show:[],set(){trlClear();const o=ART_M.find(q=>q.i===trlArtist());if(o){o.x=40;o.z=13.4;o.m.position.set(o.x,0,o.z)}S.t=200;mode='play';trlPut(8,7,Math.PI);/* a dark charcoal wall behind the plaques, wide and tall enough that no outside shows past its ends */const w=TRL.wall=new THREE.Mesh(new THREE.PlaneGeometry(14,4.4),new THREE.MeshLambertMaterial({color:'#2c2b31',polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));w.position.set(14,2.2,.004);if(innerHeight>innerWidth)w.scale.set(1.3,4,1);scene.add(w)},cam:trlCam([[13.95,1.9,3],[13.95,1.9,0],40],[[14.06,1.98,2.6],[14.06,1.98,0],40],trlE.o)},
  {sc:'World Tour app',d:B,show:['ui'],set(){trlClear();trlHome();openPC();app='wtour';smo=0;pcR()},pz:['pc',1.04,1.1,'50% 45%'],acts:[[.2,()=>trlMove(()=>trlQ('#pc .win svg')||trlQ('#pc .mn'),1.1)]]},
@@ -144,7 +144,7 @@ function trlZoom(s){const z=s&&s.pz,e=z&&$(z[0]);if(TRL.pzEl&&TRL.pzEl!==e){TRL.
   tx=cl((innerWidth/2-o.x)*m,innerWidth-o.x-(er.right-o.x)*sc,(o.x-er.left)*sc-o.x);ty=cl((innerHeight/2-o.y)*m,innerHeight-o.y-(er.bottom-o.y)*sc,(o.y-er.top)*sc-o.y)}
  const P=TRL.pzP=TRL.pzP&&TRL.pzP.s===s?TRL.pzP:{s,x:o.x,y:o.y,tx,ty};P.x+=(o.x-P.x)*.25;P.y+=(o.y-P.y)*.25;P.tx+=(tx-P.tx)*.25;P.ty+=(ty-P.ty)*.25;
  e.style.transformOrigin=(P.x-er.left).toFixed(1)+'px '+(P.y-er.top).toFixed(1)+'px';e.style.transform=`translate(${P.tx.toFixed(1)}px,${P.ty.toFixed(1)}px) scale(${sc.toFixed(4)})`}
-/* the listener and follower counts on a Spotifly page */
+/* the listener and follower counts on a WaveFern page */
 function trlNums(){const pc=$('pc');if(!pc)return null;const w=document.createTreeWalker(pc,NodeFilter.SHOW_TEXT),L=[];let n;while(n=w.nextNode())if(/monthly listeners|followers/.test(n.nodeValue)&&n.parentElement)L.push(n.parentElement);L.length=Math.min(L.length,2);
  /* on a short screen the counts sit below the page's fold: scroll the page so they are in view */
  const m=L[0]&&L[0].closest('.mn');if(m){const r=m.getBoundingClientRect(),a=L[0].getBoundingClientRect(),b=(L[1]||L[0]).getBoundingClientRect(),c=(Math.min(a.top,b.top)+Math.max(a.bottom,b.bottom))/2;if(c>r.bottom-r.height*.3||c<r.top+r.height*.2)m.scrollTop+=c-(r.top+r.height/2)}

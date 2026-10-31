@@ -45,16 +45,16 @@ page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide
 /* ===================== Getting started ===================== */
 page('first-day','Your first day','start',{e:'',sum:'What to do in your first hour, step by step.',src:['72-tutorial.js','02-data.js'],body:()=>`
 ${IB('New career','',[['Cash','$100'],['Energy','100'],['Home','Starter house'],['Phone','Gphone 8'],['Tutorial gift','$150 + small rewards']])}
-<p class=lead>You start as an unknown artist with $100, a starter house with a tiny studio and a laptop. The goal: record songs, release them on Spotifly, and grow from nobody to a global star.</p>
+<p class=lead>You start as an unknown artist with $100, a starter house with a tiny studio and a laptop. The goal: record songs, release them on WaveFern, and grow from nobody to a global star.</p>
 ${H2('Gameplay')}<ol>
-<li>Pick an artist name on the laptop (${K('E')} at the desk, then <b>Spotifly</b>). You cannot record until you have one.</li>
+<li>Pick an artist name on the laptop (${K('E')} at the desk, then <b>WaveFern</b>). You cannot record until you have one.</li>
 <li>Walk to the mic in your studio and press ${K('E')}. Pick a genre and play the three ${L('recording','recording minigames')}. Each song costs 15 ${L('days','energy')}.</li>
-<li>Back at the laptop, open Spotifly › Upload, give the draft a title and release it. Streams start right away.</li>
+<li>Back at the laptop, open WaveFern › Upload, give the draft a title and release it. Streams start right away.</li>
 <li>Sleep in your bed to end the day. Overnight, yesterday's ${L('streams')} are paid out and your ${L('listeners','monthly listeners')} update.</li>
 <li>Spend the money on ${L('gear')} so your next songs are better, and repeat.</li></ol>
 ${H2('The tutorial')}<p>Big Vee, your manager, walks you through the basics: walk, pick your artist name, record a song and release it. A glowing line on the ground leads you to each place, and on the laptop his box shows over the screen and the button to click is outlined. After the basics he only drops in now and then, when you find something new (your first DM, the street, a car, a shop, the airport...), with at least 45 seconds between tips.</p>
 ${N('Press <b>Tips off</b> on his box, or use the pause menu, and he stays quiet (so do the small helper tips). Turn them back on from the pause menu. You get the $150 starting gift either way.','tip','Tips off')}
-<p>Your first release is added to Spotifly's ${L('streams/fresh-finds','Fresh Finds')} playlist, so your first songs get real plays from day one.</p>
+<p>Your first release is added to WaveFern's ${L('streams/fresh-finds','Fresh Finds')} playlist, so your first songs get real plays from day one.</p>
 ${H2('Early goals')}${ul([`Record a few songs in one ${L('genres','genre family')}: the ${L('genres','genre focus')} bonus rewards a steady sound.`,`Buy a better ${L('gear','microphone')} first: it gives the most quality per level.`,`Install ${L('instagrime','Instagrime')} and post once a day for followers.`,`Reach 10 monthly listeners to unlock your first ${L('mentors','mentor')}.`])}`});
 
 page('controls','Controls','start',{e:'',sum:'Keyboard, mouse and touch controls.',src:['07-input-loop.js','154-touch-controls.js'],kw:'keys keyboard wasd shift sprint',body:()=>`
@@ -91,7 +91,7 @@ ${H2('3. Mix')}<p>Hold ${K('Space')} (or hold the mouse) to raise the level, let
 ${FX('mix score = min(1, time in band ÷ 6 s × 1.15)')}
 ${H2('Gear you can feel','gear-feel')}<p>Besides its quality points, some gear changes how a step plays. All of it is per level:</p>${T(['Gear','Step','What changes'],[['Microphone','Beat','The green zone is 1.2% wider each side'],['Drums','Beat','+1 go'],['Guitar','Lyrics','+0.5 s on every line'],['Keyboard','Lyrics','One wrong word fades out after 70%, 50% or 30% of the time'],['Acoustics','Mix','The green band is 0.02 wider each side'],['Headphones','Mix','The level moves 10% more slowly, so it is easier to hold steady'],['Mixing desk','Mix','The band drifts 10% more slowly'],['Chair','Every song','Costs 1 less energy']])}
 ${H2('Session grade')}${T(['Average of Lyrics and Mix','Grade'],[['0.9 and up','Studio magic'],['0.7 to 0.9','Solid session'],['0.45 to 0.7','Rough around the edges'],['below 0.45','Messy take']])}
-<p>The results screen shows your Perfect hits and says how the song compares with your last one and your best. The finished draft waits on your laptop. Give it a title and release it from Spotifly › Upload, or use <b>Upload all</b> to release every titled draft at once.</p>
+<p>The results screen shows your Perfect hits and says how the song compares with your last one and your best. The finished draft waits on your laptop. Give it a title and release it from WaveFern › Upload, or use <b>Upload all</b> to release every titled draft at once.</p>
 ${N(`In a ${L('band-rooms','band room')} the middle step depends on your instrument: only vocalists rhyme. Guitar, bass, drums and keys play their own part.`,'','Bands')}`});
 
 page('song-quality','Song quality','music',{e:'',sum:'How a song\'s quality score is calculated.',src:['34-studio-minigames.js','29-v26.js','52-gear-shop-plus.js'],kw:'quality score q experience formula',body:()=>{const g=D.gear||[];
@@ -154,7 +154,7 @@ ${H2('Daily streams')}${FX(`daily = quality × ${p.base} × random(0.75-1.25)
       × <b>focus</b>       genre focus (see Genres)
       × 1.5 on release day`)}
 <p>On top of that, a ${L('collabs','collab')} brings the featured artist's fans: about 1% of their monthly listeners a day, decaying the same way.</p>
-${H2('Fresh Finds','fresh-finds')}<p>While you have under 3,000 monthly listeners, Spotifly's <b>Fresh Finds</b> playlist for new artists plays your songs too. Each song gets extra daily streams on top of the formula above, and the morning results say how many came from the playlist:</p>${FX(`fresh finds = 28 × (1 − listeners ÷ 3,000) × age decay × clamp(quality ÷ 10, 0.6, 2.2)
+${H2('Fresh Finds','fresh-finds')}<p>While you have under 3,000 monthly listeners, WaveFern's <b>Fresh Finds</b> playlist for new artists plays your songs too. Each song gets extra daily streams on top of the formula above, and the morning results say how many came from the playlist:</p>${FX(`fresh finds = 28 × (1 − listeners ÷ 3,000) × age decay × clamp(quality ÷ 10, 0.6, 2.2)
       × random(0.8-1.2) × 1.5 on release day          (still under the cap)`)}<p>So an average first song gets about 30 extra streams on release day. The playlist fades out as your own fans grow, and is gone by 3,000 monthly listeners.</p>
 <p>Other boosts that stack on top: ${L('promotions')}, ${L('albums','album')} tracks, the ${L('halo','catalogue halo')}, your ${L('gphone','Gphone')} model and ${L('radio')} slots.</p>
 ${H2('Interest')}<p>Interest is a 0-100% measure of how much people are talking about you. Each morning it drops by 10%, then gains 6% for every song you released yesterday. Albums, radio and diss tracks also move it. Releasing steadily keeps it high.</p>
@@ -163,7 +163,7 @@ a hit streams ×${f.hitMin}-${f.hitMax}`)}
 ${H2('Going viral','viral')}${FX(`viral chance = ${f.viralP} × min(1, quality ÷ ${f.viralQBest})^${f.viralQPow}
 a viral song gets ${fmt(f.viralMin)} + listeners × ${f.viralLisMin}-${f.viralLisMax} extra streams over ${f.viralDays} days`)}
 ${H2('The cap')}<p>So one song can't run away forever, daily streams are capped:</p>${FX('cap = quality² × 25 × 1.5^fame tier × hit multiplier')}
-${H2('Payouts')}<p>Each morning you're paid yesterday's streams × $${(D.tune||{}).payRate}. If you're signed, the label keeps its cut first. Earnings show on the morning summary and in Spotifly › Stats.</p>`}});
+${H2('Payouts')}<p>Each morning you're paid yesterday's streams × $${(D.tune||{}).payRate}. If you're signed, the label keeps its cut first. Earnings show on the morning summary and in WaveFern › Stats.</p>`}});
 
 page('listeners','Monthly listeners and followers','music',{e:'',sum:'How monthly listeners and followers are counted.',src:['29-v26.js'],kw:'monthly listeners followers ml',body:()=>`
 <p class=lead>Monthly listeners are the headline number: they set your ${L('fame')} level, who ${L('collabs','DMs you')}, which ${L('labels')} want you, and how big your ${L('festival')} crowds are.</p>
@@ -177,8 +177,8 @@ otherwise:
 ${H2('Followers')}<p>Followers grow by 5% of each day's streams, plus extras from ${L('instagrime','Instagrime')} posts, photo posts (bigger with a better ${L('gphone','Gphone')}), ${L('radio')}, ${L('promotions')}, ${L('festival')} sets, tour shows and landmark selfies.</p>`});
 
 page('albums','Albums','music',{e:'',sum:'Bundling songs into an album, and the album boost.',src:['21-v7-albums-rivals-instagrime-profiles-sit.js','98-spotifly-artist-page.js','96-album-song-picker.js','112-cover-art.js'],kw:'album cover art tracks',body:()=>`
-<p class=lead>Once you have at least two released songs you can bundle them into an album from Spotifly. Pick the tracks, the order, a title and cover art.</p>
-${H2('What an album does')}${ul(['Releasing an album adds 20% interest.','For the first 14 days, track 1 gets up to +60% streams and the other tracks up to +25%. The boost fades over those two weeks.','Albums show on your Spotifly artist page.'])}
+<p class=lead>Once you have at least two released songs you can bundle them into an album from WaveFern. Pick the tracks, the order, a title and cover art.</p>
+${H2('What an album does')}${ul(['Releasing an album adds 20% interest.','For the first 14 days, track 1 gets up to +60% streams and the other tracks up to +25%. The boost fades over those two weeks.','Albums show on your WaveFern artist page.'])}
 ${N('Put your best song as track 1: it gets the biggest boost.','tip')}`});
 
 page('collabs','Collabs, fees and haggling','music',{e:'',sum:'DMs, negotiation, meetings and how collab fees are set.',src:['75-collab-fees-dms.js','33-haggle.js','29-v26.js','54-skyline-meetings.js'],kw:'collab feature feat dm message fee haggle negotiate meeting',body:()=>{
@@ -212,6 +212,6 @@ ${FX(`extra daily streams per song = listeners × ${h.rate} ÷ max(${h.minSongs}
 age factor = ${h.ageKeep} + ${1-h.ageKeep} × ${h.ageDecay}^days since release`)}
 <p>Because it's split across the catalogue, the total stays about the same however many songs you have. Hit and viral songs don't get it. It does nothing early on, when your listeners are small.</p>`}});
 
-page('spotifly','Spotifly','music',{e:'',sum:'The streaming site: upload, stats, artist page and browse.',src:['37-spotifly.js','98-spotifly-artist-page.js','111-spotifly-browse.js','109-analytics.js'],kw:'spotifly upload stats artist page',body:()=>`
-<p class=lead>Spotifly is where your music lives. Open it on the laptop (or the Spotifly app on your phone).</p>
+page('spotifly','The WaveFern app','music',{e:'',sum:'The streaming site: upload, stats, artist page and browse.',src:['37-spotifly.js','98-spotifly-artist-page.js','111-spotifly-browse.js','109-analytics.js'],kw:'spotifly upload stats artist page',body:()=>`
+<p class=lead>WaveFern is where your music lives. Open it on the laptop (or the WaveFern app on your phone).</p>
 ${ul(['<b>Setup</b>: pick your artist name. You need one before recording.','<b>Upload</b>: title drafts and release them, one by one or all at once.','<b>Stats</b>: streams, earnings and listeners by day, and per-song history.','<b>Artist page</b>: your profile, top 5 songs by popularity (or all songs), albums.','<b>Browse</b>: other artists\' pages.',`Promote songs (${L('promotions')}) and build ${L('albums')}.`])}`});

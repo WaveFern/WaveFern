@@ -17,7 +17,7 @@ function bbDraw(cv,ad){const x=cv.getContext('2d'),W=cv.width,H=cv.height,f=(sz,
  x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';let fs=56;x.font=f(fs,1);while(fs>20&&x.measureText(ad.n).width>W-40){fs-=2;x.font=f(fs,1)}
  x.fillText(ad.n,W/2,H*.4);
  x.fillStyle='#e8f3ec';x.font=f(26);x.fillText(ad.g+(ad.tag?'  ·  '+ad.tag:''),W/2,H*.7);
- x.fillStyle='#2fe68a';x.font=f(22,1);x.fillText('ON SPOTIFLY',W/2,H*.88)}
+ x.fillStyle='#2fe68a';x.font=f(22,1);x.fillText('ON WAVEFERN',W/2,H*.88)}
 function bbRefresh(){const ads=bbAds();if(!ads.length)return;BB.list.forEach((b,i)=>{const ad=ads[(BB.k+i*2)%ads.length];bbDraw(b.cv,ad);b.tex.needsUpdate=true})}
 function bbBuild(spots){spots.forEach(p=>{const G=new THREE.Group();G.position.set(p.x,0,p.z);G.rotation.y=p.th;scene.add(G);
  B(G,.22,3.3,.22,'#4a4f57',-1.5,1.65,0);B(G,.22,3.3,.22,'#4a4f57',1.5,1.65,0);

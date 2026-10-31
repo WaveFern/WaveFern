@@ -1,6 +1,6 @@
 # WaveFern (the music career game)
 
-> WaveFern is a free music career game you play in your browser at https://wavefern.com/: a 3D open-world music career sim. Create a character, record songs and albums in your studio, release them on Spotifly and grow your fame, then explore a big open-world 3D city on foot or by car, buy houses, cars and clothes, and meet other artists. No download. It is a free browser music career game for rappers, singers, producers and bands: make an artist, record songs, release them on Spotifly, tour the world, and play multiplayer band rooms with up to 4 friends.
+> WaveFern is a free music career game you play in your browser at https://wavefern.com/: a 3D open-world music career sim. Create a character, record songs and albums in your studio, release them on WaveFern and grow your fame, then explore a big open-world 3D city on foot or by car, buy houses, cars and clothes, and meet other artists. No download. It is a free browser music career game for rappers, singers, producers and bands: make an artist, record songs, release them on WaveFern, tour the world, and play multiplayer band rooms with up to 4 friends.
 
 WaveFern (also written "WaveFern game") is a video game: the free browser music career sim at wavefern.com. It is a fictional 3D open-world game (plain JavaScript and WebGL, no install), made by James Hutchinson and Rowan Burton. Real artists named in-game are inspiration references only, with no affiliation or endorsement.
 
@@ -14,7 +14,7 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 <!-- wiki pages: made by tools/wiki-static.js -->
 ## Wiki pages
 
-- [Your first day](https://wavefern.com/wiki/first-day/): You start as an unknown artist with $100, a starter house with a tiny studio and a laptop. The goal: record songs, release them on Spotifly, and grow from nobody to a global star.[1]
+- [Your first day](https://wavefern.com/wiki/first-day/): You start as an unknown artist with $100, a starter house with a tiny studio and a laptop. The goal: record songs, release them on WaveFern, and grow from nobody to a global star.[1]
 - [Controls](https://wavefern.com/wiki/controls/): WaveFern plays with a keyboard and mouse, or with touch controls on phones and tablets.[1]
 - [Days, time and energy](https://wavefern.com/wiki/days/): A full in-game day lasts 12 real minutes, from 06:00 to 06:00 the next morning. About nine songs fit in one day.[1]
 - [Saves and careers](https://wavefern.com/wiki/saves/): Two career slots, autosave, cloud saves, save codes and backups.
@@ -24,11 +24,11 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 - [Extras: sub-genres, diss tracks, 808s and hi hats](https://wavefern.com/wiki/extras/): Open Extras on the Make a song screen to choose a sub-genre, a diss track, your 808 and your hi hats.[1]
 - [Streams](https://wavefern.com/wiki/streams/): The full daily streams formula, decay, caps, hits and viral songs.
 - [Monthly listeners and followers](https://wavefern.com/wiki/listeners/): Monthly listeners are the headline number: they set your Fame levels level, who DMs you, which Record labels want you, and how big your Park Fields Festival crowds are.[1]
-- [Albums](https://wavefern.com/wiki/albums/): Once you have at least two released songs you can bundle them into an album from Spotifly. Pick the tracks, the order, a title and cover art.[1]
+- [Albums](https://wavefern.com/wiki/albums/): Once you have at least two released songs you can bundle them into an album from WaveFern. Pick the tracks, the order, a title and cover art.[1]
 - [Collabs, fees and haggling](https://wavefern.com/wiki/collabs/): A collab is a song with another artist. You either pay them (you messaged them) or they pay you (they messaged you). Their fans come along: a featured song gets about 1% of their monthly listeners in extra streams each day.[1]
 - [Promotions](https://wavefern.com/wiki/promotions/): Paid campaigns that multiply a song's streams for a few days.
 - [Catalogue halo](https://wavefern.com/wiki/halo/): When your listeners balloon, some of them dig into your older songs.
-- [Spotifly](https://wavefern.com/wiki/spotifly/): Spotifly is where your music lives. Open it on the laptop (or the Spotifly app on your phone).[1]
+- [WaveFern](https://wavefern.com/wiki/spotifly/): WaveFern is where your music lives. Open it on the laptop (or the WaveFern app on your phone).[1]
 - [Money](https://wavefern.com/wiki/money/): You start with $100. Most of your income comes from streams, paid every morning.[1]
 - [Studio gear](https://wavefern.com/wiki/gear/): Every piece of studio gear, its levels, prices and what it adds.
 - [Fame levels](https://wavefern.com/wiki/fame/): Your fame level comes from your monthly listeners. Jewellery makes you look more famous: each piece adds 8%.[1]
@@ -58,9 +58,9 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 - [Jewellery](https://wavefern.com/wiki/jewellery/): Each piece bought at the Jewellery store adds 8% to your Fame levels value.[1]
 - [Fans, autographs and robbery](https://wavefern.com/wiki/fans/): The more famous you are, the more people recognise you. A passer-by notices you with a chance of monthly listeners ÷ 5,000,000.[1]
 - [Food and energy](https://wavefern.com/wiki/food/): Food refills energy. Drinks marked "stamina" also refill your sprint.[1]
-- [Gphone](https://wavefern.com/wiki/gphone/): Press G to open your phone. You start with a laggy Gphone 8; newer models are sold on Amazoom. Every model has Messages, Spotifly, Instagrime, Eats, Gigs, Camera and Photos. Better models boost every song's streams and make photo posts bring more followers.[1]
+- [Gphone](https://wavefern.com/wiki/gphone/): Press G to open your phone. You start with a laggy Gphone 8; newer models are sold on Amazoom. Every model has Messages, WaveFern, Instagrime, Eats, Gigs, Camera and Photos. Better models boost every song's streams and make photo posts bring more followers.[1]
 - [Instagrime](https://wavefern.com/wiki/instagrime/): Instagrime is a $400 app. Post once a day for 2-8 new followers. Photos from your Gphone camera can be posted too, for more followers with a better phone. Promotions are bought here.[1]
-- [Computer and apps](https://wavefern.com/wiki/apps/): Press E at your desk to use the laptop: Spotifly, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.[1]
+- [Computer and apps](https://wavefern.com/wiki/apps/): Press E at your desk to use the laptop: WaveFern, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.[1]
 - [Messages and Big Vee](https://wavefern.com/wiki/messages/): Messages holds every chat: artists who DM you (see Collabs, fees and haggling), label offers and Big Vee, your manager. Pin chats to keep them on top, clear them, or press New for suggested people.[1]
 - [Band rooms](https://wavefern.com/wiki/band-rooms/): Up to four friends in one band, how songs and sets work together.
 - [Settings and graphics](https://wavefern.com/wiki/settings/): Settings opens from the main menu or the pause menu. Under Graphics pick a preset or your own mix.[1]
@@ -70,5 +70,5 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 - [Credits](https://wavefern.com/wiki/credits/): WaveFern was made by James Hutchinson and Rowan Burton.
 - [Frequently asked questions](https://wavefern.com/wiki/faq/): Short answers to common questions. Each one links to the page with the full details.
 - [Contact](https://wavefern.com/wiki/contact/): Found a bug, got an idea, or just want to say something? Send a message to the people who make WaveFern.
-- [How Spotifly songs sound](https://wavefern.com/wiki/song-audio/): How the game makes a playable track for every song you record.
+- [How WaveFern songs sound](https://wavefern.com/wiki/song-audio/): How the game makes a playable track for every song you record.
 <!-- /wiki pages -->

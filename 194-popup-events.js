@@ -186,7 +186,7 @@ const scale=()=>1+FL()*.6+Math.sqrt(S.listeners||0)*.004;
 function openEvent(i){const v=today()[i];if(!v||mode!='play')return;const st=state(v),K=KINDS[v.k];
  if(st=='soon'){sn('err');return say(K.n+' at '+PLACES[v.p].n+' opens at '+hm(v.s)+'.')}
  if(st!='open'){sn('err');return say('The '+K.n.toLowerCase()+' is over for today.')}
- if(K.need&&!(S.songs||[]).length){sn('err');return say('You need a released song first. Upload one on Spotifly.')}
+ if(K.need&&!(S.songs||[]).length){sn('err');return say('You need a released song first. Upload one on WaveFern.')}
  mode='menu';CUR={v,i};sn('pop');({party:party,signing:signing,radio:radio,openmic:openmic,food:food,shoot:shoot})[v.k](v)}
 
 /* block party: play a song */

@@ -3,7 +3,7 @@
    (same pointer, cards, captions, cameras and end card) with its own track (assets/trailer-band.mp3, 120 BPM): the drop at 0:16, black as it stops at 0:48 and the end card on its last bit at 0:56.
    The band room is played with no network: 161-multiplayer.js sets up a room (FERN5, The Ferns) with no sign-in, and three
    made-up bandmates (Kai on guitar, Mila on drums, Theo on bass) stand, walk and play next to you through the real band code:
-   their name tags, the band panel, the four instrument minigames, emotes, the bunk beds, the band's Spotifly account and a band set
+   their name tags, the band panel, the four instrument minigames, emotes, the bunk beds, the band's WaveFern account and a band set
    at the festival. In the minigame shots the camera follows whoever is playing, so each one is a bandmate's
    own screen. wavefern.com/mtrailer (or ?trailer=band) plays it; add ?menu for the scene menu. Nothing is saved, as in the main trailer. */
 if(TRL.on&&window.MPT){
@@ -46,7 +46,7 @@ function bPlace(){const pl=BB.place,L=mates(),z=BM.ME.zone||'o';
  /* a bandmate's emote, on cue */
  const a=BM.AV;for(const id in BB.em){const e=BB.em[id];if(e.done||TRL.T<e.at||!a[id]||!a[id].g.visible)continue;e.done=1;a[id].em={k:e.k,t:0};BM.emFloat(a[id].g,e.k)}}
 function bEm(L){BB.em={};L.forEach(([id,k,at])=>{BB.em[id]={k,at:TRL.T+at}})}
-/* the band's own Spotifly account: the drawn picture shows all four */
+/* the band's own WaveFern account: the drawn picture shows all four */
 function bAccount(){S.artist='The Ferns';S.mp=Object.assign(S.mp||{},{code:'FERN5',inst:BB.pov,band:'The Ferns',host:1,seen:['vo','gt','dr','bs'],mem:{}});BAND.forEach(b=>S.mp.mem[b.inst]={nm:b.nm,look:b.look})}
 function bSetup(){bPov('vo');bAccount();try{buildStudio()}catch(e){}}
 /* a band take on the minigame of instrument k, started at its first beat */
@@ -117,8 +117,8 @@ trlShots=function(){const M={};trlShots0().forEach(s=>M[s.sc]=s);const b=BEAT,B=
  /* one house: bunk beds for the band */
  {sc:'Bunk beds',d:B,show:[],place:'bunks',set(){trlClear();bRoom('bedroom');bPov('vo');S.t=200;trlPut(3.4,2.4,1.55);bEm([['b3','wave',.2]])},
   cam:trlCam([[7.6,2.5,3.2],[1,1.1,3],58],[[7.1,2.2,3],[1,1.1,3],54],trlE.s)},
- /* one Spotifly account for the band, its picture drawn with all four of you */
- {sc:'Band Spotifly',d:B,show:['ui'],place:'off',set(){trlClear();bAccount();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[4800,1200000],followers:[60,310000],fame:[4,120]})}},
+ /* one WaveFern account for the band, its picture drawn with all four of you */
+ {sc:'Band WaveFern',d:B,show:['ui'],place:'off',set(){trlClear();bAccount();openPC();app=1;smo=0;pg='home';pcR()},pz:['pc',1.12,1.22,trlNums],tick(u){trlCount(Math.min(1,u/.95),{'monthly listeners':[4800,1200000],followers:[60,310000],fame:[4,120]})}},
  /* a band set: the smaller stage, then the Main Stage, the band around you */
  {sc:'Festival: The Pit',d:2*b,show:[],place:'stage',set(){bStage(3)},tick(){trlCrowd(600)}},
  {sc:'Festival: Main Stage',d:2*b,show:[],place:'stage',set(){bStage(1)},tick(){trlCrowd(60000)}},

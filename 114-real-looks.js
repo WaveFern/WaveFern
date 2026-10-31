@@ -1,7 +1,7 @@
 /* ===== v26.132: famous artists look like their real-life counterparts (stylised) =====
    A hand-made table of broad, public traits only (skin tone, hair style and colour, beard, glasses, signature clothes and accessories) built
    from the character creator's own parts, so they stay blocky pixel characters, never photo likenesses.
-   Used for the game's artists in Messages / collabs (ART), the Spotifly Browse artists and their pictures. Made-up artists keep their generated look.
+   Used for the game's artists in Messages / collabs (ART), the WaveFern Browse artists and their pictures. Made-up artists keep their generated look.
    New: facial hair (c.fh 1 stubble, 2 moustache, 3 goatee, 4 beard; c.fhc colour) drawn on the pixel portrait and the 3D head. Characters without it are unchanged. */
 /* Look codes (v42.1.0): on the admin account the character creator shows a code like
    "skin=7 hair=1 hc=#1b1b1f eyes=0 mouth=0 top=1 tc=#2f2f38 pc=#2c3e50 body=40 hgt=50" (see 124-look-code.js).
@@ -37,7 +37,7 @@ const K='#1b1b1f',BR='#4a2c1a',BL='#e3c77a',GR='#9aa0a6',GD='#e6b422',W='#f4f4f4
 const realLook=n=>{const c=RLK[String(n).toLowerCase()];return c?Object.assign({},c):null};
 /* the game's own artists (Messages, collabs, 3D) */
 try{ART.forEach(a=>{const c=realLook(a[0]);if(c)a[4]=c})}catch(e){console.error('real looks',e)}
-/* Spotifly Browse artists and their pictures */
+/* WaveFern Browse artists and their pictures */
 brFace=function(i){if(BRFC.has(i))return BRFC.get(i);const x=BRL()[i];let u='';try{const cfg=realLook(x[0])||x[3]||lk(x[0]);u=(typeof pf2=='function'?pf2(cfg):pfp(cfg))}catch(e){u=sfCover({id:-(i+1)*7,g:x[1]})}BRFC.set(i,u);return u};
 /* facial hair: pixel portrait */
 {const f0=fig;fig=function(x,c,ox,oy){f0.apply(this,arguments);try{if(!c||!c.fh)return;const hc=c.fhc||c.hc_custom||HAIRC[c.hc%HAIRC.length],sk=SKIN[c.skin%SKIN.length],a=c.fh,R_=(col,u,v,w,h)=>rc(x,col,ox+u,oy+v,w,h);

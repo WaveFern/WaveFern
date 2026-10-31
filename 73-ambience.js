@@ -10,7 +10,7 @@
    2. Passing cars with music. The traffic stands for a city of about 1,000,000 cars: every traffic car that comes past you is a
       draw, and it blasts music with probability monthlyListeners / 1,000,000 (S.listeners). It plays one of your own released
       songs (S.songs) through Beats.play (owner 'car') with a muffling low-pass, a bass boost, distance volume and a pan that
-      follow the real car. One at a time; never while the beat engine is in use (recording, Spotifly, festival sets). The main
+      follow the real car. One at a time; never while the beat engine is in use (recording, WaveFern, festival sets). The main
       soundtrack dips by 30% while it is audible and comes back (MU_DIP, read by 08-music.js). If audio/cars/manifest.json lists
       clips, a passing car may play one of those instead, with a fixed 0.5% chance.
    3. Ambience.state() reports the zone, busyness, layers and the active car, for testing. */

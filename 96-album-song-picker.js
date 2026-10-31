@@ -1,7 +1,7 @@
 /* ===== v26.102: Create album picks songs like the festival setlist =====
    The old "Choose songs" list was a checkbox per song (the checkboxes floated above the titles) and a separate
    "Track order" list. Now it is two columns like FestivalApp's setlist: your track list on the left (move up/down,
-   remove), your unused released songs on the right with + Add. Spotifly colours, and no limit on the number of songs.
+   remove), your unused released songs on the right with + Add. WaveFern colours, and no limit on the number of songs.
    The "Put my face on the cover" checkbox sits next to its text again. A collab whose title already says "(feat. X)" no longer shows "feat. X" a second time. */
 const alFt=x=>x.ft&&!String(x.title||'').toLowerCase().includes(String(x.ft).toLowerCase())?` <small class=alft>feat. ${esc(x.ft)}</small>`:'';
 function alAddAll(){const used=S.albums.flatMap(a=>a.songs);S.songs.forEach(x=>{if(!used.includes(x.id)&&!AL.sel.includes(x.id))AL.sel.push(x.id)});snd('pop');pcR()}

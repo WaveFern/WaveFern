@@ -11,7 +11,7 @@ const VEE_SYN=[[/\b(bucks|dollars|cash|paid|pay|payout|earn|earning|earnings|inc
  [/\b(cars|ride|motor|driving)\b/g,'drive'],
  [/\b(famous|popular|celebrity)\b/g,'fame'],
  [/\bwhats\b/g,'what is'],[/\bim\b/g,'i am'],[/\bdont\b/g,'do not'],[/\bcant\b/g,'cannot'],[/\bu\b/g,'you'],[/\bur\b/g,'your'],[/\bpls\b|\bplz\b/g,'please']];
-const VEE_VOCAB=['money','stream','billboard','fame','listener','height','delete','spotifly','amazoom','collab','record','upload','sleep','energy','gear','clothes','drive','festival','save','message','pin','clear','search','artist','level','song','beat','lyrics','mix','price','haggle','camera','wheel','zoom','panic','studio','wardrobe','speed','speedometer','shoes','hair','album','rapper','famous','release','income','balance','tired','passed','profile','mentor'];
+const VEE_VOCAB=['money','stream','billboard','fame','listener','height','delete','spotifly','wavefern','amazoom','collab','record','upload','sleep','energy','gear','clothes','drive','festival','save','message','pin','clear','search','artist','level','song','beat','lyrics','mix','price','haggle','camera','wheel','zoom','panic','studio','wardrobe','speed','speedometer','shoes','hair','album','rapper','famous','release','income','balance','tired','passed','profile','mentor'];
 function veeLev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let p=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]==b[j-1]?0:1));p=c}return p[n]}
 function veeClean(t){let s=' '+String(t).toLowerCase().replace(/['’]/g,'').replace(/[^a-z0-9$ ]+/g,' ').replace(/\s+/g,' ')+' ';
  VEE_SYN.forEach(([rx,to])=>{s=s.replace(rx,' '+to+' ')});

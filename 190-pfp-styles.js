@@ -5,7 +5,7 @@
      Big Vee (who had a 16x16 face).
    - Instagrime: a selfie. Turned the other way, a tighter crop from a little above, pastel sunset backdrop with bokeh and a
      ring light behind the head. Covers the post headers, profiles, your account and the commenters.
-   - Spotifly: a press shot at 64x64. Facing the camera from slightly below, more shoulders, a dark stage backdrop with a
+   - WaveFern: a press shot at 64x64. Facing the camera from slightly below, more shoulders, a dark stage backdrop with a
      coloured spotlight, a coloured back light and a soft vignette. Covers Browse artists, artist pages, your own artist page,
      the sidebar and the Gphone app. An uploaded picture still wins.
    Long lists (Browse, the New chat list, commenters) draw their pictures a few at a time after the page shows, then swap
@@ -13,7 +13,7 @@
 (function(){
 if(typeof igxPortrait!='function'||typeof IGX!='object')return;
 const P0=igxPortrait,SH0=igxShot,PST={cur:null},PF={},VEEC={skin:3,eyes:0,mouth:0,hair:1,hc:0,hc_custom:'#2ee59d',fh:3,fhc:'#1b1b1f',top:0,tc:0,tc_custom:'#1c6b46',pc:4,ac:2,acc:'#e6b422',body:.5,hgt:.5};
-/* extra camera framings: 'bust' (Spotifly, from slightly below) and 'tight' (Instagrime, from slightly above) */
+/* extra camera framings: 'bust' (WaveFern, from slightly below) and 'tight' (Instagrime, from slightly above) */
 igxShot=function(cam,box,shot,ar,hy){if(shot!='bust'&&shot!='tight')return SH0.apply(this,arguments);
  const top=box.max.y,f=Math.tan(cam.fov*Math.PI/360)*2,b=shot=='bust',y0=b?hy-1:hy-.66,y1=Math.max(top,hy+.48)+(b?.24:.16),vh=y1-y0,d=vh/f,cy=(y0+y1)/2;
  cam.position.set(b?0:-.12,cy+(b?-.2:.3),d);cam.lookAt(0,cy,0);cam.aspect=ar;cam.updateProjectionMatrix()};
@@ -67,9 +67,9 @@ if(typeof tutPic=='function'){const tp=tutPic;tutPic=function(){if(IGX.on)try{re
 if(typeof meetR=='function'){const m0=meetR;meetR=function(){const r=m0.apply(this,arguments);try{const ui=document.getElementById('ui'),im=ui&&ui.querySelector('.mth img');if(im&&MEET&&MEET.a&&MEET.a[4])im.src=igxPortrait(MEET.a[4],0,'msg')}catch(e){}return r}}
 /* Instagrime: every picture in the app in the selfie style (178's swaps run inside, with PST.cur set) */
 {const ig0=PA.ig;PA.ig=function(){PST.cur='ig';let h;try{h=ig0.apply(this,arguments)}finally{PST.cur=null}return swapAll(h,'ig')}}
-/* Spotifly: Browse artists and artist pages */
+/* WaveFern: Browse artists and artist pages */
 if(typeof brFace=='function'){const b0=brFace;brFace=function(i){const old=b0(i);if(!IGX.on)return old;try{const x=BRL()[i],cfg=(typeof realLook=='function'&&realLook(x[0]))||x[3]||lk(x[0]);return later(cfg,0,'sf',old)}catch(e){return old}}}
-/* your own picture in Spotifly (not while a band picture or an uploaded one is showing) */
+/* your own picture in WaveFern (not while a band picture or an uploaded one is showing) */
 const myOld=()=>{try{if(S.pfpSp)return null;const u=pfp();return u===pfp(ch)?u:null}catch(e){return null}};
 function sfMine(root){const u=myOld();if(!u||!IGX.on||!root)return;let n;try{n=igxPortrait(ch,1,'sf')}catch(e){return}root.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===u)i.src=n})}
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{if(app==1&&S.artist)sfMine(document.getElementById('pc'))}catch(e){}return r}}

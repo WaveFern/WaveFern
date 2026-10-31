@@ -107,7 +107,7 @@ function rollLuck(s){if(s.lk!==undefined)return;if(S.day-s.day>0){s.lk=0;return}
  else if(Math.random()<hitChance(s.q)){s.lk='h';s.hm=+R(PERF.hitMin,PERF.hitMax).toFixed(2)}else s.lk=0;
  if(s.lk)luckNote(s)}
 function luckNote(s){const v=s.lk=='v',t=v?'"'+s.title+'" is going VIRAL! Millions of streams are on the way.':'"'+s.title+'" is a HIT! It is streaming far better than your other songs.';
- try{say(t)}catch(e){}try{snd('chime')}catch(e){}if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'Spotifly Team',body:v?'Your song "'+s.title+'" has gone viral. It is on every playlist and will pull in at least '+PERF.viralMin.toLocaleString()+' streams over the next two weeks.':'Your song "'+s.title+'" is a hit. Listeners are playing it on repeat, so it will keep streaming several times better than usual.',state:9,unread:1,day:S.day})}
+ try{say(t)}catch(e){}try{snd('chime')}catch(e){}if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'WaveFern Team',body:v?'Your song "'+s.title+'" has gone viral. It is on every playlist and will pull in at least '+PERF.viralMin.toLocaleString()+' streams over the next two weeks.':'Your song "'+s.title+'" is a hit. Listeners are playing it on repeat, so it will keep streaming several times better than usual.',state:9,unread:1,day:S.day})}
 const luckTag=s=>s.lk=='v'?' VIRAL':s.lk=='h'?' HIT':'';
 const songCap=s=>s.q*s.q*25*Math.pow(FAME_MULT,fameLv())*(s.lk=='h'?s.hm||1:1)-(s.streams-(s.lk=='v'?(s.vt||0)-(s.vr||0):0)-(s.fs||0));
 /* v26.104: the featured artist's own monthly listeners (looked up by name, so older saves work too) */

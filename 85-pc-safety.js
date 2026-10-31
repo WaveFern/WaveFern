@@ -3,7 +3,7 @@
    remembers but the game no longer has, an out-of-range wallpaper), the whole screen stopped redrawing: the Start
    button and every icon did nothing, and the save kept the bad data so it happened again after a reload.
    Now:
-   - each app and Spotifly page draws inside its own guard; a failure repairs the save data and tries once more,
+   - each app and WaveFern page draws inside its own guard; a failure repairs the save data and tries once more,
      and if it still fails the window shows a short notice instead of taking the desktop down with it
    - if the desktop itself fails, the save data is repaired and it redraws; failing that, the broken app is closed;
      failing that, a plain desktop with a working Start menu and Shut down comes up
@@ -22,7 +22,7 @@ function msgFix(){if(!S)return;if(!Array.isArray(S.msgs))S.msgs=[];
   if(m.log!==undefined&&!Array.isArray(m.log))m.log=[];
   if(m.a!==undefined&&!Array.isArray(m.log))m.log=[];
   if(Array.isArray(m.log))m.log=m.log.filter(x=>x&&typeof x=='object');
-  if(m.a===undefined){if(typeof m.from!='string')m.from=m.from==null?'Spotifly Team':String(m.from);if(m.body==null)m.body=''}
+  if(m.a===undefined){if(typeof m.from!='string')m.from=m.from==null?'WaveFern Team':String(m.from);if(m.body==null)m.body=''}
   if(!isFinite(m.id))m.id=S.nid++});
  if(S.chat!=null&&!S.msgs.some(m=>m.id==S.chat))S.chat=0}
 
@@ -40,15 +40,15 @@ function pcSafeFix(){if(!S)return;
  OA=OA.filter(k=>k=='1'||k=='store'||k=='web'||k=='msg'||k=='gear'||(S.apps[k]&&PA[k]));
  if(app&&app!=1&&!PA[app])app=0}
 
-/* every app and Spotifly page draws inside its own guard */
+/* every app and WaveFern page draws inside its own guard */
 const appFail=n=>`<div style="padding:24px"><h1>${esc(n)}</h1><p class=m>This app hit a problem and could not open. Close it with X and carry on; the rest of the computer still works.</p></div>`;
 function guardDraw(T,k,name){const f=T[k];if(typeof f!='function'||f.guarded)return;
  const g=function(){try{return f.apply(this,arguments)}catch(e){console.error('app failed to draw: '+k,e);
   try{pcSafeFix();return f.apply(this,arguments)}catch(e2){console.error('app failed to draw after repair: '+k,e2)}
   return appFail(name(k))}};g.guarded=1;T[k]=g}
-const appName=k=>{try{return k==1?'Spotifly':k=='store'?'App Barn':k=='msg'?'Messages':k=='web'?'Browser':BI[k]||(APPD[k]&&APPD[k].n)||String(k)}catch(e){return String(k)}};
+const appName=k=>{try{return k==1?'WaveFern':k=='store'?'App Barn':k=='msg'?'Messages':k=='web'?'Browser':BI[k]||(APPD[k]&&APPD[k].n)||String(k)}catch(e){return String(k)}};
 Object.keys(PA).forEach(k=>{if(k!='msg')guardDraw(PA,k,appName)});
-Object.keys(PG).forEach(k=>guardDraw(PG,k,()=>'Spotifly'));
+Object.keys(PG).forEach(k=>guardDraw(PG,k,()=>'WaveFern'));
 
 /* Messages: if the full chat view cannot draw even after repair, a plain list of chats still opens */
 {const pm=PA.msg;PA.msg=function(){try{return pm.apply(this,arguments)}catch(e){console.error('messages failed',e)}

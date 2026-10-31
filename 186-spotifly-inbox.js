@@ -1,19 +1,19 @@
-/* ===== v49.35.0: Spotifly Team messages live in the Spotifly app, with notifications =====
-   - Messages from the Spotifly Team (welcome, Fresh Finds, hits, viral songs, catalogue boosts, plaques and so on) no
-     longer land in Messages. They move into a Notifications page inside Spotifly (a sidebar button on the computer, a
-     tab in the Gphone app), drawn in Spotifly's dark green and black.
-   - A new one pops a Spotifly-style notification card in the top right corner; click it to open the page. The Spotifly
+/* ===== v49.35.0: WaveFern Team messages live in the WaveFern app, with notifications =====
+   - Messages from the WaveFern Team (welcome, Fresh Finds, hits, viral songs, catalogue boosts, plaques and so on) no
+     longer land in Messages. They move into a Notifications page inside WaveFern (a sidebar button on the computer, a
+     tab in the Gphone app), drawn in WaveFern's dark green and black.
+   - A new one pops a WaveFern-style notification card in the top right corner; click it to open the page. The WaveFern
      desktop icon, taskbar button and Gphone tile show how many are unread.
-   - Old saves: their Spotifly Team messages move over quietly when the save loads.
+   - Old saves: their WaveFern Team messages move over quietly when the save loads.
    State: S.sfN (list of {id,body,day,unread}). Wrapped in an IIFE. */
 (function(){
-const FROM=['Spotifly Team','WaveFern Team'];
+const FROM=['WaveFern Team','Spotifly Team'];
 if(!Array.isArray(S.sfN))S.sfN=[];
 const isSf=m=>m&&m.a===undefined&&FROM.includes(m.from);
 const unread=()=>(Array.isArray(S.sfN)?S.sfN:[]).filter(n=>n.unread).length;
 window.sfUnread=unread;
 const short=t=>{t=String(t||'');return t.length>110?t.slice(0,107).replace(/\s+\S*$/,'')+'...':t};
-/* move Spotifly Team messages out of Messages; quiet=1 for loads and new games */
+/* move WaveFern Team messages out of Messages; quiet=1 for loads and new games */
 function sweep(quiet){try{if(!Array.isArray(S.msgs))return;if(!Array.isArray(S.sfN))S.sfN=[];
  const got=S.msgs.filter(isSf);if(!got.length)return;S.msgs=S.msgs.filter(m=>!isSf(m));
  got.forEach(m=>S.sfN.push({id:m.id,body:String(m.body==null?'':m.body),day:m.day==null?S.day:m.day,unread:quiet?(m.unread?1:0):1}));
@@ -25,13 +25,13 @@ window.sfSweep=sweep;
 let box=null;
 function pop(body){try{if(!box||!document.body.contains(box)){box=document.createElement('div');box.id='sfincb';document.body.appendChild(box)}
  const d=document.createElement('button');d.className='sfinc';d.type='button';
- d.innerHTML=`<img src="${IC.fw}" alt=""><span><b>Spotifly</b><small>now</small><br>${esc(short(body))}</span>`;
+ d.innerHTML=`<img src="${IC.fw}" alt=""><span><b>WaveFern</b><small>now</small><br>${esc(short(body))}</span>`;
  d.onclick=()=>{d.remove();sfOpenN()};box.appendChild(d);while(box.children.length>3)box.firstChild.remove();
  requestAnimationFrame(()=>d.classList.add('in'));setTimeout(()=>{d.classList.remove('in');setTimeout(()=>d.remove(),300)},7000)}catch(e){}}
-window.sfOpenN=function(){try{if(mode=='pc'){app=1;smo=0;pg='notif';pcR();return}if(mode=='phone'){PH.app='sf';PH.view=null;PH.sft='nt';phR();return}say('Open Spotifly on your laptop or Gphone to read it.')}catch(e){}};
+window.sfOpenN=function(){try{if(mode=='pc'){app=1;smo=0;pg='notif';pcR();return}if(mode=='phone'){PH.app='sf';PH.view=null;PH.sft='nt';phR();return}say('Open WaveFern on your laptop or Gphone to read it.')}catch(e){}};
 /* the list, used by both the computer page and the phone tab */
 function list(ph){const L=(S.sfN||[]).slice().reverse();
- const h=L.length?L.map(n=>`<div class="sfnr${n.unread?' nw':''}"><img src="${IC.fw}" alt=""><div><div class=sfnh><b>Spotifly Team</b><small>Day ${n.day||1}</small></div><p>${esc(n.body)}</p></div></div>`).join(''):`<p class=sfne>Nothing yet. News about your songs from the Spotifly Team shows up here.</p>`;
+ const h=L.length?L.map(n=>`<div class="sfnr${n.unread?' nw':''}"><img src="${IC.fw}" alt=""><div><div class=sfnh><b>WaveFern Team</b><small>Day ${n.day||1}</small></div><p>${esc(n.body)}</p></div></div>`).join(''):`<p class=sfne>Nothing yet. News about your songs from the WaveFern Team shows up here.</p>`;
  (S.sfN||[]).forEach(n=>n.unread=0);
  return`<div class="sfinp${ph?' ph':''}"><h1>Notifications</h1>${h}</div>`}
 PG.notif=()=>list(0);
@@ -41,9 +41,9 @@ PG.notif=()=>list(0);
   if(pg=='notif')sb.querySelectorAll('button.on').forEach(b=>b.classList.remove('on'));
   sb.insertAdjacentHTML('beforeend',`<button class="sfnnav${pg=='notif'?' on':''}" onclick="pg='notif';pcR()">Notifications${u&&pg!='notif'?` <span class=sfbd2>${u}</span>`:''}</button>`)}}
  const n=unread();if(n){document.querySelectorAll('#pc .ico').forEach(i=>{const im=i.querySelector('img');if(im&&im.getAttribute('src')===IC.fw&&!i.querySelector('.sfbd2'))i.insertAdjacentHTML('beforeend',`<span class="sfbd2 ib">${n}</span>`)});
-  document.querySelectorAll('#pc .tb button').forEach(b=>{if(b.textContent=='Spotifly'&&!(app==1&&pg=='notif'))b.insertAdjacentHTML('beforeend',` <span class=sfbd2>${n}</span>`)})}
+  document.querySelectorAll('#pc .tb button').forEach(b=>{if(b.textContent=='WaveFern'&&!(app==1&&pg=='notif'))b.insertAdjacentHTML('beforeend',` <span class=sfbd2>${n}</span>`)})}
  }catch(e){console.error('spotifly inbox nav',e)}return r}}
-/* Gphone: a tab in the Spotifly app and a badge on its tile */
+/* Gphone: a tab in the WaveFern app and a badge on its tile */
 {const g0=gpSf;gpSf=function(){sweep();const nt=PH.sft=='nt',u=unread();let h=g0.apply(this,arguments);if(!S.artist)return h;
  h=h.replace(/(<div class=gstb>[\s\S]*?)(<\/div><div class=gsb>)/,(_,a,b)=>a+`<button class="${nt?'on':''}" onclick="PH.sft='nt';phR()">Alerts${u&&!nt?' ('+u+')':''}</button>`+b);
  if(nt)h=h.replace(/<div class=gsb>[\s\S]*<\/div><\/div>$/,`<div class=gsb>${list(1)}</div></div>`);return h}}

@@ -1,8 +1,8 @@
-/* ===== v44.5.0: Spotifly on a phone held upright, a now-playing mini bar, no Phone button without a phone, no accidental zoom =====
-   - On a phone or tablet held upright, the computer's Spotifly app looks like the Gphone one: dark, a smaller artist header, and
+/* ===== v44.5.0: WaveFern on a phone held upright, a now-playing mini bar, no Phone button without a phone, no accidental zoom =====
+   - On a phone or tablet held upright, the computer's WaveFern app looks like the Gphone one: dark, a smaller artist header, and
      the pages as a row of tabs along the top instead of a side menu.
    - A mini bar at the bottom shows the song that is playing with a pause / play button (tap the song to see more). It shows
-     on the computer (upright phone screens) and on the Gphone, like the desktop Spotifly player.
+     on the computer (upright phone screens) and on the Gphone, like the desktop WaveFern player.
    - The touch Phone button hides while you do not own a phone (S.noPhone).
    Nothing is saved. Wrapped in an IIFE. */
 (function(){

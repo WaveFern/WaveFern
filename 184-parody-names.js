@@ -1,5 +1,5 @@
 /* ===== v49.32.0: real artists become parodies =====
-   Every real artist in the game (the Messages/collab roster ART, Spotifly Browse, mentors and the awards pool) gets a parody name you can still recognise.
+   Every real artist in the game (the Messages/collab roster ART, WaveFern Browse, mentors and the awards pool) gets a parody name you can still recognise.
    This runs last, so looks, listener numbers and seeds worked out from the old names at load stay exactly the same.
    The real-looks table also answers to the parody name, and saves made before this have the old names swapped when they load. */
 const PARODY={'Lil Tecca':'Lil Decka','Ed Sheeran':'Ed Shearin','Kendrick Lamar':'Kenrick Llamar','Dolly Parton':'Dolly Partin','Billie Eilish':'Billie Eyelash','Drake':'Drakeo','The Weeknd':'The Weekdayz',
