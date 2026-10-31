@@ -46,7 +46,7 @@ function shell(p,pages,cats,article,ver){const title=p.id=='home'?'WaveFern Wiki
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap">
-<link rel="stylesheet" href="/wiki/wiki.css">
+<link rel="stylesheet" href="/wiki/wiki.css"><script src="/wiki/accent.js"></script>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g,'\\u003c')}</script>
 </head><body>
 <header id="top">

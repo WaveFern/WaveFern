@@ -10,6 +10,10 @@ Use this when you add or change UI in any app. It lists the colours, fonts and s
 4. Keep the Silkscreen font for headings and `ui-monospace` for body text in the default look. Apps with their own look name their font in their own section.
 5. Bump `GAME_VERSION` and add a `VERSION_HISTORY` entry in `version.js` with every change (patch for fixes, minor for features).
 
+## Game UI style (`style.css` end, `198-game-ui.js`)
+
+The plain look for generic game screens: black `#000` panels, `#2e2e2e` borders, no shadows, no gradients, no emoji. One accent, chosen in Settings > Game (`OPT.accent`, saved in `fw_opt`), lives in `--ga` (`--gad` darker, `--gat` text on top). Inside the scope `--g` is mapped to `--ga`, so existing `var(--g)` uses follow it. The scope is the `:is(...)` list at the end of `style.css`: `#ui>.box.modal` (minus themed ones), `#pzm`, `#stg`, `#sts`, `#admp`, `#ttl`, `#cre`, HUD boxes, `#load` and toasts. A new generic screen just uses `.box.modal`. A screen with its own look must either have a class in the `:not(...)` list or sit outside those roots. The wiki (`wiki/accent.js`) and the tab icon follow the same accent.
+
 ## Shared base (`style.css`)
 
 | Token / class | Value | Used for |

@@ -236,3 +236,49 @@ body.notags #ntags{display:none}
 .tsm.rs{--sbk:#fbf5e6;--sbt:#b98a90;--sbh:#7a1f2b;--sbe:#7a1f2b}
 .shx{--sbk:var(--bg);--sbt:var(--mu,var(--ink));--sbh:var(--ink);--sbe:var(--ink)}
 #ui .box.th{--sbk:var(--bt,var(--bg));--sbt:var(--mu,var(--ac));--sbh:var(--ac);--sbe:var(--ink)}
+
+/* ===== v49.50.0: game UI style (plain black + the player's accent) =====
+   Generic game screens (title and career menus, pause, settings, stats, wake-up and day cards, the world map, creator, HUD boxes, loading,
+   toasts, admin) are black with one accent colour the player picks in Settings > Game. --ga is the accent, --gad a darker shade of it
+   for hover and scroll thumbs, --gat the text colour that reads on top of it. 198-game-ui.js sets all three. Screens with a look of
+   their own (WaveFern app, Gphone, shops, robbery, collab chat, barbershop, pop-up cards) are left out on purpose. No emoji, no gradients. */
+:root{--ga:#2fe68a;--gad:#1a8a52;--gat:#04120a}
+:is(#ui>.box.modal:not(.th,.wrd,.recm,.mtg,.swdesk,.svs-wrap,#rob,#barb),#pzm,#stg,#sts,#admp,#ttl,#cre,#hud .hb,#load,#toast>div:not(.pcard)){
+ --g:var(--ga);--bg:#000;--p:#000;--t:#f2f2f2;--m:#9a9a9a;--sbk:#000;--sbt:#3a3a3a;--sbh:var(--ga);--sbe:#000;
+ color:var(--t);
+ &.box,&.hb{background:#000;border:2px solid #2e2e2e;box-shadow:none}
+ &.box.modal,&#pzm,&#stg,&#admp{border-color:var(--ga)}
+ &#load,&#ttl{background:#000}
+ &#load .ldbg{background:#000}
+ &#load h1,&#ttl h1{text-shadow:none;animation:none}&#load .ldsub{background:#000;box-shadow:none;border:2px solid #2e2e2e}
+ &#load .ldbox,&#ttl .ttpf{background:#000;border:2px solid #2e2e2e;box-shadow:none}
+ &#load .bar{background:#000;border:2px solid #2e2e2e;box-shadow:none}&#load .bar i{background:var(--ga)}&#load .ldeq i{background:var(--ga);border-color:#000;box-shadow:none}
+ h1,h2,h3,.px{color:var(--t)}
+ h2{padding-bottom:6px;border-bottom:2px solid var(--ga)}
+ button{background:#161616;color:var(--t);border:2px solid #2e2e2e;box-shadow:none}
+ button:hover{background:#262626;border-color:var(--ga)}
+ button:active{background:#0c0c0c}
+ button.go{background:var(--ga);color:var(--gat);border-color:var(--ga);font-weight:700}
+ button.go:hover{background:var(--ga);filter:brightness(1.12)}
+ button:disabled{opacity:.4}
+ input,textarea,select{background:#0a0a0a;color:var(--t);border:2px solid #2e2e2e;outline:0}
+ input:focus,textarea:focus,select:focus{border-color:var(--ga)}
+ .card{background:#0f0f0f;border:2px solid #2e2e2e;border-radius:0}
+ .card b,.bar i,.ch i,.fxgoal i{color:var(--ga)}.bar i,.ch i,.fxgoal i{background:var(--ga)}
+ .bar{background:#000;border-color:#2e2e2e}
+ #stt button.on{color:var(--gat);background:var(--ga);border-color:var(--ga)}
+ .so{border-color:#2e2e2e}
+ a{color:var(--ga)}
+ input[type=range]{background:#000;border-color:#2e2e2e!important;box-shadow:none}
+ input[type=range]::-webkit-slider-runnable-track{background:#161616}
+ input[type=range]::-webkit-slider-thumb{background:var(--ga);border-color:#000;box-shadow:none}
+ input[type=range]::-moz-range-track{background:#161616}
+ input[type=range]::-moz-range-thumb{background:var(--ga);border-color:#000}
+ &.box::before{content:none}
+}
+#pzo{background:rgba(0,0,0,.72);backdrop-filter:none}
+#toast>div:not(.pcard){background:#000;border:2px solid var(--ga);box-shadow:none}
+::selection{background:var(--ga);color:var(--gat)}
+/* accent picker (Settings > Game) */
+.gaw{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}.gaw i{width:26px;height:26px;border:2px solid #2e2e2e;cursor:pointer;box-sizing:border-box}.gaw i.on{outline:2px solid #fff;outline-offset:1px}
+.gaw input[type=color]{width:34px;height:26px;padding:0;border:2px solid #2e2e2e;background:#000;cursor:pointer;flex:none}
