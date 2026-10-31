@@ -363,9 +363,9 @@ function dsGap(C,x0,z0,x1,z1,front){const s=C.s,G=mkG(),r=C.r,mx=(x0+x1)/2,mz=(z
  flushTo(G,C.g)}
 function dsYard(C,bk,z0,z1){const s=C.s,G=mkG(),r=C.r;quadY(G,bk.x0,z0,bk.x1,z1,.04,s.desert?'#c8b48a':'#6a9a5a');for(let x=bk.x0+3;x<bk.x1-2;x+=r()*5+4){const z=z0+1.5+r()*Math.max(.1,z1-z0-3);if(s.palm)palm(G,x,z,4+r()*2);else tree(G,x,z,s.tree,.8);col(C,x-.3,z-.3,x+.3,z+.3)}flushTo(G,C.g)}
 function shopRow(C,G,Gw,q,face,x0,z0,x1,z1,words){const len=face=='z'?x1-x0:z1-z0,n=Math.max(1,Math.round(len/7)),seg=len/n;
- for(let i=0;i<n;i++){const a=(face=='z'?x0:z0)+i*seg,b=a+seg,nm=C.r()<(C.s.lang=='en'?.15:.22)?pick(BRANDS):pick(words);
+ for(let i=0;i<n;i++){const a=(face=='z'?x0:z0)+i*seg,b=a+seg,nm0=C.r()<(C.s.lang=='en'?.15:.22)?pick(BRANDS):pick(words),sv=!C.svDoor&&(C.doors||[]).length>=1&&D.svName,nm=sv?D.svName(C.s.lang):nm0;
   const sp=face=='z'?shopFront(C,G,Gw,q,'z',a,z0,b,z1,nm):shopFront(C,G,Gw,q,'x',x0,a,x1,b,nm);
-  if(!sp)continue;const door={x:sp.x,z:sp.z,n:nm,k:pick(['food','food','cafe','souv','conv','records']),face,tall:z1-z0>0&&C.curTall};(C.doors=C.doors||[]).push(door);if(C.r()<.16&&C.shops.length<14)C.shops.push(door)}}
+  if(!sp)continue;if(sv)C.svDoor=1;const door={x:sp.x,z:sp.z,n:nm,k:pick(['food','food','cafe','souv','conv','records']),face,tall:z1-z0>0&&C.curTall};(C.doors=C.doors||[]).push(door);if(C.r()<.16&&C.shops.length<14)C.shops.push(door)}}
 function hotelFront(C,G,Gw,q,L,h){const s=C.s,mx=(L.x0+L.x1)/2,z1=L.z1;bx(G,8,.3,3,'#c8b88a',mx,3.2,z1+1.5);[-3.6,3.6].forEach(o=>bx(G,.25,3.2,.25,'#c8b88a',mx+o,1.6,z1+2.8));quadZ(Gw,mx-1.5,mx+1.5,0,2.6,z1+.04,'#ffe2a8');
  const nm=dw(s.lang).hotel,t=(s.lang=='en'?'':nm+' ')+'HOTEL '+(C.d.city||C.d.country).toUpperCase(),uv=C.A.add(512,96,(x,W,H)=>signArt(x,W,H,t,{bg:'#1a1426',fg:'#ffd890',neon:1}));
  qFace(q,'z',z1+.1,mx-Math.min(7,(L.x1-L.x0)/2-.3),mx+Math.min(7,(L.x1-L.x0)/2-.3),h-3,h-3+Math.min(14,L.x1-L.x0-.6)/5.3,uv&&uv.uv);
