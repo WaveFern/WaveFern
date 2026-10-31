@@ -96,4 +96,21 @@ if(typeof wnSync=='function'&&typeof XPSL!='undefined'){
  if(typeof wardrobe=='function'){const w0=wardrobe;wardrobe=function(){try{wnSync()}catch(e){}return w0.apply(this,arguments)}}
  let ft=0;const u0=update;update=function(dt){u0(dt);ft+=dt||0;if(ft<1)return;ft=0;try{if(typeof S!='object'||!S||S.wfix45||mode!='play')return;S.wfix45=1;
   if(ch.ac>=0&&!(S.wn&&S.wn.ac&&GM[S.wn.ac])){unq('ac');refresh();if(typeof autoSave=='function')autoSave()}wnSync()}catch(e){console.warn('wardrobe fix',e)}}}
+
+/* ---- the real pink line: the jewellery bar ----
+   Jewellery from the shop (S.bling 1-4) was drawn as one flat bar across the chest, and the top tier (Iced platinum
+   set) used hot pink, so a pink stripe sat on the chest of your character and of every wardrobe and Threadz picture.
+   Now the bar is replaced by a real chain that hangs in a V with a pendant: silver, gold, gold with a diamond grill
+   on the teeth, or icy platinum with a diamond pendant. Try-on pictures leave jewellery off so they show the clothes. */
+{const BLC=['#cfd3d8','#e6b422','#7fe3ff','#ff6ad5'];let trying=0;
+ if(typeof tryOn=='function'){const t0=tryOn;tryOn=function(){trying++;try{return t0.apply(this,arguments)}finally{trying--}}}
+ const b0=buildChar;buildChar=function(c){const r=b0.apply(this,arguments);try{if(c!==ch||!(S.bling>0)||!r||!r.g)return r;
+  const mats=BLC.map(k=>M(k)),bar=r.g.children.find(m=>m.isMesh&&mats.includes(m.material)&&Math.abs(m.position.y-1)<1e-6&&m.position.x===0&&m.position.z===0);
+  if(bar)r.g.remove(bar);if(trying)return r;
+  const lv=Math.min(4,S.bling),w=.42+c.body*.5,d=.3+c.body*.28,o=c.jk>=0?.045:0,z=d/2+o+.016,col=lv>=4?'~#e8f2fa':lv>=2?'~#e6b422':'~#cfd3d8';
+  for(let i=0;i<11;i++){const a=(i-5)/5;xb(r.g,.034,.026,.014,col,a*w*.3,1.06-(1-Math.abs(a))*.1,z,0,0,a*.5)}
+  if(lv>=2)xb(r.g,.07,.08,.016,col,0,.92,z+.002);
+  if(lv>=4){xb(r.g,.05,.05,.018,'*e8fbff',0,.92,z+.006,0,0,Math.PI/4);for(let i=0;i<5;i++)xb(r.g,.018,.018,.016,'*ffffff',(i-2)*w*.06,1.07-(2-Math.abs(i-2))*.012,z+.006)}
+  if(lv>=3){const h=xHead(r.g);if(h)xb(h,.14,.02,.012,'~#e8f2fa',0,-.165,.296)}
+ }catch(e){console.warn('bling',e)}return r}}
 })();
