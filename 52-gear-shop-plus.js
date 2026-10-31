@@ -16,15 +16,19 @@ const GX={
  desk:{n:'Mixing desk',d:'Pro-level mixing',lv:['Mouse and laptop','Control surface','16-channel console','Large-format console'],c:[700,2600,8000],q:3,fl:[1,2,3]},
  content:{n:'Content kit',d:'More people find your songs',lv:['Phone camera','Ring light','Camera + softbox','Video studio'],c:[260,950,3200],s:.05,fl:[-1,0,2]}};
 Object.assign(GEAR,GX);
+/* v49.48.0: every gear line now has 5 levels (GMAX). GY holds the newer lines made in 197-gear-levels.js; they work like GX. */
+const GMAX=5,GY={};
 /* what every gear line does per level (the older lines are added straight into the recording and stream formulas) */
 const GQ={chair:4,mic:8,guitar:6,keys:3,drums:3,booth:5},GSB={promo:.3,decks:.2};Object.keys(GX).forEach(k=>{if(GX[k].q)GQ[k]=GX[k].q;if(GX[k].s)GSB[k]=GX[k].s});
-const gl=k=>S.gear[k]||0,gfill=()=>{S.gear=S.gear||{};Object.keys(GEAR).forEach(k=>{if(!(S.gear[k]>=0))S.gear[k]=0})};gfill();
-const gearQx=()=>Object.keys(GX).reduce((a,k)=>a+gl(k)*(GX[k].q||0),0),gearSx=()=>Object.keys(GX).reduce((a,k)=>a+gl(k)*(GX[k].s||0),0);
-const gearLock=k=>{const G=GEAR[k],l=gl(k),t=G.fl?G.fl[l]:-1;return l<3&&t>=0&&fameLevel()<FTL()[t]?FTL()[t]:0};
+const gl=k=>S.gear[k]||0,gfill=()=>{S.gear=S.gear||{};Object.keys(GEAR).forEach(k=>{if(!(S.gear[k]>=0))S.gear[k]=0;else if(S.gear[k]>GMAX)S.gear[k]=GMAX})};gfill();
+/* levels 4 and 5 count half again: each level past 3 adds 1.5x the usual quality or stream bonus. gearX(k) is the effective level count. */
+const isNg=k=>!!(GX[k]||GY[k]),gearX=k=>Math.max(0,gl(k)-3)*.5+(isNg(k)?gl(k):0);
+const gearQx=()=>Math.round(Object.keys(GQ).reduce((a,k)=>a+gearX(k)*GQ[k],0)),gearSx=()=>Object.keys(GSB).reduce((a,k)=>a+gearX(k)*GSB[k],0);
+const gearLock=k=>{const G=GEAR[k],l=gl(k),t=G.fl?G.fl[l]:-1;return l<GMAX&&t>=0&&fameLevel()<FTL()[t]?FTL()[t]:0};
 {const lc=loadCode;loadCode=function(c){const r=lc(c);gfill();return r}}
 
 /* buying: locks first, then the usual purchase (older saves may lack the new keys) */
-{const buy0=buy;buy=function(k){gfill();const G=GEAR[k];if(!G||gl(k)>=3)return;const lk=gearLock(k);if(lk){snd('err');return say(G.n+': '+G.lv[gl(k)+1]+' unlocks at Fame Level '+lk+'.')}return buy0(k)}}
+{const buy0=buy;buy=function(k){gfill();const G=GEAR[k];if(!G||gl(k)>=GMAX)return;const lk=gearLock(k);if(lk){snd('err');return say(G.n+': '+G.lv[gl(k)+1]+' unlocks at Fame Level '+lk+'.')}return buy0(k)}}
 
 /* the bonus: new gear adds quality to every song you finish recording, and the content kit adds streams */
 {const mf0=mgFinish;mgFinish=function(){const n0=S.nid;mf0.apply(this,arguments);const d=S.drafts[S.drafts.length-1];if(!d||d.id!==n0)return;const b=gearQx();if(!b)return;d.q+=b;
@@ -33,9 +37,9 @@ const gearLock=k=>{const G=GEAR[k],l=gl(k),t=G.fl?G.fl[l]:-1;return l<3&&t>=0&&f
 
 /* the shop, in sections */
 const GCAT=[['Instruments',['guitar','bass','pedals','keys','synth','drums','sampler']],['Recording',['mic','vocal','iface','phones','monitors','desk']],['Room',['chair','booth','treat']],['Getting heard',['promo','decks','content']]];
-const gEff=k=>GQ[k]?'+'+GQ[k]+' song quality per level':GSB[k]?'+'+Math.round(GSB[k]*100)+'% streams per level':'';
-PG.shop=()=>{gfill();const q=Object.keys(GQ).reduce((a,k)=>a+gl(k)*GQ[k],0),s=Object.keys(GSB).reduce((a,k)=>a+gl(k)*GSB[k],0),seen=new Set();
- const card=k=>{seen.add(k);const G=GEAR[k],l=gl(k),mx=l>=3,lk=gearLock(k);return`<div class="card gsc" data-pv="g:${k}:${Math.min(3,l+(mx?0:1))}"><small class=m>${G.n} · ${G.d}</small><p style="margin:4px 0"><b style="font-size:15px">${G.lv[l]}</b> <span class=gpip>${[1,2,3].map(i=>`<i class="${i<=l?'on':''}"></i>`).join('')}</span></p><small style="color:var(--g)">${gEff(k)}</small>${typeof gFeel=='function'?gFeel(k):''}${mx?'<p class=m>Maxed out</p>':`<p class=m>Next: ${G.lv[l+1]}</p>${lk?`<button disabled>Fame Level ${lk} · ${$$(G.c[l])}</button>`:`<button class=go ${S.money<G.c[l]?'disabled':''} onclick="buy('${k}')">Buy ${$$(G.c[l])}</button>`}`}</div>`};
+const gEff=k=>GQ[k]?'+'+GQ[k]+' song quality per level (x1.5 from level 4)':GSB[k]?'+'+Math.round(GSB[k]*100)+'% streams per level (x1.5 from level 4)':'';
+PG.shop=()=>{gfill();const q=Math.round(Object.keys(GQ).reduce((a,k)=>a+(gl(k)+Math.max(0,gl(k)-3)*.5)*GQ[k],0)),s=Object.keys(GSB).reduce((a,k)=>a+(gl(k)+Math.max(0,gl(k)-3)*.5)*GSB[k],0),seen=new Set();
+ const card=k=>{seen.add(k);const G=GEAR[k],l=gl(k),mx=l>=GMAX,lk=gearLock(k);return`<div class="card gsc${mx?' gsc-max':''}" data-pv="g:${k}:${Math.min(3,l+(mx?0:1))}"><small class=m>${G.n} · ${G.d}</small><p style="margin:4px 0"><b style="font-size:15px">${G.lv[l]}</b> <span class=gpip>${[1,2,3,4,5].map(i=>`<i class="${i<=l?'on':''}"></i>`).join('')}</span> <small class=m>Level ${l}/${GMAX}</small></p><small style="color:var(--g)">${gEff(k)}</small>${typeof gFeel=='function'?gFeel(k):''}${mx?'<p class=m>Maxed out</p>':`<p class=m>Next: ${G.lv[l+1]}${l+1>3?' · bonus x1.5':''}</p>${lk?`<button disabled>Fame Level ${lk} · ${$$(G.c[l])}</button>`:`<button class=go ${S.money<G.c[l]?'disabled':''} onclick="buy('${k}')">Buy ${$$(G.c[l])}</button>`}`}</div>`};
  const secs=GCAT.map(([t,ks])=>[t,ks.filter(k=>GEAR[k])]);const rest=Object.keys(GEAR).filter(k=>!GCAT.some(c=>c[1].includes(k)));if(rest.length)secs.push(['More',rest]);
  return`<h1>Gear shop</h1><p class=m>Balance: <b style="color:var(--g)">${$$(S.money)}</b> · Fame Level ${fameLevel()}</p><p class=m>Your gear adds <b style="color:var(--g)">+${q} quality</b> to every song you record${s?` and <b style="color:var(--g)">+${Math.round(s*100)}%</b> streams`:''}. Some upgrades unlock as your fame grows.</p>${secs.map(([t,ks])=>`<h3 class=gsh>${t}</h3><div class=cards>${ks.map(card).join('')}</div>`).join('')}`};
 {const st=document.createElement('style');st.textContent='.gsh{margin:16px 0 8px;font:700 14px Silkscreen,monospace;letter-spacing:1px;opacity:.85}.gpip{display:inline-flex;gap:3px;vertical-align:middle;margin-left:4px}.gpip i{width:9px;height:9px;border-radius:2px;background:#0005;box-shadow:inset 0 0 0 1px #fff3}.gpip i.on{background:var(--g)}.gsc button[disabled]{opacity:.7}';document.head.appendChild(st)}

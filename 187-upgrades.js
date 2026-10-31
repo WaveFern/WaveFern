@@ -7,10 +7,11 @@
 const lv=k=>(S.gear&&+S.gear[k])||0,pct=v=>Math.round(v*100)+'%';
 function rows(){const out=[],Q=typeof GQ!='undefined'?GQ:{},SB=typeof GSB!='undefined'?GSB:{},F=window.GFEEL||{};let q=0,s=0;
  Object.keys(GEAR).forEach(k=>{const l=lv(k);if(!l)return;const G=GEAR[k],fx=[];
-  if(Q[k]){fx.push('+'+Q[k]*l+' quality');q+=Q[k]*l}
-  if(SB[k]){fx.push('+'+pct(SB[k]*l)+' streams');s+=SB[k]*l}
+  const e=l+Math.max(0,l-3)*.5;/* levels 4 and 5 count x1.5 (gearX in 52-gear-shop-plus.js) */
+  if(Q[k]){const v=Math.round(Q[k]*e);fx.push('+'+v+' quality');q+=v}
+  if(SB[k]){fx.push('+'+pct(SB[k]*e)+' streams');s+=SB[k]*e}
   if(F[k])fx.push(k=='drums'?'Beat: +'+l+' go'+(l>1?'es':''):k=='chair'?'songs cost '+Math.min(l,3)+' less energy':F[k].replace(/,? (sooner )?each level$/,''));
-  out.push([G.lv[l],G.n,l,fx])});
+  out.push([G.lv[l],G.n,l,fx,l>=5])});
  const h=+S.home||0,p=(S.pets||[]).length,m=typeof mentors=='function'?mentors():0;
  if(h){out.push([h+' home'+(h>1?'s':''),'Property',0,['+'+3*h+' quality','+'+10*h+'% streams']]);q+=3*h;s+=.1*h}
  if(p){out.push([p+' pet'+(p>1?'s':''),'Pets',0,['+'+p+' quality']]);q+=p}
@@ -18,7 +19,7 @@ function rows(){const out=[],Q=typeof GQ!='undefined'?GQ:{},SB=typeof GSB!='unde
  return{out,q,s}}
 window.upgradesView=function(){const{out,q,s}=rows();mode='menu';
  $('ui').innerHTML=`<div class="box modal recm upgv"><h2>Upgrades</h2><div class=recl>${out.length?'+'+q+' quality'+(s?' · +'+pct(s)+' streams':''):'None yet'}</div>
- ${out.length?`<div class=upgl>${out.map(([n,t,l,fx])=>`<div class=upgr><div><b>${esc(n)}</b>${l?`<span class=gpip>${[1,2,3].map(i=>`<i class="${i<=l?'on':''}"></i>`).join('')}</span>`:''}<small>${esc(t)}</small></div><p>${fx.map(esc).join(' · ')}</p></div>`).join('')}</div>`:'<p class=m style="text-align:center">Buy gear in the Gearshop on your laptop.</p>'}
+ ${out.length?`<div class=upgl>${out.map(([n,t,l,fx,mx])=>`<div class="upgr${mx?' upgmax':''}"><div><b>${esc(n)}</b>${l?`<span class=gpip>${[1,2,3,4,5].map(i=>`<i class="${i<=l?'on':''}"></i>`).join('')}</span><em>Level ${l}/5${mx?' MAX':''}</em>`:''}<small>${esc(t)}</small></div><p>${fx.map(esc).join(' · ')}</p></div>`).join('')}</div>`:'<p class=m style="text-align:center">Buy gear in the Gearshop on your laptop.</p>'}
  <button class=recc onclick="recMenu()">Back</button></div>`};
 /* the button, between the extras and Cancel */
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const box=document.querySelector('#ui .box.modal.recm'),c=box&&box.querySelector('.recc');
@@ -28,5 +29,6 @@ window.upgradesView=function(){const{out,q,s}=rows();mode='menu';
 .upgv .upgl{display:flex;flex-direction:column;gap:6px;margin:0 0 12px}
 .upgv .upgr{padding:8px 10px;background:#0a0d0b;border:2px solid #000;box-shadow:inset 0 0 0 2px #2a352e}
 .upgv .upgr>div{display:flex;align-items:center;gap:6px}.upgv .upgr small{margin-left:auto;font-size:11px;color:var(--m)}
+.upgv .upgr em{font:normal 11px 'Silkscreen',ui-monospace,monospace;color:var(--g);letter-spacing:1px}.upgv .upgr.upgmax{box-shadow:inset 0 0 0 2px #ffb000}
 .upgv .upgr p{margin:4px 0 0;font-size:12px;color:var(--g)}`;document.head.appendChild(st)}
 })();

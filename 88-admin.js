@@ -24,7 +24,7 @@ const ADMA={
  evening:()=>{S.t=480;return'Time set to evening'},
  sleep:()=>{admClose();sleepNow(1);return null},
  hype:()=>{Object.keys(S.hype||{}).forEach(g=>S.hype[g]=1.3);return'Every genre is trending'},
- gear:()=>{Object.keys(GEAR).forEach(k=>S.gear[k]=3);return'All gear maxed'},
+ gear:()=>{Object.keys(GEAR).forEach(k=>S.gear[k]=GMAX);return'All gear maxed'},
  apps:()=>{Object.keys(APPD).forEach(k=>S.apps[k]=1);return'All apps unlocked'},
  furniture:()=>{Object.keys(F).forEach(k=>S.inv[k]=(S.inv[k]||0)+3);return'3 of every furniture item added'},
  cars:()=>{S.cars=CARS.map((c,i)=>i);S.garage=Math.max(S.garage||0,1);return'Every car added'},

@@ -209,3 +209,30 @@ body.notags #ntags{display:none}
 .recm .amp{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700}
 .recm .recf{font:11px ui-monospace,Menlo,Consolas,monospace;font-style:normal;font-weight:700;letter-spacing:0}.recm .recf.up{color:var(--g)}.recm .recf.dn{color:#ff8a7a}
 .recs{font:11px ui-monospace,Menlo,Consolas,monospace;font-style:normal;font-weight:700;color:#ffd27a;letter-spacing:0}.recg button.recsg{box-shadow:inset 0 0 0 2px #ffd27a}
+
+/* ===== v49.48.0: every scroll bar in the game's look =====
+   One pixel scroll bar for the whole game: a dark track, a chunky thumb with a black edge and a pixel highlight, no arrows, and
+   the thumb turns bright green on hover. It is all driven by --sbk (track), --sbt (thumb), --sbh (thumb on hover), --sbe (edge)
+   and --sbw (width), which inherit, so any screen with a look of its own just sets those four and every list inside it follows.
+   Chrome, Edge, Safari and phones use the ::-webkit-scrollbar pieces; Firefox gets scrollbar-color. */
+:root{--sbk:#0a0d0b;--sbt:#34604b;--sbh:var(--g);--sbe:#000;--sbw:14px}
+@supports not selector(::-webkit-scrollbar){*{scrollbar-color:var(--sbt) var(--sbk)}}
+::-webkit-scrollbar{width:var(--sbw);height:var(--sbw);background:var(--sbk)}
+::-webkit-scrollbar-track{background:var(--sbk);border-left:2px solid var(--sbe);box-shadow:inset 3px 0 0 #0006}
+::-webkit-scrollbar-thumb{background:var(--sbt);border:2px solid var(--sbe);min-height:36px;min-width:36px;box-shadow:inset 2px 2px 0 #ffffff2e,inset -2px -2px 0 #0000004d}
+::-webkit-scrollbar-thumb:hover,::-webkit-scrollbar-thumb:active{background:var(--sbh)}
+::-webkit-scrollbar-button{display:none;width:0;height:0}
+::-webkit-scrollbar-corner{background:var(--sbk)}
+@media(pointer:coarse){:root{--sbw:10px}}
+/* screens with a look of their own */
+.win.sfw{--sbk:#121212;--sbt:#3a3a3a;--sbh:#1db954;--sbe:#121212;--sbw:10px}
+#ph{--sbk:#000;--sbt:#2d4a3c;--sbh:var(--g);--sbe:#000;--sbw:8px}
+.gshop{--sbk:#0f1114;--sbt:#6b5a2a;--sbh:#ffb000;--sbe:#000}
+.bw,.ue,.az,.ig{--sbk:#f1f1f1;--sbt:#c1c1c1;--sbh:#8a8a8a;--sbe:#dcdcdc}
+.wtx{--sbk:#0d1533;--sbt:#2f3f86;--sbh:#ffcc4d;--sbe:#060a1c}
+.swa{--sbk:#0d1522;--sbt:#7a5f10;--sbh:#ffd84a;--sbe:#000}
+.swdesk{--sbk:#d6e6f7;--sbt:#7ba6d6;--sbh:#4a86c6;--sbe:#4a6a8a}
+.svs,.tsm.sv{--sbk:#cfaa72;--sbt:#7a5230;--sbh:#3a2410;--sbe:#4a2c12}
+.tsm.rs{--sbk:#fbf5e6;--sbt:#b98a90;--sbh:#7a1f2b;--sbe:#7a1f2b}
+.shx{--sbk:var(--bg);--sbt:var(--mu,var(--ink));--sbh:var(--ink);--sbe:var(--ink)}
+#ui .box.th{--sbk:var(--bt,var(--bg));--sbt:var(--mu,var(--ac));--sbh:var(--ac);--sbe:var(--ink)}
