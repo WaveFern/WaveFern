@@ -336,15 +336,19 @@ function plan(src){if(typeof src=='string')src={genre:src};src=src||{};const gen
    kd[1]=pa}}
  const kp=dk.find(x=>x[0]=='k');
  const comp=p=>COMPH.includes(p)&&COMPI.includes(st.ch&&st.ch.i)&&rD()<.4?COMPX[rD()*COMPX.length|0]:p;
- const bs=st.bs?Object.assign({},st.bs,{p:pk(st.bs.p)}):null,ch=st.ch?Object.assign({},st.ch,{i:pk(st.ch.i),p:comp(pk(st.ch.p))}):null,ar=st.ar?Object.assign({},st.ar,{p:pk(st.ar.p)}):null;
+ let bs=st.bs?Object.assign({},st.bs,{p:pk(st.bs.p)}):null,ch=st.ch?Object.assign({},st.ch,{i:pk(st.ch.i),p:comp(pk(st.ch.p))}):null,ar=st.ar?Object.assign({},st.ar,{p:pk(st.ar.p)}):null;
  let ld=st.ld?Object.assign({},st.ld):null;if(ld&&LDX[st.n])ld.i=pk([ld.i].concat(LDX[st.n]));
  /* the recorded Lead and Pluck samples play the tune in about half the songs */
  const rS=rng(seed^0x5A5A);if(ld&&!['cowbell'].includes(ld.i)&&rS()<(SLD[genre]||.4))ld.i=rS()<(SLP[genre]||.3)?'pluck':'lead';
  /* a sustained pad under the chorus, bridge and pre-chorus, and a pluck arpeggio in the chorus: more of the recorded Pad and Pluck samples */
  const padish=st.ch&&['pad','strings','choir'].includes(st.ch.i),ROCKY=genre=='Rock'&&!/Arena|Indie/.test(st.n);
  const pd=!padish&&!ROCKY&&rS()<(SPD[genre]||.6)?{i:'pad',x:7,o:58}:null;
- const pkp=!ar&&!ROCKY&&rS()<(SPK[genre]||.4)?{i:'pluck',p:PKP[rS()*PKP.length|0],r:1,o:rS()<.5?67:72,x:3}:null;
- const P={genre,style:st.n,si,count:L.length,seed,bpm,key,kr,tn:key,sc,keyName:KEYN[key]+' '+SCN[sc],pn,pg,cad:cad?{vs:cad,br:cad}:null,nm,fi,fm:{song:fsong,live:FORMS.live,rec:FORMS.rec},cpb:st.cpb||1,sw:st.sw||0,kit,dk,kick:kp?kp[1]:null,bs,ch,ar,ld,pd,pk:pkp,
+ /* every song has its own arrangement: the style's own arp is dropped in about 1 song in 3, the pluck arp and the pad are each in only some songs and in different sections, the verse chords may sit out, and the intro may have no drums */
+ if(ar&&rS()<.3)ar=null;
+ const pkp=!ar&&!ROCKY&&rS()<(SPK[genre]||.4)*.7?{i:'pluck',p:PKP[rS()*PKP.length|0],r:1,o:rS()<.5?67:72,x:3,sec:rS()<.5?'hk':'hk pc'}:null;
+ if(pd)pd.sec=['hk','hk pc br','hk pc br in','hk br vs'][rS()*4|0];
+ const arr={vsNoCh:rS()<.2,inDr:rS()<.5};
+ const P={genre,style:st.n,si,count:L.length,seed,bpm,key,kr,tn:key,sc,keyName:KEYN[key]+' '+SCN[sc],pn,pg,cad:cad?{vs:cad,br:cad}:null,nm,fi,fm:{song:fsong,live:FORMS.live,rec:FORMS.rec},cpb:st.cpb||1,sw:st.sw||0,kit,dk,kick:kp?kp[1]:null,bs,ch,ar,ld,pd,pk:pkp,arr,
   spc:new Set(SC[sc].map(x=>(x+key)%12)),pl:{},
   sp:src.sp&&typeof src.sp=='object'?src.sp:{bass:'auto',key:'auto',lead:'auto',pad:'auto',pluck:'auto'},s8:dPick(src.s8,N808,seed,0x808),hh:src.hh=='auto'&&!/^(trap|b808)$/.test(st.kit)?'':dPick(src.hh,DHAT,seed,0x4a7),
   fill:st.fill||'',crash:!!st.crash,side:st.side||0,fx:st.fx||{},mx:Object.assign({dr:1,bs:.6,ch:.3,ar:.2,ld:.24,pd:.26,pk:.2},st.mx||{})};
@@ -530,7 +534,7 @@ function sched(E,n,t){const P=E.P,sd=E.sd,bar=n>>4,s=n&15;
  if(k=='hk'&&sec.i==0&&s==0&&(P.crash||P.fill=='drop'))drum(E,'z',t,.9*lvl);
  if(fill=='tom'&&s>=8){if(s%2==0||s>=12){E.tf=[200,170,140,115,95,80][Math.min(5,(s-8)>>1)];drum(E,'t',t,.8*lvl)}if(s==8)drum(E,'k',t,.9*lvl)}
  else for(const[key,pa]of P.dk){let v=pa[(bar*16+s)%pa.length];if(!v)continue;
-  if(k=='in'&&!'hpyr'.includes(key))continue;if(k=='br'&&key=='k')continue;if(silent&&key!='h')continue;
+  if(k=='in'&&!P.arr.inDr&&!'hpyr'.includes(key))continue;if(k=='br'&&key=='k')continue;if(silent&&key!='h')continue;
   if(I<.2&&(key=='s'||key=='c'||key=='n'))continue;
   if(fill=='sn'&&s>=12&&(key=='h'||key=='o'))continue;
   v=v<0?-1:v*(.9+.1*rb())*lvl*sg;
@@ -553,14 +557,14 @@ function sched(E,n,t){const P=E.P,sd=E.sd,bar=n>>4,s=n&15;
    if(bs.i=='acid'){x.acc=rb()<.3;if(E.lb&&rb()<.25)x.from=mtof(E.lb)}if(bs.i=='funk'&&E.lb&&rb()<.2)x.from=mtof(E.lb);if(bs.i=='wob')x.wr=[1,2,3,4][rb()*4|0]/(sd*4);
    const l=Math.min(ev.l,16-s+(bs.p=='k'?16:0));note(E,'bs',bs.i,t,m,l*sd*(bs.i=='808'?1:.92),.9*lvl,x);E.lb=m}}
  /* chords */
- const ch=P.ch;if(ch&&I>=.12&&!(silent&&fill=='stop')){const tp=tpat(ch.p),ev=tp[(bar*16+s)%tp.length];
+ const ch=P.ch;if(ch&&I>=.12&&!(k=='vs'&&P.arr.vsNoCh)&&!(silent&&fill=='stop')){const tp=tpat(ch.p),ev=tp[(bar*16+s)%tp.length];
   if(ev){const CL=16/P.cpb,rem=CL-(n%CL),l=Math.min(ev.l,rem),I0=INS[ch.i]||{},vs=voicing(P,cd,ch.x||3,ch.o||60),dur=l*sd*.96,v=(ev.c=='X'?1:.8)*lvl*(k=='in'?.8:1);
    if(I0.st){const tn=[inWin(vs[0]-12,40)].concat(vs,[vs[0]+12]),up=ev.c=='u',ord=up?tn.slice(-4).reverse():tn;ord.forEach((m,i)=>note(E,'ch',ch.i,t+i*(up?.008:.012),m,dur,v*(up?.45:.65)/Math.sqrt(ord.length)*1.6))}
    else vs.forEach(m=>note(E,'ch',ch.i,t,m,dur,v*.9/Math.sqrt(vs.length)))}}
  /* arpeggio (ar is the style's own; pk is the plucked arpeggio the seed adds in the pre-chorus and chorus) */
- for(const al of['ar','pk']){const ar=P[al];if(!ar||I<.3||silent||k=='br'||(al=='pk'&&k!='hk'&&k!='pc'))continue;const r=ar.r||1;if(s%r==0){const c=ar.p[((n/r)|0)%ar.p.length];if(c>='0'&&c<='9'){const vs=voicing(P,cd,ar.x||3,ar.o||64),i=+c,m=vs[i%vs.length]+12*Math.floor(i/vs.length);note(E,al,ar.i,t,m,sd*r*.9,(al=='pk'?.6:.75)*lvl*(k=='in'?.7:1))}}}
+ for(const al of['ar','pk']){const ar=P[al];if(!ar||I<.3||silent||k=='br'||(al=='pk'&&!ar.sec.split(' ').includes(k)))continue;const r=ar.r||1;if(s%r==0){const c=ar.p[((n/r)|0)%ar.p.length];if(c>='0'&&c<='9'){const vs=voicing(P,cd,ar.x||3,ar.o||64),i=+c,m=vs[i%vs.length]+12*Math.floor(i/vs.length);note(E,al,ar.i,t,m,sd*r*.9,(al=='pk'?.6:.75)*lvl*(k=='in'?.7:1))}}}
  /* pad: one long chord under the pre-chorus, chorus and bridge (softer in the intro and verse), started when the chord changes */
- const pd=P.pd;if(pd&&I>=.12&&!(silent&&fill=='stop')){const sp=sec.i*16+s,pv=sp?chAt(P,k,Math.floor((sp-1)/16),sec.n,(sp-1)%16):null;
+ const pd=P.pd;if(pd&&pd.sec.split(' ').includes(k)&&I>=.12&&!(silent&&fill=='stop')){const sp=sec.i*16+s,pv=sp?chAt(P,k,Math.floor((sp-1)/16),sec.n,(sp-1)%16):null;
   if(pv!==cd){let l=1;while(l<32&&chAt(P,k,Math.floor((sp+l)/16),sec.n,(sp+l)%16)===cd&&sp+l<sec.n*16)l++;const g=k=='hk'?1:k=='pc'||k=='br'?.9:k=='in'?.6:.45;
    voicing(P,cd,pd.x,pd.o).forEach(m=>note(E,'pd',pd.i,t,m,l*sd*.98,.55*g*lvl/Math.sqrt(4)))}}
  /* lead melody: the chorus hook, a quiet verse line (styles that keep a lead going), the pre-chorus climb and the bridge */

@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.58.1';
+const GAME_VERSION='v49.58.2';
 const VERSION_HISTORY=[
+ {v:'v49.58.2',n:'Every song has its own arrangement: plucked arps, pads and the style\'s own arp are only in some songs and in different sections, some verses drop the chords, and some intros have no drums.'},
  {v:'v49.58.1',n:'Trailer pages: the mouse pointer now shows on the Ready card (so the Record and download video button can be pressed) and on the saved card; it is still hidden while the trailer plays.'},
  {v:'v49.58.0',n:'Record and download the trailers. The Ready card on wavefern.com/mtrailer, /vtrailer and /?trailer has a Record and download video button: pick This tab when the browser asks, press Space, and the trailer is recorded with its song and saved as a video file (mp4, or webm where the browser cannot make mp4) when it ends, ready to upload to YouTube. It all happens on your own device.'},
  {v:'v49.57.0',n:'Fuller, wider songs that use your recorded sounds. Every song, old ones too, now uses the Lead, Pluck, Pad, Key and Bass samples that suit its genre (about half of the tunes are played by a Lead or Pluck sample). New layers: a sustained Pad under the chorus, bridge and pre-chorus, and a plucked arpeggio in the chorus. Instruments sit in different places left to right instead of all in the middle.'},
