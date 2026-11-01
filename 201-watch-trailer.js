@@ -6,7 +6,7 @@ let WTR=null,WTRM=0;
 function wtrOpen(){if(WTR)return;snd('click');
  try{if(MENUA&&!MENUA.paused){MENUA.pause();WTRM=1}}catch(e){}
  const o=document.createElement('div');o.id='wtr';
- o.innerHTML='<div class=wtb><div class=wth><b>WAVEFERN TRAILER</b><button class=go onclick="wtrClose()">Close</button></div><div class=wtv><iframe src="https://www.youtube-nocookie.com/embed/VylJTzJzko4?rel=0&autoplay=1" title="WaveFern Official Game Trailer" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><small>Esc or Close goes back to the game</small></div>';
+ o.innerHTML='<div class=wtb><div class=wth><b>WAVEFERN TRAILER</b><button class=go onclick="wtrClose()">Close</button></div><div class=wtv><iframe src="https://www.youtube.com/embed/VylJTzJzko4?rel=0&playsinline=1&origin='+encodeURIComponent(location.origin)+'" title="WaveFern Official Game Trailer" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><a class=wtyt href="https://www.youtube.com/watch?v=VylJTzJzko4" target="_blank" rel="noopener">Video not showing? Open on YouTube</a><small>Esc or Close goes back to the game</small></div>';
  o.addEventListener('mousedown',e=>{if(e.target===o)wtrClose()});document.body.appendChild(o);WTR=o}
 function wtrClose(){if(!WTR)return;WTR.remove();WTR=null;try{if(WTRM&&PAUSED&&menuOK())MENUA.play().catch(()=>{})}catch(e){}WTRM=0}
 addEventListener('keydown',e=>{if(WTR&&e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();wtrClose()}},true);
@@ -15,7 +15,7 @@ addEventListener('keydown',e=>{if(WTR&&e.key=='Escape'){e.preventDefault();e.sto
 #wtr .wth{display:flex;align-items:center;justify-content:space-between;gap:10px}#wtr .wth b{font-family:'Silkscreen',ui-monospace,monospace;color:#2fe68a;font-size:clamp(14px,3vw,20px);letter-spacing:1px}
 #wtr .wth button{font-family:'Silkscreen',ui-monospace,monospace;padding:8px 14px}
 #wtr .wtv{position:relative;width:100%;aspect-ratio:16/9;background:#000;border:3px solid #000}#wtr iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-#wtr small{color:#8aa094;text-align:center}
+#wtr .wtyt{font-family:'Silkscreen',ui-monospace,monospace;color:#06210f;background:#2fe68a;border:3px solid #000;box-shadow:4px 4px 0 #000;padding:10px 14px;text-align:center;text-decoration:none}#wtr .wtv{background:#000 url(https://i.ytimg.com/vi/VylJTzJzko4/maxresdefault.jpg) center/cover}#wtr small{color:#8aa094;text-align:center}
 .wtbtn{font-family:'Silkscreen',ui-monospace,monospace}`;document.head.appendChild(st)}
 /* the title screen and the pause menu get a button after they draw */
 const wtrBtn='<button class=wtbtn onclick="wtrOpen()">Watch trailer</button>';

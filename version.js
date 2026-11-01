@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.58.2';
+const GAME_VERSION='v49.58.3';
 const VERSION_HISTORY=[
+ {v:'v49.58.3',n:'Fix: the Watch trailer window now loads the YouTube video the standard way and shows the trailer picture behind it. It also has an Open on YouTube button under the video, for when a school, work or browser filter blocks the embed.'},
  {v:'v49.58.2',n:'Every song has its own arrangement: plucked arps, pads and the style\'s own arp are only in some songs and in different sections, some verses drop the chords, and some intros have no drums.'},
  {v:'v49.58.1',n:'Trailer pages: the mouse pointer now shows on the Ready card (so the Record and download video button can be pressed) and on the saved card; it is still hidden while the trailer plays.'},
  {v:'v49.58.0',n:'Record and download the trailers. The Ready card on wavefern.com/mtrailer, /vtrailer and /?trailer has a Record and download video button: pick This tab when the browser asks, press Space, and the trailer is recorded with its song and saved as a video file (mp4, or webm where the browser cannot make mp4) when it ends, ready to upload to YouTube. It all happens on your own device.'},
