@@ -241,7 +241,7 @@ body.notags #ntags{display:none}
    Only a few screens use it: the world map, pause menu, main menu / career list, HUD boxes (monthly listeners, money, energy...) and the
    waking-up card (any .box.modal.gu). The FPS counter is styled in 122-graphics.js. --ga is the WaveFern green, --gad a darker shade for scroll thumbs, --gat the text colour that reads on top of it. Fixed, no setting. No emoji, no gradients. */
 :root{--ga:#2fe68a;--gad:#1a8a52;--gat:#04120a}
-:is(#ui>.box.modal.gu,#pzm,#ttl,#hud .hb){
+:is(#ui>.box.modal.gu,#ui>.box.modal[class="box modal"],#pzm,#ttl,#hud .hb){
  --g:var(--ga);--bg:#000;--p:#000;--t:#f2f2f2;--m:#9a9a9a;--sbk:#000;--sbt:#3a3a3a;--sbh:var(--ga);--sbe:#000;
  color:var(--t);
  &.box,&.hb{background:#000;border:2px solid #2e2e2e;box-shadow:none}

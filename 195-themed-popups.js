@@ -28,7 +28,7 @@ const txt=b=>b.textContent||'';
 /* which theme a box gets (null: leave it as the WaveFern box) */
 function kind(b){const t=h2(b),id=b.id||'',c=b.classList;
  if(id=='rob')return'rob';if(c.contains('mtg'))return'meet';if(id=='gift')return'gift';
-  if(t=='Go to bed?')return'night';if(t=='Welcome home')return'keys';
+  if(t=='Welcome home')return'keys';
  if(/Current floor:/.test(txt(b)))return'lift';
  if(/^World map$/.test(t)||b.querySelector('#bm,#dsmap'))return'atlas';
  if(/^i\s/.test(t)&&/Time now/.test(txt(b)))return'depart';

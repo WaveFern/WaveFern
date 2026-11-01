@@ -26,7 +26,7 @@ if(typeof lbSign=='function'){const o=lbSign;lbSign=function(){const had=!!S.lab
 if(typeof wakeUp=='function'){const o=wakeUp;wakeUp=function(){const r=o.apply(this,arguments);try{if([7,30,100,365,1000].includes(S.day))anLog('day_milestone',{milestone:S.day})}catch(e){}return r}}
 /* one-time notice */
 function anNotice(){let seen=0;try{seen=localStorage.getItem('fw_an_seen')}catch(e){}if(seen||!AN_OK)return;
- const d=document.createElement('div');d.id='annote';d.style.cssText='position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:9999;max-width:min(440px,92vw);background:#14121a;color:#fff;border:2px solid #444;padding:10px 12px;font-size:12px;line-height:1.4';
+ const d=document.createElement('div');d.id='annote';d.style.cssText='position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:9999;max-width:min(440px,92vw);background:#000;color:#f2f2f2;border:2px solid #2fe68a;padding:10px 12px;font-size:12px;line-height:1.4';
  d.innerHTML='Allow anonymous stats? WaveFern can use Google Analytics to count visits and key game events (like starting a career). We send no names, emails or saves. You can change this any time in Settings &gt; Game. <a href="privacy/" target="_blank" rel="noopener" style="color:#2fe68a">Privacy Policy</a><div style="margin-top:8px;display:flex;gap:8px"><button id=anok>Allow</button><button id=anoff>No thanks</button></div>';
  const done=()=>{try{localStorage.setItem('fw_an_seen','1')}catch(e){}d.remove()};
  document.body.appendChild(d);d.querySelector('#anok').onclick=()=>{done();anSet(true);anLog('game_start')};d.querySelector('#anoff').onclick=()=>{anSet(false);done()}}

@@ -82,4 +82,4 @@ function wxTick(dt){const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='
 
 /* HUD: the weather next to the time of day */
 {const h0=hud;hud=function(){h0();try{if(hc===WTHR.lastHc)return;WTHR.lastHc=hc;if(!S.wx||S.wx.d!==S.day)return;const b0=$('hud').querySelector('.hb.tl b.px'),b=b0&&b0.nextElementSibling&&b0.nextElementSibling.tagName=='SPAN'?b0.nextElementSibling:b0;if(!b)return;
- const k=S.wx.k,n=k=='sun'?(S.t>=300?'Clear':'Sunny'):WTHR.kinds[k].n,s=document.createElement('span');s.className='wxh';s.style.color=k=='sun'?'#ffd27a':'#b8c8dc';s.textContent=' · '+n;b.after(s)}catch(e){}}}
+ const k=S.wx.k,n=k=='sun'?(S.t>=300?'Clear':'Sunny'):WTHR.kinds[k].n,s=document.createElement('span');s.className='wxh';s.style.color=k=='sun'?'var(--g)':'#9a9a9a';s.textContent=' · '+n;b.after(s)}catch(e){}}}
