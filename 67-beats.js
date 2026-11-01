@@ -290,7 +290,8 @@ function buildLead(P,seed){const ld=P.ld;if(!ld)return;const r=rng(seed),d=ld.d,
 
 /* ---------- the plan: everything about a song, worked out from its seed ---------- */
 function seedOf(src){if(src.seed!=null)return typeof src.seed=='number'?src.seed>>>0:hash(src.seed);if(src.bs==null&&typeof songSeeds=='function')songSeeds();if(src.bs!=null)return src.bs>>>0;return hash(normG(src.genre||src.g)+'#'+(src.id!=null?src.id:src.title||''))}
-const FLAV={maj:[['mix',.14],['lyd',.07]],min:[['dor',.18],['phr',.05],['hmin',.07]]};
+/* major and minor are by far the most common; other modes are the occasional colour (about 1 song in 8). A style that lists a mode itself (drill: harmonic minor) keeps it 40% of the time. */
+const FLAV={maj:[['mix',.06],['lyd',.025]],min:[['dor',.07],['phr',.02],['hmin',.025]]},FOLD={maj:'maj',min:'min',mix:'maj',lyd:'maj',dor:'min',phr:'min',hmin:'min'};
 /* a style's own list of other lead sounds the seed can pick from */
 const LDX={'Trap':['bell','pluck','piano','pbell'],'Plugg':['pbell','pluck','bell','sine'],'Dance Pop':['saw','pluck','square','super'],'Synth-pop':['square','saw','bell','pluck'],'Pop Ballad':['bell','piano','sine'],'Tropical':['flute','marimba','pluck'],'Bedroom Pop':['sine','bell','epiano'],'Disco Pop':['saw','brass','square'],
  'House':['piano','pluck','bell','organ'],'Trance':['super','pluck','saw'],'Future Bass':['pluck','super','bell'],'Synthwave':['saw','square','pluck','lead'],'Chillhop':['bell','flute','epiano','pluck'],'Boom Bap':['brass','piano','flute','strings'],'Jazz Rap':['flute','piano','epiano','bell'],'G-Funk':['whine','saw','square'],
@@ -305,7 +306,7 @@ function plan(src){if(typeof src=='string')src={genre:src};src=src||{};const gen
  const pk=a=>Array.isArray(a)?a[r()*a.length|0]:a,si=src.style!=null?((src.style%L.length)+L.length)%L.length:r()*L.length|0,st=L[si];
  const bpm=Math.round(st.bpm[0]+r()*(st.bpm[1]-st.bpm[0])),key=r()*12|0,kr=((key+6)%12)-6;
  /* mode: the style's own, or now and then a modal colour (dorian, mixolydian, lydian, phrygian...) */
- let sc=pk(st.sc)||'min';const basic=[].concat(st.sc).every(x=>x=='maj'||x=='min'),fl=FLAV[sc];
+ let sc=pk(st.sc)||'min';const own=sc!=FOLD[sc];if(own&&rng(seed^0xA11)()>=.4)sc=FOLD[sc];const basic=!own||sc==FOLD[sc],fl=FLAV[sc];
  const rH=rng(seed^0xC0FFEE);
  if(fl&&basic){const u=rH()*(genre=='Country'?2.5:genre=='Pop'?1.7:1);let a=0;for(const[m,p]of fl){a+=p;if(u<a){sc=m;break}}}
  /* chords: a progression from the style's pool that lives in that mode; verse, chorus, bridge, pre-chorus and intro each get their own */
