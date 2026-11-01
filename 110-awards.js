@@ -97,7 +97,7 @@ function awBuildOut(){if(AWB.on||AW.i==null)return;AWB.on=1;const X=AWB.cx,zf=AW
  for(let k=0;k<6;k++)SB(21-k*3.4,.55,1.6-k*.1,k%2?'#f4ecd8':'#e8dec4',X,9.2+k*.55,zf+1.5);SB(.5,.5,.5,trim,X,12.6,zf+1.5);
  [-1,1].forEach(sd=>{SB(.5,.5,.5,trim,X+sd*10.9,9.1,zf+1.5)});
  SB(2,2,.2,'#2a0a12',X,10.8,zf+2.4);
- const sg=ixSign('GRAMOPHONE AWARDS','#f6d86a','#2a0a12',14,1.4,{border:'#c9a227',ff:'Georgia,serif'});sg.position.set(X,8.2,zf+2.74);scene.add(sg);
+ const sg=ixSign('GRAMOPHONE AWARDS','#f6d86a','#2a0a12',14,1.4,{border:'#c9a227',ff:'Silkscreen,monospace'});sg.position.set(X,8.2,zf+2.74);scene.add(sg);
  const sg2=ixSign('SONG OF THE YEAR · LIVE TONIGHT','#fff3b0','#6a0f1e',10,.7,{border:'#c9a227'});sg2.position.set(X,6.9,zf+2.9);scene.add(sg2);
  /* the doors */
  SB(5.2,5.4,.3,'#2a0a12',X,3.3,zf+.05);SB(2.2,4.2,.12,'#7a0f1e',X-1.1,2.8,zf+.22);SB(2.2,4.2,.12,'#7a0f1e',X+1.1,2.8,zf+.22);SB(1.8,2.4,.06,'#e6c34a',X-1.1,3.2,zf+.3);SB(1.8,2.4,.06,'#e6c34a',X+1.1,3.2,zf+.3);SB(1.5,2.1,.04,'#b9a0c8',X-1.1,3.2,zf+.34);SB(1.5,2.1,.04,'#b9a0c8',X+1.1,3.2,zf+.34);SB(.12,.5,.1,'#f6d86a',X-.2,2.5,zf+.35);SB(.12,.5,.1,'#f6d86a',X+.2,2.5,zf+.35);SB(5.4,.3,.5,trim,X,5.9,zf+.3);SB(1.6,.7,.1,'#2a0a12',X,5.2,zf+.3);SB(1.2,.4,.04,'#f6d86a',X,5.2,zf+.36);
@@ -203,7 +203,7 @@ function awShow(F0,song){
  /* the screen */
  const screen=(lines,hue)=>{const x=sc.getContext('2d'),W=1024,H=430,gr=x.createLinearGradient(0,0,W,H);gr.addColorStop(0,'#2a0f3f');gr.addColorStop(1,hue||'#0e1b3a');x.fillStyle=gr;x.fillRect(0,0,W,H);
   for(let k=0;k<26;k++){x.fillStyle=`rgba(255,220,120,${.04+k%3*.03})`;x.beginPath();x.arc((k*173)%W,(k*97)%H,20+k*4,0,7);x.fill()}x.strokeStyle='#e6c34a';x.lineWidth=6;x.strokeRect(14,14,W-28,H-28);
-  x.textAlign='center';lines.forEach(l=>{x.font=(l[3]||'bold ')+l[1]+'px Georgia,serif';let fs=l[1];while(x.measureText(l[0]).width>W-90&&fs>14){fs-=2;x.font=(l[3]||'bold ')+fs+'px Georgia,serif'}x.fillStyle=l[2]||GOLD2;x.fillText(l[0],W/2,l[4]);});tex.needsUpdate=true};
+  x.textAlign='center';lines.forEach(l=>{x.font=(l[3]||'bold ')+l[1]+'px Silkscreen,ui-monospace,monospace';let fs=l[1];while(x.measureText(l[0]).width>W-90&&fs>14){fs-=2;x.font=(l[3]||'bold ')+fs+'px Silkscreen,ui-monospace,monospace'}x.fillStyle=l[2]||GOLD2;x.fillText(l[0],W/2,l[4]);});tex.needsUpdate=true};
  /* the state machine */
  const A={cheer:0,look:null,t:0,si:0,li:0,typed:0,hold:0,clap:0,clapT:0,stand:0,end:false,cl:0,walk:null,cam:{p:[0,5,26],l:[0,5,-9]},fade:1,lastClap:0},NTH=AW.nth();O.A=A;
  const wrap=document.createElement('div');wrap.id='awd';wrap.style.cssText='position:fixed;inset:0;z-index:50;pointer-events:none;font-family:"Silkscreen",ui-monospace,monospace';

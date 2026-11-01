@@ -213,7 +213,7 @@ TFB['Skyline Tower']=[
  b(.5,.06,13,'#6b4a2e',.4,1.04,8.5);b(.08,1,13,'#4a2f1c',.6,.5,8.5);for(let z=2.6;z<15;z+=1.3)tfStool(K,1.2,z,'#2f6b4f',.78);K.cl(0,2,.7,15);
  /* bistro tables */
  [[4.2,6.2],[7.4,7.6],[4.2,10.4],[7.4,12],[14.6,8.4],[18.2,8.4],[14.6,12.4],[18.2,12.4]].forEach((q,i)=>{tfRTable(K,q[0],q[1],.45,i%2?'#e8e0d0':'#2a2a2a',.76,'#2a2a2a');tfChair(K,q[0]-.72,q[1],1,'#6b4a2e');tfChair(K,q[0]+.72,q[1],3,'#6b4a2e');b(.12,.12,.12,'#f4f4f4',q[0]-.1,.84,q[1]+.05);b(.06,.16,.06,'#2e8b57',q[0]+.12,.86,q[1]-.1);tfPend(K,q[0],q[1],'#2f6b4f','*ffd98a',2.7,.7)});
- tfSign(K,'SKYLINE CAFE','#ffe7a8','#3a2416',3,.5,3.6,2.65,{glow:'#ffb050',ff:'Georgia,serif'});tfPic(K,3.6,1.6,2.2,1.2,7);
+ tfSign(K,'SKYLINE CAFE','#ffe7a8','#3a2416',3,.5,3.6,2.65,{glow:'#ffb050',ff:'Silkscreen,monospace'});tfPic(K,3.6,1.6,2.2,1.2,7);
  b(1.2,.9,.6,'#4a2f1c',6.6,.45,.4);b(1.24,.05,.64,'#e8e0d0',6.6,.92,.4);b(.3,.4,.3,'#cfe9ff',6.3,1.15,.4);b(.4,.1,.3,'#c9a27a',6.9,1,.4);K.cl(5.95,.05,7.25,.75);
  b(3.6,.07,1.1,'#8a5a36',10.8,.98,11.6);b(3.4,.95,.9,'#4a2f1c',10.8,.475,11.6);for(let i=0;i<4;i++){tfStool(K,9.6+i*.8,10.6,'#c0392b',.8);tfStool(K,9.6+i*.8,12.6,'#c0392b',.8)}b(.14,.3,.14,'#e8f4fa',10.8,1.17,11.6);b(.24,.2,.24,'#ffe066',10.8,1.4,11.6);K.cl(8.95,11.05,12.65,12.15);[9.6,12].forEach(x=>tfPend(K,x,11.6,'#c9a227','*ffd98a',2.6,.8));
  tfPlant(K,21.2,15.2,1,'#c0392b');tfPlant(K,12.4,15.1,.9,'#c0392b');tfTree(K,21.1,6,1,'#c0392b');K.done()},
@@ -288,7 +288,7 @@ TFB['Skyline Tower']=[
  [[17.6,1.3],[20.2,1.3]].forEach(q=>{b(.1,.9,.1,'#c9a227',q[0],.45,q[1]);b(.24,.03,.24,'#c9a227',q[0],.015,q[1]);K.cl(q[0]-.12,q[1]-.12,q[0]+.12,q[1]+.12)});b(2.6,.05,.05,'#a0202a',18.9,.82,1.3);
  b(3.2,1,.9,'#e8e0d0',3.5,.5,13.7);b(3.3,.06,1,'#8a5a36',3.5,1.03,13.7);b(.5,.32,.04,'#111',3,1.24,13.5);b(1,.03,.6,'#f4f4f4',4.2,1.07,13.7);K.cl(1.85,13.2,5.15,14.2);
  twKeep(g,o,3.5,12.5,Object.assign({},SUSHIL),'Sushil (curator)',()=>say('Sushil: "Every frame here was painted by a different pixel artist. Take your time."'),2.9);
- tfSign(K,'GALLERY 6','#1a1a1a','#f4f2ec',2.2,.36,4.5,2.4,{border:'#1a1a1a',f:'',ff:'Georgia,serif'},0,7.12);
+ tfSign(K,'GALLERY 6','#1a1a1a','#f4f2ec',2.2,.36,4.5,2.4,{border:'#1a1a1a',f:'',ff:'Silkscreen,monospace'},0,7.12);
  tfTrack(K,1,8,.9,4);tfTrack(K,14,21,.9,4);tfTrack(K,2,7,7.9,2);tfTrack(K,15,20,7.9,2);tfPlant(K,21.2,15.2,1,'#ffffff');tfPlant(K,8.4,15.2,.8,'#ffffff');K.done()},
 /* 7 Sky Lounge: a long bar with lit bottle shelves, stools, sofas round a fire table, a grand piano, a sunset view */
 (g,o)=>{const K=tfK(g,o),b=K.b;tfWin(K,1,.6,15.4,7,'sunset');
@@ -425,7 +425,7 @@ TFB['Aurora Residences']=[
  [[5,6.5],[17,6.5]].forEach(q=>{b(.6,3.4,.6,'#e8e0d0',q[0],1.7,q[1]);b(.8,.24,.8,'#c9a227',q[0],.12,q[1]);b(.8,.2,.8,'#c9a227',q[0],3.3,q[1]);K.cl(q[0]-.4,q[1]-.4,q[0]+.4,q[1]+.4)});
  [[2.3,'#bfa88a','#2f6b4f'],[15.4,'#bfa88a','#7a1f3a']].forEach(q=>{const cx=q[0]+2.3;tfRug(K,cx,13,5.6,3.6,'#e8dcc4','#bfa88a');tfSofa(K,q[0],13,1,2.8,q[1],q[2]);tfSofa(K,q[0]+4.6,12.2,3,1.1,q[2]);tfSofa(K,q[0]+4.6,13.8,3,1.1,q[2]);tfCTable(K,cx-.1,13,1.1,1.6,'#8a5a36','#c9a227')});
  tfTree(K,.9,1,1.1,'#d9d2c0');tfTree(K,21.1,15.1,1,'#d9d2c0');tfTree(K,.9,15.1,1,'#d9d2c0');tfTree(K,7.8,1,1,'#d9d2c0');
- tfChand(K,11,9.4,null,2.4);[4.6,17.6].forEach(x=>tfPend(K,x,13,'#c9a227','*fff2c8',2.75,1));tfSign(K,'AURORA','#c9a227','#c3bfb4',3,.5,11,2.45,{border:'#c9a227',ff:'Georgia,serif',f:''},0,.04);
+ tfChand(K,11,9.4,null,2.4);[4.6,17.6].forEach(x=>tfPend(K,x,13,'#c9a227','*fff2c8',2.75,1));tfSign(K,'AURORA','#c9a227','#c3bfb4',3,.5,11,2.45,{border:'#c9a227',ff:'Silkscreen,monospace',f:''},0,.04);
  INT.push({x:o+11,z:335,r:1.6,l:'Leave building',a:leaveShop});K.done()},
 /* 2 Fitness Club: treadmills and bikes facing the window, a mirror wall with dumbbells, a power rack, lockers, a shake bar */
 (g,o)=>{const K=tfK(g,o),b=K.b;tfWin(K,1,.6,15.4,2,'day');

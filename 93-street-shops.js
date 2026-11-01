@@ -85,5 +85,5 @@ function stShop(cx,D){const X=WX(cx),z=11,H=D.h,w=D.wall,tr=D.trim;
  SB(.1,H+.4,.1,'#3a3d42',X+4.08,(H+.4)/2,5.25);SB(.16,.1,.16,'#3a3d42',X+4.08,.05,5.25);SB(.26,.2,.12,'#3a3d42',X+4.08,H+.35,5.2);SB(.08,.5,.4,'#d8d4c8',X+4.04,.7,7.8);
  D.extra(X,z,H);
  /* painted fascia lettering (smooth canvas text, like the shop room signs) */
- const sg=ixSign(D.n,D.txt,D.fas,4.6,.5,{border:null,ff:'Georgia,serif'});sg.position.set(X,2.72,z+.145);scene.add(sg)}
+ const sg=ixSign(D.n,D.txt,D.fas,4.6,.5,{border:null,ff:'Silkscreen,monospace'});sg.position.set(X,2.72,z+.145);scene.add(sg)}
 {const f=flushSB;flushSB=function(){warpWorld();try{for(const k in SHOPX)if(SHOPX[k].on&&!SHOPX[k].built){SHOPX[k].built=1;stShop(+k,SHOPX[k])}}catch(e){console.error('street shops',e)}f()}}

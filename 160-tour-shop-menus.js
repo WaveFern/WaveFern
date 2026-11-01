@@ -65,12 +65,12 @@ function spin(){if(spinning)return;spinning=1;const f=()=>{const cs=[...document
 {const st=document.createElement('style');st.textContent=`
 .tsm{padding:0;min-width:min(400px,92vw);max-width:min(560px,94vw);box-shadow:0 10px 40px #0009}
 .tsm h2{margin:2px 0;letter-spacing:0;text-shadow:none}
-.tsm .tsm-hd{padding:14px 18px 8px;text-align:center}.tsm .tsm-k{font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.75}.tsm .tsm-g{font-style:italic;font-size:13px;opacity:.85}
+.tsm .tsm-hd{padding:14px 18px 8px;text-align:center}.tsm .tsm-k{font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.75}.tsm .tsm-g{font-size:13px;opacity:.85}
 .tsm .tsm-ft{display:flex;align-items:center;gap:8px;padding:10px 16px 14px;font-size:13px}.tsm .tsm-ft span{font-weight:bold}.tsm .tsm-x{margin-left:auto;min-height:36px}
 /* souvenir counter: kraft paper under a striped awning */
 .tsm.sv{background:repeating-linear-gradient(0deg,#c9a46c 0 3px,#c49e66 3px 6px);border:3px solid #5a3a1e;border-radius:10px;color:#3a2410;font-family:'Trebuchet MS',sans-serif;overflow:auto}
 .tsm.sv .tsm-aw{height:18px;background:repeating-linear-gradient(90deg,var(--ac) 0 24px,#fff6e6 24px 48px);border-bottom:3px solid #5a3a1e;border-radius:7px 7px 0 0}
-.tsm.sv h2{font-family:Georgia,serif;font-style:italic;font-size:28px;color:#3a2410}
+.tsm.sv h2{font-family:Silkscreen,ui-monospace,monospace;font-size:28px;color:#3a2410}
 .tsm.sv .tsm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:6px 16px}
 .tsm.sv .tsm-it{position:relative;background:#fff8ec;border:2px dashed #8a5a32;border-radius:8px;padding:10px;text-align:center;display:flex;flex-direction:column;gap:3px;transform:rotate(-.8deg)}
 .tsm.sv .tsm-it:nth-child(even){transform:rotate(.8deg)}.tsm.sv .tsm-it.own{opacity:.7}
@@ -82,9 +82,9 @@ function spin(){if(spinning)return;spinning=1;const f=()=>{const cs=[...document
 .tsm.sv button.go{background:var(--ac);color:var(--act);border:2px solid #3a2410;box-shadow:0 3px 0 #3a2410}.tsm.sv button.go:disabled{background:#d8c8a8;color:#6a5a3a;opacity:1}
 .tsm.sv .tsm-x{background:#5a3a1e;color:#fff6e6;border:2px solid #3a2410}
 /* restaurant: a printed paper menu */
-.tsm.rs{background:#fbf5e6;color:#2a1a12;font-family:Georgia,'Times New Roman',serif;border:2px solid #7a1f2b;outline:6px double #fbf5e6;outline-offset:-12px;border-radius:4px}
+.tsm.rs{background:#fbf5e6;color:#2a1a12;font-family:ui-monospace,monospace;border:2px solid #7a1f2b;outline:6px double #fbf5e6;outline-offset:-12px;border-radius:4px}
 .tsm.rs .tsm-hd{border-bottom:1px solid #d8c8a8;margin:10px 20px 0}
-.tsm.rs h2{font-family:Georgia,serif;font-variant:small-caps;font-size:30px;color:#7a1f2b}
+.tsm.rs h2{font-family:Silkscreen,ui-monospace,monospace;font-variant:small-caps;font-size:30px;color:#7a1f2b}
 .tsm.rs .tsm-sec,.tsm.cf .tsm-sec{text-align:center;font-size:12px;letter-spacing:4px;text-transform:uppercase;margin:10px 0 2px}
 .tsm.rs .tsm-sec{color:#7a1f2b}
 .tsm .tsm-row{display:flex;align-items:flex-end;gap:6px;width:calc(100% - 32px);margin:0 16px;padding:9px 6px;background:none;border:0;box-shadow:none;color:inherit;font:inherit;text-align:left;cursor:pointer;min-height:44px;border-radius:4px}

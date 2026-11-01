@@ -282,7 +282,7 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 
 /* ---------- looks: each event dressed as itself ---------- */
 (function css(){if(document.getElementById('pecss'))return;
- const f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bungee&family=Special+Elite&family=Playfair+Display:wght@700;900&display=swap';document.head.appendChild(f);
+ const f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bungee&family=Special+Elite&display=swap';document.head.appendChild(f);
  const s=document.createElement('style');s.id='pecss';s.textContent=`
 #ui .box.modal.pe{width:min(520px,94vw);max-height:92vh;overflow:auto;padding:0;border:3px solid #111;box-shadow:6px 6px 0 #0009;font-family:ui-monospace,Menlo,Consolas,monospace}
 .pe .pehd{padding:14px 18px 10px;position:relative}.pe .pehd h2{margin:2px 0 0;font-size:26px;line-height:1.1}
@@ -305,7 +305,7 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 .pe-party button{background:#fff;color:#1a1208}.pe-party button.go{background:#111;color:#ffe45c}.pe-party .pemeter i{background:repeating-linear-gradient(90deg,#ff4f8b 0 10px,#ff7aa8 10px 20px)}
 /* signing: kraft paper, a record and a queue */
 .pe-signing{background:#c8a57a!important;color:#2a1a0c;background-image:repeating-linear-gradient(0deg,#0000 0 3px,#00000008 3px 4px)!important}
-.pe-signing .pehd{background:#2a1d14;color:#f4e2c4;border-bottom:4px double #f4e2c4}.pe-signing .pehd h2{font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:28px}
+.pe-signing .pehd{background:#2a1d14;color:#f4e2c4;border-bottom:4px double #f4e2c4}.pe-signing .pehd h2{font-family:Silkscreen,ui-monospace,monospace;font-weight:900;font-size:28px}
 .pe-signing .pevinyl{float:right;width:84px;height:84px;margin:6px 0 6px 12px;border-radius:50%;background:radial-gradient(circle,#e8452c 0 16%,#111 17% 20%,#1c1c1c 21% 30%,#111 31% 40%,#1c1c1c 41% 50%,#111 51% 70%,#222 71%);box-shadow:3px 3px 0 #0006}
 .pe-signing .peq{display:flex;gap:5px;margin:8px 0 4px;clear:both}.pe-signing .peq i{width:18px;height:26px;background:#f4e2c4;border:2px solid #2a1d14;border-radius:8px 8px 2px 2px}.pe-signing .peq i.d{background:#2a1d14}.pe-signing .peq i.c{background:#e8b04a;transform:translateY(-3px)}
 .pe-signing .pebar{position:relative;height:30px;background:#f8efdf;border:2px solid #2a1d14;margin:10px 0}.pe-signing .pebar .z{position:absolute;top:0;bottom:0;background:#e8b04a;border-left:2px solid #a06a1a;border-right:2px solid #a06a1a}

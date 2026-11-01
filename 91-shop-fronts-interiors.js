@@ -40,7 +40,7 @@ const SFI={
  kind:{book:i=>[.07+(i%3)*.02,.3+(i*7%4)*.04,.26],rec:i=>[.04,.32,.32],box:i=>[.24,.16+(i%3)*.06,.24],jar:i=>[.12,.16,.12],pot:i=>[.18,.16,.18],shoe:i=>[.3,.12,.14],bottle:i=>[.08,.24,.08],tool:i=>[.1,.3+(i%3)*.06,.08],cloth:i=>[.08,.5,.34],glasses:i=>[.22,.06,.1],bread:i=>[.26,.12,.14]},
  table2(b,cl,x,z,top='#6b4a2e',chair='#7a4a2e'){b(.9,.06,.9,top,x,.76,z);b(.1,.72,.1,'#222',x,.37,z);b(.5,.04,.5,'#222',x,.02,z);ixChair(b,x-.75,z,chair,0);ixChair(b,x+.75,z,chair,1);cl(x-1.05,z-.45,x+1.05,z+.45)},
  display(b,cl,x,z,w,d,c,cols,kind){b(w,.8,d,c,x,.4,z);b(w+.06,.05,d+.06,ixShade(c,1.25),x,.82,z);SFI.items(b,z,.85,x-w/2+.1,x+w/2-.1,cols,kind,0,0);cl(x-w/2,z-d/2,x+w/2,z+d/2)},
- board(b,add,x,t,bg='#20302a'){b(1.6,.9,.05,'#6b4a2e',x,2.15,.04);b(1.48,.78,.02,bg,x,2.15,.07);add(ixSign(t,'#f4e8c8',bg,1.36,.24,{ff:'Georgia,serif',k:.5}),x,2.36,.085);for(let j=0;j<3;j++)b(1-j*.15,.03,.01,'#e8e8e0',x-.1,2.12-j*.15,.085)}};
+ board(b,add,x,t,bg='#20302a'){b(1.6,.9,.05,'#6b4a2e',x,2.15,.04);b(1.48,.78,.02,bg,x,2.15,.07);add(ixSign(t,'#f4e8c8',bg,1.36,.24,{ff:'Silkscreen,monospace',k:.5}),x,2.36,.085);for(let j=0;j<3;j++)b(1-j*.15,.03,.01,'#e8e8e0',x-.1,2.12-j*.15,.085)}};
 
 /* ---------- 2. Motors, Pet Shop and Security rooms ---------- */
 const SFSTREET=[

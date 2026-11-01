@@ -79,7 +79,7 @@ APPD.hq.d='Locked until you sign with a record label. They send you a login. Bet
   return h}}
 
 /* Label HQ look: its own dark navy and gold boardroom style */
-{const st=document.createElement('style');st.textContent=`.hqx{background:linear-gradient(160deg,#10142a,#1b2140 60%,#14182f);color:#e9e4d2;padding:14px;border-radius:0;border:2px solid #e6b422;box-shadow:inset 0 0 0 2px #0b0e1d;font-family:Georgia,'Times New Roman',serif;min-height:100%}
+{const st=document.createElement('style');st.textContent=`.hqx{background:linear-gradient(160deg,#10142a,#1b2140 60%,#14182f);color:#e9e4d2;padding:14px;border-radius:0;border:2px solid #e6b422;box-shadow:inset 0 0 0 2px #0b0e1d;font-family:ui-monospace,monospace;min-height:100%}
 .hqx h1{font-variant:small-caps;letter-spacing:2px;color:#e6b422;border-bottom:2px solid #e6b42266;padding-bottom:6px}
 .hqx .card{background:#1d2547;border:1px solid #e6b42288;border-radius:0;box-shadow:3px 3px 0 #0b0e1d}
 .hqx .m,.hqx small.m{color:#aeb4d0}

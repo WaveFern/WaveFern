@@ -10,9 +10,9 @@ Use this when you add or change UI in any app. It lists the colours, fonts and s
 4. Keep the Silkscreen font for headings and `ui-monospace` for body text in the default look. Apps with their own look name their font in their own section.
 5. Bump `GAME_VERSION` and add a `VERSION_HISTORY` entry in `version.js` with every change (patch for fixes, minor for features).
 
-## Game UI style (`style.css` end, `198-game-ui.js`)
+## Game UI style (`style.css` end)
 
-A plain look for a few screens only: the world map, pause menu, main menu and career list, HUD boxes (monthly listeners, money, energy) and the waking-up card. The FPS counter is styled in `122-graphics.js`. Black `#000` panels, `#2e2e2e` borders, no shadows, gradients or emoji. One accent, chosen in Settings > Game (`OPT.accent`, saved in `fw_opt`), lives in `--ga` (`--gad` darker, `--gat` text on top). Inside the scope `--g` is mapped to `--ga`. The scope is the `:is(...)` list at the end of `style.css`: `#ui>.box.modal.gu`, `#pzm`, `#ttl` and `#hud .hb`. To put another screen in it, add the class `gu` to its `box modal`. Every other screen keeps its own look.
+The game's signature palette: black `#000` panels, `#2e2e2e` borders and WaveFern green `#2fe68a` (`--ga`, `--gad` darker, `--gat` text on top). It is fixed; there is no colour setting (old `accent` values in `fw_opt` are ignored). Used on the world map, pause menu, main menu and career list, HUD boxes (monthly listeners, money, energy) and the FPS counter (`122-graphics.js`). Inside the scope `--g` is mapped to `--ga`. The scope is the `:is(...)` list at the end of `style.css`: `#ui>.box.modal.gu`, `#pzm`, `#ttl` and `#hud .hb`. Fonts: only Silkscreen (headings) and `ui-monospace` (text). No serif fonts.
 
 ## Shared base (`style.css`)
 

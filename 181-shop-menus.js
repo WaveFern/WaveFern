@@ -91,7 +91,7 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
 .shx .shx-hd{display:flex;align-items:center;gap:12px;padding:18px 16px 6px}
 .shx .shx-ic{width:52px;height:52px;flex-shrink:0;display:grid;place-items:center;font-size:30px;background:var(--card);border:2px solid var(--ink);border-radius:50%;box-shadow:3px 3px 0 var(--ac)}
 .shx .shx-tt{flex:1;min-width:0}.shx .shx-kk{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ac);font-weight:700}
-.shx h2{margin:2px 0 0;font:700 25px/1.1 Georgia,'Times New Roman',serif;color:var(--ink);text-shadow:none;letter-spacing:0;overflow:hidden;text-overflow:ellipsis}
+.shx h2{margin:2px 0 0;font:700 25px/1.1 ui-monospace,monospace;color:var(--ink);text-shadow:none;letter-spacing:0;overflow:hidden;text-overflow:ellipsis}
 .shx h2 small,.shx h2 .m{font:400 13px 'Trebuchet MS',sans-serif;color:inherit;opacity:.65}
 .shx .shx-cash{text-align:right;flex-shrink:0;background:var(--card);border:2px solid var(--ink);border-radius:8px;padding:4px 9px}.shx .shx-cash small{display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:.65}.shx .shx-cash b{font-size:14px;color:var(--ink)}
 .shx .shx-say{margin:6px 16px 8px;padding:9px 12px;background:var(--card);border:2px solid var(--ink);border-radius:12px 12px 12px 3px;position:relative;font-size:13px}
@@ -114,7 +114,7 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
 .shx-paper .shx-aw{height:14px;background:repeating-linear-gradient(45deg,var(--aw) 0 8px,var(--ac2) 8px 16px)}.shx-paper .shx-aw:after{display:none}
 .shx-paper .shx-hd{border-bottom:3px double var(--ink);margin:0 14px;padding:14px 2px 10px}.shx-paper .shx-say{border-style:dashed;border-radius:6px}
 .shx-paper .shx-it{border-width:0 0 1px;border-style:solid;border-color:color-mix(in srgb,var(--ink) 25%,transparent);border-radius:0;box-shadow:none;background:transparent}.shx-paper .shx-it:hover{background:var(--card);box-shadow:none;transform:none}
-.shx-paper .shx-n b{font-family:Georgia,serif;font-size:16px}.shx-paper .shx-p{background:none;color:var(--ac);clip-path:none;font-family:Georgia,serif;font-size:16px;padding:0}.shx-paper .shx-p:before{display:none}
+.shx-paper .shx-n b{font-family:Silkscreen,ui-monospace,monospace;font-size:16px}.shx-paper .shx-p{background:none;color:var(--ac);clip-path:none;font-family:Silkscreen,ui-monospace,monospace;font-size:16px;padding:0}.shx-paper .shx-p:before{display:none}
 /* chalk: blackboard in a wooden frame */
 .shx-chalk{border:10px solid #7a5232;border-radius:6px;box-shadow:inset 0 0 0 2px #5a3a20,0 14px 40px #000a;background:var(--bg) radial-gradient(ellipse at 30% 20%,#ffffff10,transparent 70%)}
 .shx-chalk .shx-aw{display:none}.shx-chalk h2,.shx-chalk .shx-n b{font-family:'Comic Sans MS','Chalkboard SE','Marker Felt',cursive;color:#fff}
@@ -138,14 +138,14 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
 .shx-clean .shx-it{border:1px solid #0001;box-shadow:0 1px 4px #0002}.shx-clean .shx-it:hover{border-color:var(--ac);box-shadow:0 3px 10px #0002}
 .shx-clean .shx-p{clip-path:none;border-radius:999px;padding:5px 12px}.shx-clean .shx-p:before{display:none}.shx-clean .shx-x{background:var(--ac);border-color:var(--ac);color:#fff;border-radius:999px}
 /* pastel: soft card, scalloped awning, rounded everything */
-.shx-pastel{border-color:var(--ac);border-radius:20px}.shx-pastel .shx-aw{border-color:var(--ac)}.shx-pastel h2{font-family:Georgia,serif;font-style:italic;color:var(--ac)}
+.shx-pastel{border-color:var(--ac);border-radius:20px}.shx-pastel .shx-aw{border-color:var(--ac)}.shx-pastel h2{font-family:Silkscreen,ui-monospace,monospace;color:var(--ac)}
 .shx-pastel .shx-ic{border-color:var(--ac);box-shadow:3px 3px 0 var(--ac2)}.shx-pastel .shx-say,.shx-pastel .shx-cash{border-color:color-mix(in srgb,var(--ac) 50%,transparent)}
 .shx-pastel .shx-it{border-color:color-mix(in srgb,var(--ac) 45%,transparent);box-shadow:0 3px 0 color-mix(in srgb,var(--ac) 35%,transparent);border-radius:16px}
 .shx-pastel .shx-ii{border-radius:50%}.shx-pastel .shx-p{border-radius:999px;clip-path:none;padding:5px 12px}.shx-pastel .shx-p:before{display:none}.shx-pastel .shx-x{background:var(--ac);border-color:var(--ac);color:#fff;border-radius:999px}
 /* boutique: black and white, spaced capitals, gold */
 .shx-boutique{border:1px solid var(--ink);border-radius:2px;outline:1px solid var(--ink);outline-offset:-7px}
 .shx-boutique .shx-aw{height:4px;border:0;background:var(--ac)}.shx-boutique .shx-aw:after{display:none}
-.shx-boutique h2{font:400 22px Georgia,serif;letter-spacing:5px;text-transform:uppercase}.shx-boutique .shx-ic{border-radius:2px;box-shadow:none;border-width:1px}
+.shx-boutique h2{font:400 22px Silkscreen,ui-monospace,monospace;letter-spacing:5px;text-transform:uppercase}.shx-boutique .shx-ic{border-radius:2px;box-shadow:none;border-width:1px}
 .shx-boutique .shx-cash,.shx-boutique .shx-say{border-width:1px;border-radius:2px}.shx-boutique .shx-it{border-width:1px;border-radius:2px;box-shadow:none}.shx-boutique .shx-it:hover{box-shadow:3px 3px 0 var(--ac2)}
 .shx-boutique .shx-n b{letter-spacing:1px;text-transform:uppercase;font-size:13px}.shx-boutique .shx-p{background:var(--ink);color:var(--bg);clip-path:none;border-radius:0}.shx-boutique .shx-p:before{display:none}
 .shx-boutique .shx-x{border-radius:0;letter-spacing:2px;text-transform:uppercase;font-size:12px}
