@@ -9,9 +9,9 @@ const REC={st:0,rec:null,chunks:[],stream:null,ctx:null,mime:'',note:''};
 const name=()=>window.MPT?'wavefern-multiplayer-trailer':/[?&]vert\b/.test(location.search)?'wavefern-vertical-trailer':'wavefern-trailer';
 const pick=()=>{const L=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
  try{return L.find(t=>MediaRecorder.isTypeSupported(t))||''}catch(e){return''}};
-const css=document.createElement('style');css.textContent='body.trlon #trlh,body.trlon #trlh *,body.trlon #trlsv,body.trlon #trlsv *{cursor:default!important}body.trlon #trlh #trlrec:not(:disabled){cursor:pointer!important}#trlh #trlrec{pointer-events:auto;margin-top:10px;cursor:pointer}#trlh #trlrec:disabled{opacity:.6;cursor:default}#trlh .recn{display:block;margin-top:6px}';document.head.appendChild(css);
+const css=document.createElement('style');css.textContent='body.trlon #trlh,body.trlon #trlh *,body.trlon #trlsv,body.trlon #trlsv *{cursor:default!important}body.trlon #trlh #trlrec:not(:disabled){cursor:pointer!important}#trlh #trlrec,#trlh #trldl{pointer-events:auto;margin-top:10px;cursor:pointer}#trlh #trlrec:disabled{opacity:.6;cursor:default}#trlh .recn{display:block;margin-top:6px}';document.head.appendChild(css);
 /* the button's press must not count as the tap that starts the trailer (that listener is added later, so this one runs first) */
-addEventListener('pointerdown',e=>{if(e.target&&e.target.closest&&e.target.closest('#trlrec')){e.stopImmediatePropagation()}},true);
+addEventListener('pointerdown',e=>{if(e.target&&e.target.closest&&e.target.closest('#trlrec,#trldl')){e.stopImmediatePropagation()}},true);
 addEventListener('keydown',e=>{if(REC.st==1&&(e.key=='Enter'||e.key==' ')&&document.activeElement&&document.activeElement.id=='trlrec'){e.stopImmediatePropagation();e.preventDefault()}},true);
 function say(t){const n=document.querySelector('#trlh .recn');if(n)n.innerHTML=t}
 /* the song goes to the recording as well as to the speakers */
@@ -43,6 +43,8 @@ function save(){const type=(REC.rec&&REC.rec.mimeType)||REC.mime||'video/webm',e
 /* the button on the Ready card, and the recorder starting as the trailer rolls */
 {const p0=trlPlay;trlPlay=function(){const r=p0.apply(this,arguments);try{const h=$('trlh');if(h&&!$('trlrec')){
   h.insertAdjacentHTML('beforeend','<br><button class=go id="trlrec" type=button>⏺ Record and download video</button><small class="m recn">Saves the trailer as a video file to upload to YouTube. Pick <b>This tab</b> when your browser asks.</small>');
+  /* the multiplayer trailer also has a finished video on the site, for downloading without watching or recording anything */
+  if(window.MPT)$('trlrec').insertAdjacentHTML('afterend','<a class=go id="trldl" href="mtrailer/wavefern-multiplayer-trailer.mp4" download="wavefern-multiplayer-trailer.mp4" style="display:inline-block;margin:10px 0 0 8px;padding:6px 10px;border:2px solid #000;background:var(--g);color:#04120a;font-weight:700;text-decoration:none;pointer-events:auto">⬇ Download the video now</a>');
   $('trlrec').addEventListener('click',e=>{e.stopPropagation();arm()})}}catch(e){console.error('trailer record',e)}return r}}
 {const r0=trlRoll;trlRoll=function(){const r=r0.apply(this,arguments);if(REC.st==1)setTimeout(begin,650);return r}}
 }

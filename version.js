@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.59.0';
+const GAME_VERSION='v49.59.1';
 const VERSION_HISTORY=[
+ {v:'v49.59.1',n:'The multiplayer trailer page has a Download the video now button: the finished trailer (1080p, with its song) as an mp4, so it can be uploaded without watching or recording it.'},
  {v:'v49.59.0',n:'Songs are mixed. Every instrument and every drum kit was measured on its own and set to a level that suits its job, recorded samples are matched to the same loudness, the chords, pads, arps and lead have their own high-pass filters so the low end stays clean, and there is a small dip around 300 Hz where things used to get muddy. Tools: tools/mix-check.js and tools/mix-calibrate.js.'},
  {v:'v49.58.3',n:'Fix: the Watch trailer window now loads the YouTube video the standard way and shows the trailer picture behind it. It also has an Open on YouTube button under the video, for when a school, work or browser filter blocks the embed.'},
  {v:'v49.58.2',n:'Every song has its own arrangement: plucked arps, pads and the style\'s own arp are only in some songs and in different sections, some verses drop the chords, and some intros have no drums.'},
