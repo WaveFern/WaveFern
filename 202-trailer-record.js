@@ -9,7 +9,7 @@ const REC={st:0,rec:null,chunks:[],stream:null,ctx:null,mime:'',note:''};
 const name=()=>window.MPT?'wavefern-multiplayer-trailer':/[?&]vert\b/.test(location.search)?'wavefern-vertical-trailer':'wavefern-trailer';
 const pick=()=>{const L=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
  try{return L.find(t=>MediaRecorder.isTypeSupported(t))||''}catch(e){return''}};
-const css=document.createElement('style');css.textContent='#trlh #trlrec{pointer-events:auto;margin-top:10px;cursor:pointer}#trlh #trlrec:disabled{opacity:.6;cursor:default}#trlh .recn{display:block;margin-top:6px}';document.head.appendChild(css);
+const css=document.createElement('style');css.textContent='body.trlon #trlh,body.trlon #trlh *,body.trlon #trlsv,body.trlon #trlsv *{cursor:default!important}body.trlon #trlh #trlrec:not(:disabled){cursor:pointer!important}#trlh #trlrec{pointer-events:auto;margin-top:10px;cursor:pointer}#trlh #trlrec:disabled{opacity:.6;cursor:default}#trlh .recn{display:block;margin-top:6px}';document.head.appendChild(css);
 /* the button's press must not count as the tap that starts the trailer (that listener is added later, so this one runs first) */
 addEventListener('pointerdown',e=>{if(e.target&&e.target.closest&&e.target.closest('#trlrec')){e.stopImmediatePropagation()}},true);
 addEventListener('keydown',e=>{if(REC.st==1&&(e.key=='Enter'||e.key==' ')&&document.activeElement&&document.activeElement.id=='trlrec'){e.stopImmediatePropagation();e.preventDefault()}},true);
@@ -39,7 +39,7 @@ function finish(){if(REC.st!=2)return;REC.st=3;clearInterval(REC.t);try{REC.rec.
 function save(){const type=(REC.rec&&REC.rec.mimeType)||REC.mime||'video/webm',ext=/mp4/.test(type)?'mp4':'webm',blob=new Blob(REC.chunks,{type:type.split(';')[0]});
  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name()+'.'+ext;document.body.appendChild(a);a.click();a.remove();
  /* the file is saved; this card stays so it can be saved again if the download was blocked */
- const o=$('trl'),d=document.createElement('div');d.className='qhint box';d.style.pointerEvents='auto';d.innerHTML=`<b>Saved: ${name()}.${ext}</b> (${(blob.size/1048576).toFixed(0)} MB)<br><small class=m>Upload this file to YouTube.</small><br><a download="${name()}.${ext}" href="${u}" style="color:var(--g)">Download it again</a> · <a href="" style="color:var(--g)">Run it again</a>`;if(o)o.appendChild(d)}
+ const o=$('trl'),d=document.createElement('div');d.className='qhint box';d.id='trlsv';d.style.pointerEvents='auto';d.innerHTML=`<b>Saved: ${name()}.${ext}</b> (${(blob.size/1048576).toFixed(0)} MB)<br><small class=m>Upload this file to YouTube.</small><br><a download="${name()}.${ext}" href="${u}" style="color:var(--g)">Download it again</a> · <a href="" style="color:var(--g)">Run it again</a>`;if(o)o.appendChild(d)}
 /* the button on the Ready card, and the recorder starting as the trailer rolls */
 {const p0=trlPlay;trlPlay=function(){const r=p0.apply(this,arguments);try{const h=$('trlh');if(h&&!$('trlrec')){
   h.insertAdjacentHTML('beforeend','<br><button class=go id="trlrec" type=button>⏺ Record and download video</button><small class="m recn">Saves the trailer as a video file to upload to YouTube. Pick <b>This tab</b> when your browser asks.</small>');
