@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.57.0';
+const GAME_VERSION='v49.58.0';
 const VERSION_HISTORY=[
+ {v:'v49.58.0',n:'Record and download the trailers. The Ready card on wavefern.com/mtrailer, /vtrailer and /?trailer has a Record and download video button: pick This tab when the browser asks, press Space, and the trailer is recorded with its song and saved as a video file (mp4, or webm where the browser cannot make mp4) when it ends, ready to upload to YouTube. It all happens on your own device.'},
  {v:'v49.57.0',n:'Fuller, wider songs that use your recorded sounds. Every song, old ones too, now uses the Lead, Pluck, Pad, Key and Bass samples that suit its genre (about half of the tunes are played by a Lead or Pluck sample). New layers: a sustained Pad under the chorus, bridge and pre-chorus, and a plucked arpeggio in the chorus. Instruments sit in different places left to right instead of all in the middle.'},
  {v:'v49.56.0',n:'Watch the official trailer without leaving the game. There is now a Watch trailer button on the title screen, in the pause menu and in Settings > Game. It opens the trailer in a window over the game, only when you choose it, and Close or Esc takes you straight back.'},
  {v:'v49.55.1',n:'Major and minor are the common sound again: about 4 songs in 5 are plain major or minor, and dorian, mixolydian, lydian, phrygian or harmonic minor turn up as the occasional different colour.'},
