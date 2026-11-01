@@ -352,6 +352,7 @@ function plan(src){if(typeof src=='string')src={genre:src};src=src||{};const gen
   spc:new Set(SC[sc].map(x=>(x+key)%12)),pl:{},
   sp:src.sp&&typeof src.sp=='object'?src.sp:{bass:'auto',key:'auto',lead:'auto',pad:'auto',pluck:'auto'},s8:dPick(src.s8,N808,seed,0x808),hh:src.hh=='auto'&&!/^(trap|b808)$/.test(st.kit)?'':dPick(src.hh,DHAT,seed,0x4a7),
   fill:st.fill||'',crash:!!st.crash,side:st.side||0,fx:st.fx||{},mx:Object.assign({dr:1,bs:.6,ch:.3,ar:.2,ld:.24,pd:.26,pk:.2},st.mx||{})};
+ if(src.over)Object.assign(P,src.over);/* tools/mix-calibrate.js plays one layer at a time */
  buildLead(P,seed^0xBADA55);return P}
 
 /* ---------- audio building blocks ---------- */
@@ -437,6 +438,8 @@ function cbV(E,L,t,f,dur,v){const c=E.c,g=c.createGain(),bp=c.createGain();bp.co
    '' keeps the code-made voice, a file name picks that sample). Songs without sp are older ones: they keep the original
    sample set (the entries with no n in the manifest) and the original instrument-to-family map, so they sound as they did. */
 const LAYS=['bs','ch','ar','ld','pd','pk'];
+/* v49.59.0: per-instrument mix gains from tools/mix-calibrate.js (each instrument and each style's drums measured on their own and brought to a target level for their role) */
+const MIXT={"bs:bass":0.71,"ch:piano":0.72,"ld:brass":1.38,"dr:Boom Bap":0.79,"ld:piano":1.21,"ld:flute":0.86,"ld:strings":1.29,"ld:lead":1.3,"ld:pluck":2.38,"bs:upright":0.85,"dr:Jazz Rap":0.87,"ch:epiano":0.87,"ld:bell":1.14,"ld:epiano":1.31,"dr:G-Funk":1.02,"bs:funk":0.67,"ch:pad":0.78,"ld:whine":0.88,"ld:saw":1.43,"ld:square":0.94,"dr:Soul Chop":0.75,"ch:stab":1.03,"dr:Southern Bounce":0.94,"bs:808":0.66,"dr:Breakbeat":1.31,"ch:organ":0.59,"dr:Trap":0.85,"ld:pbell":1.07,"dr:UK Drill":0.86,"ch:strings":0.77,"ch:choir":0.6,"dr:NY Drill":0.91,"dr:Rage":0.74,"ld:super":1.18,"dr:Plugg":0.88,"ld:sine":0.96,"dr:Phonk":0.72,"ld:cowbell":0.86,"dr:Dance Pop":0.82,"bs:pluckb":1.16,"dr:Pop Ballad":1.6,"ar:pluck":1.08,"dr:Synth-pop":0.92,"ch:super":0.97,"bs:round":0.68,"ar:piano":0.84,"bs:sub":0.86,"dr:Tropical":1.25,"ld:marimba":1.39,"ch:marimba":0.94,"ch:gtr":0.88,"dr:Bedroom Pop":1.28,"dr:Disco Pop":0.83,"ar:mute":1.43,"dr:Garage Rock":1.0,"bs:pick":0.76,"ch:dist":0.59,"dr:Arena Rock":1.17,"dr:Hard Rock Riff":1.03,"dr:Punk":0.93,"ch:chug":0.78,"dr:Indie Rock":1.05,"ar:gtr":0.93,"dr:Grunge":1.06,"dr:Slow Jam":1.45,"dr:Trap Soul":0.72,"dr:Neo-Soul":0.8,"dr:Alt R&B":0.75,"dr:New Jack Swing":0.83,"dr:Afro R&B":1.22,"dr:Rainy Day":0.87,"dr:Jazzhop":0.83,"dr:Chillhop":0.79,"ar:nylon":1.14,"dr:Sleepy":1.07,"dr:Lo-fi Bossa":0.77,"ld:mbox":1.13,"ch:nylon":0.89,"dr:Train Beat":1.6,"ch:strum":0.69,"dr:Tape Beat":0.71,"ld:twang":2.0,"dr:Honky Tonk":1.24,"dr:Country Ballad":1.6,"ld:steel":0.85,"ld:fiddle":1.39,"dr:Bluegrass":1.6,"dr:Country Pop":0.87,"dr:Country Trap":0.85,"ar:banjo":0.83,"dr:House":0.81,"dr:Techno":0.72,"bs:acid":1.28,"ld:organ":0.98,"dr:Drum & Bass":1.0,"bs:reese":0.61,"dr:Dubstep":0.95,"bs:wob":0.62,"dr:Trance":0.82,"dr:Synthwave":1.06,"dr:Reggaeton":0.91,"dr:Future Bass":0.92,"dr:Latin Trap":0.92,"ld:nylon":2.09,"dr:Cumbia":1.41,"dr:Bachata":1.41,"ch:pluck":1.2,"bs:smp":2.44,"dr:Latin Pop":0.86,"ld:smp":4.13,"ch:smp":3.45,"dr:Salsa":1.22,"ar:smp":1.82,"pd:smp":2.55,"pk:smp":1.6,"pd:pad":0.66,"pk:pluck":0.98};
 const SMP={},SMP_OF={bass:'bass',round:'bass',upright:'bass',funk:'bass',pluckb:'bass',pick:'bass',acid:'bass',reese:'bass',wob:'bass',
  epiano:'key',piano:'piano',bell:'bell',pbell:'bell',brass:'brass',lead:'lead',pluck:'pluck',flute:'flute',strings:'string',super:'synth'},
  SMP_OF2=Object.assign({},SMP_OF,{pad:'pad',choir:'pad',organ:'key',saw:'lead',square:'lead',stab:'pluck'}),
@@ -470,8 +473,10 @@ function loadMan(){if(smpLoad)return smpLoad;if(typeof fetch!='function'){smpDon
   Object.keys(SMP).forEach(k=>SMP[k].sort((a,b)=>a.f<b.f?-1:1))}).catch(()=>{}).then(()=>{smpDone=1});return smpLoad}
 function loadSamples(c){if(!c)return smpLoad;return loadMan()}
 /* one file, fetched and decoded when first asked for; null until it is there, and s.bad if it never arrives */
+/* v49.59.0: samples were recorded at very different levels, so each one is matched to the same loudness when it loads (RMS of the part that sounds) */
+function gainOf(b){const d=b.getChannelData(0);let pk=0;for(let i=0;i<d.length;i+=4)pk=Math.max(pk,Math.abs(d[i]));if(pk<1e-4)return 1;let e=Math.min(d.length,b.sampleRate*1.5|0);while(e>1000&&Math.abs(d[e-1])<pk*.05)e--;let s=0;for(let i=0;i<e;i++)s+=d[i]*d[i];const r=Math.sqrt(s/e);return Math.max(.3,Math.min(3.5,.12/r))}
 function sBuf(c,s){if(s.buf)return s.buf;if(s.bad||s.ld||!c||typeof fetch!='function'){if(!s.ld&&!s.buf)s.bad=1;return null}
- s.ld=1;fetch('audio/oneshots/'+s.f).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>c.decodeAudioData(b)).then(buf=>{s.buf=buf}).catch(()=>{s.bad=1});return null}
+ s.ld=1;fetch('audio/oneshots/'+s.f).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>c.decodeAudioData(b)).then(buf=>{s.gain=gainOf(buf);s.buf=buf}).catch(()=>{s.bad=1});return null}
 /* the samples a song uses: instrument name -> entry, for the four parts of its beat */
 function sUse(P){const U={};for(const k of LAYS){const d=P[k];if(!d||U[d.i])continue;const s=pickS(P,famOf(P,d.i));if(s)U[d.i]=s}return U}
 function sReady(c,P){let ok=true;const U=sUse(P);for(const n in U){const s=U[n];if(!sBuf(c,s)&&!s.bad)ok=false}return ok}
@@ -480,7 +485,7 @@ function sReady(c,P){let ok=true;const U=sUse(P);for(const n in U){const s=U[n];
 function smpV(E,L,t,m,dur,v,s){
  const c=E.c,src=c.createBufferSource(),g=c.createGain(),end=t+dur;
  src.buffer=s.buf;src.playbackRate.value=Math.pow(2,(m-s.root)/12);
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.9,t+.004);g.gain.setValueAtTime(v*.9,end);g.gain.linearRampToValueAtTime(0,end+.08);
+ v*=s.gain||1;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.9,t+.004);g.gain.setValueAtTime(v*.9,end);g.gain.linearRampToValueAtTime(0,end+.08);
  src.connect(g);g.connect(L.in);src.start(t);src.stop(end+.1)}
 /* v49.51.0: the picker's list and a one-shot preview of a sample (played at a steady pitch so they compare) */
 function previewSample(fam,f){const c=ctx();if(!c)return;const s=(SMP[fam]||[]).find(q=>q.f==f);if(!s)return;let k=0;const go=()=>{const b=sBuf(c,s);if(!b){if(!s.bad&&k++<40)setTimeout(go,100);return}
@@ -579,18 +584,20 @@ function mkE(c,dest,P,o){const E={c,P,fbk:{},sd:60/P.bpm/4,nb:noiseBuf(c),I:o.in
  E.out=c.createGain();E.mix=c.createGain();let n=E.mix;const fx=P.fx;
  if(fx.lp){const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=fx.lp;f.Q.value=.6;n.connect(f);n=f}
  if(fx.sat){const w=shaper(c,fx.sat),g=c.createGain();g.gain.value=.8;n.connect(w);w.connect(g);n=g}
+ /* mud: a gentle dip around 300 Hz where bass, chords and pads pile up */
+ const mud=c.createBiquadFilter();mud.type='peaking';mud.frequency.value=300;mud.Q.value=.8;mud.gain.value=-2.5;n.connect(mud);n=mud;
  const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=28;n.connect(hp);hp.connect(E.out);E.out.connect(dest);
  E.rv=c.createGain();const cv=c.createConvolver();cv.buffer=irBuf(c,fx.rt||1.8);const rr=c.createGain();rr.gain.value=fx.verb!=null?fx.verb*1.4:.3;E.rv.connect(cv);cv.connect(rr);rr.connect(E.mix);
  if(fx.dly){E.dl=c.createGain();const d=c.createDelay(2),fb=c.createGain(),lp=c.createBiquadFilter(),w=c.createGain();d.delayTime.value=E.sd*3;fb.gain.value=.35;lp.type='lowpass';lp.frequency.value=3000;w.gain.value=.35;E.dl.connect(d);d.connect(lp);lp.connect(fb);fb.connect(d);lp.connect(w);w.connect(E.mix)}
  E.pump=c.createGain();E.pump.connect(E.mix);
- E.dr=c.createGain();E.dr.gain.value=P.mx.dr;E.dr.connect(E.mix);
+ E.dr=c.createGain();E.dr.gain.value=P.raw?1:P.mx.dr*(MIXT['dr:'+P.style]||1);E.dr.connect(E.mix);
  let wob=null;if(fx.wob){const l=c.createOscillator();l.frequency.value=.55;wob=c.createGain();wob.gain.value=.0011*fx.wob;l.connect(wob);l.start();E.loops.push(l)}
- E.lay={};const RVS={bs:0,ch:.3,ar:.35,ld:.35,pd:.5,pk:.4},PAN={bs:0,ch:-.22,ar:.3,ld:.08,pd:0,pk:-.3};
- for(const k of LAYS){const def=P[k];if(!def)continue;const g=c.createGain(),Id=INS[def.i]||{},smp=sampled(def.i,P);g.gain.value=P.mx[k];let inp=g;
+ E.lay={};const RVS={bs:0,ch:.3,ar:.35,ld:.35,pd:.5,pk:.4},HPF={ch:150,ar:200,ld:180,pd:170,pk:240},PAN={bs:0,ch:-.22,ar:.3,ld:.08,pd:0,pk:-.3};
+ for(const k of LAYS){const def=P[k];if(!def)continue;const g=c.createGain(),Id=INS[def.i]||{},smp=sampled(def.i,P);g.gain.value=P.raw?1:MIXT[k+':'+(smp?'smp':def.i)]!=null?MIXT[k+':'+(smp?'smp':def.i)]:P.mx[k];let inp=g;
   let lf=null;if(Id.t=='o'){lf=c.createBiquadFilter();lf.type='lowpass';lf.frequency.value=smp?15000:Math.min(15000,Id.lp||6000);lf.Q.value=Id.q||.7;lf.connect(g);inp=lf}
   if(Id.ds&&!smp){const w=shaper(c,k=='ld'?6:9,'2x'),lp=c.createBiquadFilter(),h=c.createBiquadFilter(),wg=c.createGain();lp.type='lowpass';lp.frequency.value=3600;h.type='highpass';h.frequency.value=90;wg.gain.value=k=='ld'?.5:.6;w.connect(h);h.connect(lp);lp.connect(wg);wg.connect(g);if(lf){lf.disconnect();lf.connect(w)}else inp=w}
   if(wob&&k!='bs'){const d=c.createDelay(.05);d.delayTime.value=.006;wob.connect(d.delayTime);d.connect(inp);inp=d}
-  let po=g;if(c.createStereoPanner&&PAN[k]){po=c.createStereoPanner();po.pan.value=PAN[k];g.connect(po)}po.connect(P.side&&k!='ld'?E.pump:E.mix);if(RVS[k]){const sg=c.createGain();sg.gain.value=RVS[k];g.connect(sg);sg.connect(E.rv)}if(k=='ld'&&E.dl)g.connect(E.dl);E.lay[k]={in:inp,g,f:lf}}
+  let po=g;if(HPF[k]){po=c.createBiquadFilter();po.type='highpass';po.frequency.value=HPF[k];po.Q.value=.6;g.connect(po)}if(c.createStereoPanner&&PAN[k]){const pn=c.createStereoPanner();pn.pan.value=PAN[k];po.connect(pn);po=pn}po.connect(P.side&&k!='ld'?E.pump:E.mix);if(RVS[k]){const sg=c.createGain();sg.gain.value=RVS[k];g.connect(sg);sg.connect(E.rv)}if(k=='ld'&&E.dl)g.connect(E.dl);E.lay[k]={in:inp,g,f:lf}}
  if(fx.vinyl){const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=vinylBuf(c);s.loop=true;f.type='highpass';f.frequency.value=700;g.gain.value=.22*fx.vinyl;s.connect(f);f.connect(g);g.connect(E.mix);s.start();E.loops.push(s)}
  if(fx.rain){const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=E.nb;s.loop=true;f.type='lowpass';f.frequency.value=1400;g.gain.value=.05*fx.rain;s.connect(f);f.connect(g);g.connect(E.mix);s.start();E.loops.push(s)}
  return E}
@@ -639,8 +646,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&cur)pause(
 addEventListener('pagehide',()=>stop(.02));
 
 /* offline render (tests, previews): returns a Promise of an AudioBuffer */
-function render(src,secs,o){o=o||{};const P=plan(src),sr=o.sampleRate||44100,OC=window.OfflineAudioContext||window.webkitOfflineAudioContext,c=new OC(2,Math.ceil(sr*secs),sr),out=outChain(c);
- out.vol.gain.value=(o.vol!=null?o.vol:.5)*BASE;const E=mkE(c,out.vol,P,o);lockE(E);E.t0=.02;if(o.solo){if(o.solo!='dr')E.dr.gain.value=0;for(const k in E.lay)if(k!=o.solo)E.lay[k].g.gain.value=0}for(let n=0;stepTime(E,n)<secs;n++)sched(E,n,stepTime(E,n));return c.startRendering()}
+async function render(src,secs,o){o=o||{};const P=plan(src),sr=o.sampleRate||44100,OC=window.OfflineAudioContext||window.webkitOfflineAudioContext,c=new OC(2,Math.ceil(sr*secs),sr),out=outChain(c);
+ out.vol.gain.value=(o.vol!=null?o.vol:.5)*BASE;const E=mkE(c,out.vol,P,o);
+ if(o.samples!==false&&typeof fetch=='function'){try{await loadMan();const U=sUse(P);for(const n in U){for(let k=0;k<60&&!sBuf(c,U[n])&&!U[n].bad;k++)await new Promise(r=>setTimeout(r,50))}}catch(e){}}lockE(E);E.t0=.02;if(o.solo){if(o.solo!='dr')E.dr.gain.value=0;for(const k in E.lay)if(k!=o.solo)E.lay[k].g.gain.value=0}for(let n=0;stepTime(E,n)<secs;n++)sched(E,n,stepTime(E,n));return c.startRendering()}
 
 return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,+x||0))},setVolume:x=>{uvol=Math.max(0,Math.min(1,+x||0))},
  playing:()=>!!cur,current:()=>cur?Object.assign(info(cur),{owner:cur.owner,src:cur.src,paused:!!cur.paused,held:!!cur.up,intensity:cur.I}):null,
@@ -672,7 +680,7 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
    o.buffer=b;o.playbackRate.value=Math.pow(2,(m-s.root)/12);const v=(vol||.15)*musicVol()*3;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.004);g.gain.setValueAtTime(v,t+dur);g.gain.linearRampToValueAtTime(0,t+dur+.12);
    o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.2);return true}},
  previewDrum(kind,n){const c=ctx();if(!c||!n)return;let k=0;const go=()=>{const b=dBuf(c,kind,n);if(!b){if(k++<20)setTimeout(go,100);return}
-  const s=c.createBufferSource(),g=c.createGain();s.buffer=b;g.gain.value=musicVol()*.9;s.connect(g);g.connect(c.destination);s.start();if(kind=='808')s.stop(c.currentTime+1.2)};go()},samples:()=>Object.fromEntries(Object.entries(SMP).map(([k,v])=>[k,v.length])),_dbg:{STY,INS,KIT},styles:Object.fromEntries(GENRES.map(g=>[g,STY[g].map(s=>s.n)])),genres:GENRES.slice(),render,
+  const s=c.createBufferSource(),g=c.createGain();s.buffer=b;g.gain.value=musicVol()*.9;s.connect(g);g.connect(c.destination);s.start();if(kind=='808')s.stop(c.currentTime+1.2)};go()},samples:()=>Object.fromEntries(Object.entries(SMP).map(([k,v])=>[k,v.length])),_dbg:{STY,INS,KIT,LDX},styles:Object.fromEntries(GENRES.map(g=>[g,STY[g].map(s=>s.n)])),genres:GENRES.slice(),render,
  /* festival set: called every frame by festMusic; plays the beat of the song on stage (a new beat when the setlist moves on)
     and follows the crowd's hype. Returns false if audio is not available, so the old drum loop can play instead. */
  fest(set){if(!set||!set.song||set._bt==-1)return false;
