@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.60.0';
+const GAME_VERSION='v49.60.1';
 const VERSION_HISTORY=[
+ {v:'v49.60.1',n:'The downloadable multiplayer trailer is re-encoded at a much higher quality (about 6 Mbps, was 2.4), so it is sharp instead of blurry.'},
  {v:'v49.60.0',n:'Artists who message you are about your size now. If you have 30 million monthly listeners, most messages come from artists with roughly 25 to 45 million, some from a bit smaller or bigger, and an artist 3 times your size or more is rare (a megastar can still write to you, just very seldom). Six new artists between 19 and 56 million listeners join the roster. Collabs with real megastars also pay more: your featured song now gets about 3 times the fan streams it did before. Old saves keep working.'},
  {v:'v49.59.1',n:'The multiplayer trailer page has a Download the video now button: the finished trailer (1080p, with its song) as an mp4, so it can be uploaded without watching or recording it.'},
  {v:'v49.59.0',n:'Songs are mixed. Every instrument and every drum kit was measured on its own and set to a level that suits its job, recorded samples are matched to the same loudness, the chords, pads, arps and lead have their own high-pass filters so the low end stays clean, and there is a small dip around 300 Hz where things used to get muddy. Tools: tools/mix-check.js and tools/mix-calibrate.js.'},
