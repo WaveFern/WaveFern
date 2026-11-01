@@ -145,10 +145,10 @@ function drawPins(){const c=$('bm');if(!c||away())return;const x=c.getContext('2
   x.globalAlpha=PCOL[st];
   /* a burst: eight points round a circle */
   x.fillStyle='#000a';x.beginPath();for(let i=0;i<16;i++){const a=i/16*Math.PI*2,r=i%2?6:11;x.lineTo(X+1+Math.cos(a)*r,Z+1.5+Math.sin(a)*r)}x.fill();
-  x.fillStyle=K.c;x.strokeStyle='#111';x.lineWidth=1.5;x.beginPath();for(let i=0;i<16;i++){const a=i/16*Math.PI*2,r=i%2?6:11;x.lineTo(X+Math.cos(a)*r,Z+Math.sin(a)*r)}x.closePath();x.fill();x.stroke();
+  x.fillStyle='#2fe68a';x.strokeStyle='#000';x.lineWidth=1.5;x.beginPath();for(let i=0;i<16;i++){const a=i/16*Math.PI*2,r=i%2?6:11;x.lineTo(X+Math.cos(a)*r,Z+Math.sin(a)*r)}x.closePath();x.fill();x.stroke();
   x.fillStyle='#111';x.beginPath();x.arc(X,Z,2.4,0,7);x.fill();
   const t=K.n+' · '+(st=='open'?'now':st=='soon'?hm(v.s):st=='done'?'done':'over'),w=x.measureText(t).width+14,lx=Math.min(M.W-w-50,Math.max(4,X-w/2)),ly=Z-30;
-  x.fillStyle=K.c;mapPill(x,lx,ly,w,17,4);x.fill();x.strokeStyle='#111';x.lineWidth=1.5;x.stroke();x.fillStyle=K.c=='#f2f2f2'||K.c=='#ffd23d'||K.c=='#ffcf3a'||K.c=='#c8955a'?'#111':'#fff';x.fillText(t,lx+7,ly+9);
+  x.fillStyle='#2fe68a';mapPill(x,lx,ly,w,17,4);x.fill();x.strokeStyle='#000';x.lineWidth=1.5;x.stroke();x.fillStyle='#04120a';x.fillText(t,lx+7,ly+9);
   x.globalAlpha=1});
  x.textBaseline='alphabetic'}
 {const d0=mapDraw;mapDraw=function(){d0.apply(this,arguments);try{drawPins()}catch(e){console.error('pop pins',e)}}}
@@ -353,11 +353,11 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 .pe-shoot button{background:#222;color:#f2f2f2;border-color:#000}.pe-shoot button.go{background:#f2f2f2;color:#111}.pe-shoot .pegrid div{border-color:#444}
 @media(max-width:520px){.pe-shoot .peframes{grid-template-columns:1fr}.pe .pehd h2{font-size:22px}}
 /* the map list and the morning paper column */
-#ui .popl{margin:8px 0 0;border:2px solid #000;background:#0b0f0d}
-#ui .popl .poplh{display:flex;align-items:center;gap:6px;padding:5px 8px;background:#ffcf3a;color:#111;font-family:'Silkscreen',monospace;font-size:12px}
+#ui .popl{margin:8px 0 0;border:2px solid #2e2e2e;background:#000}
+#ui .popl .poplh{display:flex;align-items:center;gap:6px;padding:5px 8px;background:#2fe68a;color:#04120a;font-family:'Silkscreen',monospace;font-size:12px}
 #ui .popl{display:grid;grid-template-columns:1fr 1fr}#ui .popl .poplh{grid-column:1/-1}@media(max-width:600px){#ui .popl{grid-template-columns:1fr}}
 #ui .popr{display:flex;align-items:center;gap:8px;padding:4px 8px;border-top:1px solid #222;font-size:12px}#ui .popr i{width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:#111;border:2px solid #000;flex-shrink:0}
-#ui .popr span{flex:1;display:flex;flex-direction:column;min-width:0}#ui .popr small{color:#8aa094}#ui .popr em{font-style:normal;font-size:11px;color:#ffcf3a}#ui .popr.over,#ui .popr.done{opacity:.45}#ui .popr.done em,#ui .popr.over em{color:#8aa094}
+#ui .popr span{flex:1;display:flex;flex-direction:column;min-width:0}#ui .popr small{color:#9a9a9a}#ui .popr em{font-style:normal;font-size:11px;color:#2fe68a}#ui .popr.over,#ui .popr.done{opacity:.45}#ui .popr.done em,#ui .popr.over em{color:#8aa094}
 #ui .popr button{padding:3px 8px}
 .popam{margin:10px 0 0;padding:8px 10px;border:2px dashed currentColor}.popam b{display:block;margin-bottom:4px}.popam div{display:flex;align-items:center;gap:6px;font-size:13px;margin:2px 0}.popam i{width:10px;height:10px;border:1px solid #000;flex-shrink:0}.popam span{opacity:.75}
 `;document.head.appendChild(s)})();

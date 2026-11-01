@@ -30,7 +30,6 @@ function kind(b){const t=h2(b),id=b.id||'',c=b.classList;
  if(id=='rob')return'rob';if(c.contains('mtg'))return'meet';if(id=='gift')return'gift';
   if(t=='Welcome home')return'keys';
  if(/Current floor:/.test(txt(b)))return'lift';
- if(/^World map$/.test(t)||b.querySelector('#bm,#dsmap'))return'atlas';
  if(/^i\s/.test(t)&&/Time now/.test(txt(b)))return'depart';
  if(/^Park Fields Festival/.test(t)||/^Stage \d+ ·/.test((b.querySelector('p.m')||{}).textContent||''))return'fest';
  if(/^(Box office|Plan the show) · /.test(t)||/crowd moments.*score \d+/.test((b.querySelector('p.m')||{}).textContent||''))return'ticket';
