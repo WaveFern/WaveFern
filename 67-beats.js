@@ -301,6 +301,9 @@ const SONGF=[[['in',2],['vs',8],['hk',8],['vs',8],['hk',8],['br',4],['hk',8]],
  [['in',2],['vs',6],['pc',2],['hk',8],['vs',6],['pc',2],['hk',8],['br',4],['hk',8]],
  [['in',2],['hk',8],['vs',8],['hk',8],['br',4],['vs',8],['hk',8]],
  [['in',2],['vs',4],['pc',4],['hk',8],['vs',4],['pc',4],['hk',8],['br',4],['hk',8]]];
+const SLD={'Pop':.5,'Electronic':.6,'Rap':.5,'Lo-fi':.55,'R&B':.55,'Hip-Hop':.5,'Latin':.45,'Country':.3,'Rock':.3},SLP={'Pop':.4,'Electronic':.4,'Rap':.45,'Latin':.45,'Lo-fi':.25,'R&B':.25,'Hip-Hop':.3,'Country':.5,'Rock':.2};
+const SPD={'Pop':.8,'Electronic':.8,'Rap':.7,'Lo-fi':.8,'R&B':.9,'Hip-Hop':.7,'Latin':.6,'Country':.6,'Rock':.5},SPK={'Pop':.8,'Electronic':.8,'Rap':.7,'Latin':.6,'R&B':.55,'Lo-fi':.6,'Hip-Hop':.5,'Country':.3,'Rock':0};
+const PKP=['0.2.1.2.0.2.1.2.','0120120120120121','0.1.2.3.2.1.0.1.','0.1.2.1.0.1.2.1.','.0.2.1.2.0.2.1.2','0.12.12.0.12.12.'];
 const COMPH=['x---------------','x-------x-------'],COMPX=['x--x--x-x--x--x-','x---x--.x---x-x-','x-.x-.x-x-.x-.x-','..x...x...x..x..','x--.x--.x-.x----'],COMPI=['piano','epiano','super','stab','marimba','nylon','gtr','pluck','bell','pbell'];
 function plan(src){if(typeof src=='string')src={genre:src};src=src||{};const genre=normG(src.genre||src.g),seed=seedOf(src),r=rng(seed^0x5bd1e995),L=STY[genre];
  const pk=a=>Array.isArray(a)?a[r()*a.length|0]:a,si=src.style!=null?((src.style%L.length)+L.length)%L.length:r()*L.length|0,st=L[si];
@@ -335,10 +338,16 @@ function plan(src){if(typeof src=='string')src={genre:src};src=src||{};const gen
  const comp=p=>COMPH.includes(p)&&COMPI.includes(st.ch&&st.ch.i)&&rD()<.4?COMPX[rD()*COMPX.length|0]:p;
  const bs=st.bs?Object.assign({},st.bs,{p:pk(st.bs.p)}):null,ch=st.ch?Object.assign({},st.ch,{i:pk(st.ch.i),p:comp(pk(st.ch.p))}):null,ar=st.ar?Object.assign({},st.ar,{p:pk(st.ar.p)}):null;
  let ld=st.ld?Object.assign({},st.ld):null;if(ld&&LDX[st.n])ld.i=pk([ld.i].concat(LDX[st.n]));
- const P={genre,style:st.n,si,count:L.length,seed,bpm,key,kr,tn:key,sc,keyName:KEYN[key]+' '+SCN[sc],pn,pg,cad:cad?{vs:cad,br:cad}:null,nm,fi,fm:{song:fsong,live:FORMS.live,rec:FORMS.rec},cpb:st.cpb||1,sw:st.sw||0,kit,dk,kick:kp?kp[1]:null,bs,ch,ar,ld,
+ /* the recorded Lead and Pluck samples play the tune in about half the songs */
+ const rS=rng(seed^0x5A5A);if(ld&&!['cowbell'].includes(ld.i)&&rS()<(SLD[genre]||.4))ld.i=rS()<(SLP[genre]||.3)?'pluck':'lead';
+ /* a sustained pad under the chorus, bridge and pre-chorus, and a pluck arpeggio in the chorus: more of the recorded Pad and Pluck samples */
+ const padish=st.ch&&['pad','strings','choir'].includes(st.ch.i),ROCKY=genre=='Rock'&&!/Arena|Indie/.test(st.n);
+ const pd=!padish&&!ROCKY&&rS()<(SPD[genre]||.6)?{i:'pad',x:7,o:58}:null;
+ const pkp=!ar&&!ROCKY&&rS()<(SPK[genre]||.4)?{i:'pluck',p:PKP[rS()*PKP.length|0],r:1,o:rS()<.5?67:72,x:3}:null;
+ const P={genre,style:st.n,si,count:L.length,seed,bpm,key,kr,tn:key,sc,keyName:KEYN[key]+' '+SCN[sc],pn,pg,cad:cad?{vs:cad,br:cad}:null,nm,fi,fm:{song:fsong,live:FORMS.live,rec:FORMS.rec},cpb:st.cpb||1,sw:st.sw||0,kit,dk,kick:kp?kp[1]:null,bs,ch,ar,ld,pd,pk:pkp,
   spc:new Set(SC[sc].map(x=>(x+key)%12)),pl:{},
-  sp:src.sp&&typeof src.sp=='object'?src.sp:null,s8:dPick(src.s8,N808,seed,0x808),hh:src.hh=='auto'&&!/^(trap|b808)$/.test(st.kit)?'':dPick(src.hh,DHAT,seed,0x4a7),
-  fill:st.fill||'',crash:!!st.crash,side:st.side||0,fx:st.fx||{},mx:Object.assign({dr:1,bs:.6,ch:.3,ar:.2,ld:.24},st.mx||{})};
+  sp:src.sp&&typeof src.sp=='object'?src.sp:{bass:'auto',key:'auto',lead:'auto',pad:'auto',pluck:'auto'},s8:dPick(src.s8,N808,seed,0x808),hh:src.hh=='auto'&&!/^(trap|b808)$/.test(st.kit)?'':dPick(src.hh,DHAT,seed,0x4a7),
+  fill:st.fill||'',crash:!!st.crash,side:st.side||0,fx:st.fx||{},mx:Object.assign({dr:1,bs:.6,ch:.3,ar:.2,ld:.24,pd:.26,pk:.2},st.mx||{})};
  buildLead(P,seed^0xBADA55);return P}
 
 /* ---------- audio building blocks ---------- */
@@ -423,6 +432,7 @@ function cbV(E,L,t,f,dur,v){const c=E.c,g=c.createGain(),bp=c.createGain();bp.co
    v49.51.0: a song can name its sample per family (sp: {bass, key, lead, pad, pluck...}: 'auto' picks one from the song's seed,
    '' keeps the code-made voice, a file name picks that sample). Songs without sp are older ones: they keep the original
    sample set (the entries with no n in the manifest) and the original instrument-to-family map, so they sound as they did. */
+const LAYS=['bs','ch','ar','ld','pd','pk'];
 const SMP={},SMP_OF={bass:'bass',round:'bass',upright:'bass',funk:'bass',pluckb:'bass',pick:'bass',acid:'bass',reese:'bass',wob:'bass',
  epiano:'key',piano:'piano',bell:'bell',pbell:'bell',brass:'brass',lead:'lead',pluck:'pluck',flute:'flute',strings:'string',super:'synth'},
  SMP_OF2=Object.assign({},SMP_OF,{pad:'pad',choir:'pad',organ:'key',saw:'lead',square:'lead',stab:'pluck'}),
@@ -459,7 +469,7 @@ function loadSamples(c){if(!c)return smpLoad;return loadMan()}
 function sBuf(c,s){if(s.buf)return s.buf;if(s.bad||s.ld||!c||typeof fetch!='function'){if(!s.ld&&!s.buf)s.bad=1;return null}
  s.ld=1;fetch('audio/oneshots/'+s.f).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>c.decodeAudioData(b)).then(buf=>{s.buf=buf}).catch(()=>{s.bad=1});return null}
 /* the samples a song uses: instrument name -> entry, for the four parts of its beat */
-function sUse(P){const U={};for(const k of['bs','ch','ar','ld']){const d=P[k];if(!d||U[d.i])continue;const s=pickS(P,famOf(P,d.i));if(s)U[d.i]=s}return U}
+function sUse(P){const U={};for(const k of LAYS){const d=P[k];if(!d||U[d.i])continue;const s=pickS(P,famOf(P,d.i));if(s)U[d.i]=s}return U}
 function sReady(c,P){let ok=true;const U=sUse(P);for(const n in U){const s=U[n];if(!sBuf(c,s)&&!s.bad)ok=false}return ok}
 /* v43.0.1: one sample per instrument per song, picked from the song's seed (it used to take the sample nearest each note,
    so the bass could change sound from note to note) */
@@ -484,7 +494,7 @@ function s808(E,L,t,m,dur,v,b,x){const c=E.c,src=c.createBufferSource(),g=c.crea
  if(x&&x.from){R.setValueAtTime(rt(69+12*Math.log2(x.from/440)),t);R.exponentialRampToValueAtTime(rt(m),t+.09)}else R.setValueAtTime(rt(m),t);
  g.gain.setValueAtTime(v*.85,t);g.gain.setTargetAtTime(0,end,.025);src.connect(g);g.connect(L.in);src.start(t);src.stop(end+.15)}
 /* v43.0.1: whether a song uses samples or the code-made voices is settled once, when it starts (lockE), so nothing swaps mid-song */
-function lockE(E){E.sm={};const U=sUse(E.P);for(const k of['bs','ch','ar','ld']){const d=E.P[k];if(d&&U[d.i]&&U[d.i].buf){E.sm[d.i]=U[d.i];const L=E.lay[k];if(L&&L.f)L.f.frequency.value=15000}}
+function lockE(E){E.sm={};const U=sUse(E.P);for(const k of LAYS){const d=E.P[k];if(d&&U[d.i]&&U[d.i].buf){E.sm[d.i]=U[d.i];const L=E.lay[k];if(L&&L.f)L.f.frequency.value=15000}}
  E.u8=!!dBuf(E.c,'808',E.P.s8);E.uh=!!dBuf(E.c,'hat',E.P.hh)}
 function note(E,lay,name,t,midi,dur,v,x){const I=INS[name]||INS.sine,L=E.lay[lay],f=mtof(midi);if(!L)return;
  if(name=='808'&&E.u8){s808(E,L,t,midi,dur,v,dBuf(E.c,'808',E.P.s8),x);return}
@@ -547,8 +557,12 @@ function sched(E,n,t){const P=E.P,sd=E.sd,bar=n>>4,s=n&15;
   if(ev){const CL=16/P.cpb,rem=CL-(n%CL),l=Math.min(ev.l,rem),I0=INS[ch.i]||{},vs=voicing(P,cd,ch.x||3,ch.o||60),dur=l*sd*.96,v=(ev.c=='X'?1:.8)*lvl*(k=='in'?.8:1);
    if(I0.st){const tn=[inWin(vs[0]-12,40)].concat(vs,[vs[0]+12]),up=ev.c=='u',ord=up?tn.slice(-4).reverse():tn;ord.forEach((m,i)=>note(E,'ch',ch.i,t+i*(up?.008:.012),m,dur,v*(up?.45:.65)/Math.sqrt(ord.length)*1.6))}
    else vs.forEach(m=>note(E,'ch',ch.i,t,m,dur,v*.9/Math.sqrt(vs.length)))}}
- /* arpeggio */
- const ar=P.ar;if(ar&&I>=.3&&!silent&&k!='br'){const r=ar.r||1;if(s%r==0){const c=ar.p[((n/r)|0)%ar.p.length];if(c>='0'&&c<='9'){const vs=voicing(P,cd,ar.x||3,ar.o||64),i=+c,m=vs[i%vs.length]+12*Math.floor(i/vs.length);note(E,'ar',ar.i,t,m,sd*r*.9,.75*lvl*(k=='in'?.7:1))}}}
+ /* arpeggio (ar is the style's own; pk is the plucked arpeggio the seed adds in the pre-chorus and chorus) */
+ for(const al of['ar','pk']){const ar=P[al];if(!ar||I<.3||silent||k=='br'||(al=='pk'&&k!='hk'&&k!='pc'))continue;const r=ar.r||1;if(s%r==0){const c=ar.p[((n/r)|0)%ar.p.length];if(c>='0'&&c<='9'){const vs=voicing(P,cd,ar.x||3,ar.o||64),i=+c,m=vs[i%vs.length]+12*Math.floor(i/vs.length);note(E,al,ar.i,t,m,sd*r*.9,(al=='pk'?.6:.75)*lvl*(k=='in'?.7:1))}}}
+ /* pad: one long chord under the pre-chorus, chorus and bridge (softer in the intro and verse), started when the chord changes */
+ const pd=P.pd;if(pd&&I>=.12&&!(silent&&fill=='stop')){const sp=sec.i*16+s,pv=sp?chAt(P,k,Math.floor((sp-1)/16),sec.n,(sp-1)%16):null;
+  if(pv!==cd){let l=1;while(l<32&&chAt(P,k,Math.floor((sp+l)/16),sec.n,(sp+l)%16)===cd&&sp+l<sec.n*16)l++;const g=k=='hk'?1:k=='pc'||k=='br'?.9:k=='in'?.6:.45;
+   voicing(P,cd,pd.x,pd.o).forEach(m=>note(E,'pd',pd.i,t,m,l*sd*.98,.55*g*lvl/Math.sqrt(4)))}}
  /* lead melody: the chorus hook, a quiet verse line (styles that keep a lead going), the pre-chorus climb and the bridge */
  const ld=P.ld;if(ld&&I>=.7&&!silent){const rows=k=='hk'?P.mhk:k=='br'?P.mbr:k=='pc'?P.mpc:k=='vs'&&ld.all?P.mvs:null,row=rows&&rows[sec.i%rows.length],nt=row&&row[s];
   if(nt){const x=E.ll?{from:mtof(E.ll)}:null,v=nt.v*lvl*(k=='vs'?.75:k=='hk'&&sec.fin?1.08:1);note(E,'ld',ld.i,t,nt.m,nt.l*sd*.92,v,x);E.ll=nt.m;
@@ -567,12 +581,12 @@ function mkE(c,dest,P,o){const E={c,P,fbk:{},sd:60/P.bpm/4,nb:noiseBuf(c),I:o.in
  E.pump=c.createGain();E.pump.connect(E.mix);
  E.dr=c.createGain();E.dr.gain.value=P.mx.dr;E.dr.connect(E.mix);
  let wob=null;if(fx.wob){const l=c.createOscillator();l.frequency.value=.55;wob=c.createGain();wob.gain.value=.0011*fx.wob;l.connect(wob);l.start();E.loops.push(l)}
- E.lay={};const RVS={bs:0,ch:.3,ar:.35,ld:.35};
- for(const k of['bs','ch','ar','ld']){const def=P[k];if(!def)continue;const g=c.createGain(),Id=INS[def.i]||{},smp=sampled(def.i,P);g.gain.value=P.mx[k];let inp=g;
+ E.lay={};const RVS={bs:0,ch:.3,ar:.35,ld:.35,pd:.5,pk:.4},PAN={bs:0,ch:-.22,ar:.3,ld:.08,pd:0,pk:-.3};
+ for(const k of LAYS){const def=P[k];if(!def)continue;const g=c.createGain(),Id=INS[def.i]||{},smp=sampled(def.i,P);g.gain.value=P.mx[k];let inp=g;
   let lf=null;if(Id.t=='o'){lf=c.createBiquadFilter();lf.type='lowpass';lf.frequency.value=smp?15000:Math.min(15000,Id.lp||6000);lf.Q.value=Id.q||.7;lf.connect(g);inp=lf}
   if(Id.ds&&!smp){const w=shaper(c,k=='ld'?6:9,'2x'),lp=c.createBiquadFilter(),h=c.createBiquadFilter(),wg=c.createGain();lp.type='lowpass';lp.frequency.value=3600;h.type='highpass';h.frequency.value=90;wg.gain.value=k=='ld'?.5:.6;w.connect(h);h.connect(lp);lp.connect(wg);wg.connect(g);if(lf){lf.disconnect();lf.connect(w)}else inp=w}
   if(wob&&k!='bs'){const d=c.createDelay(.05);d.delayTime.value=.006;wob.connect(d.delayTime);d.connect(inp);inp=d}
-  g.connect(P.side&&k!='ld'?E.pump:E.mix);if(RVS[k]){const sg=c.createGain();sg.gain.value=RVS[k];g.connect(sg);sg.connect(E.rv)}if(k=='ld'&&E.dl)g.connect(E.dl);E.lay[k]={in:inp,g,f:lf}}
+  let po=g;if(c.createStereoPanner&&PAN[k]){po=c.createStereoPanner();po.pan.value=PAN[k];g.connect(po)}po.connect(P.side&&k!='ld'?E.pump:E.mix);if(RVS[k]){const sg=c.createGain();sg.gain.value=RVS[k];g.connect(sg);sg.connect(E.rv)}if(k=='ld'&&E.dl)g.connect(E.dl);E.lay[k]={in:inp,g,f:lf}}
  if(fx.vinyl){const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=vinylBuf(c);s.loop=true;f.type='highpass';f.frequency.value=700;g.gain.value=.22*fx.vinyl;s.connect(f);f.connect(g);g.connect(E.mix);s.start();E.loops.push(s)}
  if(fx.rain){const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=E.nb;s.loop=true;f.type='lowpass';f.frequency.value=1400;g.gain.value=.05*fx.rain;s.connect(f);f.connect(g);g.connect(E.mix);s.start();E.loops.push(s)}
  return E}
