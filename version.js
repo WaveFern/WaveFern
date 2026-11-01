@@ -3,7 +3,6 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-<<<<<<< HEAD
 const GAME_VERSION='v49.55.0';
 const VERSION_HISTORY=[
  {v:'v49.55.0',n:'Songs sound different from each other. Every song now gets its own mode (major, minor, dorian, mixolydian, lydian, phrygian or harmonic minor), key and real chord progressions from a library of pop, doo-wop, canon, rock, jazz, soul, country and dark loop changes, with a different set of chords for the verse, pre-chorus, chorus, bridge and intro, and a turn to the dominant chord at the end of verses and bridges. Four song layouts (some with a pre-chorus). Lead melodies are written like hooks: one bar of rhythm that repeats, a call and answer, mostly stepwise with a few leaps, chord notes on the strong beats, a climbing contrast phrase and a last chorus that doubles the tune a third below. Basses walk into the next chord, kick patterns shift per song, and Auto instrument samples now pick sounds that suit the genre. Older songs keep their seed but sound fresher. Test it with node tools/music-test.js.'},
