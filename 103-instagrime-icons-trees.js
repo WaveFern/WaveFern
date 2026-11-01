@@ -3,7 +3,7 @@
    Trees: blkTree() builds every tree from boxes (shaded layers, a few shapes) for the streets, house, park and festival. */
 
 /* ---- WaveFern icon: an original pixel-art paper-wing fly (not the green circle logo) ---- */
-{const ic=mkIc(['.TTTTTTTT.','TTTTTTTTTT','TWWTTTTWWT','TWLWTTWLWT','TTWWWYWWWT','TTTWWYWWTT','TTWWWYWWWT','TWLWTYTWLT','TWWTTYTTWT','.TTTTYYTT.'],{T:'#0f6b4a',W:'#d9fff0',L:'#7ff0c0',Y:'#ffd23f'});IC.fw=ic}
+{const ic=mkIc(['.TTTTTTTT.','TTTTTTTTTT','TWWTTTTWWT','TWLWTTWLWT','TTWWWYWWWT','TTTWWYWWTT','TTWWWYWWWT','TWLWTYTWLT','TWWTTYTTWT','.TTTTYYTT.'],{T:'#6a35c9',W:'#efe6ff',L:'#c3a0ff',Y:'#e9d9ff'});IC.fw=ic}
 
 /* ---- Instagrime ---- */
 {const i0=inst;inst=function(k){const had=S.apps&&S.apps.ig;const r=i0.apply(this,arguments);if(k=='ig'&&!had&&S.apps&&S.apps.ig&&!S.igInit){S.igInit=1;S.igPosts=[];S.likedP=[];S.savedP=[];S.igF=0;S.lastPost=0}return r}}

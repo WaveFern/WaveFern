@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.54.0';
+const GAME_VERSION='v49.54.1';
 const VERSION_HISTORY=[
+ {v:'v49.54.1',n:'The WaveFern app icon (phone home screen, notifications and desktop) is now purple instead of green.'},
  {v:'v49.54.0',n:'The game now has one fixed black and green colour palette, like a brand colour scheme. The colour picker in Settings > Game is gone. The world map, pause menu, main menu, FPS counter and the boxes at the top of the screen (monthly listeners, money, energy) all use the same black with WaveFern green. The waking-up card is back to its normal look, no more newspaper. The serif Times New Roman style lettering is gone everywhere: the game only uses its two fonts, Silkscreen and the monospace text font.'},
  {v:'v49.53.0',n:'Sound effects polish: clicks, pops, pings, chimes, cash, errors and more are re-layered (transient, tuned bell body, sub thump, shimmer tail). New sounds for purchases, level ups, notifications and Perfect, Great, Good and Miss beat hits. All synthesised, so royalty free; see docs/SFX-CREDITS.md.'},
  {v:'v49.52.0',n:'The WaveFern music app is violet instead of green: its buttons, play circles, notifications, sidebar highlight, scroll bars and logo. The plain black game style with a colour you pick in Settings > Game now only covers the world map, the pause menu, the main menu, the FPS counter, the boxes at the top of the screen (monthly listeners, money, energy) and the waking-up card. Every other screen, the wiki and the tab icon look the way they did before.'},
