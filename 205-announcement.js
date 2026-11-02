@@ -5,7 +5,7 @@
    To send a NEW announcement later: change ANN.id (and the text), and everyone sees it once more.
    ANN.enabled=false switches the whole thing off.
 
-   v49.71.0: the details are decided. Everything is reset for everyone at RS.CUT (12-reset.js, 6 November 2026 00:00 UTC) and
+   v49.71.0: the details are decided. Everything is reset for everyone at RS.CUT (12-reset.js, 6 November 2026 18:00 UTC) and
    Founder rewards go to everyone who played before it (206-founder.js). This file only SHOWS the notice. The notice is a new
    id (fresh-start-2), so people who closed the older version with "to be announced" in it see this one. */
 (function(){
@@ -35,7 +35,7 @@
  if(/[?&]trailer\b/.test(location.search)||window.FW_TRAILER)return;
  const post=()=>{try{return rsNow()>=RS.CUT}catch(e){return false}};
  const when=()=>{try{const d=new Date(RS.CUT),o={weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'};
-  return 'Friday 6 November 2026 at 00:00 UTC. In your time that is '+d.toLocaleString([],o)+'.'}catch(e){return 'Friday 6 November 2026 at 00:00 UTC.'}};
+  return 'Friday 6 November 2026 at 18:00 UTC. In your time that is '+d.toLocaleString([],o)+'.'}catch(e){return 'Friday 6 November 2026 at 18:00 UTC.'}};
  function build(){
   const css=document.createElement('style');
   css.textContent=`#annov{position:fixed;inset:0;z-index:100000;background:#000d;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;user-select:text}

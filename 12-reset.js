@@ -1,5 +1,5 @@
 /* ---------- v49.71.0: the fresh start ----------
-   One reset of every career, at one moment: RS.CUT (6 November 2026, 00:00 UTC). Before that moment this file does nothing.
+   One reset of every career, at one moment: RS.CUT (6 November 2026, 18:00 UTC = 6pm in England). Before that moment this file does nothing.
    At and after it:
    - Every career on this device is moved into the Legacy store (fw_legacy) and its slot is emptied: guest slots, every Google
      account's slots, the recovered backups (fw_bak_N) and the copies in the save vault. The cloud copy is handled the same way
@@ -13,7 +13,7 @@
      old money back; it goes to the Legacy store instead.
    Caveat: this all runs in the browser, so a save can be edited by the person who owns it. The signed saves work is what will
    make S.rv and S.fdr tamper-proof; both are plain fields in the career so they travel inside whatever is signed. */
-const RS={V:1,CUT:Date.UTC(2026,10,6,0,0,0),MIN_DAY:2,K:'fw_legacy'};
+const RS={V:1,CUT:Date.UTC(2026,10,6,18,0,0),MIN_DAY:2,K:'fw_legacy'};
 /* the password-protected /dev/ page (00-dev.js) can move this clock; on the real site it is just Date.now() */
 const rsNow=()=>{try{return window.FW_CLOCK?FW_CLOCK.now():Date.now()}catch(e){return Date.now()}};
 const rsOn=()=>!FW_TRL&&rsNow()>=RS.CUT;
