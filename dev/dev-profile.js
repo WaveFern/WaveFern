@@ -57,7 +57,7 @@
  const css=document.createElement('style');
  css.textContent=`#pfx{position:fixed;inset:0;z-index:9995;display:flex;align-items:center;justify-content:center;background:#000b;padding:12px;font:14px ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec}
 #pfx *{box-sizing:border-box}
-#pfx .pf{width:min(520px,100%);max-height:92vh;overflow:auto;background:#000;border:3px solid #2e2e2e;box-shadow:6px 6px 0 #0008;display:flex;flex-direction:column}
+#pfx .fwpc{width:min(520px,100%);max-height:92vh;overflow:auto;background:#000;border:3px solid #2e2e2e;box-shadow:6px 6px 0 #0008;display:flex;flex-direction:column}
 #pfx .pf-top{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:2px solid #2e2e2e;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#8aa094}
 #pfx .pf-top button{padding:5px 10px;font-size:12px}
 #pfx .pf-head{display:flex;gap:16px;padding:20px 16px 16px;align-items:flex-start}
@@ -150,7 +150,7 @@
   const sh=k=>mineView||!p.me||st.show[k];
   const dim=(k,html)=>mineView&&!st.show[k]?html.replace('class="pf-sec"','class="pf-sec" style="opacity:.55"').replace('</h3>',' '+tag('HIDDEN FROM OTHERS')+'</h3>'):html;
   const state=stateFor(p);
-  let h=`<div class=pf><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
+  let h=`<div class=fwpc><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
   h+=`<div class=pf-head><div class=pf-av>${avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
   h+=p.bio?`<p class=pf-bio>${esc(p.bio)}</p>`:`<p class="pf-bio e">${p.me&&!V.visitor?'No bio yet. Add one in Edit profile.':'No bio.'}</p>`;
   const cells=[['FAME LEVEL',String(p.fame)]];
@@ -175,13 +175,13 @@
  }
  function privacy(){
   const st=load();
-  return`<div class=pf><div class=pf-top><span>PRIVACY</span><button data-pf=done>Done</button></div><div class=pf-sec><h3>SHOW ON YOUR PROFILE</h3>${Object.keys(SECS).map(k=>`<label class=pf-sw><span>${SECS[k]}</span><input type=checkbox data-sw="${k}" ${st.show[k]?'checked':''}></label>`).join('')}</div>
+  return`<div class=fwpc><div class=pf-top><span>PRIVACY</span><button data-pf=done>Done</button></div><div class=pf-sec><h3>SHOW ON YOUR PROFILE</h3>${Object.keys(SECS).map(k=>`<label class=pf-sw><span>${SECS[k]}</span><input type=checkbox data-sw="${k}" ${st.show[k]?'checked':''}></label>`).join('')}</div>
   <div class=pf-sec><h3>FRIEND REQUESTS</h3><div class=pf-seg>${[['everyone','Everyone'],['band','Band members'],['nobody','Nobody']].map(o=>`<button data-req="${o[0]}" class="${st.req==o[0]?'on':''}">${o[1]}</button>`).join('')}</div></div>
   <p class=pf-note style="padding-top:12px">Your artist name, username, avatar, Founder badge and fame level are always public. They are what lets friends find you.</p></div>`;
  }
  function edit(){
   const st=load(),bad=V.err||'';
-  return`<div class=pf><div class=pf-top><span>EDIT PROFILE</span><button data-pf=done>Cancel</button></div><div class=pf-sec>
+  return`<div class=fwpc><div class=pf-top><span>EDIT PROFILE</span><button data-pf=done>Cancel</button></div><div class=pf-sec>
   <div class=pf-f><label>Avatar</label><div class=pf-av-pick>${[3,8,14,21,34,55].map(s=>`<button data-av="${s}" class="${st.pfp==s?'on':''}">${avatar(s,44)}</button>`).join('')}</div></div>
   <div class=pf-f><label for=pf-user>Username (letters and numbers, 3 to 16)</label><input id=pf-user maxlength=16 value="${esc(st.user)}" autocomplete=off spellcheck=false></div>
   <div class=pf-f><label for=pf-bio>Bio</label><textarea id=pf-bio maxlength=80>${esc(st.bio)}</textarea><small class="${bad?'er':''}">${bad||'Up to 80 characters. Bios and usernames are checked before they show to other players.'}</small></div>
@@ -230,7 +230,7 @@
   const old=document.getElementById('pfx');if(old)old.remove();
   const d=document.createElement('div');d.id='pfx';d.onmousedown=e=>{if(e.target===d)d.remove()};
   const row=id=>{const p=PEOPLE[id];return`<div class=pf-row data-pfopen="${id}">${avatar(p.seed,32)}<span class=n><b>@${esc(p.user)}</b><small>${esc(p.artist)} · ${esc(p.online)}</small></span>${id in REL&&REL[id]=='requested'?tag('REQUESTED'):''}</div>`};
-  d.innerHTML=`<div class=pf><div class=pf-top><span>FRIENDS (MOCK)</span><button data-pffc>Close</button></div>
+  d.innerHTML=`<div class=fwpc><div class=pf-top><span>FRIENDS (MOCK)</span><button data-pffc>Close</button></div>
   <div class=pf-sec><div class=pf-row data-pfopen="me" style="cursor:pointer">${avatar(load().pfp,32)}<span class=n><b>My profile</b><small>@${esc(load().user)}</small></span></div></div>
   <div class="pf-sec pf-list"><h3>REQUESTS</h3>${REQUESTS.map(row).join('')}</div>
   <div class="pf-sec pf-list"><h3>FRIENDS</h3>${FRIENDS.map(row).join('')}</div>
