@@ -79,15 +79,15 @@ function lib(){if(window.Peer)return Promise.resolve();if(libP)return libP;
 
 /* ---- main menu ---- */
 const U={inst:'vo',q:null,qp:null};
-{const t0=titleUI;titleUI=function(){t0.apply(this,arguments);try{menu();autoJoin()}catch(e){console.error('mp menu',e)}}}
+{const t0=titleUI;titleUI=function(){t0.apply(this,arguments);try{menu();autoJoin();frDraw()}catch(e){console.error('mp menu',e)}}}
 function menu(){const m=document.querySelector('#ttl .ttm');if(!m)return;const play=m.querySelector('button[onclick="ttWorlds()"]');if(!play)return;
  if(MPS){const busy=play.disabled;play.textContent=busy?play.textContent:'Play with the band';play.setAttribute('onclick','mpPlay()');
   play.insertAdjacentHTML('beforebegin',`<p class=m style="margin:4px 0">Room <b>${esc(MPS.code)}</b> · ${esc(MPS.band||'Your band')} · ${iName(MPS.inst)}${MPS.host?' · you host':''}</p>`);
-  play.insertAdjacentHTML('afterend','<button onclick="mpLeave()">Leave room</button>');
+  play.insertAdjacentHTML('afterend','<button onclick="frOpen()">Friends<span class=frbadge></span></button><button onclick="mpLeave()">Leave room</button>');
   m.querySelectorAll('button[onclick="fbSignInAsk()"]').forEach(b=>{const p=b.nextElementSibling;if(p&&p.tagName=='P')p.remove();b.remove()});return}
  play.textContent=play.disabled?play.textContent:'Single player';
  const last=FW_ACCT?lsGet()[0]:null;
- play.insertAdjacentHTML('afterend','<button class=go onclick="mpRooms()">Multiplayer</button>'+(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:''))}
+ play.insertAdjacentHTML('afterend','<button class=go onclick="mpRooms()">Multiplayer</button><button onclick="frOpen()">Friends<span class=frbadge></span></button>'+(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:''))}
 /* v49.61.0: wavefern.com/?join=CODE opens Join a room with the code filled in and the room looked up */
 function autoJoin(){const m=/[?&]join=([A-Za-z0-9]{5})\b/.exec(location.search);if(!m||MPS||MPTR||U.aj)return;U.aj=1;const c=m[1].toUpperCase();try{history.replaceState(null,'',location.pathname+location.search.replace(/([?&])join=[A-Za-z0-9]{5}&?/,'$1').replace(/[?&]$/,'')+location.hash)}catch(e){}
  let n=0;const t=setInterval(()=>{if(FW_ACCT||++n>20){clearInterval(t);if(!$('ttl'))return;mpJoinUI();const i=$('mpcd');if(i&&FW_ACCT){i.value=c;mpFind()}}},400)}
@@ -98,7 +98,7 @@ window.mpRooms=()=>{if(needLogin())return;snd('click');TT.sel=1;const L=lsGet(),
   return`<div class=ttsl><div><b>${esc(x.band||'Band')}</b><small>Room ${esc(x.code)} · ${iName(x.inst)} · ${x.host?'you host':'you joined'}${v?' · Day '+v.day:''}</small></div><button class=go onclick="mpRoomGo(${i})">${x.host?'Host':'Join'}</button><button class=ttdel title="Delete this band career" aria-label="Delete band career ${i+1}" onclick="mpRoomDel(${i})">✕</button></div>`});
  for(let i=L.length;i<MPMAX;i++)rows.push(`<div class="ttsl empty"><div><b>Empty slot</b><small>Band career ${i+1}</small></div></div>`);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Your rooms</h2><p class=m style="text-align:center;margin:0">Play as a band of up to ${MAXN} with friends. Keep up to ${MPMAX} band careers.</p>${rows.join('')}${L.length>=MPMAX?`<p class=m style="margin:0"><small>You have ${MPMAX} band careers. Delete one to create or join a new room.</small></p>`:''}
-  <div class=row2><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpCreateUI()">Create a room</button><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpJoinUI()">Join a room</button></div><button onclick="ttBack()">Back</button></div></div>`};
+  <div class=row2><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpCreateUI()">Create a room</button><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpJoinUI()">Join a room</button></div><button onclick="frOpen()">Friends<span class=frbadge></span></button><button onclick="ttBack()">Back</button></div></div>`;frDraw()};
 window.mpRoomGo=i=>{const x=lsGet()[i];if(!x)return;if(x.host)return mpHostAgain(x.code,x.inst);mpJoinUI();$('mpcd').value=x.code;mpFind()};
 window.mpRoomDel=i=>{const x=lsGet()[i];if(!x)return;snd('click');mpAsk('Delete this band career?','Your progress in '+(x.band||'Band')+' (room '+x.code+') is lost for good.','Delete',()=>{
  try{localStorage.setItem(LK,JSON.stringify(lsGet().filter(q=>!(q.code==x.code&&q.inst==x.inst))));localStorage.removeItem(SAVE_PRE+'mp_'+x.code+'_'+x.inst)}catch(e){}mpRooms()})};
@@ -601,7 +601,7 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
  if(!PMIN&&online()&&n>1&&!MPTR){const bd=S.drafts.find(x=>x.bl);if(bd){const bl=bd.bl,dn=m=>m.id===ME.id||(BQ[bl]&&BQ[bl][m.id]!=null)||(SKP[bl]&&SKP[bl][m.id]),wt=me.filter(m=>!dn(m));
   h+=`<div class=mps>Band song "${esc(bd.title)}": <b>${n-wt.length}/${n} parts done</b>`+me.map(m=>`<div class=mpr><i class="${dn(m)?'ok':''}" style="font-style:normal">${dn(m)?'✓':'·'}</i><span>${esc(m.nm||'Player')} · ${INS[m.inst]?INS[m.inst].n:''}</span>${!dn(m)?`<button onclick="mpNudge('${m.id}','${bl}')">Nudge</button>`+(isHost()?`<button onclick="mpSkip('${m.id}','${bl}')">Skip</button>`:''):''}</div>`).join('')+(wt.length?'<small class=m>It can be released once everyone has done their part.</small>':'<small class=m>Everyone is done. Release it from the computer.</small>')+'</div>'}}
  if(!PMIN&&online()&&n==1&&isHost()&&!MPTR)h+=`<div class=mps>Waiting for bandmates. Share the code <b>${esc(MPS.code)}</b> or send an invite link.</div>`;
- if(!PMIN)h+='<div class=mps><button onclick="emWheel()">Emotes (B)</button>'+(MPTR?'':(online()?'<button onclick="mpChatOpen()">Chat (T)</button>':'')+(isHost()?'<button onclick="mpLock()">'+(NET.lock?'Unlock room':'Lock room')+'</button>':'')+'<button onclick="mpCopy(\'code\')">Copy code</button><button onclick="mpCopy(\'link\')">Copy invite link</button><button onclick="mpLeaveAsk()">Leave room</button>')+'</div>';
+ if(!PMIN)h+='<div class=mps><button onclick="emWheel()">Emotes (B)</button>'+(MPTR?'':(online()?'<button onclick="mpChatOpen()">Chat (T)</button>':'')+'<button onclick="frOpen()">Friends'+(frN()?' ('+frN()+')':'')+'</button>'+(isHost()?'<button onclick="mpLock()">'+(NET.lock?'Unlock room':'Lock room')+'</button>':'')+'<button onclick="mpCopy(\'code\')">Copy code</button><button onclick="mpCopy(\'link\')">Copy invite link</button><button onclick="mpLeaveAsk()">Leave room</button>')+'</div>';
  if(h!==PK){PK=h;el.innerHTML=h}}
 
 /* ===== v45.5.0: band room fixes, shared artist account, linked band songs ===== */
@@ -723,6 +723,90 @@ function cmRecv(d,from){const r=d.m;if(!r||typeof r!='object'||typeof r.a!='numb
  NET.cs[r.a]=cmSig(m);if(st0!==m.state&&(st0==1||m.state==1)){try{syncArt()}catch(e){}}
  if(grew&&st0!==null&&m.state==1&&st0!=1)say(from.nm+' agreed a collab with '+artN(r.a)+'. It is for the whole band.');
  try{if(mode=='pc')pcR()}catch(e){}}
+
+/* ===== v49.67.0: friends. Pick a username, send friend requests, see who is online, invite a friend into your band room or join theirs.
+   Everything lives in the Realtime Database under f/ (rules in docs/database.rules.json):
+     n/HANDLE = uid (who owns a username) · p/UID = {h,nm,o,rm,t} presence, readable only by that player's friends
+     l/UID/FRIEND = true (friends list, written in pairs when a request is accepted) · q/TO/FROM = friend request {h,nm,t}
+     s/UID = time of your last request (10 s between requests) · b/UID/OTHER = blocked (their @name) · i/TO/FROM = band invite {c,b,nm,t}
+   Only the person a request is for can accept it, blocked players cannot send requests or invites, and only friends can invite. ===== */
+const FR={on:0,me:'',h:'',L:{},P:{},Q:{},I:{},B:{},pu:{},open:0,seen:{},sent:{},err:'',msg:'',pk:'',hk:''};
+const okId=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
+function frErr(e){console.warn('[friends]',e);FR.err=/permission/i.test(String(e&&(e.code||e.message)||e))?'Friends is not switched on yet. The database rules need publishing.':'Could not reach Friends. Check your connection.';frDraw()}
+function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
+ rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;
+  R.get(R.ref(db,'f/p/'+uid+'/h')).then(s=>{FR.h=s.val()||'';FR.ok=1;frPresence();frDraw()}).catch(frErr);
+  R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.od=0;frPresence()}});
+  R.onValue(R.ref(db,'f/l/'+uid),s=>{const v=s.val()||{};for(const f in FR.pu)if(!v[f]){try{FR.pu[f]()}catch(e){}delete FR.pu[f];delete FR.P[f]}FR.L=v;
+   for(const f in v)if(!FR.pu[f]&&okId(f))FR.pu[f]=R.onValue(R.ref(db,'f/p/'+f),x=>{const o=FR.P[f],n=x.val();FR.P[f]=n;if(o&&!o.o&&n&&n.o&&n.h)say('@'+n.h+' is online.');frDraw()},()=>{});frDraw()},frErr);
+  R.onValue(R.ref(db,'f/q/'+uid),s=>{const v=s.val()||{},nw=Object.keys(v).filter(k=>!FR.Q[k]&&v[k]&&v[k].h);if(FR.qd&&nw.length){snd('ping');say('Friend request from @'+v[nw[0]].h+'. Open Friends to answer.')}FR.qd=1;FR.Q=v;frDraw()},frErr);
+  R.onValue(R.ref(db,'f/i/'+uid),s=>{FR.I=s.val()||{};frInvite()},()=>{});
+  R.onValue(R.ref(db,'f/b/'+uid),s=>{FR.B=s.val()||{};frDraw()},()=>{});
+ }).catch(e=>{FR.on=0;frErr(e)})}
+function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
+ if(k===FR.pk)return;FR.pk=k;const ref=R.ref(db,'f/p/'+uid);R.set(ref,Object.assign({t:R.serverTimestamp()},o)).then(()=>{if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{FR.pk='';console.warn('[friends] presence',e)})}
+setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);
+const frN=()=>Object.keys(FR.Q||{}).length;
+const frName=f=>{const p=FR.P[f];return p&&p.h?'@'+p.h:'Friend'};
+/* pick a username (once) */
+window.frClaim=()=>{const i=$('frh'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='A username has 3 to 16 letters, numbers or _.';snd('err');return frDraw(1)}
+ const{R,db,uid}=FR.r;FR.msg='Checking…';frDraw(1);R.get(R.ref(db,'f/n/'+h)).then(s=>{if(s.exists()&&s.val()!==uid){FR.msg='@'+h+' is taken. Try another.';snd('err');return frDraw(1)}
+  return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24),o:1,rm:MPS&&!MPTR?MPS.code:'',t:R.serverTimestamp()}}).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
+ .catch(e=>{FR.msg='Could not save that username.';frErr(e)})};
+/* send a request by username */
+window.frAdd=()=>{const i=$('fra'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='Type your friend\'s username (3 to 16 letters, numbers or _).';snd('err');return frDraw(1)}
+ if(h===FR.h){FR.msg='That is you.';return frDraw(1)}const{R,db,uid}=FR.r;FR.msg='Looking for @'+h+'…';frDraw(1);
+ R.get(R.ref(db,'f/n/'+h)).then(s=>{const f=s.val();if(!f||!okId(f)){FR.msg='No player is called @'+h+'.';snd('err');return frDraw(1)}
+  if(FR.L[f]){FR.msg='@'+h+' is already your friend.';return frDraw(1)}if(FR.Q[f])return frAcc(f);if(FR.B[f]){FR.msg='You blocked @'+h+'. Unblock them first.';return frDraw(1)}
+  const ts=R.serverTimestamp();return R.update(R.ref(db),{['f/q/'+f+'/'+uid]:{h:FR.h,nm:String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24),t:ts},['f/s/'+uid]:ts}).then(()=>{FR.sent[f]=h;FR.msg='Request sent to @'+h+'.';if(i)i.value='';snd('pop');frDraw(1)})})
+ .catch(()=>{FR.msg='Could not send it. Wait 10 seconds between requests, or you may already have one waiting with @'+h+'.';snd('err');frDraw(1)})};
+window.frAcc=f=>{if(!okId(f))return;const{R,db,uid}=FR.r,h=FR.Q[f]&&FR.Q[f].h;R.update(R.ref(db),{['f/l/'+uid+'/'+f]:true,['f/l/'+f+'/'+uid]:true,['f/q/'+uid+'/'+f]:null}).then(()=>{snd('chime');say('You and @'+(h||'your friend')+' are friends now.');FR.msg=''}).catch(frErr)};
+window.frDec=f=>{if(!okId(f))return;const{R,db,uid}=FR.r;snd('click');R.remove(R.ref(db,'f/q/'+uid+'/'+f)).catch(frErr)};
+window.frDel=f=>{if(!okId(f))return;const n=frName(f);mpAsk('Remove '+n+'?','You will both be taken off each other\'s friends list.','Remove',()=>{const{R,db,uid}=FR.r;R.update(R.ref(db),{['f/l/'+uid+'/'+f]:null,['f/l/'+f+'/'+uid]:null}).then(()=>say('Removed '+n+'.')).catch(frErr)})};
+window.frBlock=f=>{if(!okId(f))return;const n=FR.Q[f]&&FR.Q[f].h?'@'+FR.Q[f].h:frName(f);mpAsk('Block '+n+'?','They are removed from your friends and cannot send you requests or invites. You can unblock them later.','Block',()=>{const{R,db,uid}=FR.r;
+ R.update(R.ref(db),{['f/b/'+uid+'/'+f]:n.slice(0,24),['f/l/'+uid+'/'+f]:null,['f/l/'+f+'/'+uid]:null,['f/q/'+uid+'/'+f]:null,['f/i/'+uid+'/'+f]:null}).then(()=>say('Blocked '+n+'.')).catch(frErr)})};
+window.frUnblock=f=>{if(!okId(f))return;const{R,db,uid}=FR.r;snd('click');R.remove(R.ref(db,'f/b/'+uid+'/'+f)).catch(frErr)};
+/* invites: from inside a band room to an online friend; they get a box to join */
+window.frInv=f=>{if(!okId(f)||!MPS||MPTR)return;const{R,db,uid}=FR.r,n=frName(f);
+ R.set(R.ref(db,'f/i/'+f+'/'+uid),{c:MPS.code,b:String(MPS.band||'Band').replace(/[<>"]/g,'').slice(0,24),nm:'@'+FR.h,t:R.serverTimestamp()}).then(()=>{snd('pop');say('Invited '+n+' to '+(MPS.band||'the band')+'.')})
+ .catch(()=>{snd('err');say('Wait a few seconds before inviting '+n+' again.')})};
+function frGo(c){if(!/^[A-Z0-9]{5}$/.test(c))return;if(MPS&&MPS.code===c)return say('You are already in that room.');try{if(S&&mode!='title')autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.href=location.pathname+'?join='+c}
+window.frJoin=f=>{const p=FR.P[f];if(!p||!p.rm)return;snd('click');const go=()=>frGo(p.rm);if(S&&mode!='title'&&!(MPS&&MPS.code===p.rm))mpAsk('Join '+frName(f)+'\'s band room?','Your game is saved first. You pick your instrument on the next screen.','Join',go);else go()};
+function frInvite(){const{R,db,uid}=FR.r||{};if(!R)return;const now=Date.now();let best=null,bk='';
+ for(const k in FR.I){const v=FR.I[k];if(!v||!okId(k))continue;if(now-(+v.t||0)>600000||(MPS&&MPS.code===v.c)){R.remove(R.ref(db,'f/i/'+uid+'/'+k)).catch(()=>{});continue}const sk=k+v.t;if(FR.seen[sk])continue;if(!best||v.t>best.t){best=v;bk=k}}
+ if(!best||$('frinv'))return;FR.seen[bk+best.t]=1;snd('chime');const d=document.createElement('div');d.id='frinv';d.style.cssText='position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:#000a';
+ d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Band invite</h2><p><b>${esc(best.nm||'A friend')}</b> invited you to play in <b>${esc(best.b||'their band')}</b> (room ${esc(best.c)}).</p><p class=m><small>Your game is saved first. You pick your instrument on the next screen.</small></p><div class=row2><button class=go id=frij>Join the band</button><button id=frin>Not now</button></div></div>`;document.body.appendChild(d);
+ const done=()=>{d.remove();R.remove(R.ref(db,'f/i/'+uid+'/'+bk)).catch(()=>{});setTimeout(frInvite,300)};
+ d.querySelector('#frij').onclick=()=>{const c=best.c;done();frGo(c)};d.querySelector('#frin').onclick=done}
+/* the Friends window */
+window.frOpen=()=>{if(needLogin())return;snd('click');FR.open=1;FR.msg='';frStart();frDraw(1)};
+window.frClose=()=>{FR.open=0;const d=$('mpfr');if(d)d.remove()};
+window.frCopyH=()=>{const t='@'+FR.h;try{navigator.clipboard.writeText(t).then(()=>say('Copied '+t+'. Send it to a friend.'),()=>say('Your username is '+t))}catch(e){say('Your username is '+t)}};
+function frDraw(force){document.querySelectorAll('.frbadge').forEach(b=>b.textContent=frN()?' ('+frN()+')':'');if(!FR.open)return;
+ let h='<h2>Friends</h2>';
+ if(FR.err&&!FR.ok)h+=`<p class=m>${esc(FR.err)}</p>`;
+ else if(!FR.ok)h+='<p class=m>Connecting…</p>';
+ else if(!FR.h)h+=`<p>Pick a username so your friends can find you. It is the only thing other players see, so keep your real name out of it.</p><div class=ng><input id=frh maxlength=16 placeholder="username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frClaim()"><button class=go onclick="frClaim()">Save</button></div>`;
+ else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button></p>
+  <div class=ng><input id=fra maxlength=17 placeholder="Friend's username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frAdd()"><button class=go onclick="frAdd()">Add friend</button></div>`;
+  const Q=Object.keys(FR.Q).filter(okId);if(Q.length)h+='<h3>Requests</h3>'+Q.map(f=>{const q=FR.Q[f]||{};return`<div class=frr><div><b>@${esc(q.h||'?')}</b><small>${q.nm?'Plays as '+esc(q.nm):'Wants to be friends'}</small></div><button class=go onclick="frAcc('${f}')">Accept</button><button onclick="frDec('${f}')">Decline</button><button onclick="frBlock('${f}')">Block</button></div>`}).join('');
+  const L=Object.keys(FR.L).filter(okId).sort((a,b)=>((FR.P[b]||{}).o?1:0)-((FR.P[a]||{}).o?1:0)||frName(a).localeCompare(frName(b)));
+  h+=`<h3>Friends${L.length?' ('+L.filter(f=>(FR.P[f]||{}).o).length+' online)':''}</h3>`;
+  h+=L.length?L.map(f=>{const p=FR.P[f]||{},on=!!p.o,inMine=MPS&&p.rm===MPS.code,st=!on?'Offline':p.rm?(inMine?'In your band room':'In a band room'):'Online, playing solo';
+   const bt=(on&&MPS&&!MPTR&&!inMine?`<button class=go onclick="frInv('${f}')">Invite</button>`:'')+(on&&p.rm&&!inMine?`<button onclick="frJoin('${f}')">Join</button>`:'')+`<button onclick="frDel('${f}')" title="Remove friend">Remove</button>`;
+   return`<div class=frr><div><b><i class="mpd ${on?'on':'off'}"></i>${esc(frName(f))}</b><small>${st}${p.nm?' · '+esc(p.nm):''}</small></div>${bt}</div>`}).join(''):'<p class=m>No friends yet. Add one by their username, or send them yours.</p>';
+  if(!MPS)h+='<p class=m><small>Create or join a band room to invite friends into it.</small></p>';
+  const B=Object.keys(FR.B).filter(okId);if(B.length)h+=`<details><summary class=m>Blocked (${B.length})</summary>${B.map(f=>`<div class=frr><div><b>${esc(String(FR.B[f]))}</b></div><button onclick="frUnblock('${f}')">Unblock</button></div>`).join('')}</details>`}
+ if(FR.msg)h+=`<p class=m>${esc(FR.msg)}</p>`;h+='<button onclick="frClose()">Close</button>';
+ let d=$('mpfr');if(!d){d=document.createElement('div');d.id='mpfr';d.onclick=e=>{if(e.target===d)frClose()};document.body.appendChild(d);force=1}
+ if(!force&&d.dataset.k===h)return;d.dataset.k=h;const keep={};['frh','fra'].forEach(k=>{const i=$(k);if(i)keep[k]=[i.value,document.activeElement===i]});
+ d.innerHTML=`<div class="box modal frw">${h}</div>`;for(const k in keep){const i=$(k);if(i){i.value=keep[k][0];if(keep[k][1])i.focus()}}}
+addEventListener('keydown',e=>{if(e.key=='Escape'&&FR.open){e.stopImmediatePropagation();frClose()}},true);
+{const st=document.createElement('style');st.textContent=`#mpfr{position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:#000a;padding:12px}
+#mpfr .frw{width:min(460px,94vw);max-height:88vh;overflow:auto;display:flex;flex-direction:column;gap:8px}#mpfr h2{color:var(--g)}#mpfr h3{margin:8px 0 0;font-size:14px}
+#mpfr .frr{display:flex;align-items:center;gap:6px;background:#0b0f0dd9;border:3px solid #000;padding:8px}#mpfr .frr>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#mpfr .frr b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mpfr .frr small{color:var(--m)}#mpfr .frr button{padding:6px 9px;font-size:12px}
+#mpfr .mpd{display:inline-block;width:8px;height:8px;margin-right:6px;background:#888;vertical-align:middle}#mpfr .mpd.on{background:var(--g)}#mpfr .mpd.off{background:#555}`;document.head.appendChild(st)}
 
 /* v46.0.0: lets the admin fun effects (162-fun-admin.js) ride on the room: send, who is in the room, their avatars */
 window.MPI=()=>MPS&&MPF?MPS.inst:'';/* your instrument while you play a band set (188-stage-walk.js) */
