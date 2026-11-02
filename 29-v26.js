@@ -102,8 +102,10 @@ const collabF=s=>s.ft?Math.pow(s.fm||1.4,PERF.collabPow)*(1+PERF.collabQ*Math.mi
 const hitChance=q=>PERF.hitP*Math.max(PERF.hitQMin,Math.min(PERF.hitQMax,(q||0)/PERF.hitQRef));
 const viralChance=q=>PERF.viralP*Math.pow(Math.max(0,Math.min(1,(q||0)/PERF.viralQBest)),PERF.viralQPow);
 /* lk: 0 normal, 'h' hit, 'v' viral. Rolled once, on the release day; songs from older saves stay normal. */
+/* v49.64.2: a viral song always pays at least viralMin (5M), and bigger ones get rarer and rarer (Pareto tail, exponent .85): about half are under 11M, 1 in 7 over 50M, 1 in 50 over 500M, about 1 in 90 reach the 1 billion cap. */
+const viralSize=()=>Math.min(1e9,Math.round(PERF.viralMin*Math.pow(1-Math.random(),-1/.85)));
 function rollLuck(s){if(s.lk!==undefined)return;if(S.day-s.day>0){s.lk=0;return}
- if(Math.random()<viralChance(s.q)){s.lk='v';s.vr=Math.round(PERF.viralMin+(S.listeners||0)*R(PERF.viralLisMin,PERF.viralLisMax));s.vt=s.vr}
+ if(Math.random()<viralChance(s.q)){s.lk='v';s.vr=viralSize();s.vt=s.vr}
  else if(Math.random()<hitChance(s.q)){s.lk='h';s.hm=+R(PERF.hitMin,PERF.hitMax).toFixed(2)}else s.lk=0;
  if(s.lk)luckNote(s)}
 function luckNote(s){const v=s.lk=='v',t=v?'"'+s.title+'" is going VIRAL! Millions of streams are on the way.':'"'+s.title+'" is a HIT! It is streaming far better than your other songs.';

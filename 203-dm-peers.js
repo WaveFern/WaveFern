@@ -44,6 +44,6 @@ if(typeof MKT!='undefined')MKT=null;if(typeof MKT_R!='undefined')MKT_R=null;
    stream room back (s.rc). It can only happen once per song (it is a hit or viral from then on). */
 {const p3=planOf;planOf=function(s){
   if(s&&s.lk===0&&s.pd!==S.day&&S.day-s.day>=7){try{
-    if(Math.random()<viralChance(s.q)/30){s.lk='v';s.vr=Math.round(PERF.viralMin+(S.listeners||0)*R(PERF.viralLisMin,PERF.viralLisMax));s.vt=s.vr;s.rv=S.day;s.rc=Math.max(0,(s.streams||0)-(s.fs||0));luckNote(s)}
+    if(Math.random()<viralChance(s.q)/30){s.lk='v';s.vr=viralSize();s.vt=s.vr;s.rv=S.day;s.rc=Math.max(0,(s.streams||0)-(s.fs||0));luckNote(s)}
     else if(Math.random()<hitChance(s.q)/500){s.lk='h';s.hm=+R(PERF.hitMin,PERF.hitMax).toFixed(2);s.rv=S.day;s.rc=Math.max(0,(s.streams||0)-(s.fs||0));luckNote(s)}}catch(e){}}
   return p3.apply(this,arguments)}}
