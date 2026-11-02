@@ -29,7 +29,7 @@ const PACE={base:.36,interest:.06,lisBonus:200,floor:.015,viralP:.012,viralMin:1
    featured artist's fans (v26.104): every artist has a set monthly-listener count (ART row, a[2]). A collab also earns
      featLis x that artist's listeners per day from their fans, x quality factor, x your chemistry, decaying like any song (x1.5 on release day, x hit size on a hit).
      These streams sit outside the song's normal stream cap, so a feature with a big artist pays off even while you are small. */
-const PERF={qRef:50,qPow:.8,qMin:.45,qMax:2.5,collabPow:2,collabQ:.5,hitP:.08,hitQRef:60,hitQMin:.5,hitQMax:1.6,hitMin:3,hitMax:6,viralP:.0003,viralQBest:90,viralQPow:3,viralMin:5e6,viralLisMin:20,viralLisMax:50,viralShare:.3,viralDays:14,featLis:.01,expMin:.3,expScale:200,expMentor:8,expFame:6};
+const PERF={qRef:50,qPow:.8,qMin:.45,qMax:2.5,collabPow:2,collabQ:.5,hitP:.08,hitQRef:60,hitQMin:.5,hitQMax:1.6,hitMin:3,hitMax:6,viralP:.0003,viralQBest:90,viralQPow:3,viralMin:5e6,viralLisMin:20,viralLisMax:50,viralShare:.06,viralDays:90,featLis:.01,expMin:.3,expScale:200,expMentor:8,expFame:6};
 const mentors=()=>MEN.filter(m=>S.listeners>=m[0]).length;
 const updateVersion=()=>S.version++;
 
