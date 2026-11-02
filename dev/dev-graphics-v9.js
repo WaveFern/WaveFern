@@ -89,7 +89,7 @@
  const box=document.getElementById('fwdvb');
  if(box){
   const h=document.createElement('h5');h.textContent='Graphics (dev)';box.prepend(h);
-  const tip=document.createElement('small');tip.textContent='Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
+  const tip=document.createElement('small');tip.textContent='Graphics build v9. Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
   let last=tip;
   LV.forEach(k=>{const b=document.createElement('button');b.onclick=()=>{lv=k;apply()};last.after(b);last=b;btns.push([k,b])});
   const h2=document.createElement('h5');h2.textContent='Light colour (dev)';last.after(h2);last=h2;
