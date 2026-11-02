@@ -57,7 +57,7 @@
  const css=document.createElement('style');
  css.textContent=`#pfx{position:fixed;inset:0;z-index:9995;display:flex;align-items:center;justify-content:center;background:#000b;padding:12px;font:14px ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec}
 #pfx *{box-sizing:border-box}
-#pfx .fwpc{width:min(520px,100%);max-height:92vh;overflow:auto;background:#000;border:3px solid #2e2e2e;box-shadow:6px 6px 0 #0008;display:flex;flex-direction:column}
+#pfx .fwpc{height:auto;border-radius:0;width:min(520px,100%);max-height:92vh;overflow:auto;background:#000;border:3px solid #2e2e2e;box-shadow:6px 6px 0 #0008;display:flex;flex-direction:column}
 #pfx .pf-top{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:2px solid #2e2e2e;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#8aa094}
 #pfx .pf-top button{padding:5px 10px;font-size:12px}
 #pfx .pf-head{display:flex;gap:16px;padding:20px 16px 16px;align-items:flex-start}
