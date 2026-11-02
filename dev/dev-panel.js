@@ -36,8 +36,7 @@
    ['Open a stranger profile',()=>FW_PROFILE.open('dex')],
    ['Open mock Friends window',()=>FW_PROFILE.friendsWin()],
    ['Show mock band room panel',()=>FW_PROFILE.mockBand()]]],
- ['Time',[
-
+  ['Time',[
    ['Skip 1 day',jump(1)],['Skip 7 days',jump(7)],['Skip 30 days',jump(30)],['Skip 100 days',jump(100)],
    ['Set time to morning',need(()=>{S.t=0;sv('Morning')})]]],
   ['Progress',[
