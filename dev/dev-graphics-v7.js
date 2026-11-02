@@ -33,7 +33,7 @@
   sun.castShadow=on;
   const sz=mx?2048:1024;
   if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.12) saturate(1.14) brightness(.94)':'';
+  cv.style.filter=on?'contrast(1.12) saturate(1.05) brightness(.94)':'';
   vg.style.display=on?'block':'none';
   bc.style.display='none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
@@ -67,7 +67,7 @@
   hemi.intensity=.1*Math.min(1.3,amb.intensity/.75);
   if(!(frame%20))mark(false);
  }
- const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(0xffd2a6),SW=new THREE.Color(0xffa860);
+ const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(0xdfe9ff),SW=new THREE.Color(0xf4f6ff);
  const r0=renderer.render.bind(renderer);
  renderer.render=function(s,c){
   let a0=0,s0=0,dp=0;
