@@ -45,7 +45,7 @@
    band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:{name:'The Ferns',inst:'Vocals',members:3,streak:sk||4},
    ach:has?[0,1,2].filter((_,i)=>i<1+Math.floor(((D.songs||[]).length)/3)):[0],online:'Online',rel:'self'};
  };
- const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3,career:'cur'};
+ const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3,career:'cur',userAt:0};
  function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}return Object.assign({},defaults,o,{show:Object.assign({},defaults.show,o.show||{})})}
  function save(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
 
@@ -191,12 +191,14 @@
   const st=load(),bad=V.err||'';
   return`<div class=fwpc><div class=pf-top><span>EDIT PROFILE</span><button data-pf=done>Cancel</button></div><div class=pf-sec>
   <div class=pf-f><label>Avatar</label><div class=pf-av-pick>${[3,8,14,21,34,55].map(s=>`<button data-av="${s}" class="${st.pfp==s?'on':''}">${avatar(s,44)}</button>`).join('')}</div></div>
-  <div class=pf-f><label for=pf-user>Username (letters and numbers, 3 to 16)</label><input id=pf-user maxlength=16 value="${esc(st.user)}" autocomplete=off spellcheck=false></div>
+  <div class=pf-f><label for=pf-user>Username (letters, numbers and underscore, 3 to 16)</label><input id=pf-user maxlength=16 value="${esc(st.user)}" autocomplete=off spellcheck=false ${left(st)?'disabled':''}><small>${left(st)?'You changed your username recently. You can change it again in '+left(st)+' day'+(left(st)==1?'':'s')+'.':'You can change your username once every 30 days. Friends find you by it.'}</small></div>
   <div class=pf-f><label for=pf-bio>Bio</label><textarea id=pf-bio maxlength=80>${esc(st.bio)}</textarea><small class="${bad?'er':''}">${bad||'Up to 80 characters. Bios and usernames are checked before they show to other players.'}</small></div>
   <div class=pf-f><label for=pf-car>Career shown on your profile</label><select id=pf-car>${(careers().length?careers():[{k:'cur',label:'Sample career'}]).map(c=>`<option value="${c.k}" ${(mine().career||st.career)==c.k||st.career==c.k?'selected':''}>${esc(c.label)}</option>`).join('')}</select><small>Visitors see this career's artist name, fame level, listeners, songs and band. Your friends can still find you by username.</small></div></div>
   <div class=pf-acts><button class=go data-pf=savee>Save</button><button data-pf=done>Cancel</button></div></div>`;
  }
  /* placeholder filter so the error path can be seen. The real one would run on the server. */
+ const COOL=30*DAY,RESERVED=/^(admin|mod|moderator|staff|support|wavefern|official|system|null|undefined)$/;
+ const left=st=>Math.max(0,Math.ceil((st.userAt+COOL-Date.now())/DAY));
  const BLOCK=/(fuck|shit|nigg|fag|http|www\.|\.com|discord|@\w+\.)/i;
 
  function draw(){
@@ -220,10 +222,15 @@
   else if(k=='done'){V.mode='view';draw()}
   else if(k=='visitor'){V.visitor=V.visitor?0:1;draw()}
   else if(k=='savee'){
-   const u=document.getElementById('pf-user').value.trim().toLowerCase(),b=document.getElementById('pf-bio').value.trim();
-   if(!/^[a-z0-9]{3,16}$/.test(u)){V.err='Username must be 3 to 16 letters or numbers.';return draw()}
+   const ue=document.getElementById('pf-user'),be=document.getElementById('pf-bio'),s0=load();
+   const u=(s0.userAt&&left(s0)?s0.user:ue.value.trim().toLowerCase()),b=be.value.trim().replace(/\s+/g,' ');
+   if(!/^[a-z0-9_]{3,16}$/.test(u)){V.err='Username must be 3 to 16 characters: letters, numbers or underscore. No spaces or symbols.';return draw()}
+   if(/^_|_$|__/.test(u)||/^\d+$/.test(u)){V.err='Username cannot start or end with an underscore, repeat underscores, or be only numbers.';return draw()}
+   if(RESERVED.test(u)){V.err='That username is reserved.';return draw()}
+   if(b.length>80){V.err='Bio is over 80 characters.';return draw()}
+   if(/[<>{}\[\]\\|^~`]/.test(b)||/[\u0300-\u036f\u200b-\u200f\u202a-\u202e]/.test(b)){V.err='Bio has characters that are not allowed.';return draw()}
    if(BLOCK.test(b)||BLOCK.test(u)){V.err='That text is not allowed. Remove links and rude words.';return draw()}
-   const s=load();s.user=u;s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
+   const s=load();if(u!==s.user){s.user=u;s.userAt=Date.now()}s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
   else if(k=='add'){REL[p.id]='requested';V.msg='Friend request sent to @'+p.user+'. (Mock: nothing was sent.)';draw()}
   else if(k=='cancel'){REL[p.id]='none';V.msg='Request cancelled.';draw()}
   else if(k=='invite'){V.msg=p.rel=='friend'||REL[p.id]=='friend'?'Invite sent to @'+p.user+'. (Mock: nothing was sent.)':'You can invite friends only. Add them first.';draw()}
