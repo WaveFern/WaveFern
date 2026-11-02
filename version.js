@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.60.1';
+const GAME_VERSION='v49.61.0';
 const VERSION_HISTORY=[
+ {v:'v49.61.0',n:'Band rooms keep time in sync. Pausing no longer stops the clock for the whole band: time only stops when every online member is paused, and if anyone is still playing it keeps running for everyone, including you while you are in the pause menu.'},
  {v:'v49.60.1',n:'Collab songs stream like real songs. The fans of the artist you feature now follow a real song\'s curve: biggest on day one, falling over the first weeks, then a long steady tail that fades slowly. There is no release-day boost any more. A collab with a megastar gives roughly 20 to 25 million streams in the first 11 days. Songs you already released with a featured artist are caught up once to the same curve, so old collabs with big artists are no longer stuck at 10 million (your monthly listeners do not jump).'},
  {v:'v49.60.1',n:'The downloadable multiplayer trailer is re-encoded at a much higher quality (about 6 Mbps, was 2.4), so it is sharp instead of blurry.'},
  {v:'v49.60.0',n:'Artists who message you are about your size now. If you have 30 million monthly listeners, most messages come from artists with roughly 25 to 45 million, some from a bit smaller or bigger, and an artist 3 times your size or more is rare (a megastar can still write to you, just very seldom). Six new artists between 19 and 56 million listeners join the roster. Collabs with real megastars also pay more: your featured song now gets about 3 times the fan streams it did before. Old saves keep working.'},

@@ -8,6 +8,7 @@
    - The instrument is picked when you first join and is kept for that band career.
    - Everyone spawns in the studio, which holds every member's instrument at the lowest level. The bedroom has 2 bunk beds.
    - The host's clock is the band's clock: day and time follow the host, and only the host's bed ends the day.
+   - Pausing only stops time when every online member is paused; if anyone is still playing, time keeps running for everyone.
    - Recording and festival sets need every online member present and ready ("1/3 members ready").
    - The middle recording step and the festival crowd games depend on your instrument (only vocals rhyme). */
 (()=>{
@@ -302,7 +303,7 @@ function handle(d,id,self){
  if(d.t=='clk'){if(!isHost())clock(d);return}
  if(d.t=='go'){go(d);return}
  if(!id||self||id===ME.id)return;const m=MB[id];if(!m)return;
- if(d.t=='st'){['x','z','r','zone','where','studio','stg','nm','ctry','col'].forEach(k=>{if(d[k]!==undefined)m[k]=d[k]});if(d.look){m.look=d.look}}
+ if(d.t=='st'){['x','z','r','zone','where','studio','stg','nm','ctry','col','pz'].forEach(k=>{if(d[k]!==undefined)m[k]=d[k]});if(d.look){m.look=d.look}}
  else if(d.t=='rd'){const was=m.rd;m.rd=d.rd||null;if(d.rd&&!was)say(m.nm+(d.rd.k=='rec'?' is ready to record.':d.rd.k=='slp'?' is in bed and wants to sleep.':d.rd.k=='col'?' is ready to record with '+artN(d.rd.a)+'.':' is ready to play Stage '+d.rd.n+'.'))}
  else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q}say(d.c?m.nm+' finished the collab session.':m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
  else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s WaveFern account "'+d.v+'".')}}
@@ -328,8 +329,9 @@ function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.ad=(typ
  if(ME.rd&&!band()){const r=ME.rd;ME.rd=null;if(r.k=='rec'){MPGO=1;try{startRec(r.g)}finally{MPGO=0}}else if(r.k=='slp'){if(mode=='play')sleepNow(0)}else if(r.k=='fest'&&r.lead&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}else if(r.k=='col')goCol({a:r.a,op:r.op,n:1})}
  if(online()&&S.artist&&S.artist!==NET.an&&mode!='creator'){NET.an=S.artist;send({t:'an',v:S.artist})}
  if(online()&&S.gear&&mode!='creator'){const gk=JSON.stringify(S.gear);if(gk!==NET.gk){NET.gk=gk;send({t:'gr',g:S.gear})}}
- if(!online())return;const now=Date.now(),o={t:'st',ctry:ME.ctry,x:ME.x,z:ME.z,r:ME.r,zone:ME.zone,where:ME.where,studio:ME.studio,stg:ME.stg,nm:ME.nm,col:ME.col},k=JSON.stringify(o);
+ if(!online())return;const now=Date.now(),o={t:'st',ctry:ME.ctry,x:ME.x,z:ME.z,r:ME.r,zone:ME.zone,where:ME.where,studio:ME.studio,stg:ME.stg,nm:ME.nm,col:ME.col,pz:(typeof PAUSED!='undefined'&&PAUSED)?1:0},k=JSON.stringify(o);
  if(k!==NET.lastSt||now-NET.stT>1000){NET.lastSt=k;NET.stT=now;if(now-NET.lkT>4000){NET.lkT=now;ME.look=o.look=myLook()}send(o)}
+ pausedTime(now);
  if(isHost()){if(now-NET.clkT>2000){NET.clkT=now;sendAll({t:'clk',day:S.day,tm:S.t})}hostCheck()}}
 setInterval(()=>{try{netTick()}catch(e){console.error('mp tick',e)}},120);
 /* the host starts a band take or set once every online member is there and ready */
@@ -345,6 +347,13 @@ function go(d){const r=ME.rd;for(const k in MB)MB[k].rd=null;ME.rd=null;if(!r||r
  else if(d.k=='col'){closeUI();goCol(d)}
  else if(d.k=='slp'){closeUI();say('The whole band is in bed. Good night!');sleepNow(0)}
  else if(d.k=='fest'){MPF=1;if(d.lead===ME.id&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}else guestSet(d);if(mode!='fest')MPF=0}}
+/* v49.45.0: pausing only stops time when the whole band is paused. While you are paused and anyone else is still playing, your
+   clock keeps running (the host's clock keeps coming in and corrects it). It stops below the end of the day, so the night itself
+   starts when you come back. */
+function pausedTime(now){const dt=Math.min(1,(now-(NET.pzT||now))/1000);NET.pzT=now;
+ if(!S||typeof PAUSED=='undefined'||!PAUSED||mode!='pause')return;
+ if(!list().some(m=>m.id!==ME.id&&!m.pz))return;
+ S.t=Math.min(599.9,S.t+dt*(typeof DAYK!='undefined'?DAYK:1))}
 /* the host's clock is the band's clock */
 function clock(d,force){if(mode=='sleep'||mode=='creator'||mode=='load'||!S)return;
  if(d.day==S.day){if(force||Math.abs(S.t-d.tm)>1.5)S.t=d.tm}
