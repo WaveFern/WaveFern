@@ -10,10 +10,10 @@
  /* fail safe: never runs during loading, never throws; add ?nogfx to the address to skip it entirely */
  if(/[?&]nogfx/.test(location.search))return;
  function boot(){try{
- const TONES={neutral:{n:'Neutral',aw:0xdfe9ff,sw:0xf4f6ff,a:.4,s:.45,sat:1.05},mid:{n:'Soft gold (balanced)',aw:0xf2eef4,sw:0xffd9a0,a:.3,s:.4,sat:1.09},golden:{n:'Golden (strong)',aw:0xffd2a6,sw:0xffa860,a:.4,s:.45,sat:1.14}},TK='fw_dtone';
+ const TONES={neutral:{n:'Neutral',aw:0xdfe9ff,sw:0xf4f6ff,a:.4,s:.45,sat:1.05},mid:{n:'Soft gold (balanced)',aw:0xf2eef4,sw:0xffd9a0,a:.3,s:.4,sat:1.09},golden:{n:'Golden (strong)',aw:0xffd2a6,sw:0xffa860,a:.4,s:.45,sat:1.14}},TK='fw_dtone2';
  let tone='neutral';try{const t=localStorage.getItem(TK);if(TONES[t])tone=t}catch(e){}
- const BR={low:.88,mid:1,high:1.12},BK='fw_dbri';let bri='mid';try{const b=localStorage.getItem(BK);if(BR[b])bri=b}catch(e){}
- const GLOW=false,KEY='fw_dgfx',LV=['off','balanced','max'];
+ const BR={low:.88,mid:1,high:1.12},BK='fw_dbri2';let bri='high';try{const b=localStorage.getItem(BK);if(BR[b])bri=b}catch(e){}
+ const GLOW=false,KEY='fw_dgfx2',LV=['off','balanced','max'];
  let lv='max';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
  const ok=()=>{try{return typeof renderer!='undefined'&&typeof scene!='undefined'&&typeof sun!='undefined'&&typeof cam!='undefined'}catch(e){return false}};
  if(!ok()){console.warn('dev graphics: game not ready');return}
@@ -90,7 +90,7 @@
  const box=document.getElementById('fwdvb');
  if(box){
   const h=document.createElement('h5');h.textContent='Graphics (dev)';box.prepend(h);
-  const tip=document.createElement('small');tip.textContent='Graphics build v11. Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
+  const tip=document.createElement('small');tip.textContent='Graphics build v12. Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
   let last=tip;
   LV.forEach(k=>{const b=document.createElement('button');b.onclick=()=>{lv=k;apply()};last.after(b);last=b;btns.push([k,b])});
   const h2=document.createElement('h5');h2.textContent='Light colour (dev)';last.after(h2);last=h2;

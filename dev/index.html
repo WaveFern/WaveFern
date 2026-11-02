@@ -35,7 +35,7 @@ button:disabled{opacity:.5;cursor:default}
   html=html.replace(/<meta name="robots"[^>]*>/i,'').replace(/<link rel="canonical"[^>]*>/i,'').replace(/<title>[^<]*<\/title>/i,'<title>DEV - WaveFern</title>');
   html=html.replace(/<head[^>]*>/i,'$&<base href="/"><meta name="robots" content="noindex,nofollow,noarchive"><script src="/dev/dev-shim.js"><\/script>');
   html=html.replace(/<script src="27-boot\.js[^>]*><\/script>/i,m=>'<script src="/dev/dev-models-v2.js"><\/script>'+m);
-  html=html.replace(/<\/body>/i,'<script src="/dev/dev-panel.js"><\/script><script src="/dev/dev-profile-v3.js"><\/script><script src="/dev/dev-graphics-v11.js"><\/script></body>');
+  html=html.replace(/<\/body>/i,'<script src="/dev/dev-panel.js"><\/script><script src="/dev/dev-profile-v3.js"><\/script><script src="/dev/dev-graphics-v12.js"><\/script></body>');
   /* every dev script gets a fresh stamp on every load, so a browser can never serve a stale copy */
   html=html.replace(/(src="\/dev\/[^"?]+\.js)"/g,'$1?t='+Date.now()+'"');
   document.open();document.write(html);document.close();
