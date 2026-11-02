@@ -7,13 +7,16 @@
    - Glow (Max only): bright things (lamps, neon, stage lights, windows at night) bloom softly */
 (function(){
  if(!window.FW_DEV)return;
+ /* fail safe: never runs during loading, never throws; add ?nogfx to the address to skip it entirely */
+ if(/[?&]nogfx/.test(location.search))return;
+ function boot(){try{
  const KEY='fw_dgfx',LV=['off','balanced','max'];
- let lv='max';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
+ let lv='off';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
  const ok=()=>{try{return typeof renderer!='undefined'&&typeof scene!='undefined'&&typeof sun!='undefined'&&typeof cam!='undefined'}catch(e){return false}};
  if(!ok()){console.warn('dev graphics: game not ready');return}
  const cv=renderer.domElement,st=document.createElement('style');
- st.textContent='#fwdg-v{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 58%,rgba(18,10,24,.34) 100%)}'+
-  '#fwdg-b{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen;opacity:.5;filter:brightness(.8) contrast(1.9) blur(7px) saturate(1.3)}';
+ st.textContent='#fwdg-v{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 58%,rgba(18,10,24,.45) 100%)}'+
+  '#fwdg-b{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen;opacity:.22;filter:brightness(.8) contrast(1.9) blur(7px) saturate(1.3)}';
  document.head.appendChild(st);
  const vg=document.createElement('div');vg.id='fwdg-v';
  const bc=document.createElement('canvas');bc.id='fwdg-b';bc.width=192;bc.height=108;const bx=bc.getContext('2d');
@@ -30,7 +33,7 @@
   sun.castShadow=on;
   const sz=mx?2048:1024;
   if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.06) saturate(1.08) brightness(.99)':'';
+  cv.style.filter=on?'contrast(1.04) saturate(1.0) brightness(.94)':'';
   vg.style.display=on?'block':'none';
   bc.style.display=mx?'block':'none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
@@ -61,7 +64,7 @@
   const c=sun.shadow.camera;
   if(Math.abs(shRange-r)>.5){shRange=r;c.left=c.bottom=-r;c.right=c.top=r;c.near=1;c.far=70;c.updateProjectionMatrix()}
   /* sky light follows the day and night level of the ambient light */
-  hemi.intensity=.18*Math.min(1.3,amb.intensity/.75);
+  hemi.intensity=.08*Math.min(1.3,amb.intensity/.75);
   if(!(frame%20))mark(false);
  }
  const r0=renderer.render.bind(renderer);
@@ -84,4 +87,6 @@
  }
  apply();
  window.FW_DGFX={set(k){if(LV.indexOf(k)>=0){lv=k;apply()}},get:()=>lv};
+ }catch(e){console.warn('dev graphics failed',e)}}
+ let tries=0;const iv=setInterval(()=>{tries++;if(!document.getElementById('load')&&document.getElementById('fwdvb')){clearInterval(iv);boot()}else if(tries>240)clearInterval(iv)},250);
 })();
