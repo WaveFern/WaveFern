@@ -750,6 +750,8 @@ function cmRecv(d,from){const r=d.m;if(!r||typeof r!='object'||typeof r.a!='numb
      s/UID = time of your last request (10 s between requests) · b/UID/OTHER = blocked (their @name) · i/TO/FROM = band invite {c,b,nm,t}
    Only the person a request is for can accept it, blocked players cannot send requests or invites, and only friends can invite. ===== */
 const FR={on:0,me:'',h:'',L:{},P:{},Q:{},I:{},B:{},pu:{},open:0,seen:{},sent:{},err:'',msg:'',pk:'',hk:''};
+/* v49.73.0: the name friends and bandmates see: the display name chosen at first sign-in (208-onboarding.js), else the artist name */
+const frNm=()=>{let d='';try{d=typeof fwDisplayName=='function'?fwDisplayName():''}catch(e){}return d||(typeof fwNameSafe=='function'?fwNameSafe(S&&S.artist):String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24))};
 const okId=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
 function frErr(e){console.warn('[friends]',e);FR.err=/permission/i.test(String(e&&(e.code||e.message)||e))?'Friends is not switched on yet. The database rules need publishing.':'Could not reach Friends. Check your connection.';frDraw()}
 function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
@@ -762,22 +764,23 @@ function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;
   R.onValue(R.ref(db,'f/i/'+uid),s=>{FR.I=s.val()||{};frInvite()},()=>{});
   R.onValue(R.ref(db,'f/b/'+uid),s=>{FR.B=s.val()||{};frDraw()},()=>{});
  }).catch(e=>{FR.on=0;frErr(e)})}
-function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
+function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
  if(k===FR.pk)return;FR.pk=k;const ref=R.ref(db,'f/p/'+uid);R.set(ref,Object.assign({t:R.serverTimestamp()},o)).then(()=>{if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{FR.pk='';console.warn('[friends] presence',e)})}
 setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);
 const frN=()=>Object.keys(FR.Q||{}).length;
 const frName=f=>{const p=FR.P[f];return p&&p.h?'@'+p.h:'Friend'};
 /* pick a username (once) */
+window.FRX={FR,frStart:()=>frStart(),frPresence:()=>frPresence(),trailer:MPTR};
 window.frClaim=()=>{const i=$('frh'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='A username has 3 to 16 letters, numbers or _.';snd('err');return frDraw(1)}
  const{R,db,uid}=FR.r;FR.msg='Checking…';frDraw(1);R.get(R.ref(db,'f/n/'+h)).then(s=>{if(s.exists()&&s.val()!==uid){FR.msg='@'+h+' is taken. Try another.';snd('err');return frDraw(1)}
-  return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24),o:1,rm:MPS&&!MPTR?MPS.code:'',t:R.serverTimestamp()}}).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
+  return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:frNm(),o:1,rm:MPS&&!MPTR?MPS.code:'',t:R.serverTimestamp()}}).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
  .catch(e=>{FR.msg='Could not save that username.';frErr(e)})};
 /* send a request by username */
 window.frAdd=()=>{const i=$('fra'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='Type your friend\'s username (3 to 16 letters, numbers or _).';snd('err');return frDraw(1)}
  if(h===FR.h){FR.msg='That is you.';return frDraw(1)}const{R,db,uid}=FR.r;FR.msg='Looking for @'+h+'…';frDraw(1);
  R.get(R.ref(db,'f/n/'+h)).then(s=>{const f=s.val();if(!f||!okId(f)){FR.msg='No player is called @'+h+'.';snd('err');return frDraw(1)}
   if(FR.L[f]){FR.msg='@'+h+' is already your friend.';return frDraw(1)}if(FR.Q[f])return frAcc(f);if(FR.B[f]){FR.msg='You blocked @'+h+'. Unblock them first.';return frDraw(1)}
-  const ts=R.serverTimestamp();return R.update(R.ref(db),{['f/q/'+f+'/'+uid]:{h:FR.h,nm:String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24),t:ts},['f/s/'+uid]:ts}).then(()=>{FR.sent[f]=h;FR.msg='Request sent to @'+h+'.';if(i)i.value='';snd('pop');frDraw(1)})})
+  const ts=R.serverTimestamp();return R.update(R.ref(db),{['f/q/'+f+'/'+uid]:{h:FR.h,nm:frNm(),t:ts},['f/s/'+uid]:ts}).then(()=>{FR.sent[f]=h;FR.msg='Request sent to @'+h+'.';if(i)i.value='';snd('pop');frDraw(1)})})
  .catch(()=>{FR.msg='Could not send it. Wait 10 seconds between requests, or you may already have one waiting with @'+h+'.';snd('err');frDraw(1)})};
 window.frAcc=f=>{if(!okId(f))return;const{R,db,uid}=FR.r,h=FR.Q[f]&&FR.Q[f].h;R.update(R.ref(db),{['f/l/'+uid+'/'+f]:true,['f/l/'+f+'/'+uid]:true,['f/q/'+uid+'/'+f]:null}).then(()=>{snd('chime');say('You and @'+(h||'your friend')+' are friends now.');FR.msg=''}).catch(frErr)};
 window.frDec=f=>{if(!okId(f))return;const{R,db,uid}=FR.r;snd('click');R.remove(R.ref(db,'f/q/'+uid+'/'+f)).catch(frErr)};
@@ -806,7 +809,7 @@ function frDraw(force){document.querySelectorAll('.frbadge').forEach(b=>b.textCo
  if(FR.err&&!FR.ok)h+=`<p class=m>${esc(FR.err)}</p>`;
  else if(!FR.ok)h+='<p class=m>Connecting…</p>';
  else if(!FR.h)h+=`<p>Pick a username so your friends can find you. It is the only thing other players see, so keep your real name out of it.</p><div class=ng><input id=frh maxlength=16 placeholder="username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frClaim()"><button class=go onclick="frClaim()">Save</button></div>`;
- else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button></p>
+ else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button> <button onclick="fwNameBox()" style="padding:3px 8px;font-size:12px">Change name</button></p>
   <div class=ng><input id=fra maxlength=17 placeholder="Friend's username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frAdd()"><button class=go onclick="frAdd()">Add friend</button></div>`;
   const Q=Object.keys(FR.Q).filter(okId);if(Q.length)h+='<h3>Requests</h3>'+Q.map(f=>{const q=FR.Q[f]||{};return`<div class=frr><div><b>@${esc(q.h||'?')}</b><small>${q.nm?'Plays as '+esc(q.nm):'Wants to be friends'}</small></div><button class=go onclick="frAcc('${f}')">Accept</button><button onclick="frDec('${f}')">Decline</button><button onclick="frBlock('${f}')">Block</button></div>`}).join('');
   const L=Object.keys(FR.L).filter(okId).sort((a,b)=>((FR.P[b]||{}).o?1:0)-((FR.P[a]||{}).o?1:0)||frName(a).localeCompare(frName(b)));

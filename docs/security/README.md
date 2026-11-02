@@ -23,3 +23,6 @@ A browser game runs on the player's machine, so nothing here makes cheating impo
 - Rolling back to an older valid code can't be detected without a server.
 - Band rooms are peer to peer; a modified client can still send odd-but-in-range values to its bandmates. The host is trusted.
 - A Cloud Function that verifies the seal before accepting a cloud save would close that path further; it needs the Blaze plan.
+
+## Names (v49.73.0)
+`208-onboarding.js` checks usernames and display names in the game; `database.rules.proposed.json` repeats the checks so an edited client can not skip them. Username: 3-16 of a-z 0-9 _, at least one letter, changeable once per 30 days. Display name (`f/p/{uid}/nm`): 2-24 of A-Z a-z 0-9 space . _ ' -, changeable once per 7 days. Change times are stored in a new node `f/u/{uid}` (`t` username, `d` display name), written in the same update as the change; the rules refuse a change without a fresh stamp. Names containing WaveFern, admin, moderator, official, support, founder, Big Vee or a short list of slurs and strong swear words are refused (the game also matches look-alikes such as 0 for o; the rules match the plain words only). A blocklist never catches everything. Publish the proposed Realtime Database rules to turn the server side on; until then the game still enforces it and retries without the stamps.

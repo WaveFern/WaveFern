@@ -99,8 +99,8 @@
       "n": {
         "$h": {
           ".read": "auth != null",
-          ".write": "auth != null && auth.token.firebase.sign_in_provider == 'google.com' && ((!data.exists() && newData.val() == auth.uid) || (data.val() == auth.uid && !newData.exists()))",
-          ".validate": "$h.matches(/^[a-z0-9_]{3,16}$/) && newData.isString()"
+          ".write": "auth != null && auth.token.firebase.sign_in_provider == 'google.com' && (!root.child('f/u/' + auth.uid + '/t').exists() || now - root.child('f/u/' + auth.uid + '/t').val() > 2592000000) && ((!data.exists() && newData.val() == auth.uid && newData.parent().parent().child('u/' + auth.uid + '/t').val() == now) || (data.val() == auth.uid && !newData.exists() && newData.parent().parent().child('u/' + auth.uid + '/t').val() == now))",
+          ".validate": "$h.matches(/^[a-z0-9_]{3,16}$/) && $h.matches(/[a-z]/) && !$h.matches(/(wavefern|admin|moderator|official|support|founder|bigvee|fuck|shit|cunt|nigg|fagg|rape|nazi|hitler|bitch|whore|retard|kike|chink)/) && !$h.matches(/^(mod|dev|owner|staff|system|james|rowan|ceo|team|wf|vee|server|bot)$/) && newData.isString()"
         }
       },
       "p": {
@@ -112,7 +112,7 @@
             ".validate": "newData.isString() && newData.val().length <= 16"
           },
           "nm": {
-            ".validate": "newData.isString() && newData.val().length <= 24 && newData.val().matches(/^[^<>\"]*$/)"
+            ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 24 && newData.val().matches(/^[A-Za-z0-9 ._'-]+$/) && !newData.val().matches(/^ | $|  /) && !newData.val().matches(/(wavefern|admin|moderator|official|support|founder|bigvee|fuck|shit|cunt|nigg|fagg|rape|nazi|hitler|bitch|whore|retard|kike|chink)/i) && (data.val() == newData.val() || newData.parent().parent().parent().child('u/' + $uid + '/d').val() == now)"
           },
           "o": {
             ".validate": "newData.val() == 1"
@@ -147,7 +147,7 @@
               ".validate": "newData.isString() && newData.val().length <= 16"
             },
             "nm": {
-              ".validate": "newData.isString() && newData.val().length <= 24 && newData.val().matches(/^[^<>\"]*$/)"
+              ".validate": "newData.isString() && newData.val().length <= 24 && newData.val().matches(/^[A-Za-z0-9 ._'-]*$/)"
             },
             "t": {
               ".validate": "newData.isNumber()"
@@ -199,6 +199,22 @@
       },
       "$other": {
         ".validate": false
+      },
+      "u": {
+        "$uid": {
+          ".read": "auth != null && auth.uid == $uid",
+          "t": {
+            ".write": "auth != null && auth.uid == $uid && auth.token.firebase.sign_in_provider == 'google.com'",
+            ".validate": "newData.isNumber() && newData.val() == now && (!data.exists() || now - data.val() > 2592000000)"
+          },
+          "d": {
+            ".write": "auth != null && auth.uid == $uid && auth.token.firebase.sign_in_provider == 'google.com'",
+            ".validate": "newData.isNumber() && newData.val() == now && (!data.exists() || now - data.val() > 604800000)"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
       }
     }
   }

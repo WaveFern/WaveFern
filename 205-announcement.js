@@ -17,7 +17,8 @@
   scope:`<p><b>Everyone's career is reset, every career on every device and every Google account.</b> You start again from a new character.</p>
 <ul><li><b>Reset</b>: money, followers, monthly listeners, streams, songs, albums, fame, jobs and quests, houses, cars, pets, furniture, clothes, souvenirs, everything in Storage, and your band streak and band rewards.</li>
 <li><b>Kept</b>: your Google account, your username and friends list, and your settings.</li></ul>
-<p>Your old career is not deleted. It is kept as a <b>Legacy career</b> on your device, you can look at it in Settings, then Save, and Export save puts it in the file. It cannot be played again.</p>`,
+<p>Your old career is not deleted. It is kept as a <b>Legacy career</b> on your device, you can look at it in Settings, then Save, and Export save puts it in the file. It cannot be played again, and old save codes stop working: a code from before the reset will not load.</p>
+<p><b>First sign-in after the reset:</b> the first time you sign in with Google you choose a username and a display name. Your username is the one your friends use to find you.</p>`,
   founder:`<p><b>Everyone who played before the reset becomes a Founder</b> (a career that reached Day 2 or released a song). Founder rewards are only for them. They are not sold anywhere, nothing in the game gives them out, and nobody who starts after the reset can ever get them. They are all cosmetic.</p>
 <ul><li><b>The Founder mark</b>, a small green emblem next to your name on your WaveFern artist page, in the pause menu, on the title screen and in band panels and band chat.</li>
 <li><b>The Founder title</b>, with the Day your career had reached before the reset.</li>
