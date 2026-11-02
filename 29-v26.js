@@ -112,10 +112,12 @@ const luckTag=s=>s.lk=='v'?' VIRAL':s.lk=='h'?' HIT':'';
 const songCap=s=>s.q*s.q*25*Math.pow(FAME_MULT,fameLv())*(s.lk=='h'?s.hm||1:1)-(s.streams-(s.lk=='v'?(s.vt||0)-(s.vr||0):0)-(s.fs||0));
 /* v26.104: the featured artist's own monthly listeners (looked up by name, so older saves work too) */
 const artLis=s=>{if(!s||!s.ft)return 0;const a=ART.find(x=>x[0]===s.ft);return a?Math.max(0,a[2]||0):0};
+/* v49.60.1: a featured artist's fans stream the way a real catalogue song goes: biggest on day one, falling fast over the first weeks, then a long steady tail (about 12% of day one, fading slowly). No release-day bonus. */
+const featCurve=a=>.12*Math.pow(.995,a)+.88*Math.pow(.88,a);
 function planOf(s){if(s.pd===S.day)return s.pv;rollLuck(s);const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/PACE.lisBonus));
  let v=s.q*PACE.base*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,age)+PACE.floor)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*qualF(s)*collabF(s)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<PACE.viralP&&age<8)v*=R(PACE.viralMin,PACE.viralMax);if(s.lk=='h')v*=s.hm||1;
  v=Math.max(0,Math.min(Math.round(v||0),songCap(s)));
- s.fx=0;const AL=artLis(s);if(AL>0){const x=Math.round(AL*PERF.featLis*R(.75,1.25)*(Math.pow(.86,age)+PACE.floor)*qualF(s)*(1+(s.op||0)*.12)*(age==0?1.5:1)*(s.lk=='h'?s.hm||1:1));if(x>0){s.fx=x;s.fs=(s.fs||0)+x;v+=x}}
+ s.fx=0;const AL=artLis(s);if(AL>0){const x=Math.round(AL*PERF.featLis*R(.75,1.25)*featCurve(age)*qualF(s)*(1+(s.op||0)*.12)*(s.lk=='h'?s.hm||1:1));if(x>0){s.fx=x;s.fs=(s.fs||0)+x;v+=x}}
  s.vx=0;if(s.lk=='v'&&s.vr>0){const x=age>=PERF.viralDays-1||s.vr<1000?s.vr:Math.round(s.vr*PERF.viralShare);s.vr-=x;s.vx=x;v+=x}
  s.pd=S.day;s.pv=isFinite(v)?v:0;s.acc=0;s.today=0;s.p0=s.day==S.day?prog(S.t):0;return s.pv}
 /* monthly listeners: month = 30 in-game days; ML = this month's streams / random divisor 2-5 chosen each month */

@@ -26,3 +26,12 @@ if(typeof MKT!='undefined')MKT=null;if(typeof MKT_R!='undefined')MKT_R=null;
   return w*m}}
 
 {const p1=planOf;planOf=function(s){if(!s||!s.ft||!REAL_SET.has(s.ft)||s.pd===S.day)return p1.apply(this,arguments);const k=PERF.featLis;PERF.featLis=k*3;try{return p1.apply(this,arguments)}finally{PERF.featLis=k}}}
+
+/* ---------- v49.60.1: the featured-artist streams follow a real song's curve (featCurve in 29-v26.js), and old collab songs are caught up once ----------
+   A song already out gets, one time, the streams its featured artist's fans would have given it so far under the new curve, minus what it already had.
+   Only the song's lifetime total moves (not this month's streams), so monthly listeners do not jump. s.fv marks a song as done. */
+{const p2=planOf;planOf=function(s){
+  if(s&&s.ft&&s.fv!==1&&s.pd!==S.day){try{s.fv=1;const AL=artLis(s);if(AL>0){const age=Math.max(0,S.day-s.day),k=REAL_SET.has(s.ft)?PERF.featLis*3/REAL_X:PERF.featLis;let sum=0;for(let a=0;a<age;a++)sum+=featCurve(a);
+    const want=Math.round(AL*k*sum*qualF(s)*(1+(s.op||0)*.12)*(s.lk=='h'?s.hm||1:1)),add=Math.max(0,want-(s.fs||0));
+    if(add>0){s.fs=(s.fs||0)+add;s.streams=(s.streams||0)+add;S.streams=(S.streams||0)+add}}}catch(e){}}
+  return p2.apply(this,arguments)}}
