@@ -3,7 +3,7 @@
    Proportional to monthly listeners (zero effect in the early game), scaled by song quality and age,
    and split across the catalogue so the total stays stable however many songs you have. */
 const HALO={rate:.08,minSongs:10,ageKeep:.4,ageDecay:.985};
-function haloOf(s,all){const L=S.listeners||0;if(!(L>0)||(!all&&(s.lk=='v'||s.lk=='h')))return 0;const age=Math.max(0,S.day-s.day);
+function haloOf(s,all){const L=S.listeners||0;if(!(L>0))return 0;/* v49.60.3: hit and viral songs get the halo too (they used to be left out, so after their boost they fell to a few hundred streams a day) */const age=Math.max(0,S.day-s.day);
  const n=Math.max(HALO.minSongs,S.songs.length-1),q=qualF(s),a=HALO.ageKeep+(1-HALO.ageKeep)*Math.pow(HALO.ageDecay,age);
  return Math.max(0,Math.round(L*HALO.rate/n*q*a*(S.interest!=null?.5+.5*S.interest:1)*R(.75,1.25)))}
 {const po=planOf;planOf=function(s){const fresh=s&&s.pd!==S.day,v=po.apply(this,arguments);if(!fresh)return v;
