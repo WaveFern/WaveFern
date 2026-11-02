@@ -10,13 +10,13 @@
  /* fail safe: never runs during loading, never throws; add ?nogfx to the address to skip it entirely */
  if(/[?&]nogfx/.test(location.search))return;
  function boot(){try{
- const KEY='fw_dgfx',LV=['off','balanced','max'];
- let lv='off';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
+ const GLOW=false,KEY='fw_dgfx',LV=['off','balanced','max'];
+ let lv='max';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
  const ok=()=>{try{return typeof renderer!='undefined'&&typeof scene!='undefined'&&typeof sun!='undefined'&&typeof cam!='undefined'}catch(e){return false}};
  if(!ok()){console.warn('dev graphics: game not ready');return}
  const cv=renderer.domElement,st=document.createElement('style');
  st.textContent='#fwdg-v{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 58%,rgba(18,10,24,.45) 100%)}'+
-  '#fwdg-b{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen;opacity:.22;filter:brightness(.8) contrast(1.9) blur(7px) saturate(1.3)}';
+  '#fwdg-b{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen;opacity:.3;filter:brightness(.8) contrast(1.9) blur(7px) saturate(1.3)}';
  document.head.appendChild(st);
  const vg=document.createElement('div');vg.id='fwdg-v';
  const bc=document.createElement('canvas');bc.id='fwdg-b';bc.width=192;bc.height=108;const bx=bc.getContext('2d');
@@ -33,9 +33,9 @@
   sun.castShadow=on;
   const sz=mx?2048:1024;
   if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.04) saturate(1.0) brightness(.94)':'';
+  cv.style.filter=on?'contrast(1.12) saturate(1.14) brightness(.96)':'';
   vg.style.display=on?'block':'none';
-  bc.style.display=mx?'block':'none';
+  bc.style.display='none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
   /* materials need to rebuild when shadows switch on or off */
   scene.traverse(o=>{if(o.isMesh){if(o.material&&!Array.isArray(o.material))o.material.needsUpdate=true}});
@@ -64,15 +64,16 @@
   const c=sun.shadow.camera;
   if(Math.abs(shRange-r)>.5){shRange=r;c.left=c.bottom=-r;c.right=c.top=r;c.near=1;c.far=70;c.updateProjectionMatrix()}
   /* sky light follows the day and night level of the ambient light */
-  hemi.intensity=.08*Math.min(1.3,amb.intensity/.75);
+  hemi.intensity=.1*Math.min(1.3,amb.intensity/.75);
   if(!(frame%20))mark(false);
  }
  const r0=renderer.render.bind(renderer);
  renderer.render=function(s,c){
-  if(c===cam&&s===scene){frame++;try{frameFx()}catch(e){}}
-  const o=r0(s,c);
+  let a0=0,s0=0,dp=0;
+  if(c===cam&&s===scene){frame++;try{frameFx()}catch(e){}if(lv!='off'){a0=amb.intensity;s0=sun.intensity;dp=1;amb.intensity=a0*.82;sun.intensity=s0*1.32}}
+  let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
-  if(lv=='max'&&c===cam&&!(frame&1))try{bx.drawImage(cv,0,0,bc.width,bc.height)}catch(e){}
+  if(GLOW&&lv=='max'&&c===cam&&!(frame&1))try{bx.drawImage(cv,0,0,bc.width,bc.height)}catch(e){}
   return o};
  /* dev panel section */
  const names={off:'Off (original look)',balanced:'Balanced',max:'Max'};
@@ -81,7 +82,7 @@
  const box=document.getElementById('fwdvb');
  if(box){
   const h=document.createElement('h5');h.textContent='Graphics (dev)';box.prepend(h);
-  const tip=document.createElement('small');tip.textContent='Shadows, sky light, colour grade, vignette; glow on Max. Off puts the normal look back.';h.after(tip);
+  const tip=document.createElement('small');tip.textContent='Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
   let last=tip;
   LV.forEach(k=>{const b=document.createElement('button');b.onclick=()=>{lv=k;apply()};last.after(b);last=b;btns.push([k,b])});
  }
