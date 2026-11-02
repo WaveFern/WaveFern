@@ -42,7 +42,7 @@ button:disabled{opacity:.5;cursor:default}
   html=html.replace(/<head[^>]*>/i,'$&<base href="/"><meta name="robots" content="noindex,nofollow,noarchive"><script src="/dev/dev-shim.js"><\/script>');
   const extra='<script src="/dev/dev-panel.js"><\/script><script src="/dev/dev-profile-v3.js"><\/script><script src="/dev/dev-graphics-v12.js"><\/script><script src="/dev/dev-perf.js"><\/script>';
   if(useB){
-   window.__FWB=B.files;
+   window.__FWB=B.files;window.__FWL=list;
    tags.forEach(t=>{html=html.replace(t,'')});
    /* runs every game script in order, each as its own classic script (an error in one does not stop the rest), then the dev add-ons */
    const run='<script>(function(){var F=window.__FWB,i=0;window.__FWB=null;function put(c,n){var e=document.createElement("script");e.text=c+"\\n//# sourceURL=/"+n;document.head.appendChild(e);e.remove()}'+

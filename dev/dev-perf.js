@@ -1,8 +1,7 @@
 /* WaveFern dev performance helpers. Only loaded on /dev/.
    1. Loading watchdog: if the loading screen is still up after 15 s (a stuck script, a failed library, a blocked tab), it says so
       and offers a reload instead of sitting at 92% forever.
-   2. Auto quality: if the dev graphics pack runs under ~40 fps for a few seconds, it steps down one level (Max > Balanced > Off).
-      The level is saved like a manual choice and can be changed again in the DEV panel (Graphics). ?noauto turns this off. */
+   2. Auto quality (OFF unless the address has ?auto): steps the graphics level down when fps stays under ~40. Never runs by default. */
 (function(){
  if(!window.FW_DEV)return;
  const errs=[];addEventListener('error',e=>{errs.push((e.message||'error')+' '+(e.filename||'').split('/').pop()+':'+(e.lineno||''))});
@@ -16,7 +15,7 @@
    const a=document.createElement('a');a.href='#';a.textContent='Reload';a.style.color='inherit';a.onclick=e=>{e.preventDefault();location.reload()};lt.appendChild(a)}
   console.warn('dev: loading stuck >15s',errs.slice(0,5));
  },1000);
- if(/[?&]noauto/.test(location.search))return;
+ if(!/[?&]auto/.test(location.search))return; /* opt-in only: visuals are never lowered unless asked for */
  const ORDER=['max','balanced','off'];
  let n=0,t=0,last=0,low=0,cool=0;
  function tick(x){
