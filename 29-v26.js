@@ -108,9 +108,11 @@ function rollLuck(s){if(s.lk!==undefined)return;if(S.day-s.day>0){s.lk=0;return}
  if(Math.random()<viralChance(s.q)){s.lk='v';s.vr=viralSize();s.vt=s.vr}
  else if(Math.random()<hitChance(s.q)){s.lk='h';s.hm=+R(PERF.hitMin,PERF.hitMax).toFixed(2)}else s.lk=0;
  if(s.lk)luckNote(s)}
-function luckNote(s){const v=s.lk=='v',t=v?'"'+s.title+'" is going VIRAL! Millions of streams are on the way.':'"'+s.title+'" is a HIT! It is streaming far better than your other songs.';
+function luckNote(s){const v=s.lk=='v',t=v?'Your song "'+s.title+'" is going viral. Millions of streams are on the way.':'Your song "'+s.title+'" is a hit. It is streaming far better than your other songs.';
  try{say(t)}catch(e){}try{snd('chime')}catch(e){}if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'WaveFern Team',body:v?'Your song "'+s.title+'" has gone viral. It is on every playlist and will pull in at least '+PERF.viralMin.toLocaleString()+' streams over the next three months.':'Your song "'+s.title+'" is a hit. Listeners are playing it on repeat, so it will keep streaming several times better than usual.',state:9,unread:1,day:S.day})}
-const luckTag=s=>s.lk=='v'?' VIRAL':s.lk=='h'?' HIT':'';
+/* v49.64.3: a small coloured badge after the title instead of shouting the word in capitals */
+try{if(!document.getElementById('lkcss')){const st=document.createElement('style');st.id='lkcss';st.textContent='.lkb{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:9px;font:700 10px/15px Silkscreen,ui-monospace,monospace;letter-spacing:.5px;text-transform:uppercase;vertical-align:middle;color:#fff}.lkb.v{background:linear-gradient(90deg,#8e44ff,#e84393)}.lkb.h{background:#e6a117;color:#241a00}';document.head.appendChild(st)}}catch(e){}
+const luckTag=s=>s.lk=='v'?'<span class="lkb v">Viral</span>':s.lk=='h'?'<span class="lkb h">Hit</span>':'';
 const songCap=s=>s.q*s.q*25*Math.pow(FAME_MULT,fameLv())*(s.lk=='h'?s.hm||1:1)-(s.streams-(s.lk=='v'?(s.vt||0)-(s.vr||0):0)-(s.fs||0)-(s.rc||0));
 /* v26.104: the featured artist's own monthly listeners (looked up by name, so older saves work too) */
 const artLis=s=>{if(!s||!s.ft)return 0;const a=ART.find(x=>x[0]===s.ft);return a?Math.max(0,a[2]||0):0};

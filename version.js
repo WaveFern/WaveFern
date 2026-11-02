@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.64.2';
+const GAME_VERSION='v49.64.3';
 const VERSION_HISTORY=[
+ {v:'v49.64.3',n:'Hit and viral songs are marked with a small coloured badge (purple Viral, gold Hit) after the song title instead of the word in capital letters, and the pop-up that tells you a song took off now reads as a normal sentence.'},
  {v:'v49.64.2',n:'Viral songs now start at 5 million streams and can go up to a billion, with the big ones getting rarer and rarer. About half of viral songs bring 5 to 11 million, 1 in 7 bring over 50 million, 1 in 50 over 500 million and about 1 in 90 reach 1 billion. It no longer depends on your monthly listeners. The extra streams are still paid out over about three months.'},
  {v:'v49.64.1',n:'Viral songs last much longer. The extra streams from going viral are now paid out over about three months (the biggest day is the first, then it falls gradually) instead of two weeks, since going viral is so rare. The total is the same, so a viral song just stays big for a lot longer. Songs that are mid-viral now spread what is left over the same longer time.'},
  {v:'v49.64.0',n:'Away players are disconnected and paused games stay quiet. In a band room, a guest with no input for 5 minutes gets a warning at 4:30 and is then taken out of the room with a Rejoin the band button (the host is never removed, so the room stays open); bandmates also show as away after one minute without input. While the game is paused it no longer reads your cloud save: it syncs once as you pause, then nothing until you resume.'},
