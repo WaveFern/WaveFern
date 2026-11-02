@@ -1,6 +1,6 @@
 /* WaveFern dev: public profile MOCKUP. Only loaded on /dev/ after the password.
    Everything here is fake or read from the DEV save. No network calls, nothing is written outside the "dev:" storage keys.
-   Entry points: title menu, pause menu, Gphone app, Friends window, Messages chat header, band room panel, DEV panel. */
+   Entry point: the avatar icon in the top right of the main menu. The DEV panel has test shortcuts. */
 (function(){
  if(!window.FW_DEV)return;
  const g=f=>{try{return f()}catch(e){return undefined}};
@@ -26,18 +26,26 @@
  const FRIENDS=['marlo','juno'],REQUESTS=['dex'],OTHERS=['ines','tobias'];
 
  /* ---------- my profile: dev save where it exists, sample values otherwise ---------- */
+ /* careers the player can show: the one they are in, plus the other saved slots. Which one is public is the player's choice. */
+ function careers(){
+  const out=[],seen={};
+  const cur=g(()=>S&&S.artist&&S);if(cur){out.push({k:'cur',S:cur,label:cur.artist+' (current)'});seen[cur.artist]=1}
+  for(let n=1;n<=(g(()=>SLOTS)||2);n++){const o=g(()=>scDecode(localStorage.getItem(slotKey(n))).S);if(o&&o.artist&&!seen[o.artist]){seen[o.artist]=1;out.push({k:'slot'+n,S:o,label:o.artist+' (save slot '+n+')'})}}
+  return out;
+ }
+ const fameOf=o=>{const s0=g(()=>S);if(o===s0)return g(()=>fameLevel())||0;try{S=o;return fameLevel()||0}catch(e){return 0}finally{try{S=s0}catch(e){}}};
  const mine=()=>{
-  const has=!!g(()=>S&&S.artist);
-  const songs=(g(()=>S.songs)||[]).slice().sort((a,b)=>(b.streams||0)-(a.streams||0)).slice(0,5).map(s=>[s.title,s.streams||0,(s.streams||0)>=1e6?1:((s.today||0)>5e4?2:0)]);
-  const sk=g(()=>S.mp&&S.mp.sk&&S.mp.sk.n)||0;
+  const st0=load(),L=careers(),ch=L.find(c=>c.k===st0.career)||L[0],D=ch?ch.S:null,has=!!D;
+  const songs=((D&&D.songs)||[]).slice().sort((a,b)=>(b.streams||0)-(a.streams||0)).slice(0,5).map(s=>[s.title,s.streams||0,(s.streams||0)>=1e6?1:((s.today||0)>5e4?2:0)]);
+  const sk=(D&&D.mp&&D.mp.sk&&D.mp.sk.n)||0;
   const st=load();
-  return{id:'me',me:1,sample:!has,artist:has?S.artist:'Your Artist Name',user:st.user,seed:3,founder:has?!!g(()=>S.founder):1,
-   fame:has?(g(()=>fameLevel())||0):7,listeners:has?(g(()=>S.listeners)||0):18400,joined:has?NOW-Math.max(0,(g(()=>S.day)||1)-1)*DAY:NOW-9*DAY,
+  return{id:'me',me:1,sample:!has,artist:has?D.artist:'Your Artist Name',user:st.user,seed:3,founder:has?!!g(()=>S.founder):1,
+   fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:has?NOW-Math.max(0,(D.day||1)-1)*DAY:NOW-9*DAY,
    bio:st.bio,songs:songs.length?songs:[['Sample Song One',120400,2],['Sample Song Two',8800,0]],
-   band:g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:{name:'The Ferns',inst:'Vocals',members:3,streak:sk||4},
-   ach:has?[0,1,2].filter((_,i)=>i<1+Math.floor((g(()=>S.songs.length)||0)/3)):[0],online:'Online',rel:'self'};
+   band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:{name:'The Ferns',inst:'Vocals',members:3,streak:sk||4},
+   ach:has?[0,1,2].filter((_,i)=>i<1+Math.floor(((D.songs||[]).length)/3)):[0],online:'Online',rel:'self'};
  };
- const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3};
+ const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3,career:'cur'};
  function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}return Object.assign({},defaults,o,{show:Object.assign({},defaults.show,o.show||{})})}
  function save(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
 
@@ -119,7 +127,7 @@
 #pfx .pf-list .pf-row:hover .n b{color:#2fe68a}
 #pfx .pf-list .pf-row img{flex:none;width:32px;height:32px;border:1px solid #2e2e2e}
 #pfx .pf-list small{display:block;color:#8aa094}
-.fwpf-b{cursor:pointer}
+.fwpf-ic{padding:0!important;width:36px;height:36px;flex:none;border:2px solid #2a352e!important;background:#0a0d0b!important;box-shadow:none!important;cursor:pointer;display:block;border-radius:0!important}.fwpf-ic:hover{border-color:#2fe68a!important}.fwpf-ic img,.fwpf-ic i{display:block;width:100%!important;height:100%!important;border:0!important;margin:0}
 #mpb .mpr span b.fwpf-n,.fwpf-n{text-decoration:underline dotted #2fe68a;text-underline-offset:3px;cursor:pointer}
 @media(max-width:480px){#pfx .pf-head{flex-direction:column}#pfx .pf-stats b{font-size:14px}#pfx .pf-ach{grid-template-columns:1fr}}`;
  document.head.appendChild(css);
@@ -185,7 +193,7 @@
   <div class=pf-f><label>Avatar</label><div class=pf-av-pick>${[3,8,14,21,34,55].map(s=>`<button data-av="${s}" class="${st.pfp==s?'on':''}">${avatar(s,44)}</button>`).join('')}</div></div>
   <div class=pf-f><label for=pf-user>Username (letters and numbers, 3 to 16)</label><input id=pf-user maxlength=16 value="${esc(st.user)}" autocomplete=off spellcheck=false></div>
   <div class=pf-f><label for=pf-bio>Bio</label><textarea id=pf-bio maxlength=80>${esc(st.bio)}</textarea><small class="${bad?'er':''}">${bad||'Up to 80 characters. Bios and usernames are checked before they show to other players.'}</small></div>
-  <div class=pf-f><label>Artist name</label><input value="${esc(mine().artist)}" disabled><small>Change this on the computer. It is the name on your songs.</small></div></div>
+  <div class=pf-f><label for=pf-car>Career shown on your profile</label><select id=pf-car>${(careers().length?careers():[{k:'cur',label:'Sample career'}]).map(c=>`<option value="${c.k}" ${(mine().career||st.career)==c.k||st.career==c.k?'selected':''}>${esc(c.label)}</option>`).join('')}</select><small>Visitors see this career's artist name, fame level, listeners, songs and band. Your friends can still find you by username.</small></div></div>
   <div class=pf-acts><button class=go data-pf=savee>Save</button><button data-pf=done>Cancel</button></div></div>`;
  }
  /* placeholder filter so the error path can be seen. The real one would run on the server. */
@@ -215,7 +223,7 @@
    const u=document.getElementById('pf-user').value.trim().toLowerCase(),b=document.getElementById('pf-bio').value.trim();
    if(!/^[a-z0-9]{3,16}$/.test(u)){V.err='Username must be 3 to 16 letters or numbers.';return draw()}
    if(BLOCK.test(b)||BLOCK.test(u)){V.err='That text is not allowed. Remove links and rude words.';return draw()}
-   const s=load();s.user=u;s.bio=b;save(s);V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
+   const s=load();s.user=u;s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
   else if(k=='add'){REL[p.id]='requested';V.msg='Friend request sent to @'+p.user+'. (Mock: nothing was sent.)';draw()}
   else if(k=='cancel'){REL[p.id]='none';V.msg='Request cancelled.';draw()}
   else if(k=='invite'){V.msg=p.rel=='friend'||REL[p.id]=='friend'?'Invite sent to @'+p.user+'. (Mock: nothing was sent.)':'You can invite friends only. Add them first.';draw()}
@@ -242,28 +250,17 @@
 
  /* ---------- entry points ---------- */
  const pfBtn=(label,fn)=>{const b=document.createElement('button');b.textContent=label;b.className='fwpf-b';b.onclick=fn;return b};
- /* title menu */
- g(()=>{const t0=titleUI;titleUI=function(){const r=t0.apply(this,arguments);try{const m=document.querySelector('#ttl .ttm');if(m&&!m.querySelector('.fwpf-b')){const set=m.querySelector('button[onclick="ttSet()"]');const b=pfBtn('Profile',()=>open('me'));set?set.parentNode.insertBefore(b,set):m.appendChild(b)}}catch(e){}return r}});
- /* pause menu */
- g(()=>{const p0=pauseUI;pauseUI=function(){const r=p0.apply(this,arguments);try{const m=document.getElementById('pzm');if(m&&!m.querySelector('.fwpf-b')){const s=m.querySelector('button[onclick^="settings("]')||m.querySelector('button');const b=pfBtn('Profile',()=>open('me'));s?s.parentNode.insertBefore(b,s):m.appendChild(b)}}catch(e){}return r}});
- /* Gphone */
- g(()=>{
-  const ico='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" shape-rendering="crispEdges"><rect width="20" height="20" fill="#04120a"/><rect x="7" y="3" width="6" height="6" fill="#2fe68a"/><rect x="4" y="11" width="12" height="6" fill="#2fe68a"/></svg>');
-  if(!GP_APPS.some(a=>a[0]=='prof')){GP_APPS.push(['prof','Profile',()=>ico,'#0b2a1b']);GP_TITLE.prof='Profile'}
-  const a0=phApp;phApp=function(a){if(a=='prof')return open('me');return a0.apply(this,arguments)};
- });
+ /* The only way in: the avatar in the top right of the main menu, next to the account chip. */
+ g(()=>{const t0=titleUI;titleUI=function(){const r=t0.apply(this,arguments);try{
+  const t=document.getElementById('ttl');if(!t||t.querySelector('.fwpf-ic'))return r;
+  let c=t.querySelector('.ttpf');if(!c){c=document.createElement('div');c.className='ttpf';t.insertBefore(c,t.firstChild)}
+  const old=c.querySelector('img,i');const b=document.createElement('button');b.type='button';b.className='fwpf-ic';b.title='Your profile';b.setAttribute('aria-label','Open your profile');
+  b.innerHTML=old&&old.tagName=='IMG'?old.outerHTML:avatar(load().pfp,32);b.onclick=()=>open('me');
+  if(old)old.replaceWith(b);else c.insertBefore(b,c.firstChild)}catch(e){}return r}});
  /* Friends window: replace with the mock one */
- window.frOpen=()=>{try{snd('click')}catch(e){}friendsWin()};
- /* Messages chat header and band room names */
- function decorate(){
-  document.querySelectorAll('.cvh').forEach(h=>{if(h.querySelector('.fwpf-b'))return;const b=pfBtn('Profile',()=>open(g(()=>cname(S.msgs.find(m=>m.id==S.chat)))&&'tobias'));b.style.marginLeft='auto';b.style.padding='5px 10px';b.style.fontSize='12px';h.appendChild(b)});
-  document.querySelectorAll('#mpb .mpr span b:not(.fwpf-n)').forEach((b,i)=>{b.classList.add('fwpf-n');const keys=['me','marlo','juno','ines'];b.dataset.pfopen=keys[i%keys.length]});
- }
- new MutationObserver(()=>{if(decorate.q)return;decorate.q=1;setTimeout(()=>{decorate.q=0;g(decorate)},120)}).observe(document.body,{childList:true,subtree:true});
-
  /* ---------- DEV panel hooks ---------- */
  window.FW_PROFILE={open,friendsWin,mockBand(){
   let el2=document.getElementById('mpb');if(!el2){el2=document.createElement('div');el2.id='mpb';el2.className='hb';document.body.appendChild(el2)}
-  el2.style.display='';el2.innerHTML='<div class=mph><span><b>Static Orchard</b> <small class=m>Room MOCK1</small></span></div>'+['You (Keys)','Marlo','Juno','Ines'].map((n,i)=>`<div class=mpr><span><b>${n}</b></span></div>`).join('');
+  el2.style.display='';el2.innerHTML='<div class=mph><span><b>Static Orchard</b> <small class=m>Room MOCK1</small></span></div>'+[['You (Keys)','me'],['Marlo','marlo'],['Juno','juno'],['Ines','ines']].map(n=>`<div class=mpr><span><b class=fwpf-n data-pfopen="${n[1]}">${n[0]}</b></span></div>`).join('');
  }};
 })();
