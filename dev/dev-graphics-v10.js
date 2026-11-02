@@ -11,13 +11,13 @@
  if(/[?&]nogfx/.test(location.search))return;
  function boot(){try{
  const TONES={neutral:{n:'Neutral',aw:0xdfe9ff,sw:0xf4f6ff,a:.4,s:.45,sat:1.05},mid:{n:'Soft gold (balanced)',aw:0xf2eef4,sw:0xffd9a0,a:.3,s:.4,sat:1.09},golden:{n:'Golden (strong)',aw:0xffd2a6,sw:0xffa860,a:.4,s:.45,sat:1.14}},TK='fw_dtone';
- let tone='mid';try{const t=localStorage.getItem(TK);if(TONES[t])tone=t}catch(e){}
+ let tone='neutral';try{const t=localStorage.getItem(TK);if(TONES[t])tone=t}catch(e){}
  const GLOW=false,KEY='fw_dgfx',LV=['off','balanced','max'];
  let lv='max';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
  const ok=()=>{try{return typeof renderer!='undefined'&&typeof scene!='undefined'&&typeof sun!='undefined'&&typeof cam!='undefined'}catch(e){return false}};
  if(!ok()){console.warn('dev graphics: game not ready');return}
  const cv=renderer.domElement,st=document.createElement('style');
- st.textContent='#fwdg-v{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 58%,rgba(18,10,24,.45) 100%)}'+
+ st.textContent='#fwdg-v{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 58%,rgba(18,10,24,.26) 100%)}'+
   '#fwdg-b{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen;opacity:.3;filter:brightness(.8) contrast(1.9) blur(7px) saturate(1.3)}';
  document.head.appendChild(st);
  const vg=document.createElement('div');vg.id='fwdg-v';
@@ -35,7 +35,7 @@
   sun.castShadow=on;
   const sz=mx?2048:1024;
   if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.1) saturate('+TONES[tone].sat+') brightness(.94)':'';
+  cv.style.filter=on?'contrast(1.08) saturate('+TONES[tone].sat+') brightness(1.02)':'';
   vg.style.display=on?'block':'none';
   bc.style.display='none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
@@ -66,7 +66,7 @@
   const c=sun.shadow.camera;
   if(Math.abs(shRange-r)>.5){shRange=r;c.left=c.bottom=-r;c.right=c.top=r;c.near=1;c.far=70;c.updateProjectionMatrix()}
   /* sky light follows the day and night level of the ambient light */
-  hemi.intensity=.1*Math.min(1.3,amb.intensity/.75);
+  hemi.intensity=.17*Math.min(1.3,amb.intensity/.75);
   if(!(frame%20))mark(false);
  }
  const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(),SW=new THREE.Color();
@@ -76,7 +76,7 @@
   if(c===cam&&s===scene){frame++;try{frameFx()}catch(e){}if(lv!='off'){a0=amb.intensity;s0=sun.intensity;dp=1;
    /* d is 1 in full daylight and fades to 0 by dusk: daytime gets a golden-hour look (lower, warmer light), sunset stays as it is */
    const d=Math.max(0,Math.min(1,(a0-.55)/.2));ac0.copy(amb.color);sc0.copy(sun.color);
-   amb.intensity=a0*(.84-.24*d);sun.intensity=s0*(1.32-.43*d);
+   amb.intensity=a0*(.84+.1*d);sun.intensity=s0*(1.32-.32*d);
    const T=TONES[tone];AW.setHex(T.aw);SW.setHex(T.sw);amb.color.lerp(AW,T.a*d);sun.color.lerp(SW,T.s*d)}}
   let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0;amb.color.copy(ac0);sun.color.copy(sc0)}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
@@ -89,7 +89,7 @@
  const box=document.getElementById('fwdvb');
  if(box){
   const h=document.createElement('h5');h.textContent='Graphics (dev)';box.prepend(h);
-  const tip=document.createElement('small');tip.textContent='Graphics build v9. Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
+  const tip=document.createElement('small');tip.textContent='Graphics build v10. Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
   let last=tip;
   LV.forEach(k=>{const b=document.createElement('button');b.onclick=()=>{lv=k;apply()};last.after(b);last=b;btns.push([k,b])});
   const h2=document.createElement('h5');h2.textContent='Light colour (dev)';last.after(h2);last=h2;
