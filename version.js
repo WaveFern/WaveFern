@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.64.3';
+const GAME_VERSION='v49.65.0';
 const VERSION_HISTORY=[
+ {v:'v49.65.0',n:'Concert offers from around the world. Once you reach Fame Level 120, promoters and venues in real cities (Tokyo, Seoul, Sydney, Dubai and more) can write to you in Messages, but rarely: about a 1.3% chance each morning, never within 45 days of the last offer. They pay 5 to 8 times your last 30 days of streaming income for a club or hall, and 9 to 15 times for a stadium (at least $5,000 and $20,000). Accept or Decline in the message; an accepted show happens 4 to 8 days later, the promoter pays the flights, and you come home tired.'},
  {v:'v49.64.3',n:'Hit and viral songs are marked with a small coloured badge (purple Viral, gold Hit) after the song title instead of the word in capital letters, and the pop-up that tells you a song took off now reads as a normal sentence.'},
  {v:'v49.64.2',n:'Viral songs now start at 5 million streams and can go up to a billion, with the big ones getting rarer and rarer. About half of viral songs bring 5 to 11 million, 1 in 7 bring over 50 million, 1 in 50 over 500 million and about 1 in 90 reach 1 billion. It no longer depends on your monthly listeners. The extra streams are still paid out over about three months.'},
  {v:'v49.64.1',n:'Viral songs last much longer. The extra streams from going viral are now paid out over about three months (the biggest day is the first, then it falls gradually) instead of two weeks, since going viral is so rare. The total is the same, so a viral song just stays big for a lot longer. Songs that are mid-viral now spread what is left over the same longer time.'},
