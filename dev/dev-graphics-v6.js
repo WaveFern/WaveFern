@@ -33,7 +33,7 @@
   sun.castShadow=on;
   const sz=mx?2048:1024;
   if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.12) saturate(1.14) brightness(.99)':'';
+  cv.style.filter=on?'contrast(1.12) saturate(1.14) brightness(.94)':'';
   vg.style.display=on?'block':'none';
   bc.style.display='none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
@@ -74,8 +74,8 @@
   if(c===cam&&s===scene){frame++;try{frameFx()}catch(e){}if(lv!='off'){a0=amb.intensity;s0=sun.intensity;dp=1;
    /* d is 1 in full daylight and fades to 0 by dusk: daytime gets a golden-hour look (lower, warmer light), sunset stays as it is */
    const d=Math.max(0,Math.min(1,(a0-.55)/.2));ac0.copy(amb.color);sc0.copy(sun.color);
-   amb.intensity=a0*(.84-.14*d);sun.intensity=s0*(1.32-.4*d);
-   amb.color.lerp(AW,.3*d);sun.color.lerp(SW,.38*d)}}
+   amb.intensity=a0*(.84-.24*d);sun.intensity=s0*(1.32-.43*d);
+   amb.color.lerp(AW,.4*d);sun.color.lerp(SW,.45*d)}}
   let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0;amb.color.copy(ac0);sun.color.copy(sc0)}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
   if(GLOW&&lv=='max'&&c===cam&&!(frame&1))try{bx.drawImage(cv,0,0,bc.width,bc.height)}catch(e){}
