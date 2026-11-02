@@ -10,7 +10,7 @@ const GIFTS=[
 const GFT={busy:0,next:0};
 const gNum=v=>Math.max(0,Math.min(1e12,Math.floor(+v||0)));
 function giftApply(g){const m=gNum(g.money),st=gNum(g.streams),ls=gNum(g.listeners);
- if(m)S.money=+(S.money+m).toFixed(2);
+ if(m){S.money=+(S.money+m).toFixed(2);S.gm=(S.gm||0)+m}/* gm = total gifted, so the save check allows for it (12-save-seal.js) */
  if(st||ls){try{if(typeof mlInit=='function')mlInit()}catch(e){}}
  if(st){S.streams=(S.streams||0)+st;S.monthStreams=(S.monthStreams||0)+st}
  if(ls){S.monthStreams=(S.monthStreams||0)+ls*(S.mlDiv||3);S.listeners=(S.listeners||0)+ls}

@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.70.0';
+const GAME_VERSION='v49.71.0';
 const VERSION_HISTORY=[
+ {v:'v49.71.0',n:'Saves are now protected. Save codes and saved careers are encrypted and checked, so an edited or made-up code is refused instead of loaded, and your old saves are upgraded automatically the first time they load. Numbers that are impossible are repaired, and values sent by other players in a band room are checked before the game uses them.'},
  {v:'v49.70.0',n:'A must-read notice for every player. A one-time announcement about a coming fresh start (early players could get rich very quickly through bugs) appears on the title screen. Its Close button only works after you have scrolled to the bottom and a few seconds have passed, and once closed it never shows again on that device or account. It lists what you can play with now (Friends, band rooms, band streaks, daily band goals, band chat), what is still to come (public profiles), how to back up your career with Export save, and links to the wiki. The date, what is reset and what early players get are still to be announced.'},
  {v:'v49.69.0',n:'Your career is backed up on your device. A backup copy of each career is kept next to the game save, and Settings > Save has Export save and Import save so you can move a career to another browser or keep a file. An empty or unreadable cloud save can never replace the career on your device, and if WaveFern moves to a new cloud your careers come with you.'},
  {v:'v49.68.0',n:'Band streak rewards you can show off. Reaching a 3, 7, 14 and 30 day band streak unlocks a Band poster stand, a Neon band sign, a Gold record plaque and a Platinum band trophy. They go to Storage to place in the house, and you cannot buy them anywhere. The band panel shows the next reward. Streaks you already reached count.'},

@@ -75,7 +75,7 @@ let libP=null;
 function lib(){if(window.Peer)return Promise.resolve();if(libP)return libP;
  const urls=['https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js','https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js'];
  return libP=new Promise((res,rej)=>{let i=0;const go=()=>{if(i>=urls.length){libP=null;return rej(new Error('PeerJS did not load'))}
-  const s=document.createElement('script');s.src=urls[i++];s.onload=()=>window.Peer?res():go();s.onerror=()=>{s.remove();go()};document.head.appendChild(s)};go()})}
+  const s=document.createElement('script');s.src=urls[i++];/* v49.70.0: the browser checks the downloaded file against this hash, so a changed or hijacked copy does not run */s.integrity='sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR';s.crossOrigin='anonymous';s.onload=()=>window.Peer?res():go();s.onerror=()=>{s.remove();go()};document.head.appendChild(s)};go()})}
 
 /* ---- main menu ---- */
 const U={inst:'vo',q:null,qp:null};
@@ -173,7 +173,11 @@ function regBeat(){if(NET.regT||!isHost())return;const w=()=>{if(NET.closed||!NE
   regAuth().then(r=>r.F.setDoc(r.F.doc(r.D,'rooms',MPS.code),{code:MPS.code,band:String(MPS.band||'Band').slice(0,24),n:Object.keys(MB).length,uid:r.uid,t:Date.now()})).then(()=>{if(NET.regBad){NET.regBad=0;try{say('Room list: registered.')}catch(e){}}console.log('[rooms] registered',MPS.code)},e=>{const c=(e&&e.code)||String(e);console.warn('[rooms] register failed',c,e);if(!NET.regBad){NET.regBad=1;try{say('Admin room list: could not register this room ('+c+').')}catch(x){}}})};
  w();NET.regT=setInterval(w,20000);addEventListener('visibilitychange',()=>{if(!document.hidden)w()});addEventListener('online',w)}
 window.mpAdminJoin=c=>{try{mpJoinUI();$('mpcd').value=c;mpFind()}catch(e){console.error(e)}};
-function hostData(c,d){if(!d||!d.t)return;d=cln(d);
+function hostData(c,d){if(!d||!d.t)return;
+ /* v49.70.0: a link id is only letters, digits, - and _ (it ends up in button handlers), and one link can send at most 60 messages a second; the rest are dropped */
+ if(!/^[A-Za-z0-9_-]{1,128}$/.test(String(c.peer||''))){try{c.close()}catch(e){}return}
+ {const rl=NET.rl=NET.rl||{},n=Date.now(),b=rl[c.peer]||(rl[c.peer]={t:n,c:0});if(n-b.t>=1000){b.t=n;b.c=0}if(++b.c>60)return}
+ d=cln(d);
  if(NET.kk[c.peer]){try{c.close()}catch(e){}return}
  if(d.t=='q'){const L=Object.values(MB);try{c.send({t:'qi',band:MPS.band,n:L.length,taken:L.map(m=>m.inst)})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
  if(d.t=='hi'){const gu=String(d.uid||'').slice(0,16);
@@ -317,6 +321,12 @@ function guestVC(r,base,uid){const{R,db}=r,up=k=>R.ref(db,base+'/u/'+uid+'/'+k),
  return vc}
 /* messages from members (relayed by the host) */
 function handle(d,id,self){
+  /* v49.70.0: numbers that other players (or a host) send are bounded before the game uses them, so a modified client can not push crazy values into your career */
+  if(!self){const nb=(v,lo,hi,df)=>{v=+v;return isFinite(v)?Math.min(hi,Math.max(lo,v)):df};
+   if('q' in d)d.q=nb(d.q,0,150,0);if('sc' in d)d.sc=nb(d.sc,0,1,0);if('n' in d)d.n=Math.floor(nb(d.n,1,MAXN||4,1));if('cnt' in d)d.cnt=Math.floor(nb(d.cnt,1,MAXN||4,1));
+   if('day' in d)d.day=Math.floor(nb(d.day,1,1e5,1));if('tm' in d)d.tm=nb(d.tm,0,1e5,0);
+   if(typeof d.v=='string')d.v=d.v.slice(0,40);if(typeof d.title=='string')d.title=d.title.slice(0,60);if(typeof d.bl=='string')d.bl=d.bl.slice(0,60);
+   if(d.t=='clk'&&!(d.day>=1))return}
  if(d.t=='ros'){if(isHost())return;const ids=new Set(d.mem.map(m=>m.id));for(const k in MB)if(k!==ME.id&&!ids.has(k)){rmAv(k);delete MB[k]}
   d.mem.forEach(m=>{if(m.id===ME.id)return;MB[m.id]=Object.assign(MB[m.id]||{},m)});if(d.band)MPS.band=d.band;return}
  if(d.t=='clk'){if(!isHost())clock(d);return}
