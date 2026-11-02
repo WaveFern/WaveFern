@@ -35,3 +35,15 @@ if(typeof MKT!='undefined')MKT=null;if(typeof MKT_R!='undefined')MKT_R=null;
     const want=Math.round(AL*k*sum*qualF(s)*(1+(s.op||0)*.12)*(s.lk=='h'?s.hm||1:1)),add=Math.max(0,want-(s.fs||0));
     if(add>0){s.fs=(s.fs||0)+add;s.streams=(s.streams||0)+add;S.streams=(S.streams||0)+add}}}catch(e){}}
   return p2.apply(this,arguments)}}
+
+/* ---------- v49.60.2: old songs can catch fire again ----------
+   Every day each song that is a week or more old and has had no luck so far has a very small chance to turn into a hit or to go viral,
+   much smaller than the one-off roll on release day (hit: 1/500 of it per day, viral: 1/30 of it per day; about 0.02% and 0.001% a day
+   for a good song, so with a big catalogue it is a rare surprise, not a routine). Same rewards as a release-day hit or viral song.
+   A song's daily streams fade with its age, so a revived song also restarts that fade from today (s.rv) and gets its used-up
+   stream room back (s.rc). It can only happen once per song (it is a hit or viral from then on). */
+{const p3=planOf;planOf=function(s){
+  if(s&&s.lk===0&&s.pd!==S.day&&S.day-s.day>=7){try{
+    if(Math.random()<viralChance(s.q)/30){s.lk='v';s.vr=Math.round(PERF.viralMin+(S.listeners||0)*R(PERF.viralLisMin,PERF.viralLisMax));s.vt=s.vr;s.rv=S.day;s.rc=Math.max(0,(s.streams||0)-(s.fs||0));luckNote(s)}
+    else if(Math.random()<hitChance(s.q)/500){s.lk='h';s.hm=+R(PERF.hitMin,PERF.hitMax).toFixed(2);s.rv=S.day;s.rc=Math.max(0,(s.streams||0)-(s.fs||0));luckNote(s)}}catch(e){}}
+  return p3.apply(this,arguments)}}
