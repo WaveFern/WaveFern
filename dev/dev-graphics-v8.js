@@ -10,6 +10,8 @@
  /* fail safe: never runs during loading, never throws; add ?nogfx to the address to skip it entirely */
  if(/[?&]nogfx/.test(location.search))return;
  function boot(){try{
+ const TONES={neutral:{n:'Neutral',aw:0xdfe9ff,sw:0xf4f6ff,a:.4,s:.45,sat:1.05},mid:{n:'Soft gold (balanced)',aw:0xf2eef4,sw:0xffd9a0,a:.3,s:.4,sat:1.09},golden:{n:'Golden (strong)',aw:0xffd2a6,sw:0xffa860,a:.4,s:.45,sat:1.14}},TK='fw_dtone';
+ let tone='mid';try{const t=localStorage.getItem(TK);if(TONES[t])tone=t}catch(e){}
  const GLOW=false,KEY='fw_dgfx',LV=['off','balanced','max'];
  let lv='max';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
  const ok=()=>{try{return typeof renderer!='undefined'&&typeof scene!='undefined'&&typeof sun!='undefined'&&typeof cam!='undefined'}catch(e){return false}};
@@ -33,7 +35,7 @@
   sun.castShadow=on;
   const sz=mx?2048:1024;
   if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.12) saturate(1.05) brightness(.94)':'';
+  cv.style.filter=on?'contrast(1.1) saturate('+TONES[tone].sat+') brightness(.94)':'';
   vg.style.display=on?'block':'none';
   bc.style.display='none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
@@ -67,7 +69,7 @@
   hemi.intensity=.1*Math.min(1.3,amb.intensity/.75);
   if(!(frame%20))mark(false);
  }
- const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(0xdfe9ff),SW=new THREE.Color(0xf4f6ff);
+ const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(),SW=new THREE.Color();
  const r0=renderer.render.bind(renderer);
  renderer.render=function(s,c){
   let a0=0,s0=0,dp=0;
@@ -75,21 +77,23 @@
    /* d is 1 in full daylight and fades to 0 by dusk: daytime gets a golden-hour look (lower, warmer light), sunset stays as it is */
    const d=Math.max(0,Math.min(1,(a0-.55)/.2));ac0.copy(amb.color);sc0.copy(sun.color);
    amb.intensity=a0*(.84-.24*d);sun.intensity=s0*(1.32-.43*d);
-   amb.color.lerp(AW,.4*d);sun.color.lerp(SW,.45*d)}}
+   const T=TONES[tone];AW.setHex(T.aw);SW.setHex(T.sw);amb.color.lerp(AW,T.a*d);sun.color.lerp(SW,T.s*d)}}
   let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0;amb.color.copy(ac0);sun.color.copy(sc0)}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
   if(GLOW&&lv=='max'&&c===cam&&!(frame&1))try{bx.drawImage(cv,0,0,bc.width,bc.height)}catch(e){}
   return o};
  /* dev panel section */
  const names={off:'Off (original look)',balanced:'Balanced',max:'Max'};
- let btns=[];
- function refresh(){btns.forEach(([k,b])=>{b.textContent=(lv==k?'> ':'')+names[k]})}
+ let btns=[],tbtns=[];
+ function refresh(){btns.forEach(([k,b])=>{b.textContent=(lv==k?'> ':'')+names[k]});tbtns.forEach(([k,b])=>{b.textContent=(tone==k?'> ':'')+TONES[k].n})}
  const box=document.getElementById('fwdvb');
  if(box){
   const h=document.createElement('h5');h.textContent='Graphics (dev)';box.prepend(h);
   const tip=document.createElement('small');tip.textContent='Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
   let last=tip;
   LV.forEach(k=>{const b=document.createElement('button');b.onclick=()=>{lv=k;apply()};last.after(b);last=b;btns.push([k,b])});
+  const h2=document.createElement('h5');h2.textContent='Light colour (dev)';last.after(h2);last=h2;
+  Object.keys(TONES).forEach(k=>{const b=document.createElement('button');b.onclick=()=>{tone=k;try{localStorage.setItem(TK,k)}catch(e){}apply()};last.after(b);last=b;tbtns.push([k,b])});
  }
  apply();
  window.FW_DGFX={set(k){if(LV.indexOf(k)>=0){lv=k;apply()}},get:()=>lv};

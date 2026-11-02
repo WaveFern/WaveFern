@@ -35,7 +35,7 @@ button:disabled{opacity:.5;cursor:default}
   html=html.replace(/<meta name="robots"[^>]*>/i,'').replace(/<link rel="canonical"[^>]*>/i,'').replace(/<title>[^<]*<\/title>/i,'<title>DEV - WaveFern</title>');
   html=html.replace(/<head[^>]*>/i,'$&<base href="/"><meta name="robots" content="noindex,nofollow,noarchive"><script src="/dev/dev-shim.js"><\/script>');
   html=html.replace(/<script src="27-boot\.js[^>]*><\/script>/i,m=>'<script src="/dev/dev-models-v2.js"><\/script>'+m);
-  html=html.replace(/<\/body>/i,'<script src="/dev/dev-panel.js?v=2"><\/script><script src="/dev/dev-profile-v3.js"><\/script><script src="/dev/dev-graphics-v7.js"><\/script></body>');
+  html=html.replace(/<\/body>/i,'<script src="/dev/dev-panel.js?v=2"><\/script><script src="/dev/dev-profile-v3.js"><\/script><script src="/dev/dev-graphics-v8.js"><\/script></body>');
   document.open();document.write(html);document.close();
  }
  $('f').addEventListener('submit',async e=>{
