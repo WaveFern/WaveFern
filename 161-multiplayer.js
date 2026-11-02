@@ -111,7 +111,7 @@ window.mpLeave=()=>{snd('click');try{autoSave()}catch(e){}wiping=true;try{sessio
 function insBtns(taken,lock){return`<div class=mpins>${IK.map(k=>{const off=(taken||[]).includes(k)||(lock&&lock!=k);return`<button class="${U.inst==k?'on':''}" ${off?'disabled':''} onclick="mpPick('${k}')">${pxIcon(INS[k].ic)}<br><small>${INS[k].n}</small></button>`}).join('')}</div>`}
 window.mpPick=k=>{snd('click');U.inst=k;document.querySelectorAll('.mpins button').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick')==`mpPick('${k}')`))};
 window.mpCreateUI=()=>{if(needLogin())return;snd('click');TT.sel=1;U.inst='vo';const mine=lsGet().filter(x=>x.host);
- $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Create a room</h2><p class=m>Up to ${MAXN} players live in one house as a band. Everyone picks one instrument and keeps it. Your friends join with the room code.</p>
+ $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Create a room</h2><p class=m>Up to ${MAXN} players live in one house as a band. Everyone picks one instrument and keeps it. Your friends join with the room code. Band songs get +3 quality per extra member, +4 more for a tight take, and can only be released once everyone has done their part.</p>
   <div class=r><span>Band name</span><input id=mpbn maxlength=24 placeholder="The Ferns"></div><div class=r><span>Your name</span><input id=mpyn maxlength=16 placeholder="Your name" value="${esc(lastNm()||acctNm())}"></div><p style="margin:10px 0 0">Your instrument</p>${insBtns()}
   <button class=go onclick="mpCreateGo()">Create room</button>
   ${mine.length?`<details class=ttrb open><summary>Your bands (host again)</summary>${mine.map(x=>`<div class=ttsl><div><b>${esc(x.band||'Band')}</b><small>Room ${esc(x.code)} · ${iName(x.inst)}</small></div><button onclick="mpHostAgain('${esc(x.code)}','${x.inst}')">Host</button></div>`).join('')}</details>`:''}
@@ -192,7 +192,7 @@ function hostData(c,d){if(!d||!d.t)return;d=cln(d);
   NET.gk='';NET.cs={};roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
  if(d.t=='pg'&&c.mp){try{c.send({t:'pn',ts:+d.ts||0})}catch(e){}return}
  if(d.t=='ch'&&c.mp){const w=NET.chT=NET.chT||{},n=Date.now();if(n-(w[c.peer]||0)<600)return;w[c.peer]=n;d.x=String(d.x||'').slice(0,120)}
- if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm','fx','ch'].includes(d.t))return;if(d.t=='fx'&&!MB[c.peer].ad)return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
+ if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm','fx','ch','ng'].includes(d.t))return;if(d.t=='fx'&&!MB[c.peer].ad)return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
 /* v45.9.0: host removes a member: tell them, close their link, remember their ids for this session */
 function kick(id){if(!isHost()||id===ME.id)return;const m=MB[id],c=NET.conns[id];NET.kk[id]=1;if(m&&m.uid)NET.kk['u'+m.uid]=1;if(c){try{c.send({t:'kick'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},800)}if(m){say('You removed '+m.nm+' from the room.');rmAv(id);delete MB[id]}delete NET.conns[id];roster()}
 window.mpLock=()=>{if(!isHost())return;NET.lock=NET.lock?0:1;snd('click');sendAll({t:'lk',v:NET.lock});say(NET.lock?'Room locked. Nobody new can join.':'Room unlocked. Friends can join with the code.')};
@@ -322,12 +322,14 @@ function handle(d,id,self){
  if(d.t=='clk'){if(!isHost())clock(d);return}
  if(d.t=='pn'){NET.ping=Math.max(0,Date.now()-(+d.ts||Date.now()));return}
  if(d.t=='lk'){NET.lock=d.v?1:0;return}
+ if(d.t=='sk'){if(self||id===pid(MPS.code)){(SKP[d.bl]=SKP[d.bl]||{})[d.w]=1}return}
  if(d.t=='go'){go(d);return}
  if(!id||self||id===ME.id)return;const m=MB[id];if(!m)return;
  if(d.t=='st'){['x','z','r','zone','where','studio','stg','nm','ctry','col','pz','afk'].forEach(k=>{if(d[k]!==undefined)m[k]=d[k]});if(d.look){m.look=d.look}}
  else if(d.t=='rd'){const was=m.rd;m.rd=d.rd||null;if(d.rd&&!was)say(m.nm+(d.rd.k=='rec'?' is ready to record.':d.rd.k=='slp'?' is in bed and wants to sleep.':d.rd.k=='col'?' is ready to record with '+artN(d.rd.a)+'.':' is ready to play Stage '+d.rd.n+'.'))}
- else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q}say(d.c?m.nm+' finished the collab session.':m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
+ else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q;if(typeof d.sc=='number')(BS[d.bl]=BS[d.bl]||{})[id]=d.sc}say(d.c?m.nm+' finished the collab session.':m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
  else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s WaveFern account "'+d.v+'".')}}
+ else if(d.t=='ng'){if(d.to===ME.id){snd('pop');say(m.nm+' is waiting for you to finish the band song'+(d.ti?' "'+d.ti+'"':'')+'.')}}
  else if(d.t=='ch'){chatAdd(m.nm,String(d.x||'').slice(0,120))}
  else if(d.t=='em'){const a=AV[id];if(a&&EMK[d.k]&&a.g.visible){a.em={k:d.k,t:0};emFloat(a.g,d.k)}}
  else if(d.t=='rel')relRecv(d,m)
@@ -435,7 +437,7 @@ window.mpUnready=()=>{snd('click');ME.rd=null;send({t:'rd',rd:null})};
 {const f0=mgFinish;mgFinish=function(){if(rec&&rec.bl===BT)BT=null;const bt=rec&&rec.bt,bl=rec&&rec.bl,b=rec&&rec.band||0,sc=rec&&rec.sc?[rec.sc.l||0,rec.sc.x||0]:[0,0],n0=S.nid;const r=f0.apply(this,arguments);
  try{if(MPS){const d=S.drafts[S.drafts.length-1],add=b>1?3*(b-1):0;if(d&&d.id===n0&&add){d.q+=add;const p=document.querySelector('#ui .box p.m');if(p)p.insertAdjacentHTML('afterend',`<p class=m>Band take with ${b} members: +${add} quality</p>`)}
   if(MPS.inst!='vo'){const c=[...document.querySelectorAll('#ui .box .card')].find(c=>c.firstChild&&c.firstChild.textContent=='Lyrics');if(c)c.firstChild.textContent=INS[MPS.inst].st}
-  const d2=S.drafts[S.drafts.length-1];if(bl&&d2&&d2.id===n0){d2.title=bt||d2.title;d2.bt=d2.title;d2.bl=bl;(BQ[bl]=BQ[bl]||{})[ME.id]=d2.q;const t=$('tin');if(t){t.value=d2.title;t.readOnly=true;t.blur();t.insertAdjacentHTML('afterend','<p class=m><small>Band song: everyone in the take gets it, and releasing it releases it for the whole band.</small></p>')}if(REL[bl])setTimeout(()=>relDo(bl),300)}
+  const d2=S.drafts[S.drafts.length-1];if(bl&&d2&&d2.id===n0){d2.title=bt||d2.title;d2.bt=d2.title;d2.bl=bl;(BQ[bl]=BQ[bl]||{})[ME.id]=d2.q;(BS[bl]=BS[bl]||{})[ME.id]=(sc[0]+sc[1])/2;const t=$('tin');if(t){t.value=d2.title;t.readOnly=true;t.blur();t.insertAdjacentHTML('afterend','<p class=m><small>Band song: everyone in the take gets it, and releasing it releases it for the whole band.</small></p>')}if(REL[bl])setTimeout(()=>relDo(bl),300)}
   if(b>1)send({t:'dn',sc:(sc[0]+sc[1])/2,q:d2&&d2.q,bl})}}catch(e){console.error('mp finish',e)}return r}}
 
 /* ---- the middle recording step depends on your instrument (vocals keep the rhyming) ---- */
@@ -580,6 +582,8 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
     const ld=me.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);if(ld){const fr=me.filter(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n);h+=`<div class=mps>Stage ${ld.rd.n} set: <b>${fr.length}/${n} members ready</b>`;
      const away=me.filter(m=>m.stg!=ld.rd.n).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not at Stage ${ld.rd.n}: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='fest'?(ME.rd.lead?'<br><button onclick="mpUnready()">Cancel the set</button>':'<br><button onclick="mpUnready()">Not ready</button>'):ME.stg==ld.rd.n?`<br><button class=go onclick="mpFestReady(${ld.rd.n})">Ready to play</button>`:`<br><small class=m>Go to Stage ${ld.rd.n} at the festival.</small>`;h+='</div>'}}}}
+ if(!PMIN&&online()&&n>1&&!MPTR){const bd=S.drafts.find(x=>x.bl);if(bd){const bl=bd.bl,dn=m=>m.id===ME.id||(BQ[bl]&&BQ[bl][m.id]!=null)||(SKP[bl]&&SKP[bl][m.id]),wt=me.filter(m=>!dn(m));
+  h+=`<div class=mps>Band song "${esc(bd.title)}": <b>${n-wt.length}/${n} parts done</b>`+me.map(m=>`<div class=mpr><i class="${dn(m)?'ok':''}" style="font-style:normal">${dn(m)?'✓':'·'}</i><span>${esc(m.nm||'Player')} · ${INS[m.inst]?INS[m.inst].n:''}</span>${!dn(m)?`<button onclick="mpNudge('${m.id}','${bl}')">Nudge</button>`+(isHost()?`<button onclick="mpSkip('${m.id}','${bl}')">Skip</button>`:''):''}</div>`).join('')+(wt.length?'<small class=m>It can be released once everyone has done their part.</small>':'<small class=m>Everyone is done. Release it from the computer.</small>')+'</div>'}}
  if(!PMIN&&online()&&n==1&&isHost()&&!MPTR)h+=`<div class=mps>Waiting for bandmates. Share the code <b>${esc(MPS.code)}</b> or send an invite link.</div>`;
  if(!PMIN)h+='<div class=mps><button onclick="emWheel()">Emotes (B)</button>'+(MPTR?'':(online()?'<button onclick="mpChatOpen()">Chat (T)</button>':'')+(isHost()?'<button onclick="mpLock()">'+(NET.lock?'Unlock room':'Lock room')+'</button>':'')+'<button onclick="mpCopy(\'code\')">Copy code</button><button onclick="mpCopy(\'link\')">Copy invite link</button><button onclick="mpLeaveAsk()">Leave room</button>')+'</div>';
  if(h!==PK){PK=h;el.innerHTML=h}}
@@ -608,17 +612,24 @@ function pfComp(im){const k=document.createElement('canvas');k.width=k.height=32
  if(k!==PFK){PFK=k;PFU='';let n=0;const im=L.map(l=>{const i=new Image();i.onload=()=>{if(++n==L.length&&PFK===k){PFU=pfComp(im);try{if(mode=='pc')pcR()}catch(e){}}};i.src=p0(l);return i})}return p0()}}
 
 /* band songs: whoever starts the take names it, everyone records it together, and releasing it releases it for the whole band */
-const BQ={},REL={};let RELF=0,BT=null;
+const BQ={},REL={},SKP={},BS={};let RELF=0,BT=null;
+/* v49.65.0: a band song can only be released once every bandmate in the room has done their part. BQ = quality each member finished with, BS = their score, SKP = parts the host skipped.
+   A tight take (everyone 70% or better) adds +4 quality on top of the +3 per extra member. */
+const bandMissing=bl=>list().filter(m=>m.id!==ME.id&&!(BQ[bl]&&BQ[bl][m.id]!=null)&&!(SKP[bl]&&SKP[bl][m.id]));
+const chem=bl=>{const v=Object.values(BS[bl]||{}).filter(x=>typeof x=='number');return v.length>1&&v.every(x=>x>=.7)?4:0};
+window.mpNudge=(id,bl)=>{const n=Date.now();if(n-(NET.ngT||0)<8000)return say('Give them a moment before nudging again.');NET.ngT=n;const d=S.drafts.find(x=>x.bl===bl);snd('pop');send({t:'ng',to:id,bl,ti:d?d.title:''});say('Nudged '+((MB[id]||{}).nm||'your bandmate')+'.')};
+window.mpSkip=(id,bl)=>{if(!isHost())return;const m=MB[id];mpAsk('Skip '+(m?m.nm:'this player')+'?','The band song can be released without their part. They get the song only if they finish it.','Skip',()=>{send({t:'sk',bl,w:id});say('Skipped '+(m?m.nm:'that player')+'.')})};
 /* one member running out of goes (or leaving the take) scraps it for the whole band */
 setInterval(()=>{if(BT&&!(rec&&rec.bl===BT)){const bl=BT;BT=null;send({t:'scr',bl})}},150);
 function scrRecv(d,m){if(!d.bl)return;let hit=0;if(rec&&rec.bl===d.bl){BT=null;rec=null;mode='play';try{mgDraw()}catch(e){}hit=1}
  const i=S.drafts.findIndex(x=>x.bl===d.bl);if(i>=0){S.drafts.splice(i,1);hit=1;if($('tin'))closeUI()}
  if(hit){snd('err');say(m.nm+' ran out of goes, so the band take is scrapped.')}}
 const bqAvg=bl=>{const q=Object.values(BQ[bl]||{}).filter(v=>typeof v=='number'&&isFinite(v));return q.length?Math.round(q.reduce((a,b)=>a+b,0)/q.length):null};
-function relDo(bl){const d=S.drafts.find(x=>x.bl===bl);if(!d){REL[bl]=1;return}delete REL[bl];const q=bqAvg(bl);if(q!=null)d.q=q;d.title=d.bt||d.title;
+function relDo(bl){const d=S.drafts.find(x=>x.bl===bl);if(!d){REL[bl]=1;return}delete REL[bl];const q=bqAvg(bl);if(q!=null)d.q=q+chem(bl);d.title=d.bt||d.title;
  RELF=1;const p=pcR;if(mode!='pc')pcR=()=>{};try{upl(d.id)}catch(e){console.error('band release',e)}finally{pcR=p;RELF=0}}
 function relRecv(d,m){if(!d.bl)return;say(m.nm+' released the band song "'+(d.title||'')+'". It is out for the whole band.');relDo(d.bl)}
-{const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bl=d&&d.bl;if(bl&&MPS&&!RELF){const q=bqAvg(bl);if(q!=null)d.q=q;d.title=d.bt||d.title}
+{const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bl=d&&d.bl;if(bl&&MPS&&!RELF){const w=bandMissing(bl);if(w.length){snd('err');return say('Your band is not done yet. Waiting for '+w.map(m=>m.nm).join(', ')+'. Nudge them from the band panel.')}
+  const q=bqAvg(bl),c=chem(bl);if(q!=null)d.q=q+c;if(c)say('Tight take! Everyone nailed their part: +'+c+' quality.');d.title=d.bt||d.title}
  const r=u0.apply(this,arguments);if(bl&&MPS&&!RELF&&!S.drafts.some(x=>x.id==id))send({t:'rel',bl,title:d.title});return r}}
 /* a band song can be released by a bandmate while your title box is still open */
 {const t0=saveT;saveT=function(id){if(MPS&&!S.drafts.some(d=>d.id==id)){closeUI();return say('Your band already released this song.')}return t0.apply(this,arguments)}}
