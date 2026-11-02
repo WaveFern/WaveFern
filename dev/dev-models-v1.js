@@ -1,5 +1,5 @@
 /* WaveFern dev models pack. Only loaded on /dev/ (see dev/index.html). The live game is untouched.
-   Part 1 (loads just before the game starts): extra blocky detail on every character (eyebrows, nose, cheeks, ears,
+   Part 1 (DISABLED, original models restored): extra blocky detail on every character (eyebrows, nose, cheeks, ears,
      belt, side seams, cuffs, watch, soles, hair highlight). Wraps buildChar; any error falls back to the plain model.
    Part 2 (runs after the game has started): extra detail inside and outside the house (skirting, panelling, curtains,
      rug, wall art, foam panels, shutters, siding, door panels, drainpipes). One group, so it can be hidden in one go.
@@ -46,7 +46,8 @@
   if(c.hair>=2&&c.hair!=9&&!(c.ht>=0)){const m=B(h,.34,.02,.3,dkc(hc,1.3),.05,.375,.05);m.userData.hair=1}
  }
  try{
-  if(typeof buildChar=='function'&&typeof B=='function'){
+  /* player models are back to the original look (James: the extra detail did not look good); set to true to bring it back */
+  if(false&&typeof buildChar=='function'&&typeof B=='function'){
    const b0=buildChar;
    buildChar=function(c){
     const r=b0.apply(this,arguments);
