@@ -345,7 +345,7 @@ function zone(){if(['title','creator','load'].includes(mode))return'menu';try{re
 function where(){try{if(['title','creator','load'].includes(mode))return'in the menu';if(IN)return SHOPS[IN.i].name;if(typeof FEST!='undefined'&&FEST.view)return'on stage';const n=stg();if(n)return'Festival, Stage '+n;
  if(P.x>=0&&P.x<=16&&P.z>=0&&P.z<=12)return P.x<8?(P.z<6?'Bedroom':'Living room'):(P.z<6?'Studio':'Kitchen');return mode=='drive'?'driving':'out in town'}catch(e){return''}}
 function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.ad=(typeof isAdmin=='function'&&isAdmin())?1:0;ME.x=+P.x.toFixed(2);ME.z=+P.z.toFixed(2);ME.r=+(P.rot||0).toFixed(2);ME.zone=zone();ME.where=where();
- ME.ctry=ctry();ME.studio=ME.zone=='o'&&P.x>8&&P.x<16&&P.z>0&&P.z<6?1:0;ME.stg=stg();ME.col=colNear();ME.afk=document.hidden?1:0;
+ ME.ctry=ctry();ME.studio=ME.zone=='o'&&P.x>8&&P.x<16&&P.z>0&&P.z<6?1:0;ME.stg=stg();ME.col=colNear();ME.afk=document.hidden||Date.now()-LAST>60000?1:0;
  /* ready only holds while you are where it counts */
  if(ME.rd&&((ME.rd.k=='rec'&&!ME.studio&&mode!='rec')||(ME.rd.k=='fest'&&ME.stg!=ME.rd.n&&mode!='fest')||(ME.rd.k=='slp'&&(Math.hypot(P.x-ME.rd.x,P.z-ME.rd.z)>2.5||mode!='play'))||(ME.rd.k=='col'&&ME.col!==ME.rd.a&&mode!='cut'))){ME.rd=null;send({t:'rd',rd:null});say('You walked away, so you are no longer ready.')}
  if(ME.rd&&!band()){const r=ME.rd;ME.rd=null;if(r.k=='rec'){MPGO=1;try{startRec(r.g)}finally{MPGO=0}}else if(r.k=='slp'){if(mode=='play')sleepNow(0)}else if(r.k=='fest'&&r.lead&&festBk){MPGO=1;try{festStartBooked(festBk)}finally{MPGO=0}}else if(r.k=='col')goCol({a:r.a,op:r.op,n:1})}
@@ -513,6 +513,19 @@ function guestSet(d){const s=fStage(d.n);if(!s||!s.cr||FEST.ph!='fest'){MPF=0;re
 const FOK={vo:['lyric','hold','call','hype'],gt:['call','drop','hype'],bs:['drop','hold','hype'],dr:['drop','hype','call'],ky:['call','hold','drop']};
 if(MPS){const k=MPS.inst,T={gt:{hype:'Shred a solo!',call:'Play the riff back!',drop:'Hit the power chord!'},bs:{hype:'Slap the bass!',drop:'Drop the bass!',hold:'Hold the low note!'},dr:{hype:'Drum fill!',drop:'Hit the crash!',call:'Copy the beat!'},ky:{call:'Play the melody back!',hold:'Hold the chord!',drop:'Hit the stab!'}}[k];if(T)Object.assign(FMG,T)}
 {const m0=festMgStart;festMgStart=function(){const r=m0.apply(this,arguments);try{const ok=MPS&&FOK[MPS.inst];if(ok){for(let i=0;i<12;i++){const m=FEST.set&&FEST.set.mg;if(!m||ok.includes(m.k))break;m0.apply(this,arguments)}}}catch(e){}return r}}
+
+/* ---- v49.64.0: away for 5 minutes (no key, mouse, touch or gamepad input; a pause or hidden tab counts as away) and a guest is taken out of the room.
+   The host is never removed, because the room would close for everyone. ---- */
+let LAST=Date.now(),AFW=0;
+['keydown','pointerdown','pointermove','touchstart','wheel'].forEach(ev=>addEventListener(ev,()=>{LAST=Date.now();AFW=0},{passive:true,capture:true}));
+function afkTick(){if(!MPS||MPTR||NET.closed)return;try{for(const g of(navigator.getGamepads?navigator.getGamepads():[])){if(g&&(g.buttons.some(b=>b.pressed)||g.axes.some(a=>Math.abs(a)>.4))){LAST=Date.now();AFW=0}}}catch(e){}
+ if(isHost()||!online())return;const idle=Date.now()-LAST;
+ if(idle>270000&&!AFW){AFW=1;say('You seem to be away. Press any key or move to stay in the room, or you will be disconnected in 30 seconds.')}
+ if(idle>300000)afkOut()}
+setInterval(afkTick,5000);
+function afkOut(){NET.closed=1;NET.on=0;const h=NET.hc;NET.hc=null;try{h&&h.close()}catch(e){}try{NET.peer&&NET.peer.destroy()}catch(e){}NET.peer=null;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}ME.rd=null;try{autoSave()}catch(e){}
+ const o=document.getElementById('mpno');if(o)o.remove();const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000c';
+ d.innerHTML='<div class="box modal" style="width:min(380px,92vw)"><h2>Disconnected for being away</h2><p>You were away for over 5 minutes, so you were taken out of the room to free your spot. Your band career is saved on this device.</p><div class=row2><button class=go onclick="location.reload()">Rejoin the band</button><button onclick="mpLeave()">Back to menu</button></div></div>';document.body.appendChild(d)}
 
 /* ---- v49.63.0: band chat. T opens it, Enter sends, Esc closes; quick lines for when typing is slow ---- */
 const CH=[];let CHO=0,CHT=0;

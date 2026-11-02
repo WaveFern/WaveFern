@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.63.0';
+const GAME_VERSION='v49.64.0';
 const VERSION_HISTORY=[
+ {v:'v49.64.0',n:'Away players are disconnected and paused games stay quiet. In a band room, a guest with no input for 5 minutes gets a warning at 4:30 and is then taken out of the room with a Rejoin the band button (the host is never removed, so the room stays open); bandmates also show as away after one minute without input. While the game is paused it no longer reads your cloud save: it syncs once as you pause, then nothing until you resume.'},
  {v:'v49.63.0',n:'Band chat and room controls. Press T to message your band (Enter sends, Esc closes) with quick lines like Ready and Wait for me; messages fade after a few seconds. Guests see their ping to the host in the band panel, bandmates who switch tabs show as away, and the host can lock the room so nobody new can join (people already in can still reconnect).'},
  {v:'v49.62.1',n:'Fix: hit and viral songs no longer drop to a few streams a day once their boost is over. They were left out of the catalogue boost that every other song gets from your monthly listeners, so a viral song fell to about 50 streams a day even at 30 million monthly listeners. They now stream like the rest of your catalogue (about the same as your other songs of that quality and age) on top of their boost.'},
  {v:'v49.62.0',n:'Multiplayer is tidier. The band panel shows a connection light (green, amber, red), who the host is, a Copy code and Copy invite link button, a Leave room button, and a Try again button when the room cannot be reached. Invite links (wavefern.com/?join=CODE) open Join a room with the room looked up. The Join box cleans up pasted codes and links and offers Try again when a room is not found. Removing a bandmate and deleting a band career use proper in-game boxes instead of browser popups, and a host alone in a room is told to share the code.'},

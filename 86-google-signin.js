@@ -164,3 +164,6 @@ function saveQuit(){snd('click');autoSave();TT.game=1;
  const pg=pauseGame;pauseGame=function(){pg();csPush()}}
 /* browsers block sound until the first click, so start the menu music then */
 addEventListener('pointerdown',()=>{if(TT.on&&MENUA&&MENUA.paused)MENUA.play().catch(()=>{})},{capture:true});
+
+/* v49.64.0: no cloud save reads while the game is paused. Entering the pause does one last sync, then the 90 second timer and tab-hidden syncs stay quiet until you resume. */
+{const c0=csPush;let pz=0;csPush=function(force){if(typeof PAUSED!='undefined'&&PAUSED&&!force){if(pz)return Promise.resolve();pz=1}else pz=0;return c0.apply(this,arguments)}}
