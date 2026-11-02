@@ -12,6 +12,7 @@
  function boot(){try{
  const TONES={neutral:{n:'Neutral',aw:0xdfe9ff,sw:0xf4f6ff,a:.4,s:.45,sat:1.05},mid:{n:'Soft gold (balanced)',aw:0xf2eef4,sw:0xffd9a0,a:.3,s:.4,sat:1.09},golden:{n:'Golden (strong)',aw:0xffd2a6,sw:0xffa860,a:.4,s:.45,sat:1.14}},TK='fw_dtone';
  let tone='neutral';try{const t=localStorage.getItem(TK);if(TONES[t])tone=t}catch(e){}
+ const BR={low:.88,mid:1,high:1.12},BK='fw_dbri';let bri='mid';try{const b=localStorage.getItem(BK);if(BR[b])bri=b}catch(e){}
  const GLOW=false,KEY='fw_dgfx',LV=['off','balanced','max'];
  let lv='max';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
  const ok=()=>{try{return typeof renderer!='undefined'&&typeof scene!='undefined'&&typeof sun!='undefined'&&typeof cam!='undefined'}catch(e){return false}};
@@ -35,7 +36,7 @@
   sun.castShadow=on;
   const sz=mx?2048:1024;
   if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.08) saturate('+TONES[tone].sat+') brightness(1.02)':'';
+  cv.style.filter=on?'contrast(1.08) saturate('+TONES[tone].sat+') brightness(.98)':'';
   vg.style.display=on?'block':'none';
   bc.style.display='none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
@@ -66,7 +67,7 @@
   const c=sun.shadow.camera;
   if(Math.abs(shRange-r)>.5){shRange=r;c.left=c.bottom=-r;c.right=c.top=r;c.near=1;c.far=70;c.updateProjectionMatrix()}
   /* sky light follows the day and night level of the ambient light */
-  hemi.intensity=.17*Math.min(1.3,amb.intensity/.75);
+  hemi.intensity=.13*Math.min(1.3,amb.intensity/.75);
   if(!(frame%20))mark(false);
  }
  const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(),SW=new THREE.Color();
@@ -76,7 +77,7 @@
   if(c===cam&&s===scene){frame++;try{frameFx()}catch(e){}if(lv!='off'){a0=amb.intensity;s0=sun.intensity;dp=1;
    /* d is 1 in full daylight and fades to 0 by dusk: daytime gets a golden-hour look (lower, warmer light), sunset stays as it is */
    const d=Math.max(0,Math.min(1,(a0-.55)/.2));ac0.copy(amb.color);sc0.copy(sun.color);
-   amb.intensity=a0*(.84+.1*d);sun.intensity=s0*(1.32-.32*d);
+   amb.intensity=a0*(.84-.09*d)*BR[bri];sun.intensity=s0*(1.32-.42*d)*BR[bri];
    const T=TONES[tone];AW.setHex(T.aw);SW.setHex(T.sw);amb.color.lerp(AW,T.a*d);sun.color.lerp(SW,T.s*d)}}
   let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0;amb.color.copy(ac0);sun.color.copy(sc0)}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
@@ -84,15 +85,17 @@
   return o};
  /* dev panel section */
  const names={off:'Off (original look)',balanced:'Balanced',max:'Max'};
- let btns=[],tbtns=[];
- function refresh(){btns.forEach(([k,b])=>{b.textContent=(lv==k?'> ':'')+names[k]});tbtns.forEach(([k,b])=>{b.textContent=(tone==k?'> ':'')+TONES[k].n})}
+ let btns=[],tbtns=[],bbtns=[];
+ function refresh(){btns.forEach(([k,b])=>{b.textContent=(lv==k?'> ':'')+names[k]});tbtns.forEach(([k,b])=>{b.textContent=(tone==k?'> ':'')+TONES[k].n});bbtns.forEach(([k,b])=>{b.textContent=(bri==k?'> ':'')+({low:'Dimmer',mid:'Normal',high:'Brighter'})[k]})}
  const box=document.getElementById('fwdvb');
  if(box){
   const h=document.createElement('h5');h.textContent='Graphics (dev)';box.prepend(h);
-  const tip=document.createElement('small');tip.textContent='Graphics build v10. Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
+  const tip=document.createElement('small');tip.textContent='Graphics build v11. Shadows, sky light, colour grade, vignette. Off puts the normal look back.';h.after(tip);
   let last=tip;
   LV.forEach(k=>{const b=document.createElement('button');b.onclick=()=>{lv=k;apply()};last.after(b);last=b;btns.push([k,b])});
   const h2=document.createElement('h5');h2.textContent='Light colour (dev)';last.after(h2);last=h2;
+  const h3=document.createElement('h5');h3.textContent='Brightness (dev)';last.after(h3);last=h3;
+  Object.keys(BR).forEach(k=>{const b=document.createElement('button');b.onclick=()=>{bri=k;try{localStorage.setItem(BK,k)}catch(e){}refresh()};last.after(b);last=b;bbtns.push([k,b])});
   Object.keys(TONES).forEach(k=>{const b=document.createElement('button');b.onclick=()=>{tone=k;try{localStorage.setItem(TK,k)}catch(e){}apply()};last.after(b);last=b;tbtns.push([k,b])});
  }
  apply();
