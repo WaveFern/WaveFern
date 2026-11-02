@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.65.0';
+const GAME_VERSION='v49.66.0';
 const VERSION_HISTORY=[
+ {v:'v49.66.0',n:'Reasons to come back to the band. Band streak: every real day you and a bandmate play together for 2 minutes adds to your streak (one missed day is forgiven), with bonuses at 3, 7, 14 and 30 days ($300, $800, $2000, $5000 plus followers). Daily band goals: three goals a day, the same for the whole band (finish a band take, release a band song, go to bed as a band, message the band, use an emote, record a collab), $150 each and $400 plus 200 followers for all three. Both show in the band panel.'},
  {v:'v49.65.0',n:'Band songs are a team effort. A band song can only be released once every bandmate in the room has done their part. The band panel shows a checklist of who has finished, with a Nudge button for anyone still working and, for the host, a Skip button for someone who is away. Bandmates who leave the room stop blocking it. When everyone scores 70% or better on their part it is a tight take and the song gets +4 quality, on top of the +3 per extra member.'},
  {v:'v49.65.0',n:'Concert offers from around the world. Once you reach Fame Level 120, promoters and venues in real cities (Tokyo, Seoul, Sydney, Dubai and more) can write to you in Messages, but rarely: about a 1.3% chance each morning, never within 45 days of the last offer. They pay 5 to 8 times your last 30 days of streaming income for a club or hall, and 9 to 15 times for a stadium (at least $5,000 and $20,000). Accept or Decline in the message; an accepted show happens 4 to 8 days later, the promoter pays the flights, and you come home tired.'},
  {v:'v49.64.3',n:'Hit and viral songs are marked with a small coloured badge (purple Viral, gold Hit) after the song title instead of the word in capital letters, and the pop-up that tells you a song took off now reads as a normal sentence.'},
