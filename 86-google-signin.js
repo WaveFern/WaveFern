@@ -11,7 +11,7 @@ const FB_CFG={
  appId:'1:696041816952:web:d3ce1fbc7a33e36f8ebe8d',
  measurementId:'G-4PMWS9D7BV'
 };
-const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL;
+const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
 let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';

@@ -152,7 +152,7 @@ const isHost=()=>!!(MPS&&MPS.host);
 const online=()=>!!(MPS&&NET.on&&(isHost()||(NET.hc&&NET.hc.open)));
 const list=()=>online()?Object.values(MB):[];
 const band=()=>list().length>1;
-const pub=m=>({id:m.id,nm:m.nm,inst:m.inst,look:m.look,ad:m.ad?1:0});
+const pub=m=>({id:m.id,nm:m.nm,inst:m.inst,look:m.look,ad:m.ad?1:0,fd:m.fd?1:0});
 function sendAll(o,ex){for(const id in NET.conns){const c=NET.conns[id];if(id!==ex&&c.open&&c.mp)try{c.send(o)}catch(e){}}}
 function send(o){if(isHost()){o.id=ME.id;handle(o,ME.id,1);sendAll(o)}else if(NET.hc&&NET.hc.open)try{NET.hc.send(o)}catch(e){}}
 function roster(){sendAll({t:'ros',band:MPS.band,mem:Object.values(MB).map(pub)});fbInfo()}
@@ -191,7 +191,7 @@ function hostData(c,d){if(!d||!d.t)return;
   const kd=!d.ad&&(NET.kk[c.peer]||(d.uid&&NET.kk['u'+d.uid]));
   const no=kd?'The host removed you from this room.':L.length>=MAXN?'The room is full.':L.some(m=>m.inst==d.inst)?'Someone in the room already plays '+(INS[d.inst]?INS[d.inst].n:'that')+'.':!INS[d.inst]?'Unknown instrument.':'';
   if(no){try{c.send({t:'no',why:no})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},1500);return}
-  NET.seenU[gu]=1;c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{ad:d.ad?1:0,id:c.peer,uid:String(d.uid||'').slice(0,16),nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
+  NET.seenU[gu]=1;c.mp=1;NET.conns[c.peer]=c;MB[c.peer]=Object.assign(MB[c.peer]||{},{ad:d.ad?1:0,fd:d.fd?1:0,id:c.peer,uid:String(d.uid||'').slice(0,16),nm:String(d.nm||'Player').slice(0,24),inst:d.inst,look:d.look||null,rd:null,zone:'menu'});
   c.send({t:'lk',v:NET.lock?1:0});c.send({t:'wel',band:MPS.band,an:S.artist||'',you:c.peer,day:S.day,tm:S.t,mem:Object.values(MB).map(m=>Object.assign(pub(m),{x:m.x,z:m.z,zone:m.zone,where:m.where,studio:m.studio,stg:m.stg,rd:m.rd}))});
   NET.gk='';NET.cs={};roster();say(MB[c.peer].nm+' joined on '+INS[d.inst].n+'.');return}
  if(d.t=='pg'&&c.mp){try{c.send({t:'pn',ts:+d.ts||0})}catch(e){}return}
@@ -212,7 +212,7 @@ function connectHost(){if(NET.closed)return;if(NET.fb)return fbConnect();if(!NET
  /* no direct link after 9 s: the network is probably blocking it, so use the Firebase relay */
  setTimeout(()=>{if(!c.open&&!NET.closed&&NET.hc===c)fbJoin()},9000);bindHost(c)}
 function bindHost(c){
- c.on('open',()=>{c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook(),uid:myUid(),ad:(typeof isAdmin=='function'&&isAdmin())?1:0})});
+ c.on('open',()=>{c.send({t:'hi',nm:myName(),inst:MPS.inst,look:myLook(),uid:myUid(),ad:(typeof isAdmin=='function'&&isAdmin())?1:0,fd:typeof fdFlag=='function'?fdFlag():0})});
  c.on('data',d=>{if(!d||!d.t)return;d=cln(d);
   if(d.t=='kick'){kicked();return}
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
@@ -340,7 +340,7 @@ function handle(d,id,self){
  else if(d.t=='dn'){if(d.bl){(BQ[d.bl]=BQ[d.bl]||{})[id]=d.q;if(typeof d.sc=='number')(BS[d.bl]=BS[d.bl]||{})[id]=d.sc}say(d.c?m.nm+' finished the collab session.':m.nm+' ('+(INS[m.inst]?INS[m.inst].n:'')+') finished their part: '+Math.round((d.sc||0)*100)+'%')}
  else if(d.t=='an'){if(d.v&&d.v!==S.artist){S.artist=d.v;NET.an=d.v;try{updateVersion()}catch(e){}say(m.nm+' named the band\'s WaveFern account "'+d.v+'".')}}
  else if(d.t=='ng'){if(d.to===ME.id){snd('pop');say(m.nm+' is waiting for you to finish the band song'+(d.ti?' "'+d.ti+'"':'')+'.')}}
- else if(d.t=='ch'){chatAdd(m.nm,String(d.x||'').slice(0,120))}
+ else if(d.t=='ch'){chatAdd(m.nm,String(d.x||'').slice(0,120),0,m.fd)}
  else if(d.t=='em'){const a=AV[id];if(a&&EMK[d.k]&&a.g.visible){a.em={k:d.k,t:0};emFloat(a.g,d.k)}}
  else if(d.t=='rel')relRecv(d,m)
  else if(d.t=='scr')scrRecv(d,m)
@@ -356,7 +356,7 @@ function stg(){try{if(typeof FEST=='undefined'||FEST.ph!='fest'||IN)return 0;con
 function zone(){if(['title','creator','load'].includes(mode))return'menu';try{return IN?'i'+IN.i+(IN.i==7?'f'+S.fl:''):'o'}catch(e){return'o'}}
 function where(){try{if(['title','creator','load'].includes(mode))return'in the menu';if(IN)return SHOPS[IN.i].name;if(typeof FEST!='undefined'&&FEST.view)return'on stage';const n=stg();if(n)return'Festival, Stage '+n;
  if(P.x>=0&&P.x<=16&&P.z>=0&&P.z<=12)return P.x<8?(P.z<6?'Bedroom':'Living room'):(P.z<6?'Studio':'Kitchen');return mode=='drive'?'driving':'out in town'}catch(e){return''}}
-function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.ad=(typeof isAdmin=='function'&&isAdmin())?1:0;ME.x=+P.x.toFixed(2);ME.z=+P.z.toFixed(2);ME.r=+(P.rot||0).toFixed(2);ME.zone=zone();ME.where=where();
+function netTick(){if(!MPS||!S)return;ME.nm=myName();ME.inst=MPS.inst;ME.ad=(typeof isAdmin=='function'&&isAdmin())?1:0;ME.fd=typeof fdFlag=='function'?fdFlag():0;ME.x=+P.x.toFixed(2);ME.z=+P.z.toFixed(2);ME.r=+(P.rot||0).toFixed(2);ME.zone=zone();ME.where=where();
  ME.ctry=ctry();ME.studio=ME.zone=='o'&&P.x>8&&P.x<16&&P.z>0&&P.z<6?1:0;ME.stg=stg();ME.col=colNear();ME.afk=document.hidden||Date.now()-LAST>60000?1:0;
  /* ready only holds while you are where it counts */
  if(ME.rd&&((ME.rd.k=='rec'&&!ME.studio&&mode!='rec')||(ME.rd.k=='fest'&&ME.stg!=ME.rd.n&&mode!='fest')||(ME.rd.k=='slp'&&(Math.hypot(P.x-ME.rd.x,P.z-ME.rd.z)>2.5||mode!='play'))||(ME.rd.k=='col'&&ME.col!==ME.rd.a&&mode!='cut'))){ME.rd=null;send({t:'rd',rd:null});say('You walked away, so you are no longer ready.')}
@@ -565,13 +565,13 @@ function afkOut(){NET.closed=1;NET.on=0;const h=NET.hc;NET.hc=null;try{h&&h.clos
 /* ---- v49.63.0: band chat. T opens it, Enter sends, Esc closes; quick lines for when typing is slow ---- */
 const CH=[];let CHO=0,CHT=0;
 const QUICK=['Ready','Wait for me','Nice one','Meet in the studio'];
-function chatAdd(n,t,me){CH.push({n,t,ts:Date.now()});if(CH.length>40)CH.shift();if(!me)snd('ping');chatDraw()}
+function chatAdd(n,t,me,fd){CH.push({n,t,ts:Date.now(),fd:fd?1:0});if(CH.length>40)CH.shift();if(!me)snd('ping');chatDraw()}
 function chatDraw(){let el=$('mpc');if(!MPS||!['play','menu','drive'].includes(mode)){if(el)el.style.display='none';return}
  const now=Date.now(),rows=CH.filter(m=>CHO||now-m.ts<14000).slice(-(CHO?12:6));
  if(!el){el=document.createElement('div');el.id='mpc';document.body.appendChild(el)}el.style.display=rows.length||CHO?'':'none';
- const h=rows.map(m=>`<div class=mpcm><b>${esc(m.n)}</b> ${esc(m.t)}</div>`).join('')+(CHO?`<div class=mpcq>${QUICK.map(q=>`<button onclick="mpSay(this.textContent)">${q}</button>`).join('')}</div><input id=mpci maxlength=120 placeholder="Message the band. Enter to send, Esc to close" autocomplete=off>`:'');
+ const h=rows.map(m=>`<div class=mpcm><b>${esc(m.n)}</b>${m.fd&&typeof fdMark=='function'?fdMark(11):''} ${esc(m.t)}</div>`).join('')+(CHO?`<div class=mpcq>${QUICK.map(q=>`<button onclick="mpSay(this.textContent)">${q}</button>`).join('')}</div><input id=mpci maxlength=120 placeholder="Message the band. Enter to send, Esc to close" autocomplete=off>`:'');
  if(el.dataset.k!==h){const v=$('mpci')&&$('mpci').value;el.dataset.k=h;el.innerHTML=h;const i=$('mpci');if(i){i.value=v||'';i.onkeydown=e=>{e.stopPropagation();if(e.key=='Enter'){mpSay(i.value);i.value=''}else if(e.key=='Escape')mpChatClose()};if(CHO==1){i.focus();CHO=2}else i.focus()}}}
-window.mpSay=t=>{t=String(t||'').trim().slice(0,120);if(!t)return;const n=Date.now();if(n-CHT<600)return;CHT=n;if(!online()){return say('You are not connected to the band yet.')}chatAdd(myName(),t,1);send({t:'ch',x:t});snd('pop');gp('chat')};
+window.mpSay=t=>{t=String(t||'').trim().slice(0,120);if(!t)return;const n=Date.now();if(n-CHT<600)return;CHT=n;if(!online()){return say('You are not connected to the band yet.')}chatAdd(myName(),t,1,typeof fdFlag=='function'?fdFlag():0);send({t:'ch',x:t});snd('pop');gp('chat')};
 window.mpChatOpen=()=>{if(!MPS||!['play','drive'].includes(mode))return;CHO=1;const el=$('mpc');if(el)el.dataset.k='';chatDraw()};
 window.mpChatClose=()=>{CHO=0;const el=$('mpc');if(el)el.dataset.k='';const i=$('mpci');if(i)i.blur();chatDraw()};
 addEventListener('keydown',e=>{if(!MPS||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;if(e.key.toLowerCase()=='t'&&mode=='play'&&!$('emw')&&!$('ui').innerHTML){e.preventDefault();e.stopImmediatePropagation();mpChatOpen()}},true);
@@ -604,7 +604,7 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
  const L=list(),me=L.length?L:[ME],n=me.length,head=`<div class=mph onclick="mpTog()"><span><i class="mpd ${online()?'on':NET.dead||NET.closed?'off':'wait'}"></i><b>${esc(MPS.band||'Band')}</b> <small class=m>Room ${esc(MPS.code)}${NET.fb?' · relay':''}${NET.lock?' · locked':''}${!isHost()&&online()&&NET.ping!=null?' · '+Math.round(NET.ping)+' ms':''}</small></span><small class=m>${PMIN?'▸':'▾'}</small></div>`;
  let h=head;if(!PMIN){
   if(!online()){const stuck=!isHost()&&!NET.closed&&(NET.dead||(!NET.on&&!NET.tries&&Date.now()-NET.st0>20000));h+=`<div class=m style="margin-top:4px">${NET.closed?'Not in the room.':NET.dead?'Cannot reach the room.':stuck?'Still connecting. The host may not be in the game.':NET.on||NET.tries?'Room offline. Reconnecting…':isHost()?'Opening your room…':'Connecting to the room…'} You play ${iName(MPS.inst)}, on your own for now.</div>${stuck||NET.dead?'<button class=go onclick="mpRetry()">Try again</button>':''}`}
-  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].n:''}${!MPTR&&m.id===pid(MPS.code)?' · host':''} <small class=m>${m.afk?'away':esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');
+  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.fd&&typeof fdMark=='function'?fdMark(12):''}${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].n:''}${!MPTR&&m.id===pid(MPS.code)?' · host':''} <small class=m>${m.afk?'away':esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');
    if(n>1){const rr=me.filter(m=>m.rd&&m.rd.k=='rec');if(rr.length){h+=`<div class=mps>Recording${rr[0].rd.title?' "'+esc(rr[0].rd.title)+'"':''}: <b>${rr.length}/${n} members ready</b>`;
      const away=me.filter(m=>!m.studio).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not in the studio: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='rec'?'<br><button onclick="mpUnready()">Not ready</button>':ME.studio?'<br><button class=go onclick="mpRecReady()">Ready to record</button>':'<br><small class=m>Go to the studio to join the take.</small>';h+='</div>'}

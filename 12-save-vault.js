@@ -29,14 +29,15 @@ setTimeout(vtTouch,4000);
 /* export / import */
 function vtExport(){try{vtTouch();autoSave();const keys={};
  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^fw_(u_.+?_)?(save_[12]|slot)$|^fw_bak_\d+$|^fw_bakw_\d+$|^fw_opt$/.test(k))keys[k]=localStorage.getItem(k)}
- const n=vtAll().length;if(!n){say('Nothing to export yet.');return}
- const blob=new Blob([JSON.stringify({app:'wavefern',format:1,version:typeof GAME_VERSION!='undefined'?GAME_VERSION:'',exported:new Date().toISOString(),keys})],{type:'application/json'});
+ const n=vtAll().length,lg=typeof rsGet=='function'?rsGet():null;if(!n&&!(lg&&lg.e.length)){say('Nothing to export yet.');return}
+ const blob=new Blob([JSON.stringify({app:'wavefern',format:1,version:typeof GAME_VERSION!='undefined'?GAME_VERSION:'',exported:new Date().toISOString(),keys,legacy:lg&&lg.e.length?lg:undefined})],{type:'application/json'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wavefern-save-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();
- setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},2000);snd('chime');say('Save file downloaded ('+n+' career'+(n==1?'':'s')+')')}catch(e){snd('err');say('Could not export your save.')}}
+ setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},2000);snd('chime');say('Save file downloaded ('+n+' career'+(n==1?'':'s')+(lg&&lg.e.length?', '+lg.e.length+' Legacy':'')+')')}catch(e){snd('err');say('Could not export your save.')}}
 function vtImportPick(){snd('click');const f=document.createElement('input');f.type='file';f.accept='.json,application/json';f.onchange=()=>{const x=f.files&&f.files[0];if(x)x.text().then(vtImport,()=>say('Could not read that file.'))};f.click()}
 function vtImport(txt){try{const d=JSON.parse(txt);if(!d||d.app!='wavefern'||!d.keys||typeof d.keys!='object')throw 0;
  const inc=[];for(const k in d.keys){if(!/^fw_(u_.+?_)?save_[12]$|^fw_bak_\d+$/.test(k))continue;const c=d.keys[k];if(typeof c!='string'||!vtOK(c))continue;if(!inc.some(q=>q.code==c))inc.push({code:c,...vtInfo(c)})}
- if(!inc.length){snd('err');say('No careers found in that file.');return}
+ const lgn=typeof rsMerge=='function'&&d.legacy?rsMerge(d.legacy):0;
+ if(!inc.length){if(lgn){snd('chime');say('Added '+lgn+' Legacy career'+(lgn==1?'':'s')+'. See Settings > Save.');return}snd('err');say('No careers found in that file.');return}
  inc.sort((a,b)=>b.day-a.day);let filled=0,kept=0,skipped=0;
  for(const c of inc){let done=0;
   for(let n=1;n<=SLOTS&&!done;n++){const k=slotKey(n);if(!localStorage.getItem(k)&&n!=BOOT_SLOT||(!localStorage.getItem(k)&&n==BOOT_SLOT&&!TT.game)){localStorage.setItem(k,c.code);filled++;done=1}}

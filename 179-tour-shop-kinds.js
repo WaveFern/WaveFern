@@ -96,7 +96,7 @@ D.menuFor=function(C,dr){const F=D.food(C.id),k=dr.k,sub=dr.sub;
  return s0.apply(this,arguments)}}
 /* boutiques and shoe shops sell real clothes from the game's catalogue; they go to your wardrobe at home */
 function clothes(C,dr){const sub=dr&&dr.sub,slots=sub=='shoes'?['sh']:sub=='vintage'?['jk','top','ht','bt']:['top','jk','ht','bt','sh'];
- const pool=(typeof GAR!='undefined'?GAR:[]).filter(g=>slots.includes(g.slot));if(!pool.length)return keepMenu(C,esc(shopName(dr,'Boutique')),'"Welcome!"',[['Local T-shirt',28,'A keepsake']]);
+ const pool=(typeof GAR!='undefined'?GAR:[]).filter(g=>slots.includes(g.slot)&&!g.fdr);if(!pool.length)return keepMenu(C,esc(shopName(dr,'Boutique')),'"Welcome!"',[['Local T-shirt',28,'A keepsake']]);
  const h=hsh(C.id+(dr&&dr.n)),it=[];for(let i=0;i<6&&it.length<Math.min(6,pool.length);i++){const g=pool[(h+i*37)%pool.length];if(!it.includes(g))it.push(g)}
  const off=sub=='vintage'?.6:1,price=g=>Math.max(5,Math.round(g.p*off));
  GR=sub=='shoes'?'"Fresh pairs in this week."':sub=='vintage'?'"Everything here has a story. And a lower price."':'"Hello! Everything is from local designers."';

@@ -23,3 +23,10 @@
  return l0.apply(this,arguments)}}
 {const p0=csPush;csPush=function(){vtTouch();return p0.apply(this,arguments)}}
 
+/* the cloud copy: an old one is archived on this device and left alone until the new career is saved over it */
+{const l0=csLoad;csLoad=function(c){if(c&&typeof c.code=='string'&&rsOn()&&rsIsOld(c.code)){
+  rsArchive(c.code,FW_ACCT||'guest',0,'Cloud save before the fresh start');
+  if(typeof FBU!='undefined'&&FBU){CLD.ok=1;csSetMark(c.t||0);if(typeof fbRedraw=='function')fbRedraw();
+   try{if(rsNow()>=RS.CUT&&!sessionStorage.getItem('fw_rscl')){sessionStorage.setItem('fw_rscl','1');sessionStorage.setItem('fw_msg','Your old cloud career is kept as a Legacy career. Start a new career to begin again.')}}catch(e){}}
+  return}return l0.apply(this,arguments)}}
+

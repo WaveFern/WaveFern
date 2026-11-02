@@ -5,29 +5,36 @@
    To send a NEW announcement later: change ANN.id (and the text), and everyone sees it once more.
    ANN.enabled=false switches the whole thing off.
 
-   OPEN QUESTIONS FOR JAMES (nothing below is decided; the fields marked TODO show "to be announced" to players until filled in):
-   - TODO reset scope: exactly what is wiped and what is kept (ANN.scope).
-   - TODO reset date (ANN.date).
-   - TODO Founder reward: badge or cosmetic for early players (ANN.founder).
-   This file only SHOWS a notice. It does not wipe, reset or change any save. */
+   v49.71.0: the details are decided. Everything is reset for everyone at RS.CUT (12-reset.js, 3 November 2026 00:00 UTC) and
+   Founder rewards go to everyone who played before it (206-founder.js). This file only SHOWS the notice. The notice is a new
+   id (fresh-start-2), so people who closed the older version with "to be announced" in it see this one. */
 (function(){
  const ANN={
-  id:'fresh-start-1',
+  id:'fresh-start-2',
   enabled:true,
   minSeconds:8,                /* the Close button cannot work before this many seconds have passed */
-  date:null,                   /* TODO: e.g. 'Saturday 14 November'. null shows "Date to be announced". */
-  scope:null,                  /* TODO: plain-words list of what is wiped / kept. null shows "To be announced". */
-  founder:null,                /* TODO: what early players get, e.g. 'a Founder badge'. null shows "To be announced". */
+  date:null,                   /* built below from the real cutover time, shown in the player's own time zone */
+  scope:`<p><b>Everyone's career is reset, every career on every device and every Google account.</b> You start again from a new character.</p>
+<ul><li><b>Reset</b>: money, followers, monthly listeners, streams, songs, albums, fame, jobs and quests, houses, cars, pets, furniture, clothes, souvenirs, everything in Storage, and your band streak and band rewards.</li>
+<li><b>Kept</b>: your Google account, your username and friends list, and your settings.</li></ul>
+<p>Your old career is not deleted. It is kept as a <b>Legacy career</b> on your device, you can look at it in Settings, then Save, and Export save puts it in the file. It cannot be played again.</p>`,
+  founder:`<p><b>Everyone who played before the reset becomes a Founder</b> (a career that reached Day 2 or released a song). Founder rewards are only for them. They are not sold anywhere, nothing in the game gives them out, and nobody who starts after the reset can ever get them. They are all cosmetic.</p>
+<ul><li><b>The Founder mark</b>, a small green emblem next to your name on your WaveFern artist page, in the pause menu, on the title screen and in band panels and band chat.</li>
+<li><b>The Founder title</b>, with the Day your career had reached before the reset.</li>
+<li><b>Founder Bomber</b>, an ink black jacket with a foil fern across the back and a mark on the chest, and the matching <b>Founder Cap</b>. The foil glows slowly. Both are in your wardrobe.</li>
+<li><b>Founder plaque</b> and <b>Day One light</b>, two studio pieces for your house. They arrive in Storage.</li></ul>`,
   keepBackup:true              /* the Export save backup exists today (Settings > Save), so it can be mentioned as fact */
  };
  if(!ANN.enabled)return;
  const KEY='fw_ann_seen';
  const rd=k=>{try{const v=JSON.parse(localStorage.getItem(k));return Array.isArray(v)?v:[]}catch(e){return[]}};
  const uk=()=>{try{return typeof FBU!='undefined'&&FBU&&FBU.uid?KEY+'_'+FBU.uid:''}catch(e){return''}};
- const seen=()=>rd(KEY).includes(ANN.id)||(uk()&&rd(uk()).includes(ANN.id));
+ const seen=()=>rd(KEY).includes(ANN.id)||(uk()&&rd(uk()).includes(ANN.id))||(post()&&!(typeof rsGet=='function'&&rsGet().e.length));
  const mark=()=>{for(const k of [KEY,uk()]){if(!k)continue;try{const a=rd(k);if(!a.includes(ANN.id)){a.push(ANN.id);localStorage.setItem(k,JSON.stringify(a))}}catch(e){}}};
  if(/[?&]trailer\b/.test(location.search)||window.FW_TRAILER)return;
- const tba=(v,t)=>v?String(v).replace(/[<>&]/g,''):'<i>'+t+'</i>';
+ const post=()=>{try{return rsNow()>=RS.CUT}catch(e){return false}};
+ const when=()=>{try{const d=new Date(RS.CUT),o={weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'};
+  return 'Tuesday 3 November 2026 at 00:00 UTC. In your time that is '+d.toLocaleString([],o)+'.'}catch(e){return 'Tuesday 3 November 2026 at 00:00 UTC.'}};
  function build(){
   const css=document.createElement('style');
   css.textContent=`#annov{position:fixed;inset:0;z-index:100000;background:#000d;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;user-select:text}
@@ -43,14 +50,14 @@
 #annov .annf button{font-family:Silkscreen,ui-monospace,monospace;padding:10px 16px}`;
   document.head.appendChild(css);
   const o=document.createElement('div');o.id='annov';o.tabIndex=-1;o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');
-  o.innerHTML=`<div class=annb><small class=k>READ THIS FIRST</small><h2>A fresh start is coming</h2><div class=anns>
+  o.innerHTML=`<div class=annb><small class=k>READ THIS FIRST</small><h2>${post()?'WaveFern has a fresh start':'A fresh start is coming'}</h2><div class=anns>
 <h3>What is happening</h3>
-<p>Early players could earn huge amounts of money very quickly because of bugs. That is not fair to anyone, and it makes the game worse for everyone who plays it properly. So WaveFern is going to give every player a clean start.</p>
+<p>Early players could earn huge amounts of money very quickly because of bugs. That is not fair to anyone, and it makes the game worse for everyone who plays it properly. So WaveFern ${post()?'has given':'is going to give'} every player a clean start.</p>
 <p>This is a reset of everyone's progress. It is not a new release of the game.</p>
-<h3>When</h3><p>${tba(ANN.date,'Date to be announced')}</p>
-<h3>What gets reset and what you keep</h3><p>${tba(ANN.scope,'To be announced')}</p>
-<h3>Thank you, early players</h3><p>${tba(ANN.founder,'To be announced')}</p>
-<h3>Back up your career first</h3><p>${ANN.keepBackup?'You can keep a copy of your current career any time: open Settings, go to Save and press Export save. It downloads a file with every career on this device. See <a href="/wiki/saves/" target="_blank" rel="noopener">Saves and careers</a>.':''}</p>
+<h3>When</h3><p>${post()?'It happened on ':'It happens on '}${when()}</p>
+<h3>What gets reset and what you keep</h3>${ANN.scope}
+<h3>Thank you, early players</h3>${ANN.founder}
+<h3>${post()?'Your old career':'Back up your career first'}</h3><p>${post()?'It is kept as a Legacy career: open Settings, go to Save and choose Legacy careers to look at it, or press Export save to keep a copy in a file.':'You can keep a copy of your current career any time: open Settings, go to Save and press Export save. It downloads a file with every career on this device, and after the reset it will include your Legacy career too.'} See <a href="/wiki/saves/" target="_blank" rel="noopener">Saves and careers</a>.</p>
 <h3>What you can play with</h3>
 <ul><li><b>Friends</b>: pick a username, send and accept friend requests, see who is online, and invite a friend into your band room.</li>
 <li><b>Band rooms</b>: play as a band of up to four, with band chat. Keep a band streak going and finish three daily band goals for rewards. <a href="/wiki/band-rooms/" target="_blank" rel="noopener">Read about band rooms</a>.</li></ul>

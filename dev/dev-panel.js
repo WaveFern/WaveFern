@@ -28,8 +28,8 @@
    ['Show fresh-start notice again',()=>{localStorage.removeItem('fw_ann_seen');Object.keys(FW_DEV_REAL).filter(k=>k.indexOf('dev:fw_ann_seen')===0).forEach(k=>FW_DEV_REAL.removeItem(k));say('Reload to see the notice.')}],
    ['Reload',()=>location.reload()]]],
   ['Founder',[
-   ['Grant Founder status',need(()=>{S.founder=1;S.founderAt=S.founderAt||Date.now();sv('Founder set on the dev save')})],
-   ['Remove Founder status',need(()=>{delete S.founder;delete S.founderAt;sv('Founder removed')})]]],
+   ['Grant Founder status',need(()=>{S.rv=S.rv||1;S.fdr=S.fdr||{v:1,a:'Test',d:41,g:{}};founderSync();sv('Founder set on the dev save')})],
+   ['Remove Founder status',need(()=>{delete S.fdr;founderSync();sv('Founder removed')})]]],
   ['Public profile (mockup)',[
    ['Open my profile',()=>FW_PROFILE.open('me')],
    ['Open a friend profile',()=>FW_PROFILE.open('marlo')],
@@ -37,6 +37,7 @@
    ['Open mock Friends window',()=>FW_PROFILE.friendsWin()],
    ['Show mock band room panel',()=>FW_PROFILE.mockBand()]]],
  ['Time',[
+
    ['Skip 1 day',jump(1)],['Skip 7 days',jump(7)],['Skip 30 days',jump(30)],['Skip 100 days',jump(100)],
    ['Set time to morning',need(()=>{S.t=0;sv('Morning')})]]],
   ['Progress',[
