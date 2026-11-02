@@ -233,7 +233,7 @@ function noJoin(why){say('Could not join: '+why);const d=document.createElement(
      d/UID: what the host sends that guest: p/ID, m/ID, l/ID per member, c clock "day,time", e/* other messages
    To keep downloads small: positions only go to players in the same area, nothing is re-sent unless it changed,
    and a player's position, area info and look each overwrite one spot instead of piling up. ---- */
-const RTDB_URL='https://waveferngame-default-rtdb.europe-west1.firebasedatabase.app';
+const RTDB_URL=FB_CFG.databaseURL;
 const MK=['zone','where','studio','stg','nm','ctry','col','afk'];
 const FB={vc:{},un:[],gun:[],r:null};
 let FBRP=null;
