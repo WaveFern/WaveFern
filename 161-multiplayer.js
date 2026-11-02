@@ -25,6 +25,18 @@ const TABK='fw_mp_tab',TABID=(()=>{try{let t=sessionStorage.getItem('fw_mp_tabid
 const acctNm=()=>{try{return localStorage.getItem('fw_acctnm')||''}catch(e){return''}};
 function needLogin(){if(FW_ACCT||MPTR)return false;snd('err');const o=document.getElementById('mpli');if(o)o.remove();const d=document.createElement('div');d.id='mpli';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Sign in to play with the band</h2><p>Band rooms need a Google account, so your band character is kept safe on your account and each account can only be in a room once.</p>${FB_ON?'<div class=row2><button class=go onclick="document.getElementById(\'mpli\').remove();fbSignInAsk()">Sign in with Google</button><button onclick="document.getElementById(\'mpli\').remove()">Cancel</button></div>':'<p class=m>Sign-in is not available right now.</p><button onclick="document.getElementById(\'mpli\').remove()">OK</button>'}</div>`;document.body.appendChild(d);return true}
+/* v49.61.0: one in-game confirm box for the whole room flow (replaces the browser's plain confirm popups) */
+function mpAsk(h,p,yes,fn,no){const o=document.getElementById('mpq');if(o)o.remove();const d=document.createElement('div');d.id='mpq';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
+ d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>${esc(h)}</h2><p>${esc(p)}</p><div class=row2><button class=go id=mpqy>${esc(yes)}</button><button id=mpqn>${esc(no||'Cancel')}</button></div></div>`;document.body.appendChild(d);
+ d.querySelector('#mpqy').onclick=()=>{d.remove();fn()};d.querySelector('#mpqn').onclick=()=>d.remove();d.onclick=e=>{if(e.target===d)d.remove()};d.querySelector('#mpqn').focus()}
+window.mpCC=v=>{const m=/join=([A-Za-z0-9]{5})/.exec(v||'');return(m?m[1]:String(v||'')).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5)};
+window.mpCopy=k=>{const t=k=='link'?location.origin+'/?join='+MPS.code:MPS.code,ok=()=>{snd('pop');say(k=='link'?'Invite link copied. Send it to your friends.':'Room code '+MPS.code+' copied.')};
+ const fb=()=>{try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();const r=document.execCommand('copy');a.remove();r?ok():say((k=='link'?'Invite link: ':'Room code: ')+t)}catch(e){say('Room code: '+MPS.code)}};
+ try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}};
+window.mpLeaveAsk=()=>{snd('click');mpAsk('Leave the room?','Your band career is saved on this device. You can come back to this room from Your rooms.','Leave room',mpLeave,'Stay')};
+window.mpRetry=()=>{if(!MPS||isHost())return;snd('click');NET.closed=0;NET.dead=0;NET.tries=0;NET.rt=0;NET.st0=Date.now();say('Trying to reach the room again…');
+ if(NET.fb||!NET.peer){NET.fb=NET.fb||/[?&]relay\b/.test(location.search);if(NET.fb)connectHost();else{try{NET.peer&&NET.peer.destroy()}catch(e){}NET.peer=null;lib().then(joinOpen).catch(fbJoin)}}
+ else{try{NET.peer.destroy()}catch(e){}NET.peer=null;NET.hc=null;lib().then(joinOpen).catch(fbJoin)}};
 function dupTab(){NET.closed=1;const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000e';
  d.innerHTML='<div class="box modal" style="width:min(380px,92vw)"><h2>Already open</h2><p>This band room is already open in another tab on this browser. Only one tab per account can be in a room.</p><button class=go onclick="mpDupLeave()">Back to menu</button></div>';document.body.appendChild(d)}
 window.mpDupLeave=()=>{wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.reload()};
@@ -67,7 +79,7 @@ function lib(){if(window.Peer)return Promise.resolve();if(libP)return libP;
 
 /* ---- main menu ---- */
 const U={inst:'vo',q:null,qp:null};
-{const t0=titleUI;titleUI=function(){t0.apply(this,arguments);try{menu()}catch(e){console.error('mp menu',e)}}}
+{const t0=titleUI;titleUI=function(){t0.apply(this,arguments);try{menu();autoJoin()}catch(e){console.error('mp menu',e)}}}
 function menu(){const m=document.querySelector('#ttl .ttm');if(!m)return;const play=m.querySelector('button[onclick="ttWorlds()"]');if(!play)return;
  if(MPS){const busy=play.disabled;play.textContent=busy?play.textContent:'Play with the band';play.setAttribute('onclick','mpPlay()');
   play.insertAdjacentHTML('beforebegin',`<p class=m style="margin:4px 0">Room <b>${esc(MPS.code)}</b> · ${esc(MPS.band||'Your band')} · ${iName(MPS.inst)}${MPS.host?' · you host':''}</p>`);
@@ -76,6 +88,9 @@ function menu(){const m=document.querySelector('#ttl .ttm');if(!m)return;const p
  play.textContent=play.disabled?play.textContent:'Single player';
  const last=FW_ACCT?lsGet()[0]:null;
  play.insertAdjacentHTML('afterend','<button class=go onclick="mpRooms()">Multiplayer</button>'+(last?`<button class=go onclick="mpContinue()">Continue as ${esc(last.nm||lastNm()||acctNm()||'your band player')}</button><p class=m style="margin:2px 0 6px"><small>${last.host?'Host':'Join'} room ${esc(last.code)} · ${esc(last.band||'Band')} · ${iName(last.inst)}</small></p>`:''))}
+/* v49.61.0: wavefern.com/?join=CODE opens Join a room with the code filled in and the room looked up */
+function autoJoin(){const m=/[?&]join=([A-Za-z0-9]{5})\b/.exec(location.search);if(!m||MPS||MPTR||U.aj)return;U.aj=1;const c=m[1].toUpperCase();try{history.replaceState(null,'',location.pathname+location.search.replace(/([?&])join=[A-Za-z0-9]{5}&?/,'$1').replace(/[?&]$/,'')+location.hash)}catch(e){}
+ let n=0;const t=setInterval(()=>{if(FW_ACCT||++n>20){clearInterval(t);if(!$('ttl'))return;mpJoinUI();const i=$('mpcd');if(i&&FW_ACCT){i.value=c;mpFind()}}},400)}
 /* v46.7.0: Multiplayer opens straight into Your rooms, which also has Create a room and Join a room */
 /* Your rooms: the band careers on this device, at most MPMAX. Older lists may hold more; those still show and play, but no new one can start until there is room. */
 const svInfo=x=>{try{const c=localStorage.getItem(SAVE_PRE+'mp_'+x.code+'_'+x.inst);if(!c)return null;const q=scDecode(c).S;return{day:q.day||1}}catch(e){return null}};
@@ -85,8 +100,8 @@ window.mpRooms=()=>{if(needLogin())return;snd('click');TT.sel=1;const L=lsGet(),
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Your rooms</h2><p class=m style="text-align:center;margin:0">Play as a band of up to ${MAXN} with friends. Keep up to ${MPMAX} band careers.</p>${rows.join('')}${L.length>=MPMAX?`<p class=m style="margin:0"><small>You have ${MPMAX} band careers. Delete one to create or join a new room.</small></p>`:''}
   <div class=row2><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpCreateUI()">Create a room</button><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpJoinUI()">Join a room</button></div><button onclick="ttBack()">Back</button></div></div>`};
 window.mpRoomGo=i=>{const x=lsGet()[i];if(!x)return;if(x.host)return mpHostAgain(x.code,x.inst);mpJoinUI();$('mpcd').value=x.code;mpFind()};
-window.mpRoomDel=i=>{const x=lsGet()[i];if(!x)return;if(!confirm('Delete your band career in '+(x.band||'Band')+' (room '+x.code+')? Your progress in that band is lost.'))return;snd('click');
- try{localStorage.setItem(LK,JSON.stringify(lsGet().filter(q=>!(q.code==x.code&&q.inst==x.inst))));localStorage.removeItem(SAVE_PRE+'mp_'+x.code+'_'+x.inst)}catch(e){}mpRooms()};
+window.mpRoomDel=i=>{const x=lsGet()[i];if(!x)return;snd('click');mpAsk('Delete this band career?','Your progress in '+(x.band||'Band')+' (room '+x.code+') is lost for good.','Delete',()=>{
+ try{localStorage.setItem(LK,JSON.stringify(lsGet().filter(q=>!(q.code==x.code&&q.inst==x.inst))));localStorage.removeItem(SAVE_PRE+'mp_'+x.code+'_'+x.inst)}catch(e){}mpRooms()})};
 function roomsFull(o){const L=lsGet();return!L.some(x=>x.code==o.code&&x.inst==o.inst)&&L.length>=MPMAX}
 function fullMsg(){snd('err');const o=document.getElementById('mpli');if(o)o.remove();const d=document.createElement('div');d.id='mpli';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Your rooms are full</h2><p>You can keep up to ${MPMAX} band careers. Delete one in Your rooms to start a new one.</p><div class=row2><button class=go onclick="document.getElementById('mpli').remove();mpRooms()">Your rooms</button><button onclick="document.getElementById('mpli').remove()">Cancel</button></div></div>`;document.body.appendChild(d)}
@@ -106,12 +121,12 @@ window.mpCreateGo=()=>{snd('click');const b=($('mpbn').value||'').trim()||'The F
 window.mpHostAgain=(c,i)=>{snd('click');const x=lsGet().find(q=>q.code==c&&q.inst==i);enter({code:c,inst:i,band:x&&x.band||'Band',host:1,nm:x&&x.nm||''})};
 window.mpJoinUI=()=>{if(needLogin())return;snd('click');TT.sel=1;const rec=lsGet().filter(x=>!x.host);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Join a room</h2><p class=m>Type the room code your friend sees on their screen.</p>
-  <div class=ng><input id=mpcd maxlength=5 placeholder="CODE" style="text-transform:uppercase;letter-spacing:3px" onkeydown="if(event.key=='Enter')mpFind()"><button class=go onclick="mpFind()">Find room</button></div>
+  <div class=ng><input id=mpcd placeholder="CODE" autocomplete=off autocapitalize=characters spellcheck=false style="text-transform:uppercase;letter-spacing:3px" oninput="this.value=mpCC(this.value)" onkeydown="if(event.key=='Enter')mpFind()"><button class=go onclick="mpFind()">Find room</button></div>
   ${rec.length?`<p class=m style="margin:8px 0 0"><small>Rooms you joined: ${rec.map(x=>`<button onclick="$('mpcd').value='${esc(x.code)}';mpFind()">${esc(x.code)}</button>`).join(' ')}</small></p>`:''}
   <div id=mpjr></div><button onclick="mpRooms()">Back</button></div></div>`;setTimeout(()=>{const i=$('mpcd');i&&i.focus()},50)};
-window.mpFind=()=>{if(needLogin())return;const c=($('mpcd').value||'').trim().toUpperCase(),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers.</p>';return}
- snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'…</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
- const fail=t=>{if(U.qc!==c||U.qok===c)return;out.innerHTML='<p class=m>'+t+'</p>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;U.qok='';
+window.mpFind=()=>{if(needLogin())return;const c=mpCC($('mpcd').value),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers. Ask the host for the code on their band panel.</p>';return}
+ snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'… this can take a few seconds.</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
+ const fail=t=>{if(U.qc!==c||U.qok===c)return;out.innerHTML='<p class=m>'+t+'</p><button onclick="mpFind()">Try again</button>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;U.qok='';
  /* ask the Firebase relay at the same time: it answers even when direct connections are blocked */
  fbRoomInfo(c).then(d=>{if(d&&U.qc===c)qShow(c,d)}).catch(()=>{});
  lib().then(()=>{const p=U.qp=new Peer(peerOpts());const to=setTimeout(()=>fail('No answer from room '+esc(c)+'. Check the code and that the host is in the game.'),15000);
@@ -129,7 +144,7 @@ function qShow(c,d){const out=$('mpjr');if(!out||U.qok===c)return;U.qok=c;const 
 window.mpJoinGo=()=>{if(!U.q)return;snd('click');enter({code:U.q.code,inst:U.inst,band:U.q.band,host:0})};
 
 /* ---- network: star around the host ---- */
-const NET={kk:{},peer:null,hc:null,conns:{},id:'',on:0,tries:0,closed:0,lastSt:'',stT:0,lkT:0,clkT:0};
+const NET={st0:Date.now(),kk:{},peer:null,hc:null,conns:{},id:'',on:0,tries:0,closed:0,lastSt:'',stT:0,lkT:0,clkT:0};
 const MB={};/* every member by peer id, yourself included */
 const ME={id:'',nm:'',inst:MPS?MPS.inst:'',look:null,x:0,z:0,r:0,zone:'menu',where:'',studio:0,stg:0,rd:null};
 let MPGO=0,MPF=0,festBk=null,sleepW=0;
@@ -177,7 +192,7 @@ function hostData(c,d){if(!d||!d.t)return;d=cln(d);
  if(!c.mp||!['st','rd','dn','an','em','rel','scr','gr','cm','fx'].includes(d.t))return;if(d.t=='fx'&&!MB[c.peer].ad)return;d.id=c.peer;handle(d,c.peer);sendAll(d,c.peer)}
 /* v45.9.0: host removes a member: tell them, close their link, remember their ids for this session */
 function kick(id){if(!isHost()||id===ME.id)return;const m=MB[id],c=NET.conns[id];NET.kk[id]=1;if(m&&m.uid)NET.kk['u'+m.uid]=1;if(c){try{c.send({t:'kick'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},800)}if(m){say('You removed '+m.nm+' from the room.');rmAv(id);delete MB[id]}delete NET.conns[id];roster()}
-window.mpKick=id=>{const m=MB[id];if(!m||!isHost())return;if(!confirm('Remove '+m.nm+' from the band room? They will not be able to rejoin this room until you close it.'))return;snd('click');kick(id)};
+window.mpKick=id=>{const m=MB[id];if(!m||!isHost())return;snd('click');mpAsk('Remove '+m.nm+'?','They will not be able to rejoin this room until you close it.','Remove',()=>{if(MB[id])kick(id)})};
 function kicked(){NET.closed=1;NET.on=0;const h=NET.hc;NET.hc=null;try{h&&h.close()}catch(e){}for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}ME.rd=null;try{localStorage.setItem(LK,JSON.stringify(lsGet().filter(x=>x.code!=MPS.code)))}catch(e){}say('The host removed you from the band room.');const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML='<div class="box modal" style="width:min(380px,92vw)"><h2>Removed from the room</h2><p>The host removed you from this band room. You cannot rejoin it right now.</p><div class=row2><button class=go onclick="mpLeave()">Back to menu</button><button onclick="this.closest(\'#mpno\').remove()">Play alone</button></div></div>';document.body.appendChild(d)}
 function drop(id){const c=NET.conns[id];if(!c)return;delete NET.conns[id];const m=MB[id];if(m){say(m.nm+' left the room.');rmAv(id);delete MB[id]}roster()}
@@ -193,13 +208,13 @@ function bindHost(c){
  c.on('data',d=>{if(!d||!d.t)return;d=cln(d);
   if(d.t=='kick'){kicked();return}
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
-  if(d.t=='wel'){NET.on=1;NET.tries=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
+  if(d.t=='wel'){NET.on=1;NET.tries=0;NET.dead=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
    if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+(NET.fb?' through the Firebase relay.':'.'));NET.lastSt='';NET.gk='';NET.cs={};return}
   handle(d,d.id)});
  c.on('close',()=>{if(NET.hc===c){NET.hc=null;lost()}})}
 function lost(){if(NET.closed||NET.rt)return;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}ME.rd=null;
- if(NET.tries==0&&NET.on)say('Lost the room. Trying to reconnect…');NET.on=0;
- if(++NET.tries<=12)NET.rt=setTimeout(()=>{NET.rt=0;connectHost()},5000);else say('Room '+MPS.code+' is closed. You are playing this band career on your own.')}
+ if(NET.tries==0&&NET.on)say('Lost the connection to the host. Trying to reconnect…');NET.on=0;
+ if(++NET.tries<=12)NET.rt=setTimeout(()=>{NET.rt=0;connectHost()},5000);else{NET.dead=1;say('Room '+MPS.code+' is closed or out of reach. You are playing on your own. Use Try again in the band panel to reconnect.')}}
 function noJoin(why){say('Could not join: '+why);const d=document.createElement('div');d.id='mpno';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Could not join</h2><p>${esc(why)}</p><div class=row2><button class=go onclick="mpLeave()">Leave room</button><button onclick="this.closest('#mpno').remove()">Play alone</button></div></div>`;document.body.appendChild(d)}
 /* ---- v46.6.0: Firebase relay. When a direct (WebRTC) link cannot be made, for example on a school network, a guest
@@ -496,6 +511,7 @@ if(MPS){const k=MPS.inst,T={gt:{hype:'Shred a solo!',call:'Play the riff back!',
 #mpb .mph{display:flex;justify-content:space-between;align-items:center;gap:6px;cursor:pointer}#mpb .mph b{color:var(--g)}
 #mpb .mpr{display:flex;gap:6px;margin-top:3px;align-items:baseline}#mpb .mpr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mpb .ok{color:var(--g)}
 #mpb .mps{margin-top:6px;padding-top:6px;border-top:1px solid #2a352e}#mpb button{padding:4px 8px;font-size:12px;margin:4px 4px 0 0}
+#mpb .mpd{display:inline-block;width:8px;height:8px;margin-right:6px;background:#888}#mpb .mpd.on{background:var(--g)}#mpb .mpd.wait{background:#f5c542}#mpb .mpd.off{background:#ff4455}
 body.fston #mpb,body.mgon #mpb,body.dsshow #mpb{display:none}
 .mpins{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 12px}.mpins button{padding:8px 2px;line-height:1.3}
 .mpins .pxi{font-size:22px}.mpins button.on{background:var(--g);color:#04120a}
@@ -510,10 +526,10 @@ body.fston #mpb,body.mgon #mpb,body.dsshow #mpb{display:none}
 let PK='',PMIN=0;window.mpTog=()=>{PMIN=!PMIN;PK=''};
 function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode);
  if(!on){if(el)el.style.display='none';return}if(!el){el=document.createElement('div');el.id='mpb';el.className='hb';document.body.appendChild(el)}el.style.display='';
- const L=list(),me=L.length?L:[ME],n=me.length,head=`<div class=mph onclick="mpTog()"><span><b>${esc(MPS.band||'Band')}</b> <small class=m>Room ${esc(MPS.code)}${NET.fb?' · relay':''}</small></span><small class=m>${PMIN?'▸':'▾'}</small></div>`;
+ const L=list(),me=L.length?L:[ME],n=me.length,head=`<div class=mph onclick="mpTog()"><span><i class="mpd ${online()?'on':NET.dead||NET.closed?'off':'wait'}"></i><b>${esc(MPS.band||'Band')}</b> <small class=m>Room ${esc(MPS.code)}${NET.fb?' · relay':''}</small></span><small class=m>${PMIN?'▸':'▾'}</small></div>`;
  let h=head;if(!PMIN){
-  if(!online())h+=`<div class=m style="margin-top:4px">${NET.closed?'Not in the room.':NET.on||NET.tries?'Room offline. Reconnecting…':'Connecting to the room…'} You play ${iName(MPS.inst)}.</div>`;
-  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].n:''} <small class=m>${esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');
+  if(!online()){const stuck=!isHost()&&!NET.closed&&(NET.dead||(!NET.on&&!NET.tries&&Date.now()-NET.st0>20000));h+=`<div class=m style="margin-top:4px">${NET.closed?'Not in the room.':NET.dead?'Cannot reach the room.':stuck?'Still connecting. The host may not be in the game.':NET.on||NET.tries?'Room offline. Reconnecting…':isHost()?'Opening your room…':'Connecting to the room…'} You play ${iName(MPS.inst)}, on your own for now.</div>${stuck||NET.dead?'<button class=go onclick="mpRetry()">Try again</button>':''}`}
+  else{h+=me.map(m=>`<div class=mpr><i class="${m.rd?'ok':''}" style="font-style:normal">${m.rd?'✓':'·'}</i><span><b>${esc(m.nm||'Player')}</b>${m.id===ME.id?' (you)':''} · ${INS[m.inst]?INS[m.inst].n:''}${!MPTR&&m.id===pid(MPS.code)?' · host':''} <small class=m>${esc(m.where||'')}</small></span>${isHost()&&m.id!==ME.id?`<button title="Remove from room" style="margin-left:auto;padding:0 6px" onclick="mpKick('${m.id}')">✕</button>`:''}</div>`).join('');
    if(n>1){const rr=me.filter(m=>m.rd&&m.rd.k=='rec');if(rr.length){h+=`<div class=mps>Recording${rr[0].rd.title?' "'+esc(rr[0].rd.title)+'"':''}: <b>${rr.length}/${n} members ready</b>`;
      const away=me.filter(m=>!m.studio).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not in the studio: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='rec'?'<br><button onclick="mpUnready()">Not ready</button>':ME.studio?'<br><button class=go onclick="mpRecReady()">Ready to record</button>':'<br><small class=m>Go to the studio to join the take.</small>';h+='</div>'}
@@ -524,7 +540,8 @@ function panel(){let el=$('mpb');const on=['play','menu','drive'].includes(mode)
     const ld=me.find(m=>m.rd&&m.rd.k=='fest'&&m.rd.lead);if(ld){const fr=me.filter(m=>m.rd&&m.rd.k=='fest'&&m.rd.n==ld.rd.n);h+=`<div class=mps>Stage ${ld.rd.n} set: <b>${fr.length}/${n} members ready</b>`;
      const away=me.filter(m=>m.stg!=ld.rd.n).map(m=>esc(m.nm));if(away.length)h+=`<br><small class=m>Not at Stage ${ld.rd.n}: ${away.join(', ')}</small>`;
      h+=ME.rd&&ME.rd.k=='fest'?(ME.rd.lead?'<br><button onclick="mpUnready()">Cancel the set</button>':'<br><button onclick="mpUnready()">Not ready</button>'):ME.stg==ld.rd.n?`<br><button class=go onclick="mpFestReady(${ld.rd.n})">Ready to play</button>`:`<br><small class=m>Go to Stage ${ld.rd.n} at the festival.</small>`;h+='</div>'}}}}
- if(!PMIN)h+='<div class=mps><button onclick="emWheel()">Emotes (B)</button></div>';
+ if(!PMIN&&online()&&n==1&&isHost()&&!MPTR)h+=`<div class=mps>Waiting for bandmates. Share the code <b>${esc(MPS.code)}</b> or send an invite link.</div>`;
+ if(!PMIN)h+='<div class=mps><button onclick="emWheel()">Emotes (B)</button>'+(MPTR?'':'<button onclick="mpCopy(\'code\')">Copy code</button><button onclick="mpCopy(\'link\')">Copy invite link</button><button onclick="mpLeaveAsk()">Leave room</button>')+'</div>';
  if(h!==PK){PK=h;el.innerHTML=h}}
 
 /* ===== v45.5.0: band room fixes, shared artist account, linked band songs ===== */
