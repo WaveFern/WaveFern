@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.74.0';
+const GAME_VERSION='v49.75.0';
 const VERSION_HISTORY=[
+ {v:'v49.75.0',n:'Souvenir shops are on the World Tour map. Every tour city has a small shop marker beside its pin, and each country card lists the three souvenirs that country sells.'},
  {v:'v49.74.0',n:'The house got a craft pass. The living room stairs have a proper banister: wood treads, painted risers, a sloped hand rail, balusters and newel posts. The upstairs stairwell has a matching rail on its open sides, and the upstairs windows have frames, a cross bar, a sill and curtains. When you expand the house, the two windows that used to look straight into the new back rooms become framed sunset paintings, and the back rooms get skirting boards, rugs, a runner through the new doorway and curtained windows.'},
  {v:'v49.73.1',n:'The fresh start moved to 00:00 UTC on Friday 6 November 2026. Nothing changes before then.'},
  {v:'v49.73.0',n:'After the fresh start, the first time you sign in with Google you choose a username and a display name in one box. The username is your Friends username, so friends find you by it, and the display name is what friends and bandmates see next to it. Names have rules: a username is 3 to 16 lower case letters, numbers or _ and can be changed once every 30 days, a display name is 2 to 24 letters, numbers, spaces and . _ \' - and can be changed once every 7 days, names that imitate WaveFern, staff or the makers, or that are offensive, are refused (also with look-alike characters), and the Friends window has a Change name button. The notice also says that old save codes stop working after the reset.'},

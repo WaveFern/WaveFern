@@ -95,6 +95,7 @@ function css(){if($('wtxcss'))return;const s=document.createElement('style');s.i
 .wtx svg.lv1 g.ct:not(.cur) path.cy:hover{fill:#3a4a8a!important;filter:none}
 .wtx svg text{pointer-events:none;font-family:Silkscreen,ui-monospace,monospace;paint-order:stroke;stroke:#050816;stroke-linejoin:round;fill:#fff}
 .wtx svg text.cl{fill:#fff7d6;letter-spacing:.06em}.wtx svg text.nl{fill:#e7ecff}.wtx svg text.nl.d{fill:#ffe08a}
+.wtx svg .shopmk rect{fill:#d4b07a;stroke:#3a2410;vector-effect:non-scaling-stroke;stroke-width:1.2}.wtx svg .shopmk path{fill:#fff4dc;stroke:#3a2410;vector-effect:non-scaling-stroke;stroke-width:1;stroke-linejoin:round}.wtx svg .shopmk path+path{fill:none}.wtx .shp{margin-top:8px;padding:8px 10px;background:#f4ecd6;color:#3a2410;border:2px solid #3a2410}.wtx .shp b{display:block;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px}.wtx .shp span{display:block;font-size:12px;margin-top:3px}
 .wtx svg .pin{fill:var(--wg);stroke:#000;vector-effect:non-scaling-stroke;stroke-width:1.2}.wtx svg .pin.in{fill:#7dffb0}.wtx svg .pring{fill:none;stroke:var(--wg);vector-effect:non-scaling-stroke;stroke-width:1.5;animation:wtxpr 1.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes wtxpr{0%{transform:scale(.6);opacity:1}100%{transform:scale(2.6);opacity:0}}
 .wtx svg .route{fill:none;stroke:#ffcc4d;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;stroke-width:1.6;opacity:.85;animation:wtxdash 1.2s linear infinite}@keyframes wtxdash{to{stroke-dashoffset:-16}}
@@ -155,6 +156,7 @@ function decorate(){const sv=$('wtxsvg');if(!sv)return;const r=sv.getBoundingCli
    const bx=[q[4]*k-tw/2-2,q[5]*k-fs/2-1,q[4]*k+tw/2+2,q[5]*k+fs/2+1];if(placed.some(o=>bx[0]<o[2]&&bx[2]>o[0]&&bx[1]<o[3]&&bx[3]>o[1]))continue;placed.push(bx);
    lab+=`<text class="nl${d?' d':''}" x="${q[4]}" y="${q[5]}" text-anchor=middle dominant-baseline=middle font-size="${px(fs)}" stroke-width="${px(3)}">${E(q[1])}</text>`}
   for(const d of WT_DEST){if(d.cont!==U.cont)continue;const p=P(d.lat,d.lon),on=inT.has(d.id);pins+=`<circle class=pring cx="${p[0]}" cy="${p[1]}" r="${px(5)}"/><circle class="pin${on?' in':''}" cx="${p[0]}" cy="${p[1]}" r="${px(on?4.5:3.5)}"><title>${E(wtPlace(d))}</title></circle>`;
+   {const sx=p[0]+7/k,sy=p[1]-7/k,w=px(10);pins+=`<g class=shopmk transform="translate(${sx.toFixed(2)} ${sy.toFixed(2)})"><rect x="${-w/2}" y="${-w/2}" width="${w}" height="${w}" rx="${px(1.5)}"/><path d="M${-w*.26} ${-w*.1}h${w*.52}v${w*.34}h${-w*.52}z"/><path d="M${-w*.14} ${-w*.1}v${-w*.1}a${w*.14} ${w*.14} 0 0 1 ${w*.28} 0v${w*.1}"/><title>${E(wtPlace(d))}: souvenir shop</title></g>`}
    if(U.iso===d.iso&&d.city)lab+=`<text class=nl x="${p[0]+5.5/k}" y="${p[1]}" dominant-baseline=middle font-size="${px(11)}" stroke-width="${px(3)}">${E(d.city)}</text>`}}
  if(!U.cont)for(const s of T.stops){const d=wtDest(s.d),p=P(d.lat,d.lon);pins+=`<circle class="pin in" cx="${p[0]}" cy="${p[1]}" r="${px(3.5)}"/>`}
  $('wtxlab').innerHTML=lab;$('wtxpins').innerHTML=pins}
@@ -211,13 +213,14 @@ function destCard(d){const T=st(),inT=T.stops.some(s=>s.d===d.id),lv=fl(),cc=WT_
  return`<div class=dc style="--cc:${cc}"><b class=cn>${E(d.city||d.country+' (country show)')}</b>${d.city?'':`<div class=m2>No big city here: you play a smaller town with its own stadium.</div>`}
  ${vrow(d.venue,'Stadium')}${vrow(d.club,'Smaller show')}
  <div class=rw><span>Flight from home</span><span>${d.hrs}h · from ${fm(d.fare)}</span></div><div class=rw><span>Local time now</span><span>${localT(d)}</span></div>
+ ${(()=>{const L=(window.SVS191&&window.SVS191.SOUV||{})[d.iso];return L?`<div class=shp><b>Souvenir shop</b><span>Made in ${E(d.country)}: ${L.map(x=>E(x[0])).join(', ')}.</span><span class=m2 style="color:#7a5a3a">Visit the shop on the city streets when you are there.</span></div>`:''})()}
  ${here?'<div class="rw okc"><span>You are here</span><span>✓</span></div>':''}
  ${inT?`<button class="btn red" onclick="wtxRm('${d.id}')">Remove from tour</button>`:`<button class="btn go" ${full||low?'disabled':''} onclick="wtxAdd('${d.id}')">${swap?'Swap into tour':'Add to tour'}</button>`}
  ${full?'<div class="m2 lk">Your tour is full (5 stops).</div>':''}${swap?'<div class=m2>Your tour plays one city per country, so this swaps out the other city.</div>':''}</div>`}
 function side(){const T=st();
  if(!U.cont)return`<div class=pan><h2>Pick a continent<small>Hover to light it up, click to open it.</small></h2><div class=chips>${Object.keys(WT_CONT).map(c=>`<button class=chip style="--cc:${WT_CONT[c].c}" onclick="wtxCont('${c}')">${WT_CONT[c].n}</button>`).join('')}</div></div>${tourMini()}`;
  const cs=[...new Set(WT_DEST.filter(d=>d.cont==U.cont).map(d=>d.iso))].map(i=>WT_DEST.find(d=>d.iso==i));
- if(!U.iso)return`<div class=pan><h2>${E(WT_CONT[U.cont].n)}<small>Click a glowing country on the map, or pick one here.</small></h2><div class=chips>${cs.map(d=>`<button class=chip style="--cc:${WT_CONT[U.cont].c}" onclick="wtxIso(${d.iso})">${E(d.country)}</button>`).join('')}</div></div>${tourMini()}`;
+ if(!U.iso)return`<div class=pan><h2>${E(WT_CONT[U.cont].n)}<small>Click a glowing country on the map, or pick one here. The bag marks a souvenir shop.</small></h2><div class=chips>${cs.map(d=>`<button class=chip style="--cc:${WT_CONT[U.cont].c}" onclick="wtxIso(${d.iso})">${E(d.country)}</button>`).join('')}</div></div>${tourMini()}`;
  const r=cRow(U.iso),L=WT_DEST.filter(d=>d.iso===U.iso);
  return`<div class=pan><h2>${E(r?r[1]:'')}<small>${E(WT_CONT[U.cont].n)}${L.length>1?' · pick a city, or several for a country tour':''}</small></h2>${L.length?L.map(destCard).join(''):`<p class=m2>No tour stops in ${E(r?r[1]:'this country')} yet. The glowing countries have stadiums.</p>`}</div>${tourMini()}`}
 function tourMini(){const T=st();if(!T.stops.length)return`<div class=pan><h2>Your tour<small>Empty. Add up to ${MAXS} stops from the map.</small></h2></div>`;
