@@ -14,108 +14,64 @@
  /* pattern number = position here. Only ever add to the end. */
  const PATS=['Plain','Racing stripes','Side stripe','Two-tone roof','Hood and boot','Checker band','Centre stripe','Double side stripe','Pinstripe',
   'Rocker stripe','Two-tone lower','Chequered roof','Hazard band','Flames','Lightning','Polka dots','Camo','Race roundels','Fade','Chevrons','Zebra','Half and half','Sparkle'];
- const SHOW=[0,1,6,2,7,8,9,10,3,4,11,5,12,13,14,19,20,21,18,15,16,22,17];
+ const SHOW=[0,1,6,2,9,3,10,4,21,5,17,13,18,15,16];
  const TOM_HIT='Talk to Tom (mechanic)';
- let dMat=null,pvR=null,pvS=null,pvC=null,pvM=null,pvRaf=0;
+ let pvR=null,pvS=null,pvC=null,pvM=null,pvRaf=0;
  const PW=360,PH=200;
 
  const cust=i=>{try{const c=S.carCust&&S.carCust[i];return c&&typeof c=='object'?c:null}catch(e){return null}};
  const okHex=h=>typeof h=='string'&&/^#[0-9a-f]{6}$/i.test(h);
  const patOk=p=>Number.isInteger(p)&&p>=0&&p<PATS.length;
 
- /* ---------- pattern decals: thin shapes laid just over the paint, merged into one mesh ---------- */
- const decalCache={};
- function decalGeo(st,pat,c2){const key=st+'|'+pat+'|'+c2;if(decalCache[key])return decalCache[key];
-  const S0=CSPEC[st],{L,W,r,yb,yh,yhf,ytr,fo,ro}=S0,[zr0,zr1,zf1,zf0,yt]=S0.cab,Wc=W*S0.cw,ra=r+.035,parts=[];
-  const col2=new THREE.Color(c2),dark=col2.clone().multiplyScalar(.5),mid=col2.clone().multiplyScalar(.75),black=new THREE.Color('#1c1d20'),white=new THREE.Color('#f4f4f4');
-  const add=(g,c)=>parts.push([g,c instanceof THREE.Color?c:new THREE.Color(c)]);
-  const box=(w,h,d,x,y,z,c,rx)=>{const g=new THREE.BoxGeometry(w,h,d);if(rx)g.rotateX(rx);g.translate(x,y,z);add(g,c||col2)};
-  const disc=(rad,x,y,z,c,axis)=>{const g=new THREE.CylinderGeometry(rad,rad,.012,16);if(axis=='x')g.rotateZ(Math.PI/2);g.translate(x,y,z);add(g,c||col2)};
-  const edge=c=>(c||col2).clone().multiplyScalar(.45);
-  const SX=W/2;                       /* the side of the body */
-  /* a bar on both sides from (z0,y0) to (z1,y1), with a dark edge line around it so it reads as a proper livery */
-  const bar=(z0,y0,z1,y1,t,c,noEdge)=>{const dz=z1-z0,dy=y1-y0,len=Math.hypot(dz,dy),a=-Math.atan2(dy,dz);
-   [-1,1].forEach(s=>{if(!noEdge)box(.012,t+.016,len+.016,s*(SX+.002),(y0+y1)/2,(z0+z1)/2,edge(c),a);box(.012,t,len,s*(SX+.006),(y0+y1)/2,(z0+z1)/2,c,a)})};
-  const e=.008,hz0=zf0+.02,hz1=L/2-.1,ha=Math.atan2(yh-yhf,hz1-hz0),hl=Math.hypot(hz1-hz0,yh-yhf);
-  /* top panels, each drawn as a dark edge then the colour on top */
-  const hood=(w,x,c,noEdge)=>{if(!noEdge)box(w+.016,.012,hl+.016,x,(yh+yhf)/2+e-.004,(hz0+hz1)/2,edge(c),ha);box(w,.012,hl,x,(yh+yhf)/2+e,(hz0+hz1)/2,c,ha)};
-  const roof=(w,x,c,noEdge)=>{if(!noEdge)box(w+.016,.012,zf1-zr1+.016,x,yt+e-.004,(zr1+zf1)/2,edge(c));box(w,.012,zf1-zr1,x,yt+e,(zr1+zf1)/2,c)};
-  const boot=(w,x,c,noEdge)=>{const l=zr0+L/2-.06,m=(zr0-L/2+.06)/2;if(!noEdge)box(w+.016,.012,l+.016,x,ytr+e-.004,m,edge(c));box(w,.012,l,x,ytr+e,m,c)};
-  const skip=(z,y,m)=>Math.hypot(z-fo,y-yb)<ra+m||Math.hypot(z-ro,y-yb)<ra+m;
-  /* the belt-line band runs the full length of the car: as far back and as far forward as the body is tall enough */
-  const bh=.07,by=Math.max(yh-.06,yb+ra+.014+bh/2),need=by+bh/2+.012;
-  const zFront=yhf>=need?L/2-.05:yh>need?zf0+(yh-need)/(yh-yhf)*(hz1-zf0):zf0,zBack=ytr>=need?-L/2+.05:zr0;
-  const sz0=ro+ra+.03,sz1=fo-ra-.03;
-  let seed=st*97+pat*13+7;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
-  const flat=(w,d,x,z,y,c)=>box(w,.012,d,x,y,z,c);
-  /* the lower body in three pieces (rear, between the wheels, front), never over a wheel arch */
-  const lowTop=by-bh/2-.012,lowPieces=[[-L/2+.04,ro-ra-.012,Math.min(lowTop,ytr-.05)],[sz0-.015,sz1+.015,lowTop],[fo+ra+.012,L/2-.04,Math.min(lowTop,yhf-.06)]];
-  const mix=(a,b,t)=>a.clone().lerp(b,t);
+ /* ---------- patterns are painted onto the car's own paint by a small shader, so they always sit on the body ----------
+    Only the car's body-colour surfaces are changed (glass, wheels, trim and lights keep their colour). Positions are in the
+    car's own space: x across, y up, z forward. */
+ const GL_COMMON='varying vec3 vOP;varying vec3 vON;';
+ const GL_FRAG='uniform vec3 uBody;uniform vec3 uC2;uniform float uPat;uniform vec4 uD;uniform vec4 uE;varying vec3 vOP;varying vec3 vON;\n'+
+ 'float gcH(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}\n'+
+ 'float gcN(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(gcH(i),gcH(i+vec2(1,0)),f.x),mix(gcH(i+vec2(0,1)),gcH(i+vec2(1,1)),f.x),f.y);}\n'+
+ 'vec3 gcPat(vec3 b){\n'+
+ ' vec3 p=vOP,n=normalize(vON),k=uC2,dk=uC2*.45,c=b;\n'+
+ ' float L=uD.x,W=uD.y,yb=uD.z,yh=uD.w,yt=uE.x,zf=uE.y,zr=uE.z,pt=uPat;\n'+
+ ' bool side=abs(n.x)>.6,top=n.y>.55,frontback=abs(n.z)>.6;\n'+
+ ' float by=yb+(yh-yb)*.64,e=.012;\n'+
+ ' float d=-1.;\n'+
+ ' if(pt==1.){if(top)d=W*.085-abs(abs(p.x)-W*.17);}\n'+
+ ' else if(pt==2.){if(side)d=.05-abs(p.y-by);}\n'+
+ ' else if(pt==3.){if(p.y>yh+.05)return k;return b;}\n'+
+ ' else if(pt==4.){if(top&&(p.z>zf-.03||p.z<zr+.03))return k;return b;}\n'+
+ ' else if(pt==5.){if(side&&abs(p.y-by)<.05){float r=step(by,p.y);float s=mod(floor(p.z*15.)+r,2.);return s<1.?k:vec3(.1,.1,.12);}return b;}\n'+
+ ' else if(pt==6.){if(top)d=W*.16-abs(p.x);}\n'+
+ ' else if(pt==7.){if(side)d=max(.02-abs(p.y-by-.04),.02-abs(p.y-by+.04));}\n'+
+ ' else if(pt==8.){if(side)d=max(.007-abs(p.y-by-.02),.007-abs(p.y-by+.02));if(top)d=max(.007-abs(p.x-W*.16),.007-abs(p.x+W*.16));}\n'+
+ ' else if(pt==9.){if(side)d=.034-abs(p.y-(yb+.1));}\n'+
+ ' else if(pt==10.){if(!top&&p.y<yb+(yh-yb)*.5)return k;return b;}\n'+
+ ' else if(pt==11.){if(top){float s=mod(floor(p.x*11.)+floor(p.z*11.),2.);return s<1.?k:vec3(.1,.1,.12);}return b;}\n'+
+ ' else if(pt==12.){if(side&&p.y<yb+.15&&p.y>yb+.04){float s=fract((p.z+p.y)*7.);d=.0;return s<.5?k:vec3(.1,.1,.12);}return b;}\n'+
+ ' else if(pt==13.){if(side){float t=(p.z+L*.5)/L;float u=fract(p.z*3.+p.y*1.2);float sh=pow(1.-abs(u*2.-1.),.75);float h=(yh-yb)*1.05*sh*smoothstep(.0,.8,t)+.012;float r=p.y-(yb+.03);\n'+
+  '  if(r>0.&&r<h){c=k;if(r<h*.68)c=vec3(1.,.56,.1);if(r<h*.36)c=vec3(1.,.9,.35);return c;}}return b;}\n'+
+ ' else if(pt==14.){if(side)d=.028-abs(p.y-(by+.05*(abs(fract(p.z*3.)*2.-1.)*2.-1.)));}\n'+
+ ' else if(pt==15.){vec2 uv=side?vec2(p.z,p.y):(top?vec2(p.x,p.z):vec2(-9.));if(uv.x>-8.){uv/=.17;uv.x+=mod(floor(uv.y),2.)*.5;if(length(fract(uv)-.5)<.3)return k;}return b;}\n'+
+ ' else if(pt==16.){float v=gcN(p.xz*6.+p.y*4.)*.7+gcN(p.zy*13.+p.x*5.)*.3;if(v>.6)return k;if(v>.44)return mix(b,k,.5)*.8;return b;}\n'+
+ ' else if(pt==17.){vec2 q=vec2(p.z-(zf+zr)*.5,p.y-(yb+yh)*.5-.03);float r=min(.17,(yh-yb)*.46);if(side){float l=length(q);if(l<r){c=k;if(l<r*.8)c=vec3(.1,.1,.12);if(l<r*.62)c=vec3(.96);return c;}}\n'+
+  '  if(top&&p.z>zf){float l=length(vec2(p.x,p.z-(zf+L*.5)*.5));if(l<.15){c=k;if(l<.12)c=vec3(.1,.1,.12);if(l<.09)c=vec3(.96);return c;}}return b;}\n'+
+ ' else if(pt==18.){if(!top){float t=clamp((p.y-yb)/(yh-yb+.05),0.,1.);return mix(k,b,smoothstep(.0,.95,t));}return b;}\n'+
+ ' else if(pt==19.){if(side){float v=abs(p.y-by);if(v<.06&&fract((p.z+v*1.1)*3.5)<.38)return k;}return b;}\n'+
+ ' else if(pt==20.){if(side||top){float s=side?p.z:p.z;if(fract(s*7.)<.42)return k;}return b;}\n'+
+ ' else if(pt==21.){if(p.x>0.)return k;return b;}\n'+
+ ' else if(pt==22.){vec2 uv=side?vec2(p.z,p.y):(top?vec2(p.x,p.z):vec2(-9.));if(uv.x>-8.){uv/=.11;vec2 i=floor(uv);if(gcH(i)>.8&&length(fract(uv)-.5)<.22)return k;}return b;}\n'+
+ ' if(d>0.)return d<e?dk:k;\n'+
+ ' return b;}\n';
+ const patMats={};
+ function patMat(st,col,pat,c2){const key=st+'|'+col+'|'+pat+'|'+c2;if(patMats[key])return patMats[key];
+  const S0=CSPEC[st],m=carMats()[0].clone(),V=h=>{const c=new THREE.Color(h);return new THREE.Vector3(c.r,c.g,c.b)};
+  m.onBeforeCompile=sh=>{
+   sh.uniforms.uBody={value:V(col)};sh.uniforms.uC2={value:V(c2)};sh.uniforms.uPat={value:pat};
+   sh.uniforms.uD={value:new THREE.Vector4(S0.L,S0.W/2,S0.yb,S0.yh)};sh.uniforms.uE={value:new THREE.Vector4(S0.cab[4],S0.cab[3],S0.cab[0],S0.ytr)};
+   sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\n'+GL_COMMON).replace('#include <begin_vertex>','#include <begin_vertex>\nvOP=position;vON=normal;');
+   sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\n'+GL_FRAG).replace('#include <color_fragment>','#include <color_fragment>\nif(distance(vColor,uBody)<.03)diffuseColor.rgb=gcPat(vColor);')};
+  m.customProgramCacheKey=()=>'gcar1';return patMats[key]=m}
 
-  if(pat==1){[-1,1].forEach(s=>{const x=s*.115;hood(.1,x);roof(.1,x);boot(.1,x)});bar(zBack,by,zFront,by,.03,col2,1)}
-  else if(pat==2){bar(zBack,by,zFront,by,bh);bar(zBack,by+bh/2+.02,zFront,by+bh/2+.02,.014,white,1)}
-  else if(pat==3){roof(Wc*1.0,0);[-1,1].forEach(s=>{box(.012,Math.max(.04,yt-yh-.05),zf1-zr1+.06,s*(Wc/2+.004),(yh+yt)/2+.01,(zr1+zf1)/2,col2)});box(Wc,.012,.07,0,yt-.04,zr1-.005,col2,.5)}
-  else if(pat==4){hood(W*.66,0);boot(W*.66,0);hood(.03,0,white,1);boot(.03,0,white,1)}
-  else if(pat==5){const z0=zBack,z1=zFront,n=Math.max(8,Math.round((z1-z0)/.08)),sz=(z1-z0)/n;
-   [-1,1].forEach(s=>{for(let k=0;k<n;k++)for(let row=0;row<3;row++)if((k+row)%2==0)box(.012,bh/3,sz,s*(SX+.004),by+(row-1)*bh/3,z0+sz*(k+.5),k%2?black:col2);box(.012,bh+.016,z1-z0+.016,s*(SX+.002),by,(z0+z1)/2,edge(col2))})}
-  else if(pat==6){hood(.24,0);roof(.24,0);boot(.24,0);hood(.03,-.07,white,1);hood(.03,.07,white,1);roof(.03,-.07,white,1);roof(.03,.07,white,1);boot(.03,-.07,white,1);boot(.03,.07,white,1)}
-  else if(pat==7){bar(zBack,by+.045,zFront,by+.045,.04);bar(zBack,by-.045,zFront,by-.045,.04);bar(zBack,by,zFront,by,.016,white,1)}
-  else if(pat==8){[.045,.012,-.025].forEach((o,k)=>bar(zBack,by+o+.02,zFront,by+o+.02,k==1?.022:.012,k==1?white:col2,1));hood(.016,-.14,col2,1);hood(.016,.14,col2,1);boot(.016,-.14,col2,1);boot(.016,.14,col2,1);roof(.016,-.14,col2,1);roof(.016,.14,col2,1)}
-  else if(pat==9){bar(sz0-.1,yb+.105,sz1+.1,yb+.105,.07);bar(sz0-.1,yb+.165,sz1+.1,yb+.165,.012,white,1)}
-  else if(pat==10){lowPieces.forEach(([a,b,t])=>{if(b-a>.1&&t>yb+.06)bar(a,(t+yb+.02)/2,b,(t+yb+.02)/2,t-yb-.02)})}
-  else if(pat==11){const w=.1,nx=Math.max(2,Math.floor(Wc/w)),nz=Math.max(3,Math.floor((zf1-zr1)/w)),sx=Wc/nx,sz=(zf1-zr1)/nz;
-   for(let i=0;i<nx;i++)for(let k=0;k<nz;k++)flat(sx,sz,-Wc/2+sx*(i+.5),zr1+sz*(k+.5),yt+e,(i+k)%2?black:white);
-   const bl=zr0+L/2-.06,nb=Math.max(2,Math.floor(bl/w)),sb=bl/nb,wb=W*.7/4;
-   for(let i=0;i<4;i++)for(let k=0;k<nb;k++)flat(wb,sb,-W*.35+wb*(i+.5),-L/2+.06+sb*(k+.5),ytr+e,(i+k)%2?black:white);
-   const hn=Math.max(2,Math.floor(hl/w)),hs=hl/hn,hw=W*.6/4;for(let i=0;i<4;i++)for(let k=0;k<hn;k++)if((i+k)%2==0)box(hw,.012,hs,-W*.3+hw*(i+.5),(yh+yhf)/2+e-(k-hn/2+.5)*0,hz0+hs*(k+.5)+0,col2,0)}
-  else if(pat==12){const a=sz0-.1,b=sz1+.1,n=Math.max(6,Math.round((b-a)/.075)),sz=(b-a)/n;[-1,1].forEach(s=>{box(.012,.09,b-a+.016,s*(SX+.002),yb+.115,(a+b)/2,black);for(let k=0;k<n;k++)box(.012,.075,sz*.55,s*(SX+.006),yb+.115,a+sz*(k+.5),k%2?col2:col2,.55)})}
-  else if(pat==13){const base=yb+.03,top=yh-.03,H=top-base;
-   /* three layers of flame (outer colour, orange, yellow) licking back from the front wheel and up from the sill */
-   const L3=[[col2,1,1],[new THREE.Color('#ff8a1c'),.74,.8],[new THREE.Color('#ffe066'),.46,.55]];
-   const tongues=[[.0,.72,.14],[.2,1,.17],[.42,.82,.15],[.62,1,.17],[.82,.66,.14]];
-   [-1,1].forEach(s=>{const x=s*(SX+.004);
-    L3.forEach(([c,hs,ws],li)=>tongues.forEach(([u,hh,w0])=>{const zc=sz1-(sz1-sz0)*u,hgt=H*hh*hs,steps=6;
-     for(let q=0;q<steps;q++){const f=q/steps,w=w0*ws*(1-f*.9)*(sz1-sz0)*1.6,h=hgt/steps,off=f*f*.07;box(.012+li*.002,h+.003,w,x,base+h*(q+.5),zc-off-.02,c)}}))})}
-  else if(pat==14){const z0=zBack+.06,z1=zFront-.06,n=6,dz=(z1-z0)/n,ya=by+.075,yb2=by-.075;for(let k=0;k<n;k++){const a=z0+dz*k,b=z0+dz*(k+1),y0=k%2?yb2:ya,y1=k%2?ya:yb2;bar(a,y0,b,y1,.06,'#ffd23f'==='x'?col2:col2);bar(a,y0,b,y1,.022,white,1)}}
-  else if(pat==15){const dots=(x,y,z,rr,c)=>disc(rr,x,y,z,c,'x');
-   for(let z=zBack;z<zFront;z+=.2)for(let y=yb+.1,row=0;y<yh-.02;y+=.12,row++){const zz=z+(row%2?.1:0);if(skip(zz,y,.07)||zz>zFront)continue;[-1,1].forEach(s=>dots(s*(SX+.004),y,zz,.05,(row%2)?white:col2))}
-   const pr=[[-.2,0],[0,0],[.2,0],[-.1,1],[.1,1],[-.2,2],[0,2],[.2,2]];pr.forEach(([x,k])=>disc(.055,x*Wc/.8*.8,yt+e,zr1+(zf1-zr1)*(k+.5)/3,col2));
-   for(let z=zr0-.0,k=0;k<4;k++)[-.28,-.09,.09,.28].forEach((x,j)=>{if((k+j)%2==0)disc(.055,x*W/.9,ytr+e,-L/2+.14+k*((zr0+L/2-.28)/3),col2)});
-   for(let k=0;k<3;k++)[-.24,0,.24].forEach((x,j)=>{if((k+j)%2==0)box(.07,.012,.07,x*W/.9,(yh+yhf)/2+e,hz0+.1+k*.17,col2,ha)})}
-  else if(pat==16){const sh=[col2,dark,mid];
-   for(let k=0;k<64;k++){const z=zBack+rnd()*(zFront-zBack),y=yb+.04+rnd()*(yh-yb-.04),w=.09+rnd()*.22,h=.05+rnd()*.09;if(skip(z,y,.04))continue;const c=sh[k%3];[-1,1].forEach(s=>box(.012,h,w,s*(SX+.004),y,z,c))}
-   for(let k=0;k<26;k++){const c=sh[k%3];box(.1+rnd()*.18,.012,.09+rnd()*.14,(rnd()-.5)*(Wc-.16),yt+e,zr1+rnd()*(zf1-zr1),c);box(.12+rnd()*.2,.012,.08+rnd()*.12,(rnd()-.5)*(W-.2),ytr+e+.001,-L/2+.1+rnd()*(zr0+L/2-.2),c);box(.12+rnd()*.2,.012,.08+rnd()*.12,(rnd()-.5)*(W-.2),(yh+yhf)/2+e+.006,zf0+.1+rnd()*(L/2-.22-zf0),sh[(k+1)%3],ha)}}
-  else if(pat==17){const z=(zr1+zf1)/2-.06,y=(yb+yh)/2+.03,rr=Math.min(.17,(yh-yb)/2-.035);
-   [-1,1].forEach(s=>{const x=s*(SX+.004);disc(rr,x,y,z,col2,'x');disc(rr*.8,x+s*.003,y,z,black,'x');disc(rr*.62,x+s*.006,y,z,white,'x');box(.012,rr*1.1,.03,x+s*.01,y,z,black);box(.012,.03,rr*.5,x+s*.01,y+rr*.4,z-rr*.12,black,.0)});
-   disc(.16,0,yt+e,(zr1+zf1)/2,col2);disc(.13,0,yt+e+.003,(zr1+zf1)/2,black);disc(.1,0,yt+e+.006,(zr1+zf1)/2,white);box(.03,.012,.12,0,yt+e+.01,(zr1+zf1)/2,black);
-   hood(.22,0,col2,1);disc(.1,0,(yh+yhf)/2+e+.003,(hz0+hz1)/2,white);bar(zBack,by-.03,zFront,by-.03,.018,col2,1)}
-  else if(pat==18){/* fade: the pattern colour is strongest at the sill and fades to dark towards the belt line */
-   const steps=7,H=(lowTop+.02)-(yb+.03),h=H/steps;
-   [-1,1].forEach(s=>{for(let q=0;q<steps;q++)lowPieces.forEach(([a,b])=>{if(b-a>.1)box(.012,h*1.03,b-a,s*(SX+.004),yb+.03+h*(q+.5),(a+b)/2,col2.clone().multiplyScalar(1-.8*q/steps))})});
-   boot(W*.8,0,col2.clone().multiplyScalar(.75),1);hood(W*.8,0,col2.clone().multiplyScalar(.75),1)}
-  else if(pat==19){/* chevrons down the sides, pointing at the front */
-   const n=6,z0=zBack+.1,z1=zFront-.1,dz=(z1-z0)/n;for(let k=0;k<n;k++){const zc=z0+dz*(k+.5);bar(zc-dz*.35,by-.06,zc+dz*.15,by,.05,col2,1);bar(zc-dz*.35,by+.06,zc+dz*.15,by,.05,col2,1)}
-   hood(.03,0,col2,1)}
-  else if(pat==20){/* zebra: slanted bars over the sides, roof and boot */
-   const n=Math.max(8,Math.round((zFront-zBack)/.11)),dz=(zFront-zBack)/n;for(let k=0;k<n;k++){const zc=zBack+dz*(k+.5);if(k%2)continue;[-1,1].forEach(s=>{if(!skip(zc,yb+.1,.0)||true){const y0=yb+.06,y1=yh-.02;box(.012,y1-y0,dz*.7,s*(SX+.004),(y0+y1)/2,zc,col2,0)}})}
-   for(let k=0;k<5;k++)flat(Wc*.98,.06,0,zr1+(zf1-zr1)*(k+.5)/5,yt+e,k%2?col2:col2);for(let k=0;k<5;k++)if(k%2==0)flat(W*.9,.06,0,-L/2+.1+k*((zr0+L/2-.2)/4),ytr+e,col2)}
-  else if(pat==21){/* half and half: the whole right side, half the bonnet, roof and boot */
-   box(.012,yh-yb-.03,zFront-zBack,SX+.004,(yb+yh)/2,(zFront+zBack)/2,col2);
-   hood(W*.5,W*.25,col2,1);roof(Wc*.5,Wc*.25,col2,1);boot(W*.5,W*.25,col2,1);box(.012,yt-yh-.03,zf1-zr1+.05,Wc/2+.004,(yh+yt)/2,(zr1+zf1)/2,col2);
-   bar(zBack,by,zFront,by,.016,white,1)}
-  else if(pat==22){/* stars and sparkles scattered over the whole car */
-   const spark=(x,y,z,s,f)=>{if(f=='side')[-1,1].forEach(q=>{box(.012,s*2.2,s*.7,q*(SX+.004),y,z,col2);box(.012,s*.7,s*2.2,q*(SX+.004),y,z,col2);box(.013,s*.9,s*.9,q*(SX+.005),y,z,white)});else{box(s*.7,.012,s*2.2,x,y,z,col2);box(s*2.2,.012,s*.7,x,y,z,col2);box(s*.9,.013,s*.9,x,y+.001,z,white)}};
-   for(let k=0;k<26;k++){const z=zBack+rnd()*(zFront-zBack),y=yb+.08+rnd()*(yh-yb-.1);if(skip(z,y,.06))continue;spark(0,y,z,.022+rnd()*.022,'side')}
-   for(let k=0;k<7;k++)spark((rnd()-.5)*(Wc-.2),yt+e,zr1+rnd()*(zf1-zr1),.022+rnd()*.02);for(let k=0;k<7;k++)spark((rnd()-.5)*(W-.25),ytr+e,-L/2+.1+rnd()*(zr0+L/2-.2),.022+rnd()*.02)}
-
-  let n=0;parts.forEach(p=>{p[0]=p[0].toNonIndexed();n+=p[0].attributes.position.count});
-  const P=new Float32Array(n*3),N=new Float32Array(n*3),C=new Float32Array(n*3);let o=0;
-  parts.forEach(([g,c])=>{const cnt=g.attributes.position.count;P.set(g.attributes.position.array,o*3);N.set(g.attributes.normal.array,o*3);for(let q=0;q<cnt;q++){const j=(o+q)*3;C[j]=c.r;C[j+1]=c.g;C[j+2]=c.b}o+=cnt;g.dispose()});
-  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(P,3));geo.setAttribute('normal',new THREE.BufferAttribute(N,3));geo.setAttribute('color',new THREE.BufferAttribute(C,3));
-  geo.computeBoundingBox();geo.computeBoundingSphere();return decalCache[key]=geo}
- function decalMat(){return dMat||(dMat=new THREE.MeshPhongMaterial({vertexColors:true,shininess:70,specular:0x5a5a5a,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}))}
-
- /* a car model list for car i with a given look (the same contract as carList in 39-car-models.js, plus one pattern mesh) */
  const carList0=carList;
  /* the Phantom GT has gold stripes built into its model: recolour them to the body so a chosen look replaces them */
  const cleanCache={};
@@ -124,8 +80,7 @@
   g.setAttribute('color',new THREE.BufferAttribute(ca,3));return cleanCache[k]=g}
  function looked(i,cu){const col=cu&&okHex(cu.c)?cu.c:CARS[i].c,a=carList0(i,col,1),pat=cu&&patOk(cu.p)&&cu.p>0?cu.p:0;
   const c2=okHex(cu&&cu.c2)?cu.c2:'#f2f2f2';
-  a.forEach=function(cb){const m0=cb([1,1,1,'#fff',0,0,0]);if(m0&&m0.isMesh){m0.geometry=cleanGeo(i,col);m0.material=carMats();m0.scale.set(1,1,1)}
-   if(pat){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=decalGeo(i,pat,c2);m.material=decalMat();m.scale.set(1,1,1)}}};return a}
+  a.forEach=function(cb){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=cleanGeo(i,col);const M=carMats();m.material=pat?[patMat(i,col,pat,c2),M[1],M[2]]:M;m.scale.set(1,1,1)}};return a}
  /* your own cars (no traffic colour given) wear their saved look everywhere; traffic and shop cars are untouched */
  carList=function(i,cc,fixed){if(cc===undefined&&CARS[i]&&cust(i))return looked(i,cust(i));return carList0(i,cc,fixed)};
 
@@ -140,7 +95,7 @@
   pvS.add(new THREE.AmbientLight(0xfff4e0,.8));const d=new THREE.DirectionalLight(0xffffff,.85);d.position.set(3,5,4);pvS.add(d);
   const plate=new THREE.Mesh(new THREE.CylinderGeometry(1.95,2.05,.06,28),new THREE.MeshLambertMaterial({color:0x4a4f58}));plate.position.y=-.03;pvS.add(plate);
   const ring=new THREE.Mesh(new THREE.TorusGeometry(2,.03,6,40),new THREE.MeshBasicMaterial({color:0xf2b705}));ring.rotation.x=Math.PI/2;ring.position.y=.01;pvS.add(ring);
-  pvC=new THREE.PerspectiveCamera(33,PW/PH,.1,50);pvC.position.set(0,2.1,4.6);pvC.lookAt(0,.55,0);return true}catch(e){pvR=null;return false}}
+  pvC=new THREE.PerspectiveCamera(33,PW/PH,.1,50);pvC.position.set(0,2.4,5.9);pvC.lookAt(0,.5,0);return true}catch(e){pvR=null;return false}}
  function pvShow(i,cu){if(!pvInit())return;if(pvM)pvS.remove(pvM);pvM=mkS(looked(i,cu));pvM.scale.setScalar(1.6);pvM.rotation.y=pvM._ry=.6;pvS.add(pvM);
   const slot=document.getElementById('gcvs');if(slot&&pvR.domElement.parentNode!==slot)slot.appendChild(pvR.domElement);
   cancelAnimationFrame(pvRaf);const tick=()=>{if(!document.getElementById('gcv')||!pvM)return;if(!pvM._hold)pvM.rotation.y+=.01;pvR.render(pvS,pvC);pvRaf=requestAnimationFrame(tick)};tick()}
@@ -190,36 +145,16 @@
 #ui .gar .gw button.on{outline:3px solid var(--hz);outline-offset:1px}
 #ui .gar .gt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 #ui .gar .gt button{padding:4px 2px 3px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;letter-spacing:0;line-height:1.1;text-align:center;min-height:0}
-#ui .gar .gt button svg{display:block;width:100%;height:auto;background:#23262b;border-radius:2px}
+#ui .gar .gt button img{display:block;width:100%;height:auto;background:#23262b;border-radius:2px;aspect-ratio:240/132}
 #ui .gar .gt button.on{background:var(--hz);color:var(--ink);outline:0}
 `;document.head.appendChild(s)}
 
- /* ---------- small side-view icons for the patterns ---------- */
- function icon(k,body,c){const q=`fill="${c}"`,d=`fill="#1c1d20"`,G=(x,y,w,h,f)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" ${f||q}/>`;let p='';
-  if(k==1)p=G(30,8,4,5)+G(24,6,16,3,'fill="none"')+G(9,13,40,3)+G(9,16,0,0);
-  if(k==1)p=G(26,6,10,3)+G(8,11,44,3)+'';
-  if(k==2)p=G(6,19,48,4);
-  if(k==3)p=`<path d="M22 8h18l4 6H18z" ${q}/>`;
-  if(k==4)p=G(8,12,12,3)+G(44,12,10,3)+G(8,19,0,0);
-  if(k==5)for(let i=0;i<12;i++)p+=G(7+i*4,18+((i%2)*3),4,3);
-  if(k==6)p=G(8,11,44,3)+G(26,7,12,3);
-  if(k==7)p=G(6,17,48,2)+G(6,21,48,2);
-  if(k==8)p=G(6,17,48,1)+G(6,20,48,1);
-  if(k==9)p=G(18,26,28,3);
-  if(k==10)p=G(18,17,28,12);
-  if(k==11)for(let i=0;i<6;i++)p+=G(22+i*3.2,9+((i%2)*3),3.2,3)+G(22+i*3.2,12-((i%2)*3),0,0);
-  if(k==12)for(let i=0;i<7;i++)p+=G(18+i*4,26,4,3,i%2?d:q);
-  if(k==13)p=`<path d="M20 29l3-10 3 4 3-9 3 8 3-4 3 11z" ${q}/>`;
-  if(k==14)p=`<path d="M8 22l8-5 6 6 8-6 6 6 8-5 6 4" fill="none" stroke="${c}" stroke-width="2.5"/>`;
-  if(k==15)for(let i=0;i<8;i++)p+=`<circle cx="${10+i*6}" cy="${19+((i%2)*5)}" r="1.8" ${q}/>`;
-  if(k==16)p=G(10,17,8,4)+G(22,21,9,3)+G(36,16,8,5)+G(46,22,7,3)+G(26,10,8,3)+G(14,23,5,3);
-  if(k==17)p=`<circle cx="32" cy="22" r="6" ${q}/><circle cx="32" cy="22" r="3.6" ${d}/><circle cx="32" cy="22" r="1.6" ${q}/>`;
-  if(k==18)for(let i=0;i<5;i++)p+=`<rect x="14" y="${29-i*2.4}" width="36" height="2.4" fill="${c}" opacity="${1-i*.18}"/>`;
-  if(k==19)for(let i=0;i<5;i++)p+=`<path d="M${14+i*8} 17l5 4-5 4" fill="none" stroke="${c}" stroke-width="2"/>`;
-  if(k==20)for(let i=0;i<7;i++)p+=`<path d="M${12+i*6} 26l3-9" stroke="${c}" stroke-width="2.4"/>`;
-  if(k==21)p=`<path d="M5 27V21l8-3 6-9h11v18z" fill="${c}"/>`;
-  if(k==22)for(let i=0;i<6;i++)p+=`<path d="M${12+i*8} ${18+(i%2)*5}l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" fill="${c}"/>`;
-  return`<svg viewBox="0 0 64 36" aria-hidden="true"><path d="M5 27V21l8-3 6-9h22l8 9 10 3v6z" fill="${body}" stroke="#0008" stroke-width="1"/><path d="M21 11h20l5 7H17z" fill="#8fb8cf"/>${p}<circle cx="17" cy="28" r="5" fill="#1b1b1d"/><circle cx="47" cy="28" r="5" fill="#1b1b1d"/><circle cx="17" cy="28" r="2" fill="#c9ced6"/><circle cx="47" cy="28" r="2" fill="#c9ced6"/></svg>`}
+ /* ---------- picker pictures: every pattern drawn on the selected car, in its colours (cached) ---------- */
+ let tR=null,tS=null,tC=null;const pthumbs={};
+ function pthumb(i,cu,k){const key=i+'|'+cu.c+'|'+cu.c2+'|'+k;if(pthumbs[key])return pthumbs[key];
+  try{if(!tR){tR=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});tR.setPixelRatio(1);tR.setSize(240,132);tS=new THREE.Scene();tS.add(new THREE.AmbientLight(0xfff4e0,.8));const d=new THREE.DirectionalLight(0xffffff,.85);d.position.set(3,5,4);tS.add(d);
+    tC=new THREE.PerspectiveCamera(30,240/132,.1,50);tC.position.set(0,2.6,4.7);tC.lookAt(0,.45,0)}
+   const m=mkS(looked(i,Object.assign({},cu,{p:k})));m.scale.setScalar(1.55);m.rotation.y=.78;tS.add(m);tR.render(tS,tC);const u=tR.domElement.toDataURL('image/png');tS.remove(m);return pthumbs[key]=u}catch(e){return''}}
 
  /* ---------- screens ---------- */
  const head=`<div class=gh></div><div class=gs>Tom's Garage<small>Custom paint shop</small></div>`;
@@ -235,11 +170,10 @@
    <div class=gf><button onclick="closeUI()">Leave garage</button></div></div>`}
  function carUI(i){css();const cu=Object.assign({c:CARS[i].c,p:0,c2:'#f2f2f2'},cust(i)||{}),cn=n=>(COLS.concat(PCOLS).find(x=>x[1]==n)||[n,n])[0],pn=patOk(cu.p)?cu.p:0;
   $('ui').innerHTML=`<div class="box modal gar" id="gar">${head}
-   <div class=gp><div><div id=gcvs></div><div class=gcar><span>${CARS[i].n}</span><b>Bay ${i+1}</b></div></div>
+   <div class=gp><div><div id=gcvs></div><div class=gcar><span>${CARS[i].n}</span><b>Bay ${i+1}</b></div><div class=gk style="margin-top:10px;${pn>0?'':'opacity:.5'}"><h4>Pattern colour <span>${pn>0?cn(cu.c2):'pick a pattern first'}</span></h4><div class=gw>${PCOLS.map(x=>chip(x[1],x[1]==cu.c2,`gcSet(${i},'c2','${x[1]}')`,x[0])).join('')}</div></div></div>
    <div>
     <div class=gk><h4>Paint colour <span>${cn(cu.c)}</span></h4><div class=gw>${COLS.map(x=>chip(x[1],x[1]==cu.c,`gcSet(${i},'c','${x[1]}')`,x[0])).join('')}</div></div>
-    <div class=gk><h4>Pattern <span>${PATS[pn]}</span></h4><div class=gt>${SHOW.map(k=>`<button type=button class="${k==pn?'on':''}" aria-pressed="${k==pn?'true':'false'}" onclick="gcSet(${i},'p',${k})">${icon(k,cu.c,k==pn?'#1a1b1e':cu.c2)}${PATS[k]}</button>`).join('')}</div></div>
-    ${pn>0?`<div class=gk><h4>Pattern colour <span>${cn(cu.c2)}</span></h4><div class=gw>${PCOLS.map(x=>chip(x[1],x[1]==cu.c2,`gcSet(${i},'c2','${x[1]}')`,x[0])).join('')}</div></div>`:''}
+    <div class=gk><h4>Pattern <span>${PATS[pn]}</span></h4><div class=gt>${SHOW.map(k=>`<button type=button class="${k==pn?'on':''}" aria-pressed="${k==pn?'true':'false'}" onclick="gcSet(${i},'p',${k})"><img alt="" src="${pthumb(i,cu,k)}">${PATS[k]}</button>`).join('')}</div></div>
    </div></div>
    <div class=gf><button onclick="gcReset(${i})">Stock paint</button><button class=go onclick="gcList()">Done</button></div></div>`;
   pvShow(i,cu)}
