@@ -14,8 +14,10 @@
 #fwdv .st{margin-top:8px;color:#2fe68a;min-height:14px}`;
  document.head.appendChild(css);
  const w=document.createElement('div');w.id='fwdv';
- w.innerHTML='<div class=p><h4>DEV SLOT</h4><small>Separate save. Cloud is switched off. Nothing here touches real saves or players.</small><div id=fwdvb></div><div class=st id=fwdvs></div></div><button class=t id=fwdvt>DEV</button>';
+ w.innerHTML='<div class=p><h4>DEV SLOT</h4><small id=fwdvbn></small><small>Separate save. Cloud is switched off. Nothing here touches real saves or players.</small><div id=fwdvb></div><div class=st id=fwdvs></div></div><button class=t id=fwdvt>DEV</button>';
  document.body.appendChild(w);
+ const bn=document.getElementById('fwdvbn');if(bn)bn.textContent='Build '+(window.FW_DEV_BUILD||'?')+(typeof GAME_VERSION!='undefined'?' on game '+GAME_VERSION:'');
+ document.getElementById('fwdvt').textContent='DEV '+String(window.FW_DEV_BUILD||'').replace(/^dev-/,'');
  const say=t=>{document.getElementById('fwdvs').textContent=t};
  const g=f=>{try{return f()}catch(e){return undefined}};
  const ready=()=>g(()=>typeof S==='object'&&S&&S.day!==undefined);
@@ -36,6 +38,13 @@
    ['Open a stranger profile',()=>FW_PROFILE.open('dex')],
    ['Open mock Friends window',()=>FW_PROFILE.friendsWin()],
    ['Show mock band room panel',()=>FW_PROFILE.mockBand()]]],
+  ['City crowds',[
+   ['Crowd: always on (ignore fame)',()=>{FW_CROWD.force=!FW_CROWD.force;say('Forced crowd '+(FW_CROWD.force?'on':'off'))}],
+   ['Crowd: switch off / on',()=>{FW_CROWD.off=!FW_CROWD.off;say('Crowd '+(FW_CROWD.off?'off':'on'))}],
+   ['Crowd status',()=>say('Crowd '+FW_CROWD.n+' of '+FW_CROWD.want+', guards '+g(()=>S.guards))],
+   ['Bodyguards with me: 0',need(()=>{S.guards=0;g(()=>syncF());sv('0 bodyguards')})],
+   ['Bodyguards with me: 1',need(()=>{S.guards=1;S.gs='follow';g(()=>syncF());sv('1 bodyguard')})],
+   ['Bodyguards with me: 3',need(()=>{S.guards=3;S.gs='follow';g(()=>syncF());sv('3 bodyguards')})]]],
   ['Time',[
    ['Skip 1 day',jump(1)],['Skip 7 days',jump(7)],['Skip 30 days',jump(30)],['Skip 100 days',jump(100)],
    ['Set time to morning',need(()=>{S.t=0;sv('Morning')})]]],
