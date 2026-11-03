@@ -14,6 +14,9 @@
  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
  const G=[1,.4,.12,0],TIER=[0,0,0,3,5,7,9,11,12,13,14,14,15];
  const SIDE=1.0;
+ /* heading change is rate-limited (rad/s) so nobody can ever spin round in a frame or two, whatever made the target flip */
+ const TURN=4.2;
+ function turn(n,tgt,dt,k){let d=tgt-n._hd;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;const m=TURN*dt;n._hd+=clamp(d*Math.min(1,dt*k),-m,m)}
  let CW=[],nextRec=0,nextRel=0,rollT=0,roll=0,extraDone=0;
 
  function prep(n){
@@ -87,8 +90,10 @@
    n._stk=(spd<.25&&dist>2.8)?n._stk+dt:0;
    if(n._stk>2.5||t>n._bt){release(n,vert,t>n._bt?30:12,t);return}
    /* face you when close, otherwise face where they are walking */
-   let tgt=n._hd;if(Math.hypot(P.x-cx,P.z-cz)<7)tgt=Math.atan2(P.x-cx,P.z-cz);else if(spd>.3)tgt=Math.atan2(n._vx,n._vz);
-   let d=tgt-n._hd;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;n._hd+=d*Math.min(1,dt*7);
+   /* always face the way they are actually moving (no more walking backwards while looking at you); only when
+      standing nearly still do they turn to look at you */
+   let tgt=n._hd;if(spd>.35)tgt=Math.atan2(n._vx,n._vz);else if(Math.hypot(P.x-cx,P.z-cz)<7)tgt=Math.atan2(P.x-cx,P.z-cz);
+   turn(n,tgt,dt,7);
    n.x=cx;n.z=cz;n.m.position.set(cx,0,cz);n.m.rotation.y=n._hd;
    const a=clamp(spd/1.6,0,1)*.6,s=Math.sin(n.t)*a;
    n.legs[0].rotation.x=s;n.legs[1].rotation.x=-s;n.arms[0].rotation.x=-s;n.arms[1].rotation.x=s})}
@@ -123,7 +128,7 @@
   if(n.pet&&!vert)n.pet.position.z+=n._lo;
   /* heading follows the real motion, eased, so turns are never a snap */
   const lg=n.dir*n._sp0*n._sf,vx=vert?n._lv:lg,vz=vert?lg:n._lv;
-  if(Math.hypot(vx,vz)>.05){let d=Math.atan2(vx,vz)-n._hd;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;n._hd+=d*Math.min(1,dt*9)}
+  if(Math.hypot(vx,vz)>.05)turn(n,Math.atan2(vx,vz),dt,9);
   n.m.rotation.y=n._hd;
   if(n.st!=1&&n._sf<.98){const k=Math.max(.25,n._sf);n.legs[0].rotation.x*=k;n.legs[1].rotation.x*=k;n.arms[0].rotation.x*=k;n.arms[1].rotation.x*=k}}
 
