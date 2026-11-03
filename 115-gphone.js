@@ -60,7 +60,7 @@ function phR(){let e=document.getElementById('ph');if(!e){e=document.createEleme
 /* chat replies arrive on timers that only redraw the computer, so the phone's Messages refreshes itself */
 setInterval(()=>{try{if(mode=='phone'&&PH.app=='msg'&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))phR()}catch(e){}},3000);
 setInterval(()=>{try{if(typeof S!='undefined'&&S&&mode=='play'&&!S.phHint&&!document.getElementById('load')){S.phHint=1;say('Press G for your Gphone.')}}catch(e){}},5000);
-/* ---- camera: a full-screen viewfinder like a phone camera. PHOTO is first person (walk with W/S, turn with A/D, tilt with R/F);
+/* ---- camera: a full-screen viewfinder like a phone camera. PHOTO is first person (you stand still: turn with A/D, tilt with R/F);
    SELFIE puts the camera in front of you with the arm out, optionally with a friend standing beside you. Space or Enter (or the shutter) takes the photo. ---- */
 {const px=(r,p)=>{const c=document.createElement('canvas');c.width=r[0].length;c.height=r.length;const x=c.getContext('2d');r.forEach((l,y)=>[...l].forEach((h,i)=>{if(p[h]){x.fillStyle=p[h];x.fillRect(i,y,1,1)}}));return c.toDataURL()};
  IC.cam=px(['..........','...DDDD...','.DDDDDDDD.','DDDWWWWDDD','DDWBBBBWDD','DDWBLLBWDD','DDWBBBBWDD','DDDWWWWDDD','DDDDDDDDDD','..........'],{D:'#6b7480',W:'#e8f3ec',B:'#1b2733',L:'#7fd0ff'});
@@ -116,11 +116,13 @@ const phGV=()=>(typeof IN!='undefined'&&!!IN)||(typeof HIN!='undefined'&&!!HIN);
  if(PH.camOn&&P.mesh&&c===cam)P.mesh.visible=true;return r0(sc,c)}}
 /* buildings fade out when they stand between the game camera and you; in the first person view they must stay solid */
 {const f0=fadeT;fadeT=function(dt){if(PH.camOn&&!phGV()){try{CT.forEach(b=>{b.mat.opacity=1;b.mat.depthWrite=true})}catch(e){}return}return f0.apply(this,arguments)}}
+/* v49.75.0: you stand still while the camera is open. A and D turn the view, R and F tilt it (PHOTO), but you cannot walk; the keys, touch stick and gamepad
+   stick are cleared every frame and your position is put back after the update. */
 {const u0=update;update=function(dt){
- if(PH.camOn){if(mode!='play')closeCamera();else if(!phGV()){for(const k in keys)delete keys[k];
-  const sp=(PHK.shift?5:2.6)*dt;if(PHK.a||PHK.arrowleft)PH.yaw+=1.6*dt;if(PHK.d||PHK.arrowright)PH.yaw-=1.6*dt;if(PH.cam=='land'){if(PHK.r)PH.pitch=Math.min(.6,PH.pitch+.8*dt);if(PHK.f)PH.pitch=Math.max(-.6,PH.pitch-.8*dt)}
-  const m=(PHK.w||PHK.arrowup?1:0)-(PHK.s||PHK.arrowdown?1:0);if(m){const dx=Math.sin(PH.yaw)*m*sp,dz=Math.cos(PH.yaw)*m*sp;if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz}P.rot=PH.yaw}}
- return u0(dt)}}
+ if(PH.camOn){if(mode!='play')closeCamera();else{for(const k in keys)delete keys[k];
+  if(!phGV()){if(PHK.a||PHK.arrowleft)PH.yaw+=1.6*dt;if(PHK.d||PHK.arrowright)PH.yaw-=1.6*dt;if(PH.cam=='land'){if(PHK.r)PH.pitch=Math.min(.6,PH.pitch+.8*dt);if(PHK.f)PH.pitch=Math.max(-.6,PH.pitch-.8*dt)}P.rot=PH.yaw}}}
+ if(!PH.camOn)return u0(dt);
+ const x=P.x,z=P.z,r=u0(dt);P.x=x;P.z=z;if(P.mesh){P.mesh.position.x=x;P.mesh.position.z=z}return r}}
 addEventListener('keyup',e=>{delete PHK[e.key.toLowerCase()]});addEventListener('blur',()=>{for(const k in PHK)delete PHK[k]});
 function phFlash(){const f=document.getElementById('pcmfla');if(!f)return;f.style.transition='none';f.style.opacity=.9;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .35s';f.style.opacity=0}))}
 function phNew(c,kind,who){const L=phPhotos(),id=(S.phId=(S.phId||0)+1);L.push({id,c,k:kind,w:who||'',d:S.day,gp:phModel()});while(L.length>PH_MAX)L.shift();PH.last=id;return id}
