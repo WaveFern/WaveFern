@@ -86,7 +86,7 @@ const TIPS=[
   go:{w:TUT_LAP,hl:()=>mode=='pc'?(app!=1?TUT_PC(1):`button[onclick*="pg='upload'"]`):null,done:b=>S.songs.length>b.s}},
  {k:'free',b:1,l:['That is the basics: record, release, sleep, spend, grow.','From now on I only drop in, now and then, when you find something new. Tips off on this box and I stay quiet for good.'],dm:['Yo, it is Big Vee. I will drop in now and then when you find something new. Want me quiet? Tips off on my box or in the pause menu.']},
  /* contextual */
- {k:'tired',when:()=>mode=='play'&&(S.energy<25||S.t>=300),l:['You are running on fumes. Your bed (E) ends the day, and your streams pay out when you wake.','A day is 12 minutes: 6 light, 6 dark. Stay up past 06:00 and you pass out.'],
+ {k:'tired',when:()=>mode=='play'&&(S.t>=300||(typeof bedTired=='function'&&bedTired())),l:['You are running on fumes. Your bed (E) ends the day, and your streams pay out when you wake.','A day is 12 minutes: 6 light, 6 dark. Stay up past 06:00 and you pass out.'],
   go:{w:TUT_BED,done:b=>S.day>b.day,t:240}},
  {k:'dm',when:()=>(S.msgs||[]).some(m=>!m.g&&m.unread),pc:['Messages is the outlined icon. Open the chat with the red dot.'],l:['Someone slid into your DMs. Check Messages on the laptop.','If THEY ask for a collab, they pay you. If YOU ask, you pay their fee. Haggle in plain words, like "how about 150".'],
   go:{w:TUT_LAP,hl:()=>mode=='pc'&&app!='msg'?TUT_PC('msg'):null,done:()=>S.tut.f.msg,t:180}},
