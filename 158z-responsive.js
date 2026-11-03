@@ -1,4 +1,4 @@
-/* WaveFern dev responsive pass (v1). Only loaded on /dev/ (see dev/index.html); the live game is untouched.
+/* WaveFern dev responsive pass (v1). Loaded from index.html.
    Makes the menus fit and stay usable on phones, foldables and tablets in portrait and landscape:
    - every pop-up (.modal / pause / shop / settings) is capped to the visible screen and scrolls inside itself
    - the world map shrinks to fit short (landscape) screens instead of running off the top and bottom
