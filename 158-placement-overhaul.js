@@ -52,15 +52,17 @@ function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
 /* ---- ghost follows the pointer; green = fits, red = does not ---- */
 function groundPoint(){RC.setFromCamera({x:mouse.x,y:pType=='touch'?mouse.y+.14:mouse.y},cam);const p=new THREE.Vector3();return RC.ray.intersectPlane(PLN,p)?p:null}
 /* v49.75.0: the held item glides after the pointer, hovers a little above the floor and turns smoothly; the footprint is a soft tint */
+const DEV=()=>!!window.FW_DEV;/* v49.75.0 changes only run on the /dev/ build */
 let gT=0,gFresh=true;const lerpA=(a,b,k)=>{let d=((b-a+Math.PI*3)%(Math.PI*2))-Math.PI;return a+d*k};
 function ghostTick(){const p=groundPoint();if(!p||!ghost)return;const o=fit(hold,p.x,p.z,gp.r,-1);gp.r=o.r;gp.x=o.x;gp.z=o.z;gp.ok=valid(hold,o.x,o.z,o.r,-1);
+ if(!DEV()){const c=fb(hold,o.x,o.z,o.r);ghost.position.set(o.x,0,o.z);ghost.rotation.y=o.r*Math.PI/2;GF.position.set(o.x,.05,o.z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.color.set(gp.ok?0x44ff88:0xff4455);return}
  const now=performance.now(),dt=Math.min(.1,Math.max(0,(now-gT)/1000));gT=now;const k=gFresh?1:1-Math.exp(-dt*24);gFresh=false;
  const c=fb(hold,o.x,o.z,o.r),lift=F[hold].f?.02:.1;
  ghost.position.x+=(o.x-ghost.position.x)*k;ghost.position.z+=(o.z-ghost.position.z)*k;ghost.position.y+=(lift-ghost.position.y)*Math.min(1,k*.8);
  ghost.rotation.y=lerpA(ghost.rotation.y,o.r*Math.PI/2,k);
  GF.position.set(o.x,.03,o.z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.opacity=.28;GF.material.color.set(gp.ok?0x5fa77a:0xb8575f)}
 function hilite(i){const b=new THREE.Box3().setFromObject(PL[i].m),sz=b.getSize(new THREE.Vector3()),ct=b.getCenter(new THREE.Vector3());
- if(!HOVO){HOVO=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1)),new THREE.LineBasicMaterial({color:0xe6d8a8,depthTest:false}));HOVO.renderOrder=999;scene.add(HOVO)}
+ if(!HOVO){HOVO=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1)),new THREE.LineBasicMaterial({color:DEV()?0xe6d8a8:0xffee55,depthTest:false}));HOVO.renderOrder=999;scene.add(HOVO)}
  HOVO.position.copy(ct);HOVO.scale.set(sz.x+.06,sz.y+.06,sz.z+.06);HOVO.visible=true}
 {const b0=buildTick;buildTick=function(){const r=b0.apply(this,arguments);
   document.body.classList.toggle('pbuild',mode=='build');
@@ -80,10 +82,10 @@ function settleTick(done){const now=performance.now();for(let i=SET.length-1;i>=
   const e=u*u*(3-2*u);a.m.position.y=a.y0*(1-e);const sq=u<1?1-.035*Math.sin(u*Math.PI):1;a.m.scale.set(1+(1-sq)*.5,sq,1+(1-sq)*.5);
   if(u>=1){a.m.position.y=0;a.m.scale.set(1,1,1);SET.splice(i,1)}}}
 function place(){if(!hold)return;if(!gp.ok){snd('err');return say(F[hold].wall?'Hang it on a wall: move it right up against one, back to the wall.':'It does not fit there. Move it or turn it.')}
- const t=hold,m=mkF(t);m.position.set(gp.x,ghost?ghost.position.y:0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t,x:gp.x,z:gp.z,r:gp.r,m});settle(m);snd('thunk');
+ const t=hold,m=mkF(t);m.position.set(gp.x,DEV()&&ghost?ghost.position.y:0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t,x:gp.x,z:gp.z,r:gp.r,m});if(DEV())settle(m);snd('thunk');
  moving=null;if(S.inv[t]>0){S.inv[t]--;man=false}else{hold=null;clrGhost();sel=PL.length-1}buildUI()}
 function pickUp(i){const q=PL[i];if(!q||hold)return;if(q.t=='desk'){snd('err');return say('Your desk is part of the house. Upgrade it in the Gear shop.')}
- scene.remove(q.m);PL.splice(i,1);moving={t:q.t,x:q.x,z:q.z,r:q.r};hold=q.t;gp.r=q.r;gp.ok=0;man=true;sel=-1;mkGhost();ghost.position.set(q.x,0,q.z);ghost.rotation.y=q.r*Math.PI/2;gFresh=false;gT=performance.now();snd('pop');buildUI()}
+ scene.remove(q.m);PL.splice(i,1);moving={t:q.t,x:q.x,z:q.z,r:q.r};hold=q.t;gp.r=q.r;gp.ok=0;man=true;sel=-1;mkGhost();if(DEV()){ghost.position.set(q.x,0,q.z);ghost.rotation.y=q.r*Math.PI/2;gFresh=false;gT=performance.now()}snd('pop');buildUI()}
 function restore(){if(!moving)return;const q=moving,m=mkF(q.t);moving=null;m.position.set(q.x,0,q.z);m.rotation.y=q.r*Math.PI/2;scene.add(m);PL.push({t:q.t,x:q.x,z:q.z,r:q.r,m});hold=null;clrGhost();sel=PL.length-1}
 function rot(d){snd('click');man=true;if(hold){gp.r=(gp.r+d+4)%4;return}
  if(sel<0)return;const q=PL[sel];if(q.t=='desk'){snd('err');return say('Your desk is fixed in place.')}
@@ -121,7 +123,7 @@ addEventListener('keydown',e=>{if(mode!='build'||/INPUT|TEXTAREA/.test(e.target.
 const css=document.createElement('style');css.textContent=`
 body.pbuild canvas{touch-action:none}
 body.pbuild #tch{display:none!important}
-.pb{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 16px));max-height:56vh;overflow:auto;box-sizing:border-box;padding:10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pb{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 16px));max-height:52vh;overflow:auto;box-sizing:border-box;padding:10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .pb h3{margin:0;font-size:14px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pb button{min-height:40px;padding:6px 12px;font:inherit}
 .pb .pbr{display:flex;gap:6px;align-items:center;margin-bottom:8px}
@@ -180,7 +182,7 @@ window.PBcat=c=>{SCAT=c;snd('click');buildUI()};
 window.PBq=v=>{SSQ=v;const g=document.getElementById('pbgrid');if(g)g.innerHTML=listHTML();const x=document.getElementById('pbclr');if(x)x.style.display=v?'':'none'};
 window.PBclr=()=>{SSQ='';buildUI();const i=document.getElementById('pbq');if(i)i.focus()};
 
-buildUI=function(){const s=PS();S.fd=S.fd||{};const oldp=document.querySelector('#ui .pb'),sl=oldp?oldp.scrollTop:0,wasQ=document.activeElement&&document.activeElement.id=='pbq';
+buildUI=function(){const s=PS();S.fd=S.fd||{};const oldp=document.querySelector('#ui .pb'),sl=oldp?oldp.scrollTop:0,ol=document.querySelector('#ui .pbl'),sl2=ol?ol.scrollLeft:0,wasQ=document.activeElement&&document.activeElement.id=='pbq';
  const k=stored(),fd=Object.keys(S.fd).filter(i=>S.fd[i]>0&&FOOD[i]);
  const tab=(t,n)=>`<button class="${SGT==t?'on':''}" onclick="SGT='${t}';buildUI()">${n}</button>`;
  const tg=(key,val,n)=>`<button class="${s[key]==val?'on':''}" onclick="PBset('${key}',${val})">${n}</button>`;
@@ -188,12 +190,12 @@ buildUI=function(){const s=PS();S.fd=S.fd||{};const oldp=document.querySelector(
  const turn='<button onclick="PBdo(\'rl\')" aria-label="Turn left">↺</button><button onclick="PBdo(\'rr\')" aria-label="Turn right">↻</button>';
  const actRow=hold?`<div class="pbr pbact"><button class=on onclick="PBdo('place')">✔ Place</button>${turn}<button onclick="PBdo('store')">Store</button><button onclick="PBdo('cancel')">${moving?'Undo':'✕'}</button></div>`
   :q?`<div class="pbr pbact"><button class=on onclick="PBdo('move')">✥ Move</button>${turn}<button onclick="PBdo('store')">Store</button><button onclick="PBdo('cancel')">✕</button></div>`:'';
- const body=SGT=='f'?(k.length?`<div class=pbf><div class=pbsr><input id=pbq type=search placeholder="Search furniture" autocomplete=off spellcheck=false value="${esc2(SSQ)}" oninput="PBq(this.value)"><button id=pbclr class=pbx style="${SSQ?'':'display:none'}" onclick="PBclr()" aria-label="Clear search">✕</button></div><div class="pbc">${catsHTML()}</div><div class="pbl pbg" id=pbgrid>${listHTML()}</div></div>`:'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>')
+ const body=SGT=='f'?(k.length&&!DEV()?`<div class=pbl>${k.map(t=>`<button onclick="holdItem('${t}')"><span>${F[t].n}</span><small>×${S.inv[t]} in storage</small></button>`).join('')}</div>`:k.length?`<div class=pbf><div class=pbsr><input id=pbq type=search placeholder="Search furniture" autocomplete=off spellcheck=false value="${esc2(SSQ)}" oninput="PBq(this.value)"><button id=pbclr class=pbx style="${SSQ?'':'display:none'}" onclick="PBclr()" aria-label="Clear search">✕</button></div><div class="pbc">${catsHTML()}</div><div class="pbl pbg" id=pbgrid>${listHTML()}</div></div>`:'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>')
   :(fd.length?`<div class="pbl wrap">${fd.map(i=>`<button onclick="eatFood(${i})"><span>${FOOD[i][0]}</span><small>×${S.fd[i]} · +${FOOD[i][2]} energy</small></button>`).join('')}</div>`:'<span class=m>No food in storage. Order from Goober Eats (computer).</span>');
  const sets=setOpen?`<div class=pbs><b>Snap to walls and furniture</b>${tg('snap',1,'On')}${tg('snap',0,'Off')}<b>Turn back to the wall</b>${tg('turn',1,'On')}${tg('turn',0,'Off')}<b>Grid size</b>${tg('grid',.25,'¼')}${tg('grid',.5,'½')}${tg('grid',1,'1')}${tg('grid',0,'Free')}</div>`:'';
- const hint=SGT!='f'?'Tap food to eat it and restore energy.':touch()?(act?'Drag in the room to move it. Green means it fits.':'Tap an item below to place it, or tap a placed item to move it. Search or pick a category to find things faster.'):(act?'Click to place · R or right-click: turn · E: store · Enter: place':'Pick an item below, or click a placed item. Drag to move it.');
+ const hint=SGT!='f'?'Tap food to eat it and restore energy.':touch()?(act?'Drag in the room to move it. Green means it fits.':'Tap an item below to place it, or tap a placed item to move it.'+(DEV()?' Search or pick a category to find things faster.':'')):(act?'Click to place · R or right-click: turn · E: store · Enter: place':'Pick an item below, or click a placed item. Drag to move it.');
  $('ui').innerHTML=`<div class="box pb ${act?'act':''}"><div class=pbr><h3>Storage${name?' · '+name:''}</h3>${tab('f','Furniture ('+k.reduce((a,t)=>a+S.inv[t],0)+')')}${tab('d','Food ('+fdN()+')')}<button class="${setOpen?'on':''}" onclick="PBgear()" aria-label="Placement settings">${pxIcon('gear')}</button><button class=go onclick="exitBuild()">Done</button></div>${actRow}${sets}${body}<small class="m pbh">${hint}${hasBed()?'':' · The room needs a bed'}</small></div>`;
- const n=document.querySelector('#ui .pb');if(n)n.scrollTop=sl;if(wasQ){const i=document.getElementById('pbq');if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}}};
+ const n=document.querySelector('#ui .pb');if(n)n.scrollTop=sl;const n2=document.querySelector('#ui .pbl');if(n2&&!DEV())n2.scrollLeft=sl2;if(wasQ){const i=document.getElementById('pbq');if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}}};
 window.PBdo=a=>{if(mode!='build')return;if(a=='place')place();else if(a=='rl'){rot(-1);buildUI()}else if(a=='rr'){rot(1);buildUI()}else if(a=='store')store();else if(a=='cancel')cancel();else if(a=='move'&&sel>=0)pickUp(sel)};
 window.PBset=(k,v)=>{PS()[k]=v;snd('click');buildUI()};
 window.PBgear=()=>{setOpen=!setOpen;snd('click');buildUI()};
