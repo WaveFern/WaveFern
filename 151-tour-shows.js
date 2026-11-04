@@ -336,7 +336,7 @@ function showCam(dt){const H=SH,c=H.cam,A=H.A,T=A.stage,t=H.t,k=H.k,ax=OX+AX,az=
  else{v.set(px+sw,T.h+2.2,pz-5);L2.set(px,1.6,pz+40)}
  c.position.set(ax+v.x,v.y,az+v.z);c.lookAt(ax+L2.x,L2.y,az+L2.z);c.aspect=innerWidth/innerHeight;c.fov=s=='wide'||s=='orbit'?50:58;c.updateProjectionMatrix()}
 function showHud(){const H=SH;let a=$('dsst'),b=$('dscr');if(!a){a=document.createElement('div');a.id='dsst';a.className='hb';document.body.appendChild(a);b=document.createElement('div');b.id='dscr';b.className='hb';document.body.appendChild(b);
-  const e=document.createElement('button');e.id='dsend';e.className='hb';e.textContent='Leave stage (Esc)';e.onclick=()=>showEnd(1);document.body.appendChild(e)}
+  const e=document.createElement('button');e.id='dsend';e.className='hb';e.textContent='Leave stage';e.onclick=()=>showEnd(1);document.body.appendChild(e)}
  const v=vOf(H.C.d,H.k),n=H.list.length,cur=Math.min(n,H.i+1),song=H.song;let line;
  if(H.state=='song'&&song)line=`Now playing ${cur}/${n}${H.encoring?' · encore':''}: <b>"${esc(song.title)}"</b>${song.ft?' feat. '+esc(song.ft):''}<div class=bar><i style="width:${Math.min(100,Math.round(H.sm/H.dur*100))}%"></i></div><small class=m>${Math.max(0,Math.round(H.dur-H.sm))} min left · ${H.list[H.i+1]&&H.i+1<(H.encoring?n:H.main)?'next: "'+esc(H.list[H.i+1].title)+'"':H.enc&&!H.encDone?'then the encore':'last song!'} · ${clk()}</small>`;
  else line=`<small class=m>${H.state=='intro'?'The lights go down…':H.state=='inter'?'Intermission · the crowd is doing a wave':H.state=='talk'?'Talk to the crowd':H.state=='encq'?'Encore?':H.state=='finale'?'Final bow':''} · ${clk()}</small>`;
@@ -387,7 +387,7 @@ D.showOn=()=>!!SH;D.show=()=>SH;
 addEventListener('keydown',e=>{if(mode!='dshow'||!SH||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key;e.stopImmediatePropagation();
  /* v49.37.0: walking keys still reach the shared key map, for walking around the stage (188-stage-walk.js) */
  if(/^(w|a|s|d|shift|arrow(up|down|left|right))$/.test(k.toLowerCase())){keys[k.toLowerCase()]=1;if(k.startsWith('Arrow'))e.preventDefault()}
- if(k=='Escape'){return showEnd(1)}if(e.repeat)return;const n=parseInt(k);
+ if(k=='Escape'){if(!e.repeat)pauseGame();return}if(e.repeat)return;const n=parseInt(k);
  if(SH.state=='talk'&&n>=1&&n<=3)return talkPick(n-1);if(SH.state=='encq'&&(n==1||n==2))return encore(n==1);
  if(k==' '||k=='Enter'||k.toLowerCase()=='e'){e.preventDefault();W2(festMgPress,-1)}else if(n>=1&&n<=4)W2(festMgPress,n-1)},true);
 addEventListener('keyup',e=>{if(mode=='dshow')delete keys[e.key.toLowerCase()]});
