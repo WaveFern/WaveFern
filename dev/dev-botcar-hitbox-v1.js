@@ -20,6 +20,15 @@
   if(ax>0||az>0)return r-Math.hypot(Math.max(ax,0),Math.max(az,0));
   return r-Math.max(ax,az);
  }
+ /* same test, but also says which way to push the circle out (world direction) */
+ function sep(c,px,pz,r){
+  const b=box(c),h=c.h,sx=Math.sin(h),cz=Math.cos(h),dx=px-(c.rx??c.x),dz=pz-(c.rz??c.z),
+   lx=dx*cz-dz*sx-b.ox,lz=dx*sx+dz*cz-b.oz,ax=Math.abs(lx)-b.hw,az=Math.abs(lz)-b.hl;
+  let nlx,nlz,p;
+  if(ax>0||az>0){const qx=Math.max(ax,0),qz=Math.max(az,0),d=Math.hypot(qx,qz)||1e-6;p=r-d;nlx=Math.sign(lx||1)*qx/d;nlz=Math.sign(lz||1)*qz/d}
+  else if(ax>az){p=r-ax;nlx=Math.sign(lx||1);nlz=0}else{p=r-az;nlx=0;nlz=Math.sign(lz||1)}
+  return{p,x:nlx*cz+nlz*sx,z:-nlx*sx+nlz*cz};
+ }
  function carCircles(x,z){
   const S=(typeof CSPEC!='undefined'&&CSPEC[dr.i])||{L:2.4,W:1},k=(dr.m&&dr.m.scale&&dr.m.scale.x)||1.5,hl=S.L*k/2,hw=S.W*k/2*.88,
    sx=Math.sin(dr.h),cz=Math.cos(dr.h),e=hl-hw,n=Math.max(1,Math.ceil(e/(hw*.9))),out=[];
@@ -31,13 +40,29 @@
  tcB=function(x0,z0,x,z){
   if(typeof dr=='undefined'||!dr)return false;
   const a=carCircles(x,z),b=carCircles(x0,z0);
-  return TRAF.some(c=>{if(!near(c,x,z))return false;const n=worst(c,a);return n>0&&n>worst(c,b)});
+  return TRAF.some(c=>{if(!near(c,x,z))return false;const n=worst(c,a);return n>.01&&n>worst(c,b)+.004});
  };
  const R0=.62;
  dynB=function(x0,z0,x,z){
   if(IN||HIN)return false;
   const ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
   if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;
-  return TRAF.some(c=>{if(!near(c,x,z))return false;const n=pen(c,x,z,.35);return n>0&&n>pen(c,x0,z0,.35)});
+  return TRAF.some(c=>{if(!near(c,x,z))return false;const n=pen(c,x,z,.35);return n>.01&&n>pen(c,x0,z0,.35)+.004});
  };
+ /* depenetration: a bot car that turns or creeps into your car pushes you out smoothly (no stick-slip "humping"),
+    and you lose the speed you had into it */
+ function unstick(dt){
+  if(typeof dr=='undefined'||!dr||mode!='drive'||IN||HIN)return;
+  for(let it=0;it<3;it++){
+   let best=null;
+   for(const c of TRAF){if(!near(c,dr.x,dr.z))continue;for(const q of carCircles(dr.x,dr.z)){const s=sep(c,q[0],q[1],q[2]);if(s.p>.02&&(!best||s.p>best.p))best=s}}
+   if(!best)return;
+   const k=Math.min(best.p,.25);let nx=dr.x+best.x*k,nz=dr.z+best.z*k;
+   if(typeof drvFree=='function'&&!drvFree(nx,nz))return;
+   dr.x=nx;dr.z=nz;
+   const into=-(Math.sin(dr.h)*best.x+Math.cos(dr.h)*best.z)*dr.v;
+   if(into>0)dr.v*=1-Math.min(.5,6*dt);
+  }
+ }
+ const wt=worldTick;worldTick=function(dt){wt(dt);try{unstick(dt)}catch(e){}};
 })();
