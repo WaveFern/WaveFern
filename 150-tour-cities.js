@@ -671,7 +671,7 @@ function dsHud(){let h=$('dshud');const show=inCity()&&(mode=='play')&&!D.view;i
 /* taxis and the home map never run abroad */
 {const t0=taxi;taxi=function(x,z){if(inCity())return say('You are abroad. Use the city map (N) for a local taxi.');return t0(x,z)}}
 /* waking up abroad: stay in the city (at the hotel if you slept there) */
-{const w0=wakeUp;wakeUp=function(auto){w0(auto);try{if(D.on&&D.C){IN=null;if(D.hotelWake&&D.hotelWake(auto))return;const hs=D.C.spots.hotel;D.room=null;if(hs)dsPlace(hs.x,hs.z+1,0);else dsPlace(D.C.air.x1+10,D.C.mid+1.5,Math.PI/2)}}catch(e){console.error('dcity wake',e)}}}
+{const w0=wakeUp;wakeUp=function(auto){w0(auto);try{if(D.on&&D.C&&dsLocNow()===D.id){IN=null;if(D.hotelWake&&D.hotelWake(auto))return;const hs=D.C.spots.hotel;D.room=null;if(hs)dsPlace(hs.x,hs.z+1,0);else dsPlace(D.C.air.x1+10,D.C.mid+1.5,Math.PI/2)}}catch(e){console.error('dcity wake',e)}}}
 /* saves: keep where you are; rebuild the city quietly after loading a save made abroad */
 function dsLocNow(){try{if(typeof TRAVEL=='object'&&TRAVEL&&typeof TRAVEL.loc=='function'){const w=TRAVEL.loc();return w&&w!=='home'?w:null}}catch(e){}return S.dcity&&S.dcity.loc||null}
 D.locNow=dsLocNow;D.SFONT=SFONT;D.sky=dsSky;D.skyCol=dsSkyCol;D.place=dsPlace;
