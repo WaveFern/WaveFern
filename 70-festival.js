@@ -489,10 +489,10 @@ function festMgDraw(){const set=FEST.set;let el=$('fsg');const m=set&&set.mg;if(
  else if(m.k=='lyric'){const it=m.items[m.i];if(tm)tm.style.width=Math.max(0,100-m.t/m.lim*100)+'%';el.querySelectorAll('.mgo button').forEach((b,i)=>{b.classList.toggle('ok',m.lt>0&&it.opts[i]==it.right);b.classList.toggle('no',m.lt>0&&i==m.pk&&it.opts[i]!=it.right)})}
  else{const z=$('fmz'),k=$('fmk');if(z)z.style.left=(m.c-.11)*100+'%';if(k){k.style.left=m.lv*100+'%';k.style.background=Math.abs(m.lv-m.c)<.11?'#2fe68a':'#fff'}if(tm)tm.style.width=Math.max(0,100-m.t/m.dur*100)+'%'}}
 addEventListener('keydown',e=>{if(FEST.set&&FEST.set.end&&e.key=='Escape'){e.stopImmediatePropagation();return festLeave()}if(mode!='fest'||!FEST.set||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key;
- if(k=='Escape'){e.stopImmediatePropagation();return festEnd(1)}if(e.repeat)return;if(k==' '||k=='Enter'||k.toLowerCase()=='e'){e.preventDefault();festMgPress(-1)}else{const n=parseInt(k);if(n>=1&&n<=4)festMgPress(n-1)}},true);
+ if(k=='Escape'){e.stopImmediatePropagation();if(!e.repeat)pauseGame();return}if(e.repeat)return;if(k==' '||k=='Enter'||k.toLowerCase()=='e'){e.preventDefault();festMgPress(-1)}else{const n=parseInt(k);if(n>=1&&n<=4)festMgPress(n-1)}},true);
 function festHud(){const set=FEST.set;let a=$('fst'),b=$('fcr');if(!set||set.end){if(a)a.remove();if(b)b.remove();const e=$('fend');if(e)e.remove();return}
  if(!a){a=document.createElement('div');a.id='fst';a.className='hb';document.body.appendChild(a);b=document.createElement('div');b.id='fcr';b.className='hb';document.body.appendChild(b);
-  const e=document.createElement('button');e.id='fend';e.className='hb';e.textContent='Leave stage (Esc)';e.onclick=()=>festEnd(1);document.body.appendChild(e)}
+  const e=document.createElement('button');e.id='fend';e.className='hb';e.textContent='Leave stage';e.onclick=()=>festEnd(1);document.body.appendChild(e)}
  const s=set.st,nx=set.list[set.i+1],end=FSLOT[set.bk.slot][1],h=`<b class=px style="color:${s.col}">STAGE ${s.n} · ${esc(s.name.toUpperCase())}</b><br><small>Now playing ${set.i+1}/${set.list.length}: <b>"${esc(set.song.title)}"</b>${set.song.ft?' feat. '+esc(set.song.ft):''}</small><div class=bar><i style="width:${Math.min(100,Math.round(set.sm/set.dur*100))}%"></i></div>
   <small class=m>${fDurS(Math.max(0,set.dur-set.sm))} left · ${nx?'next: "'+esc(nx.title)+'"':'last song!'} · ${clk()} · slot ends ${fHM(end)}</small>`;if(a.dataset.h!=h){a.dataset.h=h;a.innerHTML=h}
  const c=Math.round(set.C),dd=c-set.start,g=`<small class=m>CROWD</small><b>${c.toLocaleString()}</b><span class=d style="color:${dd>=0?'#2fe68a':'#ff6a6a'}">${dd>=0?'▲ +':'▼ '}${dd.toLocaleString()}</span><br><small class=m>Earned ${$$(set.pay)} · next song pays ${$$(FSONG_PAY*s.mult*c)}</small>`;if(b.dataset.h!=g){b.dataset.h=g;b.innerHTML=g}}
@@ -502,7 +502,7 @@ function festMusic(set,dt){set.songT+=dt;
  /* the beat: kick, snare and hats at about 126 bpm, a chord stab every bar */
  set.bt+=dt;if(set.bt>=.476){set.bt-=.476;set.beat++;const b=set.beat%4;sfx(110,.16,'sine',.32,42,0,0);if(b==1||b==3)nz(.12,1900,.12,1,'bandpass');nz(.03,8000,.05,1,'highpass',.238);
   if(b==0){const r=[[262,330,392],[220,262,330],[175,220,262],[196,247,294]][(set.beat>>2)%4];r.forEach(f=>sfx(f,.4,'sawtooth',.025,0,0,.4))}}}
-function festSetTick(dt){const set=FEST.set,s=set.st;if(set.end)return;set.t+=dt;if(S.t<599)S.t=Math.min(599,S.t+dt*(typeof DAYK!="undefined"?DAYK:1));if(!set.fin)set.sm=Math.max(0,festMins()-set.ms0);
+function festSetTick(dt){const set=FEST.set,s=set.st;if(set.end||PAUSED)return;set.t+=dt;if(S.t<599)S.t=Math.min(599,S.t+dt*(typeof DAYK!="undefined"?DAYK:1));if(!set.fin)set.sm=Math.max(0,festMins()-set.ms0);
  if(set.t<16)set.T=Math.min(set.C0*1.6,set.T+set.C0*.012*dt);
  set.C+=(set.T-set.C)*Math.min(1,dt*1.3);set.peak=Math.max(set.peak,set.C);s.cr.C=set.C;s.cr.hype+=(set.hype-s.cr.hype)*Math.min(1,dt*2);
  if(set.mg)festMgTick(dt);else if(!set.fin&&set.t>=set.next&&festSetLeft(set).s>9)festMgStart();
