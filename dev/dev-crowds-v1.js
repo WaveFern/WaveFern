@@ -16,7 +16,7 @@
  const SIDE=1.0,SPACE=1.15;
  /* heading change is rate-limited (rad/s) so nobody can ever spin round in a frame or two, whatever made the target flip */
  const TURN=4.2;
- function turn(n,tgt,dt,k){let d=tgt-n._hd;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;const m=TURN*dt;n._hd+=clamp(d*Math.min(1,dt*k),-m,m)}
+ function turn(n,tgt,dt,k){let d=tgt-n._hd;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;const m=(n._turn||TURN)*dt;n._hd+=clamp(d*Math.min(1,dt*k),-m,m)}
  let CW=[],nextRec=0,nextRel=0,rollT=0,roll=0,extraDone=0;
 
  function prep(n){
@@ -88,6 +88,10 @@
    CW.forEach(o=>{if(o===n||!o._cw)return;const ax=cx-o._cx,az=cz-o._cz,d=Math.hypot(ax,az);if(d<SPACE&&d>1e-3){const k=(SPACE-d)*6/d;wx+=ax*k;wz+=az*k}});
    const px=cx-P.x,pz=cz-P.z,pd=Math.hypot(px,pz);if(pd<1.6&&pd>1e-3){const k=(1.6-pd)*3.2/pd;wx+=px*k;wz+=pz*k}
    n._vx+=(wx-n._vx)*Math.min(1,dt*4.5);n._vz+=(wz-n._vz)*Math.min(1,dt*4.5);
+   /* people walk where they face: sideways drift (relative to the body) is damped hard, so nobody glides or crab-walks.
+      The heading below turns towards the travel direction, and the body only really speeds up along the way it faces */
+   {const fx=Math.sin(n._hd),fz=Math.cos(n._hd),vf=n._vx*fx+n._vz*fz,vs=n._vx*fz-n._vz*fx,ks=Math.min(1,dt*9);
+    const sv=vs*(1-ks);n._vx=fx*vf+fz*sv;n._vz=fz*vf-fx*sv}
    const nx=cx+n._vx*dt,nz=cz+n._vz*dt;
    if(!hit(nx,cz,.28))cx=nx;else n._vx=0;
    if(!hit(cx,nz,.28))cz=nz;else n._vz=0;
@@ -101,10 +105,12 @@
    /* face you when close, otherwise face where they are walking */
    /* always face the way they are actually moving (no more walking backwards while looking at you); only when
       standing nearly still do they turn to look at you */
-   let tgt=n._hd;if(spd>.35)tgt=Math.atan2(n._vx,n._vz);else if(Math.hypot(P.x-cx,P.z-cz)<7)tgt=Math.atan2(P.x-cx,P.z-cz);
-   turn(n,tgt,dt,7);
+   let tgt=n._hd;if(spd>.5)tgt=Math.atan2(wx,wz);else if(spd<.2&&Math.hypot(P.x-cx,P.z-cz)<7)tgt=Math.atan2(P.x-cx,P.z-cz);
+   n._turn=5.5;turn(n,tgt,dt,8);n._turn=0;
    n.x=cx;n.z=cz;n.m.position.set(cx,0,cz);n.m.rotation.y=n._hd;
-   const a=clamp(spd/1.6,0,1)*.6,s=Math.sin(n.t)*a;
+   /* stride follows the real ground speed (about 0.41 m per radian, like the normal walk), so feet never skate */
+   n._ph=(n._ph||0)+spd/.41*dt;n._am=(n._am||0)+(clamp(spd/2.4,0,1)*.65-(n._am||0))*Math.min(1,dt*10);
+   const s=Math.sin(n._ph)*n._am;
    n.legs[0].rotation.x=s;n.legs[1].rotation.x=-s;n.arms[0].rotation.x=-s;n.arms[1].rotation.x=s})}
 
  /* spring-based sidestep for everyone on the pavement */
@@ -139,6 +145,7 @@
   const lg=n.dir*n._sp0*n._sf,vx=vert?n._lv:lg,vz=vert?lg:n._lv;
   if(Math.hypot(vx,vz)>.05)turn(n,Math.atan2(vx,vz),dt,9);
   n.m.rotation.y=n._hd;
+  if(n.st!=1&&n._sf<.98)n.t-=dt*8*(1-n._sf);/* the live walk cycle runs at full rate; hold it back to match the slowed pace */
   if(n.st!=1&&n._sf<.98){const k=Math.max(.25,n._sf);n.legs[0].rotation.x*=k;n.legs[1].rotation.x*=k;n.arms[0].rotation.x*=k;n.arms[1].rotation.x*=k}}
 
  const wt=worldTick;
