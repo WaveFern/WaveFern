@@ -17,4 +17,7 @@
  const t0=titleUI;
  titleUI=function(){const r=t0.apply(this,arguments);try{fix()}catch(e){console.error('menu friends',e)}return r};
  try{fix()}catch(e){}
+ /* the first menu is drawn while the game boots, before this script wraps titleUI, and other scripts redraw it later: watch the menu and take the button out the moment it appears, so it never flashes up */
+ let busy=0;
+ new MutationObserver(()=>{if(busy)return;if(!document.querySelector('#ttl .ttm button[onclick="frOpen()"]'))return;busy=1;try{fix()}catch(e){console.error('menu friends',e)}busy=0}).observe(document.documentElement,{childList:true,subtree:true});
 })();
