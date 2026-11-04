@@ -88,25 +88,28 @@
    const tx=P.x+Math.sin(n._sa)*n._sr,tz=P.z+Math.cos(n._sa)*n._sr,dx=tx-cx,dz=tz-cz,dist=Math.hypot(dx,dz);
    const want=Math.atan2(dx,dz);let err=want-n._hd;while(err>Math.PI)err-=2*Math.PI;while(err<-Math.PI)err+=2*Math.PI;
    const pl=Math.atan2(P.x-cx,P.z-cz);
-   let target=n._hd,v=0;
+   let target=pl,v=0;
    /* followers only ever walk towards you (facing you), never away from you or round you with their back turned:
       if getting to their spot would mean turning away, they stand where they are and face you instead */
    let pa=want-pl;while(pa>Math.PI)pa-=2*Math.PI;while(pa<-Math.PI)pa+=2*Math.PI;
    const pd0=Math.hypot(P.x-cx,P.z-cz),away=Math.abs(pa)>.9&&pd0<12;
+   /* the way they actually walk: towards their spot, but with the body kept turned mostly towards you */
+   const tw=pl+Math.max(-.6,Math.min(.6,pa*.7));let ew=tw-n._hd;while(ew>Math.PI)ew-=2*Math.PI;while(ew<-Math.PI)ew+=2*Math.PI;
    if(away&&n._ms!='idle'){n._ms='idle';n._ib=t+R(1.5,4)}
    /* three calm states: turn on the spot to face where they are going, walk straight the way they face, then stand and idle */
    if(n._ms=='turn'){
-    if(t>=n._mt){target=want;n._turn=2.6;if(Math.abs(err)<.12)n._ms='walk'}
+    n._turn=3.6;if(t>=n._mt){target=tw;if(Math.abs(ew)<.3)n._ms='walk'}
     if(dist<.45&&n._ms=='turn')n._ms='idle'}
    else if(n._ms=='walk'){
-    target=want;n._turn=2.2;
-    if(Math.abs(err)>.8){n._ms='turn';n._mt=t}
-    else if(dist<.3){n._ms='idle';n._ib=t+R(1.5,4)}
-    else v=Math.max(.5,Math.min(n._mx,dist*1.1))*Math.max(0,Math.cos(err))}
+    /* walk towards the spot but keep the body turned mostly towards you */
+    target=tw;n._turn=3.6;
+    if(Math.abs(ew)>.8){n._ms='turn';n._mt=t}
+    else if(dist<.45){n._ms='idle';n._ib=t+R(1.5,4)}
+    else v=Math.max(.5,Math.min(n._mx,dist*1.1))*Math.max(0,Math.cos(ew))}
    else{
     /* standing around: face you, and now and then look away, shift about or fiddle with a phone */
     if(t>n._lk)n._lkv=0;
-    target=pl+(n._lkv||0);n._turn=2.4;
+    target=pl+(n._lkv||0);n._turn=3.6;
     if(t>n._ib){n._ib=t+R(2.5,6);const r=Math.random();
      if(r<.4){n._lkv=R(-1.1,1.1);n._lk=t+R(1,2.2)}
      else if(r<.7){n._apT=1;n._ap_t=t+R(2,4)}
@@ -169,8 +172,10 @@
   if(n.pet&&!vert)n.pet.position.z+=n._lo;
   /* heading follows the real motion, eased, so turns are never a snap */
   const lg=n.dir*n._sp0*n._sf,vx=vert?n._lv:lg,vz=vert?lg:n._lv;
-  if(Math.hypot(vx,vz)>.05)turn(n,Math.atan2(vx,vz),dt,9);
-  n.m.rotation.y=n._hd;
+  /* base-game fans walking up to you (st==1) already face you: leave their rotation alone, or they keep their pavement heading */
+  if(n.st==1)n._hd=n.m.rotation.y;
+  else{if(Math.hypot(vx,vz)>.05)turn(n,Math.atan2(vx,vz),dt,9);
+  n.m.rotation.y=n._hd}
   if(n.st!=1&&n._sf<.98)n.t-=dt*8*(1-n._sf);/* the live walk cycle runs at full rate; hold it back to match the slowed pace */
   if(n.st!=1&&n._sf<.98){const k=Math.max(.25,n._sf);n.legs[0].rotation.x*=k;n.legs[1].rotation.x*=k;n.arms[0].rotation.x*=k;n.arms[1].rotation.x*=k}}
 
