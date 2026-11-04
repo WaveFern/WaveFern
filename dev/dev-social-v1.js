@@ -28,6 +28,9 @@
   '#ttl .fwsoc a svg{image-rendering:pixelated;display:block}'+
   '#ttl .fwsoc a:hover{transform:scale(1.1);background:#14301a}#ttl .fwsoc a:active{transform:scale(.95)}'+
   '#ttl .fwsoc a:focus-visible{outline:3px solid #fff;outline-offset:2px;background:#14301a}'+
+  /* the dev menu is about 690px tall, so on a normal browser window (Edge on a Mac is often ~650px of page) the row used to sit below the fold with no sign it was there: tighten the dev menu on shorter windows so the whole menu, row included, fits on screen */
+  '@media(max-height:780px){#ttl .ttm>.px{margin:8px 0 10px}#ttl .ttm h1{font-size:clamp(30px,6vw,44px)}#ttl .ttbx{gap:7px;padding:10px}#ttl .ttbx>button{padding:8px 12px;font-size:14px}#ttl .fwsoc{margin-top:10px}#ttl .ttm{padding-bottom:26px}}'+
+  '@media(max-height:640px){#ttl .ttm>.px{margin:6px 0 8px;padding:3px 8px}#ttl .ttm h1{font-size:clamp(26px,5vw,34px)}#ttl .ttbx{gap:5px;padding:8px}#ttl .ttbx>button{padding:5px 10px;font-size:13px}#ttl .fwsoc{margin-top:8px}#ttl .fwsoc a{width:38px;height:38px}#ttl .fwsoc a svg{width:20px;height:20px}}'+
   '@media(max-height:560px){#ttl .fwsoc{margin-top:8px;gap:8px}#ttl .fwsoc a{width:38px;height:38px}#ttl .fwsoc a svg{width:20px;height:20px}}'+
   '@media(max-height:560px) and (pointer:coarse){#ttl .fwsoc a{width:44px;height:44px}}';
  function add(){
