@@ -5,7 +5,7 @@
  const bad=[],errs=[],broke=[],seen={};let shown=0,booted=0;
  function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
  function panel(title,msg,hint,cont){
-  if(shown)return;shown=1;
+  if(shown||booted)return;shown=1;
   const ld=document.getElementById('load');if(ld)ld.style.display='none';
   const d=document.createElement('div');d.id='fatal';
   d.style.cssText='position:fixed;inset:0;z-index:99999;background:#0c0f0d;color:#e8f3ec;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px;font:14px ui-monospace,Menlo,Consolas,monospace';
@@ -18,7 +18,7 @@
    +'<div style="max-width:460px;color:#8aa094;font-size:11px">Your save is kept in this browser and is not touched by this screen.</div>';
   (document.body||document.documentElement).appendChild(d);
   document.getElementById('fatalReload').onclick=()=>location.reload();
-  const k=document.getElementById('fatalKeep');if(k)k.onclick=()=>{d.remove();if(ld)ld.style.display='';shown=0};
+  const k=document.getElementById('fatalKeep');if(k)k.onclick=()=>{d.remove();if(ld&&!booted)ld.style.display='';shown=0};
  }
  function details(){return (bad.length?'Could not load: '+bad.map(esc).join(', ')+'.<br>':'')+(errs.length?'Error: '+esc(errs[0])+'<br>':'')}
  function webglOK(){try{const c=document.createElement('canvas');return !!(window.WebGLRenderingContext&&(c.getContext('webgl')||c.getContext('experimental-webgl')))}catch(e){return false}}
@@ -37,7 +37,7 @@
   if(typeof THREE==='undefined')return panel('Could not load the game','The 3D library did not download. Check your internet connection and try again.',details());
   panel('Something went wrong while starting','The game hit a problem while loading.',details());
  }
- window.fwBooted=function(){booted=1;const parts=bad.concat(broke.filter(f=>bad.indexOf(f)<0));if(parts.length){const b=document.createElement('div');b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#000d;border-top:2px solid #2fe68a;color:#e8f3ec;padding:6px 10px;font:12px ui-monospace,monospace;text-align:center';b.innerHTML='Some game files failed to load ('+parts.map(esc).join(', ')+'), so parts of the game may not work. <button onclick="location.reload()" style="font:inherit;margin-left:6px">Reload</button> <button onclick="this.parentNode.remove()" style="font:inherit">Dismiss</button>';document.body.appendChild(b)}};
+ window.fwBooted=function(){booted=1;try{const f=document.getElementById('fatal');if(f)f.remove();shown=0}catch(e){}const parts=bad.concat(broke.filter(f=>bad.indexOf(f)<0));if(parts.length){const b=document.createElement('div');b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#000d;border-top:2px solid #2fe68a;color:#e8f3ec;padding:6px 10px;font:12px ui-monospace,monospace;text-align:center';b.innerHTML='Some game files failed to load ('+parts.map(esc).join(', ')+'), so parts of the game may not work. <button onclick="location.reload()" style="font:inherit;margin-left:6px">Reload</button> <button onclick="this.parentNode.remove()" style="font:inherit">Dismiss</button>';document.body.appendChild(b)}};
  /* v41.1.0: an error in one part of the game (a frame update, a boot step) is logged once and the rest carries on,
     instead of freezing the whole game. where = a short label, e.g. 'update' or 'buildCity'. */
  window.fwSoftErr=function(e,where){const m=(where?where+': ':'')+(e&&e.message||e);if(seen[m])return;seen[m]=1;
