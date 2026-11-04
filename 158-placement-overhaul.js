@@ -51,14 +51,23 @@ function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
 
 /* ---- ghost follows the pointer; green = fits, red = does not ---- */
 function groundPoint(){RC.setFromCamera({x:mouse.x,y:pType=='touch'?mouse.y+.14:mouse.y},cam);const p=new THREE.Vector3();return RC.ray.intersectPlane(PLN,p)?p:null}
+/* v49.75.0: the held item glides after the pointer, hovers a little above the floor and turns smoothly; the footprint is a soft tint */
+const DEV=()=>!!window.FW_DEV;/* v49.75.0 changes only run on the /dev/ build */
+let gT=0,gFresh=true;const lerpA=(a,b,k)=>{let d=((b-a+Math.PI*3)%(Math.PI*2))-Math.PI;return a+d*k};
 function ghostTick(){const p=groundPoint();if(!p||!ghost)return;const o=fit(hold,p.x,p.z,gp.r,-1);gp.r=o.r;gp.x=o.x;gp.z=o.z;gp.ok=valid(hold,o.x,o.z,o.r,-1);
- const c=fb(hold,o.x,o.z,o.r);ghost.position.set(o.x,0,o.z);ghost.rotation.y=o.r*Math.PI/2;GF.position.set(o.x,.05,o.z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.color.set(gp.ok?0x44ff88:0xff4455)}
+ if(!DEV()){const c=fb(hold,o.x,o.z,o.r);ghost.position.set(o.x,0,o.z);ghost.rotation.y=o.r*Math.PI/2;GF.position.set(o.x,.05,o.z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.color.set(gp.ok?0x44ff88:0xff4455);return}
+ const now=performance.now(),dt=Math.min(.1,Math.max(0,(now-gT)/1000));gT=now;const k=gFresh?1:1-Math.exp(-dt*24);gFresh=false;
+ const c=fb(hold,o.x,o.z,o.r),lift=F[hold].f?.02:.1;
+ ghost.position.x+=(o.x-ghost.position.x)*k;ghost.position.z+=(o.z-ghost.position.z)*k;ghost.position.y+=(lift-ghost.position.y)*Math.min(1,k*.8);
+ ghost.rotation.y=lerpA(ghost.rotation.y,o.r*Math.PI/2,k);
+ GF.position.set(o.x,.03,o.z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.opacity=.28;GF.material.color.set(gp.ok?0x5fa77a:0xb8575f)}
 function hilite(i){const b=new THREE.Box3().setFromObject(PL[i].m),sz=b.getSize(new THREE.Vector3()),ct=b.getCenter(new THREE.Vector3());
- if(!HOVO){HOVO=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1)),new THREE.LineBasicMaterial({color:0xffee55,depthTest:false}));HOVO.renderOrder=999;scene.add(HOVO)}
+ if(!HOVO){HOVO=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1)),new THREE.LineBasicMaterial({color:DEV()?0xe6d8a8:0xffee55,depthTest:false}));HOVO.renderOrder=999;scene.add(HOVO)}
  HOVO.position.copy(ct);HOVO.scale.set(sz.x+.06,sz.y+.06,sz.z+.06);HOVO.visible=true}
 {const b0=buildTick;buildTick=function(){const r=b0.apply(this,arguments);
   document.body.classList.toggle('pbuild',mode=='build');
-  if(mode!='build'){sel=-1;moving=null;return r}
+  if(mode!='build'){sel=-1;moving=null;if(SET.length)settleTick(true);return r}
+  if(SET.length)settleTick();
   if(sel>=PL.length)sel=-1;
   if(hold){if(ghost&&GF)ghostTick();if(HOVO)HOVO.visible=false}
   else if(sel>=0)hilite(sel);
@@ -66,11 +75,17 @@ function hilite(i){const b=new THREE.Box3().setFromObject(PL[i].m),sz=b.getSize(
   return r}}
 
 /* ---- actions ---- */
+/* a placed item drops the last bit onto the floor and settles with a tiny squash */
+const SET=[];function settle(m){SET.push({m,t:performance.now(),y0:m.position.y})}
+function settleTick(done){const now=performance.now();for(let i=SET.length-1;i>=0;i--){const a=SET[i],u=done?1:Math.min(1,(now-a.t)/170);
+  if(!a.m.parent){SET.splice(i,1);continue}
+  const e=u*u*(3-2*u);a.m.position.y=a.y0*(1-e);const sq=u<1?1-.035*Math.sin(u*Math.PI):1;a.m.scale.set(1+(1-sq)*.5,sq,1+(1-sq)*.5);
+  if(u>=1){a.m.position.y=0;a.m.scale.set(1,1,1);SET.splice(i,1)}}}
 function place(){if(!hold)return;if(!gp.ok){snd('err');return say(F[hold].wall?'Hang it on a wall: move it right up against one, back to the wall.':'It does not fit there. Move it or turn it.')}
- const t=hold,m=mkF(t);m.position.set(gp.x,0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t,x:gp.x,z:gp.z,r:gp.r,m});snd('thunk');
+ const t=hold,m=mkF(t);m.position.set(gp.x,DEV()&&ghost?ghost.position.y:0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t,x:gp.x,z:gp.z,r:gp.r,m});if(DEV())settle(m);snd('thunk');
  moving=null;if(S.inv[t]>0){S.inv[t]--;man=false}else{hold=null;clrGhost();sel=PL.length-1}buildUI()}
 function pickUp(i){const q=PL[i];if(!q||hold)return;if(q.t=='desk'){snd('err');return say('Your desk is part of the house. Upgrade it in the Gear shop.')}
- scene.remove(q.m);PL.splice(i,1);moving={t:q.t,x:q.x,z:q.z,r:q.r};hold=q.t;gp.r=q.r;gp.ok=0;man=true;sel=-1;mkGhost();snd('pop');buildUI()}
+ scene.remove(q.m);PL.splice(i,1);moving={t:q.t,x:q.x,z:q.z,r:q.r};hold=q.t;gp.r=q.r;gp.ok=0;man=true;sel=-1;mkGhost();if(DEV()){ghost.position.set(q.x,0,q.z);ghost.rotation.y=q.r*Math.PI/2;gFresh=false;gT=performance.now()}snd('pop');buildUI()}
 function restore(){if(!moving)return;const q=moving,m=mkF(q.t);moving=null;m.position.set(q.x,0,q.z);m.rotation.y=q.r*Math.PI/2;scene.add(m);PL.push({t:q.t,x:q.x,z:q.z,r:q.r,m});hold=null;clrGhost();sel=PL.length-1}
 function rot(d){snd('click');man=true;if(hold){gp.r=(gp.r+d+4)%4;return}
  if(sel<0)return;const q=PL[sel];if(q.t=='desk'){snd('err');return say('Your desk is fixed in place.')}
@@ -80,7 +95,7 @@ function store(){if(hold){const t=hold;moving=null;S.inv[t]=(S.inv[t]||0)+1;hold
  if(sel<0)return;const q=PL[sel];if(q.t=='desk'){snd('err');return say('Your desk is part of the house. It cannot be stored.')}
  scene.remove(q.m);PL.splice(sel,1);S.inv[q.t]=(S.inv[q.t]||0)+1;sel=-1;if(HOVO)HOVO.visible=false;snd('pop');buildUI()}
 {const k0=storeKey;storeKey=function(){if(mode!='build')return;if(hold||sel>=0)return store();return k0.apply(this,arguments)}}
-{const h0=holdItem;holdItem=function(t){if(moving)restore();sel=-1;man=false;h0.apply(this,arguments);buildUI()}}
+{const h0=holdItem;holdItem=function(t){if(moving)restore();sel=-1;man=false;gFresh=true;h0.apply(this,arguments);buildUI()}}
 {const e0=exitBuild;exitBuild=function(){if(mode=='build'){if(moving)restore();sel=-1}return e0.apply(this,arguments)}}
 
 /* ---- pointer input (mouse and touch) ---- */
@@ -122,26 +137,65 @@ body.pbuild #tch{display:none!important}
 .pb .pbs b{flex:1 0 100%;font-size:12px;color:var(--m);font-weight:normal}
 .pb .pbs button{flex:1 1 auto}
 .pb button.on{background:var(--g);color:#04120a;font-weight:bold}
+.pb .pbf{display:block}
+.pb .pbsr{position:relative;margin-bottom:6px}
+.pb .pbsr input{box-sizing:border-box;width:100%;min-height:40px;padding:6px 36px 6px 10px;font:inherit;background:#0a0d0b;color:inherit;border:2px solid #2a352e;outline:none}
+.pb .pbsr input:focus{border-color:var(--g)}
+.pb .pbsr .pbx{position:absolute;right:0;top:0;min-height:40px;min-width:36px;padding:0;background:none;border:0;color:var(--m)}
+.pb .pbc{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.pb .pbc button{flex:0 0 auto;min-height:32px;padding:3px 10px;font-size:13px}
+.pb .pbc button small{opacity:.7;font-size:11px}
+.pb .pbl.pbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px;overflow:visible}
+.pb .pbg h4.pbg{grid-column:1/-1;margin:6px 0 0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--m);font-weight:normal;display:block}
+.pb .pbl.pbg h4.pbg:first-child{margin-top:0}
+.pb .pbl .pbi{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:6px;min-width:0!important;text-align:left;min-height:40px}
+.pb .pbg>.m{grid-column:1/-1}
+.pb .pbi i{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1px #0006}
+.pb .pbi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.pb .pbi small{margin:0}
 .pb .pbh{display:block;margin-top:4px;font-size:11px}
-@media(max-height:520px){.pb{max-height:62vh}.pb.act .pbl,.pb.act .pbh{display:none}}
+@media(max-height:520px){.pb{max-height:62vh}.pb.act .pbf,.pb.act .pbl,.pb.act .pbh{display:none}}
 @media(pointer:coarse){.pb button{min-height:46px}.pb .pbact button{font-size:16px}}
 `;document.head.appendChild(css);
-const touch=()=>pType=='touch'||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+const touch=()=>pType=='touch'||(window.WF_TOUCH?WF_TOUCH():(window.matchMedia&&matchMedia('(pointer:coarse)').matches));
 
-buildUI=function(){const s=PS();S.fd=S.fd||{};const old=document.querySelector('#ui .pbl'),sl=old?old.scrollLeft:0;
- const k=Object.keys(S.inv).filter(x=>S.inv[x]>0&&F[x]&&x!='desk'),fd=Object.keys(S.fd).filter(i=>S.fd[i]>0&&FOOD[i]);
+/* v49.75.0: storage list is organised. Items are grouped into categories (the same ones Amazoom uses; plaques have their own) and can be
+   searched by name. The filter is remembered while the game is open; it is not saved. */
+let SCAT='all',SSQ='';
+const CATS=['Plaques','Seating','Tables','Storage','Bedroom','Lighting','Decor','Music','Electronics','Appliances','Paint','Other'];
+const catOf=t=>{const f=F[t];if(!f)return'Other';if(f.wall||/^plq_/.test(t))return'Plaques';const c=typeof AZ!='undefined'&&AZ[t]&&AZ[t][7];return CATS.includes(c)?c:'Other'};
+const esc2=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const swatch=t=>{const b=F[t]&&F[t].b&&F[t].b[0];const c=b&&typeof b[3]=='string'?b[3].replace(/^\*/,'#'):'#556';return/^#[0-9a-f]{3,8}$/i.test(c)?c:'#556'};
+const stored=()=>Object.keys(S.inv).filter(x=>S.inv[x]>0&&F[x]&&x!='desk');
+function listHTML(){const k=stored(),q=SSQ.trim().toLowerCase();
+ if(!k.length)return'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>';
+ const L=k.filter(t=>(SCAT=='all'||catOf(t)==SCAT)&&(!q||(F[t].n+' '+catOf(t)).toLowerCase().includes(q))).sort((a,b)=>CATS.indexOf(catOf(a))-CATS.indexOf(catOf(b))||F[a].n.localeCompare(F[b].n,undefined,{numeric:true}));
+ if(!L.length)return'<span class=m>Nothing matches. Try another word or category.</span>';
+ let out='',cur='';
+ L.forEach(t=>{const c=catOf(t);if(SCAT=='all'&&c!=cur){cur=c;out+=`<h4 class=pbg>${c}</h4>`}
+  out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(F[t].n)}"><i style="background:${swatch(t)}"></i><span>${esc2(F[t].n)}</span><small>×${S.inv[t]}</small></button>`});
+ return out}
+function catsHTML(){const k=stored(),n={};k.forEach(t=>{const c=catOf(t);n[c]=(n[c]||0)+1});
+ const chip=(c,l,cnt)=>`<button class="${SCAT==c?'on':''}" onclick="PBcat('${c}')">${l} <small>${cnt}</small></button>`;
+ return chip('all','All',k.length)+CATS.filter(c=>n[c]).map(c=>chip(c,c,n[c])).join('')}
+window.PBcat=c=>{SCAT=c;snd('click');buildUI()};
+window.PBq=v=>{SSQ=v;const g=document.getElementById('pbgrid');if(g)g.innerHTML=listHTML();const x=document.getElementById('pbclr');if(x)x.style.display=v?'':'none'};
+window.PBclr=()=>{SSQ='';buildUI();const i=document.getElementById('pbq');if(i)i.focus()};
+
+buildUI=function(){const s=PS();S.fd=S.fd||{};const oldp=document.querySelector('#ui .pb'),sl=oldp?oldp.scrollTop:0,ol=document.querySelector('#ui .pbl'),sl2=ol?ol.scrollLeft:0,wasQ=document.activeElement&&document.activeElement.id=='pbq';
+ const k=stored(),fd=Object.keys(S.fd).filter(i=>S.fd[i]>0&&FOOD[i]);
  const tab=(t,n)=>`<button class="${SGT==t?'on':''}" onclick="SGT='${t}';buildUI()">${n}</button>`;
  const tg=(key,val,n)=>`<button class="${s[key]==val?'on':''}" onclick="PBset('${key}',${val})">${n}</button>`;
  const q=sel>=0?PL[sel]:null,act=!!hold||!!q,name=hold?F[hold].n:q?F[q.t].n:'';
  const turn='<button onclick="PBdo(\'rl\')" aria-label="Turn left">↺</button><button onclick="PBdo(\'rr\')" aria-label="Turn right">↻</button>';
  const actRow=hold?`<div class="pbr pbact"><button class=on onclick="PBdo('place')">✔ Place</button>${turn}<button onclick="PBdo('store')">Store</button><button onclick="PBdo('cancel')">${moving?'Undo':'✕'}</button></div>`
   :q?`<div class="pbr pbact"><button class=on onclick="PBdo('move')">✥ Move</button>${turn}<button onclick="PBdo('store')">Store</button><button onclick="PBdo('cancel')">✕</button></div>`:'';
- const body=SGT=='f'?(k.length?`<div class=pbl>${k.map(t=>`<button onclick="holdItem('${t}')"><span>${F[t].n}</span><small>×${S.inv[t]} in storage</small></button>`).join('')}</div>`:'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>')
+ const body=SGT=='f'?(k.length&&!DEV()?`<div class=pbl>${k.map(t=>`<button onclick="holdItem('${t}')"><span>${F[t].n}</span><small>×${S.inv[t]} in storage</small></button>`).join('')}</div>`:k.length?`<div class=pbf><div class=pbsr><input id=pbq type=search placeholder="Search furniture" autocomplete=off spellcheck=false value="${esc2(SSQ)}" oninput="PBq(this.value)"><button id=pbclr class=pbx style="${SSQ?'':'display:none'}" onclick="PBclr()" aria-label="Clear search">✕</button></div><div class="pbc">${catsHTML()}</div><div class="pbl pbg" id=pbgrid>${listHTML()}</div></div>`:'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>')
   :(fd.length?`<div class="pbl wrap">${fd.map(i=>`<button onclick="eatFood(${i})"><span>${FOOD[i][0]}</span><small>×${S.fd[i]} · +${FOOD[i][2]} energy</small></button>`).join('')}</div>`:'<span class=m>No food in storage. Order from Goober Eats (computer).</span>');
  const sets=setOpen?`<div class=pbs><b>Snap to walls and furniture</b>${tg('snap',1,'On')}${tg('snap',0,'Off')}<b>Turn back to the wall</b>${tg('turn',1,'On')}${tg('turn',0,'Off')}<b>Grid size</b>${tg('grid',.25,'¼')}${tg('grid',.5,'½')}${tg('grid',1,'1')}${tg('grid',0,'Free')}</div>`:'';
- const hint=SGT!='f'?'Tap food to eat it and restore energy.':touch()?(act?'Drag in the room to move it. Green means it fits.':'Tap an item below to place it, or tap a placed item to move it.'):(act?'Click to place · R or right-click: turn · E: store · Enter: place':'Pick an item below, or click a placed item. Drag to move it.');
+ const hint=SGT!='f'?'Tap food to eat it and restore energy.':touch()?(act?'Drag in the room to move it. Green means it fits.':'Tap an item below to place it, or tap a placed item to move it.'+(DEV()?' Search or pick a category to find things faster.':'')):(act?'Click to place · R or right-click: turn · E: store · Enter: place':'Pick an item below, or click a placed item. Drag to move it.');
  $('ui').innerHTML=`<div class="box pb ${act?'act':''}"><div class=pbr><h3>Storage${name?' · '+name:''}</h3>${tab('f','Furniture ('+k.reduce((a,t)=>a+S.inv[t],0)+')')}${tab('d','Food ('+fdN()+')')}<button class="${setOpen?'on':''}" onclick="PBgear()" aria-label="Placement settings">${pxIcon('gear')}</button><button class=go onclick="exitBuild()">Done</button></div>${actRow}${sets}${body}<small class="m pbh">${hint}${hasBed()?'':' · The room needs a bed'}</small></div>`;
- const n=document.querySelector('#ui .pbl');if(n)n.scrollLeft=sl};
+ const n=document.querySelector('#ui .pb');if(n)n.scrollTop=sl;const n2=document.querySelector('#ui .pbl');if(n2&&!DEV())n2.scrollLeft=sl2;if(wasQ){const i=document.getElementById('pbq');if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}}};
 window.PBdo=a=>{if(mode!='build')return;if(a=='place')place();else if(a=='rl'){rot(-1);buildUI()}else if(a=='rr'){rot(1);buildUI()}else if(a=='store')store();else if(a=='cancel')cancel();else if(a=='move'&&sel>=0)pickUp(sel)};
 window.PBset=(k,v)=>{PS()[k]=v;snd('click');buildUI()};
 window.PBgear=()=>{setOpen=!setOpen;snd('click');buildUI()};

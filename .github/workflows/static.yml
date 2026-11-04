@@ -46,6 +46,13 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: NODE_PATH="$RUNNER_TEMP/pw/node_modules" CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)" node tools/wiki-static.js
+      # One-request script bundle for the dev build (dev/bundle.json). The dev page falls back to the normal scripts if this is missing.
+      - name: Build dev bundle
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tz" terser@5
+          TERSER_DIR="$RUNNER_TEMP/tz" node tools/build-dev-bundle.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

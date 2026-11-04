@@ -8,7 +8,15 @@
 (function(){
 const J=window.TCHJ={on:0,x:0,y:0};
 let act=0,ui=null,base=null,knob=null,jid=null,jc=[0,0],jk={},runOn=0,held={};
-const coarse=()=>{try{return matchMedia('(pointer:coarse)').matches}catch(_){return 0}};
+/* Shared device check (also used by the computer screen, placement and messages): true for phones and tablets, false for laptops
+   and desktops even when they have a touch screen. iPads and iPadOS Safari (which reports as a Mac) always count as touch. */
+window.WF_TOUCH=function(){try{const n=navigator,ua=n.userAgent||'';
+ if(/iPad|iPhone|iPod|Android/i.test(ua))return true;
+ if(/Mac/i.test(n.platform||'')&&n.maxTouchPoints>1)return true;
+ const mm=q=>matchMedia(q).matches;
+ if(mm('(any-pointer:fine)')&&mm('(any-hover:hover)'))return false;
+ return mm('(pointer:coarse)')}catch(_){return false}};
+const coarse=()=>window.WF_TOUCH();
 const M=()=>typeof mode!='undefined'?mode:'';
 const kd=(k,t)=>{try{document.body.dispatchEvent(new KeyboardEvent(t||'keydown',{key:k,bubbles:true,cancelable:true}))}catch(_){}};
 const setK=(k,v)=>{if(typeof keys=='undefined')return;if(v){keys[k]=1;jk[k]=1}else if(jk[k]){delete keys[k];delete jk[k]}};
@@ -92,7 +100,7 @@ function relAll(){jRel();for(const id in held){kd(held[id],'keyup');delete held[
 
 function enable(){if(act)return;act=1;build();document.body.classList.add('tch')}
 if(coarse())(document.body?enable():addEventListener('DOMContentLoaded',enable));
-addEventListener('pointerdown',e=>{if(e.pointerType=='touch')enable()},true);
+addEventListener('pointerdown',e=>{if(e.pointerType=='touch'&&window.WF_TOUCH())enable()},true);
 
 /* show the controls only while walking, driving or walking at the awards; keep Run held while it is on */
 const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function'&&!(typeof S!='undefined'&&S&&S.noPhone),st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};

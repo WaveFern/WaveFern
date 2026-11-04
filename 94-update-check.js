@@ -19,8 +19,14 @@ function updGo(){if(UPD.busy)return;UPD.busy=1;try{sessionStorage.setItem('fw_up
  const wait=(p,ms)=>Promise.race([Promise.resolve(p).catch(()=>{}),new Promise(r=>setTimeout(r,ms))]);
  const cloud=typeof csPush=='function'&&typeof FBU!='undefined'&&FBU?wait(csPush(1),5000):null;
  /* pull fresh copies of the page, scripts and styles into the browser cache so the reload runs the new version */
- const files=[location.pathname,...[...document.querySelectorAll('script[src],link[rel=stylesheet][href]')].map(e=>e.src||e.href).filter(u=>u.startsWith(location.origin))];
- const fresh=wait(Promise.all(files.map(u=>fetch(u,{cache:'reload'}).catch(()=>{}))),6000);
+ /* v49.74: only the files that actually changed are re-downloaded. Every script is addressed as name.js?v=<version>, so a file whose
+    address is the same as the one already loaded is still good in the cache; before, all ~200 files were forced to re-download. */
+ const have=new Set(window.__FWL||[...document.querySelectorAll('script[src],link[rel=stylesheet][href]')].map(e=>e.getAttribute('src')||e.getAttribute('href')));
+ const fresh=wait(fetch(location.pathname,{cache:'reload'}).then(r=>r.text()).then(h=>{
+  const urls=[...h.matchAll(/<(?:script|link)[^>]*?\s(?:src|href)="([^"]+)"/g)].map(m=>m[1]).filter(u=>!/^(https?:)?\/\//.test(u)&&!/^(data|mailto):/.test(u)&&!/\.(png|svg|ico)(\?|$)/.test(u));
+  const todo=urls.filter(u=>!have.has(u));
+  if(window.FW_DEV)todo.push('/dev/bundle.json');
+  return Promise.all(todo.map(u=>fetch(u,{cache:'reload'}).catch(()=>{})))}).catch(()=>{}),8000);
  Promise.all([cloud,fresh]).then(()=>{if(b)b.textContent='Updating…';if(retry)location.replace(location.pathname+'?r='+Date.now());else location.reload()})}
 setTimeout(updCheck,5000);setInterval(updCheck,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)updCheck()});
