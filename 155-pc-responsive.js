@@ -4,7 +4,7 @@
    screen, and taller taskbar and title bar buttons. Desktop icons now open their app with a single click or tap
    everywhere (no double click). The desktop look on big screens is unchanged. No saved state. Wrapped in an IIFE. */
 (function(){
-const small=()=>{try{return matchMedia('(pointer:coarse)').matches||document.body.classList.contains('tch')||innerWidth<=760}catch(_){return innerWidth<=760}};
+const small=()=>{try{return (window.WF_TOUCH&&WF_TOUCH())||document.body.classList.contains('tch')||innerWidth<=760}catch(_){return innerWidth<=760}};
 Object.defineProperty(window,'PCSMALL',{get:small,configurable:true});
 const st=document.createElement('style');st.textContent=`
 body.pcsmall .win{left:0;right:0;top:0;bottom:52px;border-width:2px}
