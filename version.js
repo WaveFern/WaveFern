@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.73.4';
+const GAME_VERSION='v49.73.5';
 const VERSION_HISTORY=[
+ {v:'v49.73.5',n:'Fixed a valid save showing Invalid save code on reload when you own more than three pets. The save now loads first time and nothing is lost. Saves still load.'},
  {v:'v49.73.4',n:'Esc during a concert now pauses it instead of ending it. Press Esc again (or Resume) to carry on where you left off. To end a show early, use the Leave stage button. Saves still load.'},
  {v:'v49.73.3',n:'Touch screen laptops now get the laptop version of the game instead of the phone one. iPads and phones still get the touch controls.'},
  {v:'v49.73.2',n:'iPad and touch: tapping the bar while recording a song now registers properly. The guide no longer tells you to go to bed in the middle of the day.'},

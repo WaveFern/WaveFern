@@ -2,7 +2,7 @@
 Object.assign(S,{petsOut:true,gs:'follow',albums:[],likedP:[],savedP:[],clk:[],rivals:[],news:[],rep:0,fl:1});
 const hs=t=>{let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))>>>0;return h},FLN=['Lobby','Cafe Floor','Offices','Apartments','Recording Floor','Gallery','Sky Lounge','Rooftop Garden'];
 // companions
-function syncF(){FOL.forEach(f=>scene.remove(f.m));FOL=[];const hm=[[3.5,9.5],[5,8.5],[2.5,7.5]];S.pets.forEach((pi,j)=>{const m=mkS(petb(pi));m.scale.setScalar(.7);scene.add(m);if(S.petsOut)FOL.push({m,x:P.x,z:P.z,ox:-.9-j*.5,oz:.8});else{m.position.set(hm[j][0],0,hm[j][1]);m.rotation.y=j;FOL.push({m,x:hm[j][0],z:hm[j][1],home:1})}});
+function syncF(){FOL.forEach(f=>scene.remove(f.m));FOL=[];const hm=[[3.5,9.5],[5,8.5],[2.5,7.5]];S.pets.forEach((pi,j)=>{const m=mkS(petb(pi));m.scale.setScalar(.7);scene.add(m);if(S.petsOut)FOL.push({m,x:P.x,z:P.z,ox:-.9-j*.5,oz:.8});else{const h=hm[j%3],hx=h[0]+Math.floor(j/3)*.6,hz=h[1]-Math.floor(j/3)*.6;m.position.set(hx,0,hz);m.rotation.y=j;FOL.push({m,x:hx,z:hz,home:1})}});
  if(S.gs!='away')for(let j=0;j<S.guards;j++){const o=buildChar({skin:RI(0,5),eyes:4,mouth:1,hair:1,hc:0,top:2,tc:6,pc:4,body:.75}),r=S.gs=='returning';scene.add(o.g);FOL.push({m:o.g,x:P.x+(r?20:0),z:P.z+(r?12:0),ox:[1.3,-1.3,0][j],oz:[1.2,1.2,2.2][j]})}}
 const gsTxt=()=>({follow:'Following you',away:'Dismissed',returning:'Returning to you'})[S.gs];
 function gsSet(v){S.gs=v;if(v=='returning')setTimeout(()=>{if(S.gs=='returning'){S.gs='follow';syncF();say('Your bodyguards have arrived.');if(mode=='pc')pcR()}},5000);syncF();snd('ping');pcR()}
