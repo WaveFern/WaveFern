@@ -105,7 +105,10 @@
     target=tw;n._turn=3.6;
     if(Math.abs(ew)>.8){n._ms='turn';n._mt=t}
     else if(dist<.45){n._ms='idle';n._ib=t+R(1.5,4)}
-    else v=Math.max(.5,Math.min(n._mx,dist*1.1))*Math.max(0,Math.cos(ew))}
+    else{v=Math.max(.5,Math.min(n._mx,dist*1.1))*Math.max(0,Math.cos(ew));
+     /* wait for anyone standing in the way instead of walking into them */
+     const fx0=Math.sin(n._hd),fz0=Math.cos(n._hd);
+     bodies().forEach(o=>{if(o===n)return;const ox=o.x-cx,oz=o.z-cz,od=Math.hypot(ox,oz);if(od<1.5&&od>1e-3&&(ox*fx0+oz*fz0)/od>.5)v=0})}}
    else{
     /* standing around: face you, and now and then look away, shift about or fiddle with a phone */
     if(t>n._lk)n._lkv=0;
@@ -179,6 +182,19 @@
   if(n.st!=1&&n._sf<.98)n.t-=dt*8*(1-n._sf);/* the live walk cycle runs at full rate; hold it back to match the slowed pace */
   if(n.st!=1&&n._sf<.98){const k=Math.max(.25,n._sf);n.legs[0].rotation.x*=k;n.legs[1].rotation.x*=k;n.arms[0].rotation.x*=k;n.arms[1].rotation.x*=k}}
 
+ /* everyone who is close to you and acting as a follower (crowd members and the base-game fans walking up to you) has a body */
+ function bodies(){const a=[];lists().forEach(([L])=>L.forEach(n=>{if(n.m.visible&&(n._cw||n.st==1)&&Math.abs(n.x-P.x)<30&&Math.abs(n.z-P.z)<30)a.push(n)}));return a}
+ const BR=1.0;
+ function separate(){
+  const A=bodies();if(A.length<2)return;
+  for(let it=0;it<3;it++)for(let i=0;i<A.length;i++)for(let j=i+1;j<A.length;j++){
+   const a=A[i],b=A[j];let dx=a.x-b.x,dz=a.z-b.z,d=Math.hypot(dx,dz);if(d>=BR)continue;
+   if(d<1e-3){dx=Math.cos(i*2.4);dz=Math.sin(i*2.4);d=1}else{dx/=d;dz/=d}
+   const h=(BR-(d<1e-3?0:d))/2;
+   [[a,1],[b,-1]].forEach(([n,sg])=>{const nx=n.x+dx*h*sg,nz=n.z+dz*h*sg;
+    if(!hit(nx,n.z,.28))n.x=nx;if(!hit(n.x,nz,.28))n.z=nz;
+    if(n._cw){n._cx=n.x;n._cz=n.z}n.m.position.x=n.x;n.m.position.z=n.z})}}
+
  const wt=worldTick;
  worldTick=function(dt){
   dt=Math.min(dt,.1);
@@ -190,6 +206,7 @@
    crowd(dt,t,w);C.n=CW.filter(n=>n._cw).length;
    const ok=(mode=='play'||mode=='drive')&&!IN&&!HIN;
    lists().forEach(([L,v])=>L.forEach(n=>{if(!n._fx)return;if(n._cw)return;ambient(n,v,dt,ok)}));
+   separate();
   }catch(e){console.error('crowd',e)}
  };
 
