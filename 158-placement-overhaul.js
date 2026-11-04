@@ -157,7 +157,7 @@ body.pbuild #tch{display:none!important}
 @media(max-height:520px){.pb{max-height:62vh}.pb.act .pbf,.pb.act .pbl,.pb.act .pbh{display:none}}
 @media(pointer:coarse){.pb button{min-height:46px}.pb .pbact button{font-size:16px}}
 `;document.head.appendChild(css);
-const touch=()=>pType=='touch'||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+const touch=()=>pType=='touch'||(window.WF_TOUCH?WF_TOUCH():(window.matchMedia&&matchMedia('(pointer:coarse)').matches));
 
 /* v49.75.0: storage list is organised. Items are grouped into categories (the same ones Amazoom uses; plaques have their own) and can be
    searched by name. The filter is remembered while the game is open; it is not saved. */

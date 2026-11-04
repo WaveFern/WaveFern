@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.73.2';
+const GAME_VERSION='v49.73.3';
 const VERSION_HISTORY=[
+ {v:'v49.73.3',n:'Touch screen laptops now get the laptop version of the game instead of the phone one. iPads and phones still get the touch controls.'},
  {v:'v49.73.2',n:'iPad and touch: tapping the bar while recording a song now registers properly. The guide no longer tells you to go to bed in the middle of the day.'},
  {v:'v49.73.1',n:'The fresh start moved to 00:00 UTC on Friday 6 November 2026. Nothing changes before then.'},
  {v:'v49.73.0',n:'After the fresh start, the first time you sign in with Google you choose a username and a display name in one box. The username is your Friends username, so friends find you by it, and the display name is what friends and bandmates see next to it. Names have rules: a username is 3 to 16 lower case letters, numbers or _ and can be changed once every 30 days, a display name is 2 to 24 letters, numbers, spaces and . _ \' - and can be changed once every 7 days, names that imitate WaveFern, staff or the makers, or that are offensive, are refused (also with look-alike characters), and the Friends window has a Change name button. The notice also says that old save codes stop working after the reset.'},

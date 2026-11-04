@@ -26,5 +26,5 @@ body.pcsmall .win .chat .cin input{min-width:0}
   .replace(/<div class=cvh>/,'<div class=cvh><button class=mcbk title="Chats" onclick="PCMV=\'list\';pcR()">◀</button>')}}
 /* v44.7.1: on touch screens the window "blur" event fires when the keyboard opens or closes, and it paused the game on the
    computer (right after sending a message). A blur while the page is still visible is ignored there; leaving the page still pauses. */
-{const pg=pauseGame;pauseGame=function(){try{const e=window.event;if(e&&e.type=='blur'&&!document.hidden&&matchMedia('(pointer:coarse)').matches)return}catch(_){}return pg.apply(this,arguments)}}
+{const pg=pauseGame;pauseGame=function(){try{const e=window.event;if(e&&e.type=='blur'&&!document.hidden&&window.WF_TOUCH&&WF_TOUCH())return}catch(_){}return pg.apply(this,arguments)}}
 })();
