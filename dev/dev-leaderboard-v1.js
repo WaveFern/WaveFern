@@ -28,19 +28,35 @@
    const p=Math.pow((i+1)/NAMES.length,c.pw);return{name:n,v:Math.max(1,Math.round(c.max*(1-p*.985)*(.9+r()*.2))),me:0}});
   rows.push({name:meName(),v:c.me(),me:1});
   rows.sort((a,b)=>b.v-a.v||b.me-a.me);return rows};
- let cur=0,back='title';
- const css='<style>#lbd .tabs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}#lbd .tabs button{padding:6px 8px;font-size:.8em;border:3px solid #000;box-shadow:3px 3px 0 #000}#lbd .tabs button.on{background:#ffd23f;color:#000}'+
-  '#lbd .list{max-height:48vh;overflow:auto;border:3px solid #000;background:rgba(0,0,0,.35)}#lbd .row{display:flex;gap:10px;padding:6px 8px;border-bottom:2px solid rgba(0,0,0,.5)}#lbd .row b.r{width:2.4em;text-align:right}#lbd .row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'+
-  '#lbd .row.me{background:#ffd23f;color:#000;font-weight:bold;position:sticky;top:0;bottom:0}#lbd .row.top1 b.r{color:#ffd23f}</style>';
+ let cur=0,back='title',anim=1;
+ const MEDAL=['#ffd23f','#cfd8e3','#d08a4a'];
+ const FDR=i=>i%7==3;/* a few fake players are Founders too */
+ const fm=()=>{try{return typeof fdMark=='function'?fdMark(13):'<span title="Founder">★</span>'}catch(e){return''}};
+ const css='<style>@keyframes lbIn{from{transform:translateX(-14px);opacity:0}to{transform:none;opacity:1}}@keyframes lbPop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}'+
+  '@keyframes lbShine{0%{background-position:-200% 0}100%{background-position:200% 0}}@keyframes lbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes lbFall{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(260px);opacity:0}}'+
+  '@keyframes lbGlow{0%,100%{box-shadow:4px 4px 0 #000,0 0 0 #ffd23f}50%{box-shadow:4px 4px 0 #000,0 0 18px #ffd23f}}'+
+  '#lbd{position:relative;overflow:hidden;border:4px solid #000;box-shadow:6px 6px 0 #000}#lbd.top1{border-color:#ffd23f;animation:lbGlow 1.6s steps(6) infinite}'+
+  '#lbd .tabs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}#lbd .tabs button{padding:6px 8px;font-size:.8em;border:3px solid #000;box-shadow:3px 3px 0 #000}#lbd .tabs button.on{background:#ffd23f;color:#000;transform:translateY(-2px)}'+
+  '#lbd .ban{margin:6px 0;padding:8px;border:3px solid #000;text-align:center;font-weight:bold;background:linear-gradient(100deg,#7a5b00 20%,#ffd23f 45%,#fff3b0 50%,#ffd23f 55%,#7a5b00 80%) 0 0/200% 100%;color:#000;animation:lbShine 2.4s linear infinite,lbPop .5s steps(5)}'+
+  '#lbd .ban.n{background:#222;color:#fff;animation:none}'+
+  '#lbd .pod{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:8px 0 4px}#lbd .pod div{flex:1;max-width:130px;text-align:center;border:3px solid #000;padding:6px 4px;color:#000;box-shadow:3px 3px 0 #000;animation:lbPop .45s steps(5) both}'+
+  '#lbd .pod .nm{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:bold;font-size:.85em}#lbd .pod .v{display:block;font-size:.75em}#lbd .pod .k{font-size:1.5em;display:block}#lbd .pod .p1{padding-top:16px;animation:lbPop .45s steps(5) both,lbBob 1.2s steps(2) infinite}#lbd .pod .me{outline:3px solid #fff}'+
+  '#lbd .list{max-height:34vh;overflow:auto;border:3px solid #000;background:rgba(0,0,0,.35)}#lbd .row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-bottom:2px solid rgba(0,0,0,.5)}#lbd .row.a{animation:lbIn .25s steps(4) both}#lbd .row b.r{width:2.4em;text-align:right;opacity:.8}#lbd .row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'+
+  '#lbd .row.me{background:#ffd23f;color:#000;font-weight:bold}#lbd .row .fdm{vertical-align:middle;margin-left:4px}'+
+  '#lbd .cf{position:absolute;top:0;width:6px;height:6px;pointer-events:none;animation:lbFall 2.2s steps(14) infinite}</style>';
+ function podCell(x,i,c){const col=MEDAL[i],h=[0,18,30][i];return`<div class="${i==0?'p1':''}${x.me?' me':''}" style="background:${col};order:${[1,0,2][i]};padding-bottom:${h+6}px"><span class=k>${['👑','🥈','🥉'][i]}</span><span class=nm>${esc(x.name)}${x.fdr?fm():''}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
+ function confetti(){const col=['#ffd23f','#ff5a5a','#5aff8f','#5ac8ff','#fff'];let o='';for(let i=0;i<22;i++)o+=`<i class=cf style="left:${(i*4.7+((i*37)%9))%100}%;background:${col[i%5]};animation-delay:${(i%8)*.27}s"></i>`;return o}
  function draw(){
-  const c=CATS[cur],rows=LB.board(c.k),mi=rows.findIndex(x=>x.me);
-  $('ui').innerHTML=css+`<div id=lbd class="box modal" style="width:min(460px,94vw);border:4px solid #000;box-shadow:6px 6px 0 #000"><h2>Leaderboard</h2>
-   <div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div>
-   <p class=m style="margin:2px 0 6px">${c.t} (${c.u}) · you are <b>#${mi+1}</b> of ${rows.length}. Sample list, not real players yet.</p>
-   <div class=list>${rows.slice(0,25).map((x,i)=>row(x,i)).join('')}${mi>=25?row(rows[mi],mi):''}</div>
-   <p class=m><small>Arrow keys change tab. Esc goes back.</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;
-  function row(x,i){return`<div class="row${x.me?' me':''}${i==0?' top1':''}"><b class=r>${i+1}</b><span>${esc(x.name)}${x.me?' (you)':''}</span><b>${esc(c.fmt(x.v))}</b></div>`}
-  const me=document.querySelector('#lbd .row.me');if(me&&mi>=25)me.style.position='static'}
+  const c=CATS[cur],rows=LB.board(c.k),mi=rows.findIndex(x=>x.me),rk=mi+1,n=rows.length;
+  rows.forEach((x,i)=>{x.fdr=x.me?!!(S&&S.fdr):FDR(i)});
+  const ban=rk==1?`<div class=ban>👑 YOU ARE #1 IN ${c.t.toUpperCase()}! 👑</div>`:rk<=3?`<div class=ban>★ TOP 3 IN ${c.t.toUpperCase()}: #${rk} ★</div>`:`<div class="ban n">You are #${rk} of ${n}${rk<=10?' · Top 10!':''}. ${rows[mi-1]?'Next: '+esc(rows[mi-1].name)+' ('+esc(c.fmt(rows[mi-1].v))+')':''}</div>`;
+  const rest=rows.slice(3,25),lastRow=mi>=25?[rows[mi]]:[];
+  $('ui').innerHTML=css+`<div id=lbd class="box modal${rk==1?' top1':''}" style="width:min(460px,94vw)">${rk<=3?confetti():''}<h2>Leaderboard</h2>
+   <div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div>${ban}
+   <div class=pod>${[0,1,2].map(i=>podCell(rows[i],i,c)).join('')}</div>
+   <div class=list>${rest.concat(lastRow).map((x,j)=>{const i=x.me&&mi>=25?mi:j+3;return`<div class="row${x.me?' me':''}${anim?' a':''}" style="animation-delay:${Math.min(j,12)*.03}s"><b class=r>${i+1}</b><span>${esc(x.name)}${x.fdr?fm():''}${x.me?' (you)':''}</span><b>${esc(c.fmt(x.v))}</b></div>`}).join('')}</div>
+   <p class=m><small>${c.u} · sample list, not real players yet · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;
+  const me=document.querySelector('#lbd .row.me');if(me&&mi>=3&&mi<25)me.scrollIntoView({block:'nearest'})}
  LB.tab=i=>{cur=(i+CATS.length)%CATS.length;draw()};
  LB.open=function(from){back=from||(typeof TT!='undefined'&&TT.on?'title':'pause');cur=0;draw();addEventListener('keydown',key,true)};
  LB.close=function(){removeEventListener('keydown',key,true);if(back=='title')titleUI();else pauseUI()};
