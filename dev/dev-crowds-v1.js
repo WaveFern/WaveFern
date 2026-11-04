@@ -89,6 +89,11 @@
    const want=Math.atan2(dx,dz);let err=want-n._hd;while(err>Math.PI)err-=2*Math.PI;while(err<-Math.PI)err+=2*Math.PI;
    const pl=Math.atan2(P.x-cx,P.z-cz);
    let target=n._hd,v=0;
+   /* followers only ever walk towards you (facing you), never away from you or round you with their back turned:
+      if getting to their spot would mean turning away, they stand where they are and face you instead */
+   let pa=want-pl;while(pa>Math.PI)pa-=2*Math.PI;while(pa<-Math.PI)pa+=2*Math.PI;
+   const pd0=Math.hypot(P.x-cx,P.z-cz),away=Math.abs(pa)>.9&&pd0<12;
+   if(away&&n._ms!='idle'){n._ms='idle';n._ib=t+R(1.5,4)}
    /* three calm states: turn on the spot to face where they are going, walk straight the way they face, then stand and idle */
    if(n._ms=='turn'){
     if(t>=n._mt){target=want;n._turn=2.6;if(Math.abs(err)<.12)n._ms='walk'}
@@ -108,7 +113,7 @@
      else{n._ms='turn';n._mt=t;n._sr=n._sr+R(-.4,.4);n._sr0=clamp(n._sr0+R(-.4,.4),2.4,5)}}
     if(n._apT&&t>n._ap_t)n._apT=0;
     /* you moved away or the ring shifted: wait a beat, then turn and follow */
-    if(dist>1.1){n._ms='turn';n._mt=t+R(.25,.9)}}
+    if(dist>1.1&&!away){n._ms='turn';n._mt=t+R(.25,.9)}}
    turn(n,target,dt,8);n._turn=0;
    /* velocity is always along the facing direction, so there is no sideways or diagonal sliding */
    n._v+=(v-n._v)*Math.min(1,dt*(v>n._v?2.2:5));
