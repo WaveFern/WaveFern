@@ -128,8 +128,8 @@ window.mpFind=()=>{if(needLogin())return;const c=mpCC($('mpcd').value),out=$('mp
  snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'… this can take a few seconds.</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
  const fail=t=>{if(U.qc!==c||U.qok===c)return;out.innerHTML='<p class=m>'+t+'</p><button onclick="mpFind()">Try again</button>';if(U.qp)try{U.qp.destroy()}catch(e){}U.qp=null};U.qc=c;U.qok='';
  /* ask the Firebase relay at the same time: it answers even when direct connections are blocked */
- fbRoomInfo(c).then(d=>{if(d&&U.qc===c)qShow(c,d)}).catch(()=>{});
- lib().then(()=>{const p=U.qp=new Peer(peerOpts());const to=setTimeout(()=>fail('No answer from room '+esc(c)+'. Check the code and that the host is in the game.'),15000);
+ U.fx='';fbRoomInfo(c).then(d=>{if(U.qc!==c)return;if(d)qShow(c,d);else U.fx='the relay has no room '+c+' (the host\'s relay is not set up)'}).catch(e=>{U.fx=String(e&&(e.code||e.message)||e);console.warn('[relay] room lookup failed:',e)});
+ lib().then(()=>{const p=U.qp=new Peer(peerOpts());const to=setTimeout(()=>fail('No answer from room '+esc(c)+'. Check the code and that the host is in the game.'+(U.fx?'<br><small>Relay: '+esc(U.fx)+'</small>':'')),15000);
   p.on('error',e=>{clearTimeout(to);fail(e&&e.type=='peer-unavailable'?'There is no room '+esc(c)+' right now. Check the code and that the host is in the game.':'Could not reach the room service. Check your connection and try again.')});
   p.on('open',()=>{const cn=p.connect(pid(c),{reliable:true,serialization:'json'});cn.on('open',()=>cn.send({t:'q'}));
    cn.on('data',d=>{if(!d||d.t!='qi')return;clearTimeout(to);try{p.destroy()}catch(e){}U.qp=null;if(U.qc!==c)return;qShow(c,cln(d))})})
