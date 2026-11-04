@@ -29,27 +29,27 @@
   rows.push({name:meName(),v:c.me(),me:1});
   rows.sort((a,b)=>b.v-a.v||b.me-a.me);return rows};
  let cur=0,back='title',anim=1;
- const MEDAL=['#ffd23f','#cfd8e3','#d08a4a'];
  const FDR=i=>i%7==3;/* a few fake players are Founders too */
- const fm=()=>{try{return typeof fdMark=='function'?fdMark(13):'<span title="Founder">★</span>'}catch(e){return''}};
- const css='<style>@keyframes lbIn{from{transform:translateX(-14px);opacity:0}to{transform:none;opacity:1}}@keyframes lbPop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}'+
-  '@keyframes lbShine{0%{background-position:-200% 0}100%{background-position:200% 0}}@keyframes lbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes lbFall{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(260px);opacity:0}}'+
-  '@keyframes lbGlow{0%,100%{box-shadow:4px 4px 0 #000,0 0 0 #ffd23f}50%{box-shadow:4px 4px 0 #000,0 0 18px #ffd23f}}'+
-  '#lbd{position:relative;overflow:hidden;border:4px solid #000;box-shadow:6px 6px 0 #000}#lbd.top1{border-color:#ffd23f;animation:lbGlow 1.6s steps(6) infinite}'+
-  '#lbd .tabs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}#lbd .tabs button{padding:6px 8px;font-size:.8em;border:3px solid #000;box-shadow:3px 3px 0 #000}#lbd .tabs button.on{background:#ffd23f;color:#000;transform:translateY(-2px)}'+
-  '#lbd .ban{margin:6px 0;padding:8px;border:3px solid #000;text-align:center;font-weight:bold;background:linear-gradient(100deg,#7a5b00 20%,#ffd23f 45%,#fff3b0 50%,#ffd23f 55%,#7a5b00 80%) 0 0/200% 100%;color:#000;animation:lbShine 2.4s linear infinite,lbPop .5s steps(5)}'+
-  '#lbd .ban.n{background:#222;color:#fff;animation:none}'+
-  '#lbd .pod{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:8px 0 4px}#lbd .pod div{flex:1;max-width:130px;text-align:center;border:3px solid #000;padding:6px 4px;color:#000;box-shadow:3px 3px 0 #000;animation:lbPop .45s steps(5) both}'+
-  '#lbd .pod .nm{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:bold;font-size:.85em}#lbd .pod .v{display:block;font-size:.75em}#lbd .pod .k{font-size:1.5em;display:block}#lbd .pod .p1{padding-top:16px;animation:lbPop .45s steps(5) both,lbBob 1.2s steps(2) infinite}#lbd .pod .me{outline:3px solid #fff}'+
-  '#lbd .list{max-height:34vh;overflow:auto;border:3px solid #000;background:rgba(0,0,0,.35)}#lbd .row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-bottom:2px solid rgba(0,0,0,.5)}#lbd .row.a{animation:lbIn .25s steps(4) both}#lbd .row b.r{width:2.4em;text-align:right;opacity:.8}#lbd .row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'+
-  '#lbd .row.me{background:#ffd23f;color:#000;font-weight:bold}#lbd .row .fdm{vertical-align:middle;margin-left:4px}'+
+ const fm=()=>{try{return typeof fdMark=='function'?fdMark(13):''}catch(e){return''}};
+ const css='<style>@keyframes lbIn{from{transform:translateX(-12px);opacity:0}to{transform:none;opacity:1}}@keyframes lbPop{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}'+
+  '@keyframes lbShine{0%{background-position:-200% 0}100%{background-position:200% 0}}@keyframes lbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes lbFall{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(300px);opacity:0}}'+
+  '@keyframes lbGlow{0%,100%{box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008,0 0 0 var(--g)}50%{box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008,0 0 16px var(--g)}}'+
+  '#lbd{position:relative;overflow:hidden;font-family:Silkscreen,ui-monospace,monospace}#lbd.top1{border-color:var(--g);animation:lbGlow 1.6s steps(6) infinite}#lbd h2{letter-spacing:2px;text-transform:uppercase}'+
+  '#lbd .tabs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}#lbd .tabs button{padding:5px 8px;font-size:.75em}#lbd .tabs button.on{background:var(--g);color:#04120a;font-weight:700}'+
+  '#lbd .ban{margin:6px 0;padding:8px;border:3px solid #000;text-align:center;font-weight:700;letter-spacing:1px;background:linear-gradient(100deg,#1a8a52 20%,#2fe68a 45%,#b8ffd9 50%,#2fe68a 55%,#1a8a52 80%) 0 0/200% 100%;color:#04120a;animation:lbShine 2.4s linear infinite,lbPop .5s steps(5)}'+
+  '#lbd .ban.n{background:#161b18;color:var(--t);border-color:#000;box-shadow:inset 0 0 0 2px #2a352e;animation:none;font-weight:400;letter-spacing:0}'+
+  '#lbd .pod{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:10px 0 6px}#lbd .pod div{flex:1;max-width:130px;text-align:center;border:3px solid #000;padding:6px 4px;box-shadow:inset 0 -3px #0007,3px 3px 0 #0008;animation:lbPop .45s steps(5) both}'+
+  '#lbd .pod .nm{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;font-size:.8em}#lbd .pod .v{display:block;font-size:.7em;opacity:.85}#lbd .pod .k{font-size:1.6em;display:block;font-weight:700}'+
+  '#lbd .pod .c1{background:var(--g);color:#04120a;animation:lbPop .45s steps(5) both,lbBob 1.2s steps(2) infinite}#lbd .pod .c2{background:#1a8a52;color:#04120a}#lbd .pod .c3{background:#26302a;color:var(--t)}#lbd .pod .me{outline:3px solid #fff}'+
+  '#lbd .list{max-height:34vh;overflow:auto;border:3px solid #000;background:#0b0f0d;box-shadow:inset 0 0 0 2px #2a352e}#lbd .row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-bottom:2px solid #000;font-size:.85em}#lbd .row.a{animation:lbIn .25s steps(4) both}#lbd .row b.r{width:2.4em;text-align:right;color:var(--m)}#lbd .row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'+
+  '#lbd .row.me{background:var(--g);color:#04120a;font-weight:700}#lbd .row.me b.r{color:#04120a}#lbd .fdm{vertical-align:middle;margin-left:4px}'+
   '#lbd .cf{position:absolute;top:0;width:6px;height:6px;pointer-events:none;animation:lbFall 2.2s steps(14) infinite}</style>';
- function podCell(x,i,c){const col=MEDAL[i],h=[0,18,30][i];return`<div class="${i==0?'p1':''}${x.me?' me':''}" style="background:${col};order:${[1,0,2][i]};padding-bottom:${h+6}px"><span class=k>${['👑','🥈','🥉'][i]}</span><span class=nm>${esc(x.name)}${x.fdr?fm():''}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
- function confetti(){const col=['#ffd23f','#ff5a5a','#5aff8f','#5ac8ff','#fff'];let o='';for(let i=0;i<22;i++)o+=`<i class=cf style="left:${(i*4.7+((i*37)%9))%100}%;background:${col[i%5]};animation-delay:${(i%8)*.27}s"></i>`;return o}
+ function podCell(x,i,c){const h=[0,18,30][i];return`<div class="c${i+1}${x.me?' me':''}" style="order:${[1,0,2][i]};padding:${i==0?16:6}px 4px ${h+6}px"><span class=k>#${i+1}</span><span class=nm>${esc(x.name)}${x.fdr?fm():''}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
+ function confetti(){const col=['#2fe68a','#1a8a52','#b8ffd9','#e8f3ec','#26302a'];let o='';for(let i=0;i<22;i++)o+=`<i class=cf style="left:${(i*4.7+((i*37)%9))%100}%;background:${col[i%5]};animation-delay:${(i%8)*.27}s"></i>`;return o}
  function draw(){
   const c=CATS[cur],rows=LB.board(c.k),mi=rows.findIndex(x=>x.me),rk=mi+1,n=rows.length;
   rows.forEach((x,i)=>{x.fdr=x.me?!!(S&&S.fdr):FDR(i)});
-  const ban=rk==1?`<div class=ban>👑 YOU ARE #1 IN ${c.t.toUpperCase()}! 👑</div>`:rk<=3?`<div class=ban>★ TOP 3 IN ${c.t.toUpperCase()}: #${rk} ★</div>`:`<div class="ban n">You are #${rk} of ${n}${rk<=10?' · Top 10!':''}. ${rows[mi-1]?'Next: '+esc(rows[mi-1].name)+' ('+esc(c.fmt(rows[mi-1].v))+')':''}</div>`;
+  const ban=rk==1?`<div class=ban>YOU ARE #1 IN ${c.t.toUpperCase()}</div>`:rk<=3?`<div class=ban>TOP 3 IN ${c.t.toUpperCase()}: #${rk}</div>`:`<div class="ban n">You are #${rk} of ${n}${rk<=10?'. Top 10!':'.'} ${rows[mi-1]?'Next: '+esc(rows[mi-1].name)+' ('+esc(c.fmt(rows[mi-1].v))+')':''}</div>`;
   const rest=rows.slice(3,25),lastRow=mi>=25?[rows[mi]]:[];
   $('ui').innerHTML=css+`<div id=lbd class="box modal${rk==1?' top1':''}" style="width:min(460px,94vw)">${rk<=3?confetti():''}<h2>Leaderboard</h2>
    <div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div>${ban}
