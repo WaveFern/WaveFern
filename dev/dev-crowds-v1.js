@@ -13,7 +13,7 @@
  const now=()=>performance.now()/1000,R=(a,b)=>a+Math.random()*(b-a);
  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
  const G=[1,.4,.12,0],TIER=[0,0,0,3,5,7,9,11,12,13,14,14,15];
- const SIDE=1.0,SPACE=1.15;
+ const SIDE=1.0,SPACE=1.3;
  /* heading change is rate-limited (rad/s) so nobody can ever spin round in a frame or two, whatever made the target flip */
  const TURN=4.2;
  function turn(n,tgt,dt,k){let d=tgt-n._hd;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;const m=(n._turn||TURN)*dt;n._hd+=clamp(d*Math.min(1,dt*k),-m,m)}
@@ -69,49 +69,70 @@
   CW.slice().forEach(n=>{
    if(n._pend&&t>=n._pend){
     /* the moment they notice you: take over from the ambient walk */
-    n._pend=0;n._cw=1;n._cx=n.x;n._cz=n.z;
-    const vert=n._vt,sp=n.dir*n._sp0;n._vx=vert?0:sp;n._vz=vert?sp:0;
-    n._so=R(-.15,.15);n._sr0=R(1.9,3.6);n._sa=Math.atan2(n.x-P.x,n.z-P.z);n._sr=n._sr0;n._bt=t+R(35,80);n._stk=0;n._lo=0;n._lv=0;n._sd=0;n._mx=R(2.1,2.9)}});
+    n._pend=0;n._cw=1;n._cx=n.x;n._cz=n.z;n._vx=0;n._vz=0;n._v=0;n._ph=n._ph||0;
+    n._so=R(-.35,.35);n._sr0=R(2.7,4.6);n._sa=Math.atan2(n.x-P.x,n.z-P.z);n._sr=n._sr0;n._bt=t+R(35,80);n._stk=0;n._lo=0;n._lv=0;n._sd=0;n._mx=R(1.2,2.3);
+    /* they notice you, pause a moment, then turn to face their spot before walking */
+    n._ms='turn';n._mt=t+R(.15,.8);n._ib=t+R(2,5);n._lk=0;n._ap=0;n._apT=0}});
   /* spread out: everyone gets their own slot on a ring round you (kept in their current order round you, so nobody swaps
      places), and the ring is wide enough that neighbouring slots are never closer than the body spacing */
   {const A=CW.filter(n=>n._cw);if(A.length){
    A.forEach(n=>n._ca=Math.atan2(n._cx-P.x,n._cz-P.z));A.sort((x,y)=>x._ca-y._ca);
    const m=A.length,rMin=m*SPACE/(2*Math.PI);
-   A.forEach((n,i)=>{n._sa=i*2*Math.PI/m+n._so;n._sr=Math.max(n._sr0,rMin)})}}
+   /* each person keeps (roughly) the angle they arrive from; neighbours are only pushed apart where they would be too close */
+   const rr=Math.max(rMin,2.4),gap=Math.min(SPACE/rr,2*Math.PI/m),a=A.map(n=>n._ca);
+   for(let it=0;it<12&&m>1;it++)for(let i=0;i<m;i++){const j=(i+1)%m;let g=a[j]-a[i];if(j==0)g+=2*Math.PI;if(g<gap){const h=(gap-g)/2;a[i]-=h;a[j]+=h}}
+   A.forEach((n,i)=>{n._sa=a[i];n._sr=Math.max(n._sr0,rMin)})}}
   CW.slice().forEach(n=>{
    if(!n._cw)return;
    const vert=n._vt;let cx=n._cx,cz=n._cz;
    const tx=P.x+Math.sin(n._sa)*n._sr,tz=P.z+Math.cos(n._sa)*n._sr,dx=tx-cx,dz=tz-cz,dist=Math.hypot(dx,dz);
-   const vm=dist>8?3.6:n._mx,vd=dist<.2?0:Math.min(vm,dist*1.5);
-   let wx=dist>1e-3?dx/dist*vd:0,wz=dist>1e-3?dz/dist*vd:0;
-   /* keep apart from each other and from you */
-   CW.forEach(o=>{if(o===n||!o._cw)return;const ax=cx-o._cx,az=cz-o._cz,d=Math.hypot(ax,az);if(d<SPACE&&d>1e-3){const k=(SPACE-d)*6/d;wx+=ax*k;wz+=az*k}});
-   const px=cx-P.x,pz=cz-P.z,pd=Math.hypot(px,pz);if(pd<1.6&&pd>1e-3){const k=(1.6-pd)*3.2/pd;wx+=px*k;wz+=pz*k}
-   n._vx+=(wx-n._vx)*Math.min(1,dt*4.5);n._vz+=(wz-n._vz)*Math.min(1,dt*4.5);
-   /* people walk where they face: sideways drift (relative to the body) is damped hard, so nobody glides or crab-walks.
-      The heading below turns towards the travel direction, and the body only really speeds up along the way it faces */
-   {const fx=Math.sin(n._hd),fz=Math.cos(n._hd),vf=n._vx*fx+n._vz*fz,vs=n._vx*fz-n._vz*fx,ks=Math.min(1,dt*9);
-    const sv=vs*(1-ks);n._vx=fx*vf+fz*sv;n._vz=fz*vf-fx*sv}
+   const want=Math.atan2(dx,dz);let err=want-n._hd;while(err>Math.PI)err-=2*Math.PI;while(err<-Math.PI)err+=2*Math.PI;
+   const pl=Math.atan2(P.x-cx,P.z-cz);
+   let target=n._hd,v=0;
+   /* three calm states: turn on the spot to face where they are going, walk straight the way they face, then stand and idle */
+   if(n._ms=='turn'){
+    if(t>=n._mt){target=want;n._turn=2.6;if(Math.abs(err)<.12)n._ms='walk'}
+    if(dist<.45&&n._ms=='turn')n._ms='idle'}
+   else if(n._ms=='walk'){
+    target=want;n._turn=2.2;
+    if(Math.abs(err)>.8){n._ms='turn';n._mt=t}
+    else if(dist<.3){n._ms='idle';n._ib=t+R(1.5,4)}
+    else v=Math.max(.5,Math.min(n._mx,dist*1.1))*Math.max(0,Math.cos(err))}
+   else{
+    /* standing around: face you, and now and then look away, shift about or fiddle with a phone */
+    if(t>n._lk)n._lkv=0;
+    target=pl+(n._lkv||0);n._turn=2.4;
+    if(t>n._ib){n._ib=t+R(2.5,6);const r=Math.random();
+     if(r<.4){n._lkv=R(-1.1,1.1);n._lk=t+R(1,2.2)}
+     else if(r<.7){n._apT=1;n._ap_t=t+R(2,4)}
+     else{n._ms='turn';n._mt=t;n._sr=n._sr+R(-.4,.4);n._sr0=clamp(n._sr0+R(-.4,.4),2.4,5)}}
+    if(n._apT&&t>n._ap_t)n._apT=0;
+    /* you moved away or the ring shifted: wait a beat, then turn and follow */
+    if(dist>1.1){n._ms='turn';n._mt=t+R(.25,.9)}}
+   turn(n,target,dt,8);n._turn=0;
+   /* velocity is always along the facing direction, so there is no sideways or diagonal sliding */
+   n._v+=(v-n._v)*Math.min(1,dt*(v>n._v?2.2:5));
+   const fx=Math.sin(n._hd),fz=Math.cos(n._hd);n._vx=fx*n._v;n._vz=fz*n._v;
    const nx=cx+n._vx*dt,nz=cz+n._vz*dt;
    if(!hit(nx,cz,.28))cx=nx;else n._vx=0;
    if(!hit(cx,nz,.28))cz=nz;else n._vz=0;
-   /* hard stop: never let two followers overlap, whatever the forces did */
+   /* hard stop: never let two followers overlap (a tiny nudge only if they actually touch) */
    CW.forEach(o=>{if(o===n||!o._cw)return;const ax=cx-o._cx,az=cz-o._cz,d=Math.hypot(ax,az),mn=.8;if(d<mn){const u=d>1e-3?1:0,ex=u?ax/d:Math.cos(n._sa),ez=u?az/d:Math.sin(n._sa),h=(mn-d)/2;
     if(!hit(cx+ex*h,cz,.28))cx+=ex*h;if(!hit(cx,cz+ez*h,.28))cz+=ez*h}});
+   /* never closer than a comfortable distance */
+   {const px=cx-P.x,pz=cz-P.z,pd=Math.hypot(px,pz);if(pd<2&&pd>1e-3){const k=(2-pd)*Math.min(1,dt*3)/pd;if(!hit(cx+px*k,cz,.28))cx+=px*k;if(!hit(cx,cz+pz*k,.28))cz+=pz*k}}
    n._cx=cx;n._cz=cz;
    const spd=Math.hypot(n._vx,n._vz);
-   n._stk=(spd<.25&&dist>2.8)?n._stk+dt:0;
+   n._stk=(n._ms=='walk'&&spd<.25)?n._stk+dt:0;
    if(n._stk>2.5||t>n._bt){release(n,vert,t>n._bt?30:12,t);return}
-   /* face you when close, otherwise face where they are walking */
-   /* always face the way they are actually moving (no more walking backwards while looking at you); only when
-      standing nearly still do they turn to look at you */
-   let tgt=n._hd;if(spd>.5)tgt=Math.atan2(wx,wz);else if(spd<.2&&Math.hypot(P.x-cx,P.z-cz)<7)tgt=Math.atan2(P.x-cx,P.z-cz);
-   n._turn=5.5;turn(n,tgt,dt,8);n._turn=0;
    n.x=cx;n.z=cz;n.m.position.set(cx,0,cz);n.m.rotation.y=n._hd;
    /* stride follows the real ground speed (about 0.41 m per radian, like the normal walk), so feet never skate */
    n._ph=(n._ph||0)+spd/.41*dt;n._am=(n._am||0)+(clamp(spd/2.4,0,1)*.65-(n._am||0))*Math.min(1,dt*10);
    const s=Math.sin(n._ph)*n._am;
-   n.legs[0].rotation.x=s;n.legs[1].rotation.x=-s;n.arms[0].rotation.x=-s;n.arms[1].rotation.x=s})}
+   n._ap+=((n._apT?1:0)-n._ap)*Math.min(1,dt*4);
+   const sw=n._ms=='idle'?Math.sin(t*1.3+n._sa*3)*.04:0;
+   n.legs[0].rotation.x=s+sw;n.legs[1].rotation.x=-s-sw;
+   n.arms[0].rotation.x=-s*(1-n._ap)-1.25*n._ap;n.arms[1].rotation.x=s*(1-n._ap)-1.0*n._ap})}
 
  /* spring-based sidestep for everyone on the pavement */
  function ambient(n,vert,dt,ok){
