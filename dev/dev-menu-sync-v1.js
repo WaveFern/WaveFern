@@ -8,7 +8,7 @@
   try{
    if(typeof titleUI=='function'&&document.getElementById('ttl')&&typeof TT=='object'&&TT.on&&!TT.sel&&!document.getElementById('lbd')){
     const t=document.getElementById('ttl');
-    if(!t.querySelector('button[onclick="LB.open()"]')&&window.LB||!t.querySelector('.fwpf-ic')&&window.FW_PROFILE)titleUI();
+    if(!t.querySelector('button[onclick="LB.open()"]')&&window.LB||!t.querySelector('.fwpf-ic')&&window.FW_PROFILE||window.FW_SOCIAL&&!t.querySelector('.fwsoc'))titleUI();
    }
    if(typeof pauseUI=='function'&&document.getElementById('pzm')){
     const m=document.getElementById('pzm');
