@@ -13,7 +13,7 @@
  const now=()=>performance.now()/1000,R=(a,b)=>a+Math.random()*(b-a);
  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
  const G=[1,.4,.12,0],TIER=[0,0,0,3,5,7,9,11,12,13,14,14,15];
- const SIDE=1.0;
+ const SIDE=1.0,SPACE=1.15;
  /* heading change is rate-limited (rad/s) so nobody can ever spin round in a frame or two, whatever made the target flip */
  const TURN=4.2;
  function turn(n,tgt,dt,k){let d=tgt-n._hd;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;const m=(n._turn||TURN)*dt;n._hd+=clamp(d*Math.min(1,dt*k),-m,m)}
@@ -71,7 +71,13 @@
     /* the moment they notice you: take over from the ambient walk */
     n._pend=0;n._cw=1;n._cx=n.x;n._cz=n.z;
     const vert=n._vt,sp=n.dir*n._sp0;n._vx=vert?0:sp;n._vz=vert?sp:0;
-    n._sa=Math.atan2(n.x-P.x,n.z-P.z)+R(-.9,.9);n._sr=R(1.9,3.6);n._bt=t+R(35,80);n._stk=0;n._lo=0;n._lv=0;n._sd=0;n._mx=R(2.1,2.9)}});
+    n._so=R(-.15,.15);n._sr0=R(1.9,3.6);n._sa=Math.atan2(n.x-P.x,n.z-P.z);n._sr=n._sr0;n._bt=t+R(35,80);n._stk=0;n._lo=0;n._lv=0;n._sd=0;n._mx=R(2.1,2.9)}});
+  /* spread out: everyone gets their own slot on a ring round you (kept in their current order round you, so nobody swaps
+     places), and the ring is wide enough that neighbouring slots are never closer than the body spacing */
+  {const A=CW.filter(n=>n._cw);if(A.length){
+   A.forEach(n=>n._ca=Math.atan2(n._cx-P.x,n._cz-P.z));A.sort((x,y)=>x._ca-y._ca);
+   const m=A.length,rMin=m*SPACE/(2*Math.PI);
+   A.forEach((n,i)=>{n._sa=i*2*Math.PI/m+n._so;n._sr=Math.max(n._sr0,rMin)})}}
   CW.slice().forEach(n=>{
    if(!n._cw)return;
    const vert=n._vt;let cx=n._cx,cz=n._cz;
@@ -79,7 +85,7 @@
    const vm=dist>8?3.6:n._mx,vd=dist<.2?0:Math.min(vm,dist*1.5);
    let wx=dist>1e-3?dx/dist*vd:0,wz=dist>1e-3?dz/dist*vd:0;
    /* keep apart from each other and from you */
-   CW.forEach(o=>{if(o===n||!o._cw)return;const ax=cx-o._cx,az=cz-o._cz,d=Math.hypot(ax,az);if(d<1.05&&d>1e-3){const k=(1.05-d)*2.2/d;wx+=ax*k;wz+=az*k}});
+   CW.forEach(o=>{if(o===n||!o._cw)return;const ax=cx-o._cx,az=cz-o._cz,d=Math.hypot(ax,az);if(d<SPACE&&d>1e-3){const k=(SPACE-d)*6/d;wx+=ax*k;wz+=az*k}});
    const px=cx-P.x,pz=cz-P.z,pd=Math.hypot(px,pz);if(pd<1.6&&pd>1e-3){const k=(1.6-pd)*3.2/pd;wx+=px*k;wz+=pz*k}
    n._vx+=(wx-n._vx)*Math.min(1,dt*4.5);n._vz+=(wz-n._vz)*Math.min(1,dt*4.5);
    /* people walk where they face: sideways drift (relative to the body) is damped hard, so nobody glides or crab-walks.
@@ -89,6 +95,9 @@
    const nx=cx+n._vx*dt,nz=cz+n._vz*dt;
    if(!hit(nx,cz,.28))cx=nx;else n._vx=0;
    if(!hit(cx,nz,.28))cz=nz;else n._vz=0;
+   /* hard stop: never let two followers overlap, whatever the forces did */
+   CW.forEach(o=>{if(o===n||!o._cw)return;const ax=cx-o._cx,az=cz-o._cz,d=Math.hypot(ax,az),mn=.8;if(d<mn){const u=d>1e-3?1:0,ex=u?ax/d:Math.cos(n._sa),ez=u?az/d:Math.sin(n._sa),h=(mn-d)/2;
+    if(!hit(cx+ex*h,cz,.28))cx+=ex*h;if(!hit(cx,cz+ez*h,.28))cz+=ez*h}});
    n._cx=cx;n._cz=cz;
    const spd=Math.hypot(n._vx,n._vz);
    n._stk=(spd<.25&&dist>2.8)?n._stk+dt:0;
