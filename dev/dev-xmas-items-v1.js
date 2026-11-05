@@ -282,5 +282,13 @@
  /* cars and pets: the last entries are cut off while the shop page is built */
  const hideTail=(arr,at,fn)=>{if(typeof fn!='function')return fn;return function(){const k=arr.splice(at);try{return fn.apply(this,arguments)}finally{arr.push(...k)}}};
  if(typeof PA=='object'&&PA){if(PA.cars)PA.cars=hideTail(CARS,SI,PA.cars);if(PA.pets)PA.pets=hideTail(PETS,PI,PA.pets)}
+ /* the wooden sledge (given instead of a second pet bed when the pets are full) */
+ {const W='#f4f4f4',R='#c0392b',B='#8a5a36',b=[];
+  [-.34,.34].forEach(x=>{b.push([.08,.08,1.7,'#b8860b',x,.06,0],[.08,.08,.2,'#b8860b',x,.14,.96],[.08,.1,.14,'#b8860b',x,.24,1.04],[.06,.3,.08,B,x,.22,.5],[.06,.3,.08,B,x,.22,-.4])});
+  for(let i=0;i<6;i++)b.push([.8,.05,.2,i%2?'#a5703f':B,0,.4,-.64+i*.26]);
+  b.push([.7,.14,.8,R,0,.5,-.1],[.74,.06,.84,W,0,.6,-.1],[.7,.3,.1,R,0,.62,-.56],[.04,.05,1.6,R,-.34,.5,0],[.04,.05,1.6,R,.34,.5,0]);
+  b.push([.26,.22,.26,'#2ecc71',-.12,.72,-.2],[.28,.05,.08,W,-.12,.74,-.2],[.07,.24,.28,W,-.12,.72,-.2],[.2,.18,.2,'#2f6fb5',.16,.7,.05],[.06,.2,.22,GOLD,.16,.7,.05],[.16,.16,.16,'#e84393',.1,.84,-.3]);
+  b.push([.06,.06,.5,'#5a3a22',0,.3,1.2],[.3,.06,.06,'#e6b422',0,.3,1.44]);
+  defF('xm_sled','Festive Sledge',.9,1.9,b)}
  window.FW_XMAS_ITEMS={G0,PI,SI};
 })();
