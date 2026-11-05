@@ -290,5 +290,8 @@
   b.push([.26,.22,.26,'#2ecc71',-.12,.72,-.2],[.28,.05,.08,W,-.12,.74,-.2],[.07,.24,.28,W,-.12,.72,-.2],[.2,.18,.2,'#2f6fb5',.16,.7,.05],[.06,.2,.22,GOLD,.16,.7,.05],[.16,.16,.16,'#e84393',.1,.84,-.3]);
   b.push([.06,.06,.5,'#5a3a22',0,.3,1.2],[.3,.06,.06,'#e6b422',0,.3,1.44]);
   defF('xm_sled','Festive Sledge',.9,1.9,b)}
- window.FW_XMAS_ITEMS={G0,PI,SI};
+ /* what each Christmas item is worth (they have no shop price): the calendar crates sort items into rarity tiers by this value */
+ const VAL={'Santa Hat':120,'Elf Tights':190,'Candy Cane Scarf':240,'Reindeer Antlers':320,'Elf Boots':420,'Ugly Christmas Sweater':520,'Gingerbread Hoodie':760,'Elf Jacket':980,'Santa Coat':2200,
+  xm_cane:140,xm_rug:340,xm_presents:450,xm_petbed:500,xm_snowman:620,xm_nutcracker:880,xm_chair:1100,xm_cocoa:1350,xm_sled:1800,xm_ginger:2600,xm_mantel:3400,xm_reindeer:4200,xm_tree:7500,xm_globe:12000};
+ window.FW_XMAS_ITEMS={G0,PI,SI,VAL};
 })();
