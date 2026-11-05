@@ -1,6 +1,6 @@
 /* ===== dev only: a nicer airport, outside and inside =====
    OUTSIDE (home airport): a curved wave roof, lit rooftop letters and a Fern logo, flag poles, planters with trees along the
-   forecourt, benches and bollards, a glowing entrance portal with a red carpet, a parked shuttle bus, a windsock, a radar,
+   forecourt, benches and bollards, a glowing entrance portal, a parked shuttle bus, a windsock, a radar,
    fuel tanks, apron floodlights and blue taxiway lights.
    INSIDE (the terminal, same one at every airport): a Fernfield compass-rose floor and a carpeted central garden with benches,
    a painted skyline mural and plant walls, gate lounge planters, floor guide lines, trolleys, vending machines, an ATM, lockers,
@@ -27,10 +27,8 @@
   bx(.3,.3,z1-z0+2,'*ffe9a8',x1+1.1,14.7,(z0+z1)/2);bx(.25,.25,60,'*7fd4ff',-306,6.8,20);
   /* lit rooftop letters block + logo plate */
   bx(34,.5,2,'#0b2a5b',x1-4,17.3,mz,0,'#16408a');bx(.5,2.4,34,'#0b2a5b',x1+.4,16.2,mz,0,'#16408a');
-  /* entrance portal with red carpet */
+  /* entrance portal */
   bx(.5,5.6,.6,'#0b2a5b',x1+.5,2.8,mz-5.2);bx(.5,5.6,.6,'#0b2a5b',x1+.5,2.8,mz+5.2);bx(.7,.6,11,'#0b2a5b',x1+.5,5.8,mz);
-  bx(4.2,.04,9,'#a8212b',x1+3.4,.05,mz);bx(.2,.06,9.2,'#ffd84a',x1+5.5,.055,mz);
-  [mz-4,mz+4].forEach(z=>{bx(.3,1.1,.3,'#c9a24a',x1+5.7,.55,z);bx(.5,.18,.5,'*ffd27a',x1+5.7,1.2,z)});
   /* flag poles */
   [[-326,-14],[-326,54]].forEach(([x,z],i)=>{bx(.22,13,.22,'#cfd5dc',x,6.5,z);bx(.5,.5,.5,'#ffd84a',x,13.2,z);bx(.08,1.6,3,i?'#0b2a5b':'#ff6b4a',x,12,z+1.7)});
   /* planters with trees, benches and bollards along the forecourt */
