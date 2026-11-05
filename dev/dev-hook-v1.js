@@ -10,7 +10,7 @@
 (function(){
  if(!window.FW_DEV||/[?&]nohook/.test(location.search))return;
  const H={rushMax:.8,rushDays:6,dropMin:40,dropMax:90,dropWindow:15*60,luckyP:.12,luckyDays:10,
-  streak:[30,45,70,100,140,200,400],ladder:[[1,'songs',1,25],[3,'songs',2,50],[25,'lis',0,40],[100,'lis',0,75],[250,'lis',0,120],[500,'lis',0,200],[1000,'lis',0,350],[2500,'lis',0,600],[5000,'lis',0,1000],[10000,'lis',0,1800],[25000,'lis',0,3000],[50000,'lis',0,5000],[100000,'lis',0,9000]]};
+  streak:[30,45,70,100,140,200,400],ladder:[[1,'songs',1,25],[3,'songs',2,50],[25,'lis',0,40],[100,'lis',0,75],[250,'lis',0,120],[500,'lis',0,200],[1000,'lis',0,350],[2500,'lis',0,600],[5000,'lis',0,1000],[10000,'lis',0,1800],[25000,'lis',0,3000],[50000,'lis',0,5000],[100000,'lis',0,9000],[250000,'lis',0,15000],[500000,'lis',0,25000],[1000000,'lis',0,50000]]};
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev hook '+t,e)}}};
  const now=()=>window.FW_CLOCK?FW_CLOCK.now():Date.now();
  const R=(a,b)=>a+Math.random()*(b-a);
