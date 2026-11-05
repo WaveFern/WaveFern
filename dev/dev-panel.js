@@ -24,6 +24,9 @@
  const sv=m=>{g(()=>refreshHud());g(()=>autoSave());say(m)};
  const need=fn=>()=>{if(!ready())return say('Start or load a career first.');try{fn()}catch(e){say('Failed: '+e.message)}};
  const jump=n=>need(()=>{S.day=Math.min(100000,(S.day||1)+n);S.t=0;sv('Day '+S.day)});
+ const setWx=(k,n)=>{S.wx={d:S.day,k,said:1};sv(n+' today'+(FW_XMAS&&(k=='rain'||k=='storm')?' (Christmas turns it into snow)':''))};
+ const setT=(t,n)=>{S.t=t;sv(n)};
+ const popUp=(k,p)=>{g(()=>popToday());if(!S.pop||S.pop.d!==S.day)return say('Pop-ups are not ready yet.');S.pop.ev=S.pop.ev.filter(v=>v.k!==k);S.pop.ev.push({k,p,s:0,e:1800,done:0,an:0});sv('Pop-up open: '+k+'. Use the map (N) or Go to the nearest pop-up.')};
  const sections=[
   ['Reset and announcements',[
    ['Wipe dev save and restart',()=>{if(!confirm('Wipe the DEV save? Real saves are not touched.'))return;window.wiping=true;g(()=>{wiping=true});FW_DEV_REAL&&Object.keys(FW_DEV_REAL).filter(k=>k.indexOf('dev:')===0&&k!=='dev:fw_moved').forEach(k=>FW_DEV_REAL.removeItem(k));location.reload()}],
@@ -38,6 +41,23 @@
    ['Open a stranger profile',()=>FW_PROFILE.open('dex')],
    ['Open mock Friends window',()=>FW_PROFILE.friendsWin()],
    ['Show mock band room panel',()=>FW_PROFILE.mockBand()]]],
+  ['Weather',[
+   ['Weather: clear',need(()=>setWx('sun','Clear'))],
+   ['Weather: fog',need(()=>setWx('fog','Fog'))],
+   ['Weather: snow (Christmas event)',need(()=>setWx('snow','Snow'))],
+   ['Weather: rain (off in Christmas)',need(()=>setWx('rain','Rain'))],
+   ['Weather: thunderstorm (off in Christmas)',need(()=>setWx('storm','Thunderstorm'))],
+   ['Weather: roll a random day',need(()=>{S.wx=null;g(()=>wxToday());say('Rolled: '+g(()=>S.wx.k))})]]],
+  ['Time of day',[
+   ['Morning (06:00)',need(()=>setT(0,'Morning'))],['Midday (13:00)',need(()=>setT(150,'Midday'))],
+   ['Evening (19:00)',need(()=>setT(270,'Evening'))],['Night (20:00)',need(()=>setT(300,'Night'))],
+   ['Midnight (01:00)',need(()=>setT(450,'Midnight'))]]],
+  ['Pop-up events (open all day)',[
+   ['Block party',need(()=>popUp('party','meadow'))],['Record store signing',need(()=>popUp('signing','plaza'))],
+   ['Radio roadshow',need(()=>popUp('radio','plaza'))],['Open mic',need(()=>popUp('openmic','fernm'))],
+   ['Food truck rally',need(()=>popUp('food','meadow'))],['Street photo shoot',need(()=>popUp('shoot','avenue'))],
+   ['Go to the nearest pop-up',need(()=>{const l=g(()=>popToday())||[];if(!l.length)return say('No pop-ups today.');l.sort((a,b)=>Math.hypot(a.x-P.x,a.z-P.z)-Math.hypot(b.x-P.x,b.z-P.z));const v=l[0],f=g(()=>popFree(v.x,v.z+4.2))||[v.x,v.z+4.2];P.x=f[0];P.z=f[1];P.rot=Math.PI;g(()=>{camT.x=P.x;camT.z=P.z});say('At '+v.name)})],
+   ['Clear today\'s pop-ups',need(()=>{if(S.pop)S.pop.ev=[];sv('Pop-ups cleared for today')})]]],
   ['City crowds',[
    ['Crowd: always on (ignore fame)',()=>{FW_CROWD.force=!FW_CROWD.force;say('Forced crowd '+(FW_CROWD.force?'on':'off'))}],
    ['Crowd: switch off / on',()=>{FW_CROWD.off=!FW_CROWD.off;say('Crowd '+(FW_CROWD.off?'off':'on'))}],
@@ -46,8 +66,7 @@
    ['Bodyguards with me: 1',need(()=>{S.guards=1;S.gs='follow';g(()=>syncF());sv('1 bodyguard')})],
    ['Bodyguards with me: 3',need(()=>{S.guards=3;S.gs='follow';g(()=>syncF());sv('3 bodyguards')})]]],
   ['Time',[
-   ['Skip 1 day',jump(1)],['Skip 7 days',jump(7)],['Skip 30 days',jump(30)],['Skip 100 days',jump(100)],
-   ['Set time to morning',need(()=>{S.t=0;sv('Morning')})]]],
+   ['Skip 1 day',jump(1)],['Skip 7 days',jump(7)],['Skip 30 days',jump(30)],['Skip 100 days',jump(100)]]],
   ['Progress',[
    ['Add 1,000,000 money',need(()=>{S.money=+((S.money||0)+1e6).toFixed(2);sv('Money added')})],
    ['Refill energy',need(()=>{S.energy=100;S.stam=100;sv('Energy full')})],
