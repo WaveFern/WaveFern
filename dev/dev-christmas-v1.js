@@ -9,7 +9,7 @@
    - ONLY while it is snowing (the shader fades it in and out): snow lies on every upward-facing surface outdoors (roads turn
      icy grey, pavements, grass, roofs, tree tops, cars), tree sides are frosted, and you and the NPCs leave footprints.
    - Always (the winter map): the park pond is frozen over and you glide on it, trees and houses wear chasing Christmas lights,
-     houses get wreaths and snowmen, cars leave tyre tracks (footprints and tracks fade in 10 s), a big decorated tree stands in the City Plaza, and NPCs wear winter jackets and hats.
+     houses get wreaths and snowmen, cars leave tyre tracks (footprints and tracks fade in 5 s), a big decorated tree stands in the City Plaza, and NPCs wear winter jackets and hats.
    Everything is added on top (a shader patch, extra meshes, wrapped functions); no save data is changed. */
 (function(){
  const XMAS=true;
@@ -168,8 +168,8 @@
     void main(){if(wp.y<0.)discard;if(inH(wp.xz)&&(hin>.5||wp.y<3.7))discard;if(hin>.5&&inH(wp.xz-vec2(wp.y*${(16/13).toFixed(4)})))discard;gl_FragColor=vec4(.96,.98,1.,op);}`});
   const L=new THREE.Points(g,m);L.frustumCulled=false;L.renderOrder=6;L.visible=false;scene.add(L);return L}
 
- /* ---------- footprints and tyre tracks in the snow: each print slowly fades back into the snow over 10 s ---------- */
- const FADE=10,FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0'),TR_DARK=new THREE.Color('#6a7789'),FPD=new THREE.Object3D();
+ /* ---------- footprints and tyre tracks in the snow: each print slowly fades back into the snow over 5 s ---------- */
+ const FADE=5,FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0'),TR_DARK=new THREE.Color('#6a7789'),FPD=new THREE.Object3D();
  function mkPrints(N,w,l,dark){return{N,w,l,dark,mesh:null,i:0,age:null}}
  const FP=mkPrints(700,.13,.26,FP_DARK),TR=mkPrints(1400,.24,.95,TR_DARK);
  let fpMesh=null;/* kept for the visibility switch below */
@@ -201,9 +201,10 @@
    prStamp(TR,mx+cx,mz+cz,r,.045);prStamp(TR,mx-cx,mz-cz,r,.045);l[0]=x;l[1]=z}}
  let fpT=0;
  function fpTick(dt,live,inner){
-  const vis=SNOWU.value>.4;[FP,TR].forEach(K=>{if(K.mesh)K.mesh.visible=vis});
+  const indoors=!!(inner||IN||(typeof HIN!='undefined'&&HIN)||inHome(P.x,P.z)),vis=SNOWU.value>.4&&!indoors;/* no prints shown while you are inside a building */
+  [FP,TR].forEach(K=>{if(K.mesh)K.mesh.visible=vis});
   fpT+=dt;if(fpT>.1){[FP,TR].forEach(K=>prFade(K,fpT));fpT=0}
-  if(!(vis&&live&&!inner))return;
+  if(!(vis&&live&&!indoors))return;
   if(mode=='play'&&!IN&&!(typeof HIN!='undefined'&&HIN)&&!P.sit&&!inHome(P.x,P.z))walker(P,P.x,P.z);
   [NPC,typeof VPED!='undefined'?VPED:[]].forEach(L=>L.forEach(n=>{const m=n.m;if(!m||!m.visible)return;
    const x=m.position.x,z=m.position.z;if(Math.abs(x-P.x)>24||Math.abs(z-P.z)>24||inHome(x,z))return;walker(n,x,z)}));
