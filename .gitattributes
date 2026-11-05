@@ -18,3 +18,4 @@ audio/applause.mp3 -filter -diff -merge binary
 audio/drums/*.mp3 -filter -diff -merge binary
 # social share picture: plain file so GitHub Pages serves the real png
 og-image.png -filter -diff -merge binary
+audio/refresh.mp3 -filter -diff -merge binary
