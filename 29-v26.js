@@ -93,7 +93,7 @@ function stepTick(dt,mv){const d=Math.hypot(P.x-STP.px,P.z-STP.pz);STP.px=P.x;ST
 /* each song gets a plan for the day (same formula as the old overnight roll); streams accrue towards it as the clock runs, twice as fast at night */
 const prog=t=>{t=Math.max(0,Math.min(600,t));return t<300?t/900:(300+2*(t-300))/900};
 /* how much each fame tier multiplies a song's streams (was 2.2, which snowballed: tier 5 by day 30) */
-const FAME_MULT=1.22;
+const FAME_MULT=1.5;
 /* v26.79: quality, collab, hit and viral (knobs in PERF, 02-data.js) */
 const expXp=()=>Math.max(S.made||0,(S.songs||[]).length+(S.drafts||[]).length)+mentors()*PERF.expMentor+fameLv()*PERF.expFame;
 const expF=()=>PERF.expMin+(1-PERF.expMin)*(1-Math.exp(-expXp()/PERF.expScale));
