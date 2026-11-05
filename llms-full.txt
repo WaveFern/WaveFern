@@ -1639,7 +1639,7 @@ Your house sits on a quiet street west of the city. Press N for the map: scroll 
 A street in town.
 Places
 
-Home Garage Jewellery Property Corner shop Maple Lane Central Park Lake West suburb South suburb Radio City Plaza City Centre Pulse Records HQ Aurora Residences Nova Mall Motors Pet Shop Security Skyline Tower Gramophone Awards City Cafe Music Store Barbershop Airport Festival ground
+Home Garage Jewellery Property Corner shop Maple Lane Central Park Lake West suburb Radio City Plaza City Centre Pulse Records HQ Aurora Residences Nova Mall Motors Pet Shop Security Skyline Tower Gramophone Awards City Cafe Music Store Barbershop Airport Festival ground
 
 Taxi
 
