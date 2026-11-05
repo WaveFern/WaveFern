@@ -173,14 +173,15 @@ D.addInt=(x,z,r,l,a)=>{if(D.building)return addInt(D.building,x,z,r,l,a);if(!D.C
 function dsGround(C){const s=C.s,G=mkG(),W=C.W,Dz=C.Dz,hr=C.hr;
  const gm=own(new THREE.Mesh(new THREE.PlaneGeometry(2600,2600),new THREE.MeshLambertMaterial({color:s.ground})));gm.rotation.x=-Math.PI/2;gm.position.set(W/2,-.06,Dz/2-200);C.g.add(gm);
  quadY(G,0,0,W,C.zMax,0,s.walk);/* paving everywhere, roads on top */
- const asph=(x0,z0,x1,z1)=>quadY(G,x0,z0,x1,z1,.02,s.asph),mark=(x0,z0,x1,z1,c)=>quadY(G,x0,z0,x1,z1,.035,c||'#e8e4d8');
+ const asph=(x0,z0,x1,z1)=>qy(G,x0,z0,x1,z1,.02,s.asph),mark=(x0,z0,x1,z1,c)=>qy(G,x0,z0,x1,z1,.035,c||'#e8e4d8');
+ const qy=(G2,x0,z0,x1,z1,y,c)=>{const e=C.zMax,a=Math.min(z0,z1),b=Math.min(Math.max(z0,z1),e);if(b-a>.05)quadY(G2,x0,a,x1,b,y,c)};/* roads, kerbs and markings stop at the quay or the edge of the paving, never poke over the water */
  const zA=C.rz[0],zB=C.rz[C.rz.length-1],xA=C.rx[0],xB=C.sx0;
- C.rx.forEach(x=>{asph(x-hr,zA-hr,x+hr,zB+hr);for(let z=zA+hr+1;z<zB-hr;z+=5)mark(x-.08,z,x+.08,z+2.4);quadY(G,x-hr-.25,zA-hr,x-hr,zB+hr,.05,'#8a8a86');quadY(G,x+hr,zA-hr,x+hr+.25,zB+hr,.05,'#8a8a86')});
+ C.rx.forEach(x=>{asph(x-hr,zA-hr,x+hr,zB+hr);for(let z=zA+hr+1;z<zB-hr;z+=5)mark(x-.08,z,x+.08,z+2.4);qy(G,x-hr-.25,zA-hr,x-hr,zB+hr,.05,'#8a8a86');qy(G,x+hr,zA-hr,x+hr+.25,zB+hr,.05,'#8a8a86')});
  C.rz.forEach(z=>{if(z===C.canalZ)return;const x1=z===C.mid?C.plaza.x0+6:xB+hr,x0=z===C.mid?66:xA-hr;asph(x0,z-hr,x1,z+hr);for(let x=x0+2;x<x1-2;x+=5){if(C.rx.some(rx=>Math.abs(x+1.2-rx)<hr+1))continue;mark(x,z-.08,x+2.4,z+.08)}
-  quadY(G,x0,z-hr-.25,x1,z-hr,.05,'#8a8a86');quadY(G,x0,z+hr,x1,z+hr+.25,.05,'#8a8a86')});
+  qy(G,x0,z-hr-.25,x1,z-hr,.05,'#8a8a86');qy(G,x0,z+hr,x1,z+hr+.25,.05,'#8a8a86')});
  /* paving slabs along the kerbs and manhole covers in the road */
- const jn=dk(s.walk,.86),sw=3.2;C.rx.forEach(x=>{[-1,1].forEach(sd=>{const a=x+sd*(hr+.25),b=x+sd*(hr+.25+sw),lo=Math.min(a,b),hi=Math.max(a,b);quadY(G,lo,zA-hr,hi,zB+hr,.004,dk(s.walk,.96));quadY(G,(a+b)/2-.04,zA-hr,(a+b)/2+.04,zB+hr,.008,jn);for(let z=zA-hr;z<zB+hr;z+=1.6)quadY(G,lo,z,hi,z+.08,.008,jn)});for(let z=zA+11;z<zB-6;z+=23)quadY(G,x+hr*.35-.45,z-.45,x+hr*.35+.45,z+.45,.03,'#3a3a3a')});
- C.rz.forEach(z=>{if(z===C.canalZ)return;const x1=z===C.mid?C.plaza.x0+6:xB+hr,x0=z===C.mid?66:xA-hr;[-1,1].forEach(sd=>{const a=z+sd*(hr+.25),b=z+sd*(hr+.25+sw),lo=Math.min(a,b),hi=Math.max(a,b);quadY(G,x0,lo,x1,hi,.004,dk(s.walk,.96));quadY(G,x0,(a+b)/2-.04,x1,(a+b)/2+.04,.008,jn);for(let x=x0;x<x1;x+=1.6)quadY(G,x,lo,x+.08,hi,.008,jn)});for(let x=x0+13;x<x1-6;x+=23){if(C.rx.some(rx=>Math.abs(x-rx)<hr+2))continue;quadY(G,x-.45,z-hr*.35-.45,x+.45,z-hr*.35+.45,.03,'#3a3a3a')}});
+ const jn=dk(s.walk,.86),sw=3.2;C.rx.forEach(x=>{[-1,1].forEach(sd=>{const a=x+sd*(hr+.25),b=x+sd*(hr+.25+sw),lo=Math.min(a,b),hi=Math.max(a,b);qy(G,lo,zA-hr,hi,zB+hr,.004,dk(s.walk,.96));qy(G,(a+b)/2-.04,zA-hr,(a+b)/2+.04,zB+hr,.008,jn);for(let z=zA-hr;z<zB+hr;z+=1.6)qy(G,lo,z,hi,z+.08,.008,jn)});for(let z=zA+11;z<zB-6;z+=23)qy(G,x+hr*.35-.45,z-.45,x+hr*.35+.45,z+.45,.03,'#3a3a3a')});
+ C.rz.forEach(z=>{if(z===C.canalZ)return;const x1=z===C.mid?C.plaza.x0+6:xB+hr,x0=z===C.mid?66:xA-hr;[-1,1].forEach(sd=>{const a=z+sd*(hr+.25),b=z+sd*(hr+.25+sw),lo=Math.min(a,b),hi=Math.max(a,b);qy(G,x0,lo,x1,hi,.004,dk(s.walk,.96));qy(G,x0,(a+b)/2-.04,x1,(a+b)/2+.04,.008,jn);for(let x=x0;x<x1;x+=1.6)qy(G,x,lo,x+.08,hi,.008,jn)});for(let x=x0+13;x<x1-6;x+=23){if(C.rx.some(rx=>Math.abs(x-rx)<hr+2))continue;qy(G,x-.45,z-hr*.35-.45,x+.45,z-hr*.35+.45,.03,'#3a3a3a')}});
  /* zebra crossings at every junction */
  C.rx.forEach(x=>C.rz.forEach(z=>{if(z===C.canalZ)return;for(let k=-3;k<=3;k++){mark(x+k*1.05-.35,z+hr+.4,x+k*1.05+.35,z+hr+2.6);mark(x+hr+.4,z+k*1.05-.35,x+hr+2.6,z+k*1.05+.35)}}));
  /* airport forecourt road and drop-off */
