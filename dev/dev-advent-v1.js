@@ -37,6 +37,7 @@
 
  /* ---------- the 24 rewards (items only; exactly one car) ---------- */
  /* t: k = clothing (GAR name), f = furniture (F key), p = pet (PETS name), c = car (CARS name). All of them are made in dev-xmas-items-v1.js. */
+ const PLANV=2;
  const PLAN={
   1:{t:'k',n:'Santa Hat'},3:{t:'k',n:'Candy Cane Scarf'},5:{t:'k',n:'Ugly Christmas Sweater'},7:{t:'f',n:'xm_tree'},9:{t:'p',n:'Rudy the Reindeer'},11:{t:'k',n:'Elf Boots'},
   13:{t:'f',n:'xm_ginger'},15:{t:'f',n:'xm_snowman'},17:{t:'p',n:'Snowy the Polar Cub'},19:{t:'k',n:'Santa Coat'},21:{t:'f',n:'xm_globe'},23:{t:'f',n:'xm_nutcracker'},
@@ -52,7 +53,7 @@
  const CAT={k:'Clothing',f:'Furniture',p:'Pet',c:'Car',w:'Car wrap',x:'Crate'};
 
  const Sv=()=>{const s=typeof S!='undefined'?S:null;return s&&typeof s=='object'&&s.day!==undefined?s:null};
- const st=()=>{const s=Sv();if(!s)return null;const y=yr();if(!s.adv||typeof s.adv!='object'||s.adv.y!==y)s.adv={y,c:{}};if(!s.adv.c||typeof s.adv.c!='object')s.adv.c={};if(!s.adv.p||typeof s.adv.p!='object')s.adv.p={};return s.adv};
+ const st=()=>{const s=Sv();if(!s)return null;const y=yr();if(!s.adv||typeof s.adv!='object'||s.adv.y!==y||s.adv.v!==PLANV)s.adv={y,c:{},v:PLANV};/* the doors were rearranged (crates), so older claim records are cleared once; items already received stay */if(!s.adv.c||typeof s.adv.c!='object')s.adv.c={};if(!s.adv.p||typeof s.adv.p!='object')s.adv.p={};return s.adv};
  const claimed=d=>{const a=st();return!!(a&&a.c[d])};
 
  const garFind=n=>typeof GAR!='undefined'?GAR.find(g=>g.n==n&&g.xm):null;
