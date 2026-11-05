@@ -87,7 +87,7 @@ function attach(on){if(!A)return;if(on&&!A.on){try{A.mg.connect(MG);A.on=true}ca
 function chainFx(fc,db,pan,fast){if(!CH)return;const t=CH.lp.context.currentTime,k=fast?.01:.08;CH.lp.frequency.setTargetAtTime(fc,t,k);CH.sh.gain.setTargetAtTime(db,t,k);CH.pn.pan.setTargetAtTime(pan,t,k)}
 
 /* ---------------- helpers ---------------- */
-function outdoors(){try{return(mode=='play'||mode=='drive')&&!PAUSED&&!IN&&!HIN&&!GR&&P.z<INTERIOR_Z&&!(FEST&&FEST.view)&&!document.hidden}catch(e){return false}}
+function outdoors(){try{return(mode=='play'||mode=='drive')&&!PAUSED&&!IN&&!HIN&&!GR&&P.z<INTERIOR_Z&&!(window.FW_DEV&&window.DCITY&&DCITY.room)&&!(FEST&&FEST.view)&&!document.hidden}catch(e){return false}}
 const panOf=(x,z)=>clamp(((x-P.x)-(z-P.z))*.7071/32,-1,1)*.9;
 function nearPeds(){let n=0;try{for(const a of[VPED,NPC])for(const p of a)if(p.m&&p.m.visible&&Math.abs(p.x-P.x)<30&&Math.abs(p.z-P.z)<30)n++}catch(e){}return n}
 function mkPan(p){const n=A.c.createStereoPanner();n.pan.value=p;n.connect(A.mg);return n}
