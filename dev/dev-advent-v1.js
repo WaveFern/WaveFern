@@ -28,7 +28,11 @@
  const season=()=>new Date(now()).getMonth()==11;/* 1 to 31 December */
  /* on /dev/ every door is open for testing, unless a test date is set (then it behaves like the real game on that date) */
  const devOpen=()=>DEV&&!testOn();
- const ready=d=>devOpen()||(season()&&now()>=opensAt(d));
+ /* doors open in order: day N only after days 1 to N-1 are claimed (the positions on the board stay shuffled) */
+ const ANYK='fw_adv_any',anyOrder=()=>{try{return DEV&&sessionStorage.getItem(ANYK)=='1'}catch(e){return false}};
+ const nextDay=()=>{const a=st();for(let d=1;d<=24;d++)if(!(a&&a.c[d]))return d;return 25};
+ const dateOk=d=>devOpen()||(season()&&now()>=opensAt(d));
+ const ready=d=>dateOk(d)&&(anyOrder()||d<=nextDay());
  const today=()=>season()?Math.min(24,new Date(now()).getDate()):0;
 
  /* ---------- the 24 rewards (items only; exactly one car) ---------- */
@@ -171,8 +175,8 @@
 @keyframes advfade{from{opacity:0}to{opacity:1}}
 @keyframes advpop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
 
-#advw{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;font:14px/1.35 ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec;background:#050706dd;animation:advfade .2s ease-out}
-#advw .advf{position:relative;width:min(960px,96vw);height:min(760px,94vh);display:flex;flex-direction:column;box-sizing:border-box;padding:22px 18px 12px;background:#161b18;border:3px solid #000;box-shadow:inset 0 0 0 2px #26302a,6px 6px 0 #000a;animation:advpop .25s ease-out}
+#advw{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;font:14px/1.35 ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec;background:#000d;animation:advfade .2s ease-out}
+#advw .advf{position:relative;width:min(960px,96vw);height:min(760px,94vh);display:flex;flex-direction:column;box-sizing:border-box;padding:22px 18px 12px;background:#0c0c0c;border:3px solid #000;box-shadow:inset 0 0 0 2px #262626,6px 6px 0 #000a;animation:advpop .25s ease-out}
 #advw .advf:before{content:'';position:absolute;left:0;right:0;top:0;height:8px;background:repeating-linear-gradient(135deg,#c0392b 0 8px,#f4f4f4 8px 16px);border-bottom:3px solid #000}
 #advw .hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px}
 #advw .hd h2{margin:0 0 4px;font:700 clamp(18px,3vw,26px) Silkscreen,ui-monospace,monospace;letter-spacing:2px;color:#fff}
@@ -180,12 +184,12 @@
 #advw .sub{flex:1;min-width:0}
 #advw .sub p{margin:0 0 7px;color:#8aa094;font-size:13px}
 #advw .prog{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#advw .bar{width:150px;height:12px;background:#0c0f0d;border:2px solid #000;display:flex;gap:1px;padding:1px;box-sizing:border-box}
-#advw .bar i{flex:1;background:#26302a}#advw .bar i.on{background:#2fe68a}
+#advw .bar{width:150px;height:12px;background:#000;border:2px solid #000;display:flex;gap:1px;padding:1px;box-sizing:border-box}
+#advw .bar i{flex:1;background:#262626}#advw .bar i.on{background:#2fe68a}
 #advw .st{font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#8aa094}
 #advw .tt{color:#f2c14e;font-size:11px}
 #advw .x{flex:none;width:36px;height:36px;padding:0;font:700 14px Silkscreen,ui-monospace,monospace}
-#advw .gw{position:relative;flex:1;min-height:0;overflow:auto;padding:8px;background:#0c0f0d;border:2px solid #000;box-shadow:inset 0 0 0 2px #1c231f;scrollbar-width:thin}
+#advw .gw{position:relative;flex:1;min-height:0;overflow:auto;padding:8px;background:#000;border:2px solid #000;box-shadow:inset 0 0 0 2px #1a1a1a;scrollbar-width:thin}
 #advw .grid{display:grid;height:100%;min-height:400px;box-sizing:border-box;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(5,1fr);grid-auto-flow:row dense;gap:8px}
 #advw .ft{margin-top:8px;color:#8aa094;font-size:12px;text-align:center}
 
@@ -206,7 +210,7 @@
 .advd.b22 .ic,.advd.b21 .ic,.advd.b12 .ic{width:clamp(16px,2.2vw,26px);height:clamp(16px,2.2vw,26px)}
 .advd .lk{position:absolute;left:7px;bottom:6px;width:10px;height:8px;background:#cfd6d2;border:2px solid #000;z-index:2}
 .advd .lk:before{content:'';position:absolute;left:0;top:-7px;width:4px;height:5px;border:2px solid #000;border-bottom:0;background:none;box-shadow:inset 0 0 0 1px #cfd6d2}
-.advd .tg{position:absolute;right:-4px;top:-5px;padding:2px 6px;background:#2fe68a;color:#04120a;font:700 9px Silkscreen,ui-monospace,monospace;letter-spacing:1px;border:2px solid #000;z-index:4}
+.advd .advtg{position:absolute;right:-4px;top:-5px;padding:2px 6px;background:#2fe68a;color:#04120a;font:700 9px Silkscreen,ui-monospace,monospace;letter-spacing:1px;border:2px solid #000;z-index:4}
 .advd .ck{position:absolute;right:5px;top:9px;width:18px;height:18px;background:#2fe68a;color:#04120a;border:2px solid #000;font:700 12px/14px ui-monospace,monospace;text-align:center;z-index:3}
 .advd .dn{position:absolute;left:9px;top:9px;z-index:2;font:700 11px Silkscreen,ui-monospace,monospace;color:#f2c14e;text-shadow:1px 1px 0 #000}
 .advd .nm{position:absolute;z-index:2;left:6px;right:6px;bottom:6px;font:700 10px ui-monospace,monospace;color:#fff;text-shadow:1px 1px 0 #000;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -224,36 +228,36 @@
 .advd.d24 .ic{width:clamp(22px,3vw,34px);height:clamp(22px,3vw,34px);fill:#f2c14e}
 .advd.lock{cursor:not-allowed}
 .advd.lock .fr{filter:saturate(.45) brightness(.7)}
-.advd.rdy .fr{outline:3px solid #2fe68a;outline-offset:1px}
+.advd.rdy .fr{outline:3px solid #f4f4f4;outline-offset:1px}
 .advd.rdy:hover{transform:translateY(-2px)}
 .advd.rdy:hover .lf{transform:rotateY(-14deg)}
 .advd.open .lf{transform:rotateY(-112deg)}
 .advd.done .lf,.advd.peek .lf{display:none}
 .advd.done:hover .in img{transform:scale(1.06)}
-.advd.open .tg,.advd.peek .tg{display:none}
+.advd.open .advtg,.advd.peek .advtg{display:none}
 .advd.shake{animation:advshake .35s}
 @keyframes advshake{20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
 .advd:focus-visible{outline:3px solid #6fd3ff;outline-offset:2px}
 #advw .tip{position:fixed;z-index:5;padding:5px 9px;background:#000;color:#e8f3ec;border:2px solid #2fe68a;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;pointer-events:none;white-space:nowrap;transform:translate(-50%,-100%)}
 
 /* the reveal */
-#advr{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:#050706ee;animation:advfade .2s}
-#advr .card{position:relative;width:min(500px,94vw);max-height:94vh;overflow:auto;padding:0 0 18px;box-sizing:border-box;text-align:center;background:#161b18;border:3px solid #000;box-shadow:inset 0 0 0 2px #26302a,6px 6px 0 #000a;animation:advpop .25s ease-out}
+#advr{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:#000e;animation:advfade .2s}
+#advr .card{position:relative;width:min(500px,94vw);max-height:94vh;overflow:auto;padding:0 0 18px;box-sizing:border-box;text-align:center;background:#0c0c0c;border:3px solid #000;box-shadow:inset 0 0 0 2px #262626,6px 6px 0 #000a;animation:advpop .25s ease-out}
 #advr .card:before{content:'';display:block;height:8px;background:repeating-linear-gradient(135deg,#c0392b 0 8px,#f4f4f4 8px 16px);border-bottom:3px solid #000}
 #advr .rib{margin:12px 0 0;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:2px;color:#f2c14e}
-#advr .stage{position:relative;margin:10px 14px 6px;height:min(320px,40vh);background:linear-gradient(#0c1410 0 72%,#13221a 72% 100%);border:2px solid #000;box-shadow:inset 0 0 0 2px #1c231f;overflow:hidden}
+#advr .stage{position:relative;margin:10px 14px 6px;height:min(320px,40vh);background:linear-gradient(#000 0 72%,#141414 72% 100%);border:2px solid #000;box-shadow:inset 0 0 0 2px #1a1a1a;overflow:hidden}
 #advr .stage canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
 #advr .stage canvas.grab{cursor:grabbing}
 #advr .hint{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);padding:3px 8px;background:#000;border:2px solid #26302a;color:#8aa094;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:1px;pointer-events:none;transition:opacity .4s;white-space:nowrap}
 #advr .hint.gone{opacity:0}
 #advr h3{margin:8px 12px 5px;font:700 22px Silkscreen,ui-monospace,monospace;color:#fff}
-#advr .cat{display:inline-flex;align-items:center;gap:6px;margin-bottom:8px;padding:2px 8px;background:#0c0f0d;color:#2fe68a;border:2px solid #000;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:1px}
+#advr .cat{display:inline-flex;align-items:center;gap:6px;margin-bottom:8px;padding:2px 8px;background:#000;color:#2fe68a;border:2px solid #262626;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:1px}
 #advr .cat .ic{width:12px;height:12px;fill:#2fe68a}
 #advr p{margin:0 18px 12px;color:#8aa094;font-size:13px;line-height:1.45}
 #advr .cl{display:block;margin:12px auto 0;min-width:200px;padding:12px 30px;background:#2fe68a;color:#04120a;border:3px solid #000;box-shadow:inset 0 -4px 0 #0007;font:700 16px Silkscreen,ui-monospace,monospace;letter-spacing:2px;cursor:pointer}
 #advr .cl:hover{background:#5cf0a6}
 #advr .cl:active{transform:translateY(1px)}
-#advr .cl:disabled{background:#26302a;color:#8aa094;cursor:default}
+#advr .cl:disabled{background:#262626;color:#8aa094;cursor:default}
 #advr .later{display:block;margin:10px auto 0}
 .advfly{position:fixed;z-index:95;pointer-events:none;will-change:transform;image-rendering:pixelated}
 .advcf{position:fixed;z-index:96;width:8px;height:8px;pointer-events:none;will-change:transform,opacity}
@@ -290,7 +294,7 @@
  const fmtD=d=>d+' December';
  function status(){
   const y=yr(),t=now(),a=st()||{c:{}},got=Object.keys(a.c).length;
-  if(devOpen()){const left=24-got;return'Dev build: every door is unlocked · '+(left?left+' to open · ':'')+got+'/24 claimed'}
+  if(devOpen()){const nx=nextDay();return'Dev build: no date lock · '+(nx<25?'next is door '+nx+' · ':'')+got+'/24 claimed'}
   if(!season()){
    if(new Date(t).getMonth()<11){const ms=opensAt(1,y)-t,days=Math.ceil(ms/864e5);return days>1?'Opens in '+days+' days':ms>36e5?'Opens tomorrow':'Opens at midnight'}
    return'See you next December'}
@@ -301,13 +305,12 @@
   const a=st(),c=a&&a.c[d],r=ready(d),cls=['advd',STY[(i*5+d)%6],BIG[d]||'',MW[d]||''];
   const pk=!c&&r&&PEEK[d];if(d==24)cls.push('d24');
   if(c)cls.push('done');else if(pk)cls.push('peek');else if(r)cls.push('rdy');else cls.push('lock');
-  const td=today()==d&&!c;
-  const inner=c?`<img alt="" src="${pic(c.k)}"><span class=nm>${esc2(c.n)}</span>`:pk?`<img alt="" src="${pic(PEEK[d].k)}">`:'';
+    const inner=c?`<img alt="" src="${pic(c.k)}"><span class=nm>${esc2(c.n)}</span>`:pk?`<img alt="" src="${pic(PEEK[d].k)}">`:'';
   const ic=d==24?icon('tree'):icon(ICK[(d*3+i)%ICK.length]);
   return`<button type=button class="${cls.join(' ')}" data-d="${d}" aria-label="Door ${d}${c?', claimed: '+esc2(c.n):r?', ready to open':', opens on '+fmtD(d)}">
    <span class=in>${inner}</span>
    <span class=lf><span class=fr>${d==24?ic:''}<span class=n>${d}</span>${d==24?'<span class=eve>CHRISTMAS EVE</span>':ic}<i class=knob></i>${!r&&!c?'<i class=lk></i>':''}</span><span class=bk></span></span>
-   ${td&&r?'<span class=tg>TODAY</span>':''}${c?'<span class=ck>&#10003;</span>':''}${c||pk?`<span class=dn>${d}</span>`:''}</button>`}
+   ${r&&!c&&d==nextDay()?`<span class=advtg>${today()==d?'TODAY':'NEXT'}</span>`:''}${c?'<span class=ck>&#10003;</span>':''}${c||pk?`<span class=dn>${d}</span>`:''}</button>`}
  const esc2=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
  function render(){if(!W)return;
   W.querySelector('.st').textContent=status();
@@ -335,7 +338,7 @@
  function tap(b,d){
   if(REV||b.dataset.busy)return;
   if(claimed(d)){const c=st().c[d];sfx('pop');return reveal(b,d,{t:c.t,k:c.k,n:c.n,note:'You claimed this on door '+d+'.'},1)}
-  if(!ready(d)){sfx('err');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');tip(b,season()||new Date(now()).getMonth()<11?'Opens on '+fmtD(d):'This year’s calendar is over');return}
+  if(!ready(d)){sfx('err');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');tip(b,dateOk(d)?'Open door '+nextDay()+' first':season()||new Date(now()).getMonth()<11?'Opens on '+fmtD(d):'This year’s calendar is over');return}
   const r=resolve(d);if(!r)return;
   if(PEEK[d]){sfx('pop');return reveal(b,d,r)}
   /* swing the door open, show the item small inside, then bring it out big */
@@ -417,7 +420,7 @@
  if(DEV)safe(()=>{
   const box=document.getElementById('fwdvb');if(!box)return;
   const msg=t=>{const e=document.getElementById('fwdvs');if(e)e.textContent=t};
-  const h=document.createElement('h5');h.textContent='Advent calendar (all doors unlocked on dev; a test date shows the real locks)';box.appendChild(h);
+  const h=document.createElement('h5');h.textContent='Advent calendar (no date lock on dev, doors open in order; a test date shows the real locks)';box.appendChild(h);
   const y=new Date().getFullYear(),at=(m,d,hh)=>new Date(y,m,d,hh||9,0,0).getTime();
   const B=[['Open the calendar',()=>{if(!Sv())return msg('Start or load a career first.');if(W)close();open()}],
    ['Test date: 30 Nov (all locked)',()=>{setTest(at(10,30));msg('Advent test date 30 Nov');if(W)render()}],
@@ -425,7 +428,8 @@
    ['Test date: 12 Dec',()=>{setTest(at(11,12));msg('Advent test date 12 Dec');if(W)render()}],
    ['Test date: 24 Dec (every door)',()=>{setTest(at(11,24));msg('Advent test date 24 Dec');if(W)render()}],
    ['Test date: 1 Jan (over)',()=>{setTest(new Date(y+1,0,1,9).getTime());msg('Advent test date 1 Jan');if(W)render()}],
-   ['Back to dev: every door unlocked',()=>{setTest(null);msg('Advent: every door unlocked (dev)');if(W)render()}],
+   ['Dev: toggle opening doors in any order',()=>{try{if(anyOrder())sessionStorage.removeItem(ANYK);else sessionStorage.setItem(ANYK,'1')}catch(e){}msg(anyOrder()?'Advent: any order allowed (dev)':'Advent: doors open in order');if(W)render()}],
+   ['Back to dev: no date lock',()=>{setTest(null);msg('Advent: every door unlocked (dev)');if(W)render()}],
    ['Close all advent doors on this save',()=>{const s=Sv();if(!s)return msg('Start or load a career first.');s.adv={y:yr(),c:{}};safe(()=>autoSave(),'save');msg('Advent doors closed (items you got are kept)');if(W)render()}]];
   B.forEach(([l,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=f;box.appendChild(b)})},'panel');
 })();
