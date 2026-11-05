@@ -50,35 +50,57 @@
   m.needsUpdate=true}
  patchMat(SBM);
 
- /* ---------- Christmas lights: strings that spiral round the trees, bulbs chase round them ---------- */
+/* ---------- Christmas lights: a wire that spirals round the tree, with real bulbs sitting on it ---------- */
  const LC=[[1,.23,.19],[1,.76,.2],[.23,.55,1],[.22,.88,.48]];
- const lt={p:[],ph:[],ci:[]};
+ const lt={bp:[],bph:[],bci:[],bsh:[],wp:[]};
  const BU={t:{value:0}};
- function bulb(x,y,z,ph,ci){lt.p.push(x,y,z);lt.ph.push(ph);lt.ci.push(ci)}
- /* a spiral string round a foliage box */
+ const BS=.065,FACE=[[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1],.72],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1],1],[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],.86]];
+ /* one bulb: a small cube (three visible faces) */
+ function bulb(x,y,z,ph,ci){
+  FACE.forEach(f=>{[0,1,2,0,2,3].forEach(k=>{const q=f[k];lt.bp.push(x+q[0]*BS,y+q[1]*BS,z+q[2]*BS);lt.bph.push(ph);lt.bci.push(ci);lt.bsh.push(f[4])})})}
+ const wire=(x0,y0,z0,x1,y1,z1)=>lt.wp.push(x0,y0,z0,x1,y1,z1);
+ /* a wire spiralling round a foliage box, hugging its surface, with a bulb every ~.42 */
  function addString(cx,cy,cz,w,h,d){
-  const turns=h>.6?1.6:1,pw=w+.1,pd=d+.1,per=2*(pw+pd),L=turns*per,n=Math.max(4,Math.round(L/.42)),o=R(0,per),y0=cy-h*.42,y1=cy+h*.36;
-  for(let i=0;i<n;i++){const s=i/n*L,u=(s+o)%per;let x,z;
+  const OFF=.03,turns=h>.6?1.6:1,pw=w+OFF*2,pd=d+OFF*2,per=2*(pw+pd),Ls=turns*per,o=R(0,per),y0=cy-h*.42,y1=cy+h*.36;
+  const at=s=>{const u=((s+o)%per+per)%per;let x,z;
    if(u<pw){x=-pw/2+u;z=pd/2}else if(u<pw+pd){x=pw/2;z=pd/2-(u-pw)}else if(u<2*pw+pd){x=pw/2-(u-pw-pd);z=-pd/2}else{x=-pw/2;z=-pd/2+(u-2*pw-pd)}
-   bulb(cx+x,y0+(y1-y0)*i/n,cz+z,s*1.3,i&3)}}
+   return[cx+x,y0+(y1-y0)*s/Ls,cz+z]};
+  /* sample points: every .14 along the string, plus every corner, so the wire turns exactly at the corners */
+  const S=[];for(let s=0;s<=Ls;s+=.14)S.push(s);S.push(Ls);
+  for(let t=-1;t<=turns+1;t++)[0,pw,pw+pd,2*pw+pd].forEach(c=>{const s=c-o+t*per;if(s>0&&s<Ls)S.push(s)});
+  S.sort((a,b)=>a-b);
+  let prev=null;S.forEach(s=>{const q=at(s);if(prev)wire(prev[0],prev[1],prev[2],q[0],q[1],q[2]);prev=q});
+  const n=Math.max(3,Math.round(Ls/.42));
+  for(let i=0;i<n;i++){const s=(i+.5)/n*Ls,q=at(s);bulb(q[0],q[1]-.05,q[2],s*1.3,i&3)}}/* hang just under the wire, still touching the foliage */
  const bulbMeshes=[];
  function flushLights(){
-  if(!lt.p.length)return;
-  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(lt.p,3));g.setAttribute('ph',new THREE.Float32BufferAttribute(lt.ph,1));g.setAttribute('ci',new THREE.Float32BufferAttribute(lt.ci,1));
-  const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{t:BU.t,pal:{value:LC.map(c=>new THREE.Vector3(c[0],c[1],c[2]))}},
-   vertexShader:`attribute float ph,ci;uniform float t;varying float vb,vc;
-    void main(){float w=.5+.5*sin(t*3.4-ph*1.9);vb=.3+.7*w*w;vc=ci;gl_PointSize=6.;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-   fragmentShader:`uniform vec3 pal[4];varying float vb,vc;
-    void main(){vec2 q=gl_PointCoord-.5;float core=step(max(abs(q.x),abs(q.y)),.2),gl=1.-smoothstep(.12,.5,length(q));
-     int k=int(vc+.5);vec3 c=k==0?pal[0]:k==1?pal[1]:k==2?pal[2]:pal[3];
-     float a=clamp(core+gl*.75,0.,1.)*(.4+.6*vb);if(a<.05)discard;gl_FragColor=vec4(c*(.7+core*.6*vb)+core*vb*.35,a);}`});
-  const P=new THREE.Points(g,m);P.frustumCulled=false;P.renderOrder=3;P.userData.xm=1;scene.add(P);bulbMeshes.push(P);
-  lt.p=[];lt.ph=[];lt.ci=[]}
+  if(!lt.bp.length&&!lt.wp.length)return;
+  if(lt.bp.length){
+   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(lt.bp,3));g.setAttribute('ph',new THREE.Float32BufferAttribute(lt.bph,1));g.setAttribute('ci',new THREE.Float32BufferAttribute(lt.bci,1));g.setAttribute('sh',new THREE.Float32BufferAttribute(lt.bsh,1));
+   const m=new THREE.ShaderMaterial({uniforms:{t:BU.t,pal:{value:LC.map(c=>new THREE.Vector3(c[0],c[1],c[2]))}},
+    vertexShader:`attribute float ph,ci,sh;uniform float t;varying float vb,vc,vs;
+     void main(){float w=.5+.5*sin(t*3.4-ph*1.9);vb=.45+.55*w*w;vc=ci;vs=sh;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`uniform vec3 pal[4];varying float vb,vc,vs;
+     void main(){int k=int(vc+.5);vec3 c=k==0?pal[0]:k==1?pal[1]:k==2?pal[2]:pal[3];gl_FragColor=vec4(c*vs*(.6+.8*vb)+vec3(.25)*vb*vs*vs,1.);}`});
+   const M=new THREE.Mesh(g,m);M.frustumCulled=false;M.userData.xm=1;scene.add(M);bulbMeshes.push(M)}
+  if(lt.wp.length){
+   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(lt.wp,3));
+   const W2=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0x10281a}));W2.frustumCulled=false;W2.userData.xm=1;scene.add(W2);bulbMeshes.push(W2)}
+  lt.bp=[];lt.bph=[];lt.bci=[];lt.bsh=[];lt.wp=[]}
 
- /* the merged SB boxes are 12 vertices each (+x, +y, +z faces): read each box back to put lights on the trees */
+ /* the merged SB boxes are 12 vertices each (+x, +y, +z faces): read each box back to put lights on the trees.
+    Anything that is not really a plain box (other merged meshes can share the material) is skipped. */
+ function isBox(pos,nor,v){
+  for(let k=0;k<12;k++){const f=(k/4)|0,nx=nor.getX(v+k),ny=nor.getY(v+k),nz=nor.getZ(v+k);
+   if(f==0?!(nx>.9):f==1?!(ny>.9):!(nz>.9))return false}
+  const x=pos.getX(v);for(let k=1;k<4;k++)if(Math.abs(pos.getX(v+k)-x)>1e-4)return false;
+  const y=pos.getY(v+4);for(let k=5;k<8;k++)if(Math.abs(pos.getY(v+k)-y)>1e-4)return false;
+  const z=pos.getZ(v+8);for(let k=9;k<12;k++)if(Math.abs(pos.getZ(v+k)-z)>1e-4)return false;
+  return true}
  function treeLights(geo){
-  const pos=geo.attributes.position,col=geo.attributes.color;if(!pos||!col||pos.count%12)return;
+  const pos=geo.attributes.position,col=geo.attributes.color,nor=geo.attributes.normal;if(!pos||!col||!nor||pos.count%12)return;
   for(let v=0;v<pos.count;v+=12){
+   if(!isBox(pos,nor,v))continue;
    let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,z0=1e9,z1=-1e9;
    for(let k=0;k<12;k++){const x=pos.getX(v+k),y=pos.getY(v+k),z=pos.getZ(v+k);if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}
    const w=x1-x0,h=y1-y0,d=z1-z0,cx=(x0+x1)/2,cy=(y0+y1)/2,cz=(z0+z1)/2;
@@ -95,7 +117,7 @@
  /* ---------- houses: roof-edge lights, door wreath, snowmen ---------- */
  if(typeof house=='function'){const h0=house;house=function(cx,zf,w,d,h,wl,rf){
   h0.apply(this,arguments);
-  try{const y=h+.08,z=zf+.3;let i=0;for(let x=cx-w/2-.15;x<=cx+w/2+.2;x+=.5,i++)bulb(x,y,z,i*.9,i&3);
+  try{const y=h+.1,z=zf+.28,xa=cx-w/2-.2,xb=cx+w/2+.2;wire(xa,y+.07,z,xb,y+.07,z);let i=0;for(let x=xa+.15;x<=xb;x+=.45,i++)bulb(x,y,z,i*.9,i&3);
    SB(.7,.7,.1,'#2a7a36',cx,1.3,zf+.12);SB(.22,.2,.12,'#c0392b',cx,1.02,zf+.17);
    if(Math.random()<.4){const sx=cx+w/2+1.3,sz=zf+1.1;
     SB(.9,.8,.9,'#f6f9fc',sx,.4,sz);SB(.7,.65,.7,'#f6f9fc',sx,1.1,sz);SB(.5,.5,.5,'#f6f9fc',sx,1.65,sz);
@@ -193,7 +215,7 @@
    if(p.height<=.3&&foliage){const sm=m.clone();sm.color.copy(SNOW);bset.push({o,orig:m,sn:sm});if(bOn)o.material=sm;return}/* thin grass-coloured patches */
    if(o.position.y-p.height/2>.01||p.height>=.3){let sm=m;if(foliage&&cy>.9){const k=c.getHexString();sm=sideCache[k]||(sideCache[k]=(()=>{const q=m.clone();q.color.lerp(SNOW,.42);return q})())}
     const arr=[sm,sm,topM,sm,sm,sm];bset.push({o,orig:m,sn:arr});if(bOn)o.material=arr}});
-  if(added||lt.p.length)flushLights();if(bOn&&lawn)bApply(true)}
+  if(added||lt.bp.length)flushLights();if(bOn&&lawn)bApply(true)}
 
  /* ---------- the park pond: frozen all winter, and you can glide on it ---------- */
  let iceDone=false,gv=[0,0],onIce=false;
@@ -230,6 +252,10 @@
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){fpI=0;if(fpAge)fpAge.fill(-1)}}}
   SNOWU.value+=(snowTarget-SNOWU.value)*Math.min(1,dt*1.2);if(Math.abs(snowTarget-SNOWU.value)<.01)SNOWU.value=snowTarget;
   sT+=dt;BU.t.value=sT;
+  /* the pond's water jet is switched off while the pond is frozen */
+  try{if(typeof FTX!='undefined'){const b=LK,near=(x,z)=>x>b[0]-16&&x<b[2]+16&&z>b[1]-16&&z<b[3]+16;
+   FTX.L.forEach(F=>{if(!near(F.x,F.z))return;F.ps.forEach(q=>{q.pts.visible=false});if(F.foam)F.foam.visible=false});
+   if(first||sweepT===0)scene.children.forEach(o=>{if(o.isMesh&&o.material===FTWM&&near(o.position.x,o.position.z))o.visible=false})}}catch(e){}
   if(CPARK&&CPARK.ducks){CPARK.ducks.im.visible=CPARK.ducks.iw.visible=false}/* the ducks are away for the winter */
   glide(px,pz,dt);
   fpTick(dt,live,inner);
