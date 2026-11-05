@@ -183,7 +183,7 @@
   if(n.st!=1&&n._sf<.98){const k=Math.max(.25,n._sf);n.legs[0].rotation.x*=k;n.legs[1].rotation.x*=k;n.arms[0].rotation.x*=k;n.arms[1].rotation.x*=k}}
 
  /* everyone who is close to you and acting as a follower (crowd members and the base-game fans walking up to you) has a body */
- function bodies(){const a=[];lists().forEach(([L])=>L.forEach(n=>{if(n.m.visible&&(n._cw||n.st==1)&&Math.abs(n.x-P.x)<30&&Math.abs(n.z-P.z)<30)a.push(n)}));return a}
+ function bodies(){const a=[];lists().forEach(([L])=>L.forEach(n=>{if(n.m.visible&&Math.abs(n.x-P.x)<30&&Math.abs(n.z-P.z)<30)a.push(n)}));return a}
  const BR=1.0;
  function separate(){
   const A=bodies();if(A.length<2)return;
