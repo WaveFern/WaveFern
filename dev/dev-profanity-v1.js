@@ -11,28 +11,37 @@
  let fi=0;const fall=()=>FALL[(fi++)%FALL.length];
  const NPCB='.bb.a,.bb.n,[data-npc],.npc,.npcbub,.npcsay,#npcsay,#npcbub';
  const LEET={'0':'o','3':'e','4':'a','5':'s','7':'t','8':'b','@':'a','$':'s','!':'i','|':'i','+':'t','(':'c','€':'e','¢':'c','£':'l'};
- /* letter swaps: ph=f, c/q=k, v=u, z=s, then repeated letters are squashed, so fvck, phuck and fuuuck all become fuk */
- const skel=s=>s.replace(/ph/g,'f').replace(/[cq]/g,'k').replace(/v/g,'u').replace(/z/g,'s').replace(/(.)\1+/g,'$1');
- /* found anywhere inside a word */
- const ROOTS=['fuck','shit','cunt','faggot','bitch','biatch','whore','retard','bastard','asshole','arsehole','dickhead','cocksuck','motherf','wank','twat','pussy','slut','bollock','rapist','nazi','porn','jizz','dildo','blowjob','handjob','cumshot','goddam','douche','jerkoff','bugger','piss','tranny','shemale','wetback','beaner','towelhead','raghead','mongoloid','kunt','bullsh','dumbass','jackass','fatass','smartass','badass','dipshit','cracka'].map(skel);
+ /* Matching is whole-word. Short or ambiguous words (ass, cock, tit, cum, dam...) only match as the whole word, never inside another word.
+    Only long, unmistakable swears are also found inside longer text (usernames like xxfuckxx). */
+ /* letter swaps: ph=f, ck=k, c/q=k, v=u (no squashing, so ass is not as, cook is not cock, boob is not bob) */
+ const skel=s=>s.replace(/ck/g,'k').replace(/ph/g,'f').replace(/[cq]/g,'k').replace(/v/g,'u');
+ /* a term as a pattern: a double letter must stay double (ass), a single letter is one letter or stretched to 3+ (fuuuck, shhhit) */
+ const pat=t=>{const x=skel(t);let o='';for(let i=0;i<x.length;){let j=i;while(j<x.length&&x[j]===x[i])j++;const n=j-i,L=x[i];o+=n>=2?L+'{'+n+',}':'(?:'+L+'|'+L+'{3,})';i=j}return o};
+ const mk=a=>a.map(pat);
+ /* strong swears: found anywhere inside a word (usernames, glued words) */
+ const ROOTS=mk(['fuck','shit','cunt','faggot','bitch','biatch','whore','retard','bastard','asshole','arsehole','dickhead','cocksuck','motherf','pussy','slut','bollock','rapist','jizz','dildo','blowjob','handjob','cumshot','goddam','jerkoff','piss','tranny','shemale','wetback','beaner','towelhead','raghead','mongoloid','dipshit','dumbass','jackass','fatass']).map(p=>new RegExp(p));
  /* only when the whole word is exactly this */
- const WORDS=['ass','asses','arse','arses','dick','dicks','cock','cocks','prick','pricks','tit','tits','titty','titties','boob','boobs','crap','crappy','damn','damned','turd','cum','cums','cumming','anal','penis','vagina','fag','fags','fagot','dyke','spic','spick','chink','gook','kike','coon','paki','negro','negroes','jap','spaz','rape','raped','raping','rapes','hitler','heil','kkk','kys','wtf','stfu','gtfo','omfg','mfer','mfers','sob','hoe','hoes','thot','simp','incel','pedo','pedophile','molest','whore','slag','skank','bimbo','tosser','git','knob','bellend','minge','clit','scrotum','ho','hore','sluts','bitches','bitchy','biches','hell','bloody','freaking','frigging','friggin'].filter(w=>!['sob','simp','git','hell','bloody','freaking','frigging','friggin','bimbo','ho','knob'].includes(w)).map(skel);
+ const WORDS=mk(['ass','asses','arse','arses','dick','dicks','cock','cocks','prick','pricks','tit','tits','titty','titties','boob','boobs','turd','cums','cumming','anal','penis','vagina','fag','fags','fagot','spic','spick','chink','gook','kike','coon','paki','negro','negroes','jap','spaz','rape','raped','raping','rapes','hitler','heil','kys','mfer','mfers','thot','pedo','pedophile','molest','whore','slag','skank','tosser','bellend','minge','clit','scrotum','sluts','bitches','bitchy','biches','nazi','nazis','neonazi','wank','wanker','wankers','bugger','porn','porno','cracka','twat','twats','badass','smartass','douche','douchebag','hore']).map(p=>new RegExp('^'+p+'$'));
+ /* a bad word as the start or end of a username: bigdick, dickboy */
+ const NAMEEND=(mk(['penis','vagina','cunt','whore']).map(p=>new RegExp('^'+p+'|'+p+'$')));
  /* letters left out: f*ck, sh*t, b*tch, n*gger */
- const SHORT=['fck','fk','fkn','fckn','fcking','fking','fkin','fckin','fcker','fckr','sht','shtty','shyt','shyte','btch','btches','bch','cnt','dck','nga','ngga','nggr','ngger','nggers','nigr','pssy','mthrfckr','mthrfkr','mtherfkr','wtfk','azz','fuk','fuks','fuking','fukin'].map(skel);
- const OK=['shitake','shiitake','mishit','mishits','mishitting','scunthorpe','snigger','niggle','niggling','retardant','retardants','classic','assassin','assassinate','assess','assist','assume','assure','assign','assault','associate','assembly','asset','passage','massage','bass','class','glass','grass','brass','mass','pass','compass','harass','embarrass','cassette','potassium','dumbassery','titan','title','titanic','constitution','cockpit','cocktail','peacock','shuttlecock','hancock','dickens','dickinson','cumber','cucumber','document','accumulate','pissarro','analysis','analyst','analog','canal','banal','penistone','bugger','sextant','therapist','grape','drape','scrape','parapet','craps'].map(skel).filter(w=>!['bugger'].includes(w));
- const OKRE=new RegExp(OK.filter(w=>w.length>=5&&!WORDS.includes(w)).sort((a,b)=>b.length-a.length).join('|'),'g');
+ const SHORT=(['fck','fkn','fckn','fcking','fking','fkin','fckin','fcker','fckr','sht','shtty','shyt','shyte','btch','btches','dck','ngga','nggr','ngger','nggers','nigr','pssy','mthrfckr','mthrfkr','mtherfkr','fuk','fuks','fuking','fukin','phuk','azz','azzhole']).map(p=>new RegExp('^'+p.replace(/(.)/g,'$1+')+'$'));
+ /* normal words that contain a bad one: removed before the strong-swear search and before the username start/end search */
+ const OK=['shitake','shiitake','mishit','mishits','mishitting','scunthorpe','snigger','niggle','niggling','retardant','retardants','classic','assassin','assassinate','assess','assist','assistant','assume','assure','assign','assault','associate','assembly','asset','passage','massage','bass','class','glass','grass','brass','mass','pass','compass','harass','embarrass','cassette','potassium','titan','title','titanic','constitution','cockpit','cocktail','peacock','shuttlecock','hancock','cockney','cockatoo','cockroach','cockerel','dickens','dickinson','dickson','cumber','cucumber','document','accumulate','pissarro','analysis','analyst','analog','analyze','analyse','analytic','analytics','canal','banal','penistone','sextant','therapist','grape','drape','scrape','parapet','kunta','fukushima','fukuoka','fukui','rapeseed','swank','nazir','document','documents'].map(skel);
+ const OKRE=new RegExp(OK.filter((w,i,a)=>a.indexOf(w)===i).sort((a,b)=>b.length-a.length).join('|'),'g');
  const strip=s=>String(s==null?'':s).normalize('NFKD').replace(/[̀-ͯ​-‏⁠﻿­]/g,'').toLowerCase()
   .replace(/[а]/g,'a').replace(/[е]/g,'e').replace(/[о]/g,'o').replace(/[р]/g,'p').replace(/[с]/g,'c').replace(/[х]/g,'x').replace(/[і]/g,'i');
- /* 1 can be i or l, so check both */
- const variants=t=>{const a=t.replace(/[03478@$!|+(€¢£]|5/g,c=>LEET[c]||c);return[a.replace(/1/g,'i'),a.replace(/1/g,'l')].map(v=>v.replace(/[^a-z]/g,''))};
+ const LEETRE=/[03478@$!|+(€¢£]|5/g;
+ /* 1 can be i or l, so check both. Edge punctuation (ass! "ass") is dropped first so it is not read as a letter. */
+ const variants=t=>{t=t.replace(/^[^a-z0-9@$]+|[^a-z0-9$]+$/g,'');const a=t.replace(LEETRE,c=>LEET[c]||c);return[a.replace(/1/g,'i'),a.replace(/1/g,'l')].map(v=>v.replace(/[^a-z]/g,''))};
  /* one word (no spaces) */
  function badWord(w,asName){
   for(const v of variants(strip(w))){if(!v)continue;const k=skel(v);
-   if(WORDS.includes(k)||SHORT.includes(k))return true;
+   if(WORDS.some(r=>r.test(k))||SHORT.some(r=>r.test(v)))return true;
    if(/nigg|nigha|nigah/.test(v.replace(/snigger\w*|niggl\w*|nigger?ly/g,'')))return true;
-   const k2=k.replace(OKRE,'');
-   if(ROOTS.some(r=>k2.includes(r)))return true;
-   if(asName&&WORDS.some(x=>x.length>=4&&k2.includes(x)))return true}
+   const k2=k.replace(OKRE,'#');
+   if(ROOTS.some(r=>r.test(k2)))return true;
+   if(asName){const k3=k2.replace(/^x+|x+$/g,'');if(WORDS.some(r=>r.test(k3))||/(dicks?|boobs|titty)$/.test(v)||NAMEEND.some(r=>r.test(k3)))return true}}
   return false}
  /* a whole text: each word, and runs of single letters read together (f u c k) */
  function badText(t,asName){
@@ -42,7 +51,7 @@
   /* tokens joined by dots, dashes, underscores or slashes: f.u.c.k, s-h-i-t, f_u_c_k */
   for(const x of toks){const p=x.split(/[.\-_\/\\,*~^]+/).filter(Boolean);if(p.length>1){if(p.some(y=>badWord(y,asName)))return true;if(p.every(y=>y.length<=2)&&badWord(p.join(''),true))return true}}
   for(let i=0;i<toks.length;i++){let j=i,s='';while(j<toks.length&&toks[j].replace(/[^a-z0-9]/g,'').length<=1&&s.length<14){s+=toks[j].replace(/[^a-z0-9]/g,'');j++}
-   if(s.length>=3&&badWord(s,true))return true}
+   if(s.length>=3&&/[a-z]/.test(s)&&badWord(s,true))return true}
   return false}
  window.fwProfane=(t,asName)=>{try{return badText(t,!!asName)}catch(e){return false}};
  function clean(t){
