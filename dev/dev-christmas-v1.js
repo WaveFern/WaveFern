@@ -31,8 +31,8 @@
   const pos=geo.attributes.position,nor=geo.attributes.normal,col=geo.attributes.color;if(!pos||!nor||!col||col.itemSize<3)return;
   for(let i=0;i<pos.count;i++){
    const x=pos.getX(i)+mesh.position.x,z=pos.getZ(i)+mesh.position.z;if(!outdoorXZ(x,z)||inHome(x,z))continue;
-   if(nor.getY(i)<.5)continue;
    const r=col.getX(i),g=col.getY(i),b=col.getZ(i);
+   if(nor.getY(i)<.5){if(g>r*1.12&&g>b*1.3&&pos.getY(i)+mesh.position.y>.9)col.setXYZ(i,r+(SNOW.r-r)*.42,g+(SNOW.g-g)*.42,b+(SNOW.b-b)*.42);continue}
    if(b-r>.4){tmp.copy(ICE);col.setXYZ(i,r+(tmp.r-r)*.55,g+(tmp.g-g)*.55,b+(tmp.b-b)*.55);continue}/* water freezes */
    const dark=Math.max(r,g,b)<.34&&Math.max(r,g,b)-Math.min(r,g,b)<.1,T=dark?ROADSNOW:SNOW,k=dark?.88:.9;
    col.setXYZ(i,r+(T.r-r)*k,g+(T.g-g)*k,b+(T.b-b)*k)}
@@ -138,7 +138,7 @@
     if(c.g>c.r*1.12&&c.g>c.b*1.3&&w>=.6&&w<=5&&d>=.6&&d<=5&&h>=.45&&h<=2.6&&cy>=.9){const n=Math.min(8,Math.max(3,Math.round(w*h*3)));
      for(let i=0;i<n;i++){const f=RI(0,3),t=R(-.45,.45),u=R(-.4,.4);lightList[pk(LK)].push(f<2?x+(f?1:-1)*(w/2+.04):x+t*w,cy+u*h,f<2?z+t*d:z+(f&1?1:-1)*(d/2+.04))}}}
    if(p.height<=.3&&c.g>c.r*1.05&&c.g>c.b*1.1){c.copy(SNOW);return}/* thin grass-coloured patches */
-   if(o.position.y-p.height/2>.01||p.height>=.3){o.material=[m,m,snowM,m,m,m]}});flushLights()}
+   if(o.position.y-p.height/2>.01||p.height>=.3){let sm=m;if(c.g>c.r*1.12&&c.g>c.b*1.3&&o.position.y>.9){sm=m.clone();sm.color.lerp(SNOW,.42)}o.material=[sm,sm,snowM,sm,sm,sm]}});flushLights()}
  let lastSweep=0;
  function xmasTick(dt){
   sweepT+=dt;if(first||sweepT>2){if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}}
