@@ -38,20 +38,21 @@
  /* ---------- the 24 rewards (items only; exactly one car) ---------- */
  /* t: k = clothing (GAR name), f = furniture (F key), p = pet (PETS name), c = car (CARS name). All of them are made in dev-xmas-items-v1.js. */
  const PLAN={
-  1:{t:'k',n:'Santa Hat'},2:{t:'f',n:'xm_tree'},3:{t:'k',n:'Candy Cane Scarf'},4:{t:'f',n:'xm_snowman'},5:{t:'k',n:'Ugly Christmas Sweater'},6:{t:'f',n:'xm_rug'},
-  7:{t:'k',n:'Elf Boots'},8:{t:'f',n:'xm_chair'},9:{t:'f',n:'xm_cocoa'},10:{t:'k',n:'Santa Coat'},11:{t:'f',n:'xm_mantel'},12:{t:'p',n:'Rudy the Reindeer'},
-  13:{t:'k',n:'Gingerbread Hoodie'},14:{t:'f',n:'xm_globe'},15:{t:'f',n:'xm_presents'},16:{t:'k',n:'Elf Jacket'},17:{t:'f',n:'xm_ginger'},18:{t:'p',n:'Snowy the Polar Cub'},
-  19:{t:'k',n:'Reindeer Antlers'},20:{t:'f',n:'xm_reindeer'},21:{t:'f',n:'xm_cane'},22:{t:'k',n:'Elf Tights'},23:{t:'f',n:'xm_nutcracker'},24:{t:'c',n:"Santa's Sleigh"}
+  1:{t:'k',n:'Santa Hat'},3:{t:'k',n:'Candy Cane Scarf'},5:{t:'k',n:'Ugly Christmas Sweater'},7:{t:'f',n:'xm_tree'},9:{t:'p',n:'Rudy the Reindeer'},11:{t:'k',n:'Elf Boots'},
+  13:{t:'f',n:'xm_ginger'},15:{t:'f',n:'xm_snowman'},17:{t:'p',n:'Snowy the Polar Cub'},19:{t:'k',n:'Santa Coat'},21:{t:'f',n:'xm_globe'},23:{t:'f',n:'xm_nutcracker'},
+  24:{t:'c',n:"Santa's Sleigh"}
  };
+ /* every other day is a Christmas crate (t:'x'): 2, 4 ... 22. What is inside is rolled when it is opened. */
+ for(let d=2;d<=22;d+=2)PLAN[d]={t:'x'};
  /* the doors on the board, left to right, top to bottom (a real advent calendar's mixed-up order). BIG doors are larger. */
  const ORDER=[17,4,22,9,1,13,24,6,19,11,2,15,8,21,3,14,23,10,5,18,12,7,20,16];
  const BIG={24:'b22',12:'b21',6:'b12',18:'b21'};
  const MW={1:'m21',9:'m21'};/* on phones (4 columns) two more wide doors so the board stays a full rectangle */
  const STY=['red','grn','cane','navy','gold','plum'];
- const CAT={k:'Clothing',f:'Furniture',p:'Pet',c:'Car'};
+ const CAT={k:'Clothing',f:'Furniture',p:'Pet',c:'Car',w:'Car wrap',x:'Crate'};
 
  const Sv=()=>{const s=typeof S!='undefined'?S:null;return s&&typeof s=='object'&&s.day!==undefined?s:null};
- const st=()=>{const s=Sv();if(!s)return null;const y=yr();if(!s.adv||typeof s.adv!='object'||s.adv.y!==y)s.adv={y,c:{}};if(!s.adv.c||typeof s.adv.c!='object')s.adv.c={};return s.adv};
+ const st=()=>{const s=Sv();if(!s)return null;const y=yr();if(!s.adv||typeof s.adv!='object'||s.adv.y!==y)s.adv={y,c:{}};if(!s.adv.c||typeof s.adv.c!='object')s.adv.c={};if(!s.adv.p||typeof s.adv.p!='object')s.adv.p={};return s.adv};
  const claimed=d=>{const a=st();return!!(a&&a.c[d])};
 
  const garFind=n=>typeof GAR!='undefined'?GAR.find(g=>g.n==n&&g.xm):null;
@@ -61,6 +62,7 @@
   if(p.t=='k'){const g=garFind(p.n);if(!g)return fur('xm_presents');const own=(s.wr||[]).includes(g.id);
    return{t:'k',k:'k:'+g.id,id:g.id,n:g.n,note:own?'You already have this one, so it stays in your wardrobe.':'In your wardrobe now. Wear it from the wardrobe in your bedroom.'}}
   if(p.t=='f')return fur(p.n);
+  if(p.t=='x'){const a=st(),pr=a&&a.p&&a.p[d];if(pr)return Object.assign({},pr);return{t:'x',k:'x:crate',n:'Christmas Crate',note:'Open it to see what is inside: furniture, clothes or a car wrap. You only get one roll, and it is saved the moment the crate opens.'}}
   if(p.t=='p'){
    if(typeof PETS=='undefined')return fur('xm_petbed');
    const pets=s.pets||[],i=PETS.findIndex(x=>x[0]==p.n);
@@ -76,12 +78,13 @@
 
  function give(d){
   const s=Sv(),a=st();if(!s||!a||a.c[d]||!ready(d))return null;
-  const r=resolve(d);if(!r)return null;
+  const r=resolve(d);if(!r||r.t=='x')return null;
+  if(r.t=='w'){s.wraps=s.wraps&&typeof s.wraps=='object'?s.wraps:{};s.wraps[r.pat]=1}
   if(r.t=='k'){s.wr=s.wr||[];if(!s.wr.includes(r.id))s.wr.push(r.id);s.wc=s.wc||{};const g=GAR.find(x=>x.id==r.id);let c=null;safe(()=>{c=THC[r.id]},'thc');if(!s.wc[r.id])s.wc[r.id]=c||g.dc}
   if(r.t=='f'){s.inv=s.inv||{};s.inv[r.key]=(s.inv[r.key]||0)+1}
   if(r.t=='p'){s.pets=s.pets||[];if(!s.pets.includes(r.i))s.pets.push(r.i);safe(()=>syncF(),'pet')}
   if(r.t=='c'){s.cars=s.cars||[];if(!s.cars.includes(r.i))s.cars.push(r.i);if(!s.garage)s.garage=1;safe(()=>parkCars(),'car')}
-  a.c[d]={t:r.t,k:r.k,n:r.n};
+  a.c[d]={t:r.t,k:r.k,n:r.n};if(r.rar!=null)a.c[d].r=r.rar;if(a.p)delete a.p[d];
   safe(()=>updateVersion(),'ver');safe(()=>autoSave(),'save');safe(()=>{if(typeof csPush=='function')csPush(1)},'cloud');
   return r}
 
@@ -90,7 +93,49 @@
  const lights=sc=>{sc.add(new THREE.AmbientLight(0xfff4e6,.5));const k=new THREE.DirectionalLight(0xffe2b0,.72);k.position.set(3,6,5);sc.add(k);
   const r=new THREE.DirectionalLight(0x9fc8ff,.35);r.position.set(-4,3,-4);sc.add(r);const f=new THREE.DirectionalLight(0xffffff,.18);f.position.set(0,1,6);sc.add(f)};
  /* a copy of the item model, centred, sitting with its bottom at y=0 and about `size` across */
- function itemModel(k,size){const src=pvModel(k),m=src.clone(true),g=new THREE.Group();m.position.set(0,0,0);m.rotation.set(0,0,0);m.scale.setScalar(1);g.add(m);
+ /* ---------- Christmas crates: rarity tiers, the prize pool, and the models ---------- */
+ /* rarity comes from the item's price (Christmas items have no shop price, so dev-xmas-items-v1.js gives each a value) */
+ const TIERS=[{n:'Frost',c:'#8fc3e8',min:0,odds:52,flat:30},{n:'Holly',c:'#3fbf6a',min:150,odds:28,flat:28},{n:'Ember',c:'#f08a24',min:500,odds:13,flat:20},
+  {n:'Aurora',c:'#b57cff',min:1500,odds:6,flat:14},{n:'Starlight',c:'#ffd23f',min:5000,odds:1,flat:8}];
+ const tierOf=v=>{let t=0;TIERS.forEach((x,i)=>{if(v>=x.min)t=i});return t};
+ /* car wraps: pattern number in dev-garage-v1.js, name, value, body colour used for the picture */
+ const WRAPS=[[23,'Candy Cane Wrap',600,'#2f8f5a'],[24,'Snowfall Wrap',900,'#2a3f6b'],[25,'Gift Ribbon Wrap',1600,'#1f7a3a'],[26,'Tinsel Garland Wrap',3800,'#7b1e3a'],[27,'Northern Glow Wrap',8000,'#22252b'],[28,'Starlight Foil Wrap',15000,'#1c1d28']];
+ let POOL=null;
+ function pool(){if(POOL)return POOL;const out=[],X=(window.FW_XMAS_ITEMS&&window.FW_XMAS_ITEMS.VAL)||{};
+  if(typeof F!='undefined')Object.getOwnPropertyNames(F).forEach(key=>{const f=F[key];if(!f||!f.b)return;if(key.indexOf('sv_')==0)return;const v=key.indexOf('xm_')==0?X[key]:f.p;if(v>0)out.push({t:'f',key,n:f.n,v,k:'f:'+key})});
+  if(typeof GAR!='undefined')GAR.forEach(g=>{const v=g.xm?X[g.n]:g.p;if(v>0)out.push({t:'k',id:g.id,n:g.n,v,k:'k:'+g.id})});
+  WRAPS.forEach(w=>out.push({t:'w',pat:w[0],n:w[1],v:w[2],k:'w:'+w[0]}));
+  out.forEach(o=>o.tier=tierOf(o.v));return POOL=out}
+ const byTier=t=>pool().filter(o=>o.tier==t);
+ const pick=a=>a[Math.floor(Math.random()*a.length)];
+ /* the real roll: choose a tier by the odds, then an item you don't already own (clothes and wraps) */
+ function rollItem(s){
+  const own=o=>(o.t=='k'&&(s.wr||[]).includes(o.id))||(o.t=='w'&&s.wraps&&s.wraps[o.pat]);
+  let r=Math.random()*100,t=0;for(let i=0;i<TIERS.length;i++){if(r<TIERS[i].odds){t=i;break}r-=TIERS[i].odds;t=i}
+  for(let d=0;d<TIERS.length;d++)for(const tt of[t-d,t+d]){if(tt<0||tt>=TIERS.length)continue;const c=byTier(tt).filter(o=>!own(o));if(c.length)return pick(c)}
+  return pick(pool())}
+ function prizeFrom(o){
+  const r={t:o.t,k:o.k,n:o.n,rar:o.tier};
+  if(o.t=='f'){r.key=o.key;r.note='Delivered to your Storage. Press F at home to place it.'}
+  if(o.t=='k'){r.id=o.id;r.note='In your wardrobe now. Wear it from the wardrobe in your bedroom.'}
+  if(o.t=='w'){r.pat=o.pat;r.note="Unlocked in Tom's Garage: pick a car, then Pattern. Wraps are free to apply."}
+  return r}
+ /* a wooden crate with a gold strap, red ribbon and a cap of snow */
+ let CRATE=null;
+ function crateModel(){if(CRATE)return CRATE.clone(true);const g=new THREE.Group(),M=c=>new THREE.MeshLambertMaterial({color:c});
+  const bx=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);g.add(m)};
+  bx(1,.8,1,0x8a5a2b,0,.4,0);[-.33,0,.33].forEach(y=>bx(1.02,.08,1.02,0x6a4220,0,.4+y,0));
+  [-.5,.5].forEach(x=>[-.5,.5].forEach(z=>bx(.1,.84,.1,0x4a2c12,x,.4,z)));
+  bx(1.04,.82,.16,0xe6b422,0,.4,0);bx(.16,.82,1.04,0xe6b422,0,.4,0);
+  bx(1.06,.1,1.06,0xf4f4f4,0,.84,0);bx(.5,.12,.5,0xc0392b,0,.95,0);bx(.3,.2,.12,0xc0392b,-.25,1.0,0);bx(.3,.2,.12,0xc0392b,.25,1.0,0);bx(.12,.12,.12,0xe6b422,0,1.0,0);
+  CRATE=g;return g.clone(true)}
+ /* the model for any key: crates and wraps are made here, everything else is the game's own item model */
+ function rawModel(k){
+  if(k=='x:crate')return crateModel();
+  if(k.slice(0,2)=='w:'){const w=WRAPS.find(x=>x[0]==+k.slice(2));const G=window.FW_GARAGE;
+   if(w&&G&&typeof mkS=='function')return mkS(G.looked(0,{c:w[3],p:w[0],c2:'#f2f2f2'}))}
+  return pvModel(k).clone(true)}
+ function itemModel(k,size){const m=rawModel(k),g=new THREE.Group();m.position.set(0,0,0);m.rotation.set(0,0,0);m.scale.setScalar(1);g.add(m);
   const bb=new THREE.Box3().setFromObject(g),sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),s=size/Math.max(sz.x,sz.y,sz.z,.001);
   m.scale.setScalar(s);m.position.set(-c.x*s,-bb.min.y*s,-c.z*s);return g}
  /* door pictures: one small renderer, each item drawn once and kept as an image */
@@ -262,6 +307,29 @@
 .advfly{position:fixed;z-index:95;pointer-events:none;will-change:transform;image-rendering:pixelated}
 .advcf{position:fixed;z-index:96;width:8px;height:8px;pointer-events:none;will-change:transform,opacity}
 
+/* crate doors: a wooden crate with a dark strap */
+.advd.crt{--bg:#8a5a2b;--nc:#fff;--ic:#e6b422}
+.advd.crt .fr{background:linear-gradient(90deg,transparent 43%,#1a1008 43% 57%,transparent 57%),linear-gradient(transparent 43%,#1a1008 43% 57%,transparent 57%),repeating-linear-gradient(0deg,#00000030 0 2px,transparent 2px 14px),#8a5a2b}
+.advd.crt .n{background:#8a5a2b;padding:2px 8px;border:2px solid #000}
+.advd .crl{position:relative;z-index:1;margin-top:3px;padding:1px 6px;background:#e6b422;color:#1a1008;border:2px solid #000;font:700 clamp(8px,1vw,10px) Silkscreen,ui-monospace,monospace;letter-spacing:1px}
+/* rarity */
+#advr .rar{display:inline-block;margin:0 6px 8px 0;padding:2px 8px;background:#000;color:var(--rc);border:2px solid var(--rc);font:700 10px Silkscreen,ui-monospace,monospace;letter-spacing:2px;vertical-align:top}
+#advr .meta{line-height:1}
+#advr .stage{border-color:#000;box-shadow:inset 0 0 0 2px #262626,inset 0 -4px 0 var(--rc,#262626)}
+/* the case opening strip */
+#advr .strip{position:absolute;inset:0;overflow:hidden;background:#000}
+#advr .rail{position:absolute;left:0;top:50%;display:flex;margin-top:-84px;will-change:transform}
+#advr .tl{flex:none;width:104px;height:168px;margin:0 3px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;background:#0c0c0c;border:2px solid #000;border-bottom:6px solid var(--rc);box-shadow:inset 0 0 0 2px #1a1a1a}
+#advr .tl img{width:84px;height:84px;image-rendering:pixelated}
+#advr .tl b{max-width:96px;font:700 10px ui-monospace,monospace;color:#e8f3ec;text-align:center;line-height:1.15;max-height:24px;overflow:hidden}
+#advr .tl i{font:normal 9px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:var(--rc)}
+#advr .tl.win{background:#1a1a1a;box-shadow:inset 0 0 0 2px var(--rc),0 0 0 2px var(--rc)}
+#advr .mk{position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:#ffd23f;box-shadow:0 0 0 2px #000}
+#advr .mk:before,#advr .mk:after{content:'';position:absolute;left:-6px;width:0;height:0;border:8px solid transparent}
+#advr .mk:before{top:0;border-top-color:#ffd23f;border-bottom:0}
+#advr .mk:after{bottom:0;border-bottom-color:#ffd23f;border-top:0}
+#advr .sh{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#000 0,transparent 18%,transparent 82%,#000 100%)}
+
 @media (max-width:640px){
  #advw .advf{padding:20px 10px 10px;height:96vh}
  #advw .hd{flex-wrap:wrap;gap:8px}
@@ -302,14 +370,14 @@
   if(td>=24&&!left.length)return'All 24 doors opened. Merry Christmas!';
   return(left.length?(left.length==1?'1 door ready':left.length+' doors ready'):'Next door opens tomorrow')+' · '+got+'/24 claimed'}
  function doorHTML(d,i){
-  const a=st(),c=a&&a.c[d],r=ready(d),cls=['advd',STY[(i*5+d)%6],BIG[d]||'',MW[d]||''];
+  const a=st(),c=a&&a.c[d],r=ready(d),cr=PLAN[d].t=='x',cls=['advd',cr?'crt':STY[(i*5+d)%6],BIG[d]||'',MW[d]||''];
   const pk=!c&&r&&PEEK[d];if(d==24)cls.push('d24');
   if(c)cls.push('done');else if(pk)cls.push('peek');else if(r)cls.push('rdy');else cls.push('lock');
     const inner=c?`<img alt="" src="${pic(c.k)}"><span class=nm>${esc2(c.n)}</span>`:pk?`<img alt="" src="${pic(PEEK[d].k)}">`:'';
   const ic=d==24?icon('tree'):icon(ICK[(d*3+i)%ICK.length]);
   return`<button type=button class="${cls.join(' ')}" data-d="${d}" aria-label="Door ${d}${c?', claimed: '+esc2(c.n):r?', ready to open':', opens on '+fmtD(d)}">
    <span class=in>${inner}</span>
-   <span class=lf><span class=fr>${d==24?ic:''}<span class=n>${d}</span>${d==24?'<span class=eve>CHRISTMAS EVE</span>':ic}<i class=knob></i>${!r&&!c?'<i class=lk></i>':''}</span><span class=bk></span></span>
+   <span class=lf><span class=fr>${d==24?ic:''}<span class=n>${d}</span>${d==24?'<span class=eve>CHRISTMAS EVE</span>':cr?'<span class=crl>CRATE</span>':ic}<i class=knob></i>${!r&&!c?'<i class=lk></i>':''}</span><span class=bk></span></span>
    ${r&&!c&&d==nextDay()?`<span class=advtg>${today()==d?'TODAY':'NEXT'}</span>`:''}${c?'<span class=ck>&#10003;</span>':''}${c||pk?`<span class=dn>${d}</span>`:''}</button>`}
  const esc2=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
  function render(){if(!W)return;
@@ -337,7 +405,7 @@
   e.style.left=(r.left+r.width/2)+'px';e.style.top=(r.top-6)+'px';W.appendChild(e);setTimeout(()=>e.remove(),1600)}
  function tap(b,d){
   if(REV||b.dataset.busy)return;
-  if(claimed(d)){const c=st().c[d];sfx('pop');return reveal(b,d,{t:c.t,k:c.k,n:c.n,note:'You claimed this on door '+d+'.'},1)}
+  if(claimed(d)){const c=st().c[d];sfx('pop');return reveal(b,d,{t:c.t,k:c.k,n:c.n,rar:c.r,note:'You claimed this on door '+d+'.'},1)}
   if(!ready(d)){sfx('err');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');tip(b,dateOk(d)?'Open door '+nextDay()+' first':season()||new Date(now()).getMonth()<11?'Opens on '+fmtD(d):'This year’s calendar is over');return}
   const r=resolve(d);if(!r)return;
   if(PEEK[d]){sfx('pop');return reveal(b,d,r)}
@@ -353,10 +421,11 @@
   const img=b.querySelector('.in img'),from=(img||b).getBoundingClientRect();
   REV={b,d,r,view};
   const o=document.createElement('div');o.id='advr';
-  o.innerHTML=`<div class=rays></div><div class=card><div class=rib>DOOR ${d} · ${fmtD(d).toUpperCase()}</div>
-   <div class=stage><canvas aria-label="3D view of ${esc2(r.n)}. Drag to spin."></canvas><div class=hint>&#8596; DRAG TO SPIN</div></div>
-   <h3>${esc2(r.n)}</h3><span class=cat>${icon({k:'sock',f:'gift',p:'star',c:'bell'}[r.t]||'gift')}${CAT[r.t]||''}</span><p>${esc2(r.note)}</p>
-   ${view?'<button type=button class=cl>CLOSE</button>':'<button type=button class=cl>CLAIM</button>'}</div>`;
+  o.innerHTML=`<div class=card><div class=rib>DOOR ${d} · ${fmtD(d).toUpperCase()}</div>
+   <div class=stage><canvas aria-label="3D view. Drag to spin."></canvas><div class=hint>&#8596; DRAG TO SPIN</div></div>
+   <h3></h3><div class=meta></div><p></p>
+   ${view?'<button type=button class=cl>CLOSE</button>':`<button type=button class=cl>${r.t=='x'?'OPEN CRATE':'CLAIM'}</button>`}</div>`;
+  fillCard(o,r);
   W.appendChild(o);REV.o=o;
   const cv=o.querySelector('canvas'),stage=o.querySelector('.stage');
   cv.style.visibility='hidden';
@@ -374,8 +443,48 @@
   else{/* claiming is the only way out: no backdrop click, no Esc. pointerup and click both claim (claim() ignores the second), so a tap never gets lost */
    cb.addEventListener('pointerup',e=>{if(e.button===0||e.pointerType=='touch'||e.pointerType=='pen')claim(cb)});cb.addEventListener('click',()=>claim(cb))}}
 
+ function fillCard(o,r){
+  o.querySelector('h3').textContent=r.n;
+  const T=r.rar!=null?TIERS[r.rar]:null;
+  o.querySelector('.meta').innerHTML=(T?`<span class=rar style="--rc:${T.c}">${T.n.toUpperCase()}</span>`:'')+`<span class=cat>${icon({k:'sock',f:'gift',p:'star',c:'bell',w:'bell',x:'gift'}[r.t]||'gift')}${CAT[r.t]||''}</span>`;
+  o.querySelector('p').textContent=r.note||'';
+  o.querySelector('.stage').style.setProperty('--rc',T?T.c:'#26302a')}
+ /* the case opening: a strip of items slides past a marker, slows, and stops on your prize. The roll was made and saved before this starts. */
+ function spin(stage,pr,done){
+  const N=52,Wn=40+Math.floor(Math.random()*6),flat=()=>{let r=Math.random()*100;for(let i=0;i<TIERS.length;i++){if(r<TIERS[i].flat)return i;r-=TIERS[i].flat}return 0};
+  const items=[];for(let i=0;i<N;i++){const c=byTier(flat());items.push(c.length?pick(c):pick(pool()))}
+  const T=pr.rar;items[Wn]={k:pr.k,n:pr.n,tier:T};
+  /* tease: put the best rarity (or the next best) right beside the prize */
+  const side=Math.random()<.5?1:-1;
+  if(T<4&&Math.random()<.6)items[Wn+side]=pick(byTier(4));
+  else if(T<3&&Math.random()<.6)items[Wn+side]=pick(byTier(3));
+  if(T==4&&Math.random()<.6)items[Wn+side]=pick(byTier(3));
+  const tl=it=>`<div class=tl style="--rc:${TIERS[it.tier].c}"><img alt="" src="${pic(it.k)}"><b>${esc2(it.n)}</b><i>${TIERS[it.tier].n}</i></div>`;
+  const st0=document.createElement('div');st0.className='strip';
+  st0.innerHTML=`<div class=rail>${items.map(tl).join('')}</div><div class=mk></div><div class=sh></div>`;
+  stage.appendChild(st0);stage.classList.add('spin');
+  const rail=st0.querySelector('.rail'),tiles=rail.children,TW=tiles[0].offsetWidth+parseFloat(getComputedStyle(tiles[0]).marginRight||0)*2||110,SW=stage.clientWidth;
+  const jit=(Math.random()-.5)*TW*.5,X=Wn*TW+TW/2-SW/2+jit,dur=matchMedia('(prefers-reduced-motion:reduce)').matches?1200:6800;
+  const an=rail.animate([{transform:'translateX(0)'},{transform:`translateX(${-X}px)`}],{duration:dur,easing:'cubic-bezier(.1,.75,.12,1)',fill:'forwards'});
+  let last=-1,raf=0;const tick=()=>{if(!REV||REV.o!==stage.closest('#advr')){cancelAnimationFrame(raf);return}
+   const m=new DOMMatrix(getComputedStyle(rail).transform),idx=Math.floor((-m.m41+SW/2)/TW);if(idx!==last){last=idx;sfx('click')}raf=requestAnimationFrame(tick)};tick();
+  an.onfinish=()=>{cancelAnimationFrame(raf);if(!REV)return;tiles[Wn].classList.add('win');sfx('chime');
+   setTimeout(()=>{if(!REV)return;st0.remove();stage.classList.remove('spin');done()},1100)}}
+ function openCrate(cb){
+  if(!REV||REV.opened)return;REV.opened=1;REV.busy=1;const {d,o}=REV,s=Sv(),a=st();
+  let pr=a&&a.p&&a.p[d];
+  if(!pr){const it=rollItem(s);pr=prizeFrom(it);a.p[d]=pr;safe(()=>autoSave(),'save')}
+  cb.disabled=true;cb.textContent='OPENING...';
+  if(REV.v){REV.v.dispose();REV.v=null}
+  const stage=o.querySelector('.stage');let cv=stage.querySelector('canvas');cv.style.display='none';
+  const h=stage.querySelector('.hint');if(h)h.style.display='none';
+  const fin=()=>{if(!REV||REV.o!==o)return;REV.r=pr;fillCard(o,pr);/* the old canvas lost its GL context with the crate viewer: use a fresh one */const nc=document.createElement('canvas');nc.setAttribute('aria-label','3D view. Drag to spin.');cv.replaceWith(nc);cv=nc;if(h){h.style.display='';h.classList.remove('gone')}
+   REV.v=safe(()=>Viewer(cv,pr.k),'viewer');cb.disabled=false;cb.textContent='CLAIM';REV.busy=0;sfx('pop')};
+  try{spin(stage,pr,fin)}catch(e){fin()}}
  function claim(cb){
-  if(!REV||REV.done||REV.view||REV.busy)return;const {d}=REV;REV.busy=1;
+  if(!REV||REV.done||REV.view||REV.busy)return;const {d}=REV;
+  if(REV.r.t=='x')return openCrate(cb);
+  REV.busy=1;
   let r=null;try{r=claimed(d)?true:give(d)}catch(e){r=null}
   if(!r){REV.busy=0;sfx('err');cb.textContent='TRY AGAIN';return}
   REV.done=1;cb.disabled=true;cb.innerHTML='&#10003; CLAIMED!';sfx('cash');setTimeout(()=>sfx('chime'),120);
@@ -414,7 +523,7 @@
  /* anything else that clears the UI (pause, a modal, closeUI) also closes the calendar */
  setInterval(()=>{if(W&&typeof mode!='undefined'&&mode!='menu'){if(REV&&REV.v)REV.v.dispose();REV=null;W.remove();W=null}},300);
 
- window.FW_ADVENT={open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer};
+ window.FW_ADVENT={open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer,crate:{TIERS,pool,rollItem,WRAPS,tierOf}};
 
  /* ---------- dev panel: calendar-only test dates ---------- */
  if(DEV)safe(()=>{

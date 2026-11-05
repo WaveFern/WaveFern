@@ -14,7 +14,10 @@
  const PCOLS=COLS.concat([['White','#f2f2f2'],['Black','#1c1d20']]);
  /* pattern number = position here. Only ever add to the end. */
  const PATS=['Plain','Racing stripes','Side stripe','Two-tone roof','Hood and boot','Checker band','Centre stripe','Double side stripe','Pinstripe',
-  'Rocker stripe','Two-tone lower','Chequered roof','Hazard band','Flames','Lightning','Polka dots','Camo','Race roundels','Fade','Chevrons','Zebra','Half and half','Sparkle'];
+  'Rocker stripe','Two-tone lower','Chequered roof','Hazard band','Flames','Lightning','Polka dots','Camo','Race roundels','Fade','Chevrons','Zebra','Half and half','Sparkle',
+  'Candy Cane','Snowfall','Gift Ribbon','Tinsel Garland','Northern Glow','Starlight Foil'];
+ /* the Christmas wraps (pattern 23 to 28): only from Christmas crates, free to apply once you own them. Saved in S.wraps. */
+ const WRAP0=23,wrapOwned=p=>p<WRAP0||!!(S.wraps&&S.wraps[p]);
  const SHOW=[0,1,6,2,9,3,10,4,21,5,17,13,18,15,16];
  const TOM_HIT='Talk to Tom (mechanic)';
  let pvR=null,pvS=null,pvC=null,pvM=null,pvRaf=0;
@@ -61,6 +64,12 @@
  ' else if(pt==20.){if(side||top){float s=side?p.z:p.z;if(fract(s*7.)<.42)return k;}return b;}\n'+
  ' else if(pt==21.){if(p.x>0.)return k;return b;}\n'+
  ' else if(pt==22.){vec2 uv=side?vec2(p.z,p.y):(top?vec2(p.x,p.z):vec2(-9.));if(uv.x>-8.){uv/=.11;vec2 i=floor(uv);if(gcH(i)>.8&&length(fract(uv)-.5)<.22)return k;}return b;}\n'+
+ ' else if(pt==23.){if(side||top){float s=fract((p.z+p.y*1.2+p.x*.6)*3.5);return s<.5?vec3(.82,.1,.16):vec3(.97,.97,.97);}return b;}\n'+
+ ' else if(pt==24.){if(p.y<yb+.05&&!top)return vec3(.97);vec2 uv=side?vec2(p.z,p.y):(top?vec2(p.x,p.z):vec2(-9.));if(uv.x>-8.){uv/=.09;if(gcH(floor(uv))>.7&&length(fract(uv)-.5)<.3)return vec3(.97);}return b;}\n'+
+ ' else if(pt==25.){if(top&&abs(p.x)<.085)return abs(p.x)<.06?vec3(.8,.1,.15):vec3(.9,.7,.2);if(side&&abs(p.z-(zf+zr)*.5)<.1)return abs(p.z-(zf+zr)*.5)<.075?vec3(.8,.1,.15):vec3(.9,.7,.2);return b;}\n'+
+ ' else if(pt==26.){if(side){float w=by+.05*(abs(fract(p.z*3.)*2.-1.)*2.-1.);if(abs(p.y-w)<.03)return vec3(1.,.82,.25);if(abs(p.y-w+.07)<.02)return vec3(.2,.7,.35);}return b;}\n'+
+ ' else if(pt==27.){if(!top){float t=clamp((p.y-yb)/(yh-yb+.05)+sin(p.z*5.)*.12,0.,1.);vec3 g=mix(vec3(.1,.85,.5),vec3(.5,.3,.95),t);return mix(b,g,.85);}return b;}\n'+
+ ' else if(pt==28.){vec2 uv=side?vec2(p.z,p.y):(top?vec2(p.x,p.z):vec2(-9.));if(uv.x>-8.){if(abs(p.y-by)<.02&&side)return vec3(1.,.82,.25);uv/=.075;if(gcH(floor(uv))>.78&&length(fract(uv)-.5)<.3)return vec3(1.,.9,.5);return mix(b,vec3(.08,.1,.3),.7);}return b;}\n'+
  ' if(d>0.)return d<e?dk:k;\n'+
  ' return b;}\n';
  const patMats={};
@@ -85,6 +94,7 @@
  /* your own cars (no traffic colour given) wear their saved look everywhere; traffic and shop cars are untouched */
  carList=function(i,cc,fixed){if(cc===undefined&&CARS[i]&&cust(i))return looked(i,cust(i));return carList0(i,cc,fixed)};
 
+ window.FW_GARAGE={looked:(i,cu)=>looked(i,cu),WRAP0};
  function refreshCars(i){try{delete PVM['c:'+i]}catch(e){}try{parkCars()}catch(e){}}
  function setLook(i,k,v){S.carCust=S.carCust&&typeof S.carCust=='object'?S.carCust:{};const c=Object.assign({c:CARS[i].c,p:0,c2:'#f2f2f2'},S.carCust[i]||{});c[k]=v;S.carCust[i]=c;try{updateVersion()}catch(e){}refreshCars(i)}
  function resetLook(i){if(S.carCust)delete S.carCust[i];try{updateVersion()}catch(e){}refreshCars(i)}
@@ -96,9 +106,9 @@
  const COL_PRICE=[0,60,140,300];
  const colP=h=>COL_PRICE[COL_TIER[String(h).toLowerCase()]||1];
  const pcolP=h=>{h=String(h).toLowerCase();return h=='#f2f2f2'||h=='#1c1d20'?20:Math.round(colP(h)/2)};
- const PAT_TIER=[0,1,1,1,1,2,1,2,1,1,2,2,2,3,3,3,3,2,2,2,3,2,3];
+ const PAT_TIER=[0,1,1,1,1,2,1,2,1,1,2,2,2,3,3,3,3,2,2,2,3,2,3,0,0,0,0,0,0];
  const PAT_PRICE=[0,120,260,550];
- const patP=p=>PAT_PRICE[PAT_TIER[p]||1];
+ const patP=p=>p>=WRAP0?0:PAT_PRICE[PAT_TIER[p]||1];
  const stockLook=i=>({c:CARS[i].c,p:0,c2:'#f2f2f2'});
  const savedLook=i=>Object.assign(stockLook(i),cust(i)||{});
  let DR=null;
@@ -106,7 +116,7 @@
  function cost(i,d){const s=savedLook(i),st=CARS[i].c.toLowerCase();let t=0;
   if(d.c.toLowerCase()!=s.c.toLowerCase()&&d.c.toLowerCase()!=st)t+=colP(d.c);
   if(d.p>0&&d.p!=s.p)t+=patP(d.p);
-  if(d.p>0&&d.c2.toLowerCase()!='#f2f2f2'&&(d.c2!=s.c2||s.p==0))t+=pcolP(d.c2);
+  if(d.p>0&&d.p<WRAP0&&d.c2.toLowerCase()!='#f2f2f2'&&(d.c2!=s.c2||s.p==0))t+=pcolP(d.c2);
   return t}
  const same=(a,b)=>a.c==b.c&&a.p==b.p&&(a.p==0||a.c2==b.c2);
  const mny=n=>{try{return $$(n)}catch(e){return'$'+n}};
@@ -207,7 +217,7 @@
    <div class=gp><div><div id=gcvs></div><div class=gcar><span>${CARS[i].n}</span><b>Bay ${i+1}</b></div><div class=gk style="margin-top:10px;${pn>0?'':'opacity:.5'}"><h4>Pattern colour <span>${pn>0?cn(cu.c2):'pick a pattern first'}</span></h4><div class=gw>${PCOLS.map(x=>chip(x[1],x[1]==cu.c2,`gcSet(${i},'c2','${x[1]}')`,x[0],pcolP(x[1]))).join('')}</div></div></div>
    <div>
     <div class=gk><h4>Paint colour <span>${cn(cu.c)}</span></h4><div class=gw>${COLS.map(x=>chip(x[1],x[1]==cu.c,`gcSet(${i},'c','${x[1]}')`,x[0],x[1].toLowerCase()==CARS[i].c.toLowerCase()?0:colP(x[1]))).join('')}</div></div>
-    <div class=gk><h4>Pattern <span>${PATS[pn]}</span></h4><div class=gt>${SHOW.map(k=>`<button type=button class="${k==pn?'on':''}" aria-pressed="${k==pn?'true':'false'}" onclick="gcSet(${i},'p',${k})"><img alt="" src="${pthumb(i,cu,k)}">${PATS[k]}<em>${k?mny(patP(k)):'free'}</em></button>`).join('')}</div></div>
+    <div class=gk><h4>Pattern <span>${PATS[pn]}</span></h4><div class=gt>${SHOW.concat(PATS.map((x,q)=>q).filter(q=>q>=WRAP0&&wrapOwned(q))).map(k=>`<button type=button class="${k==pn?'on':''}" aria-pressed="${k==pn?'true':'false'}" onclick="gcSet(${i},'p',${k})"><img alt="" src="${pthumb(i,cu,k)}">${PATS[k]}<em>${k>=WRAP0?'wrap':k?mny(patP(k)):'free'}</em></button>`).join('')}</div></div>
    </div></div>
    <div class=gf><span style="display:flex;gap:8px"><button onclick="gcList()">Back</button><button onclick="gcReset(${i})">Stock paint</button></span>
     <span class="tot ${can?'':'no'}">Total <b>${mny(tot)}</b>${can?'':' · need '+mny(tot-S.money)+' more'}</span>
@@ -227,7 +237,7 @@
   const fg=fillGarage;fillGarage=function(){const r=fg.apply(this,arguments);try{GCM=GCM.filter((m,j)=>{const c=CARS[(S.cars||[])[j]];if(c&&c.xm){IG[6].remove(m);return false}return true})}catch(e){}return r}
   const ed=exitDrive;exitDrive=function(){const c=dr,r=ed.apply(this,arguments);try{if(c&&c.tmp){scene.remove(c.m);const k=PK.indexOf(c);if(k>=0)PK.splice(k,1)}}catch(e){}return r}}
  /* choosing only changes the preview: nothing is saved or paid until Pay and apply */
- window.gcSet=(i,k,v)=>{if(!(S.cars||[]).includes(i)||!DR||DR.i!=i)return;if((k=='c'||k=='c2')&&!okHex(v))return;if(k=='p'&&!patOk(v))return;DR[k]=v;snd('ping');carUI(i)};
+ window.gcSet=(i,k,v)=>{if(!(S.cars||[]).includes(i)||!DR||DR.i!=i)return;if((k=='c'||k=='c2')&&!okHex(v))return;if(k=='p'&&(!patOk(v)||!wrapOwned(v)))return;DR[k]=v;snd('ping');carUI(i)};
  window.gcReset=i=>{if(!DR||DR.i!=i)return;Object.assign(DR,stockLook(i));snd('ping');carUI(i)};
  window.gcBuy=i=>{if(!(S.cars||[]).includes(i)||!DR||DR.i!=i)return snd('err');const d=DR,t=cost(i,d);
   if(same(d,savedLook(i)))return snd('err');
