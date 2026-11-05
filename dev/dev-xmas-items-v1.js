@@ -94,8 +94,8 @@
  XNEW.bt[2008]=(x,c)=>{const{w,d}=x;legEach(x,l=>{[-.06,-.17,-.28,-.39].forEach((y,i)=>xb(l,w*.44+.012,.07,d*.82+.012,i%2?WHT:RED,0,y,0));xb(l,w*.44+.014,.02,d*.82+.014,'#1f7a3a',0,-.46,0)});
   [-1,1].forEach(s=>{xb(x.g,.1,.04,.012,'#e6b422',s*.14,.5,d*.4+.02)})};
  XNEW.sh[2009]=(x,c)=>{const{sw,sd,z0}=shoeDims(x),t=xtone(c,.72);legEach(x,l=>{
-  xb(l,sw*.98,.28,sd*.6,c,0,-.31,z0-.08);xb(l,sw*.95,.1,sd,c,0,-.44,z0+.02);xb(l,sw*.8,.06,.12,c,0,-.43,z0+sd/2+.04);xb(l,sw*.6,.07,.1,c,0,-.4,z0+sd/2+.12,-.5,0,0);xb(l,sw*.4,.06,.08,t,0,-.35,z0+sd/2+.17,-1,0,0);
-  bell(l,0,-.3,z0+sd/2+.21);xb(l,sw+.02,.07,sd*.62+.02,RED,0,-.2,z0-.08);xb(l,sw+.025,.02,sd*.62+.025,WHT,0,-.16,z0-.08);
+  xb(l,sw+.1,.3,sd*.78,c,0,-.31,z0-.04);xb(l,sw+.08,.1,sd+.04,c,0,-.44,z0+.03);xb(l,sw*.8,.06,.12,c,0,-.43,z0+sd/2+.04);xb(l,sw*.6,.07,.1,c,0,-.4,z0+sd/2+.12,-.5,0,0);xb(l,sw*.4,.06,.08,t,0,-.35,z0+sd/2+.17,-1,0,0);
+  bell(l,0,-.3,z0+sd/2+.21);xb(l,sw+.15,.08,sd*.8+.1,RED,0,-.19,z0-.04);xb(l,sw+.17,.03,sd*.8+.12,WHT,0,-.14,z0-.04);
   xb(l,sw*.8,.03,sd*.96,'#5a3a22',0,-.485,z0+.02);[0,1,2].forEach(i=>xb(l,sw*.5,.012,.02,WHT,0,-.3+i*.05,z0-.08+sd*.3))})};
 
  /* ---- shop and wardrobe pictures: box lists (w,h,d,colour,x,y,z) ---- */
@@ -269,7 +269,10 @@
   b.push([.9,.06,.06,'#5a3a22',0,.56,2.45]);
   /* holly and a wreath on the front */
   b.push([.5,.05,.05,'#2ecc71',0,1.55,1.58],[.1,.1,.1,'#c0392b',-.1,1.6,1.6],[.1,.1,.1,'#c0392b',.1,1.6,1.6],[.3,.3,.06,'#1f7a3a',0,1.08,1.35],[.18,.18,.08,'#a3202f',0,1.08,1.35],[.09,.09,.09,'#c0392b',.1,1.2,1.4]);
-  return b}
+  /* shrunk to about the size of a normal car */
+  const K=.62;return b.map(q=>q.map((v,n)=>(n<3||(n>3&&n<7))&&typeof v=='number'?v*K:v))}
+ /* the driver stays visible, sitting in the sleigh */
+ {const u0=update;update=function(dt){const r=u0.apply(this,arguments);try{if(mode=='drive'&&dr&&dr.i===SI&&P.mesh){P.mesh.visible=true;P.mesh.rotation.y=dr.h;P.mesh.position.set(dr.x+Math.sin(dr.h)*.1,.42,dr.z+Math.cos(dr.h)*.1)}}catch(e){}return r}}
  {const c0=carList;carList=function(i,cc,fixed){if(i===SI&&!fixed&&cc===undefined)return sleighBoxes();return c0.apply(this,arguments)}}
 
  /* ================================================================ NOT IN THE SHOPS ================================================================ */
@@ -279,5 +282,13 @@
  /* cars and pets: the last entries are cut off while the shop page is built */
  const hideTail=(arr,at,fn)=>{if(typeof fn!='function')return fn;return function(){const k=arr.splice(at);try{return fn.apply(this,arguments)}finally{arr.push(...k)}}};
  if(typeof PA=='object'&&PA){if(PA.cars)PA.cars=hideTail(CARS,SI,PA.cars);if(PA.pets)PA.pets=hideTail(PETS,PI,PA.pets)}
+ /* the wooden sledge (given instead of a second pet bed when the pets are full) */
+ {const W='#f4f4f4',R='#c0392b',B='#8a5a36',b=[];
+  [-.34,.34].forEach(x=>{b.push([.08,.08,1.7,'#b8860b',x,.06,0],[.08,.08,.2,'#b8860b',x,.14,.96],[.08,.1,.14,'#b8860b',x,.24,1.04],[.06,.3,.08,B,x,.22,.5],[.06,.3,.08,B,x,.22,-.4])});
+  for(let i=0;i<6;i++)b.push([.8,.05,.2,i%2?'#a5703f':B,0,.4,-.64+i*.26]);
+  b.push([.7,.14,.8,R,0,.5,-.1],[.74,.06,.84,W,0,.6,-.1],[.7,.3,.1,R,0,.62,-.56],[.04,.05,1.6,R,-.34,.5,0],[.04,.05,1.6,R,.34,.5,0]);
+  b.push([.26,.22,.26,'#2ecc71',-.12,.72,-.2],[.28,.05,.08,W,-.12,.74,-.2],[.07,.24,.28,W,-.12,.72,-.2],[.2,.18,.2,'#2f6fb5',.16,.7,.05],[.06,.2,.22,GOLD,.16,.7,.05],[.16,.16,.16,'#e84393',.1,.84,-.3]);
+  b.push([.06,.06,.5,'#5a3a22',0,.3,1.2],[.3,.06,.06,'#e6b422',0,.3,1.44]);
+  defF('xm_sled','Festive Sledge',.9,1.9,b)}
  window.FW_XMAS_ITEMS={G0,PI,SI};
 })();

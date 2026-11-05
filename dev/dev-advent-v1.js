@@ -62,11 +62,11 @@
    const pets=s.pets||[],i=PETS.findIndex(x=>x[0]==p.n);
    if(i>=0&&pets.includes(i))return{t:'p',k:'p:'+i,i,n:PETS[i][0],own:1,note:'Already one of your pets, so it keeps following you.'};
    if(i>=0&&pets.length<3)return{t:'p',k:'p:'+i,i,n:PETS[i][0],note:'Your new pet follows you around and adds +1 song quality.'};
-   const r=fur('xm_petbed');r.note='You already have a full pet crew, so here is a '+r.n+' for them. It is in your Storage.';return r}
+   const r=fur(p.n=='Rudy the Reindeer'?'xm_petbed':'xm_sled');r.note='You already have a full pet crew, so here is a '+r.n+' instead. It is in your Storage.';return r}
   if(p.t=='c'){
    if(typeof CARS=='undefined')return fur('xm_presents');
    const cars=s.cars||[],i=CARS.findIndex(c=>c.n==p.n);if(i<0)return fur('xm_presents');
-   return{t:'c',k:'c:'+i,i,n:CARS[i].n,own:cars.includes(i),note:cars.includes(i)?'Already in your garage.':'Top speed 80 mph. Parked in your garage east of the house: walk to it and press E.'+(s.garage?'':' Your garage is unlocked too, so you can drive it.')}}
+   return{t:'c',k:'c:'+i,i,n:CARS[i].n,own:cars.includes(i),note:cars.includes(i)?'Already in your garage.':'Top speed 80 mph. Parked outside your garage east of the house: walk to it and press E.'+(s.garage?'':' Your garage is unlocked too.')}}
   return null}
  function fur(key){const f=typeof F!='undefined'&&F[key]?F[key]:null;if(!f)return{t:'f',k:'',key,n:key,note:''};return{t:'f',k:'f:'+key,key,n:f.n,note:'Delivered to your Storage. Press F at home to place it.'}}
 
@@ -234,7 +234,7 @@
 /* a door */
 .advd{position:relative;padding:0;border:0;background:none;cursor:pointer;perspective:800px;font:inherit;color:inherit;min-width:0;transition:transform .15s}
 .advd.b22{grid-column:span 2;grid-row:span 2}.advd.b21{grid-column:span 2}.advd.b12{grid-row:span 2}
-.advd .in{position:absolute;inset:0;background:radial-gradient(circle at 50% 58%,#fff1c4 0%,#f0b956 26%,#8a4a18 58%,#2a1206 85%);box-shadow:inset 0 0 0 3px #000,inset 0 0 22px #000c;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.advd .in{position:absolute;inset:0;isolation:isolate;z-index:0;background:radial-gradient(circle at 50% 58%,#fff1c4 0%,#f0b956 26%,#8a4a18 58%,#2a1206 85%);box-shadow:inset 0 0 0 3px #000,inset 0 0 22px #000c;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .advd .in:after{content:'';position:absolute;left:12%;right:12%;bottom:16%;height:5px;background:#4a2410;box-shadow:0 2px 0 #0006}
 .advd .in img{position:relative;z-index:1;width:72%;max-width:150px;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 5px 3px #0008);animation:advbob 2.2s ease-in-out infinite}
 .advd .lf{position:absolute;inset:0;transform-origin:0 50%;transform-style:preserve-3d;transition:transform .95s cubic-bezier(.35,0,.25,1)}
