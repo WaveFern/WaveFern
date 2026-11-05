@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.73.7';
+const GAME_VERSION='v49.73.9';
 const VERSION_HISTORY=[
+ {v:'v49.73.9',n:'New artist Carlos, a pop star with 500 million monthly listeners and a blonde buzz cut. Once you are well known he can message you in Messages, and you can collab with him. Saves still load.'},
  {v:'v49.73.7',n:'When Join a room says No answer, it now also says why the Firebase relay could not find the room, so connection problems can be tracked down. Saves still load.'},
  {v:'v49.73.6',n:'Fixed waking up in an airport in a different country after sleeping on a flight home or to another city. You now wake up where your flight lands. Saves still load.'},
  {v:'v49.73.5',n:'Fixed a valid save showing Invalid save code on reload when you own more than three pets. The save now loads first time and nothing is lost. Saves still load.'},
