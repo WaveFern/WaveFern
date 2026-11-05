@@ -9,12 +9,13 @@
  window.FW_FADE2=1;
  let DM=null,MAP=null;
  function meshesOf(b){
-  if(!MAP){MAP=new Map();scene.traverse(o=>{if(o.isMesh&&!o.userData.fwPre&&o.material&&!Array.isArray(o.material)){let a=MAP.get(o.material);if(!a)MAP.set(o.material,a=[]);a.push(o)}})}
+  if(!MAP||MAP.stale){MAP=new Map();scene.traverse(o=>{if(o.isMesh&&!o.userData.fwPre&&o.material&&!Array.isArray(o.material)){let a=MAP.get(o.material);if(!a)MAP.set(o.material,a=[]);a.push(o)}})}
   const r=[];[b.mat,b.dm].forEach(m=>{if(m)(MAP.get(m)||[]).forEach(o=>r.push(o))});return r}
  function pre(b){
   if(b._pp)return b._pp;
   if(!DM)DM=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:true,transparent:true});
-  b._pp=meshesOf(b).map(o=>{const p=new THREE.Mesh(o.geometry,DM);p.userData.fwPre=1;p.renderOrder=-1;p.visible=false;p.matrixAutoUpdate=false;p.raycast=()=>{};o.add(p);return p});
+  const L=meshesOf(b);if(!L.length){MAP=null;return[]}
+  b._pp=L.map(o=>{const p=new THREE.Mesh(o.geometry,DM);p.userData.fwPre=1;p.renderOrder=-1;p.visible=false;p.matrixAutoUpdate=false;p.raycast=()=>{};o.add(p);return p});
   return b._pp}
  const show=(b,v)=>{if(b._pp||v)pre(b).forEach(p=>{p.visible=v})};
  function boot(){try{
