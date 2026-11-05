@@ -34,6 +34,7 @@
 #ifdef USE_COLOR
    {vec3 wq=(modelMatrix*vec4(position,1.)).xyz;
     float ok=step(wq.z,260.)*step(wq.x,880.)*(1.-step(-.7,wq.x)*step(wq.x,16.7)*step(-30.,wq.z)*step(wq.z,12.8));
+    float okF=step(3500.,wq.x)*step(wq.x,4800.)*step(wq.z,-3000.);/* destination cities (outdoors only): snow, but no frozen water */
     vec3 c0=vColor;float mx=max(c0.r,max(c0.g,c0.b)),mn=min(c0.r,min(c0.g,c0.b));
     float water=step(.4,c0.b-c0.r),dark=step(mx,.34)*step(mx-mn,.1)*(1.-water);
     float green=step(c0.r*1.12,c0.g)*step(c0.b*1.3,c0.g);
@@ -43,12 +44,13 @@
     vec3 sn=ice;
     sn=mix(sn,tgt,top*(1.-water)*mix(.9,.88,dark)*(1.-green*(.42+.12*sin(wq.x*1.7)*sin(wq.z*1.3))));/* grass stays a little green */
     sn=mix(sn,vec3(.945,.96,.98),(1.-top)*green*step(.9,wq.y)*.42);
-    vColor=mix(ice,sn,ok*uSnow);}
+    vColor=mix(ice,sn,min(1.,ok+okF)*uSnow);}
 #endif`);
    m.userData.xmsh=sh};
   m.customProgramCacheKey=()=>'xmas';
   m.needsUpdate=true}
  patchMat(SBM);
+ window.FW_XMAS_PATCH=patchMat;
 
 /* ---------- Christmas lights: a wire that spirals round the tree, with real bulbs sitting on it ---------- */
  const LC=[[1,.23,.19],[1,.76,.2],[.23,.55,1],[.22,.88,.48]];
