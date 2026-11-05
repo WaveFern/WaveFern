@@ -55,7 +55,7 @@ button:disabled{opacity:.5;cursor:default}
    html=html.replace(/<script src="27-boot\.js[^>]*><\/script>/i,m=>'<script src="/dev/dev-house-v1.js"><\/script><script src="/dev/dev-models-v2.js"><\/script><script src="/dev/dev-christmas-v1.js"><\/script>'+m);
    html=html.replace(/<\/body>/i,extra+'</body>');
    /* fallback path: base scripts named in the patch table are fetched, patched and inlined */
-   if(window.__fwpatch){const names=['02-data.js','29-v26.js','05-game-flow.js','14-world-fame-cars-pets-collabs.js'];
+   if(window.__fwpatch){const names=window.__fwpatchKeys||[];
     await Promise.all(names.map(async n=>{const m=html.match(new RegExp('<script src="'+n.replace(/\./g,'\\.')+'[^"]*"><\/script>'));if(!m)return;try{const c=await (await fetch('/'+n,{cache:'no-store'})).text();const pc=window.__fwpatch(n,c).replace(/<\/script/gi,'<\\/script');html=html.replace(m[0],()=>'<script>'+pc+'\n//# sourceURL=/'+n+'<\/script>')}catch(e){}}))}
   }
   /* every dev script gets a fresh stamp on every load, so a browser can never serve a stale copy */

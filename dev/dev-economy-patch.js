@@ -50,4 +50,6 @@
 ]
 ]
 };
+P["194-popup-events.js"]=[["const scale=()=>1+FL()*.6+Math.sqrt(S.listeners||0)*.004;","const scale=()=>.35+FL()*.08+Math.sqrt(S.listeners||0)*.0004;"],["ri(4,7):ri(9,15)+(g=='Perfect'?5:0)","ri(1,2):ri(3,5)+(g=='Perfect'?2:0)"],["(3+r*30)*scale()","(2+r*10)*scale()"],["crowd*(4+r*10)","crowd*(1+r*3)"]];
+window.__fwpatchKeys=Object.keys(P);
 window.__fwpatch=function(name,code){var a=P[name.split('?')[0]];if(!a)return code;a.forEach(function(p){code=code.split(p[0]).join(p[1])});return code}})();
