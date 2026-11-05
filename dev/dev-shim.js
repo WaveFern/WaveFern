@@ -4,7 +4,7 @@
       so nothing from this page can write to real accounts or the live database.
    Local-only: Friends and band rooms need the cloud, so they cannot be played from here. */
 (function(){
- window.FW_DEV=1;window.FW_DEV_BUILD='dev-2026.11.05.24-house-front-detail';
+ window.FW_DEV=1;window.FW_DEV_BUILD='dev-2026.11.05.25-npc-clean-lines';
  const P='dev:',real=window.localStorage;
  const own=()=>{const a=[];for(let i=0;i<real.length;i++){const k=real.key(i);if(k.indexOf(P)===0)a.push(k.slice(P.length))}return a};
  const api={
