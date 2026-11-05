@@ -8,9 +8,9 @@
    LOCKED UNTIL 1 DECEMBER, in code, not just by being on /dev/:
    - On the real site (no window.FW_DEV) the button only exists from 1 December to 31 December, and nothing can be claimed
      outside those dates. So if this file is ever moved into the main game early, players still see nothing until 1 December.
-   - On /dev/ the button is always there so testers can look at it, but every door stays locked until its real December day.
-     The dev panel (DEV button, "Advent calendar") can set a TEST DATE that only this calendar reads (sessionStorage, this tab
-     only). It does not move the game clock, so it cannot trigger the fresh-start reset.
+   - On /dev/ the calendar is NOT locked: every door can be opened and claimed straight away, for testing.
+     The dev panel (DEV button, "Advent calendar") can set a TEST DATE to see the real one-door-a-day behaviour; only this
+     calendar reads it (sessionStorage, this tab only). It does not move the game clock, so it cannot trigger the fresh-start reset.
 
    Saved in the career as S.adv = {y: year, c: {day: {t, k, n}}} (claimed doors and what each one gave). */
 (function(){
@@ -26,7 +26,9 @@
  const yr=()=>new Date(now()).getFullYear();
  const opensAt=(d,y)=>new Date(y==null?yr():y,11,d,0,0,0).getTime();
  const season=()=>new Date(now()).getMonth()==11;/* 1 to 31 December */
- const ready=d=>season()&&now()>=opensAt(d);
+ /* on /dev/ every door is open for testing, unless a test date is set (then it behaves like the real game on that date) */
+ const devOpen=()=>DEV&&!testOn();
+ const ready=d=>devOpen()||(season()&&now()>=opensAt(d));
  const today=()=>season()?Math.min(24,new Date(now()).getDate()):0;
 
  /* ---------- the 24 rewards (items only; exactly one car) ---------- */
@@ -255,6 +257,7 @@
  const fmtD=d=>d+' December';
  function status(){
   const y=yr(),t=now(),a=st()||{c:{}},got=Object.keys(a.c).length;
+  if(devOpen()){const left=24-got;return{cls:'',txt:'Dev build: every door is unlocked · '+(left?left+' to open · ':'')+got+'/24 claimed'}}
   if(!season()){
    if(new Date(t).getMonth()<11){const ms=opensAt(1,y)-t,days=Math.ceil(ms/864e5);
     return{cls:'',txt:days>1?'Opens in '+days+' days':ms>36e5?'Opens tomorrow':'Opens at midnight'}}
@@ -375,7 +378,7 @@
  if(DEV)safe(()=>{
   const box=document.getElementById('fwdvb');if(!box)return;
   const msg=t=>{const e=document.getElementById('fwdvs');if(e)e.textContent=t};
-  const h=document.createElement('h5');h.textContent='Advent calendar (test date is for the calendar only)';box.appendChild(h);
+  const h=document.createElement('h5');h.textContent='Advent calendar (all doors unlocked on dev; a test date shows the real locks)';box.appendChild(h);
   const y=new Date().getFullYear(),at=(m,d,hh)=>new Date(y,m,d,hh||9,0,0).getTime();
   const B=[['Open the calendar',()=>{if(!Sv())return msg('Start or load a career first.');if(W)close();open()}],
    ['Test date: 30 Nov (all locked)',()=>{setTest(at(10,30));msg('Advent test date 30 Nov');if(W)render()}],
@@ -383,7 +386,7 @@
    ['Test date: 12 Dec',()=>{setTest(at(11,12));msg('Advent test date 12 Dec');if(W)render()}],
    ['Test date: 24 Dec (every door)',()=>{setTest(at(11,24));msg('Advent test date 24 Dec');if(W)render()}],
    ['Test date: 1 Jan (over)',()=>{setTest(new Date(y+1,0,1,9).getTime());msg('Advent test date 1 Jan');if(W)render()}],
-   ['Use the real date',()=>{setTest(null);msg('Advent uses the real date');if(W)render()}],
+   ['Back to dev: every door unlocked',()=>{setTest(null);msg('Advent: every door unlocked (dev)');if(W)render()}],
    ['Close all advent doors on this save',()=>{const s=Sv();if(!s)return msg('Start or load a career first.');s.adv={y:yr(),c:{}};safe(()=>autoSave(),'save');msg('Advent doors closed (items you got are kept)');if(W)render()}]];
   B.forEach(([l,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=f;box.appendChild(b)})},'panel');
 })();
