@@ -7,6 +7,9 @@
    - NPC message logs in the save are scrubbed too, so nothing bad is ever stored or replayed. */
 (function(){
  if(!window.FW_DEV||/[?&]noprofanity/.test(location.search))return;
+ const FALL=['lol sorry, lost my train of thought. what were we saying?','haha anyway, lets keep it nice. so whats the plan?','hmm, not gonna go there. what else is up?','ok moving on, what do you want to do next?','sorry, my phone is acting up. say that again?'];
+ let fi=0;const fall=()=>FALL[(fi++)%FALL.length];
+ const NPCB='.bb.a,.bb.n,[data-npc],.npc,.npcbub,.npcsay,#npcsay,#npcbub';
  const LEET={'0':'o','3':'e','4':'a','5':'s','7':'t','8':'b','@':'a','$':'s','!':'i','|':'i','+':'t','(':'c','€':'e','¢':'c','£':'l'};
  /* letter swaps: ph=f, c/q=k, v=u, z=s, then repeated letters are squashed, so fvck, phuck and fuuuck all become fuk */
  const skel=s=>s.replace(/ph/g,'f').replace(/[cq]/g,'k').replace(/v/g,'u').replace(/z/g,'s').replace(/(.)\1+/g,'$1');
@@ -70,7 +73,7 @@
 
  /* ---- everything that shows up on the page is cleaned: NPC messages, other players' names and chat, toasts ---- */
  const q=new Set();let qt=0;
- function cleanNode(n){if(n.nodeType===3){const p=n.parentNode;if(!p||/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/.test(p.nodeName))return;const v=n.nodeValue,c=clean(v);if(c!==v)n.nodeValue=c;return}
+ function cleanNode(n){if(n.nodeType===3){const p=n.parentNode;if(!p||/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/.test(p.nodeName))return;const v=n.nodeValue;if(p.closest&&p.closest(NPCB)&&badText(v,false)){n.nodeValue=fall();return}const c=clean(v);if(c!==v)n.nodeValue=c;return}
   if(n.nodeType!==1||/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT|CANVAS)$/.test(n.nodeName))return;
   if(n.nodeName==='INPUT'){if(n.value&&!SKIP.test(n.type||'')){const c=clean(n.value);if(c!==n.value)n.value=c}return}
   const w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT);let t;while(t=w.nextNode())cleanNode(t)}
@@ -84,9 +87,11 @@
  /* ---- NPC messages: scrubbed in the data itself, so a baited NPC reply is never stored or replayed ---- */
  function scrub(){try{if(typeof S=='undefined'||!S||!Array.isArray(S.msgs))return;
   for(const m of S.msgs){if(!m)continue;
-   if(typeof m.body=='string'){const c=clean(m.body);if(c!==m.body)m.body=c}
+   if(typeof m.body=='string'&&m.a!==undefined&&badText(m.body,false))m.body=fall();
+   else if(typeof m.body=='string'){const c=clean(m.body);if(c!==m.body)m.body=c}
    if(typeof m.sub=='string'){const c=clean(m.sub);if(c!==m.sub)m.sub=c}
-   if(Array.isArray(m.log))for(const e of m.log){if(e&&e.f==='a'&&typeof e.t=='string'){const c=clean(e.t);if(c!==e.t)e.t=c}}}}catch(e){}}
+   if(Array.isArray(m.log))for(const e of m.log){if(!e||typeof e.t!='string')continue;
+    if(e.f==='a'){if(badText(e.t,false))e.t=fall()}else{const c=clean(e.t);if(c!==e.t)e.t=c}}}}catch(e){}}
  {const wrapR=()=>{const r=window.reply;if(typeof r!='function'||r.__pf)return;const g=function(m,t){const out=r.apply(this,arguments);scrub();return out};g.__pf=1;window.reply=g;try{reply=g}catch(e){}};wrapR();setInterval(wrapR,1500)}
  setInterval(scrub,500);
  window.FW_PROFANITY=1;
