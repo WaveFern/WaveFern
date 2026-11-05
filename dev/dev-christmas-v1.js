@@ -9,7 +9,7 @@
    - ONLY while it is snowing (the shader fades it in and out): snow lies on every upward-facing surface outdoors (roads turn
      icy grey, pavements, grass, roofs, tree tops, cars), tree sides are frosted, and you and the NPCs leave footprints.
    - Always (the winter map): the park pond is frozen over and you glide on it, trees and houses wear chasing Christmas lights,
-     houses get wreaths and snowmen, a big decorated tree stands in the City Plaza, and NPCs wear winter jackets and hats.
+     houses get wreaths and snowmen, cars leave tyre tracks (footprints and tracks fade in 10 s), a big decorated tree stands in the City Plaza, and NPCs wear winter jackets and hats.
    Everything is added on top (a shader patch, extra meshes, wrapped functions); no save data is changed. */
 (function(){
  const XMAS=true;
@@ -41,7 +41,7 @@
     vec3 ice=mix(c0,vec3(.75,.88,.94),top*water*.55*ok);/* water is frozen all winter */
     vec3 tgt=mix(vec3(.945,.96,.98),vec3(.78,.82,.87),dark);
     vec3 sn=ice;
-    sn=mix(sn,tgt,top*(1.-water)*mix(.9,.88,dark));
+    sn=mix(sn,tgt,top*(1.-water)*mix(.9,.88,dark)*(1.-green*(.42+.12*sin(wq.x*1.7)*sin(wq.z*1.3))));/* grass stays a little green */
     sn=mix(sn,vec3(.945,.96,.98),(1.-top)*green*step(.9,wq.y)*.42);
     vColor=mix(ice,sn,ok*uSnow);}
 #endif`);
@@ -166,37 +166,54 @@
     void main(){if(wp.y<0.)discard;if(inH(wp.xz)&&(hin>.5||wp.y<3.7))discard;if(hin>.5&&inH(wp.xz-vec2(wp.y*${(16/13).toFixed(4)})))discard;gl_FragColor=vec4(.96,.98,1.,op);}`});
   const L=new THREE.Points(g,m);L.frustumCulled=false;L.renderOrder=6;L.visible=false;scene.add(L);return L}
 
- /* ---------- footprints in the snow (you, and every NPC near you) ---------- */
- const FPN=700;let fpMesh=null,fpI=0,fpAge=null,fpT=0;const FPD=new THREE.Object3D(),FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0');
- function fpInit(){
-  const g=new THREE.BoxGeometry(.13,.02,.26),m=new THREE.MeshLambertMaterial({color:0xffffff});
-  fpMesh=new THREE.InstancedMesh(g,m,FPN);fpAge=new Float32Array(FPN).fill(-1);fpMesh.frustumCulled=false;fpMesh.userData.xm=1;
-  for(let i=0;i<FPN;i++){FPD.position.set(0,-50,0);FPD.updateMatrix();fpMesh.setMatrixAt(i,FPD.matrix);fpMesh.setColorAt(i,SNOW)}
-  scene.add(fpMesh)}
- function stamp(x,z,rot,side){
-  if(!fpMesh)fpInit();
-  const px=Math.cos(rot)*.1*side,pz=-Math.sin(rot)*.1*side;
-  FPD.position.set(x+px,.05,z+pz);FPD.rotation.set(0,rot,0);FPD.updateMatrix();fpMesh.setMatrixAt(fpI,FPD.matrix);fpAge[fpI]=0;fpMesh.setColorAt(fpI,FP_DARK);
-  fpI=(fpI+1)%FPN;fpMesh.instanceMatrix.needsUpdate=true;fpMesh.instanceColor.needsUpdate=true}
- function walker(o,x,z,out){/* o keeps its last print; a print is laid every .55 m of walking */
+ /* ---------- footprints and tyre tracks in the snow: each print slowly fades back into the snow over 10 s ---------- */
+ const FADE=10,FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0'),TR_DARK=new THREE.Color('#6a7789'),FPD=new THREE.Object3D();
+ function mkPrints(N,w,l,dark){return{N,w,l,dark,mesh:null,i:0,age:null}}
+ const FP=mkPrints(700,.13,.26,FP_DARK),TR=mkPrints(1400,.24,.95,TR_DARK);
+ let fpMesh=null;/* kept for the visibility switch below */
+ function prInit(K){
+  const g=new THREE.BoxGeometry(K.w,.02,K.l),m=new THREE.MeshLambertMaterial({color:0xffffff});
+  K.mesh=new THREE.InstancedMesh(g,m,K.N);K.age=new Float32Array(K.N).fill(-1);K.mesh.frustumCulled=false;K.mesh.userData.xm=1;
+  FPD.position.set(0,-50,0);FPD.rotation.set(0,0,0);FPD.updateMatrix();
+  for(let i=0;i<K.N;i++){K.mesh.setMatrixAt(i,FPD.matrix);K.mesh.setColorAt(i,SNOW)}
+  scene.add(K.mesh);if(K===FP)fpMesh=K.mesh}
+ function prStamp(K,x,z,rot,y){
+  if(!K.mesh)prInit(K);
+  FPD.position.set(x,y||.05,z);FPD.rotation.set(0,rot,0);FPD.updateMatrix();K.mesh.setMatrixAt(K.i,FPD.matrix);K.age[K.i]=0;K.mesh.setColorAt(K.i,K.dark);
+  K.i=(K.i+1)%K.N;K.mesh.instanceMatrix.needsUpdate=true;K.mesh.instanceColor.needsUpdate=true}
+ function prFade(K,dt){if(!K.mesh)return;let c=0,mv=0;
+  for(let i=0;i<K.N;i++){if(K.age[i]<0)continue;K.age[i]+=dt;let a=Math.min(1,K.age[i]/FADE);a=a*a*(3-2*a);/* slow at the start and the end */
+   FPC.copy(K.dark).lerp(SNOW,a);K.mesh.setColorAt(i,FPC);c=1;
+   if(K.age[i]>=FADE){K.age[i]=-1;FPD.position.set(0,-50,0);FPD.updateMatrix();K.mesh.setMatrixAt(i,FPD.matrix);mv=1}}
+  if(c)K.mesh.instanceColor.needsUpdate=true;if(mv)K.mesh.instanceMatrix.needsUpdate=true}
+ function prClear(K){if(!K.mesh)return;K.i=0;K.age.fill(-1);FPD.position.set(0,-50,0);FPD.updateMatrix();for(let i=0;i<K.N;i++)K.mesh.setMatrixAt(i,FPD.matrix);K.mesh.instanceMatrix.needsUpdate=true}
+ function stamp(x,z,rot,side){prStamp(FP,x+Math.cos(rot)*.1*side,z-Math.sin(rot)*.1*side,rot)}
+ function walker(o,x,z){/* o keeps its last print; a print is laid every .55 m of walking */
   const l=o._xp;if(!l){o._xp=[x,z,1];return}
   const dx=x-l[0],dz=z-l[1],d=Math.hypot(dx,dz);if(d>3){o._xp=[x,z,l[2]];return}
   if(d>.55){l[2]=-l[2];stamp(x,z,Math.atan2(dx,dz),l[2]);l[0]=x;l[1]=z}}
+ function roller(o,x,z){/* a car: two tyre tracks (left and right wheels), one pair every .8 m */
+  const l=o._xt;if(!l){o._xt=[x,z];return}
+  const dx=x-l[0],dz=z-l[1],d=Math.hypot(dx,dz);if(d>6){o._xt=[x,z];return}
+  if(d>.8){const r=Math.atan2(dx,dz),cx=Math.cos(r)*.78,cz=-Math.sin(r)*.78,mx=(x+l[0])/2,mz=(z+l[1])/2;
+   prStamp(TR,mx+cx,mz+cz,r,.045);prStamp(TR,mx-cx,mz-cz,r,.045);l[0]=x;l[1]=z}}
+ let fpT=0;
  function fpTick(dt,live,inner){
-  const on=SNOWU.value>.4&&live&&!inner&&fpMesh!==undefined;
-  if(!on){if(fpMesh)fpMesh.visible=SNOWU.value>.4;return}
-  if(fpMesh)fpMesh.visible=true;
+  const vis=SNOWU.value>.4;[FP,TR].forEach(K=>{if(K.mesh)K.mesh.visible=vis});
+  fpT+=dt;if(fpT>.1){[FP,TR].forEach(K=>prFade(K,fpT));fpT=0}
+  if(!(vis&&live&&!inner))return;
   if(mode=='play'&&!IN&&!(typeof HIN!='undefined'&&HIN)&&!P.sit&&!inHome(P.x,P.z))walker(P,P.x,P.z);
   [NPC,typeof VPED!='undefined'?VPED:[]].forEach(L=>L.forEach(n=>{const m=n.m;if(!m||!m.visible)return;
    const x=m.position.x,z=m.position.z;if(Math.abs(x-P.x)>24||Math.abs(z-P.z)>24||inHome(x,z))return;walker(n,x,z)}));
-  fpT+=dt;if(fpMesh&&fpT>.5){fpT=0;let ch2=0;for(let i=0;i<FPN;i++){if(fpAge[i]<0)continue;fpAge[i]+=.5;const a=Math.min(1,fpAge[i]/90);
-    FPC.copy(FP_DARK).lerp(SNOW,a);fpMesh.setColorAt(i,FPC);if(a>=1)fpAge[i]=-1;ch2=1}
-   if(ch2)fpMesh.instanceColor.needsUpdate=true}}
+  /* your car, and traffic near you */
+  if(mode=='drive'&&dr&&isFinite(dr.x)&&outdoorXZ(dr.x,dr.z))roller(dr,dr.x,dr.z);
+  if(typeof TRAF!='undefined')TRAF.forEach(c=>{const m=c.m;if(!m||!m.visible||m.position.y>.6)return;const x=m.position.x,z=m.position.z;
+   if(Math.abs(x-P.x)>40||Math.abs(z-P.z)>40||!outdoorXZ(x,z))return;roller(c,x,z)})}
 
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
-  if(lawn){try{const k=lawn.cv.getContext('2d');if(on){k.fillStyle='#f1f5fa';k.fillRect(0,0,16,16);k.fillStyle='#dfe8f1';for(let i=0;i<16;i+=4)k.fillRect(0,i,16,1);for(let i=0;i<12;i++)k.fillRect(RI(0,15),RI(0,15),2,1)}else k.putImageData(lawn.orig,0,0);lawn.map.needsUpdate=true}catch(e){}}}
+  if(lawn){try{const k=lawn.cv.getContext('2d');if(on){/* a dusting over the grass: blades still show through */const W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);k.globalAlpha=.55;k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.globalAlpha=1;for(let i=0;i<W2*H2/6;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),RI(1,3),1)}else k.putImageData(lawn.orig,0,0);lawn.map.needsUpdate=true}catch(e){}}}
  let lawn=null;const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
  function sweepWorld(){
   scene.children.forEach(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&!Array.isArray(o.material))patchMat(o.material)});
@@ -212,7 +229,7 @@
    if(c.b-c.r>.4){const ic=m.clone();ic.color.lerp(ICE,.55);o.material=ic;return}/* frozen all winter */
    const w=p.width*o.scale.x,h=p.height*o.scale.y,d=p.depth*o.scale.z,cy=o.position.y,foliage=c.g>c.r*1.12&&c.g>c.b*1.3;
    if(foliage&&w>=.6&&w<=5&&d>=.6&&d<=5&&h>=.45&&h<=2.6&&cy>=.9){addString(x,cy,z,w,h,d);added++}
-   if(p.height<=.3&&foliage){const sm=m.clone();sm.color.copy(SNOW);bset.push({o,orig:m,sn:sm});if(bOn)o.material=sm;return}/* thin grass-coloured patches */
+   if(p.height<=.3&&foliage){const sm=m.clone();sm.color.lerp(SNOW,.6);bset.push({o,orig:m,sn:sm});if(bOn)o.material=sm;return}/* thin grass-coloured patches */
    if(o.position.y-p.height/2>.01||p.height>=.3){let sm=m;if(foliage&&cy>.9){const k=c.getHexString();sm=sideCache[k]||(sideCache[k]=(()=>{const q=m.clone();q.color.lerp(SNOW,.42);return q})())}
     const arr=[sm,sm,topM,sm,sm,sm];bset.push({o,orig:m,sn:arr});if(bOn)o.material=arr}});
   if(added||lt.bp.length)flushLights();if(bOn&&lawn)bApply(true)}
@@ -249,7 +266,7 @@
   const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut',inner=(typeof wxInterior=='function')&&wxInterior();
   /* snow cover follows today's weather */
   const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live)?1:0;
-  if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){fpI=0;if(fpAge)fpAge.fill(-1)}}}
+  if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
   SNOWU.value+=(snowTarget-SNOWU.value)*Math.min(1,dt*1.2);if(Math.abs(snowTarget-SNOWU.value)<.01)SNOWU.value=snowTarget;
   sT+=dt;BU.t.value=sT;
   /* the pond's water jet is switched off while the pond is frozen */
