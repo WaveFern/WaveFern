@@ -1,10 +1,10 @@
 /* WaveFern dev: CHRISTMAS ADVENT ITEMS. Only loaded on /dev/ (see dev/index.html), before dev-advent-v1.js. Add ?noadvent to skip it.
 
    Every reward behind the advent calendar is a brand-new Christmas item that exists nowhere else:
-   - 9 clothes (they plug into the Threadz new-drop system in 50-threadz-new-drop.js, so you can wear them from the wardrobe):
+   - 13 clothes (incl. Snowflake Beanie, Tinsel Scarf, Frosty Parka, Reindeer Slippers; 9 originals:) (they plug into the Threadz new-drop system in 50-threadz-new-drop.js, so you can wear them from the wardrobe):
        Santa Hat, Reindeer Antlers, Candy Cane Scarf, Ugly Christmas Sweater, Gingerbread Hoodie, Santa Coat, Elf Jacket,
        Elf Tights, Elf Boots
-   - 13 pieces of furniture (they arrive in Storage): Grand Christmas Tree, Stocking Mantel, Gingerbread House, Snowman,
+   - 18 pieces of furniture (incl. Cosy Fireplace, Cookie Table, Wreath Stand, Snow Lantern, Snow Igloo; originals:) (they arrive in Storage): Grand Christmas Tree, Stocking Mantel, Gingerbread House, Snowman,
        Present Stack, Snow Globe, Reindeer Statue, Candy Cane Lamp Post, Santa's Armchair, Hot Cocoa Cart, Nutcracker, Snowflake Rug,
        and a Festive Pet Bed that only turns up if the pets are already full
    - 2 pets with full rigged models: Rudy the Reindeer and Snowy the Polar Cub
@@ -28,8 +28,12 @@
  gA3('jk',['Elf Jacket',0,2007,'#3f8f5a',,'xmas']);
  gA3('bt',['Elf Tights',0,2008,'#3f6f4a',,'xmas']);
  gA3('sh',['Elf Boots',0,2009,GRN,,'xmas']);
+ gA3('ht',['Snowflake Beanie',0,2010,'#5aa9e6',,'xmas']);
+ gA3('ac',['Tinsel Scarf',0,2011,'#2ecc71',,'xmas']);
+ gA3('jk',['Frosty Parka',0,2012,'#3f6fb5',,'xmas']);
+ gA3('sh',['Reindeer Slippers',0,2013,BRN,,'xmas']);
  GAR.slice(G0).forEach(g=>{g.xm=1;GM[g.id]=g});
- Object.assign(XTOPB,{2004:8,2005:8});Object.assign(XJKB,{2006:0,2007:0});Object.assign(XBTB,{2008:0});Object.assign(XSHB,{2009:1});
+ Object.assign(XTOPB,{2004:8,2005:8});Object.assign(XJKB,{2006:0,2007:0,2012:0});Object.assign(XBTB,{2008:0});Object.assign(XSHB,{2009:1,2013:1});
  if(typeof XTSL!='undefined'){XTSL[2004]=.8;XTSL[2005]=.8}
 
  const bell=(g,x,y,z)=>{xs(g,.034,'~#e6b422',x,y,z,8);xb(g,.012,.02,.012,'#7a5a10',x,y-.018,z)};
@@ -98,6 +102,33 @@
   bell(l,0,-.3,z0+sd/2+.21);xb(l,sw+.15,.08,sd*.8+.1,RED,0,-.19,z0-.04);xb(l,sw+.17,.03,sd*.8+.12,WHT,0,-.14,z0-.04);
   xb(l,sw*.8,.03,sd*.96,'#5a3a22',0,-.485,z0+.02);[0,1,2].forEach(i=>xb(l,sw*.5,.012,.02,WHT,0,-.3+i*.05,z0-.08+sd*.3))})};
 
+ XNEW.ht[2010]=(x,c)=>{const{h}=x,W='#e8f4ff',d=xtone(c,.8);
+  xb(h,.68,.15,.68,W,0,.34,0);for(let i=0;i<6;i++)xb(h,.05,.16,.69,'#bcd9f0',-.28+i*.112,.34,0);
+  xb(h,.58,.16,.58,c,0,.48,0);xb(h,.5,.16,.5,c,0,.62,0);xb(h,.4,.14,.4,d,0,.75,0);xb(h,.28,.1,.28,c,0,.84,0);
+  /* white snowflakes knitted into the band and body */
+  [[-.2,.5],[.2,.5],[0,.62],[-.15,.7],[.15,.7]].forEach(([a,b])=>{xb(h,.08,.016,.016,W,a,b,.3);xb(h,.016,.08,.016,W,a,b,.3)});
+  xb(h,.17,.17,.17,W,0,.97,0);xb(h,.1,.1,.1,'#bcd9f0',0,1.06,0);xb(h,.02,.18,.02,'#e6b422',-.22,.34,.34)};
+ XNEW.ac[2011]=(x,c)=>{const{g,w}=x,d=x.d+x.o*2,gold='~#e6b422';
+  xb(g,w*.7,.11,d*.82,c,0,1.1,0);for(let i=0;i<6;i++)xb(g,.05,.115,d*.84,i%2?gold:RED,-w*.3+i*.12*w,1.1,0);
+  xb(g,w*.62,.09,.05,xtone(c,.8),0,1.13,d/2+.04);
+  xb(g,.15,.6,.045,c,-.13,.78,d/2+.05);for(let i=0;i<5;i++)xb(g,.152,.045,.048,i%2?gold:WHT,-.13,.98-i*.12,d/2+.05);
+  [-.05,0,.05,.1].forEach((o,i)=>xs(g,.022,i%2?gold:RED,-.13+o-.07,.44,d/2+.05,6));
+  [[.15,1.14],[.3,1.06],[-.3,1.14],[.05,1.02]].forEach(([a,b],i)=>xs(g,.02,i%2?'#ffffff':gold,a*w*.6,b,d*.43,5))};
+ XNEW.jk[2012]=(x,c)=>{const{g,w,d,arms}=x,z=d/2+.052,fur='#e8f4ff',dk2=xtone(c,.75);
+  xb(g,w+.11,.14,d+.11,fur,0,.54,0);xb(g,.1,.8,.02,dk2,0,.88,z+.002);
+  /* furry hood bunched up round the neck */
+  xb(g,w*.9,.16,d*.9,fur,0,1.2,-.04);xb(g,w*.62,.12,.12,fur,0,1.16,d*.42);xb(g,.14,.2,d*.7,fur,-w*.36,1.12,-.05);xb(g,.14,.2,d*.7,fur,w*.36,1.12,-.05);
+  /* belt, toggles and a snowflake patch */
+  xb(g,w+.108,.07,d+.108,'#1a1a1a',0,.76,0);xb(g,.1,.07,.02,'#e6b422',0,.76,z+.02);
+  [.98,.88,.62,.5].forEach(y=>xb(g,.06,.03,.02,'#e8c590',0,y,z+.012));
+  xb(g,.14,.014,.014,fur,-.22,.95,z+.004);xb(g,.014,.14,.014,fur,-.22,.95,z+.004);xb(g,.1,.014,.014,fur,-.22,.95,z+.006,0,0,Math.PI/4);
+  arms.forEach(a=>{xb(a,.215,.12,.265,fur,0,-.43,0);xb(a,.217,.03,.267,dk2,0,-.35,0)})};
+ XNEW.sh[2013]=(x,c)=>{const{sw,sd,z0}=shoeDims(x),t=xtone(c,.72);legEach(x,l=>{
+  xb(l,sw+.1,.2,sd*.9,c,0,-.4,z0);xb(l,sw+.12,.07,sd*.95,t,0,-.47,z0+.01);
+  xb(l,sw*.5,.12,.14,'#2a1a10',0,-.4,z0+sd/2+.05);xb(l,.07,.07,.04,RED,0,-.37,z0+sd/2+.12);
+  [-1,1].forEach(s=>{xb(l,.05,.18,.05,BRN,s*.1,-.22,z0-.04);xb(l,.04,.1,.04,BRN,s*.14,-.14,z0-.04)});
+  xb(l,sw+.14,.05,sd*.7,WHT,0,-.29,z0-.06);xs(l,.03,'#2a1a10',-.08,-.34,z0+sd/2+.09,6);xs(l,.03,'#2a1a10',.08,-.34,z0+sd/2+.09,6)})};
+
  /* ---- shop and wardrobe pictures: box lists (w,h,d,colour,x,y,z) ---- */
  const xmclb=(g,c)=>{const a=[],P=(...q)=>a.push(q),d=dk(c,.8),t=xtone(c,.72),sk=SKIN[2],st=g.st;
   if(st==2001){P(.95,.2,.95,WHT,0,.1,0);P(.8,.24,.8,c,0,.32,0);P(.64,.24,.64,c,0,.54,-.02);P(.5,.22,.5,t,0,.74,-.08);P(.36,.2,.34,c,0,.9,-.2);P(.28,.18,.28,c,0,.98,-.36);P(.22,.16,.22,t,0,.94,-.52);P(.26,.26,.26,WHT,0,.82,-.66);return a}
@@ -112,6 +143,10 @@
   if(st==2007){P(.95,.75,.55,c,0,.5,0);[-1,1].forEach(s=>{P(.24,.7,.35,c,s*.62,.5,0);P(.27,.1,.38,RED,s*.62,.12,0);P(.08,.08,.08,GOLD,s*.66,.0,.2)});for(let i=0;i<8;i++){P(.12,.12,.58,i%2?WHT:RED,-.42+i*.12,.1,0)}P(.7,.14,.4,RED,0,.92,-.2);[0,1,2,3].forEach(i=>P(.07,.07,.04,GOLD,0,.76-i*.16,.3));P(.99,.07,.58,'#5a3a22',0,.32,0);return a}
   if(st==2008){[-1,1].forEach(s=>{for(let i=0;i<7;i++)P(.4,.13,.4,i%2?WHT:RED,s*.23,.06+i*.13,0);P(.42,.05,.42,'#1f7a3a',s*.23,-.01,0)});P(1,.12,.46,'#1f7a3a',0,.98,0);P(.12,.12,.04,GOLD,0,.98,.25);return a}
   if(st==2009){[-1,1].forEach(s=>{const x=s*.25;P(.38,.5,.4,c,x,.4,-.06);P(.4,.1,.42,RED,x,.68,-.06);P(.41,.03,.43,WHT,x,.74,-.06);P(.38,.18,.65,c,x,.1,.05);P(.28,.12,.2,c,x,.1,.44);P(.2,.12,.14,c,x,.2,.58);P(.14,.12,.1,t,x,.34,.62);P(.12,.12,.12,'#e6b422',x,.46,.64);P(.4,.04,.66,'#5a3a22',x,0,.05)});return a}
+  if(st==2010){P(.95,.2,.95,'#e8f4ff',0,.1,0);P(.8,.22,.8,c,0,.31,0);P(.66,.22,.66,c,0,.52,0);P(.5,.2,.5,t,0,.72,0);P(.34,.14,.34,c,0,.88,0);P(.26,.26,.26,'#e8f4ff',0,1.04,0);[-.2,0,.2].forEach(x=>{P(.12,.03,.03,'#e8f4ff',x,.45,.42);P(.03,.12,.03,'#e8f4ff',x,.45,.42)});return a}
+  if(st==2011){P(.9,.16,.7,c,0,.5,0);for(let i=0;i<5;i++)P(.07,.17,.72,i%2?GOLD:RED,-.35+i*.175,.5,0);P(.22,.7,.08,c,-.2,.1,.42);for(let i=0;i<4;i++)P(.222,.06,.09,i%2?GOLD:WHT,-.2,.34-i*.15,.42);for(let i=0;i<4;i++)P(.04,.1,.04,i%2?RED:GOLD,-.28+i*.055,-.31,.42);return a}
+  if(st==2012){P(.95,.75,.55,c,0,.5,0);[-1,1].forEach(s=>{P(.24,.7,.35,c,s*.62,.5,0);P(.27,.14,.38,'#e8f4ff',s*.62,.12,0)});P(.97,.14,.57,'#e8f4ff',0,.12,0);P(.9,.2,.5,'#e8f4ff',0,.92,-.05);P(.1,.7,.03,t,0,.5,.3);P(.97,.08,.57,'#1a1a1a',0,.34,0);P(.1,.08,.04,GOLD,0,.34,.3);return a}
+  if(st==2013){[-1,1].forEach(s=>{const x=s*.25;P(.4,.22,.7,c,x,.12,.04);P(.42,.08,.72,t,x,.0,.04);P(.4,.06,.5,WHT,x,.26,0);P(.22,.12,.16,'#2a1a10',x,.14,.46);P(.1,.08,.04,RED,x,.2,.56);P(.05,.3,.05,BRN,x+s*.1,.36,0);P(.04,.16,.04,BRN,x+s*.14,.54,0)});return a}
   return a};
  {const clb0=clb;clb=function(k){const[id,col]=String(k).split('|'),g=GM[id];if(!g||!g.xm)return clb0(k);try{const L=xmclb(g,col||g.dc);if(L&&L.length)return L}catch(e){console.warn('xmas preview',e)}return clb0(k)}}
 
@@ -206,6 +241,45 @@
   [[0,0],[.6,.3],[-.6,.3],[.6,-.3],[-.6,-.3]].forEach(([x,z],i)=>{const s=i?.5:1;b.push([.9*s,.06,.1*s,'#f4f4f4',x,.07,z],[.1*s,.06,.9*s,'#f4f4f4',x,.07,z],[.6*s,.062,.08*s,'#f4f4f4',x,.075,z,0],[.07*s,.07,.07*s,'#f1c40f',x,.08,z])});
   for(let i=0;i<12;i++){const x=-1+i*.18;b.push([.1,.06,.1,i%2?'#2ecc71':'#f1c40f',x,.07,.64],[.1,.06,.1,i%2?'#f1c40f':'#2ecc71',x,.07,-.64])}
   defF('xm_rug','Snowflake Rug',2.6,1.9,b);F.xm_rug.f=1}
+ /* ---- more Christmas furniture ---- */
+ /* 13. the cosy fireplace */
+ {const b=[[1.6,.12,.7,'#6e2a1f',0,.06,0],[1.4,1.1,.5,'#a34a35',0,.67,-.08],[1.1,.8,.1,'#1a1010',0,.52,.18],[.9,.6,.04,'#2a1612',0,.45,.21],[1.7,.14,.74,'#4a2e1a',0,1.3,-.02],[1.74,.04,.76,'#6b4423',0,1.39,-.02],
+   [.9,.1,.6,'#5a3a22',0,.18,.1],[.7,.1,.1,'#7a4a28',-.1,.26,.08],[.7,.1,.1,'#5a3a22',.1,.27,.16]];
+  for(let r=0;r<5;r++)for(let c=0;c<6;c++)if((c*.2-.5)**2>.2||r>2)b.push([.2,.02,.02,'#7a2f20',-.5+c*.2,.3+r*.2,.18]);
+  [[-.5,'#c0392b'],[0,'#2f6fb5'],[.5,'#2ecc71']].forEach(([x,cl],i)=>{b.push([.12,.3,.1,cl,x,1.2,.2],[.14,.08,.12,'#f4f4f4',x,1.38,.2],[.16,.1,.12,cl,x+.02,1.05,.2])});
+  b.push([.14,.5,.14,'#2a9448',.75,1.6,0],[.3,.1,.3,'#c0392b',-.72,1.46,0],[.08,.2,.08,'#f4f4f4',.7,1.5,.1],[.1,.1,.1,'*ffd23d',.7,1.62,.1]);
+  const fx=g=>{const fl=[[-.2,'#ff6a1a',.3],[0,'#ffb030',.42],[.2,'#ff6a1a',.28]].map(([x,c,h],i)=>({m:B(g,.18,h,.04,'*'+c.slice(1),x,.3+h/2,.2),ph:i*1.4}));
+   if(typeof fxAdd=='function')fxAdd(g,t=>fl.forEach(o=>{o.m.scale.y=.75+.4*Math.abs(Math.sin(t*5+o.ph));o.m.scale.x=.9+.15*Math.sin(t*7+o.ph)}))};
+  defF('xm_fire','Cosy Fireplace',1.6,.7,b,fx)}
+ /* 14. the cookie table */
+ {const b=[[1.2,.1,.8,'#7a4a28',0,.7,0],[1.24,.04,.84,'#fdf6e3',0,.77,0],[.1,.7,.1,'#5a3a22',-.5,.35,-.3],[.1,.7,.1,'#5a3a22',.5,.35,-.3],[.1,.7,.1,'#5a3a22',-.5,.35,.3],[.1,.7,.1,'#5a3a22',.5,.35,.3],
+   [.5,.04,.5,'#f4f4f4',-.2,.81,.05],[.4,.05,.4,'#b5122a',-.2,.84,.05],[.14,.04,.14,'#c68642',-.28,.88,.02],[.14,.04,.14,'#c68642',-.14,.88,.12],[.14,.04,.14,'#8a4b2a',-.18,.88,-.04],[.04,.04,.04,'#c0392b',-.28,.91,.02],[.04,.04,.04,'#2ecc71',-.14,.91,.12],
+   [.2,.26,.2,'#f4f4f4',.32,.93,.1],[.2,.1,.2,'#fdf6e3',.32,1.08,.1],[.2,.02,.2,'#e8f0f6',.32,.8,.1],
+   [.1,.22,.1,'#c68642',.4,.92,-.2],[.12,.12,.04,'#c68642',.4,1.04,-.2],[.12,.04,.04,'#f4f4f4',.4,.96,-.18],[.06,.06,.02,'#2a1612',.4,1.06,-.17],
+   [.36,.12,.3,'#8d5a2b',-.05,.88,-.22],[.32,.14,.26,'#a8703a',-.05,1.0,-.22],[.26,.12,.2,'#c68642',-.05,1.12,-.22],[.1,.1,.02,'#f4f4f4',-.05,1.0,-.08],[.04,.1,.04,'#c0392b',-.05,1.22,-.22]];
+  b.push(...four(.5,.3,.1,.1,'#3a2616',0));
+  defF('xm_cookies','Cookie Table',1.3,.8,b)}
+ /* 15. the wreath stand */
+ {const b=[[.7,.08,.5,'#5a3a22',0,.04,0],[.08,1.5,.08,'#5a3a22',-.24,.8,-.1],[.08,1.5,.08,'#5a3a22',.24,.8,-.1],[.6,.06,.06,'#5a3a22',0,.4,.2],[.08,1.2,.08,'#5a3a22',0,.65,.2]];
+  const R=.42,n=16;for(let i=0;i<n;i++){const a=i/n*Math.PI*2,x=Math.cos(a)*R,y=1.2+Math.sin(a)*R;b.push([.2,.2,.14,i%3?'#1f7a3a':'#2a9448',x,y,.0]);if(i%2)b.push([.08,.08,.08,'#c0392b',x*1.06,y+.02,.08])}
+  b.push([.3,.14,.08,'#c0392b',-.1,.8,.08],[.3,.14,.08,'#c0392b',.14,.8,.08],[.12,.14,.1,'#a3202f',.02,.8,.1],[.1,.3,.06,'#c0392b',-.08,.64,.08],[.1,.3,.06,'#c0392b',.12,.64,.08]);
+  [[-.3,1.45],[.32,1.4],[0,1.66],[-.38,1.1],[.4,1.04]].forEach(([x,y],i)=>b.push([.07,.07,.07,i%2?'*ffd23d':'*ff4b4b',x,y,.1]));
+  defF('xm_wreath','Wreath Stand',.9,.5,b)}
+ /* 16. the snow lantern */
+ {const b=[[.5,.3,.5,'#f4f7fa',0,.15,0],[.4,.24,.4,'#e9f4ff',0,.42,0],[.46,.08,.46,'#f4f7fa',0,.28,0],[.44,.06,.44,'#2a2a2a',0,.57,0],
+   [.3,.36,.3,'*ffe9a8',0,.78,0],[.34,.04,.34,'#2a2a2a',0,.62,0],[.34,.04,.34,'#2a2a2a',0,.96,0],[.04,.38,.04,'#2a2a2a',-.16,.78,.16],[.04,.38,.04,'#2a2a2a',.16,.78,.16],[.04,.38,.04,'#2a2a2a',-.16,.78,-.16],[.04,.38,.04,'#2a2a2a',.16,.78,-.16],
+   [.2,.1,.2,'#2a2a2a',0,1.02,0],[.06,.14,.06,'#2a2a2a',0,1.12,0],[.12,.08,.04,'#c0392b',.1,.3,.24],[.08,.08,.04,'#2ecc71',-.1,.3,.24],[.08,.08,.08,'#2ecc71',.14,.34,.18]];
+  [-.14,-.04,.06,.16].forEach((x,i)=>b.push([.04,.14+i%2*.06,.04,'#e9f4ff',x,.3-i%2*.04,.27]));
+  const fx=g=>{const f=B(g,.2,.3,.2,'*ffd23d',0,.78,0);if(typeof fxAdd=='function')fxAdd(g,t=>{f.scale.y=.9+.15*Math.sin(t*6);f.scale.x=f.scale.z=.95+.06*Math.sin(t*4.2)})};
+  defF('xm_lantern','Snow Lantern',.6,.6,b,fx)}
+ /* 17. the snow igloo */
+ {const b=[];const ring=(y,r,n,w,h,col)=>{for(let i=0;i<n;i++){const a=i/n*Math.PI*2;if(y<.5&&Math.abs(Math.sin(a-Math.PI/2))<.0&&0)continue;b.push([w,h,w,col(i),Math.cos(a)*r,y,Math.sin(a)*r])}};
+  const sk=i=>i%2?'#f4f7fa':'#dcecf8';ring(.17,.7,14,.38,.34,sk);ring(.5,.62,12,.34,.34,sk);ring(.82,.46,9,.3,.3,sk);ring(1.08,.22,5,.26,.26,sk);b.push([.34,.1,.34,'#f4f7fa',0,1.25,0]);
+  b.splice(0,14);ring(.17,.7,14,.38,.34,sk);
+  b.push([.6,.5,.5,'#f4f7fa',0,.26,.76],[.4,.36,.42,'#1d3550',0,.22,.84],[.3,.28,.02,'*ffd23d',0,.2,.9],[.5,.08,.5,'#dcecf8',0,.5,.76]);
+  [-.14,0,.14].forEach((x,i)=>b.push([.05,.12+i%2*.06,.05,'#cfe8ff',x,.42,.96]));
+  b.push([.5,.04,.5,'#5a3a22',-.8,.14,.9],[.08,.5,.08,'#5a3a22',-.8,.38,.9],[.34,.1,.04,'#c0392b',-.8,.6,.93],[.1,.34,.04,'#2ecc71',-.9,.66,.93]);
+  defF('xm_igloo','Snow Igloo',1.6,1.6,b)}
  /* the festive pet bed (only given if the pets are already full) */
  {const b=[[.9,.18,.8,'#a3202f',0,.09,0],[.96,.1,.86,'#f4f4f4',0,.2,0],[.7,.12,.62,'#c0392b',0,.2,0],[.9,.3,.12,'#a3202f',0,.2,-.34],[.94,.1,.16,'#f4f4f4',0,.38,-.34],[.2,.2,.2,'#2ecc71',.22,.34,.0],[.2,.06,.2,'#f4f4f4',.22,.46,0],[.12,.12,.12,'*ffd23d',.22,.5,0],[.08,.08,.1,'#f4f4f4',-.2,.3,.1]];
   defF('xm_petbed','Festive Pet Bed',1,.9,b)}
@@ -291,7 +365,7 @@
   b.push([.06,.06,.5,'#5a3a22',0,.3,1.2],[.3,.06,.06,'#e6b422',0,.3,1.44]);
   defF('xm_sled','Festive Sledge',.9,1.9,b)}
  /* what each Christmas item is worth (they have no shop price): the calendar crates sort items into rarity tiers by this value */
- const VAL={'Santa Hat':120,'Elf Tights':190,'Candy Cane Scarf':240,'Reindeer Antlers':320,'Elf Boots':420,'Ugly Christmas Sweater':520,'Gingerbread Hoodie':760,'Elf Jacket':980,'Santa Coat':2200,
+ const VAL={'Snowflake Beanie':280,'Tinsel Scarf':380,'Reindeer Slippers':640,'Frosty Parka':1500,xm_lantern:220,xm_wreath:360,xm_cookies:700,xm_igloo:1900,xm_fire:3000,'Santa Hat':120,'Elf Tights':190,'Candy Cane Scarf':240,'Reindeer Antlers':320,'Elf Boots':420,'Ugly Christmas Sweater':520,'Gingerbread Hoodie':760,'Elf Jacket':980,'Santa Coat':2200,
   xm_cane:140,xm_rug:340,xm_presents:450,xm_petbed:500,xm_snowman:620,xm_nutcracker:880,xm_chair:1100,xm_cocoa:1350,xm_sled:1800,xm_ginger:2600,xm_mantel:3400,xm_reindeer:4200,xm_tree:7500,xm_globe:12000};
  window.FW_XMAS_ITEMS={G0,PI,SI,VAL};
 })();
