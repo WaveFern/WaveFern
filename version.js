@@ -5,8 +5,8 @@
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
 const GAME_VERSION='v49.79.5';
 const VERSION_HISTORY=[
- {v:'v49.79.4',n:'People walking in opposite directions on a pavement no longer walk into each other: each direction now keeps to its own side, like real life.'},
  {v:'v49.79.5',n:'The detailed back-wall windows (frames, sills, shutters, curtain rails) are back in the starting house, and the sunbeams and their Settings toggle are kept. Saves still load.'},
+ {v:'v49.79.4',n:'People walking in opposite directions on a pavement no longer walk into each other: each direction now keeps to its own side, like real life.'},
  {v:'v49.79.3',n:'Footsteps now change with the surface (snow, floorboards, concrete, grass), the last piece of the dev build that was not switched on. Saves still load.'},
  {v:'v49.79.2',n:'Characters look the way they used to again: the shadow, sky-light and colour-grade graphics pack that came with the big update is switched off. Saves still load.'},
  {v:'v49.79.1',n:'New artist Alfonso, a blonde rapper with 400 million monthly listeners. Once you are well known he can message you in Messages, and you can collab with him. Saves still load.'},
