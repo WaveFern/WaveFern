@@ -798,7 +798,7 @@ window.frUnblock=f=>{if(!okId(f))return;const{R,db,uid}=FR.r;snd('click');R.remo
 window.frInv=f=>{if(!okId(f)||!MPS||MPTR)return;const{R,db,uid}=FR.r,n=frName(f);
  R.set(R.ref(db,'f/i/'+f+'/'+uid),{c:MPS.code,b:String(MPS.band||'Band').replace(/[<>"]/g,'').slice(0,24),nm:'@'+FR.h,t:R.serverTimestamp()}).then(()=>{snd('pop');say('Invited '+n+' to '+(MPS.band||'the band')+'.')})
  .catch(()=>{snd('err');say('Wait a few seconds before inviting '+n+' again.')})};
-function frGo(c){if(!/^[A-Z0-9]{5}$/.test(c))return;if(MPS&&MPS.code===c)return say('You are already in that room.');try{if(S&&mode!='title')autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.href=location.pathname+'?join='+c}
+window.frGo=function frGo(c){if(!/^[A-Z0-9]{5}$/.test(c))return;if(MPS&&MPS.code===c)return say('You are already in that room.');try{if(S&&mode!='title')autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.href=location.pathname+'?join='+c}
 window.frJoin=f=>{const p=FR.P[f];if(!p||!p.rm)return;snd('click');const go=()=>frGo(p.rm);if(S&&mode!='title'&&!(MPS&&MPS.code===p.rm))mpAsk('Join '+frName(f)+'\'s band room?','Your game is saved first. You pick your instrument on the next screen.','Join',go);else go()};
 function frInvite(){const{R,db,uid}=FR.r||{};if(!R)return;const now=Date.now();let best=null,bk='';
  for(const k in FR.I){const v=FR.I[k];if(!v||!okId(k))continue;if(now-(+v.t||0)>600000||(MPS&&MPS.code===v.c)){R.remove(R.ref(db,'f/i/'+uid+'/'+k)).catch(()=>{});continue}const sk=k+v.t;if(FR.seen[sk])continue;if(!best||v.t>best.t){best=v;bk=k}}
