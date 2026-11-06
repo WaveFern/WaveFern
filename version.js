@@ -5,6 +5,7 @@
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
 const GAME_VERSION='v49.80.8';
 const VERSION_HISTORY=[
+ {v:'v49.80.6',n:'The username check no longer hangs when the live connection to the database is blocked: it switches to a slower but more reliable connection after 10 seconds, and an account that already has a username on its public profile is let straight through.'},
  {v:'v49.80.8',n:'Player and NPC models are back to the original look (the extra face and clothing detail is switched off again). Max shadows and the detailed house stay on. Saves still load.'},
  {v:'v49.80.7',n:'The Fame Level 25 Legacy goal no longer pays $50,000. Anyone who was paid it has the $50,000 taken back once (never below $0). Saves still load.'},
  {v:'v49.80.5',n:'The username notice now says the real reason when the database check fails (for example you need to sign in with Google again), and the check gives up after 20 seconds instead of waiting silently.'},

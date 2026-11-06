@@ -754,9 +754,15 @@ const FR={on:0,me:'',h:'',L:{},P:{},Q:{},I:{},B:{},pu:{},open:0,seen:{},sent:{},
 const frNm=()=>{let d='';try{d=typeof fwDisplayName=='function'?fwDisplayName():''}catch(e){}return d||(typeof fwNameSafe=='function'?fwNameSafe(S&&S.artist):String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24))};
 const okId=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
 function frErr(e){console.warn('[friends]',e);FR.err=/permission/i.test(String(e&&(e.code||e.message)||e))?'Friends is not switched on yet. The database rules need publishing.':'Could not reach Friends. Check your connection.';frDraw()}
+/* first read with a fallback: if the websocket never connects (blocked by a network, proxy or extension) the Realtime Database client waits silently,
+   so after 10 seconds switch it to long-polling (plain HTTPS) and ask again, then give up after another 15 */
+function fbGet(R,db,path){const to=ms=>new Promise((_,j)=>setTimeout(()=>j(new Error('The database did not answer')),ms));
+ return Promise.race([R.get(R.ref(db,path)),to(10000)]).catch(e=>{if(!/did not answer/.test(String(e&&e.message)))throw e;console.warn('[friends] no answer over websocket, switching to long-polling');
+  try{R.forceLongPolling();R.goOffline(db);R.goOnline(db)}catch(e2){console.warn('[friends] long-polling switch failed',e2)}
+  return Promise.race([R.get(R.ref(db,path)),to(15000)])})}
 function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
  rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;console.info('[friends] connected to',RTDB_URL,'as',uid);
-  Promise.race([R.get(R.ref(db,'f/p/'+uid+'/h')),new Promise((_,j)=>setTimeout(()=>j(new Error('The database did not answer within 20 seconds')),20000))]).then(s=>{FR.h=s.val()||'';FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
+  fbGet(R,db,'f/p/'+uid+'/h').then(s=>{FR.h=s.val()||'';FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
   R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.od=0;frPresence()}});
   R.onValue(R.ref(db,'f/l/'+uid),s=>{const v=s.val()||{};for(const f in FR.pu)if(!v[f]){try{FR.pu[f]()}catch(e){}delete FR.pu[f];delete FR.P[f]}FR.L=v;
    for(const f in v)if(!FR.pu[f]&&okId(f))FR.pu[f]=R.onValue(R.ref(db,'f/p/'+f),x=>{const o=FR.P[f],n=x.val();FR.P[f]=n;if(o&&!o.o&&n&&n.o&&n.h)say('@'+n.h+' is online.');frDraw()},()=>{});frDraw()},frErr);

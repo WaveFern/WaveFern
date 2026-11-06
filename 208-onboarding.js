@@ -75,6 +75,11 @@ async function box(){const F=FR_(),st=await stamps(),now=Date.now(),hasU=!!F.h,h
 window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;const F=FR_();if(!F||!F.ok||!F.r)return;shown=1;box().catch(()=>{shown=0})};
 /* Required username: after a Google sign-in, and on every refresh, an account with no username is asked straight away. It does not depend on the
    reset date. If the database can not be reached or refuses the read, a blocking notice says why with Retry, instead of staying silent. */
+/* the username is also copied to Firestore profiles/{uid}.h (213-public-profile.js). If the Realtime Database is slow or unreachable, that copy proves
+   the account already has a username, so the player is not bothered; Firestore is the connection sign-in and cloud saves already use */
+let fsAt=0;
+function fsName(){if(Date.now()-fsAt<20000||typeof FBU=='undefined'||!FBU||typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD)return;fsAt=Date.now();
+ FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(d=>{const h=d.exists()&&d.data()&&d.data().h;if(typeof h=='string'&&/^[a-z0-9_]{3,16}$/.test(h)){try{localStorage.setItem(UK(),h)}catch(e){}const e=document.getElementById('onbe');if(e)e.remove()}},e=>console.warn('[names] profile read',e&&e.code))}
 let t0=0,eDis=0;
 /* never a blocking box: players keep playing; a small notice says why the check failed, Friends keeps retrying in the background, and the notice goes away once it works */
 function errBox(why){if(document.getElementById('onbe')||document.getElementById('onbx')||Date.now()-eDis<300000)return;const o=document.createElement('div');o.id='onbe';o.style.cssText='position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99991;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);padding:8px 10px 8px 12px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:12px';
@@ -86,7 +91,8 @@ setInterval(()=>{try{if(shown||later||!FW_ACCT||FW_TRL)return;const x=X();if(!x|
  if(F.ok){const e=document.getElementById('onbe');if(e)e.remove()}
  if(!['title','creator','play','pause'].includes(mode))return;
  if(F.ok&&F.r){if(F.h){try{localStorage.setItem(UK(),F.h)}catch(e){}}if(F.h&&dnGet())return;if(document.getElementById('annov'))return;fwNameBox();return}
- if(uCached()&&dnGet())return;
+ if(uCached())return;
+ fsName();
  if(!t0)t0=Date.now();
  let host='';try{host=new URL(FB_CFG.databaseURL).host}catch(e){}
  if(/sign-in needed|^auth$/i.test(F.rerr||''))errBox('You are not signed in with Google on this device any more (the account moved to a new Firebase project). Sign out and sign in with Google again.');
