@@ -11,14 +11,14 @@ window.fwProfileSync=function(force){try{
  const h=typeof fwUsername=='function'?fwUsername():'';if(busy||!live()||!h||typeof S!='object'||!S||!S.artist||mode=='creator')return Promise.resolve(0);
  const a=String((typeof fwDisplayName=='function'&&fwDisplayName())||S.artist).replace(/[<>"]/g,'').slice(0,24);if(!a)return Promise.resolve(0);
  const gp=f=>{try{return f()}catch(e){return undefined}};
- const ph=String(gp(()=>FBU.photoURL)||'');const sgs=((S.songs)||[]).slice().sort((x,y)=>(y.streams||0)-(x.streams||0)).slice(0,5).map(x=>String(x.title||'Song').replace(/[<>"|]/g,'').slice(0,40)+'|'+cl(x.streams,1e13));
+ const ph=gp(()=>JSON.parse(localStorage.getItem('fw_prof_mock')).gphoto)===0?'':String(gp(()=>FBU.photoURL)||'');const sgs=((S.songs)||[]).slice().sort((x,y)=>(y.streams||0)-(x.streams||0)).slice(0,5).map(x=>String(x.title||'Song').replace(/[<>"|]/g,'').slice(0,40)+'|'+cl(x.streams,1e13));
  const ts=cl(S.songs&&S.songs.reduce((q,x)=>q+(x.streams||0),0),1e13),fl=cl(gp(()=>fameLevel()),1000),lq=cl(S.listeners,1e12),ns=(S.songs||[]).length;
  const ac=[ns>=1,ns>=10,lq>=1e5,lq>=1e6,fl>=25,fl>=50,!!gp(()=>MPS&&MPS.band),ts>=1e9].reduce((q,v,i)=>q|(v?1<<i:0),0);
  const mb=gp(()=>MPS&&MPS.band)?String(MPS.band).replace(/[<>"]/g,'').slice(0,24):'';
  const d={a,h,bio:'',fame:fl,lis:lq,p:/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(ph)&&ph.length<=300?ph:'',f:!!gp(()=>isFounder()),j:cl(Date.parse(gp(()=>FBU.metadata.creationTime)||''),4e12)||Date.now(),sg:sgs,bn:mb,bi:mb?String(gp(()=>iName(MPS.inst))||'').slice(0,12):'',bm:mb?cl(gp(()=>Object.keys(MB).length)||1,50):0,ac},sig=JSON.stringify(d)+FBU.uid,n=Date.now();
  if(!force&&sig==lastSig&&n-lastAt<900000)return Promise.resolve(0);busy=1;
  return FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(x=>{if(x.exists()&&typeof x.data().bio=='string')d.bio=x.data().bio.slice(0,160)},()=>{})
-  .then(()=>FBF.setDoc(FBF.doc(FBD,'profiles',FBU.uid),Object.assign(d,{t:Date.now()}))).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
+  .then(()=>FBF.setDoc(FBF.doc(FBD,'profiles',FBU.uid),Object.assign(d,{t:Date.now()}))).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);if(!window.__pfWarn){window.__pfWarn=1;try{say('Profile could not save ('+((e&&e.code)||'error')+'). Publish the latest Firestore rules.')}catch(x){}}return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
 setInterval(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync()}catch(e){}},60000);
 setTimeout(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync(1)}catch(e){}},8000);setInterval(()=>{try{if(mode=='play'||mode=='pause'){const k=live()?FBU.uid:'';if(k&&k!==window.__pfU){window.__pfU=k;fwProfileSync(1)}}}catch(e){}},5000);
 const num=n=>Math.round(+n||0).toLocaleString();
