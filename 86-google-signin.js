@@ -4,16 +4,16 @@
    Sign-in is optional: saves stay in this browser (fw_save_1 / fw_save_2) exactly as before. */
 /* ===== FIREBASE CONFIG: the ONLY place to paste new project values (Firebase console > Project settings > Your apps > Web app > Config),
    plus databaseURL from Realtime Database. Public web config, safe to commit. Never put a service account, admin key or secret here.
-   Currently the OLD waveferngame project. ===== */
+   Currently the waveferndata project (moved from waveferngame). ===== */
 const FB_CFG={
- apiKey:'AIzaSyCd1y8e0G6dKn4h4OuUzksePKufyltmvlo',
- authDomain:'waveferngame.firebaseapp.com',
- projectId:'waveferngame',
- storageBucket:'waveferngame.firebasestorage.app',
- messagingSenderId:'696041816952',
- appId:'1:696041816952:web:d3ce1fbc7a33e36f8ebe8d',
- measurementId:'G-4PMWS9D7BV',
- databaseURL:'https://waveferngame-default-rtdb.europe-west1.firebasedatabase.app'
+ apiKey:'AIzaSyBK_7wiX2SEtEhacUsFrgt8URcG1DyHdmA',
+ authDomain:'waveferndata.firebaseapp.com',
+ projectId:'waveferndata',
+ storageBucket:'waveferndata.firebasestorage.app',
+ messagingSenderId:'729312399087',
+ appId:'1:729312399087:web:09d5d134ce654e223ed51a',
+ measurementId:'G-5CG4LPGD18',
+ databaseURL:'https://waveferndata-default-rtdb.europe-west1.firebasedatabase.app'
 };
 /* ===== END FIREBASE CONFIG ===== */
 const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
