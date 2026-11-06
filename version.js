@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.80.4';
+const GAME_VERSION='v49.80.5';
 const VERSION_HISTORY=[
+ {v:'v49.80.5',n:'Record labels are switched off for now: no more label offers or messages, and any label messages already in your inbox are cleared. Label HQ stays closed and labels no longer take a cut. Saves still load.'},
  {v:'v49.80.4',n:'Fixed two error messages. The "update did not load" notice no longer appears when you are already on the newest version, and a username check that cannot reach the database no longer locks you out: you keep playing, a small notice says why, and it retries in the background.'},
  {v:'v49.80.3',n:'The new graphics are on: shadows, sky light and colour grade at Max for everyone, plus the detailed models (people, and the inside and outside of your house). They were not starting at all before. The Update button now always loads a fresh copy of the game, so the update can no longer fail to load. Saves still load.'},
  {v:'v49.80.2',n:'Touch controls now follow whatever you used last: touch a screen and the on-screen controls appear, press a key and they hide again (touch laptops and iPads with keyboards). Entering an old save code now says it is from an older version and to start a new career. Saves still load.'},
