@@ -24,7 +24,7 @@ function updGo(){if(UPD.busy)return;UPD.busy=1;try{sessionStorage.setItem('fw_up
  const have=new Set(window.__FWL||[...document.querySelectorAll('script[src],link[rel=stylesheet][href]')].map(e=>e.getAttribute('src')||e.getAttribute('href')));
  const fresh=wait(fetch(location.pathname,{cache:'reload'}).then(r=>r.text()).then(h=>{
   const urls=[...h.matchAll(/<(?:script|link)[^>]*?\s(?:src|href)="([^"]+)"/g)].map(m=>m[1]).filter(u=>!/^(https?:)?\/\//.test(u)&&!/^(data|mailto):/.test(u)&&!/\.(png|svg|ico)(\?|$)/.test(u));
-  const todo=urls.filter(u=>!have.has(u));
+  const todo=urls.filter(u=>!have.has(u)||/(^|\/)version\.js(\?|$)/.test(u));/* version.js is always refreshed: if its cached copy is stale the page keeps reporting the old version and the notice loops */
   if(window.FW_DEV)todo.push('/dev/bundle.json');
   return Promise.all(todo.map(u=>fetch(u,{cache:'reload'}).catch(()=>{})))}).catch(()=>{}),8000);
  Promise.all([cloud,fresh]).then(()=>{if(b)b.textContent='Updating…';location.replace(location.pathname+'?r='+Date.now())})}
