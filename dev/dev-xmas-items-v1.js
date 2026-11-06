@@ -32,6 +32,7 @@
  gA3('ac',['Tinsel Scarf',0,2011,'#2ecc71',,'xmas']);
  gA3('jk',['Frosty Parka',0,2012,'#3f6fb5',,'xmas']);
  gA3('sh',['Reindeer Slippers',0,2013,BRN,,'xmas']);
+ gA3('ht',['Holly Crown',0,2014,'#1f7a3a',,'xmas']);
  GAR.slice(G0).forEach(g=>{g.xm=1;GM[g.id]=g});
  Object.assign(XTOPB,{2004:8,2005:8});Object.assign(XJKB,{2006:0,2007:0,2012:0});Object.assign(XBTB,{2008:0});Object.assign(XSHB,{2009:1,2013:1});
  if(typeof XTSL!='undefined'){XTSL[2004]=.8;XTSL[2005]=.8}
@@ -129,6 +130,10 @@
   [-1,1].forEach(s=>{xb(l,.05,.18,.05,BRN,s*.1,-.22,z0-.04);xb(l,.04,.1,.04,BRN,s*.14,-.14,z0-.04)});
   xb(l,sw+.14,.05,sd*.7,WHT,0,-.29,z0-.06);xs(l,.03,'#2a1a10',-.08,-.34,z0+sd/2+.09,6);xs(l,.03,'#2a1a10',.08,-.34,z0+sd/2+.09,6)})};
 
+ XNEW.ht[2014]=(x,c)=>{const{h}=x,d=xtone(c,.75);
+  xb(h,.64,.1,.64,c,0,.33,0);xb(h,.66,.03,.66,'~#e6b422',0,.285,0);
+  for(let i=0;i<8;i++){const a=i/8*Math.PI*2,X=Math.cos(a)*.3,Z=Math.sin(a)*.3;xb(h,.14,.22,.1,i%2?c:d,X,.46,Z,0,-a,0);xs(h,.04,'#c0392b',X*1.05,.36,Z*1.05,7)}
+  xb(h,.2,.1,.08,'#c0392b',0,.34,.34);xb(h,.1,.12,.06,'#a3202f',-.1,.28,.34);xb(h,.1,.12,.06,'#a3202f',.1,.28,.34)};
  /* ---- shop and wardrobe pictures: box lists (w,h,d,colour,x,y,z) ---- */
  const xmclb=(g,c)=>{const a=[],P=(...q)=>a.push(q),d=dk(c,.8),t=xtone(c,.72),sk=SKIN[2],st=g.st;
   if(st==2001){P(.95,.2,.95,WHT,0,.1,0);P(.8,.24,.8,c,0,.32,0);P(.64,.24,.64,c,0,.54,-.02);P(.5,.22,.5,t,0,.74,-.08);P(.36,.2,.34,c,0,.9,-.2);P(.28,.18,.28,c,0,.98,-.36);P(.22,.16,.22,t,0,.94,-.52);P(.26,.26,.26,WHT,0,.82,-.66);return a}
@@ -143,6 +148,7 @@
   if(st==2007){P(.95,.75,.55,c,0,.5,0);[-1,1].forEach(s=>{P(.24,.7,.35,c,s*.62,.5,0);P(.27,.1,.38,RED,s*.62,.12,0);P(.08,.08,.08,GOLD,s*.66,.0,.2)});for(let i=0;i<8;i++){P(.12,.12,.58,i%2?WHT:RED,-.42+i*.12,.1,0)}P(.7,.14,.4,RED,0,.92,-.2);[0,1,2,3].forEach(i=>P(.07,.07,.04,GOLD,0,.76-i*.16,.3));P(.99,.07,.58,'#5a3a22',0,.32,0);return a}
   if(st==2008){[-1,1].forEach(s=>{for(let i=0;i<7;i++)P(.4,.13,.4,i%2?WHT:RED,s*.23,.06+i*.13,0);P(.42,.05,.42,'#1f7a3a',s*.23,-.01,0)});P(1,.12,.46,'#1f7a3a',0,.98,0);P(.12,.12,.04,GOLD,0,.98,.25);return a}
   if(st==2009){[-1,1].forEach(s=>{const x=s*.25;P(.38,.5,.4,c,x,.4,-.06);P(.4,.1,.42,RED,x,.68,-.06);P(.41,.03,.43,WHT,x,.74,-.06);P(.38,.18,.65,c,x,.1,.05);P(.28,.12,.2,c,x,.1,.44);P(.2,.12,.14,c,x,.2,.58);P(.14,.12,.1,t,x,.34,.62);P(.12,.12,.12,'#e6b422',x,.46,.64);P(.4,.04,.66,'#5a3a22',x,0,.05)});return a}
+  if(st==2014){P(.95,.14,.95,c,0,.14,0);P(.97,.04,.97,GOLD,0,.04,0);for(let i=0;i<8;i++){const a=i/8*Math.PI*2;P(.26,.4,.12,i%2?c:t,Math.cos(a)*.44,.38,Math.sin(a)*.44);P(.1,.1,.1,RED,Math.cos(a)*.5,.2,Math.sin(a)*.5)}P(.3,.16,.12,RED,0,.14,.52);return a}
   if(st==2010){P(.95,.2,.95,'#e8f4ff',0,.1,0);P(.8,.22,.8,c,0,.31,0);P(.66,.22,.66,c,0,.52,0);P(.5,.2,.5,t,0,.72,0);P(.34,.14,.34,c,0,.88,0);P(.26,.26,.26,'#e8f4ff',0,1.04,0);[-.2,0,.2].forEach(x=>{P(.12,.03,.03,'#e8f4ff',x,.45,.42);P(.03,.12,.03,'#e8f4ff',x,.45,.42)});return a}
   if(st==2011){P(.9,.16,.7,c,0,.5,0);for(let i=0;i<5;i++)P(.07,.17,.72,i%2?GOLD:RED,-.35+i*.175,.5,0);P(.22,.7,.08,c,-.2,.1,.42);for(let i=0;i<4;i++)P(.222,.06,.09,i%2?GOLD:WHT,-.2,.34-i*.15,.42);for(let i=0;i<4;i++)P(.04,.1,.04,i%2?RED:GOLD,-.28+i*.055,-.31,.42);return a}
   if(st==2012){P(.95,.75,.55,c,0,.5,0);[-1,1].forEach(s=>{P(.24,.7,.35,c,s*.62,.5,0);P(.27,.14,.38,'#e8f4ff',s*.62,.12,0)});P(.97,.14,.57,'#e8f4ff',0,.12,0);P(.9,.2,.5,'#e8f4ff',0,.92,-.05);P(.1,.7,.03,t,0,.5,.3);P(.97,.08,.57,'#1a1a1a',0,.34,0);P(.1,.08,.04,GOLD,0,.34,.3);return a}
@@ -280,6 +286,19 @@
   [-.14,0,.14].forEach((x,i)=>b.push([.05,.12+i%2*.06,.05,'#cfe8ff',x,.42,.96]));
   b.push([.5,.04,.5,'#5a3a22',-.8,.14,.9],[.08,.5,.08,'#5a3a22',-.8,.38,.9],[.34,.1,.04,'#c0392b',-.8,.6,.93],[.1,.34,.04,'#2ecc71',-.9,.66,.93]);
   defF('xm_igloo','Snow Igloo',1.6,1.6,b)}
+ /* ---- small cheap pieces, so the commonest crates have plenty to pick from ---- */
+ {const b=[[.4,.2,.4,'#a3202f',0,.1,0],[.44,.06,.44,GOLD,0,.22,0],[.08,.34,.08,'#5a3a22',0,.4,0]];
+  [[0,.62,0],[.18,.56,.06],[-.18,.56,-.04],[.08,.5,-.16],[-.1,.5,.16]].forEach(([x,y,z],i)=>b.push([.2,.1,.2,i%2?'#2a9448':'#1f7a3a',x,y,z],[.05,.05,.05,'#f4f4f4',x+.04,y-.04,z+.1]));
+  b.push([.2,.04,.06,'#c0392b',0,.3,.22],[.07,.1,.06,'#c0392b',-.06,.26,.22],[.07,.1,.06,'#c0392b',.06,.26,.22]);defF('xm_mistle','Mistletoe Planter',.5,.5,b)}
+ {const b=[[.7,.1,.7,'#c68642',0,.05,0],[.6,.34,.6,'#d9944a',0,.27,0],[.64,.06,.64,'#f4f4f4',0,.45,0],[.12,.04,.04,'#c0392b',-.14,.5,.2],[.12,.04,.04,'#2ecc71',.1,.5,.2],[.06,.06,.04,'#f1c40f',0,.5,.28]];
+  for(let i=0;i<5;i++)b.push([.1,.1,.02,i%2?'#c0392b':'#2ecc71',-.2+i*.1,.3,.31]);b.push([.06,.06,.02,'#2a1612',-.12,.2,.31],[.06,.06,.02,'#2a1612',.12,.2,.31],[.2,.04,.02,'#2a1612',0,.12,.31]);
+  defF('xm_cookiestool','Giant Cookie Stool',.7,.7,b)}
+ {const b=[[.8,.1,.8,'#5a3a22',0,.05,0],[.56,.2,.56,'#f4f4f4',0,.2,0],[.5,.04,.5,'#e8f0f6',0,.32,0],[.5,.04,.5,'#e8f0f6',0,.1,0]];
+  [['#c0392b',-.12,.06],['#2f6fb5',.12,.08],['*ffd23d',0,-.1],['#2ecc71',.1,-.08],['#e84393',-.12,-.06],['*ffd23d',-.02,.14]].forEach(([c,x,z],i)=>b.push([.2,.2,.2,c,x,.46+(i%2)*.04,z],[.1,.04,.1,'#e6b422',x,.58+(i%2)*.04,z]));
+  defF('xm_baubles','Bauble Bowl',.8,.8,b)}
+ {const b=[[.5,.1,.5,'#5a3a22',0,.05,0],[.14,1.3,.14,'#c0392b',0,.75,0],[.5,.14,.5,'#2ecc71',0,.4,0],[.4,.14,.4,'#e6b422',0,.7,0],[.3,.14,.3,'#2ecc71',0,1.0,0],[.26,.14,.26,'#c0392b',0,1.3,0],[.1,.1,.1,'*ffd23d',0,1.46,0]];
+  for(let i=0;i<7;i++)b.push([.5,.03,.04,i%2?'#f4f4f4':'#e6b422',0,.22+i*.18,.0,0]);
+  defF('xm_tinsel','Tinsel Pole',.5,.5,b)}
  /* the festive pet bed (only given if the pets are already full) */
  {const b=[[.9,.18,.8,'#a3202f',0,.09,0],[.96,.1,.86,'#f4f4f4',0,.2,0],[.7,.12,.62,'#c0392b',0,.2,0],[.9,.3,.12,'#a3202f',0,.2,-.34],[.94,.1,.16,'#f4f4f4',0,.38,-.34],[.2,.2,.2,'#2ecc71',.22,.34,.0],[.2,.06,.2,'#f4f4f4',.22,.46,0],[.12,.12,.12,'*ffd23d',.22,.5,0],[.08,.08,.1,'#f4f4f4',-.2,.3,.1]];
   defF('xm_petbed','Festive Pet Bed',1,.9,b)}
@@ -365,7 +384,7 @@
   b.push([.06,.06,.5,'#5a3a22',0,.3,1.2],[.3,.06,.06,'#e6b422',0,.3,1.44]);
   defF('xm_sled','Festive Sledge',.9,1.9,b)}
  /* what each Christmas item is worth (they have no shop price): the calendar crates sort items into rarity tiers by this value */
- const VAL={'Snowflake Beanie':280,'Tinsel Scarf':380,'Reindeer Slippers':640,'Frosty Parka':1500,xm_lantern:220,xm_wreath:360,xm_cookies:700,xm_igloo:1900,xm_fire:3000,'Santa Hat':120,'Elf Tights':190,'Candy Cane Scarf':240,'Reindeer Antlers':320,'Elf Boots':420,'Ugly Christmas Sweater':520,'Gingerbread Hoodie':760,'Elf Jacket':980,'Santa Coat':2200,
+ const VAL={'Holly Crown':100,xm_mistle:90,xm_cookiestool:110,xm_baubles:130,xm_tinsel:75,'Snowflake Beanie':280,'Tinsel Scarf':380,'Reindeer Slippers':640,'Frosty Parka':1500,xm_lantern:220,xm_wreath:360,xm_cookies:700,xm_igloo:1900,xm_fire:3000,'Santa Hat':120,'Elf Tights':190,'Candy Cane Scarf':240,'Reindeer Antlers':320,'Elf Boots':420,'Ugly Christmas Sweater':520,'Gingerbread Hoodie':760,'Elf Jacket':980,'Santa Coat':2200,
   xm_cane:140,xm_rug:340,xm_presents:450,xm_petbed:500,xm_snowman:620,xm_nutcracker:880,xm_chair:1100,xm_cocoa:1350,xm_sled:1800,xm_ginger:2600,xm_mantel:3400,xm_reindeer:4200,xm_tree:7500,xm_globe:12000};
  window.FW_XMAS_ITEMS={G0,PI,SI,VAL};
 })();

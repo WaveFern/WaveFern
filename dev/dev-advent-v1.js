@@ -103,8 +103,8 @@
  const WRAPS=[[23,'Candy Cane Wrap',600,'#2f8f5a'],[24,'Snowfall Wrap',900,'#2a3f6b'],[25,'Gift Ribbon Wrap',1600,'#1f7a3a'],[26,'Tinsel Garland Wrap',3800,'#7b1e3a'],[27,'Northern Glow Wrap',8000,'#22252b'],[28,'Starlight Foil Wrap',15000,'#1c1d28']];
  let POOL=null;
  function pool(){if(POOL)return POOL;const out=[],X=(window.FW_XMAS_ITEMS&&window.FW_XMAS_ITEMS.VAL)||{};
-  if(typeof F!='undefined')Object.getOwnPropertyNames(F).forEach(key=>{const f=F[key];if(!f||!f.b)return;if(key.indexOf('sv_')==0)return;const v=key.indexOf('xm_')==0?X[key]:f.p;if(v>0)out.push({t:'f',key,n:f.n,v,k:'f:'+key})});
-  if(typeof GAR!='undefined')GAR.forEach(g=>{const v=g.xm?X[g.n]:g.p;if(v>0)out.push({t:'k',id:g.id,n:g.n,v,k:'k:'+g.id})});
+  if(typeof F!='undefined')Object.getOwnPropertyNames(F).forEach(key=>{const f=F[key];if(!f||!f.b)return;if(key.indexOf('sv_')==0)return;const v=key.indexOf('xm_')==0?X[key]:0;if(v>0)out.push({t:'f',key,n:f.n,v,k:'f:'+key})});
+  if(typeof GAR!='undefined')GAR.forEach(g=>{const v=g.xm?X[g.n]:0;if(v>0)out.push({t:'k',id:g.id,n:g.n,v,k:'k:'+g.id})});
   WRAPS.forEach(w=>out.push({t:'w',pat:w[0],n:w[1],v:w[2],k:'w:'+w[0]}));
   out.forEach(o=>o.tier=tierOf(o.v));return POOL=out}
  const byTier=t=>pool().filter(o=>o.tier==t);
