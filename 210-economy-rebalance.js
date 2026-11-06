@@ -13,17 +13,19 @@ const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=Math.random();return (u-3)/Math.
 function step(L0,rel,st){let m;if(st.slow>0){st.slow--;m=.2;if(!st.slow)st.catch=2}else if(Math.random()<.06){st.slow=1+Math.floor(Math.random()*4);m=.2}else{m=Math.max(.5,Math.min(1.6,Math.exp(gauss()*.2)));if(st.catch>0){st.catch--;m*=1.4}}
  const g=rate(L0)*m,tgt=Math.floor(L0*Math.exp(g*FIX*(rel?1:IDLE))+ADD*(rel?1:.2)),cap=Math.floor(L0*Math.exp(g*FIX*CAPX)+ADD*1.5);return{tgt,cap}}
 window.__ecoStep=step;
-const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0}catch(e){}
+/* the official listener count only changes at night: catalogue boosts, gifts and stream bursts during the day cannot inflate it */
+setInterval(()=>{try{if(typeof S=='object'&&S&&S.eco&&S.eco.L!=null&&!S.cheat){const m=Math.floor(S.eco.L*1.02+30);if(S.listeners>m)S.listeners=m}}catch(e){}},1000);
+const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.eco.L!=null)L0=S.eco.L;else if((S.day||1)<=1)L0=0}catch(e){}
  const r0=w0.apply(this,arguments);
  try{if(S.cheat)return r0;
   S.eco=S.eco||{slow:0,catch:0};
-  const Ln=+S.listeners||0,rel=(S.songs||[]).some(s=>s.day==S.day-1),{tgt,cap}=step(L0,rel,S.eco);
+  let Ln=+S.listeners||0;const rel=(S.songs||[]).some(s=>s.day==S.day-1),T=step(L0,rel,S.eco);let tgt=T.tgt,cap=T.cap;if(L0<1){tgt=100;cap=Math.max(cap,100)}
   const Lf=Math.min(cap,Math.max(Ln,tgt)),h=S.hist&&S.hist[S.hist.length-1],md=S.mlDiv||3;
   if(h&&h.d===S.day-1&&!h.cp){h.cp=1;let d=0;
    if(Ln>cap){const k=cap/Ln,e=+h.e||0;d=-e*(1-k);h.e=+(e*k).toFixed(2);h.st=Math.round((h.st||0)*k)}
    else if(Lf>Ln){const st=Math.round((Lf-Ln)*md/30*.5);d=st*PAY;h.st=(h.st||0)+st;h.e=+((+h.e||0)+d).toFixed(2);S.streams=(S.streams||0)+st}
    if(d){S.money=+Math.max(0,S.money+d).toFixed(2);S.earn=+((S.earn||0)+d).toFixed(2)}}
-  S.listeners=Lf;S.monthStreams=Math.max(0,Math.min(S.monthStreams||0,cap*md),Lf*md*.999);
+  S.listeners=Lf;S.eco.L=Lf;S.monthStreams=Math.max(0,Math.min(S.monthStreams||0,cap*md),Lf*md*.999);
   if(Array.isArray(S.mlHist)){const m=S.mlHist[S.mlHist.length-1];if(m)m.ml=Lf}
  }catch(e){console.error('economy pacing',e)}
  return r0};
