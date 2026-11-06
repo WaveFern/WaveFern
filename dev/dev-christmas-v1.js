@@ -33,9 +33,9 @@
     if(typeof WORLD!='undefined')WORLD.children.slice().forEach(o=>{if(o.isSprite&&Math.abs(o.position.x+150)<1&&Math.abs(o.position.z+70)<1)WORLD.remove(o)})}catch(e){console.warn('xmas farm',e)}
    f0()}}
 
- /* LOCKED UNTIL 1 DECEMBER on the real site: snow, ice, lights, wreaths, winter clothes and the plaza tree only happen in December. Always on in /dev/. */
- if(!window.FW_DEV&&new Date().getMonth()!==11)return;
+ /* Snow, ice, wreaths, winter clothes and the plaza tree are on now. Only the Christmas LIGHTS are LOCKED UNTIL 1 DECEMBER on the real site (always on in /dev/). */
  window.FW_XMAS=1;
+ const LIGHTS=!!window.FW_DEV||new Date().getMonth()===11;
 
  /* ---------- snow cover: one shader patch on every vertex-coloured material, driven by SNOWU ---------- */
  function patchMat(m){
@@ -73,8 +73,9 @@
  const BS=.065,FACE=[[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1],.72],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1],1],[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],.86]];
  /* one bulb: a small cube (three visible faces) */
  function bulb(x,y,z,ph,ci){
+  if(!LIGHTS)return;
   FACE.forEach(f=>{[0,1,2,0,2,3].forEach(k=>{const q=f[k];lt.bp.push(x+q[0]*BS,y+q[1]*BS,z+q[2]*BS);lt.bph.push(ph);lt.bci.push(ci);lt.bsh.push(f[4])})})}
- const wire=(x0,y0,z0,x1,y1,z1)=>lt.wp.push(x0,y0,z0,x1,y1,z1);
+ const wire=(x0,y0,z0,x1,y1,z1)=>LIGHTS&&lt.wp.push(x0,y0,z0,x1,y1,z1);
  /* a wire spiralling round a foliage box, hugging its surface, with a bulb every ~.42 */
  function addString(cx,cy,cz,w,h,d){
   const OFF=.03,turns=h>.6?1.6:1,pw=w+OFF*2,pd=d+OFF*2,per=2*(pw+pd),Ls=turns*per,o=R(0,per),y0=cy-h*.42,y1=cy+h*.36;
