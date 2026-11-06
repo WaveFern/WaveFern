@@ -135,7 +135,9 @@
  /* ---------- render ---------- */
  let V={id:'me',visitor:0,mode:'view',stack:[],msg:''};
  const el=()=>document.getElementById('pfx');
+ const signedIn=()=>{try{return !!FBU}catch(e){return false}};
  function open(id,opts){
+  if(!signedIn())return;/* no public profile when signed out */
   if(typeof id!=='string')id='me';
   const o=Object.assign({visitor:0,from:null},opts||{});
   
@@ -259,7 +261,7 @@
  const pfBtn=(label,fn)=>{const b=document.createElement('button');b.textContent=label;b.className='fwpf-b';b.onclick=fn;return b};
  /* The only way in: the avatar in the top right of the main menu, next to the account chip. */
  g(()=>{const t0=titleUI;titleUI=function(){const r=t0.apply(this,arguments);try{
-  const t=document.getElementById('ttl');if(!t||t.querySelector('.fwpf-ic'))return r;
+  const t=document.getElementById('ttl');if(!t||!signedIn()||t.querySelector('.fwpf-ic'))return r;
   let c=t.querySelector('.ttpf');if(!c){c=document.createElement('div');c.className='ttpf';t.insertBefore(c,t.firstChild)}
   const old=c.querySelector('img,i');const b=document.createElement('button');b.type='button';b.className='fwpf-ic';b.title='Your profile';b.setAttribute('aria-label','Open your profile');
   b.innerHTML=old&&old.tagName=='IMG'?old.outerHTML:avatar(load().pfp,32);b.onclick=()=>open('me');
