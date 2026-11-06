@@ -1,6 +1,6 @@
 /* WaveFern dev leaderboard (dummy data). Only loaded on /dev/ (see dev/index.html). The live game is untouched.
-   Adds a Leaderboard button to the main menu (and the pause menu). The screen has a tab per category: Time played, Listeners,
-   Streams, Money, Fame level, Songs released, Followers. The rows are made-up artists; the player is ranked among them using their real stats.
+   No fake data: shows an empty state until real rows exist. Adds a Leaderboard button to the main menu (and the pause menu). The screen has a tab per category: Time played, Listeners,
+   Streams, Money, Fame level, Songs released, Followers. 
    All data comes from LB.board(cat), which is the one function to swap for the real cloud list later. Add ?nolb to the address to skip it. */
 (function(){
  if(!window.FW_FEAT||/[?&]nolb/.test(location.search))return;
@@ -16,20 +16,10 @@
   {k:'sg',t:'Songs released',u:'songs',me:()=>(S.songs||[]).length,fmt:f,max:400,pw:1.8},
   {k:'fol',t:'Followers',u:'total',me:()=>S.followers||0,fmt:f,max:60e6,pw:3.2}
  ];
- const A=['Neon','Velvet','Lil','Young','Big','DJ','MC','Saint','Mona','Kid','Ghost','Pixel','Sunny','Dark','Cosmo','Nova','Rusty','Lucky','Wild','Chrome'];
- const B=['Fern','Wave','Mango','Static','Comet','Echo','Drift','Pepper','Bloom','Cipher','Harbor','Jett','Orbit','Tango','Willow','Zephyr','Moss','Flare','Quill','Riot'];
- function rng(s){return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
- /* fixed fake players, the same every time the screen opens */
- const NAMES=(()=>{const r=rng(7),seen={},o=[];while(o.length<40){const n=A[(r()*A.length)|0]+' '+B[(r()*B.length)|0];if(!seen[n]){seen[n]=1;o.push(n)}}return o})();
  const meName=()=>S.artist||'You';
  /* the one function to replace with the real cloud list: returns [{name,v,me}] sorted high to low */
- LB.board=function(k){
-  const c=CATS.find(x=>x.k==k),r=rng(k.split('').reduce((a,ch)=>a*31+ch.charCodeAt(0),11)),rows=NAMES.map((n,i)=>{
-   const p=Math.pow((i+1)/NAMES.length,c.pw);return{name:n,v:Math.max(1,Math.round(c.max*(1-p*.985)*(.9+r()*.2))),me:0}});
-  rows.push({name:meName(),v:c.me(),me:1});
-  rows.sort((a,b)=>b.v-a.v||b.me-a.me);return rows};
+ LB.board=function(k){return[]};/* no real rows yet: swap for the real cloud list */
  let cur=0,back='title',anim=1;
- const FDR=i=>i%7==3;/* a few fake players are Founders too */
  const fm=()=>{try{return typeof fdMark=='function'?fdMark(13):''}catch(e){return''}};
  const css='<style>@keyframes lbIn{from{transform:translateX(-12px);opacity:0}to{transform:none;opacity:1}}@keyframes lbPop{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}'+
   '@keyframes lbShine{0%{background-position:-200% 0}100%{background-position:200% 0}}@keyframes lbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes lbFall{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(300px);opacity:0}}'+
@@ -47,8 +37,10 @@
  function podCell(x,i,c){const h=[0,18,30][i];return`<div class="c${i+1}${x.me?' me':''}" style="order:${[1,0,2][i]};padding:${i==0?16:6}px 4px ${h+6}px"><span class=k>#${i+1}</span><span class=nm>${esc(x.name)}${x.fdr?fm():''}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
  function confetti(){const col=['#2fe68a','#1a8a52','#b8ffd9','#e8f3ec','#26302a'];let o='';for(let i=0;i<22;i++)o+=`<i class=cf style="left:${(i*4.7+((i*37)%9))%100}%;background:${col[i%5]};animation-delay:${(i%8)*.27}s"></i>`;return o}
  function draw(){
-  const c=CATS[cur],rows=LB.board(c.k),mi=rows.findIndex(x=>x.me),rk=mi+1,n=rows.length;
-  rows.forEach((x,i)=>{x.fdr=x.me?!!(S&&S.fdr):FDR(i)});
+  const c=CATS[cur],rows=LB.board(c.k);
+  if(!rows.length){$('ui').innerHTML=css+`<div id=lbd class="box modal" style="width:min(460px,94vw)"><h2>Leaderboard</h2><div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div><div class="ban n">No ranked players yet.</div><p class=m><small>${c.u} · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;return}
+  const mi=rows.findIndex(x=>x.me),rk=mi+1,n=rows.length;
+  
   const ban=rk==1?`<div class=ban>YOU ARE #1 IN ${c.t.toUpperCase()}</div>`:rk<=3?`<div class=ban>TOP 3 IN ${c.t.toUpperCase()}: #${rk}</div>`:`<div class="ban n">You are #${rk} of ${n}${rk<=10?'. Top 10!':'.'} ${rows[mi-1]?'Next: '+esc(rows[mi-1].name)+' ('+esc(c.fmt(rows[mi-1].v))+')':''}</div>`;
   const rest=rows.slice(3,25),lastRow=mi>=25?[rows[mi]]:[];
   $('ui').innerHTML=css+`<div id=lbd class="box modal${rk==1?' top1':''}" style="width:min(460px,94vw)">${rk<=3?confetti():''}<h2>Leaderboard</h2>
