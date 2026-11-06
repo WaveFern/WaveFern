@@ -112,7 +112,8 @@ const TT={on:0,game:0};
 function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionStorage.removeItem('fw_msg');say(m)}}catch(e){}}
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
- const pf=FBU?`<div class=ttpf>${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{textContent:${esc(JSON.stringify((nm[0]||'?').toUpperCase()))}}))">`:`<i>${esc(nm[0]||'?').toUpperCase()}</i>`}<span><b>${esc(nm)}</b><small>${esc(CLD.err||(CLD.ok?'Cloud save on':'Loading…'))}</small></span><button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf><span><b>Guest</b><small>Saves on this device</small></span></div>`;
+ const NI='<i class=ttni aria-label="Not signed in"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.6 3.8-7.5 8.5-7.5s8.5 2.9 8.5 7.5z"/></svg></i>';
+ const pf=FBU?`<div class=ttpf title="${esc(nm)}">${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="Your Google profile picture" onerror="this.outerHTML=${esc(JSON.stringify(NI))}">`:NI}<button onclick="fbSignOut()">Sign out</button></div>`:`<div class=ttpf>${NI}</div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN</h1><div class=px>Music Career Sim</div><div class=ttbx>
   <button class=go onclick="ttWorlds()" ${busy?'disabled':''}>${busy?'Loading your save…':'Play'}</button>
   <button onclick="ttSet()">Settings</button><button onclick="ttWiki()">Wiki</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · <a href="privacy/" target="_blank" rel="noopener">Privacy</a> · <a href="terms/" target="_blank" rel="noopener">Terms</a> · <a href="legal/" target="_blank" rel="noopener">Legal</a></div></div>`}
@@ -162,10 +163,12 @@ function saveQuit(){snd('click');autoSave();TT.game=1;
  const lc=loadCode;loadCode=function(c){const t=TT.on;lc(c);if(t&&mode=='play'){TT.game=1;titleOpen()}}
  const cf0=confirmChar;confirmChar=function(){TT.game=1;const r=cf0.apply(this,arguments);try{autoSave()}catch(e){}return r}}
 
-/* pause menu: Save & quit, plus who is signed in and the cloud save state */
+const NEUTRAL_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.6 3.8-7.5 8.5-7.5s8.5 2.9 8.5 7.5z"/></svg>';
+/* pause menu: Save & quit, plus the Google profile picture */
 {const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='Save and quit';q.onclick=saveQuit;m.appendChild(q);
- if(!FB_ON||!FBU)return;const n=document.createElement('p');n.className='m';n.innerHTML='<small>Signed in as <b></b><br><span></span></small>';n.querySelector('b').textContent=FBU.displayName||FBU.email||'Google user';
- n.querySelector('span').textContent=CLD.err||(CLD.ok?'Cloud save on'+(CLD.t?' · saved '+new Date(CLD.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''):'Checking cloud save…');m.appendChild(n);};
+ if(!FB_ON||!FBU)return;const h=m.querySelector('h2'),av=document.createElement('div');av.className='pzav';
+ if(FBU.photoURL){const im=document.createElement('img');im.src=FBU.photoURL;im.referrerPolicy='no-referrer';im.alt='Your Google profile picture';im.onerror=()=>{av.innerHTML=NEUTRAL_ICON};av.appendChild(im)}else av.innerHTML=NEUTRAL_ICON;
+ if(h)h.before(av);};
  const pg=pauseGame;pauseGame=function(){pg();csPush()}}
 /* browsers block sound until the first click, so start the menu music then */
 addEventListener('pointerdown',()=>{if(TT.on&&MENUA&&MENUA.paused)MENUA.play().catch(()=>{})},{capture:true});
