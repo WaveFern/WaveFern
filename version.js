@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.77.0';
+const GAME_VERSION='v49.77.1';
 const VERSION_HISTORY=[
+ {v:'v49.77.1',n:'Save codes are tighter after the fresh start: old unsigned codes (FW1-, FW2-, FW3-) are no longer loaded, and only signed saves count as new careers or can carry a Founder claim.'},
  {v:'v49.77.0',n:'Second fresh start: the game was too easy, so every career is reset again (money, listeners, apps, songs and the rest). Old careers are kept as Legacy careers, and the Founder badge and Founder items stay.'},
  {v:'v49.76.0',n:'Listener pacing now follows real play time (a day is about 5 minutes): 2K listeners in the first hour, 1M after about 12 hours, 1B after about 28, 4B after about 35 and 8B after about 40. Growth is uneven, with the odd slow patch of a few days. Fame Level 350 now sits at 8B listeners. Saves still load.'},
  {v:'v49.75.1',n:'Sign-in now loads the new Firebase settings for everyone, including players with an older copy cached. Saves still load.'},
