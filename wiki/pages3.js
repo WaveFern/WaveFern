@@ -70,7 +70,7 @@ ${H2('Posts about you')}<p>Once you have a song out, other people post about you
 ${H2('Influencers')}<p>You follow 8 big accounts (skye.daily, popwatch, tourmode.tara, drip.report, thepetpals, cozyroom.mila, dex.lifts and carspotter.jay). Their pictures sit in a row at the top of the feed, 3 of them post on every refresh, and their profiles show a verified tick, a bio and millions of followers. Once you reach about 10,000 listeners they start posting your songs too.</p>`});
 
 page('apps','Computer and apps','life',{e:'',sum:'The laptop, its websites and every app in the App Barn.',src:['06-computer.js','10-apps-shop-furniture.js','11-os-v2.js'],kw:'laptop computer app barn browser website',body:()=>`
-<p class=lead>Press ${K('E')} at your desk to use the laptop: WaveFern, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.</p>
+<p class=lead>Press ${K('E')} at your desk to use the laptop: WaveFern, the gear Shop, Messages, a web browser and the App Barn.</p>
 ${H2('App Barn')}${T(['App',['Price','n'],'What it does'],Object.values(D.apps||{}).map(a=>[a.n+(a.soon?' '+tag('soon','y'):''),[a.p?$$(a.p):'free',a.p],esc(a.d)]))}
 ${H2('Websites')}${ul(['<b>motors.wf</b>: book a car','<b>homes.wf</b>: book a home viewing','<b>pawfinder.wf</b>: book a pet','<b>bodyguards.wf</b>: book a guard','<b>Threadz</b>: clothes'])}`});
 
@@ -106,7 +106,7 @@ page('about-wiki','About this wiki','meta',{e:'',sum:'How the wiki is made and k
 /* ===================== Tips: advice rather than answers, shown near the end of the article ===================== */
 const TIPS={
  recording:['Do not rush the Beat step. A clean run with no misses adds more than you would think.','The Lyrics step gets harder as you get better at it. Harder lines are worth more, so it evens out.','In the Mix step, small taps keep the level steadier than long holds.'],
- 'song-quality':['Early on, making lots of songs is how you get better. Experience grows with every song.','Spend on the gear that gives the most quality per level first.','Things that stay with you for good (mentors, a home, pets) add up over a career.'],
+ 'song-quality':['Early on, making lots of songs is how you get better. Experience grows with every song.','Spend on the gear that gives the most quality per level first.','Things that stay with you for good (a home, pets) add up over a career.'],
  genres:['Pick a family you like and stick with it for a while. Hopping between sounds costs you.','A HOT genre is a nice bonus for one day. It is not worth breaking a long run in your family for.','If you want to switch sound, do it gradually through a genre in the same family.'],
  streams:['Release often. Interest fades every day you do not put something out.','A song does most of its streaming in its first few weeks, so a steady flow beats one big drop.','Quality lifts everything else in the formula, so it is the best place to spend effort.'],
  listeners:['The monthly number can drop at the start of a new month. Keep releasing and it climbs back.','Followers come mostly from streams, so they follow the same advice.'],
@@ -170,7 +170,7 @@ ${Q('Can I play on my phone?',`Yes. A joystick and buttons appear on phones and 
 ${Q('Why did I pass out?',`You were still awake at 06:00. You wake where you fell with only 70 energy, so get to bed after 20:00 instead. See ${L('days','Days, time and energy')}.`)}
 ${Q('I ran out of energy. What now?',`Eat something, or go to bed if it is night. Energy also comes back slowly on its own. See ${L('food','Food and energy')}.`)}
 ${H2('Music')}
-${Q('My songs are bad. How do I make them better?',`Keep making them. You get better with every song, and gear, mentors and a good run in one genre family all add up. ${L('song-quality')} explains every part of the score.`)}
+${Q('My songs are bad. How do I make them better?',`Keep making them. You get better with every song, and gear and a good run in one genre family all add up. ${L('song-quality')} explains every part of the score.`)}
 ${Q('Why are my streams so low?',`New artists start small. Releasing often keeps interest up, and better songs lift everything else. See ${L('streams')}.`)}
 ${Q('Why did my monthly listeners go down?',`The monthly number is recounted as days pass, so a quiet spell shows up there. Keep releasing and it climbs back. See ${L('listeners','Monthly listeners and followers')}.`)}
 ${Q('How do I get a collab?',`Artists about your size DM you on their own, and you can message artists yourself in Messages. See ${L('collabs','Collabs')}.`)}

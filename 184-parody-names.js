@@ -1,5 +1,5 @@
 /* ===== v49.32.0: real artists become parodies =====
-   Every real artist in the game (the Messages/collab roster ART, WaveFern Browse, mentors and the awards pool) gets a parody name you can still recognise.
+   Every real artist in the game (the Messages/collab roster ART, WaveFern Browse and the awards pool) gets a parody name you can still recognise.
    This runs last, so looks, listener numbers and seeds worked out from the old names at load stay exactly the same.
    The real-looks table also answers to the parody name, and saves made before this have the old names swapped when they load. */
 const PARODY={'Lil Tecca':'Lil Decka','Ed Sheeran':'Ed Shearin','Kendrick Lamar':'Kenrick Llamar','Dolly Parton':'Dolly Partin','Billie Eilish':'Billie Eyelash','Drake':'Drakeo','The Weeknd':'The Weekdayz',
@@ -18,7 +18,7 @@ const PARODY={'Lil Tecca':'Lil Decka','Ed Sheeran':'Ed Shearin','Kendrick Lamar'
  'Noah Kahan':'Noah Kahn','Hozier':'Hozyer','Elton John':'Elton Jon','Stevie Wonder':'Stevie Wondah','Nujabes':'Nujabbs','Jinsang':'Jinsong',
  'Beyoncé':'Beyonsay','Prince':'Princely','Dr. Dre':'Dr. Drey','Jimi Hendrix':'Jimmy Hendrikz'};
 try{ART.forEach(a=>{const p=PARODY[a[0]];if(p)a[0]=p});if(typeof BRX!='undefined')BRX.forEach(x=>{const p=PARODY[x[0]];if(p)x[0]=p});
- if(typeof MEN!='undefined')MEN.forEach(m=>{const p=PARODY[m[1]];if(p)m[1]=p});if(typeof AW!='undefined'&&AW.pool)AW.pool.forEach(x=>{const p=PARODY[x[0]];if(p)x[0]=p});
+ if(typeof AW!='undefined'&&AW.pool)AW.pool.forEach(x=>{const p=PARODY[x[0]];if(p)x[0]=p});
  if(typeof RLK!='undefined')for(const k in PARODY){const c=RLK[k.toLowerCase()];if(c)RLK[PARODY[k].toLowerCase()]=c}
  if(typeof REAL_SET!='undefined')[...REAL_SET].forEach(n=>{if(PARODY[n])REAL_SET.add(PARODY[n])});}catch(e){console.error('parody names',e)}
 /* old saves: swap real names in every string (whole words, case sensitive) */

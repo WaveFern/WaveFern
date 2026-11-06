@@ -3,8 +3,14 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.77.3';
+const GAME_VERSION='v49.79.3';
 const VERSION_HISTORY=[
+ {v:'v49.79.3',n:'Footsteps now change with the surface (snow, floorboards, concrete, grass), the last piece of the dev build that was not switched on. Saves still load.'},
+ {v:'v49.79.2',n:'Characters look the way they used to again: the shadow, sky-light and colour-grade graphics pack that came with the big update is switched off. Saves still load.'},
+ {v:'v49.79.1',n:'New artist Alfonso, a blonde rapper with 400 million monthly listeners. Once you are well known he can message you in Messages, and you can collab with him. Saves still load.'},
+ {v:'v49.79.0',n:'Monthly listeners are now your last 31 days of streams divided by a random 4 to 9, so your songs, the morning summary and your stats agree. Every player gets a slightly different start and pace. Walking now uses energy, which runs out fast at first, and the new Energy pack in the gear shop lets you go much further. Saves still load.'},
+ {v:'v49.78.1',n:'Signing in with Google now requires you to pick a username before you carry on. The username box appears right after sign-in (also on the character screen) and can no longer be skipped until you have one.'},
+ {v:'v49.78.0',n:'Mentors are gone: the Legends page, the mentor unlock messages and the quality and experience bonus they gave are removed, and the Mentors wiki page is deleted. Saves still load.'},
  {v:'v49.77.3',n:'The morning summary now shows the real figures: streams, earnings and monthly listeners match what you actually have after the night. Saves still load.'},
  {v:'v49.77.2',n:'Fixed monthly listeners starting too high: catalogue boosts, gifts and stream bursts can no longer lift your listeners during the day, so you start at about 100 after day 1 and the first-hour pace matches the plan. Saves still load.'},
  {v:'v49.77.1',n:'Save codes are tighter after the fresh start: old unsigned codes (FW1-, FW2-, FW3-) are no longer loaded, and only signed saves count as new careers or can carry a Founder claim.'},

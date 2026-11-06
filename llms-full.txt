@@ -1,6 +1,6 @@
 # WaveFern: full wiki
 
-> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.43.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
+> Every page of the WaveFern Wiki (https://wavefern.com/wiki/) as plain text, for game v49.78.0. WaveFern is a free music career game (a 3D open-world music career sim) that you play in your browser at https://wavefern.com/.
 
 ---
 
@@ -36,7 +36,6 @@ Early goals
 Record a few songs in one genre family: the genre focus bonus rewards a steady sound.
 Buy a better microphone first: it gives the most quality per level.
 Install Instagrime and post once a day for followers.
-Reach 10 monthly listeners to unlock your first mentor.
 Screenshots
 The character creator at the start of a new career.
 Tips
@@ -50,7 +49,6 @@ Monthly listeners and followers
 Studio gear
 Genres and genre focus
 Instagrime
-Mentors
 References
 ^ 72-tutorial.js. WaveFern source code, game v47.9.0.
 ^ 02-data.js. WaveFern source code, game v47.9.0.
@@ -125,7 +123,7 @@ Streams for the day are completed and paid at the stream rate (after any label c
 Interest decays by 10% and gains 6% for each song you released that day.
 Monthly listeners and followers update (followers grow by 5% of the day's streams).
 Genre hype rerolls between ×0.8 and ×1.3.
-A new mentor may unlock, artists may DM you, labels may make offers, and new quests roll.
+Artists may DM you, labels may make offers, and new quests roll.
 See also
 Food and energy
 Monthly listeners and followers
@@ -261,7 +259,6 @@ quality = max(3, round( experience × (
   + 16 × session            (average of Lyrics and Mix, 0-1)
   + gear points             (see below)
   + 3 if you own a home      + 1 per pet you own
-  + 2 per unlocked mentor
   + max(0, 8 − misses)       (Beat step)
 )))
 Experience
@@ -269,7 +266,7 @@ Experience
 New artists don't get full value from their gear. Experience starts at 0.3 and climbs towards 1:
 
 experience = 0.3 + 0.7 × (1 − e^(−xp / 200))
-xp = songs made + 8 per mentor + 6 per fame level
+xp = songs made + 6 per fame level
 
 xp	Experience
 0	0.30
@@ -315,7 +312,7 @@ A band song's quality is the average of every member's take, plus 3 for each ext
 Tips
 Early on, making lots of songs is how you get better. Experience grows with every song.
 Spend on the gear that gives the most quality per level first.
-Things that stay with you for good (mentors, a home, pets) add up over a career.
+Things that stay with you for good (a home, pets) add up over a career.
 See also
 Streams
 Park Fields Festival
@@ -749,7 +746,7 @@ Category: Music
 
 Source: https://wavefern.com/wiki/spotifly/
 
-WaveFern
+The WaveFern app
 From the WaveFern Wiki
 
 WaveFern is where your music lives. Open it on the laptop (or the WaveFern app on your phone).[1]
@@ -1130,26 +1127,6 @@ Category: Career
 
 ---
 
-Source: https://wavefern.com/wiki/mentors/
-
-Mentors
-From the WaveFern Wiki
-
-There are 5 mentors, each inspired by a music legend. One unlocks each time you reach the next monthly listener milestone, and every mentor adds +2 quality to every song (and 8 experience). Meet them on the laptop under Legends.[1]
-
-Mentor	Monthly listeners	Their advice
-Mentor 1	10	Perfectionism and showmanship: rehearse until it feels effortless.
-Mentor 2	40	Own your sound: learn every instrument in the room.
-Mentor 3	120	Write honest songs. A plain story lands harder than a fancy one.
-Mentor 4	400	Obsess over the mix. Details make the record.
-Mentor 5	1000	Experiment fearlessly with tone and texture.
-References
-^ 02-data.js. WaveFern source code, game v47.9.0.
-^ 06-computer.js. WaveFern source code, game v47.9.0.
-Category: Career
-
----
-
 Source: https://wavefern.com/wiki/labels/
 
 Record labels
@@ -1259,7 +1236,7 @@ Tips
 Submit your best song, not your newest one.
 Quality matters far more than streams here. A great song with few plays beats an average song with millions.
 The stars you face are very good. If you lose, keep improving your gear and come back in 15 days.
-Mentors, a home and pets all add quality, so they help here too.
+A home and pets add quality, so they help here too.
 
 A win puts a Gramophone Trophy in your Storage: furniture that isn't sold anywhere.
 
@@ -1639,7 +1616,7 @@ Your house sits on a quiet street west of the city. Press N for the map: scroll 
 A street in town.
 Places
 
-Home Garage Jewellery Property Corner shop Maple Lane Central Park Lake West suburb Radio City Plaza City Centre Pulse Records HQ Aurora Residences Nova Mall Motors Pet Shop Security Skyline Tower Gramophone Awards City Cafe Music Store Barbershop Airport Festival ground
+Home Garage Jewellery Property Corner shop Maple Lane Central Park Lake West suburb South suburb Radio City Plaza City Centre Pulse Records HQ Aurora Residences Nova Mall Motors Pet Shop Security Skyline Tower Gramophone Awards City Cafe Music Store Barbershop Airport Festival ground
 
 Taxi
 
@@ -2258,7 +2235,7 @@ Source: https://wavefern.com/wiki/apps/
 Computer and apps
 From the WaveFern Wiki
 
-Press E at your desk to use the laptop: WaveFern, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.[1]
+Press E at your desk to use the laptop: WaveFern, the gear Shop, Messages, a web browser and the App Barn.[1]
 
 The App Barn, where you buy apps for the laptop.
 App Barn
@@ -2378,9 +2355,73 @@ Source: https://wavefern.com/wiki/versions/
 Version history
 From the WaveFern Wiki
 
-The game is on v49.43.0. This list is read live from the game, so it is always current.
+The game is on v49.78.0. This list is read live from the game, so it is always current.
 
 Version	What changed
+v49.78.0	Mentors are gone: the Legends page, the mentor unlock messages and the quality and experience bonus they gave are removed, and the Mentors wiki page is deleted. Saves still load.
+v49.77.3	The morning summary now shows the real figures: streams, earnings and monthly listeners match what you actually have after the night. Saves still load.
+v49.77.2	Fixed monthly listeners starting too high: catalogue boosts, gifts and stream bursts can no longer lift your listeners during the day, so you start at about 100 after day 1 and the first-hour pace matches the plan. Saves still load.
+v49.77.1	Save codes are tighter after the fresh start: old unsigned codes (FW1-, FW2-, FW3-) are no longer loaded, and only signed saves count as new careers or can carry a Founder claim.
+v49.77.0	Second fresh start: the game was too easy, so every career is reset again (money, listeners, apps, songs and the rest). Old careers are kept as Legacy careers, and the Founder badge and Founder items stay.
+v49.76.0	Listener pacing now follows real play time (a day is about 5 minutes): 2K listeners in the first hour, 1M after about 12 hours, 1B after about 28, 4B after about 35 and 8B after about 40. Growth is uneven, with the odd slow patch of a few days. Fame Level 350 now sits at 8B listeners. Saves still load.
+v49.75.1	Sign-in now loads the new Firebase settings for everyone, including players with an older copy cached. Saves still load.
+v49.75.0	Everything from the test build is now live: island coast, concert crowds, world tour shops, awards, a Christmas advent calendar and much more. Big update: slower, steadier growth (1B monthly listeners after about 17 hours of play, 4B endgame after about 20), harder money and steeper prices, money shown without cents (1K, 2.5M), weaker pop-up events, a stronger first 15 minutes (rookie rush, surprise drops, goal bar, daily streak) and a real endgame at 4B (Road to 4B, Legend era with chart wars, empire projects, records, relics and ascend). Saves still load.
+v49.74.0	A small countdown to the big update (the fresh start at 18:00 UTC on Friday 6 November 2026) now shows in the top right while you play, and goes away once it begins. Saves still load.
+v49.73.9	New artist Carlos, a pop star with 500 million monthly listeners and a blonde buzz cut. Once you are well known he can message you in Messages, and you can collab with him. Saves still load.
+v49.73.7	When Join a room says No answer, it now also says why the Firebase relay could not find the room, so connection problems can be tracked down. Saves still load.
+v49.73.6	Fixed waking up in an airport in a different country after sleeping on a flight home or to another city. You now wake up where your flight lands. Saves still load.
+v49.73.5	Fixed a valid save showing Invalid save code on reload when you own more than three pets. The save now loads first time and nothing is lost. Saves still load.
+v49.73.4	Esc during a concert now pauses it instead of ending it. Press Esc again (or Resume) to carry on where you left off. To end a show early, use the Leave stage button. Saves still load.
+v49.73.3	Touch screen laptops now get the laptop version of the game instead of the phone one. iPads and phones still get the touch controls.
+v49.73.2	iPad and touch: tapping the bar while recording a song now registers properly. The guide no longer tells you to go to bed in the middle of the day.
+v49.73.1	The fresh start moved to 00:00 UTC on Friday 6 November 2026. Nothing changes before then.
+v49.73.0	After the fresh start, the first time you sign in with Google you choose a username and a display name in one box. The username is your Friends username, so friends find you by it, and the display name is what friends and bandmates see next to it. Names have rules: a username is 3 to 16 lower case letters, numbers or _ and can be changed once every 30 days, a display name is 2 to 24 letters, numbers, spaces and . _ ' - and can be changed once every 7 days, names that imitate WaveFern, staff or the makers, or that are offensive, are refused (also with look-alike characters), and the Friends window has a Change name button. The notice also says that old save codes stop working after the reset.
+v49.72.0	The fresh start and Founder rewards. At 00:00 UTC on Friday 6 November 2026 every career is reset for every player, on every device and Google account. Money, fame, songs, houses, cars, clothes and everything else start again; your Google account, username, friends and settings stay. Your old career is never deleted: it is kept as a Legacy career you can look at in Settings, then Save, and Export save puts it in the file. Anyone who played before the reset (Day 2 or later, or at least one song) is a Founder and gets rewards nobody can earn afterwards: the Founder mark next to their name on their WaveFern artist page, the pause menu, the title screen, band panels and band chat; the Founder title; the Founder Bomber jacket and Founder Cap with glowing foil; and the Founder plaque and Day One light for the house. The notice now has the real date and details. Before that moment nothing changes.
+v49.71.0	Saves are now protected. Save codes and saved careers are encrypted and checked, so an edited or made-up code is refused instead of loaded, and your old saves are upgraded automatically the first time they load. Numbers that are impossible are repaired, and values sent by other players in a band room are checked before the game uses them.
+v49.70.0	A must-read notice for every player. A one-time announcement about a coming fresh start (early players could get rich very quickly through bugs) appears on the title screen. Its Close button only works after you have scrolled to the bottom and a few seconds have passed, and once closed it never shows again on that device or account. It lists what you can play with now (Friends, band rooms, band streaks, daily band goals, band chat), what is still to come (public profiles), how to back up your career with Export save, and links to the wiki. The date, what is reset and what early players get are still to be announced.
+v49.69.0	Your career is backed up on your device. A backup copy of each career is kept next to the game save, and Settings > Save has Export save and Import save so you can move a career to another browser or keep a file. An empty or unreadable cloud save can never replace the career on your device, and if WaveFern moves to a new cloud your careers come with you.
+v49.68.0	Band streak rewards you can show off. Reaching a 3, 7, 14 and 30 day band streak unlocks a Band poster stand, a Neon band sign, a Gold record plaque and a Platinum band trophy. They go to Storage to place in the house, and you cannot buy them anywhere. The band panel shows the next reward. Streaks you already reached count.
+v49.67.0	Friends. Open Friends from the title screen, Your rooms or the band panel, pick a username, and add friends by their username. They get a request they can accept, decline or block. Your friends list shows who is online, who is playing solo and who is in a band room. From inside a band room you can invite an online friend, and they get a box to join the band straight away; you can also join a friend's band room from the list. Only your friends can see whether you are online, only the person a request is for can accept it, requests are limited to one every 10 seconds, and blocked players cannot send you requests or invites.
+v49.66.0	Reasons to come back to the band. Band streak: every real day you and a bandmate play together for 2 minutes adds to your streak (one missed day is forgiven), with bonuses at 3, 7, 14 and 30 days ($300, $800, $2000, $5000 plus followers). Daily band goals: three goals a day, the same for the whole band (finish a band take, release a band song, go to bed as a band, message the band, use an emote, record a collab), $150 each and $400 plus 200 followers for all three. Both show in the band panel.
+v49.65.0	Band songs are a team effort. A band song can only be released once every bandmate in the room has done their part. The band panel shows a checklist of who has finished, with a Nudge button for anyone still working and, for the host, a Skip button for someone who is away. Bandmates who leave the room stop blocking it. When everyone scores 70% or better on their part it is a tight take and the song gets +4 quality, on top of the +3 per extra member.
+v49.65.0	Concert offers from around the world. Once you reach Fame Level 120, promoters and venues in real cities (Tokyo, Seoul, Sydney, Dubai and more) can write to you in Messages, but rarely: about a 1.3% chance each morning, never within 45 days of the last offer. They pay 5 to 8 times your last 30 days of streaming income for a club or hall, and 9 to 15 times for a stadium (at least $5,000 and $20,000). Accept or Decline in the message; an accepted show happens 4 to 8 days later, the promoter pays the flights, and you come home tired.
+v49.64.3	Hit and viral songs are marked with a small coloured badge (purple Viral, gold Hit) after the song title instead of the word in capital letters, and the pop-up that tells you a song took off now reads as a normal sentence.
+v49.64.2	Viral songs now start at 5 million streams and can go up to a billion, with the big ones getting rarer and rarer. About half of viral songs bring 5 to 11 million, 1 in 7 bring over 50 million, 1 in 50 over 500 million and about 1 in 90 reach 1 billion. It no longer depends on your monthly listeners. The extra streams are still paid out over about three months.
+v49.64.1	Viral songs last much longer. The extra streams from going viral are now paid out over about three months (the biggest day is the first, then it falls gradually) instead of two weeks, since going viral is so rare. The total is the same, so a viral song just stays big for a lot longer. Songs that are mid-viral now spread what is left over the same longer time.
+v49.64.0	Away players are disconnected and paused games stay quiet. In a band room, a guest with no input for 5 minutes gets a warning at 4:30 and is then taken out of the room with a Rejoin the band button (the host is never removed, so the room stays open); bandmates also show as away after one minute without input. While the game is paused it no longer reads your cloud save: it syncs once as you pause, then nothing until you resume.
+v49.63.0	Band chat and room controls. Press T to message your band (Enter sends, Esc closes) with quick lines like Ready and Wait for me; messages fade after a few seconds. Guests see their ping to the host in the band panel, bandmates who switch tabs show as away, and the host can lock the room so nobody new can join (people already in can still reconnect).
+v49.62.1	Fix: hit and viral songs no longer drop to a few streams a day once their boost is over. They were left out of the catalogue boost that every other song gets from your monthly listeners, so a viral song fell to about 50 streams a day even at 30 million monthly listeners. They now stream like the rest of your catalogue (about the same as your other songs of that quality and age) on top of their boost.
+v49.62.0	Multiplayer is tidier. The band panel shows a connection light (green, amber, red), who the host is, a Copy code and Copy invite link button, a Leave room button, and a Try again button when the room cannot be reached. Invite links (wavefern.com/?join=CODE) open Join a room with the room looked up. The Join box cleans up pasted codes and links and offers Try again when a room is not found. Removing a bandmate and deleting a band career use proper in-game boxes instead of browser popups, and a host alone in a room is told to share the code.
+v49.60.2	Old songs can catch fire again. Every day, each song that is a week or more old has a tiny chance to turn into a hit or go viral, far smaller than the one-off chance on release day (a good song has roughly a 1 in 15 chance of becoming a hit in a year, and going viral later is much rarer). When it happens you get the usual HIT or VIRAL message and the song streams again like a fresh release. It only happens once per song. Old saves work as they are.
+v49.61.0	Band rooms keep time in sync. Pausing no longer stops the clock for the whole band: time only stops when every online member is paused, and if anyone is still playing it keeps running for everyone, including you while you are in the pause menu.
+v49.60.1	Collab songs stream like real songs. The fans of the artist you feature now follow a real song's curve: biggest on day one, falling over the first weeks, then a long steady tail that fades slowly. There is no release-day boost any more. A collab with a megastar gives roughly 20 to 25 million streams in the first 11 days. Songs you already released with a featured artist are caught up once to the same curve, so old collabs with big artists are no longer stuck at 10 million (your monthly listeners do not jump).
+v49.60.1	The downloadable multiplayer trailer is re-encoded at a much higher quality (about 6 Mbps, was 2.4), so it is sharp instead of blurry.
+v49.60.0	Artists who message you are about your size now. If you have 30 million monthly listeners, most messages come from artists with roughly 25 to 45 million, some from a bit smaller or bigger, and an artist 3 times your size or more is rare (a megastar can still write to you, just very seldom). Six new artists between 19 and 56 million listeners join the roster. Collabs with real megastars also pay more: your featured song now gets about 3 times the fan streams it did before. Old saves keep working.
+v49.59.1	The multiplayer trailer page has a Download the video now button: the finished trailer (1080p, with its song) as an mp4, so it can be uploaded without watching or recording it.
+v49.59.0	Songs are mixed. Every instrument and every drum kit was measured on its own and set to a level that suits its job, recorded samples are matched to the same loudness, the chords, pads, arps and lead have their own high-pass filters so the low end stays clean, and there is a small dip around 300 Hz where things used to get muddy. Tools: tools/mix-check.js and tools/mix-calibrate.js.
+v49.58.3	Fix: the Watch trailer window now loads the YouTube video the standard way and shows the trailer picture behind it. It also has an Open on YouTube button under the video, for when a school, work or browser filter blocks the embed.
+v49.58.2	Every song has its own arrangement: plucked arps, pads and the style's own arp are only in some songs and in different sections, some verses drop the chords, and some intros have no drums.
+v49.58.1	Trailer pages: the mouse pointer now shows on the Ready card (so the Record and download video button can be pressed) and on the saved card; it is still hidden while the trailer plays.
+v49.58.0	Record and download the trailers. The Ready card on wavefern.com/mtrailer, /vtrailer and /?trailer has a Record and download video button: pick This tab when the browser asks, press Space, and the trailer is recorded with its song and saved as a video file (mp4, or webm where the browser cannot make mp4) when it ends, ready to upload to YouTube. It all happens on your own device.
+v49.57.0	Fuller, wider songs that use your recorded sounds. Every song, old ones too, now uses the Lead, Pluck, Pad, Key and Bass samples that suit its genre (about half of the tunes are played by a Lead or Pluck sample). New layers: a sustained Pad under the chorus, bridge and pre-chorus, and a plucked arpeggio in the chorus. Instruments sit in different places left to right instead of all in the middle.
+v49.56.0	Watch the official trailer without leaving the game. There is now a Watch trailer button on the title screen, in the pause menu and in Settings > Game. It opens the trailer in a window over the game, only when you choose it, and Close or Esc takes you straight back.
+v49.55.1	Major and minor are the common sound again: about 4 songs in 5 are plain major or minor, and dorian, mixolydian, lydian, phrygian or harmonic minor turn up as the occasional different colour.
+v49.55.0	Songs sound different from each other. Every song now gets its own mode (major, minor, dorian, mixolydian, lydian, phrygian or harmonic minor), key and real chord progressions from a library of pop, doo-wop, canon, rock, jazz, soul, country and dark loop changes, with a different set of chords for the verse, pre-chorus, chorus, bridge and intro, and a turn to the dominant chord at the end of verses and bridges. Four song layouts (some with a pre-chorus). Lead melodies are written like hooks: one bar of rhythm that repeats, a call and answer, mostly stepwise with a few leaps, chord notes on the strong beats, a climbing contrast phrase and a last chorus that doubles the tune a third below. Basses walk into the next chord, kick patterns shift per song, and Auto instrument samples now pick sounds that suit the genre. Older songs keep their seed but sound fresher. Test it with node tools/music-test.js.
+v49.54.3	The world map screen is now black and green: no more cream frame, and the pop-up list and map pop-up tags are green.
+v49.54.2	The Go to bed dialog and other plain game dialogs are now black and green too, the top-left and top-right boxes no longer use blue or yellow text, and game files are re-fetched on every update.
+v49.54.1	The WaveFern app icon (phone home screen, notifications and desktop) is now purple instead of green.
+v49.54.0	The game now has one fixed black and green colour palette, like a brand colour scheme. The colour picker in Settings > Game is gone. The world map, pause menu, main menu, FPS counter and the boxes at the top of the screen (monthly listeners, money, energy) all use the same black with WaveFern green. The waking-up card is back to its normal look, no more newspaper. The serif Times New Roman style lettering is gone everywhere: the game only uses its two fonts, Silkscreen and the monospace text font.
+v49.53.0	Sound effects polish: clicks, pops, pings, chimes, cash, errors and more are re-layered (transient, tuned bell body, sub thump, shimmer tail). New sounds for purchases, level ups, notifications and Perfect, Great, Good and Miss beat hits. All synthesised, so royalty free; see docs/SFX-CREDITS.md.
+v49.52.0	The WaveFern music app is violet instead of green: its buttons, play circles, notifications, sidebar highlight, scroll bars and logo. The plain black game style with a colour you pick in Settings > Game now only covers the world map, the pause menu, the main menu, the FPS counter, the boxes at the top of the screen (monthly listeners, money, energy) and the waking-up card. Every other screen, the wiki and the tab icon look the way they did before.
+v49.51.0	44 new instrument sounds. Bass (Bowser, Eazy, Morty, Reel, Yawn, Zyadfav), Key (Dadah, Flacko, Future, Housekeeper, Neo, Sun, Twirl, Wonder, Worship), Lead (Bug, Glow, Ken, Madagascar, Magic, Merch, Nova, Reap, Siren, Sting, Usala), Pad (Chance, Egypt, Mellow, Munich, Order, PSG, Pink, Zilla) and Pluck (Babylon, Beetle, Blitz, Butter, Circus, Colegio, Nomination, Queso, Swirl, Toy) are recorded sounds your beats can use. Pads are new: pad parts in a beat now play a recorded pad. On the Make a song screen, open Extras and there is a Bass, Keys, Lead, Pad and Pluck row: leave it on Auto and the song picks one for you, choose Built-in for the old synth sound, or pick one by name and hear it right away. Your pick is saved with the song so it sounds the same later. The band minigames play them too (the bass, keys, riff and festival call-and-answer notes). Songs are loaded one sound at a time, so only the sounds a song uses are downloaded. Songs you made before keep exactly the sounds they had.
+v49.49.0	Gear goes up to level 5. Every piece of gear in the Gear shop now has five levels instead of three, and the price climbs each time (level 4 costs 4 times level 3, level 5 another 4.5 times) so there is always something to save for. Levels 4 and 5 are worth half as much again on quality or streams, and need a higher Fame Level. Six new gear lines: Plugin suite, Mastering chain, Tape machine, Merch stand, Press kit and Livestream rig. The Upgrades list on the Make a song screen shows each piece with its level out of 5, and the Gear shop shows the level next to every item. Your saves keep the gear they had, and the new levels are waiting above it. Every scroll bar in the game is now in the game's look: a dark pixel track with a chunky thumb that lights up green, and screens with their own look (Spotifly, Gphone, the Gearhouse, the browser and Amazoom, the world tour, the flight desk, souvenir shops and the themed pop-ups) get matching scroll bars in their own colours.
+v49.48.0	The music app on the laptop and the Gphone is called WaveFern now, not Spotifly. The name changed everywhere you see it: the app, its sidebar and Notifications page, WaveFern Team messages, the desktop wallpaper, billboards, the tutorial, Big Vee, the trailer and the wiki. Saves keep working and old Spotifly Team messages are renamed when you load.
+v49.47.1	Pop-ups moved to open lawns and squares (Fern Meadow, the Park Meadow, the Park Avenue lawn, Mill Road Green, Harbour Green, City Plaza, East Side Green and Riverside Green) instead of in front of shop doors, and they are proper tents now: a striped peaked roof, a banner, a ground mat, string lights and props for each kind, with a solid counter. The Taxi button on the map drops you right in front of the tent. You can no longer get stuck: if you ever end up standing inside something solid you are moved to the nearest clear spot, and abroad you wake up on the open hotel lobby floor instead of on the coffee table, which froze you in place at 6am.
+v49.47.0	Pop-ups that look like where they happen. The green box is now only for WaveFern itself (settings, pause, saves, stats). Getting robbed is a police incident report with a case number, the place, the time, a suspect description and a THEFT stamp. Meeting an artist to collab is a studio-lounge chat with speech bubbles and a vibe meter. The morning results are a newspaper, The Morning Mix, with the weather and what is on around town. Going to bed shows a night sky, gifts come in wrapping paper, tower lifts have a steel panel with a floor display, tour hotels use hotel stationery, the box office and show results are a concert ticket, Park Fields Festival has a wristband, the maps are paper maps and the airport info is a departures board. No emoji in any of them.
+v49.46.0	Pop-up events around the city. Every day two or three things happen in town for a few hours: a block party (play one of your songs on the sound system), a record store signing (stop the pen in the sweet spot for each fan), a radio roadshow (three live questions from Sam), an open mic (hit the beats as they cross the line), a food truck rally (cheap food for energy) or a street photo shoot (pick a pose, it goes on Instagrime). Each one has a stall with a spinning marker in the street, shows on the world map with its time and a Taxi button, gets a note when it opens and has its own look. Each can be done once a day and pays in followers, streams, cash or energy.
+v49.45.1	The pink line across the chest is really gone now. It was not a creator chain after all: it was the jewellery you own (the Iced platinum set drew a flat hot-pink bar, the other levels a grey, gold or blue bar). Your jewellery is now a proper chain of links that hangs around the neck, with a pendant from the gold chain up, a grill from the diamond grill up and a sparkling stone on the platinum set, and the wardrobe and Threadz try-on pictures leave jewellery off so only the clothes show.
+v49.45.0	Souvenir shops in every tour city, clothes you can see properly, and Amazoom furniture without parts clipping through each other. Every city now has a souvenir shop with three things from that country (a yellow cab model in the US, a red phone box in the UK, a lucky cat in Japan, a brass lantern in Morocco and 80 more) next to the postcard, snow globe, T-shirt and magnet. The counter is a gift shop with an awning in the city colours, a passport stamp, luggage-tag prices and pixel icons instead of emoji; hover or tap a souvenir and it spins in 3D. Everything you buy goes straight to your Storage at home. The pink line across every wardrobe picture is gone: it was a chain from the character creator that the wardrobe never listed, so it could not be taken off; it is removed once, and any extra you wear now always shows in its slot with a take off link. Threadz now shows your own character wearing each piece instead of floating blocks, and has nine new detailed pieces: Cable Knit Sweater, Western Shirt, Racing Tee, Utility Jacket, Rain Mac, Utility Cargo Pants, Tartan Skirt, Wool Beret and Studio Headphones. The bookshelf is rebuilt so you can see its books and shelves, and the extra wardrobe, dog house, cabinets, sideboard, popcorn machine and arcade cabinet are fixed; every other item is checked so no two parts flicker on the same face.
+v49.44.0	Detailed 3D profile pictures everywhere, in a different style for each app. Spotifly artists (Browse, artist pages, your own page and the sidebar) get press shots with a dark stage backdrop and a coloured spotlight instead of the old 16x16 faces. Instagrime pictures are now selfies with a pastel backdrop and a ring light, so they never match the Messages ones. Commenters, the New chat list, meeting pop-ups and Big Vee get 3D pictures too.
 v49.43.0	Far fewer emoji. Menus, buttons, headings, pop-ups and the wiki now use plain words, so text looks the same on every phone and computer. Where an icon still helps it is a little pixel sprite in the game's style: shop menus and every item in them, the touch buttons, the band instrument picker, locked World Tour stops and pinned chats. Emotes over heads are unchanged.
 v49.42.0	Plaques go to your Storage instead of hanging themselves on the studio wall. Press F at home, pick a plaque from the Furniture tab and hang it on any wall in your house, upstairs too. Plaques sit up on the wall, so they can go above your bed, desk or sofa, and they turn to face the room on their own. Each one shows its song title and stream count. Plaques you already earned are waiting in Storage.
 v49.41.0	The Swiftwing flight map is sharp now. It draws real country outlines at your screen's full resolution instead of big blocky squares, and you can move around it: drag to pan, mouse wheel, pinch or the + / - buttons to zoom in up to x8 (x1, the whole world, is as far out as it goes). City names show up once you zoom in, and picking a region like Europe flies the map there. The map you watch during a flight is sharp too and zooms in on your route.
@@ -2881,7 +2922,8 @@ Play the whole soundtrack here. It keeps playing while you read other pages.
 4	Box	1:47	Play
 5	Catch	1:23	Play
 6	Rocket	1:39	Play
-7	Main menu	1:00	Play
+7	Refresh	1:24	Play
+8	Main menu	1:00	Play
 
 The songs you make in the game are a separate thing: see How WaveFern songs sound.
 
@@ -2922,7 +2964,7 @@ Eat something, or go to bed if it is night. Energy also comes back slowly on its
 Music
 My songs are bad. How do I make them better?
 
-Keep making them. You get better with every song, and gear, mentors and a good run in one genre family all add up. Song quality explains every part of the score.
+Keep making them. You get better with every song, and gear and a good run in one genre family all add up. Song quality explains every part of the score.
 
 Why are my streams so low?
 

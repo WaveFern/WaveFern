@@ -14,7 +14,9 @@
  let tone='neutral';try{const t=localStorage.getItem(TK);if(TONES[t])tone=t}catch(e){}
  const BR={low:.88,mid:1,high:1.12},BK='fw_dbri2';let bri='high';try{const b=localStorage.getItem(BK);if(BR[b])bri=b}catch(e){}
  const GLOW=false,KEY='fw_dgfx2',LV=['off','balanced','max'];
- let lv='max';try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
+ /* LIVE SITE: the shadow / sky-light / colour-grade look changed how every character looks, so it stays OFF (original look) and ignores any level saved on this device from the old dev panel. Set LIVE_ON=true to bring it back. */
+ const LIVE_ON=false;
+ let lv=LIVE_ON?'max':'off';if(LIVE_ON)try{const s=localStorage.getItem(KEY);if(LV.indexOf(s)>=0)lv=s}catch(e){}
  const ok=()=>{try{return typeof renderer!='undefined'&&typeof scene!='undefined'&&typeof sun!='undefined'&&typeof cam!='undefined'}catch(e){return false}};
  if(!ok()){console.warn('dev graphics: game not ready');return}
  const cv=renderer.domElement,st=document.createElement('style');

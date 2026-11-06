@@ -18,6 +18,7 @@ const NEW={
  tape:{n:'Tape machine',d:'Warmth on everything',lv:['No tape','Cassette 4-track','Reel-to-reel','Pro tape machine','Two-inch machine','Tape vault'],b:800,q:3,fl:[1,2,4,5,7]},
  merch:{n:'Merch stand',d:'Fans spread the word',lv:['No merch','Handmade stickers','Printed tees','Online store','Tour merch line','Global brand'],b:300,s:.04,fl:[-1,0,1,3,5]},
  press:{n:'Press kit',d:'Blogs and radio pick you up',lv:['No press kit','One page bio','Photos and bio','Publicist','PR agency','Global press team'],b:500,s:.05,fl:[0,1,2,4,6]},
+ stamina:{n:'Energy pack',d:'More energy: you walk much further before you tire',lv:['Tired legs','Water bottle','Trainers','Fitness band','Energy drinks','Peak fitness'],b:150,fl:[-1,-1,0,1,3]},
  live:{n:'Livestream rig',d:'Play for fans live',lv:['No rig','Webcam stream','Multi-camera stream','Pro stream room','Broadcast truck','Satellite uplink'],b:700,s:.06,fl:[0,1,3,5,7]}};
 const MAXT=(typeof FT!='undefined'?FT.length:12)-1;
 /* 1) old lines: two more level names, two more prices, two more fame locks */
@@ -28,7 +29,7 @@ Object.keys(NEW).forEach(k=>{if(GEAR[k])return;const o=NEW[k],c=[1,6,36,160,720]
  GEAR[k]=G;GY[k]=G;if(o.q)GQ[k]=o.q;if(o.s)GSB[k]=o.s});
 gfill();
 /* shop sections */
-const sec=n=>GCAT.find(c=>c[0]==n)[1];sec('Recording').push('plugins','mastering','tape');sec('Getting heard').push('merch','press','live');
+const sec=n=>GCAT.find(c=>c[0]==n)[1];sec('Recording').push('plugins','mastering','tape');sec('Recording').push('stamina');sec('Getting heard').push('merch','press','live');
 /* small previews for the new lines (l is 0 to 3) */
 Object.assign(GXM,{
  plugins:l=>[[.5,.34,.05,'#15181d',0,.5,0],[.44,.26,.02,['#2c3e50','#1f6f5a','#6a3a8a','#8a1c2a'][l],0,.5,.04],...Array.from({length:l+1},(_,i)=>[.06,.04,.02,'#2fe68a',-.15+i*.1,.5,.06]),[.2,.2,.04,'#333',0,.2,0]],
@@ -36,6 +37,7 @@ Object.assign(GXM,{
  tape:l=>[[.5,.34,.3,['#4a4a4a','#3a2a1a','#6a6a6a','#2a2d33'][l],0,.17,0],[.16,.16,.02,'#ddd',-.12,.3,.16],[.16,.16,.02,'#ddd',.12,.3,.16],[.04,.04,.03,'#c0392b',0,.12,.16]],
  merch:l=>[[.9,.05,.4,'#6b4a2e',0,.7,0],[.06,.7,.06,'#3a2a1a',-.4,.35,0],[.06,.7,.06,'#3a2a1a',.4,.35,0],...Array.from({length:l+1},(_,i)=>[.2,.14,.04,['#e84393','#3498db','#f1c40f','#2ecc71'][i],-.3+i*.2,.8,0])],
  press:l=>[...Array.from({length:l+1},(_,i)=>[.3,.02,.4,i%2?'#f0efe8':'#d9d6c8',0,.02+i*.03,0]),[.2,.02,.03,'#2c3e50',0,.04+l*.03,.1]],
+ stamina:l=>[[.2,.5,.2,['#9aa3ad','#3498db','#2ecc71','#f1c40f'][Math.min(3,l|0)],0,.25,0],[.12,.12,.12,'#ecf0f1',0,.55,0]],
  live:l=>[[.04,1,.04,'#222',0,.5,0],[.3,.04,.3,'#222',0,.02,0],[.22,.14,.14,'#111',0,1.05,0],[.08,.08,.08,'#c0392b',.09,1.1,.08],...(l>=1?[[.5,.5,.03,'#223',.45,.9,0]]:[]),...(l>=2?[[.14,.1,.1,'#111',-.3,.9,0]]:[]),...(l>=3?[[.9,.5,.03,'#1f6f5a',-.7,.9,0]]:[])]});
 /* models only know levels 0 to 3: levels 4 and 5 show as the top model */
 {const g0=gm;gm=(k,l)=>g0(k,Math.max(0,Math.min(3,l|0)))}
