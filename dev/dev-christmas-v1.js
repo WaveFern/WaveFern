@@ -192,7 +192,7 @@
  const W=typeof WTHR=='object'?WTHR:null;
  if(W){
   W.kinds.snow={n:'Snow',dim:.8,amb:.96,grey:.2,rain:0,fog:.16};
-  wxRoll=function(){const r=Math.random();return r<.25?'sun':r<.85?'snow':'fog'};
+  wxRoll=function(){const r=Math.random();return r<.45?'sun':r<.85?'snow':'fog'};
   wxToday=function(){
    if(!S.wx||S.wx.d!==S.day)S.wx={d:S.day,k:S.day<=1?'sun':wxRoll()};
    if(S.wx.k=='rain'||S.wx.k=='storm')S.wx.k='snow';
