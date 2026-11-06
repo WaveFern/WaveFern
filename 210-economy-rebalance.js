@@ -52,6 +52,10 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
 const GATE={car:[1e3,1e4,6e4,4e5,2e6],home:[3e4,4e5,5e6],guard:[1e5,1e6,1e7],garage:[5e3]};
 const fm=n=>n>=1e9?n/1e9+'B':n>=1e6?n/1e6+'M':n>=1e3?n/1e3+'K':n;
 if(typeof buyX=='function'){const b0=buyX;buyX=function(t,i){try{const g=GATE[t],need=g&&g[t=='guard'?(S.guards||0):t=='garage'?0:i];if(need&&(+S.listeners||0)<need&&!S.cheat){snd('err');return say('Unlocks at '+fm(need)+' monthly listeners.')}}catch(e){}return b0.apply(this,arguments)}}
+/* ---- clothes and furniture follow the money curve: clothes x3, furniture x2.5 (each item scaled once) ---- */
+const seen=new WeakSet();
+const scalePrices=()=>{try{[[typeof GM!='undefined'&&GM,3],[typeof CLM!='undefined'&&CLM,3],[typeof F!='undefined'&&F,2.5]].forEach(([m,k])=>{if(!m)return;Object.values(m).forEach(x=>{if(x&&typeof x=='object'&&typeof x.p=='number'&&x.p>0&&!seen.has(x)){seen.add(x);x.p=Math.round(x.p*k)}})})}catch(e){console.error('price scale',e)}};
+scalePrices();setTimeout(scalePrices,3000);
 /* ---- energy: walking drains it; the Energy pack in the gear shop slows the drain (capacity x1 to x4) ---- */
 let said=-1;
 setInterval(()=>{try{
