@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.77.3';
+const GAME_VERSION='v49.78.0';
 const VERSION_HISTORY=[
+ {v:'v49.78.0',n:'Mentors are gone: the Legends page, the mentor unlock messages and the quality and experience bonus they gave are removed, and the Mentors wiki page is deleted. Saves still load.'},
  {v:'v49.77.3',n:'The morning summary now shows the real figures: streams, earnings and monthly listeners match what you actually have after the night. Saves still load.'},
  {v:'v49.77.2',n:'Fixed monthly listeners starting too high: catalogue boosts, gifts and stream bursts can no longer lift your listeners during the day, so you start at about 100 after day 1 and the first-hour pace matches the plan. Saves still load.'},
  {v:'v49.77.1',n:'Save codes are tighter after the fresh start: old unsigned codes (FW1-, FW2-, FW3-) are no longer loaded, and only signed saves count as new careers or can carry a Founder claim.'},

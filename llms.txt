@@ -28,11 +28,10 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 - [Collabs, fees and haggling](https://wavefern.com/wiki/collabs/): A collab is a song with another artist. You either pay them (you messaged them) or they pay you (they messaged you). Their fans come along: a featured song gets about 1% of their monthly listeners in extra streams each day.[1]
 - [Promotions](https://wavefern.com/wiki/promotions/): Paid campaigns that multiply a song's streams for a few days.
 - [Catalogue halo](https://wavefern.com/wiki/halo/): When your listeners balloon, some of them dig into your older songs.
-- [WaveFern](https://wavefern.com/wiki/spotifly/): WaveFern is where your music lives. Open it on the laptop (or the WaveFern app on your phone).[1]
+- [The WaveFern app](https://wavefern.com/wiki/spotifly/): WaveFern is where your music lives. Open it on the laptop (or the WaveFern app on your phone).[1]
 - [Money](https://wavefern.com/wiki/money/): You start with $100. Most of your income comes from streams, paid every morning.[1]
 - [Studio gear](https://wavefern.com/wiki/gear/): Every piece of studio gear, its levels, prices and what it adds.
 - [Fame levels](https://wavefern.com/wiki/fame/): Your fame level comes from your monthly listeners. Jewellery makes you look more famous: each piece adds 8%.[1]
-- [Mentors](https://wavefern.com/wiki/mentors/): There are 5 mentors, each inspired by a music legend. One unlocks each time you reach the next monthly listener milestone, and every mentor adds +2 quality to every song (and 8 experience). Meet them on the laptop under Legends.[1]
 - [Record labels](https://wavefern.com/wiki/labels/): Labels message you with an offer when your monthly listeners, total streams and reputation all reach their thresholds. Signing pays an advance up front; from then on the label keeps a cut of your streaming income every night.[1]
 - [Quests](https://wavefern.com/wiki/quests/): The Quests app (preinstalled on the laptop) gives you 3 daily quests and 3 weekly quests. Finish the whole set to get paid. Quests are rolled once and saved, so reloading never changes them.[1]
 - [Gramophone Awards](https://wavefern.com/wiki/awards/): The awards hall stands at the end of your street. From Fame Level 225 you can check in (once every 15 days), submit one song, and watch the ceremony.[1]
@@ -60,11 +59,11 @@ WaveFern (also written "WaveFern game") is a video game: the free browser music 
 - [Food and energy](https://wavefern.com/wiki/food/): Food refills energy. Drinks marked "stamina" also refill your sprint.[1]
 - [Gphone](https://wavefern.com/wiki/gphone/): Press G to open your phone. You start with a laggy Gphone 8; newer models are sold on Amazoom. Every model has Messages, WaveFern, Instagrime, Eats, Gigs, Camera and Photos. Better models boost every song's streams and make photo posts bring more followers.[1]
 - [Instagrime](https://wavefern.com/wiki/instagrime/): Instagrime is a $400 app. Post once a day for 2-8 new followers. Photos from your Gphone camera can be posted too, for more followers with a better phone. Promotions are bought here.[1]
-- [Computer and apps](https://wavefern.com/wiki/apps/): Press E at your desk to use the laptop: WaveFern, the gear Shop, Legends (mentors), Messages, a web browser and the App Barn.[1]
+- [Computer and apps](https://wavefern.com/wiki/apps/): Press E at your desk to use the laptop: WaveFern, the gear Shop, Messages, a web browser and the App Barn.[1]
 - [Messages and Big Vee](https://wavefern.com/wiki/messages/): Messages holds every chat: artists who DM you (see Collabs, fees and haggling), label offers and Big Vee, your manager. Pin chats to keep them on top, clear them, or press New for suggested people.[1]
 - [Band rooms](https://wavefern.com/wiki/band-rooms/): Up to four friends in one band, how songs and sets work together.
 - [Settings and graphics](https://wavefern.com/wiki/settings/): Settings opens from the main menu or the pause menu. Under Graphics pick a preset or your own mix.[1]
-- [Version history](https://wavefern.com/wiki/versions/): The game is on v49.43.0. This list is read live from the game, so it is always current.
+- [Version history](https://wavefern.com/wiki/versions/): The game is on v49.78.0. This list is read live from the game, so it is always current.
 - [About this wiki](https://wavefern.com/wiki/about-wiki/): This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by tools/wiki-data.js each time the site is published, so it can't fall behind.
 - [Secrets](https://wavefern.com/wiki/secrets/): There is a secret code somewhere in WaveFern. What it is, where it goes and what it does is a mystery.
 - [Credits](https://wavefern.com/wiki/credits/): WaveFern was made by James Hutchinson and Rowan Burton.

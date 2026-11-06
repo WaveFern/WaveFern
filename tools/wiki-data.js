@@ -36,7 +36,7 @@ function collect(){
  return{
   genres:GEN.slice(),styles:Beats.styles,drums:{s808:Beats.drums.s808,hats:Beats.drums.hats},
   fam:GEN.map(g=>[g,tryv(()=>GFOCUS.famName(g))]),
-  tune:TUNE,pace:PACE,perf:PERF,gear,gcat:null,mentors:MEN.map(m=>[m[0],'',m[2]]),
+  tune:TUNE,pace:PACE,perf:PERF,gear,gcat:null,
   fame:{starts:fl,ft:FT,ftl:FTL()},
   artists:art,artistCount:artN,dmStar:DM_STAR,dmLock:DM_LOCK,
   cars:CARS,props:PROPS,late:LATE,pets:PETS,jewels:JEW,apps:APPD,
