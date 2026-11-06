@@ -110,7 +110,7 @@ addEventListener('pointerdown',e=>{if(e.pointerType=='touch')setLast('touch')},t
 addEventListener('keydown',e=>{if(e.isTrusted)setLast('kbd')},true);
 
 /* show the controls only while walking, driving or walking at the awards; keep Run held while it is on */
-const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function'&&!(typeof S!='undefined'&&S&&S.noPhone),st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};
+const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function',st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};
 /* v49.37.0: on stage (a festival set or a tour show) only the joystick shows, for walking around the stage, and it hides while a crowd game is up */
 const onStage=m=>{try{if(m=='fest')return typeof FEST!='undefined'&&FEST.view&&FEST.set&&!FEST.set.end&&!FEST.set.mg;if(m=='dshow'){const H=DCITY.show&&DCITY.show();return!!(H&&!H.mg&&!H.end)}}catch(_){}return false};
 setInterval(()=>{if(!act||!ui)return;const m=M(),stg=onStage(m),ok=(m=='play'||m=='drive'||m=='cutawd'||stg)&&typeof S!='undefined'&&S&&!document.getElementById('load');
