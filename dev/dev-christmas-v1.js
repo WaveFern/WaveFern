@@ -215,7 +215,14 @@
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
-  if(lawn){try{const k=lawn.cv.getContext('2d');if(on){/* a dusting over the grass: blades still show through */const W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);k.globalAlpha=.55;k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.globalAlpha=1;for(let i=0;i<W2*H2/6;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),RI(1,3),1)}else k.putImageData(lawn.orig,0,0);lawn.map.needsUpdate=true}catch(e){}}}
+  if(lawn){try{const k=lawn.cv.getContext('2d');if(on){/* a dusting over the grass: blades still show through */const W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);k.globalAlpha=.55;k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.globalAlpha=1;for(let i=0;i<W2*H2/40;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),1,1)}else k.putImageData(lawn.orig,0,0);lawn.map.needsUpdate=true}catch(e){}}}
+ /* the grass texture is a 16 px tile with a hard stripe every 4 px and random 2 px dashes, drawn with Nearest filtering: from the
+    tilted camera that aliases into jagged streaks and shimmers. Make the tile a soft low contrast speckle and use mipmaps. */
+ function smoothGrass(t){if(!t||t.userData&&t.userData.smooth)return;t.userData=t.userData||{};t.userData.smooth=1;
+  const c=t.image,k=c.getContext('2d'),W=c.width,H=c.height;let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  const d=k.getImageData(0,0,W,H),a=d.data;let r=0,g=0,b=0;for(let i=0;i<a.length;i+=4){r+=a[i];g+=a[i+1];b+=a[i+2]}const n=a.length/4;r/=n;g/=n;b/=n;
+  for(let i=0;i<a.length;i+=4){const v=1+(rnd()-.5)*.05;a[i]=r*v;a[i+1]=g*v;a[i+2]=b*v}
+  k.putImageData(d,0,0);t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;try{t.anisotropy=8}catch(e){}t.needsUpdate=true}
  let lawn=null;const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
  function sweepWorld(){
   scene.children.forEach(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&!Array.isArray(o.material))patchMat(o.material)});
@@ -227,7 +234,7 @@
    if(!gm||gm.type!=='BoxGeometry'||Array.isArray(m)||!m||m.type!=='MeshLambertMaterial'||m.transparent||m.opacity<1)return;
    const p=gm.parameters,x=o.position.x,z=o.position.z;if(!outdoorXZ(x,z)||inHome(x,z))return;
    const c=m.color;
-   if(p.width>=200&&p.depth>=200&&m.map){try{const cv=m.map.image;lawn={cv,map:m.map,orig:cv.getContext('2d').getImageData(0,0,cv.width,cv.height)}}catch(e){}return}
+   if(p.width>=200&&p.depth>=200&&m.map){try{const cv=m.map.image;smoothGrass(m.map);lawn={cv,map:m.map,orig:cv.getContext('2d').getImageData(0,0,cv.width,cv.height)}}catch(e){}return}
    if(c.b-c.r>.4){const ic=m.clone();ic.color.lerp(ICE,.55);o.material=ic;return}/* frozen all winter */
    const w=p.width*o.scale.x,h=p.height*o.scale.y,d=p.depth*o.scale.z,cy=o.position.y,foliage=c.g>c.r*1.12&&c.g>c.b*1.3;
    if(foliage&&w>=.6&&w<=5&&d>=.6&&d<=5&&h>=.45&&h<=2.6&&cy>=.9){addString(x,cy,z,w,h,d);added++}
