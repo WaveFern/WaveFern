@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.80.1';
+const GAME_VERSION='v49.80.2';
 const VERSION_HISTORY=[
+ {v:'v49.80.2',n:'The new graphics are on: shadows, sky light and colour grade at Max for everyone, plus the detailed models (people, and the inside and outside of your house). They were not starting at all before. The Update button now always loads a fresh copy of the game, so the update can no longer fail to load. Saves still load.'},
  {v:'v49.80.1',n:'Money is much harder to earn: about $300 at 1K listeners, $3K at 10K, $200K at 1M and $100M at 8B. Cars, houses, bodyguards and the garage cost more and now also need a number of monthly listeners before you can buy them. Saves still load.'},
  {v:'v49.80.0',n:'Usernames are now a real feature. After Google sign-in (and after every refresh) an account with no username is asked to choose one straight away, it is saved to the account so it follows you to any device, and no two players can share one. Players have a public profile (Friends > Profile). If the server can not be reached the game now says why instead of staying silent. Saves still load.'},
  {v:'v49.79.6',n:'The leaderboard now works: signed-in players are ranked on real scores (days, listeners, streams, money, fame, songs, followers) with their Founder badge. Saves still load.'},
