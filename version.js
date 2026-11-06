@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.82.0';
+const GAME_VERSION='v49.83.0';
 const VERSION_HISTORY=[
+ {v:'v49.83.0',n:'Profiles: your Google profile picture now shows as your avatar, and tapping anyone on the leaderboard or Friends opens their full profile (top songs, band, achievements, joined date, Founder outline). Saves still load.'},
  {v:'v49.81.6',n:'Your profile no longer shows a made-up band when you have not joined one.'},
  {v:'v49.82.0',n:'New guide lines: on the day of your festival set, a blue line leads you to your stage once you reach Park Fields. You can also tap the world map to drop a marker, and a blue line leads you there like the tutorial. Tap the marker again to remove it. Saves still load.'},
  {v:'v49.81.5',n:'Profiles no longer show a Band section for players who have not joined a band.'},

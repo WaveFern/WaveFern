@@ -169,7 +169,7 @@
   const dim=(k,html)=>mineView&&!st.show[k]?html.replace('class="pf-sec"','class="pf-sec" style="opacity:.55"').replace('</h3>',' '+tag('HIDDEN FROM OTHERS')+'</h3>'):html;
   const state=stateFor(p);
   let h=`<div class="fwpc${p.founder?' fdo':''}"><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
-  h+=`<div class=pf-head><div class=pf-av>${avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
+  h+=`<div class=pf-head><div class=pf-av>${p.me&&g(()=>FBU.photoURL)?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=''">`:avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
   h+=p.bio?`<p class=pf-bio>${esc(p.bio)}</p>`:`<p class="pf-bio e">${p.me&&!V.visitor?'No bio yet. Add one in Edit profile.':'No bio.'}</p>`;
   const cells=[['FAME LEVEL',String(p.fame)]];
   if(sh('listeners'))cells.push(['MONTHLY LISTENERS',num(p.listeners)]);else cells.push(['MONTHLY LISTENERS','Private']);
