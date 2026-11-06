@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.79.0';
+const GAME_VERSION='v49.79.1';
 const VERSION_HISTORY=[
+ {v:'v49.79.1',n:'New artist Alfonso, a blonde rapper with 400 million monthly listeners. Once you are well known he can message you in Messages, and you can collab with him. Saves still load.'},
  {v:'v49.79.0',n:'Monthly listeners are now your last 31 days of streams divided by a random 4 to 9, so your songs, the morning summary and your stats agree. Every player gets a slightly different start and pace. Walking now uses energy, which runs out fast at first, and the new Energy pack in the gear shop lets you go much further. Saves still load.'},
  {v:'v49.78.1',n:'Signing in with Google now requires you to pick a username before you carry on. The username box appears right after sign-in (also on the character screen) and can no longer be skipped until you have one.'},
  {v:'v49.78.0',n:'Mentors are gone: the Legends page, the mentor unlock messages and the quality and experience bonus they gave are removed, and the Mentors wiki page is deleted. Saves still load.'},
