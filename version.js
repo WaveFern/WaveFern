@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.81.4';
+const GAME_VERSION='v49.81.5';
 const VERSION_HISTORY=[
+ {v:'v49.81.5',n:'Profiles no longer show a Band section for players who have not joined a band.'},
  {v:'v49.81.4',n:'The Phone button on touch screens now always shows while you walk around, so you can open your Gphone on a phone or tablet. If you do not own a phone yet, tapping it tells you where to buy one.'},
  {v:'v49.81.3',n:'Your public profile now always shows the display name and username you chose. The main menu shows only your profile icon in the top right (no sign out or Founder mark), and Founders get a WaveFern green outline around their profile box.'},
  {v:'v49.81.2',n:'It no longer snows every day: snow now falls on about 40% of days (the rest are sunny or foggy). Saves still load.'},

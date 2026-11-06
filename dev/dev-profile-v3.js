@@ -177,7 +177,6 @@
   h+=`<div class=pf-stats>${cells.map(c=>`<div><small>${c[0]}</small><b>${esc(c[1])}</b></div>`).join('')}</div>`;
   if(sh('songs'))h+=dim('songs',`<div class="pf-sec"><h3>TOP SONGS</h3>${p.songs.map((s,i)=>`<div class=pf-row><span class=i>${i+1}</span><span class=n>${esc(s[0])}</span>${songTag(s[2])}<span class=v>${num(s[1])}</span></div>`).join('')||'<span class=pf-user>No songs yet.</span>'}</div>`);
   if(sh('band')&&p.band)h+=dim('band',`<div class="pf-sec"><h3>BAND</h3><div class=pf-kv><span>Band</span><b>${esc(p.band.name)}</b><span>Plays</span><div>${esc(p.band.inst)}</div><span>Members</span><div>${p.band.members}</div>${sh('streak')?`<span>Streak</span><div>${p.band.streak} day${p.band.streak==1?'':'s'}</div>`:''}</div></div>`);
-  else if(!p.band&&sh('band'))h+=`<div class=pf-sec><h3>BAND</h3><span class=pf-user>Not in a band.</span></div>`;
   if(sh('ach'))h+=dim('ach',`<div class="pf-sec"><h3>ACHIEVEMENTS (${p.ach.length}/${ACH.length})</h3><div class=pf-ach>${ACH.map((a,i)=>`<div class="${p.ach.includes(i)?'':'lk'}"><b>${esc(a[0])}</b><small>${esc(a[1])}</small></div>`).join('')}</div></div>`);
   if(p.me&&!V.visitor)h+=`<p class=pf-priv>Visitors see ${Object.keys(SECS).filter(k=>st.show[k]).length} of ${Object.keys(SECS).length} sections. Your artist name, username, avatar, Founder badge and fame level are always public.</p>`;
   h+='<div class=pf-acts>';
