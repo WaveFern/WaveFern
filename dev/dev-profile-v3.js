@@ -164,8 +164,15 @@
  }
  const REL={};
  const SECS={listeners:'Monthly listeners',songs:'Top songs',band:'Band',streak:'Band streak',ach:'Achievements',joined:'Join date',status:'Online status'};
-const IC={add:'<path d="M9 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM3 17c0-3 3-5 6-5s6 2 6 5M17 6v6M14 9h6"/>',friend:'<path d="M5 12l4 4 10-10"/>',req:'<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',inv:'<path d="M3 18V8l9-4 9 4v10M8 18v-5h8v5"/>',rep:'<path d="M6 21V4M6 5h12l-2 4 2 4H6"/>',blk:'<circle cx="12" cy="12" r="8"/><path d="M6.5 6.5l11 11"/>'};
- const ib=(k,t,on,dis)=>`<button class="pf-ic${on?' on':''}" data-pf=${k} title="${t}" aria-label="${t}" ${dis?'disabled':''}><svg viewBox="0 0 24 24" width=20 height=20 fill=none stroke=currentColor stroke-width=2 stroke-linecap=square>${IC[{add:'add',cancel:'req',invite:'inv',report:'rep',block:'blk',fr:'friend'}[k]]}</svg></button>`;
+const PX={
+  add:['..XX....','..XX..X.','...X.XXX','.XXXX.X.','XXXXXX..','XXXXXX..','........','........'],
+  friend:['........','......XX','.....XX.','X...XX..','XX.XX...','.XXX....','..X.....','........'],
+  req:['..XXXX..','.X....X.','X..X...X','X..X...X','X..XXX.X','X......X','.X....X.','..XXXX..'],
+  inv:['...XX...','..XXXX..','.XXXXXX.','XXXXXXXX','.XXXXXX.','.XX..XX.','.XX..XX.','.XX..XX.'],
+  rep:['XX......','XXXXXXX.','XXXXXXXX','XXXXXXX.','XXXXXX..','XX......','XX......','XX......'],
+  blk:['..XXXX..','.XX..XX.','XX...XXX','XX..XX.X','XX.XX..X','.XXX..X.','..XXXX..','........']};
+ const pix=k=>`<svg viewBox="0 0 8 8" width=22 height=22 shape-rendering=crispEdges fill=currentColor>${PX[k].map((r,y)=>[...r].map((c,x)=>c=='X'?`<rect x=${x} y=${y} width=1 height=1 />`:'').join('')).join('')}</svg>`;
+ const ib=(k,t,on,dis)=>`<button class="pf-ic${on?' on':''}" data-pf=${k} title="${t}" aria-label="${t}" ${dis?'disabled':''}>${pix({add:'add',cancel:'req',invite:'inv',report:'rep',block:'blk',fr:'friend'}[k])}</button>`;
  function icons(p,state){return`<div class=pf-icons>${state=='friend'?ib('fr','Friends',1,1):state=='requested'?ib('cancel','Request sent. Tap to cancel',1):ib('add','Add friend',1)}${ib('invite','Invite to band',0,state=='blocked')}${ib('report','Report',0)}${ib('block',state=='blocked'?'Unblock':'Block',state=='blocked')}</div>`}
  function songTag(k){return k===1?tag('HIT','g'):k===2?tag('VIRAL','s'):''}
 
