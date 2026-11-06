@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.85.6';
+const GAME_VERSION='v49.85.7';
 const VERSION_HISTORY=[
+ {v:'v49.85.7',n:'Google profile pictures are now stored on the public profile as a small embedded image (base64), so other players always see them.'},
  {v:'v49.85.6',n:'Profile action icons are now pixel art to match the game.'},
  {v:'v49.85.5',n:'Edit profile now has a switch to show or hide your Google profile picture, and a clear notice appears if your profile cannot be saved.'},
  {v:'v49.85.4',n:'Fan robberies are now much rarer (1% of autographs) and take only 10% of your cash, capped at $500. Saves still load.'},
