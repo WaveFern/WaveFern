@@ -129,8 +129,8 @@ function planOf(s){if(s.pd===S.day)return s.pv;rollLuck(s);const age=S.day-s.day
    Energy refill (energyTick), the stream trickle (prog(S.t)) and the clock (clk) all run on S.t, so they stay the same per day. */
 const DAYK=600/720;
 const curMonth=()=>Math.floor((S.day-1)/30);
-function mlInit(){if(!Array.isArray(S.mlHist))S.mlHist=[];if(S.mlMonth==null||!S.mlDiv){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);const m0=S.mlMonth*30+1;S.monthStreams=(S.hist||[]).filter(h=>h.d>=m0&&h.d<S.day).reduce((a,h)=>a+(h.st||0),0)+S.songs.reduce((a,x)=>a+(x.pd===S.day?x.today||0:0),0)}
- if(S.mlMonth!==curMonth()){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);S.monthStreams=0}}
+function mlInit(){if(!Array.isArray(S.mlHist))S.mlHist=[];if(S.mlMonth==null||!S.mlDiv){S.mlMonth=curMonth();S.mlDiv=4+Math.floor(Math.random()*6);const m0=S.mlMonth*30+1;S.monthStreams=(S.hist||[]).filter(h=>h.d>=m0&&h.d<S.day).reduce((a,h)=>a+(h.st||0),0)+S.songs.reduce((a,x)=>a+(x.pd===S.day?x.today||0:0),0)}
+ if(S.mlMonth!==curMonth()){S.mlMonth=curMonth();S.mlDiv=4+Math.floor(Math.random()*6);S.monthStreams=0}}
 function addSt(s,k){if(k<=0)return;mlInit();S.monthStreams=(S.monthStreams||0)+k;s.acc+=k;s.streams+=k;s.today=(s.today||0)+k;S.streams+=k}
 let stkT=0;function streamTick(){if(mode=='sleep'||mode=='load'||mode=='creator')return;const nw=performance.now();if(nw-stkT<120)return;stkT=nw;S.songs.forEach(s=>{const pv=planOf(s),f=s.p0>=.999?0:Math.max(0,Math.min(1,(prog(S.t)-s.p0)/(1-s.p0)));addSt(s,Math.floor(pv*f)-s.acc)})}
 function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class=fade></div>';setTimeout(()=>{try{wakeUp(auto)}catch(e){console.error('wake failed',e);if(mode=='sleep'){$('ui').innerHTML='';mode='play'}}},950)}
