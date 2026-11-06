@@ -86,7 +86,7 @@ function rsNewCareer(){if(FW_TRL||!rsOn()||!S||S.rv>=RS.V)return;
 /* nothing old can come back in: a code, an import, a backup or the cloud copy is moved to Legacy instead of being loaded */
 function rsGuardCode(c){if(!rsOn())return false;try{const s=scClean(c);if(!/^FW[1234]-/i.test(s))return false;if(!rsIsOld(s))return false;
   rsArchive(s,FW_ACCT||'guest',0,'Old career that was loaded after the fresh start');return true}catch(e){return false}}
-{const l0=loadCode;loadCode=function(c){if(rsGuardCode(c)){try{say('That career is from before the fresh start. It is kept as a Legacy career in Settings > Save.')}catch(e){}return}return l0.apply(this,arguments)}}
+{const l0=loadCode;loadCode=function(c){if(rsGuardCode(c)){try{say('That save code is from an older version. WaveFern has had a fresh start for the new release, so old saves no longer work. Please start a new career. Your old career is kept as a Legacy career in Settings > Save.')}catch(e){}return}return l0.apply(this,arguments)}}
 {const b0=bakKeep;bakKeep=function(code,why){if(rsOn()&&typeof code=='string'&&rsIsOld(code))return rsArchive(code,FW_ACCT||'guest',0,why||'Old career');return b0.apply(this,arguments)}}
 /* Settings > Save: look at the Legacy careers (read only) */
 function rsFmt(n){return Number(n||0).toLocaleString('en-US')}
