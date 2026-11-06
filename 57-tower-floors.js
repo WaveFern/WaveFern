@@ -507,7 +507,7 @@ TFB['Nova Mall']=[
  [[7.4,12.6],[11,12.4]].forEach((q,k)=>{b(1.4,.04,1.4,'#888',q[0],1.4,q[1]);b(.06,1.4,.06,'#888',q[0],.7,q[1]);b(.6,.04,.6,'#888',q[0],.02,q[1]);for(let a=0;a<10;a++){const an=a*Math.PI/5;b(.2,.62,.2,['#e84a8a','#4a90d9','#ffe066','#2fe68a','#9b59b6','#e74c3c','#f4f4f4','#2a2a2a','#ff7a3a','#4ad9c0'][(a+k*3)%10],q[0]+Math.cos(an)*.62,1.08,q[1]+Math.sin(an)*.62)}K.cl(q[0]-.75,q[1]-.75,q[0]+.75,q[1]+.75)});
  b(3,.9,1,'#ffffff',4.6,.45,13.8);b(3.1,.05,1.1,'#c9a227',4.6,.92,13.8);for(let i=0;i<6;i++){b(.3,.12,.16,['#f4f4f4','#2a2a2a','#e84a8a','#c9a227','#4a90d9','#8a5a36'][i],3.5+i*.42,1.01,13.6);b(.3,.12,.16,['#2a2a2a','#e84a8a','#f4f4f4','#4a90d9','#c9a227','#ffe066'][i],3.5+i*.42,1.01,14)}K.cl(3.05,13.25,6.15,14.35);
  b(4,1,1,'#2a2a34',15.5,.5,13.2);b(4.1,.06,1.1,'#e8e0d0',15.5,1.03,13.2);b(.36,.22,.3,'#333',16.8,1.18,13.1);b(.5,.06,.36,'#e84a8a',14.6,1.08,13.2);K.cl(13.45,12.65,17.55,13.75);
- twKeep(g,o,15.5,12.1,{hair:13,hc:5,eyes:6,mouth:4,top:5,tc:4,pc:6,skin:1,body:.4},'Sasha (stylist)',()=>say('Sasha: "Threadz has its own shop in the city now, on the Cafe's street. Every piece comes in 24 colours."'),2.8);
+ twKeep(g,o,15.5,12.1,{hair:13,hc:5,eyes:6,mouth:4,top:5,tc:4,pc:6,skin:1,body:.4},'Sasha (stylist)',()=>say('Sasha: "Threadz has its own shop in the city now, on the street by the City Cafe. Every piece comes in 24 colours."'),2.8);
  b(1.2,.9,.8,'#ffffff',20.6,.45,9);b(.04,1.8,1.1,'#c9a227',21.6,1.4,11.6);b(.02,1.7,1,'*dcecf4',21.57,1.4,11.6);K.cl(20,8.6,21.2,9.4);
  tfEsc(K,.95,5,13.6);tfEsc(K,2.25,5,13.6);
  tfSign(K,'SALE','#ffffff','#c0392b',1.2,.5,9.4,2.9,{},0,4.3);tfSign(K,'NEW IN','#111111','#ffe066',1.2,.5,12.6,2.9,{},0,4.3);[9.4,12.6].forEach(x=>b(.03,.5,.03,'#333',x,3.2,4.33));
