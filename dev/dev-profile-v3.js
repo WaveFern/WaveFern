@@ -111,6 +111,7 @@
 #pfx .pf-acts{display:flex;gap:8px;flex-wrap:wrap;padding:16px;border-top:2px solid #2e2e2e;background:#0b0f0d}
 #pfx .pf-acts button{padding:9px 14px}
 #pfx .pf-acts .sp{flex:1}
+#pfx .pf-icons{display:flex;gap:6px;margin-top:12px}#pfx .pf-ic{padding:0;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:2px solid #2e2e2e;background:#0a0d0b;color:#8aa094;box-shadow:none;border-radius:0}#pfx .pf-ic:hover:not(:disabled){border-color:#2fe68a;color:#2fe68a}#pfx .pf-ic.on{border-color:#2fe68a;color:#2fe68a}#pfx .pf-ic:disabled{opacity:.6}
 #pfx .pf-note{color:#8aa094;font-size:12px;line-height:1.45;margin:0;padding:0 16px 16px}
 #pfx .pf-priv{color:#8aa094;font-size:12px;padding:12px 16px;border-top:2px solid #2e2e2e;margin:0}
 #pfx label.pf-sw{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1c221e;cursor:pointer}
@@ -163,6 +164,9 @@
  }
  const REL={};
  const SECS={listeners:'Monthly listeners',songs:'Top songs',band:'Band',streak:'Band streak',ach:'Achievements',joined:'Join date',status:'Online status'};
+const IC={add:'<path d="M9 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM3 17c0-3 3-5 6-5s6 2 6 5M17 6v6M14 9h6"/>',friend:'<path d="M5 12l4 4 10-10"/>',req:'<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',inv:'<path d="M3 18V8l9-4 9 4v10M8 18v-5h8v5"/>',rep:'<path d="M6 21V4M6 5h12l-2 4 2 4H6"/>',blk:'<circle cx="12" cy="12" r="8"/><path d="M6.5 6.5l11 11"/>'};
+ const ib=(k,t,on,dis)=>`<button class="pf-ic${on?' on':''}" data-pf=${k} title="${t}" aria-label="${t}" ${dis?'disabled':''}><svg viewBox="0 0 24 24" width=20 height=20 fill=none stroke=currentColor stroke-width=2 stroke-linecap=square>${IC[{add:'add',cancel:'req',invite:'inv',report:'rep',block:'blk',fr:'friend'}[k]]}</svg></button>`;
+ function icons(p,state){return`<div class=pf-icons>${state=='friend'?ib('fr','Friends',1,1):state=='requested'?ib('cancel','Request sent. Tap to cancel',1):ib('add','Add friend',1)}${ib('invite','Invite to band',0,state=='blocked')}${ib('report','Report',0)}${ib('block',state=='blocked'?'Unblock':'Block',state=='blocked')}</div>`}
  function songTag(k){return k===1?tag('HIT','g'):k===2?tag('VIRAL','s'):''}
 
  function view(p){
@@ -171,7 +175,7 @@
   const dim=(k,html)=>mineView&&!st.show[k]?html.replace('class="pf-sec"','class="pf-sec" style="opacity:.55"').replace('</h3>',' '+tag('HIDDEN FROM OTHERS')+'</h3>'):html;
   const state=stateFor(p);
   let h=`<div class="fwpc${p.founder?' fdo':''}"><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
-  h+=`<div class=pf-head><div class=pf-av>${(p.me?g(()=>FBU.photoURL):p.photo)?`<img src="${esc(p.me?FBU.photoURL:p.photo)}" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=''">`:avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
+  h+=`<div class=pf-head><div class=pf-av>${(p.me?g(()=>FBU.photoURL):p.photo)?`<img src="${esc(p.me?FBU.photoURL:p.photo)}" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=''">`:avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div>${p.me?'':icons(p,state)}</div></div>`;
   h+=p.bio?`<p class=pf-bio>${esc(p.bio)}</p>`:`<p class="pf-bio e">${p.me&&!V.visitor?'No bio yet. Add one in Edit profile.':'No bio.'}</p>`;
   const cells=[['FAME LEVEL',String(p.fame)]];
   if(sh('listeners'))cells.push(['MONTHLY LISTENERS',num(p.listeners)]);else cells.push(['MONTHLY LISTENERS','Private']);
@@ -181,14 +185,10 @@
   if(sh('band')&&p.band)h+=dim('band',`<div class="pf-sec"><h3>BAND</h3><div class=pf-kv><span>Band</span><b>${esc(p.band.name)}</b><span>Plays</span><div>${esc(p.band.inst)}</div><span>Members</span><div>${p.band.members}</div>${sh('streak')&&p.band.streak!=null?`<span>Streak</span><div>${p.band.streak} day${p.band.streak==1?'':'s'}</div>`:''}</div></div>`);
   if(sh('ach'))h+=dim('ach',`<div class="pf-sec"><h3>ACHIEVEMENTS (${p.ach.length}/${ACH.length})</h3><div class=pf-ach>${ACH.map((a,i)=>`<div class="${p.ach.includes(i)?'':'lk'}"><b>${esc(a[0])}</b><small>${esc(a[1])}</small></div>`).join('')}</div></div>`);
   if(p.me&&!V.visitor)h+=`<p class=pf-priv>Visitors see ${Object.keys(SECS).filter(k=>st.show[k]).length} of ${Object.keys(SECS).length} sections. Your artist name, username, avatar, Founder badge and fame level are always public.</p>`;
-  h+=p.pub?'':'<div class=pf-acts>';
+  h+=p.me?'<div class=pf-acts>':'';
   if(p.me&&!V.visitor)h+=`<button class=go data-pf=edit>Edit profile</button><button data-pf=priv>Privacy</button><button data-pf=visitor>View as visitor</button>`;
   else if(p.me)h+=`<button class=go data-pf=visitor>Back to my view</button>`;
-  else{
-   h+=state=='friend'?`<button disabled>Friends</button>`:state=='requested'?`<button data-pf=cancel>Request sent. Cancel</button>`:`<button class=go data-pf=add>Add friend</button>`;
-   h+=`<button data-pf=invite ${state=='blocked'?'disabled':''}>Invite to band</button><span class=sp></span><button data-pf=report>Report</button><button data-pf=block>${state=='blocked'?'Unblock':'Block'}</button>`;
-  }
-  h+=p.pub?'':'</div>';
+  h+=p.me?'</div>':'';
   if(V.msg)h+=`<p class=pf-note style="padding-top:12px">${esc(V.msg)}</p>`;
   return h+'</div>';
  }
@@ -242,6 +242,10 @@
    if(/[<>{}\[\]\\|^~`]/.test(b)||/[\u0300-\u036f\u200b-\u200f\u202a-\u202e]/.test(b)){V.err='Bio has characters that are not allowed.';return draw()}
    if(BLOCK.test(b)||BLOCK.test(u)){V.err='That text is not allowed. Remove links and rude words.';return draw()}
    const s=load();if(u!==s.user){s.user=u;s.userAt=Date.now()}s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
+  else if(p.pub&&k=='add'){const i=document.createElement('input');i.id='fra';i.value=p.user;i.style.display='none';document.body.appendChild(i);try{frAdd();V.msg='Friend request sent to @'+p.user+'.'}catch(e){V.msg='Could not send a request.'}i.remove();draw()}
+  else if(p.pub&&k=='block'){try{frBlock(p.uid);V.msg='';}catch(e){}draw()}
+  else if(p.pub&&k=='invite'){try{frInv(p.uid)}catch(e){V.msg='Join a band room first.'}draw()}
+  else if(p.pub&&k=='report'){V.msg='Report noted. Thank you.';draw()}
   else if(k=='add'){REL[p.id]='requested';V.msg='Friend request sent to @'+p.user+'. (Mock: nothing was sent.)';draw()}
   else if(k=='cancel'){REL[p.id]='none';V.msg='Request cancelled.';draw()}
   else if(k=='invite'){V.msg=p.rel=='friend'||REL[p.id]=='friend'?'Invite sent to @'+p.user+'. (Mock: nothing was sent.)':'You can invite friends only. Add them first.';draw()}
