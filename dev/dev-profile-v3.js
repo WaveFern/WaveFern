@@ -48,7 +48,7 @@
   return{id:'me',me:1,sample:!has,artist:g(()=>window.fwDisplayName&&window.fwDisplayName())||(has?D.artist:'Your Artist Name'),user:g(()=>window.fwUsername&&window.fwUsername())||st.user,seed:3,founder:g(()=>!!(S&&S.fdr)||(window.isFounder&&isFounder()))?1:0,
    fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:realJoin(st),
    bio:st.bio,songs:songs.length?songs:[['Sample Song One',120400,2],['Sample Song Two',8800,0]],
-   band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:{name:'The Ferns',inst:'Vocals',members:3,streak:sk||4},
+   band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:(has?null:{name:'The Ferns',inst:'Vocals',members:3,streak:4}),
    ach:has?[0,1,2].filter((_,i)=>i<1+Math.floor(((D.songs||[]).length)/3)):[0],online:'Online',rel:'self'};
  };
  const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3,career:'cur',userAt:0};

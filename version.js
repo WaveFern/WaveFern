@@ -5,6 +5,7 @@
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
 const GAME_VERSION='v49.82.0';
 const VERSION_HISTORY=[
+ {v:'v49.81.6',n:'Your profile no longer shows a made-up band when you have not joined one.'},
  {v:'v49.82.0',n:'New guide lines: on the day of your festival set, a blue line leads you to your stage once you reach Park Fields. You can also tap the world map to drop a marker, and a blue line leads you there like the tutorial. Tap the marker again to remove it. Saves still load.'},
  {v:'v49.81.5',n:'Profiles no longer show a Band section for players who have not joined a band.'},
  {v:'v49.81.4',n:'The Phone button on touch screens now always shows while you walk around, so you can open your Gphone on a phone or tablet. If you do not own a phone yet, tapping it tells you where to buy one.'},
