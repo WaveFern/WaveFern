@@ -28,6 +28,14 @@ service cloud.firestore {
       }
     }
 
+    // founders/{uid}: the cloud Founder list (see 209-founder-cloud.js). Only the admin writes it; a player reads only their own entry.
+    match /founders/{uid} {
+      allow get: if google() && me() == uid || admin();
+      allow list: if admin() && request.query.limit <= 100;
+      allow create, update: if admin() && fields(['a', 'd', 't']) && str(request.resource.data.a, 0, 24) && count(request.resource.data.d) && stamp(request.resource.data.t);
+      allow delete: if admin();
+    }
+
     match /gifts/{id} {
       allow get, list: if admin() || google() && resource.data.to == me();
       allow create: if admin() && giftOk(request.resource.data);

@@ -1,0 +1,41 @@
+/* ---------- Founder list in the cloud ----------
+   Why: a Founder claim lives in the browser (fw_legacy), so clearing site data or switching device would lose it.
+   What: Firestore founders/{uid} = {a:artist, d:day, t:time}. Only the admin can write it (see docs/security/firestore.rules.proposed);
+   a player can only read their own. Nobody can give themselves a Founder entry.
+   1. fdSnapshot(): run ONCE by the admin (signed in with the admin Google account) BEFORE the fresh start, from the browser console.
+      fdSnapshot() is a dry run: it reads every cloud save and says how many players would be listed. fdSnapshot(true) writes the list.
+      It uses the same test as the fresh start (played to Day 2 or at least one song, not a trailer career), and is safe to run again.
+   2. Every Google player, on sign-in after the fresh start, reads their own founders/{uid}. If it exists, a Founder claim for that
+      account is added to this device's Legacy store, and a career without Founder status is given it. Nothing else changes.
+   Guest players (no Google account) cannot be listed server-side; their claim stays on their device. */
+(function(){
+if(typeof RS=='undefined'||typeof rsGet!='function'||typeof FB_ON=='undefined'||!FB_ON)return;
+const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
+const rd=()=>FBF&&FBD&&FBU;
+
+window.fdSnapshot=async function(write){
+ if(!rd())return console.warn('Sign in with the admin Google account first.');
+ if(FBU.uid!==ADMIN)return console.warn('Only the admin account can do this.');
+ const F=FBF,col=F.collection(FBD,'saves');let last=null,seen=0,elig=[],skipped=0;
+ for(;;){
+  const q=last?F.query(col,F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(col,F.orderBy(F.documentId()),F.limit(100));
+  const s=await F.getDocs(q);if(s.empty)break;
+  s.forEach(d=>{seen++;const x=d.data();let st=null;try{st=rsStats(x.code)}catch(e){}
+   if(st&&!(st.rv>=RS.V)&&rsEligible(st,x.code))elig.push({uid:d.id,a:String(st.artist||'').slice(0,24),d:Math.min(9999,st.day|0)});else skipped++});
+  last=s.docs[s.docs.length-1];if(s.size<100)break}
+ console.log('Cloud saves read: '+seen+'. Founders to list: '+elig.length+'. Not eligible (already new, too new, or trailer): '+skipped+'.');
+ if(!write){console.log('Dry run: nothing written. Run fdSnapshot(true) to write the list.');return{seen,founders:elig.length}}
+ let n=0;for(let i=0;i<elig.length;i+=400){const b=F.writeBatch(FBD);elig.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,elig.length-i)}
+ console.log('Written: '+n+' Founder entries.');return{seen,founders:n}};
+
+let done='';
+function apply(uid,f){
+ const v=rsGet(),id='fdl-'+uid;
+ if(!v.e.some(e=>e.id==id)){v.e.push({id,scope:uid,slot:0,why:'Founder list',t:Date.now(),artist:String(f.a||'').slice(0,24),day:Math.min(9999,+f.d|0),money:0,followers:0,songs:0,bad:0,fd:1,used:0,code:''});rsPut(v)}
+ try{if(typeof S=='object'&&S&&S.rv>=RS.V&&!S.fdr&&FW_ACCT==uid){S.fdr={v:1,a:String(f.a||'').slice(0,24),d:Math.min(9999,+f.d|0),g:{}};if(typeof founderSync=='function')founderSync(true);autoSave()}}catch(e){console.warn('founder list apply',e)}}
+function check(){
+ if(!rd()||!rsOn()||done===FBU.uid||FBU.isAnonymous)return;const uid=FBU.uid;
+ FBF.getDoc(FBF.doc(FBD,'founders',uid)).then(d=>{done=uid;if(d.exists())apply(uid,d.data())},e=>{if(!e||e.code!=='permission-denied')done=''});
+ done=uid}
+setInterval(check,6000);setTimeout(check,2500);
+})();
