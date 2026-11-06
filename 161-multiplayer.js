@@ -756,7 +756,7 @@ const okId=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
 function frErr(e){console.warn('[friends]',e);FR.err=/permission/i.test(String(e&&(e.code||e.message)||e))?'Friends is not switched on yet. The database rules need publishing.':'Could not reach Friends. Check your connection.';frDraw()}
 function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
  rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;
-  R.get(R.ref(db,'f/p/'+uid+'/h')).then(s=>{FR.h=s.val()||'';FR.ok=1;frPresence();frDraw()}).catch(frErr);
+  R.get(R.ref(db,'f/p/'+uid+'/h')).then(s=>{FR.h=s.val()||'';FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
   R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.od=0;frPresence()}});
   R.onValue(R.ref(db,'f/l/'+uid),s=>{const v=s.val()||{};for(const f in FR.pu)if(!v[f]){try{FR.pu[f]()}catch(e){}delete FR.pu[f];delete FR.P[f]}FR.L=v;
    for(const f in v)if(!FR.pu[f]&&okId(f))FR.pu[f]=R.onValue(R.ref(db,'f/p/'+f),x=>{const o=FR.P[f],n=x.val();FR.P[f]=n;if(o&&!o.o&&n&&n.o&&n.h)say('@'+n.h+' is online.');frDraw()},()=>{});frDraw()},frErr);
@@ -770,7 +770,7 @@ setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);
 const frN=()=>Object.keys(FR.Q||{}).length;
 const frName=f=>{const p=FR.P[f];return p&&p.h?'@'+p.h:'Friend'};
 /* pick a username (once) */
-window.FRX={FR,frStart:()=>frStart(),frPresence:()=>frPresence(),trailer:MPTR};
+window.FRX={FR,frStart:()=>frStart(),frPresence:()=>frPresence(),rtdb:()=>rtdb(),trailer:MPTR};
 window.frClaim=()=>{const i=$('frh'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='A username has 3 to 16 letters, numbers or _.';snd('err');return frDraw(1)}
  const{R,db,uid}=FR.r;FR.msg='Checking…';frDraw(1);R.get(R.ref(db,'f/n/'+h)).then(s=>{if(s.exists()&&s.val()!==uid){FR.msg='@'+h+' is taken. Try another.';snd('err');return frDraw(1)}
   return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:frNm(),o:1,rm:MPS&&!MPTR?MPS.code:'',t:R.serverTimestamp()}}).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
@@ -809,13 +809,13 @@ function frDraw(force){document.querySelectorAll('.frbadge').forEach(b=>b.textCo
  if(FR.err&&!FR.ok)h+=`<p class=m>${esc(FR.err)}</p>`;
  else if(!FR.ok)h+='<p class=m>Connecting…</p>';
  else if(!FR.h)h+=`<p>Pick a username so your friends can find you. It is the only thing other players see, so keep your real name out of it.</p><div class=ng><input id=frh maxlength=16 placeholder="username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frClaim()"><button class=go onclick="frClaim()">Save</button></div>`;
- else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button> <button onclick="fwNameBox()" style="padding:3px 8px;font-size:12px">Change name</button></p>
+ else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button> <button onclick="fwNameBox()" style="padding:3px 8px;font-size:12px">Change name</button> <button onclick="fwProfileOpen('${esc(FR.h)}')" style="padding:3px 8px;font-size:12px">My profile</button></p>
   <div class=ng><input id=fra maxlength=17 placeholder="Friend's username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frAdd()"><button class=go onclick="frAdd()">Add friend</button></div>`;
   const Q=Object.keys(FR.Q).filter(okId);if(Q.length)h+='<h3>Requests</h3>'+Q.map(f=>{const q=FR.Q[f]||{};return`<div class=frr><div><b>@${esc(q.h||'?')}</b><small>${q.nm?'Plays as '+esc(q.nm):'Wants to be friends'}</small></div><button class=go onclick="frAcc('${f}')">Accept</button><button onclick="frDec('${f}')">Decline</button><button onclick="frBlock('${f}')">Block</button></div>`}).join('');
   const L=Object.keys(FR.L).filter(okId).sort((a,b)=>((FR.P[b]||{}).o?1:0)-((FR.P[a]||{}).o?1:0)||frName(a).localeCompare(frName(b)));
   h+=`<h3>Friends${L.length?' ('+L.filter(f=>(FR.P[f]||{}).o).length+' online)':''}</h3>`;
   h+=L.length?L.map(f=>{const p=FR.P[f]||{},on=!!p.o,inMine=MPS&&p.rm===MPS.code,st=!on?'Offline':p.rm?(inMine?'In your band room':'In a band room'):'Online, playing solo';
-   const bt=(on&&MPS&&!MPTR&&!inMine?`<button class=go onclick="frInv('${f}')">Invite</button>`:'')+(on&&p.rm&&!inMine?`<button onclick="frJoin('${f}')">Join</button>`:'')+`<button onclick="frDel('${f}')" title="Remove friend">Remove</button>`;
+   const bt=(on&&MPS&&!MPTR&&!inMine?`<button class=go onclick="frInv('${f}')">Invite</button>`:'')+(on&&p.rm&&!inMine?`<button onclick="frJoin('${f}')">Join</button>`:'')+(p.h?`<button onclick="fwProfileOpen('${esc(p.h)}')">Profile</button>`:'')+`<button onclick="frDel('${f}')" title="Remove friend">Remove</button>`;
    return`<div class=frr><div><b><i class="mpd ${on?'on':'off'}"></i>${esc(frName(f))}</b><small>${st}${p.nm?' · '+esc(p.nm):''}</small></div>${bt}</div>`}).join(''):'<p class=m>No friends yet. Add one by their username, or send them yours.</p>';
   if(!MPS)h+='<p class=m><small>Create or join a band room to invite friends into it.</small></p>';
   const B=Object.keys(FR.B).filter(okId);if(B.length)h+=`<details><summary class=m>Blocked (${B.length})</summary>${B.map(f=>`<div class=frr><div><b>${esc(String(FR.B[f]))}</b></div><button onclick="frUnblock('${f}')">Unblock</button></div>`).join('')}</details>`}

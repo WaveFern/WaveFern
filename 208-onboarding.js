@@ -16,6 +16,10 @@ const X=()=>window.FRX,FR_=()=>X()&&X().FR,DAY=864e5,U_CD=30*DAY,D_CD=7*DAY;
 const DK=()=>'fw_u_'+FW_ACCT+'_dn',SK=()=>'fw_u_'+FW_ACCT+'_nct';
 const dnGet=()=>{try{return FW_ACCT?String(localStorage.getItem(DK())||''):''}catch(e){return''}};
 window.fwDisplayName=dnGet;
+/* the chosen username (lower case, no @): from the database once Friends has loaded, else the copy remembered on this device */
+const UK=()=>'fw_u_'+FW_ACCT+'_h';
+const uCached=()=>{try{return FW_ACCT?String(localStorage.getItem(UK())||''):''}catch(e){return''}};
+window.fwUsername=()=>{try{const F=FR_();return(F&&F.h)||uCached()}catch(e){return uCached()}};
 /* ---- the rules ---- */
 const SUB=['wavefern','admin','moderator','official','support','founder','bigvee','fuck','shit','cunt','nigg','fagg','rape','nazi','hitler','bitch','whore','retard','kike','chink'],
  EXACT=['mod','dev','owner','staff','system','james','rowan','ceo','team','wf','vee','server','bot'];
@@ -61,15 +65,28 @@ async function box(){const F=FR_(),st=await stamps(),now=Date.now(),hasU=!!F.h,h
    if(chD||(!hasU&&canD))stp['f/u/'+uid+'/d']=ts;
    /* with the proposed rules the change stamps must go in the same write; with the older rules they are refused, so try again without them */
    try{await R.update(R.ref(db),Object.assign({},up,stp))}catch(e1){if(!/permission/i.test(String(e1&&(e1.code||e1.message)||e1)))throw e1;await R.update(R.ref(db),up)}
+   try{localStorage.setItem(UK(),nh)}catch(e5){}try{if(window.fwProfileSync)fwProfileSync(1)}catch(e5){}
    const L=stLocal();if(chU)L.t=Date.now();if(chD||(!hasU&&canD))L.d=Date.now();try{localStorage.setItem(SK(),JSON.stringify(L));localStorage.setItem(DK(),nd)}catch(e2){}
    F.h=nh;F.pk='';F.od=0;X().frPresence();close();try{snd('chime');say('Saved: '+nd+' (@'+nh+')')}catch(e3){}}
-  catch(e4){m.style.color='#ff9a9a';m.textContent='Could not save that. Try again later.';s.disabled=false;console.warn('[names]',e4)}};
+  catch(e4){console.warn('[names]',e4);m.style.color='#ff9a9a';s.disabled=false;let msg='Could not save that. Try again.';
+   try{if(chU){const{R,db,uid}=F.r,x=await R.get(R.ref(db,'f/n/'+h));if(x.exists()&&x.val()!==uid)msg='@'+h+' was just taken by someone else. Try another.';else if(/permission/i.test(String(e4&&(e4.code||e4.message)||e4)))msg='The server refused that. The database rules may need publishing (permission denied).'}}catch(e6){}
+   m.textContent=msg;snd('err')}};
  (!hasU?u:d).focus()}
 window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;const F=FR_();if(!F||!F.ok||!F.r)return;shown=1;box().catch(()=>{shown=0})};
-setInterval(()=>{try{if(shown||later||!FW_ACCT||!X()||X().trailer||!rsOn()||FW_TRL)return;
- const F=FR_();if(!F.ok||!F.r)return;if(F.h&&dnGet())return;
- if(document.getElementById('annov')||!['title','creator','play','pause'].includes(mode))return;
- fwNameBox()}catch(e){}},1000);
+/* Required username: after a Google sign-in, and on every refresh, an account with no username is asked straight away. It does not depend on the
+   reset date. If the database can not be reached or refuses the read, a blocking notice says why with Retry, instead of staying silent. */
+let t0=0;
+function errBox(why){if(document.getElementById('onbe')||document.getElementById('onbx'))return;const o=document.createElement('div');o.id='onbe';o.style.cssText='position:fixed;inset:0;z-index:99991;background:#000d;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box';
+ o.innerHTML='<div class="box modal" style="width:min(400px,94vw)"><h2>Setting up your account</h2><p>We could not check your username yet, so we can not let you in without one.</p><p class=m><small>'+esc(why)+'</small></p><div class=row2><button class=go id=onre>Retry</button><button id=onro>Sign out</button></div></div>';
+ document.body.appendChild(o);o.querySelector('#onre').onclick=()=>{o.remove();t0=Date.now();const x=X();if(x){x.FR.rerr='';x.FR.on=0;x.frStart()}};
+ o.querySelector('#onro').onclick=()=>{o.remove();try{fbSignOut()}catch(e){}}}
+setInterval(()=>{try{if(shown||later||!FW_ACCT||FW_TRL)return;const x=X();if(!x||x.trailer)return;const F=x.FR;
+ if(!F.on)x.frStart();
+ if(!['title','creator','play','pause'].includes(mode))return;
+ if(F.ok&&F.r){if(F.h){try{localStorage.setItem(UK(),F.h)}catch(e){}}if(F.h&&dnGet())return;if(document.getElementById('annov'))return;fwNameBox();return}
+ if(uCached()&&dnGet())return;
+ if(!t0)t0=Date.now();
+ if(F.rerr)errBox(/permission/i.test(F.rerr)?'The database refused the read (permission denied). The Firebase Realtime Database rules need publishing.':'Could not reach the database: '+F.rerr);
+ else if(Date.now()-t0>25000)errBox('The database did not answer in time. Check your connection.')}catch(e){}},1000);
 /* Friends is only started when needed; start it as soon as someone is signed in after the reset so this can run */
-setInterval(()=>{try{if(FW_ACCT&&X()&&rsOn()&&!FR_().on&&!X().trailer)X().frStart()}catch(e){}},3000);
 })();

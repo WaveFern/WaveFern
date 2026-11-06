@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.79.6';
+const GAME_VERSION='v49.80.0';
 const VERSION_HISTORY=[
+ {v:'v49.80.0',n:'Usernames are now a real feature. After Google sign-in (and after every refresh) an account with no username is asked to choose one straight away, it is saved to the account so it follows you to any device, and no two players can share one. Players have a public profile (Friends > Profile). If the server can not be reached the game now says why instead of staying silent. Saves still load.'},
  {v:'v49.79.6',n:'The leaderboard now works: signed-in players are ranked on real scores (days, listeners, streams, money, fame, songs, followers) with their Founder badge. Saves still load.'},
  {v:'v49.79.5',n:'The detailed back-wall windows (frames, sills, shutters, curtain rails) are back in the starting house, and the sunbeams and their Settings toggle are kept. Saves still load.'},
  {v:'v49.79.4',n:'People walking in opposite directions on a pavement no longer walk into each other: each direction now keeps to its own side, like real life.'},
