@@ -6,8 +6,12 @@
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev shops '+t,e)}}};
  const css=document.createElement('style');
  css.textContent=`body.fwk #pc .ico,body.fwk #pc .tb,body.fwk #pc .bwu,body.fwk #pc .bwb{display:none!important}
+body:not(.fwk) #pc [ondblclick*="'web'"],body:not(.fwk) #pc [onclick*="'web'"]{display:none!important}
 body.fwk #pc .win{left:3vw!important;top:3vh!important;right:auto!important;width:94vw!important;height:94vh!important;max-width:none!important;max-height:none!important}`;
  document.head.appendChild(css);
+ /* the Browser app is gone: it is no longer in the computer's app list (desktop icons, Start menu). The window code stays only
+    so the city shops can reuse it. */
+ safe(()=>{const src=String(pcR0),n=src.replace("'store','web','msg'","'store','msg'");if(n!==src)(0,eval)('pcR0='+n)},'applist');
  let K=0;
  window.devShop=function(k){if(typeof SITE=='undefined'||!SITE[k]||!PA[k])return;safe(()=>{openPC();K=1;document.body.classList.add('fwk');OA=['web'];app='web';bw=k;pcR()},'open')};
  const kOff=()=>{K=0;document.body.classList.remove('fwk')};
@@ -16,7 +20,7 @@ body.fwk #pc .win{left:3vw!important;top:3vh!important;right:auto!important;widt
   if(K&&mode=='pc'&&(app!=='web'||bw=='home')){kOff();return closePC()}
   if(!K&&mode=='pc'&&!inR){if(app=='web')app=0;if(Array.isArray(OA)&&OA.includes('web'))OA=OA.filter(k=>k!='web')}
   inR=1;let r;try{r=p0.apply(this,arguments)}finally{inR=0}
-  if(!K)safe(()=>document.querySelectorAll(`#ui [ondblclick*="'web'"],#ui [onclick*="app='web'"]`).forEach(e=>e.remove()),'hide');
+  if(!K)safe(()=>{const n=document.querySelectorAll(`#pc [ondblclick*="'web'"],#pc [onclick*="'web'"]`);n.forEach(e=>e.remove());if(n.length&&typeof pcLayout=='function')pcLayout()},'hide');
   return r}}
  /* in a shop you buy on the spot */
  if(typeof book=='function'){const b0=book;book=function(t,i){if(!K)return b0.apply(this,arguments);
