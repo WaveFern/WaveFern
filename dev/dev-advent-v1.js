@@ -106,6 +106,9 @@
   if(typeof F!='undefined')Object.getOwnPropertyNames(F).forEach(key=>{const f=F[key];if(!f||!f.b)return;if(key.indexOf('sv_')==0)return;const v=key.indexOf('xm_')==0?X[key]:0;if(v>0)out.push({t:'f',key,n:f.n,v,k:'f:'+key})});
   if(typeof GAR!='undefined')GAR.forEach(g=>{const v=g.xm?X[g.n]:0;if(v>0)out.push({t:'k',id:g.id,n:g.n,v,k:'k:'+g.id})});
   WRAPS.forEach(w=>out.push({t:'w',pat:w[0],n:w[1],v:w[2],k:'w:'+w[0]}));
+  /* anything a calendar door gives is never in a present, so each prize is only found in one place */
+  const door=new Set(Object.values(PLAN).filter(p=>p.t!='x').map(p=>p.n));
+  for(let i=out.length-1;i>=0;i--)if(door.has(out[i].n)||door.has(out[i].key))out.splice(i,1);
   out.forEach(o=>o.tier=tierOf(o.v));return POOL=out}
  const byTier=t=>pool().filter(o=>o.tier==t);
  const pick=a=>a[Math.floor(Math.random()*a.length)];
