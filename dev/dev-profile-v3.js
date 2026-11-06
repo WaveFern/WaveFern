@@ -74,6 +74,15 @@
  css.textContent=`#pfx{position:fixed;inset:0;z-index:9995;display:flex;align-items:center;justify-content:center;background:#000b;padding:12px;font:14px ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec}
 #pfx *{box-sizing:border-box}
 #pfx .fwpc{height:auto;border-radius:0;width:min(520px,100%);max-height:92vh;overflow:auto;background:#000;border:3px solid #2e2e2e;box-shadow:6px 6px 0 #0008;display:flex;flex-direction:column}
+#pfx .pf-ask{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px}
+#pfx .pf-ask-b{background:#0a0d0b;border:2px solid #2fe68a;padding:16px;max-width:320px;width:100%}
+#pfx .pf-ask-b p{margin:0 0 10px;color:#e8f3ec}
+#pfx .pf-ask-c{display:block;width:100%;margin:0 0 6px;padding:8px;text-align:left;background:#0a0d0b;border:2px solid #2e2e2e;color:#e8f3ec;font:11px Silkscreen,ui-monospace,monospace;cursor:pointer}
+#pfx .pf-ask-c.on{border-color:#2fe68a;color:#2fe68a}
+#pfx .pf-ask-r{display:flex;gap:8px;margin-top:10px}
+#pfx .pf-ask-r button{flex:1;padding:8px;background:#0a0d0b;border:2px solid #2e2e2e;color:#e8f3ec;font:11px Silkscreen,ui-monospace,monospace;cursor:pointer}
+#pfx .pf-ask-r .y{border-color:#2fe68a;color:#2fe68a}
+#pfx .pf-ask-r button:disabled{opacity:.4;cursor:not-allowed}
 #pfx .pf-top{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:2px solid #2e2e2e;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#8aa094}
 #pfx .pf-top button{padding:5px 10px;font-size:12px}
 #pfx .pf-head{display:flex;gap:16px;padding:20px 16px 16px;align-items:flex-start}
@@ -225,6 +234,9 @@ const PX={
   const keep=d.firstElementChild?d.firstElementChild.scrollTop:0;
   d.innerHTML=V.mode=='priv'?privacy():V.mode=='edit'?edit():view(p);
   if(d.firstElementChild)d.firstElementChild.scrollTop=V.mode=='view'?keep:0;
+  if(V.ask&&V.mode=='view'){const a=V.ask,n='@'+p.user,CATS=[['spam','Spam'],['harassment','Harassment or bullying'],['bad name or bio','Inappropriate name or bio'],['bad photo','Inappropriate photo'],['cheating','Cheating'],['other','Other']];
+   const body=a=='report'?`<h3>REPORT ${n}</h3><p>Choose a reason:</p>${CATS.map(c=>`<button class="pf-ask-c${V.cat==c[0]?' on':''}" data-pf=cat data-c="${c[0]}">${c[1]}</button>`).join('')}`:`<h3>ARE YOU SURE?</h3><p>${a=='add'?'Send a friend request to '+n+'?':'Invite '+n+' to your band?'}</p>`;
+   const o=document.createElement('div');o.className='pf-ask';o.innerHTML=`<div class=pf-ask-b>${body}<div class=pf-ask-r><button data-pf=askno>CANCEL</button><button data-pf=askyes class=y ${a=='report'&&!V.cat?'disabled':''}>${a=='report'?'SEND REPORT':'YES'}</button></div></div>`;d.appendChild(o)}
  }
  document.addEventListener('click',e=>{
   const d=el();
@@ -234,7 +246,15 @@ const PX={
   if(!d||!d.contains(t))return;
   if(t.dataset.req){const s=load();s.req=t.dataset.req;save(s);return draw()}
   if(t.dataset.av){const s=load();s.pfp=+t.dataset.av;save(s);return draw()}
-  if(k=='close')close();
+  if(k=='cat'){V.cat=t.dataset.c;return draw()}
+  if(k=='askno'){V.ask=0;V.cat=0;return draw()}
+  let kk=k;
+  if(k=='askyes'){if(V.ask=='report'&&!V.cat)return;kk=V.ask;V.rc=V.cat;V.ask=0;V.cat=0}
+  else if((k=='add'||k=='invite'||k=='report')&&!t.disabled){V.ask=k;V.cat=0;return draw()}
+  act(kk,p);
+ });
+ function act(k,p){
+  {if(k=='close')close();
   else if(k=='back'){V.id=V.stack.pop()||'me';V.mode='view';V.msg='';draw()}
   else if(k=='edit'){V.mode='edit';V.err='';draw()}
   else if(k=='priv'){V.mode='priv';draw()}
@@ -253,13 +273,13 @@ const PX={
   else if(p.pub&&k=='add'){const i=document.createElement('input');i.id='fra';i.value=p.user;i.style.display='none';document.body.appendChild(i);try{frAdd();V.msg='Friend request sent to @'+p.user+'.'}catch(e){V.msg='Could not send a request.'}i.remove();draw()}
   else if(p.pub&&k=='block'){try{frBlock(p.uid);V.msg='';}catch(e){}draw()}
   else if(p.pub&&k=='invite'){try{frInv(p.uid)}catch(e){V.msg='Join a band room first.'}draw()}
-  else if(p.pub&&k=='report'){V.msg='Report noted. Thank you.';draw()}
+  else if(p.pub&&k=='report'){V.msg='Report sent ('+V.rc+'). Thank you.';draw()}
   else if(k=='add'){REL[p.id]='requested';V.msg='Friend request sent to @'+p.user+'. (Mock: nothing was sent.)';draw()}
   else if(k=='cancel'){REL[p.id]='none';V.msg='Request cancelled.';draw()}
   else if(k=='invite'){V.msg=p.rel=='friend'||REL[p.id]=='friend'?'Invite sent to @'+p.user+'. (Mock: nothing was sent.)':'You can invite friends only. Add them first.';draw()}
   else if(k=='block'){REL[p.id]=stateFor(p)=='blocked'?'none':'blocked';V.msg=REL[p.id]=='blocked'?'Blocked. They cannot send you requests or invites.':'Unblocked.';draw()}
-  else if(k=='report'){V.msg='Report sent. (Mock: a real report would flag the name, bio and avatar for review.)';draw()}
- });
+  else if(k=='report'){V.msg='Report sent ('+V.rc+'). (Mock: a real report would flag the name, bio and avatar for review.)';draw()}}
+ }
  document.addEventListener('change',e=>{const s=e.target.dataset&&e.target.dataset.sw;if(!s)return;const o=load();o.show[s]=e.target.checked?1:0;save(o)});
  document.addEventListener('keydown',e=>{if(e.key=='Escape'&&el()){e.stopImmediatePropagation();close()}},true);
 
