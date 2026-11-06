@@ -1,9 +1,9 @@
 /* ---------- v49.74.0: big update countdown ----------
    A small always-visible box in gameplay (top right, under the HUD) counting down to the big update: the fresh start at
-   RS.CUT (12-reset.js), Friday 6 November 2026 18:00 UTC. Shows the countdown only; it hides itself once that moment passes.
+   RS.CUT (12-reset.js), Friday 6 November 2026 13:30 UTC. Shows the countdown only; it hides itself once that moment passes.
    Display only: it never touches saves or game state. */
 (function(){
- const CUT=(typeof RS!=='undefined'&&RS.CUT)||Date.UTC(2026,10,6,18,0,0);
+ const CUT=(typeof RS!=='undefined'&&RS.CUT)||Date.UTC(2026,10,6,13,30,0);
  const css=document.createElement('style');
  css.textContent='#bucd{position:fixed;right:10px;top:96px;z-index:60;display:none;flex-direction:column;align-items:flex-end;gap:2px;padding:6px 10px;background:#000;color:#e8f3ec;border:2px solid #000;box-shadow:inset 0 -3px #0007,0 0 0 2px #2e8b57;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;pointer-events:none}#bucd.on{display:flex}#bucd b{font:700 14px ui-monospace,Menlo,Consolas,monospace;color:#7fe0a4;letter-spacing:0}';
  document.head.appendChild(css);
