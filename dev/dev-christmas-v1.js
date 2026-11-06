@@ -20,20 +20,30 @@
  const SNOW=new THREE.Color('#f1f5fa'),ICE=new THREE.Color('#bfe0f0');
  const outdoorXZ=(x,z)=>z<260&&x<880;
  /* the player's own home (and its extension) is left as it was */
- const inHome=(x,z)=>x>-.7&&x<16.7&&z>-30&&z<12.8;
+ /* only the house itself (and its back wing, once built) is left bare; the garden behind it snows like everywhere else */
+ const HZU={value:-.7};
+ const inHome=(x,z)=>x>-.7&&x<16.7&&z>HZU.value&&z<12.8;
  const SNOWU={value:0};/* 0 = bare winter map, 1 = fully snowed (eases with the weather) */
  let snowTarget=0;
+
+ /* ---------- no farm: its fields, barn, silo, fence, sheep and sign are left out when the world is built (the ground stays grass) ---------- */
+ {const inF=(x,z)=>x>-240&&x<-128&&z>-130&&z<-28;
+  const f0=flushSB;flushSB=function(){
+   try{for(const k in SBC){const L=SBC[k];if(L&&L.some(b=>inF(b[4],b[6])))SBC[k]=L.filter(b=>!inF(b[4],b[6]))}
+    for(let i=cols.length-1;i>=0;i--){const c=cols[i];if(inF(c[0],c[1])&&inF(c[2],c[3]))cols.splice(i,1)}
+    if(typeof WORLD!='undefined')WORLD.children.slice().forEach(o=>{if(o.isSprite&&Math.abs(o.position.x+150)<1&&Math.abs(o.position.z+70)<1)WORLD.remove(o)})}catch(e){console.warn('xmas farm',e)}
+   f0()}}
 
  /* ---------- snow cover: one shader patch on every vertex-coloured material, driven by SNOWU ---------- */
  function patchMat(m){
   if(Array.isArray(m)){m.forEach(patchMat);return}
   if(!m||!m.userData||m.userData.xms||!m.vertexColors)return;m.userData.xms=1;
   m.onBeforeCompile=function(sh){
-   sh.uniforms.uSnow=SNOWU;
-   sh.vertexShader='uniform float uSnow;\n'+sh.vertexShader.replace('#include <color_vertex>',`#include <color_vertex>
+   sh.uniforms.uSnow=SNOWU;sh.uniforms.uHZ=HZU;
+   sh.vertexShader='uniform float uSnow;uniform float uHZ;\n'+sh.vertexShader.replace('#include <color_vertex>',`#include <color_vertex>
 #ifdef USE_COLOR
    {vec3 wq=(modelMatrix*vec4(position,1.)).xyz;
-    float ok=step(wq.z,260.)*step(wq.x,880.)*(1.-step(-.7,wq.x)*step(wq.x,16.7)*step(-30.,wq.z)*step(wq.z,12.8));
+    float ok=step(wq.z,260.)*step(wq.x,880.)*(1.-step(-.7,wq.x)*step(wq.x,16.7)*step(uHZ,wq.z)*step(wq.z,12.8));
     float okF=step(3500.,wq.x)*step(wq.x,4800.)*step(wq.z,-3000.);/* destination cities (outdoors only): snow, but no frozen water */
     vec3 c0=vColor;float mx=max(c0.r,max(c0.g,c0.b)),mn=min(c0.r,min(c0.g,c0.b));
     float water=step(.4,c0.b-c0.r),dark=step(mx,.34)*step(mx-mn,.1)*(1.-water);
@@ -269,6 +279,7 @@
   /* snow cover follows today's weather */
   const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live)?1:0;
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
+  HZU.value=-.7-((typeof WGX=='number'&&WGX)||0);
   SNOWU.value+=(snowTarget-SNOWU.value)*Math.min(1,dt*1.2);if(Math.abs(snowTarget-SNOWU.value)<.01)SNOWU.value=snowTarget;
   sT+=dt;BU.t.value=sT;
   /* the pond's water jet is switched off while the pond is frozen */
