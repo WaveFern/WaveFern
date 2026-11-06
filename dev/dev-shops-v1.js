@@ -1,5 +1,5 @@
 /* WaveFern dev: no browser on the computer. The city shops do what their website did: walk in and talk at the counter
-   to open that shop (Motors, Pet Shop, Security, Property, THREADZ and Gphones in Nova Mall). Buying there is instant,
+   to open that shop (Motors, Pet Shop, Security, Property, and the Threadz and Gphones buildings from dev-citystores-v1.js). Buying there is instant,
    no appointment. Only loaded on /dev/. Add ?noshops to skip it. */
 (function(){
  if(!window.FW_DEV||/[?&]noshops/.test(location.search))return;
@@ -26,7 +26,7 @@ body.fwk #pc .win{left:3vw!important;top:3vh!important;right:auto!important;widt
  if(typeof book=='function'){const b0=book;book=function(t,i){if(!K)return b0.apply(this,arguments);
   if(t=='car'&&!S.garage){snd('err');return say('You need a garage first. Buy one at the Property office.')}buyX(t,i);pcR()}}
  if(PA.cars){const c0=PA.cars;PA.cars=function(){return String(c0.apply(this,arguments)).replace('on the Property website','at the Property office')}}
- const TALK={'Rex (car dealer)':'cars','Poppy (pet keeper)':'pets','Viktor (security chief)':'guard','Mr. Okafor (agent)':'prop','Vera (sales agent)':'prop','Sasha (stylist)':'clothes','Ben (tech seller)':'phones'};
+ const TALK={'Rex (car dealer)':'cars','Poppy (pet keeper)':'pets','Viktor (security chief)':'guard','Mr. Okafor (agent)':'prop','Vera (sales agent)':'prop'};
  function shopInts(){if(typeof INT=='undefined')return;INT.forEach(o=>{if(o._dk||!o.l||o.l.indexOf('Talk to ')!==0)return;const k=TALK[o.l.slice(8)];if(!k||!SITE[k])return;
   o._dk=1;const nm=(typeof SITES!='undefined'&&SITES[k]&&SITES[k][1])||SITE[k][1];o.l='Shop '+nm;o.a=()=>devShop(k)})}
  setInterval(()=>safe(shopInts,'ints'),1000);
