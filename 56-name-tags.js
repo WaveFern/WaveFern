@@ -26,8 +26,6 @@ function ntBox(){if(NTAG.box)return NTAG.box;const d=document.createElement('div
  /* v49.33.0: in the game's own style (v49.33.1: bigger): the pixel font on a dark panel with a hard black edge and drop shadow, and a little pixel tail */
  '#ntags .nt{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font:400 18px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#e8f3ec;background:#0b0f0d;padding:6px 10px 5px;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,3px 3px 0 #0009;will-change:transform}'+
  '#ntags .nt:after{content:"";position:absolute;left:50%;bottom:-9px;margin-left:-4px;width:8px;height:6px;background:#000}'+
- '#ntags .nt.art{color:#ffd84a;box-shadow:inset 0 0 0 2px #ffd84a,3px 3px 0 #0009}'+
- '#ntags .nt.art:before{content:"";display:inline-block;width:7px;height:7px;background:#ffd84a;margin-right:7px;vertical-align:2px}';
  document.head.appendChild(st)}
 const NTV=new THREE.Vector3();
 /* attached to the scene and every parent visible (the label itself is hidden: its page tag is drawn instead) */
@@ -40,7 +38,7 @@ function ntTick(){
  for(let i=NTAG.list.length-1;i>=0;i--){const t=NTAG.list[i],s=t.s;let on=false;
   if(show&&ntShown(s)){s.getWorldPosition(NTV);NTV.y+=.12;NTV.project(NTAG.cam||cam);if(NTV.x>-1.15&&NTV.x<1.15&&NTV.y>-1.15&&NTV.y<1.2){on=true;
    const x=Math.round((NTV.x+1)/2*W),y=Math.round((1-NTV.y)/2*H);if(t.x!==x||t.y!==y){t.x=x;t.y=y;t.el.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-100%)'}
-   const art=typeof ART_M!='undefined'&&ART_M.some(o=>o.m===s.parent);if(art!==t.art){t.art=art;t.el.classList.toggle('art',art)}}}
+   }}
   if(on!==t.on){t.on=on;t.el.style.display=on?'block':'none'}
   /* a person removed from the world for good (an artist after the session, a rebuilt list) drops its tag */
   let o=s.parent;while(o&&o!==scene)o=o.parent;if(!o){if(++t.gone>240){t.el.remove();NTAG.list.splice(i,1)}}else t.gone=0}}

@@ -726,7 +726,7 @@ window.mpColReady=a=>{if(S.energy<COLLAB_E){snd('err');return say('Too tired to 
 const COFF={vo:[0,0],gt:[-.6,1.1],bs:[-.6,-1.1],dr:[-1.4,1.6],ky:[-1.4,-1.6]};
 function goCol(d){const o=ART_M.find(x=>x.i===d.a);if(!o)return say('That artist is not around any more.');S.energy=Math.max(0,+(S.energy-COLLAB_E).toFixed(1));try{updateVersion()}catch(e){}
  $('ui').innerHTML='';MEET=null;mode='cut';cs2={o,t:0,op:d.op||0,band:d.n||1,bt:d.title||'',bl:d.n>1?d.bl:null};const f=COFF[MPS.inst]||[0,0];P.x=o.x-1.4+f[0];P.z=o.z+f[1];P.rot=Math.PI/2;
- say(d.n>1?'Band collab with '+o.name+' (fictional). Everyone records together.':'Recording with '+o.name+' (fictional)')}
+ say(d.n>1?'Band collab with '+o.name+'. Everyone records together.':'Recording with '+o.name+'')}
 {const c0=collabDone;collabDone=function(){const c=cs2||{},b=c.band||0,bt=c.bt,bl=c.bl,n0=S.nid;const r=c0.apply(this,arguments);
  try{const d=S.drafts[S.drafts.length-1];if(MPS&&bl&&d&&d.id===n0){const add=b>1?3*(b-1):0;d.q+=add;d.title=bt||d.title;d.bt=d.title;d.bl=bl;(BQ[bl]=BQ[bl]||{})[ME.id]=d.q;
   const t=$('tin');if(t){t.value=d.title;t.readOnly=true;t.blur();t.insertAdjacentHTML('afterend',`<p class=m><small>Band collab with ${b} members (+${add} quality). Everyone gets this song, and releasing it releases it for the whole band.</small></p>`)}
