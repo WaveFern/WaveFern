@@ -15,7 +15,6 @@
  const XMAS=true;
  if(!window.FW_FEAT||!XMAS)return;
  if(/[?&]noxmas/.test(location.search))return;
- window.FW_XMAS=1;
  const R=(a,b)=>a+Math.random()*(b-a),RI=(a,b)=>Math.floor(R(a,b+1)),pk=a=>a[Math.floor(Math.random()*a.length)];
  const SNOW=new THREE.Color('#f1f5fa'),ICE=new THREE.Color('#bfe0f0');
  const outdoorXZ=(x,z)=>z<260&&x<880;
@@ -33,6 +32,10 @@
     for(let i=cols.length-1;i>=0;i--){const c=cols[i];if(inF(c[0],c[1])&&inF(c[2],c[3]))cols.splice(i,1)}
     if(typeof WORLD!='undefined')WORLD.children.slice().forEach(o=>{if(o.isSprite&&Math.abs(o.position.x+150)<1&&Math.abs(o.position.z+70)<1)WORLD.remove(o)})}catch(e){console.warn('xmas farm',e)}
    f0()}}
+
+ /* LOCKED UNTIL 1 DECEMBER on the real site: snow, ice, lights, wreaths, winter clothes and the plaza tree only happen in December. Always on in /dev/. */
+ if(!window.FW_DEV&&new Date().getMonth()!==11)return;
+ window.FW_XMAS=1;
 
  /* ---------- snow cover: one shader patch on every vertex-coloured material, driven by SNOWU ---------- */
  function patchMat(m){
