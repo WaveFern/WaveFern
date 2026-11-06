@@ -4,7 +4,7 @@
    a player can only read their own. Nobody can give themselves a Founder entry.
    1. fdSnapshot(): run ONCE by the admin (signed in with the admin Google account) BEFORE the fresh start, from the browser console.
       fdSnapshot() is a dry run: it reads every cloud save and says how many players would be listed. fdSnapshot(true) writes the list.
-      It uses the same test as the fresh start (played to Day 2 or at least one song, not a trailer career), and is safe to run again.
+      It uses the same test as the fresh start (played to Day 2 or at least one song, not a trailer career; a career made after the first reset only counts if it already has S.fdr), and is safe to run again. Run it again BEFORE the second reset (RS.V=2) goes live, because the reset replaces each player's cloud save.
    2. Every Google player, on sign-in after the fresh start, reads their own founders/{uid}. If it exists, a Founder claim for that
       account is added to this device's Legacy store, and a career without Founder status is given it. Nothing else changes.
    Guest players (no Google account) cannot be listed server-side; their claim stays on their device. */
@@ -21,7 +21,7 @@ window.fdSnapshot=async function(write){
   const q=last?F.query(col,F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(col,F.orderBy(F.documentId()),F.limit(100));
   const s=await F.getDocs(q);if(s.empty)break;
   s.forEach(d=>{seen++;const x=d.data();let st=null;try{st=rsStats(x.code)}catch(e){}
-   if(st&&!(st.rv>=RS.V)&&rsEligible(st,x.code))elig.push({uid:d.id,a:String(st.artist||'').slice(0,24),d:Math.min(9999,st.day|0)});else skipped++});
+   if(st&&!(st.rv>=RS.V)&&rsEligible(st,x.code))elig.push({uid:d.id,a:String((st.rv>=1&&st.s.fdr&&st.s.fdr.a)||st.artist||'').slice(0,24),d:Math.min(9999,(st.rv>=1&&st.s.fdr?st.s.fdr.d:st.day)|0)});else skipped++});
   last=s.docs[s.docs.length-1];if(s.size<100)break}
  console.log('Cloud saves read: '+seen+'. Founders to list: '+elig.length+'. Not eligible (already new, too new, or trailer): '+skipped+'.');
  if(!write){console.log('Dry run: nothing written. Run fdSnapshot(true) to write the list.');return{seen,founders:elig.length}}
