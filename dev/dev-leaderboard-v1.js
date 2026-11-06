@@ -1,5 +1,4 @@
-/* WaveFern dev leaderboard (dummy data). Only loaded on /dev/ (see dev/index.html). The live game is untouched.
-   No fake data: shows an empty state until real rows exist. Adds a Leaderboard button to the main menu (and the pause menu). The screen has a tab per category: Time played, Listeners,
+/* WaveFern leaderboard, real data from Firestore (leaderboard/{uid}); no fake rows. Adds a Leaderboard button to the main menu (and the pause menu). The screen has a tab per category: Time played, Listeners,
    Streams, Money, Fame level, Songs released, Followers. 
    All data comes from LB.board(cat), which is the one function to swap for the real cloud list later. Add ?nolb to the address to skip it. */
 (function(){
@@ -17,8 +16,35 @@
   {k:'fol',t:'Followers',u:'total',me:()=>S.followers||0,fmt:f,max:60e6,pw:3.2}
  ];
  const meName=()=>S.artist||'You';
- /* the one function to replace with the real cloud list: returns [{name,v,me}] sorted high to low */
- LB.board=function(k){return[]};/* no real rows yet: swap for the real cloud list */
+ /* Real data: Firestore leaderboard/{uid} = {a,day,lis,str,mon,fame,sg,fol,f,t} (see firebase-rules/live/firestore.rules).
+    A signed-in player writes only their own row (from the career being played); everyone signed in reads the top rows per category. */
+ const CAP=50,TTL=30000,cache={},LBS={st:'idle',err:''};
+ const live=()=>typeof FBU!='undefined'&&FBU&&typeof FBF!='undefined'&&FBF&&typeof FBD!='undefined'&&FBD;
+ const cl=(v,m)=>Math.max(0,Math.min(m,Math.floor(+v||0)));
+ /* the name on the board: the chosen username when the profile feature provides one, else the artist name */
+ const boardName=()=>{let n='';try{if(typeof fwUsername=='function')n=fwUsername()||''}catch(e){}if(!n)n=(S&&S.artist)||'';return String(n).replace(/[<>"]/g,'').slice(0,24)};
+ /* only a career made after the full progress reset counts, never a trailer career or an old one */
+ const eligible=()=>{try{return live()&&typeof S=='object'&&S&&!FW_TRL&&typeof RS!='undefined'&&rsOn()&&S.rv>=RS.V&&mode!='creator'&&mode!='load'&&!(typeof TT!='undefined'&&TT.on&&!TT.game)&&!wiping&&!!boardName()}catch(e){return false}};
+ const vals=()=>({a:boardName(),day:cl(S.day,1e5),lis:cl(S.listeners,1e12),str:cl(S.streams,1e12),mon:cl(S.money,1e12),fame:cl((()=>{try{return fameLevel()}catch(e){return 0}})(),1000),sg:cl((S.songs||[]).length,1e5),fol:cl(S.followers,1e12)});
+ let lastSig='',lastAt=0,noF=0,wbusy=0;
+ LB.push=function(force){if(wbusy||!eligible())return Promise.resolve(0);
+  const v=vals(),sig=JSON.stringify(v)+(S.fdr?1:0)+FBU.uid,n=Date.now();if(!force&&sig==lastSig&&n-lastAt<600000)return Promise.resolve(0);
+  const d=Object.assign({},v,{t:n});if(!noF)d.f=S.fdr?1:0;const uid=FBU.uid;wbusy=1;
+  const put=x=>FBF.setDoc(FBF.doc(FBD,'leaderboard',uid),x);
+  return put(d).catch(e=>{if(e&&e.code=='permission-denied'&&!noF){noF=1;delete d.f;return put(d)}throw e}).then(()=>{lastSig=sig;lastAt=n;LBS.werr='';return 1},e=>{LBS.werr=(e&&e.code)||'error';console.warn('leaderboard write',LBS.werr);return 0}).finally(()=>{wbusy=0})};
+ LB.load=function(k){if(!live()){LBS.st='out';return Promise.resolve()}
+  const c=cache[k];if(c&&Date.now()-c.at<TTL)return Promise.resolve();
+  const F=FBF,uid=FBU.uid;LBS.st='load';LBS.err='';
+  return F.getDocs(F.query(F.collection(FBD,'leaderboard'),F.orderBy(k,'desc'),F.limit(CAP))).then(async sn=>{
+   const rows=[];sn.forEach(d=>{const x=d.data();if(x&&typeof x.a=='string')rows.push({id:d.id,name:x.a,v:+x[k]||0,me:d.id==uid,fdr:!!x.f})});
+   if(!rows.some(r=>r.me)&&rows.length>=CAP){try{const m=await F.getDoc(F.doc(FBD,'leaderboard',uid));if(m.exists()){const x=m.data();rows.push({id:uid,name:x.a,v:+x[k]||0,me:true,fdr:!!x.f,rk:CAP+'+'})}}catch(e){}}
+   cache[k]={at:Date.now(),rows};LBS.st='ok'},e=>{LBS.st='err';LBS.err=(e&&e.code)||'error';cache[k]={at:Date.now()-TTL+8000,rows:[]};console.warn('leaderboard read',LBS.err)}).then(()=>{if(document.getElementById('lbd')&&CATS[cur].k==k)draw()})};
+ /* returns [{name,v,me,fdr}] sorted high to low */
+ LB.board=function(k){const c=cache[k];if(!c||Date.now()-c.at>=TTL)LB.load(k);return c?c.rows:[]};
+ const emptyMsg=()=>!live()?'Sign in with Google to see the leaderboard and join it.':LBS.st=='err'?(LBS.err=='permission-denied'?'The leaderboard is not switched on yet.':'Could not load the leaderboard. Try again soon.'):LBS.st=='load'||LBS.st=='idle'?'Loading...':!eligible()&&0?'':'No ranked players yet.';
+ setInterval(()=>{if(!document.hidden)LB.push()},60000);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)LB.push(1)});
+ addEventListener('pagehide',()=>LB.push(1));
  let cur=0,back='title',anim=1;
  const fm=()=>{try{return typeof fdMark=='function'?fdMark(13):''}catch(e){return''}};
  const css='<style>@keyframes lbIn{from{transform:translateX(-12px);opacity:0}to{transform:none;opacity:1}}@keyframes lbPop{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}'+
@@ -38,19 +64,20 @@
  function confetti(){const col=['#2fe68a','#1a8a52','#b8ffd9','#e8f3ec','#26302a'];let o='';for(let i=0;i<22;i++)o+=`<i class=cf style="left:${(i*4.7+((i*37)%9))%100}%;background:${col[i%5]};animation-delay:${(i%8)*.27}s"></i>`;return o}
  function draw(){
   const c=CATS[cur],rows=LB.board(c.k);
-  if(!rows.length){$('ui').innerHTML=css+`<div id=lbd class="box modal" style="width:min(460px,94vw)"><h2>Leaderboard</h2><div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div><div class="ban n">No ranked players yet.</div><p class=m><small>${c.u} · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;return}
+  if(!rows.length){$('ui').innerHTML=css+`<div id=lbd class="box modal" style="width:min(460px,94vw)"><h2>Leaderboard</h2><div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div><div class="ban n">${esc(emptyMsg())}</div><p class=m><small>${c.u} · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;return}
   const mi=rows.findIndex(x=>x.me),rk=mi+1,n=rows.length;
   
-  const ban=rk==1?`<div class=ban>YOU ARE #1 IN ${c.t.toUpperCase()}</div>`:rk<=3?`<div class=ban>TOP 3 IN ${c.t.toUpperCase()}: #${rk}</div>`:`<div class="ban n">You are #${rk} of ${n}${rk<=10?'. Top 10!':'.'} ${rows[mi-1]?'Next: '+esc(rows[mi-1].name)+' ('+esc(c.fmt(rows[mi-1].v))+')':''}</div>`;
+  const rkT=mi>=0&&rows[mi].rk?rows[mi].rk:rk;
+  const ban=rk==1?`<div class=ban>YOU ARE #1 IN ${c.t.toUpperCase()}</div>`:rk<=3?`<div class=ban>TOP 3 IN ${c.t.toUpperCase()}: #${rk}</div>`:`<div class="ban n">You are #${rkT}${rows[mi]&&rows[mi].rk?'':' of '+n}${rk<=10?'. Top 10!':'.'} ${rows[mi-1]?'Next: '+esc(rows[mi-1].name)+' ('+esc(c.fmt(rows[mi-1].v))+')':''}</div>`;
   const rest=rows.slice(3,25),lastRow=mi>=25?[rows[mi]]:[];
   $('ui').innerHTML=css+`<div id=lbd class="box modal${rk==1?' top1':''}" style="width:min(460px,94vw)">${rk<=3?confetti():''}<h2>Leaderboard</h2>
    <div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div>${ban}
-   <div class=pod>${[0,1,2].map(i=>podCell(rows[i],i,c)).join('')}</div>
-   <div class=list>${rest.concat(lastRow).map((x,j)=>{const i=x.me&&mi>=25?mi:j+3;return`<div class="row${x.me?' me':''}${anim?' a':''}" style="animation-delay:${Math.min(j,12)*.03}s"><b class=r>${i+1}</b><span>${esc(x.name)}${x.fdr?fm():''}${x.me?' (you)':''}</span><b>${esc(c.fmt(x.v))}</b></div>`}).join('')}</div>
-   <p class=m><small>${c.u} · sample list, not real players yet · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;
+   <div class=pod>${[0,1,2].filter(i=>rows[i]).map(i=>podCell(rows[i],i,c)).join('')}</div>
+   <div class=list>${rest.concat(lastRow).map((x,j)=>{const i=x.me&&mi>=25?mi:j+3;return`<div class="row${x.me?' me':''}${anim?' a':''}" style="animation-delay:${Math.min(j,12)*.03}s"><b class=r>${x.rk||i+1}</b><span>${esc(x.name)}${x.fdr?fm():''}${x.me?' (you)':''}</span><b>${esc(c.fmt(x.v))}</b></div>`}).join('')}</div>
+   <p class=m><small>${c.u} · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;
   const me=document.querySelector('#lbd .row.me');if(me&&mi>=3&&mi<25)me.scrollIntoView({block:'nearest'})}
  LB.tab=i=>{cur=(i+CATS.length)%CATS.length;draw()};
- LB.open=function(from){back=from||(typeof TT!='undefined'&&TT.on?'title':'pause');cur=0;draw();addEventListener('keydown',key,true)};
+ LB.open=function(from){back=from||(typeof TT!='undefined'&&TT.on?'title':'pause');cur=0;for(const k in cache)delete cache[k];draw();LB.push(1).then(()=>{if(document.getElementById('lbd')){delete cache[CATS[cur].k];LB.load(CATS[cur].k)}});addEventListener('keydown',key,true)};
  LB.close=function(){removeEventListener('keydown',key,true);if(back=='title')titleUI();else pauseUI()};
  function key(e){if(!document.getElementById('lbd')){removeEventListener('keydown',key,true);return}
   if(e.key=='ArrowRight'||e.key=='ArrowLeft'){LB.tab(cur+(e.key=='ArrowRight'?1:-1))}
