@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.83.1';
+const GAME_VERSION='v49.83.2';
 const VERSION_HISTORY=[
+ {v:'v49.83.2',n:'The "Loading is taking too long" notice now waits 40 seconds before it appears, so it only shows when loading is really stuck. Saves still load.'},
  {v:'v49.83.1',n:'World map labels now grow as you zoom in, so they are easier to read on phones and PC, and use the game pixel font. Saves still load.'},
  {v:'v49.82.1',n:'Guide targets are now a tall blue light beacon instead of a pyramid, and map markers are blue pixel pins in the game style. Saves still load.'},
  {v:'v49.83.0',n:'Profiles: your Google profile picture now shows as your avatar, and tapping anyone on the leaderboard or Friends opens their full profile (top songs, band, achievements, joined date, Founder outline). Saves still load.'},
