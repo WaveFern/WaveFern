@@ -3,7 +3,6 @@
    Also keeps "Save and quit" as the bottom button of the pause menu. Only loaded on /dev/. */
 (function(){
  if(!window.FW_FEAT)return;
- if(!window.FW_DEV&&new Date().getMonth()!==11)return;/* the still picture shows Christmas-lit trees: December only on the real site */
  const on=()=>{try{return typeof TT=='object'&&TT.on&&typeof mode!='undefined'&&mode!='load'&&mode!='play'&&mode!='creator'}catch(e){return false}};
  const st=document.createElement('style');
  st.textContent='#fwmbg{position:fixed;inset:0;z-index:0;background:#7fc4e8 url(/dev/menu-house.webp) center/cover no-repeat;display:none}body.fwmenubg #fwmbg{display:block}body.fwmenubg canvas{visibility:hidden}body.fwmenubg #pzo{background:rgba(5,8,6,.35)!important;backdrop-filter:none!important}';
