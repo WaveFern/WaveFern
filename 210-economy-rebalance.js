@@ -1,16 +1,23 @@
-/* WaveFern dev: listener pacing (v2). Target in active play (~30 min per day): 1M ~ day 17, 1B ~ 17 hours (day 34), 4B endgame ~ 20 hours (day 40).
-   Max daily growth is exp(r(L)*CAP) (fast, fades as the numbers grow); a player who releases music gets pulled up to exp(r(L)*PACE);
-   one who does not only gets 30% of that. Money follows: over-cap streams are clawed back, lifted growth pays a stream credit.
-   ?noeco skips this file (and the patches). */
+/* WaveFern listener pacing (v3): a game day is ~5 real minutes (12 days per hour of play).
+   Target path (hours of play): 1K 0.5h, 2K 1h, 10K 3h, 100K 7.5h, 1M 12h, 10M 17h, 100M 22.5h, 1B 28h, 4B 35h, 8B 40h.
+   Daily growth follows the rate of that path at the player's current listeners, so a player who skips releases falls behind.
+   Each night is noisy, and sometimes (about 6%) a slow patch of 2 to 5 days at a fifth of speed starts, followed by a small catch-up.
+   Money follows listeners: over-cap streams are clawed back, lifted growth pays a stream credit. ?noeco skips this file. */
 (()=>{
 if(/[?&]noeco/.test(location.search))return;
-const CAP=.95,PACE=.78,IDLE=.3,ADD=250,PAY=.04;
-const r=L=>{const x=Math.log10(Math.max(L,1));return x<=4?.75:x<=8?.75-(x-4)/4*.25:x<=9.2?.5-(x-8)/1.2*.22:.28};
+const PAY=.04,ADD=40,IDLE=.3,CAPX=1.15,FIX=1.065;
+const P=[[100,1],[1e3,6],[2e3,12],[1e4,36],[1e5,90],[1e6,144],[1e7,204],[1e8,270],[1e9,336],[4e9,420],[8e9,480]];
+const RT=P.slice(1).map((p,i)=>[P[i][0],p[0],Math.log(p[0]/P[i][0])/(p[1]-P[i][1])]);
+const rate=L=>{for(const s of RT)if(L<s[1])return s[2];return RT[RT.length-1][2]*.5};
+const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=Math.random();return (u-3)/Math.sqrt(.5)};
+function step(L0,rel,st){let m;if(st.slow>0){st.slow--;m=.2;if(!st.slow)st.catch=2}else if(Math.random()<.06){st.slow=1+Math.floor(Math.random()*4);m=.2}else{m=Math.max(.5,Math.min(1.6,Math.exp(gauss()*.2)));if(st.catch>0){st.catch--;m*=1.4}}
+ const g=rate(L0)*m,tgt=Math.floor(L0*Math.exp(g*FIX*(rel?1:IDLE))+ADD*(rel?1:.2)),cap=Math.floor(L0*Math.exp(g*FIX*CAPX)+ADD*1.5);return{tgt,cap}}
+window.__ecoStep=step;
 const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0}catch(e){}
  const r0=w0.apply(this,arguments);
  try{if(S.cheat)return r0;
-  const Ln=+S.listeners||0,g=r(L0),cap=Math.floor(L0*Math.exp(g*CAP)+ADD),rel=(S.songs||[]).some(s=>s.day==S.day-1);
-  const tgt=Math.floor(L0*Math.exp(g*(rel?PACE:PACE*IDLE))+ADD*(rel?.8:.2));
+  S.eco=S.eco||{slow:0,catch:0};
+  const Ln=+S.listeners||0,rel=(S.songs||[]).some(s=>s.day==S.day-1),{tgt,cap}=step(L0,rel,S.eco);
   const Lf=Math.min(cap,Math.max(Ln,tgt)),h=S.hist&&S.hist[S.hist.length-1],md=S.mlDiv||3;
   if(h&&h.d===S.day-1&&!h.cp){h.cp=1;let d=0;
    if(Ln>cap){const k=cap/Ln,e=+h.e||0;d=-e*(1-k);h.e=+(e*k).toFixed(2);h.st=Math.round((h.st||0)*k)}
