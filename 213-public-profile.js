@@ -58,7 +58,7 @@ window.fwProfileOpen=async function(handle,byUid){
  document.getElementById('pubpf')?.remove();
  const o=document.createElement('div');o.id='pubpf';o.style.cssText='position:fixed;inset:0;z-index:99995;background:#000a;display:flex;align-items:center;justify-content:center;padding:12px';o.onclick=e=>{if(e.target===o)o.remove()};
  const box=h=>{o.innerHTML='<div class="box modal" style="width:min(380px,94vw)">'+h+'<div class=row2 style="margin-top:10px"><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div></div>'};
- const full=(p,handle,me)=>{const P=window.FW_PROFILE;if(P&&P.openData&&!me){o.remove();const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')).map(x=>[x[0],+x[1]||0,0]);
+ const full=(p,handle,me)=>{const P=window.FW_PROFILE;if(P&&P.open&&me){o.remove();P.open('me');return}if(P&&P.openData&&!me){o.remove();const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')).map(x=>[x[0],+x[1]||0,0]);
   const ac=+p.ac||0;P.openData({artist:p.a||'',user:handle,founder:p.f?1:0,fame:Math.round(+p.fame||0),listeners:+p.lis||0,joined:+p.j||0,bio:p.bio||'',songs:sg,band:p.bn?{name:p.bn,inst:p.bi||'',members:+p.bm||1}:null,ach:ACH.map((_,i)=>i).filter(i=>ac>>i&1),photo:/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(p.p||'')?p.p:''});return}
   o.innerHTML=ppHtml(p,handle,me)};
  box('<p class=m>Loading…</p>');document.body.appendChild(o);

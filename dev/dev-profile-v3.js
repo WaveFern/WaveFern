@@ -66,7 +66,7 @@
   const im=document.createElement('img');im.src=k.toDataURL();im.width=im.height=px;im.alt='';im.style.imageRendering='pixelated';return im.outerHTML;
  }
  const tag=(t,cls)=>`<span class="pf-tag ${cls||''}">${t}</span>`;
- const fmtDate=ts=>new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+ const fmtDate=ts=>!(ts>0)?'Unknown':new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
  const rel=ts=>{const d=Math.max(1,Math.round((NOW-ts)/DAY));return d<60?d+' days ago':d<700?Math.round(d/30)+' months ago':Math.round(d/365)+' years ago'};
 
  /* ---------- styles ---------- */

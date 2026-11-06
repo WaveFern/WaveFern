@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.84.1';
+const GAME_VERSION='v49.85.0';
 const VERSION_HISTORY=[
+ {v:'v49.85.0',n:'Your own public profile (from Friends) now opens the same profile screen with your real joined date, and a missing joined date reads Unknown instead of 1970.'},
  {v:'v49.84.1',n:'Clothes cost three times as much and furniture two and a half times as much, so what you can afford follows your listeners. Saves still load.'},
  {v:'v49.84.0',n:'Threadz and a new Gphone store now have their own shops in the main city, on the City Cafe street, with their own doors, rooms and map pins. The mall boutique is now called Urban. Saves still load.'},
  {v:'v49.83.1',n:'Other players\' public profiles now use exactly the same profile screen as your own (their Google photo, top songs, band, real achievements, joined date). Saves still load.'},
