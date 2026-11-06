@@ -23,7 +23,7 @@
  /* only the house itself (and its back wing, once built) is left bare; the garden behind it snows like everywhere else */
  const HZU={value:-.7};
  const inHome=(x,z)=>x>-.7&&x<16.7&&z>HZU.value&&z<12.8;
- const SNOWU={value:0};/* 0 = bare winter map, 1 = fully snowed (eases with the weather) */
+ const SNOWU={value:0};window.FW_SNOWU=SNOWU;/* 0 = bare winter map, 1 = fully snowed (eases with the weather) */
  let snowTarget=0;
 
  /* ---------- no farm: its fields, barn, silo, fence, sheep and sign are left out when the world is built (the ground stays grass) ---------- */
@@ -181,17 +181,18 @@
  /* ---------- footprints and tyre tracks in the snow: each print slowly fades back into the snow over 5 s ---------- */
  const FADE=5,FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0'),TR_DARK=new THREE.Color('#6a7789'),FPD=new THREE.Object3D();
  function mkPrints(N,w,l,dark){return{N,w,l,dark,mesh:null,i:0,age:null}}
- const FP=mkPrints(700,.13,.26,FP_DARK),TR=mkPrints(1400,.24,.95,TR_DARK);
+ const FP=mkPrints(700,.13,.26,FP_DARK),TR=mkPrints(1400,.2,.9,TR_DARK);
  let fpMesh=null;/* kept for the visibility switch below */
  function prInit(K){
-  const g=new THREE.BoxGeometry(K.w,.02,K.l),m=new THREE.MeshLambertMaterial({color:0xffffff});
+  const g=new THREE.BoxGeometry(K.w,.01,K.l),m=new THREE.MeshLambertMaterial({color:0xffffff,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
   K.mesh=new THREE.InstancedMesh(g,m,K.N);K.age=new Float32Array(K.N).fill(-1);K.mesh.frustumCulled=false;K.mesh.userData.xm=1;
   FPD.position.set(0,-50,0);FPD.rotation.set(0,0,0);FPD.updateMatrix();
   for(let i=0;i<K.N;i++){K.mesh.setMatrixAt(i,FPD.matrix);K.mesh.setColorAt(i,SNOW)}
   scene.add(K.mesh);if(K===FP)fpMesh=K.mesh}
  function prStamp(K,x,z,rot,y){
   if(!K.mesh)prInit(K);
-  FPD.position.set(x,y||.05,z);FPD.rotation.set(0,rot,0);FPD.updateMatrix();K.mesh.setMatrixAt(K.i,FPD.matrix);K.age[K.i]=0;K.mesh.setColorAt(K.i,K.dark);
+  /* every print sits a hair higher than the one laid before it (cycling through 24 levels), so overlapping prints of different ages never fight over the same pixels = no flicker */
+  FPD.position.set(x,(y||.05)+(K.i%24)*.0009,z);FPD.rotation.set(0,rot,0);FPD.updateMatrix();K.mesh.setMatrixAt(K.i,FPD.matrix);K.age[K.i]=0;K.mesh.setColorAt(K.i,K.dark);
   K.i=(K.i+1)%K.N;K.mesh.instanceMatrix.needsUpdate=true;K.mesh.instanceColor.needsUpdate=true}
  function prFade(K,dt){if(!K.mesh)return;let c=0,mv=0;
   for(let i=0;i<K.N;i++){if(K.age[i]<0)continue;K.age[i]+=dt;let a=Math.min(1,K.age[i]/FADE);a=a*a*(3-2*a);/* slow at the start and the end */
