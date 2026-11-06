@@ -18,7 +18,7 @@
  const live=()=>safe(()=>S&&S.artist&&!(typeof TRL!='undefined'&&TRL.on),'live');
  const fm=n=>n>=1e9?+(n/1e9).toFixed(1)+'B':n>=1e6?+(n/1e6).toFixed(1)+'M':n>=1e4?+(n/1e3).toFixed(n>=1e5?0:1)+'K':Math.round(n).toLocaleString();
  const card=(k,t,s)=>safe(()=>glCard(k,t,s),'card');
- const cash=n=>{S.money=+((+S.money||0)+n).toFixed(0)};
+ const cash=n=>{S.money=+((+S.money||0)+n*.25).toFixed(0)};
 
  /* 1 + 3: stream shaping inside planOf */
  {const po=planOf;planOf=function(s){const fresh=s&&s.pd!==S.day,v=po.apply(this,arguments);if(!fresh||!s||!live())return v;

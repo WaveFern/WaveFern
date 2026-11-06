@@ -7,6 +7,10 @@
    Energy: walking drains energy, slowly less with each level of the Energy pack in the gear shop. ?noeco skips this file. */
 (()=>{
 if(/[?&]noeco/.test(location.search))return;
+/* income per stream is scaled by how many listeners you have, so cash in hand follows: ~$300 at 1K, $3K at 10K, $200K at 1M, $25M at 1B, $100M at 8B */
+const MFP=[[1e3,.12],[1e4,.46],[1e5,.42],[1e6,.4],[1e7,.17],[1e8,.08],[1e9,.024],[4e9,.011],[8e9,.0095]];
+const MF=L=>{if(L<=MFP[0][0])return MFP[0][1]*Math.max(.5,Math.min(1,L/1e3+.3));for(let i=1;i<MFP.length;i++)if(L<MFP[i][0]){const a=MFP[i-1],b=MFP[i],t=Math.log(L/a[0])/Math.log(b[0]/a[0]);return Math.exp(Math.log(a[1])+t*(Math.log(b[1])-Math.log(a[1])))}return MFP[MFP.length-1][1]};
+window.__ecoMF=MF;
 const PAY=.04,ADD=40,IDLE=.3,CAPX=1.15,FIX=1.065;
 const PATH=[[100,1],[1e3,6],[2e3,12],[1e4,36],[1e5,90],[1e6,144],[1e7,204],[1e8,270],[1e9,336],[4e9,420],[8e9,480]];
 const RT=PATH.slice(1).map((p,i)=>[PATH[i][0],p[0],Math.log(p[0]/PATH[i][0])/(p[1]-PATH[i][1])]);
@@ -30,7 +34,7 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
    const prev=S.hist.slice(-31,-1).reduce((a,x)=>a+(x.st||0),0),want=Math.max(Lf*md-prev,Lf*md/62),tot=Math.round(want);
    const songs=(S.songs||[]).filter(s=>s.pd===S.day-1&&s.today>0),nat=songs.reduce((a,s)=>a+s.today,0);
    if(nat>0){const k=tot/nat;songs.forEach(s=>{const dl=Math.round(s.today*(k-1));s.today+=dl;s.streams=(s.streams||0)+dl;const e=(s.dh||[]).find(x=>x[0]===S.day-1);if(e)e[1]=Math.round(s.today)})}
-   const dS=tot-(h.st||0),e1=+(tot*PAY).toFixed(2),dE=e1-(+h.e||0);
+   const dS=tot-(h.st||0),e1=+(tot*PAY*MF(Lf)).toFixed(2),dE=e1-(+h.e||0);
    S.streams=(S.streams||0)+dS;h.st=tot;h.e=e1;
    S.money=+Math.max(0,S.money+dE).toFixed(2);S.earn=+((S.earn||0)+dE).toFixed(2)}
   S.listeners=Lf;S.eco.L=Lf;S.monthStreams=Lf*md;
@@ -44,6 +48,10 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
  }catch(e){console.error('economy pacing',e)}
  return r0};
 
+/* ---- big purchases need listeners as well as cash ---- */
+const GATE={car:[1e3,1e4,6e4,4e5,2e6],home:[3e4,4e5,5e6],guard:[1e5,1e6,1e7],garage:[5e3]};
+const fm=n=>n>=1e9?n/1e9+'B':n>=1e6?n/1e6+'M':n>=1e3?n/1e3+'K':n;
+if(typeof buyX=='function'){const b0=buyX;buyX=function(t,i){try{const g=GATE[t],need=g&&g[t=='guard'?(S.guards||0):t=='garage'?0:i];if(need&&(+S.listeners||0)<need&&!S.cheat){snd('err');return say('Unlocks at '+fm(need)+' monthly listeners.')}}catch(e){}return b0.apply(this,arguments)}}
 /* ---- energy: walking drains it; the Energy pack in the gear shop slows the drain (capacity x1 to x4) ---- */
 let said=-1;
 setInterval(()=>{try{
