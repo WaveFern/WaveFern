@@ -75,18 +75,21 @@ async function box(){const F=FR_(),st=await stamps(),now=Date.now(),hasU=!!F.h,h
 window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;const F=FR_();if(!F||!F.ok||!F.r)return;shown=1;box().catch(()=>{shown=0})};
 /* Required username: after a Google sign-in, and on every refresh, an account with no username is asked straight away. It does not depend on the
    reset date. If the database can not be reached or refuses the read, a blocking notice says why with Retry, instead of staying silent. */
-let t0=0;
-function errBox(why){if(document.getElementById('onbe')||document.getElementById('onbx'))return;const o=document.createElement('div');o.id='onbe';o.style.cssText='position:fixed;inset:0;z-index:99991;background:#000d;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box';
- o.innerHTML='<div class="box modal" style="width:min(400px,94vw)"><h2>Setting up your account</h2><p>We could not check your username yet, so we can not let you in without one.</p><p class=m><small>'+esc(why)+'</small></p><div class=row2><button class=go id=onre>Retry</button><button id=onro>Sign out</button></div></div>';
+let t0=0,eDis=0;
+/* never a blocking box: players keep playing; a small notice says why the check failed, Friends keeps retrying in the background, and the notice goes away once it works */
+function errBox(why){if(document.getElementById('onbe')||document.getElementById('onbx')||Date.now()-eDis<300000)return;const o=document.createElement('div');o.id='onbe';o.style.cssText='position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99991;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);padding:8px 10px 8px 12px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:12px';
+ o.innerHTML='<span>Your username could not be checked yet. Still trying in the background.<br><small class=m>'+esc(why)+'</small></span><button class=go id=onre style="margin:0;padding:5px 10px">Retry</button><button id=onro title="Hide" style="margin:0;padding:5px 8px;background:none;border:none;color:var(--m)">\u2715</button>';
  document.body.appendChild(o);o.querySelector('#onre').onclick=()=>{o.remove();t0=Date.now();const x=X();if(x){x.FR.rerr='';x.FR.on=0;x.frStart()}};
- o.querySelector('#onro').onclick=()=>{o.remove();try{fbSignOut()}catch(e){}}}
+ o.querySelector('#onro').onclick=()=>{o.remove();eDis=Date.now()}}
 setInterval(()=>{try{if(shown||later||!FW_ACCT||FW_TRL)return;const x=X();if(!x||x.trailer)return;const F=x.FR;
  if(!F.on)x.frStart();
+ if(F.ok){const e=document.getElementById('onbe');if(e)e.remove()}
  if(!['title','creator','play','pause'].includes(mode))return;
  if(F.ok&&F.r){if(F.h){try{localStorage.setItem(UK(),F.h)}catch(e){}}if(F.h&&dnGet())return;if(document.getElementById('annov'))return;fwNameBox();return}
  if(uCached()&&dnGet())return;
  if(!t0)t0=Date.now();
- if(F.rerr)errBox(/permission/i.test(F.rerr)?'The database refused the read (permission denied). The Firebase Realtime Database rules need publishing.':'Could not reach the database: '+F.rerr);
- else if(Date.now()-t0>25000)errBox('The database did not answer in time. Check your connection.')}catch(e){}},1000);
+ let host='';try{host=new URL(FB_CFG.databaseURL).host}catch(e){}
+ if(F.rerr)errBox(/permission/i.test(F.rerr)?'The database refused the read (permission denied). The Realtime Database rules need publishing.':'Could not reach the database: '+F.rerr);
+ else if(Date.now()-t0>25000)errBox('The database ('+host+') did not answer. Check your connection, and that the Realtime Database exists at that address.')}catch(e){}},1000);
 /* Friends is only started when needed; start it as soon as someone is signed in after the reset so this can run */
 })();
