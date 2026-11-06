@@ -396,7 +396,7 @@ function festSongStart(){const set=FEST.set,s=set.st,song=set.list[set.i];set.so
  if(set.i>0){nz(1.8,1000,.14,.5,'bandpass');if(typeof festShout=='function')festShout(pick(['ONE MORE SONG!','TUUUNE!','I LOVE THIS ONE!',(S.artist||'YOU').toUpperCase()+'!']),1)}}
 function festSongDone(fr){const set=FEST.set,s=set.st,song=set.song,c=Math.round(set.C),mean=a=>a.reduce((x,y)=>x+y,0)/a.length,avg=set.ss.length?mean(set.ss):set.sc.length?mean(set.sc):.5,f=fr==null?1:fr;
  const pay=+(FSONG_PAY*s.mult*c*f).toFixed(2),st=Math.round(c*.1*(.5+avg)*f),fol=Math.round(c*.015*(.5+avg)*f);
- S.money=+(S.money+pay).toFixed(2);S.earn=(S.earn||0)+pay;S.followers=(S.followers||0)+fol;S.interest=Math.min(1,(S.interest||0)+.004*s.mult*avg*f);
+ S.money=+(S.money+pay).toFixed(2);S.earn=(S.earn||0)+pay;S.followers=(S.followers||0)+FOLN(fol);S.interest=Math.min(1,(S.interest||0)+.004*s.mult*avg*f);
  /* the crowd streams the song afterwards: counted in today's streams (paid tomorrow morning) and this month's listeners */
  try{if(typeof planOf=='function')planOf(song);if(typeof mlInit=='function')mlInit();song.streams=(song.streams||0)+st;song.today=(song.today||0)+st;S.streams+=st;S.monthStreams=(S.monthStreams||0)+st}catch(e){console.error('fest streams',e)}
  set.pay=+(set.pay+pay).toFixed(2);set.str+=st;set.fol+=fol;set.done.push({t:song.title,c,pay,f,sc:Math.round(avg*100)});

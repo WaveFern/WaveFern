@@ -368,7 +368,7 @@ function showEnd(quit){const H=SH;if(!H||H.end)return;if(quit&&H.state=='song'&&
  const score=Math.max(0,Math.min(1,.12+.5*mg+.18*hy+.1*q+.05*Math.min(2,H.reh)+(H.prod.pyro?.03:0)+(H.prod.dancers?.02:0)+(H.prod.lasers?.02:0)+(H.prod.confetti?.01:0)));
  let res=typeof wtPay=='function'?wtPay(H.C.id,H.k,score):{att:H.att,money:Math.round(H.att*3),fol:Math.round(H.att*.1),str:Math.round(H.att*15)};
  const f=quit?Math.max(.15,frac):H.fin==2?Math.max(.5,frac):1;res={att:res.att,money:Math.round(res.money*f),fol:Math.round(res.fol*f),str:Math.round(res.str*f)};
- S.money=+(S.money+res.money).toFixed(2);S.earn=(S.earn||0)+res.money;S.followers=(S.followers||0)+res.fol;S.interest=Math.min(1,(S.interest||0)+.05*score);
+ S.money=+(S.money+res.money).toFixed(2);S.earn=(S.earn||0)+res.money;S.followers=(S.followers||0)+FOLN(res.fol);S.interest=Math.min(1,(S.interest||0)+.05*score);
  const played=H.done.map(d=>S.songs.find(x=>x.id===d.id)).filter(Boolean);if(played.length){const per=Math.round(res.str/played.length);played.forEach(s=>{try{if(typeof planOf=='function')planOf(s)}catch(e){}s.streams=(s.streams||0)+per;s.today=(s.today||0)+per;S.streams+=per;S.monthStreams=(S.monthStreams||0)+per})}
  try{if(typeof wtShowDone=='function')wtShowDone(H.C.id,H.k,res)}catch(e){console.error('wtShowDone',e)}
  S.dcity.shows=(S.dcity.shows||[]).concat([{c:H.C.id,k:H.k,d:S.day,att:res.att,pay:res.money,sc:Math.round(score*100)}]).slice(-60);

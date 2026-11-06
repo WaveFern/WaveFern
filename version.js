@@ -3,8 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.87.0';
+const GAME_VERSION='v49.88.0';
+const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.88.0',n:'Followers are nerfed: every follower reward is now four times smaller, and existing careers are divided by four once on load (profile and leaderboard follow). Saves still load.'},
  {v:'v49.87.0',n:'Reporting a player now makes you pick a reason first, and Add friend and Invite to band ask Are you sure? before sending.'},
  {v:'v49.86.0',n:'Taxi home is always available, anywhere in the world and with no daily limit. Taxi fares are now three times higher.'},
  {v:'v49.85.8',n:'Profile saving is more forgiving: if the extra profile fields are refused, the basic profile still saves, and the error notice now shows the real reason.'},

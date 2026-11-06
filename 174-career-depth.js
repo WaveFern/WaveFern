@@ -23,7 +23,7 @@ if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const sd=r
  try{if(sd&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.sd=sd;const l=sd.split('|')[1],q=l=='long'?5:l=='short'?-4:0;if(q&&isFinite(+d.q))d.q=Math.max(1,Math.min(100,+d.q+q))}}catch(e){}return r}}
 {const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),sd=d&&d.sd,n0=S.songs.length;const r=u0.apply(this,arguments);
  try{if(S.songs.length>n0){const s=S.songs[S.songs.length-1];if(sd&&s.sd==null)s.sd=sd;
-  if(sd&&sd.split('|')[0]=='deep'){const f=Math.round(RI(4,12)+(S.listeners||0)*.004);S.followers=(S.followers||0)+f;say('Emotional song: +'+f.toLocaleString()+' followers')}
+  if(sd&&sd.split('|')[0]=='deep'){const f=Math.round(RI(4,12)+(S.listeners||0)*.004);S.followers=(S.followers||0)+FOLN(f);say('Emotional song: +'+FOLN(f).toLocaleString()+' followers')}
   friendsShare(s)}}catch(e){console.warn('release extras',e)}return r}}
 
 /* ===== music friends (bonds from collabs) ===== */
@@ -93,10 +93,10 @@ function finds(){const ps=paths();if(!ps.length)return[];const out=[],r=seeded('
  const m=S.smom&&S.smom.d===S.day?S.smom:(S.smom={d:S.day,got:{}}),r2=seeded('wf-street-'+S.day);for(let i=0;i<3;i++){const p=spot(r2,ps);if(!m.got[i])out.push({k:'m',i,x:p.x,z:p.z})}return out}
 function findsBuild(){const k=S.day+'|'+Object.keys(S.tapes||{}).length+'|'+Object.keys((S.smom||{}).got||{}).length;if(FG&&k===FK)return;FK=k;if(FG)scene.remove(FG);FG=new THREE.Group();FM=finds().map(f=>{const m=mkTape(FG,f.k=='t'?'#e84393':'#2fe68a');m.position.set(f.x,.7,f.z);return Object.assign(f,{m})});scene.add(FG)}
 const outdoors=()=>mode=='play'&&!IN&&!(window.DCITY&&DCITY.on)&&!(typeof P!='undefined'&&P.sit);
-function collect(f){const fl=FL();if(f.k=='t'){S.tapes[f.i]=S.day;const n=Object.keys(S.tapes).length,c=Math.round(60*(1+fl*.3)),fo=RI(5,20)+Math.round((S.listeners||0)*.002);S.money=+((+S.money||0)+c).toFixed(2);S.followers=(S.followers||0)+fo;
+function collect(f){const fl=FL();if(f.k=='t'){S.tapes[f.i]=S.day;const n=Object.keys(S.tapes).length,c=Math.round(60*(1+fl*.3)),fo=RI(5,20)+Math.round((S.listeners||0)*.002);S.money=+((+S.money||0)+c).toFixed(2);S.followers=(S.followers||0)+FOLN(fo);
   card('LOST TAPE '+n+' / '+TAPES,'An old demo from the city','+$'+c+' · +'+fo.toLocaleString()+' followers',24)}
  else{S.smom.got[f.i]=1;const g=GEN[Math.floor(Math.random()*GEN.length)],ev=[
-   ()=>{const n=RI(3,12)+Math.round((S.listeners||0)*.001);S.followers=(S.followers||0)+n;return'A fan stopped you for a photo: +'+n.toLocaleString()+' followers'},
+   ()=>{const n=RI(3,12)+Math.round((S.listeners||0)*.001);S.followers=(S.followers||0)+FOLN(n);return'A fan stopped you for a photo: +'+FOLN(n).toLocaleString()+' followers'},
    ()=>{S.hype[g]=Math.min(2,(S.hype[g]||1)*1.04);return'You jammed with a street busker: '+g+' buzz is up'},
    ()=>{const c=RI(10,40)*(1+Math.floor(fl/5));S.money=+((+S.money||0)+c).toFixed(2);return'Someone recognised you and bought you lunch: +$'+c},
    ()=>{S.energy=Math.min(100,(S.energy||0)+20);return'A producer gave you a tip over coffee: +20 energy'}];

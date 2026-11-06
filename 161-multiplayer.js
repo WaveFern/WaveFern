@@ -531,10 +531,10 @@ if(MPS){const k=MPS.inst,T={gt:{hype:'Shred a solo!',call:'Play the riff back!',
    same for the whole band. Rewards: goal $150 each, all three +$400 and 200 followers; streak days 3/7/14/30 pay $300/$800/$2000/$5000 with followers. ---- */
 const GPOOL={take:'Finish a band take',rel:'Release a band song',bed:'Go to bed as a band',chat:'Send the band a message',emo:'Use an emote with the band',col:'Record a collab together'};
 const dayKey=()=>new Date().toISOString().slice(0,10);
-const STRK={3:[300,50],7:[800,150],14:[2000,400],30:[5000,1000]};
+const STRK={3:[300,12],7:[800,38],14:[2000,100],30:[5000,250]};
 function goalsGet(){if(!S||!S.mp)return null;const d=dayKey();let g=S.mp.g;if(!g||g.d!==d){let h=0;(d+MPS.code).split('').forEach(c=>h=(h*31+c.charCodeAt(0))>>>0);const ks=Object.keys(GPOOL),k=[];while(k.length<3){h=(h*1664525+1013904223)>>>0;const x=ks[h%ks.length];if(!k.includes(x))k.push(x)}g=S.mp.g={d,k,done:{}}}return g}
 function gp(k){try{if(!MPS||MPTR||!S||!S.mp||!band())return;const g=goalsGet();if(!g||!g.k.includes(k)||g.done[k])return;g.done[k]=1;S.money=+((+S.money||0)+150).toFixed(2);snd('chime');say('Band goal done: '+GPOOL[k]+'. +$150');
- if(g.k.every(x=>g.done[x])){S.money=+((+S.money||0)+400).toFixed(2);S.followers=(S.followers||0)+200;say('All of today\'s band goals done! +$400 and 200 followers.')}}catch(e){console.error('band goal',e)}}
+ if(g.k.every(x=>g.done[x])){S.money=+((+S.money||0)+400).toFixed(2);S.followers=(S.followers||0)+50;say('All of today\'s band goals done! +$400 and 50 followers.')}}catch(e){console.error('band goal',e)}}
 /* v49.68.0: streak rewards you can show off: band-only studio pieces that land in Storage (never sold in a shop) */
 const BRW=[[3,'bnd_poster','Band poster stand',[[.06,1.5,.06,'#222',-.45,.75,0],[.06,1.5,.06,'#222',.45,.75,0],[1,1.1,.06,'#0b0f0d',0,1.05,.04],[.86,.18,.07,'#2fe68a',0,1.42,.05],[.86,.6,.07,'#14301a',0,.98,.05],[.5,.08,.08,'#2fe68a',0,.75,.06]]],
  [7,'bnd_neon','Neon band sign',[[1.4,.9,.1,'#0b0f0d',0,1.2,0],[1.1,.08,.12,'#2fe68a',0,1.45,.03],[.08,.5,.12,'#2fe68a',-.5,1.2,.03],[.08,.5,.12,'#2fe68a',.5,1.2,.03],[1.1,.08,.12,'#2fe68a',0,.95,.03],[.5,.08,.12,'#7dffb8',0,1.2,.03],[.1,.75,.1,'#222',0,.38,0],[.6,.06,.4,'#222',0,.03,0]]],

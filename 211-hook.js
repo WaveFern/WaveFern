@@ -51,7 +51,7 @@
  let nextAt=0;
  function drop(){const h=hk();h.drops++;const r=Math.random();let t,s;
   if(r<.5){const n=Math.round(R(15,45)*(1+h.drops*.15));cash(n);t='Fan tip';s='A fan slipped you $'+n+'.'}
-  else if(r<.85){const n=Math.round(R(6,20)*(1+h.drops*.2));S.followers=(S.followers||0)+n;t='New fans';s='+'+n+' followers just found you.'}
+  else if(r<.85){const n=Math.round(R(6,20)*(1+h.drops*.2));S.followers=(S.followers||0)+FOLN(n);t='New fans';s='+'+FOLN(n)+' followers just found you.'}
   else{const sg=(S.songs||[]).slice().sort((a,b)=>b.day-a.day)[0];if(sg){const n=Math.round(R(40,120));safe(()=>addSt(sg,n),'drop');t='Stream burst';s='"'+sg.title+'" got +'+n+' streams.'}else{cash(60);t='Jackpot';s='A surprise $60!'}}
   card('SURPRISE',t,s);try{snd('ping')}catch(e){}}
  /* 6: daily streak */
@@ -70,5 +70,5 @@
   if(h.play%5==0){ladder();bar()}},'tick'),1000);
  /* 7: comeback */
  document.addEventListener('visibilitychange',()=>safe(()=>{const h=hk();if(document.hidden){h.seen=now();return}
-  const gone=(now()-h.seen)/6e4;if(live()&&gone>=10&&(S.songs||[]).length){const n=Math.min(500,Math.round(gone*R(1.5,3)*(1+Math.sqrt(S.listeners||0)/10)));S.followers=(S.followers||0)+n;card('WELCOME BACK','+'+n+' new followers','Your music kept working while you were away.')}},'vis'));
+  const gone=(now()-h.seen)/6e4;if(live()&&gone>=10&&(S.songs||[]).length){const n=Math.min(500,Math.round(gone*R(1.5,3)*(1+Math.sqrt(S.listeners||0)/10)));S.followers=(S.followers||0)+FOLN(n);card('WELCOME BACK','+'+FOLN(n)+' new followers','Your music kept working while you were away.')}},'vis'));
 })();

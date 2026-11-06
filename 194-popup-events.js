@@ -178,7 +178,7 @@ function frame(v,inner,cls){const K=KINDS[v.k],pl=PLACES[v.p];
 function show(html){$('ui').innerHTML=html}
 function finish(v,res){v.done=1;save();BUILT='';CUR=null;stopLoops();sn('chime');
  show(frame(v,`<div class=peres>${res}</div><div class=row2><button class=go onclick="closeUI()">Nice</button></div>`,'fin'))}
-function gain(fol,st,song,g){fol=Math.max(0,Math.round(fol));S.followers=(S.followers||0)+fol;if(song&&st>0){try{addSt(song,Math.round(st))}catch(e){song.streams+=Math.round(st);S.streams=(S.streams||0)+Math.round(st)}}
+function gain(fol,st,song,g){fol=Math.max(0,Math.round(fol));S.followers=(S.followers||0)+FOLN(fol);if(song&&st>0){try{addSt(song,Math.round(st))}catch(e){song.streams+=Math.round(st);S.streams=(S.streams||0)+Math.round(st)}}
  if(g&&S.hype&&S.hype[g]!=null)S.hype[g]=+Math.min(2,(S.hype[g]||1)+.12).toFixed(2);return fol}
 const best=()=>(S.songs||[]).slice().sort((a,b)=>(b.q||0)-(a.q||0));
 const latest=()=>(S.songs||[]).slice().sort((a,b)=>(b.day||0)-(a.day||0)||(b.id||0)-(a.id||0))[0];

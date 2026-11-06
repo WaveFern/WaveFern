@@ -115,7 +115,7 @@ D.landmark=function(C,bk){const f=LM[C.id];if(!f)return false;const G=D.mkG(),Gw
  D.addInt(b.mx,bk.z1-2.4,2.4,'Take a selfie at the '+name.replace(/^the /,''),()=>selfie(C,name));return true}finally{D.building=prev}};
 function selfie(C,name){S.dcity=S.dcity||{};const k=C.id+'|'+S.day,done=(S.dcity.selfie||[]).includes(k);snd('pop');try{chime()}catch(e){}
  if(done)return say('Another photo at the '+name.replace(/^the /,'')+'. Your fans already saw today\'s.');
- S.dcity.selfie=(S.dcity.selfie||[]).filter(x=>(x.split('|')[1]|0)>=S.day-30).concat(k);const f=Math.round(30+Math.sqrt(S.listeners||0)*.25);S.followers=(S.followers||0)+f;
+ S.dcity.selfie=(S.dcity.selfie||[]).filter(x=>(x.split('|')[1]|0)>=S.day-30).concat(k);const f=Math.round(30+Math.sqrt(S.listeners||0)*.25);S.followers=(S.followers||0)+FOLN(f);
  say('Selfie at the '+name.replace(/^the /,'')+' · +'+f.toLocaleString()+' followers')}
 
 /* ---------- rooms ---------- */

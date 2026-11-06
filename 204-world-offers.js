@@ -41,7 +41,7 @@ window.cgDecline=function(mid){const m=S.msgs.find(x=>x.id==mid),o=m&&find(m.cg)
 function daily(){const s=st();
  s.list.forEach(o=>{if(o.st==0&&S.day>o.exp)o.st=4;
   if(o.st==1&&S.day>=o.day){o.st=3;const d=wtDest(o.d);if(!d)return;const v=d[o.k],place=wtPlace(d),fol=Math.round(v.cap*(o.k=='venue'?.02:.05)*(.8+Math.random()*.4));
-   S.money=+(S.money+o.pay).toFixed(2);S.earn=(S.earn||0)+o.pay;S.followers=(S.followers||0)+fol;S.energy=Math.min(S.energy,40);
+   S.money=+(S.money+o.pay).toFixed(2);S.earn=(S.earn||0)+o.pay;S.followers=(S.followers||0)+FOLN(fol);S.energy=Math.min(S.energy,40);
    S.msgs.push({id:S.nid++,from:v.n,state:9,unread:1,day:S.day,body:'What a night. '+Math.round(v.cap*(.9+Math.random()*.1)).toLocaleString()+' people at '+v.n+' in '+place+'. Your fee of '+fm(o.pay)+' has been paid. You flew home and are very tired.'});
    try{snd('cash');say('You played '+v.n+' in '+place+' and earned '+fm(o.pay)+'. You are tired from the trip.')}catch(e){}}});
  if(!(S.artist&&fl()>=MIN_FAME&&S.songs&&S.songs.length))return;

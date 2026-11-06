@@ -59,7 +59,7 @@ D.kindOf=function(C,dr){const n=String(dr.n||'').trim(),m=KINDS.find(([r])=>r.te
 /* ---------- small helpers ---------- */
 const place=C=>C.d.city||C.d.country;
 function daily(C,what){S.dcity=S.dcity||{};const k=what+'|'+C.id,d=S.dcity.dly=S.dcity.dly||{};if(d[k]===S.day)return false;d[k]=S.day;return true}
-function fans(base,k){const f=Math.round(base+Math.sqrt(S.listeners||0)*(k||.2));S.followers=(S.followers||0)+f;return f}
+function fans(base,k){const f=Math.round(base+Math.sqrt(S.listeners||0)*(k||.2));S.followers=(S.followers||0)+FOLN(f);return f}
 function pay(p){if(S.money<p){snd('err');say('Not enough money for that.');return false}S.money=+(S.money-p).toFixed(2);return true}
 function pass(units){S.t=Math.min(599,S.t+units)}
 const HOUR=()=>S.t<300?21:30;
