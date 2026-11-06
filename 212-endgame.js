@@ -1,4 +1,4 @@
-/* WaveFern dev: ENDGAME - "Road to 4B" and the Legend era (4,000,000,000 monthly listeners). Only loaded on /dev/. ?noendgame skips it.
+/* WaveFern dev: ENDGAME - "Road to 4B" and the Legend era (4,000,000,000 monthly listeners).  ?noendgame skips it.
    Does not retune any base number: everything is gated on listeners >= 1M (road bar) or >= 4B (Legend era), and all prices/rewards scale
    from the player's own recent daily earnings, so it works at any economy. State is S.eg (saved with the career).
    1 Road to 4B: milestone ladder 2M -> 4B with cash rewards (3 days of earnings each), progress bar once the early ladder is done.
@@ -9,7 +9,11 @@
    6 Relics: collectibles bought with LP; full set = Immortal title.
    7 Ascend: spend LP to raise your Legacy Tier (endless): more empire income and bigger rival rewards. */
 (function(){
+<<<<<<< HEAD:dev/dev-endgame-v1.js
  if(!window.FW_FEAT||/[?&]noendgame/.test(location.search))return;
+=======
+ if(/[?&]noendgame/.test(location.search))return;
+>>>>>>> origin/main:212-endgame.js
  const GOAL=4e9,LAD=[2e6,5e6,1e7,2.5e7,5e7,1e8,2.5e8,5e8,1e9,2e9,3e9,4e9];
  const RIV=[['Nova Prime',1.0,3,3],['DJ Eclipse',1.1,4,5],['The Velvet Kings',1.25,5,8],['Oracle',1.5,7,14],['KING OF POP',2.0,10,30]]; /* name, target mult, LP, cash in days of earnings */
  const PRJ=[['Sponsor Suite',3,1,4e9],['Stadium Naming Rights',10,2,4.5e9],['Private Island Studio',30,3,5e9],['Record Label Takeover',75,5,6e9],['Fan Museum',200,8,8e9],['Space Concert Rocket',500,12,1e10]]; /* name, cost in days of earnings (cash is secondary), LP, listeners needed */

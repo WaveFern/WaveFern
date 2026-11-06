@@ -219,10 +219,17 @@
  /* ---------- styles ---------- */
  const css=document.createElement('style');
  css.textContent=`
+<<<<<<< HEAD
 #advb{position:fixed;right:10px;top:96px;z-index:60;display:none;align-items:center;gap:5px;padding:4px 7px;background:#000;color:#e8f3ec;border:2px solid #000;box-shadow:inset 0 -3px #0007,0 0 0 2px #c0392b;font:9px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer}
 #advb:hover{background:#1a1a1a}#advb.on{display:flex}
 #advb .ic{width:11px;height:11px;fill:#e74c3c}
 #advb .bd{min-width:13px;height:13px;padding:0 3px;box-sizing:border-box;background:#c0392b;color:#fff;font:700 9px/13px ui-monospace,monospace;text-align:center}
+=======
+#advb{position:fixed;right:10px;top:96px;z-index:60;display:none;align-items:center;gap:8px;padding:7px 10px;background:#000;color:#e8f3ec;border:2px solid #000;box-shadow:inset 0 -3px #0007,0 0 0 2px #c0392b;font:12px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer}
+#advb:hover{background:#1a1a1a}#advb.on{display:flex}
+#advb .ic{width:16px;height:16px;fill:#e74c3c}
+#advb .bd{min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;background:#c0392b;color:#fff;font:700 11px/18px ui-monospace,monospace;text-align:center}
+>>>>>>> origin/main
 #advb .bd:empty{display:none}
 @keyframes advfade{from{opacity:0}to{opacity:1}}
 @keyframes advpop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
