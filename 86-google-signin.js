@@ -109,6 +109,11 @@ if(FB_ON)fbLoad().catch(()=>{});
 /* v26.87: main menu shown when the site opens: Play, Settings, Google sign-in, profile in the top right.
    The world stays paused behind it; Save & quit in the pause menu comes back here. */
 const TT={on:0,game:0};
+/* NEW_CAREERS: set to true to let people start a new career again. While false, no new career can be created (the + New career
+   button, an empty slot, and the Play button on a title screen with no career in progress). Careers already in progress keep working. */
+const NEW_CAREERS=false;
+const NC_MSG='Careers are temporarily closed. New careers will open again soon. Careers already in progress still work.';
+function ncClosed(){if(NEW_CAREERS)return false;snd('click');try{say(NC_MSG)}catch(e){}try{alert(NC_MSG)}catch(e){}return true}
 function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionStorage.removeItem('fw_msg');say(m)}}catch(e){}}
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
@@ -119,7 +124,7 @@ function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FB
 /* v47.3.0: the Wiki button opens the game wiki (wiki/) in a new tab, so the game stays where it is */
 function ttWiki(){snd('click');const w=window.open('wiki/','_blank');if(w)w.opener=null;else location.href='wiki/'}
 function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;TT.sel=0;pauseOverlay(0);menuMusic(0);PAUSED=0;PS='';MU.hold=0;try{const a=MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}catch(e){}
- if(TT.game){mode='play';$('ui').innerHTML=''}else{mode='creator';creatorUI()}}
+ if(TT.game){mode='play';$('ui').innerHTML=''}else{if(!NEW_CAREERS){TT.on=1;PAUSED=1;MU.hold=1;pauseOverlay(1);menuMusic(1);mode='title';titleUI();ncClosed();return}mode='creator';creatorUI()}}
 /* v26.125: career select (two slots, Minecraft style). Switching slot reloads the page into the chosen career so no state leaks between them.
    Cloud save stays one doc per account and follows the active career. */
 function ttWorlds(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.sel=1;const a=curSlot(),rows=[],free=[];
@@ -127,7 +132,7 @@ function ttWorlds(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.sel=1;const
   rows.push(i?`<div class="ttsl${n==a?' on':''}" data-slot=${n}><div><b>${esc(i.artist||'Unnamed artist')}</b><small>Career ${n} · Day ${i.day||1}${n==a?' · last played':''}</small></div><button class=go onclick="ttSlot(${n})">Play</button><button class=ttdel title="Delete this career" aria-label="Delete career ${n}" onclick="ttDel(${n})">✕</button></div>`
    :`<div class="ttsl empty" data-slot=${n}><div><b>Empty slot</b><small>Career ${n}</small></div></div>`)}
  const rec=[];for(let n=1;n<=BK_MAX;n++){try{const b=localStorage.getItem('fw_bak_'+n);if(b){let nm='';try{nm=scDecode(b).S.artist||''}catch(e){}rec.push(`<div class="ttsl ttbk" draggable=true data-bak=${n}><div><b>${esc(nm||'Recovered career')}</b><small>${esc(localStorage.getItem('fw_bakw_'+n)||'Backup from slot '+n)} · drag onto a career slot</small></div><button onclick="ttRecover(${n})">Recover</button></div>`)}}catch(e){}}
- $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Choose a career</h2>${rows.join('')}${rec.length?`<details class=ttrb><summary>Recovered backups (${rec.length})</summary>${rec.join('')}</details>`:''}<span class=ttnc title="${free.length?'':'Coming soon'}"><button ${free.length?`class=go onclick="ttSlot(${free[0]})"`:'disabled'}>+ New career</button>${free.length?'':'<em>Coming soon</em>'}</span><button onclick="ttBack()">Back</button></div></div>`}
+ $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Choose a career</h2>${rows.join('')}${rec.length?`<details class=ttrb><summary>Recovered backups (${rec.length})</summary>${rec.join('')}</details>`:''}<span class=ttnc title="${!NEW_CAREERS?'Careers are temporarily closed':free.length?'':'Coming soon'}"><button ${NEW_CAREERS&&free.length?`class=go onclick="ttSlot(${free[0]})"`:'disabled'}>+ New career</button>${!NEW_CAREERS?'<em>Temporarily closed</em>':free.length?'':'<em>Coming soon</em>'}</span><button onclick="ttBack()">Back</button></div></div>`}
 function ttRecover(n,t){let b=null;try{b=localStorage.getItem('fw_bak_'+n)}catch(e){}if(!b)return;
  if(!t){for(let k=1;k<=SLOTS;k++){const i=k==curSlot()?(TT.game?1:null):slotInfo(k);if(!i){t=k;break}}
   if(!t){alert('No free career slot. Delete a career first, then press Recover again, or drag the backup onto a slot to overwrite it. Your backup is kept.');return}}
@@ -147,6 +152,7 @@ document.addEventListener('dragleave',e=>{const r=e.target.closest&&e.target.clo
 document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(!r)return;e.preventDefault();r.classList.remove('drop');let n=0;try{n=+e.dataTransfer.getData('text/plain')}catch(x){}if(n)ttRecAsk(n,+r.dataset.slot)});
 function ttBack(){snd('click');TT.sel=0;titleUI()}
 function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
+ if(!NEW_CAREERS&&!slotInfo(n)&&ncClosed())return;
  if(TT.game)autoSave();wiping=true;const i=slotInfo(n);
  try{localStorage.setItem(SLOT_K,n);sessionStorage.setItem('fw_go','1');if(FBU)localStorage.setItem(CS_KEY,JSON.stringify(i?{uid:FBU.uid,t:CLD.t}:{uid:FBU.uid,t:CLD.t,fresh:1}))}catch(e){}
  location.reload()}
