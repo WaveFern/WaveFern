@@ -35,10 +35,10 @@ window.fwNameSafe=a=>{let v=String(a||'').replace(/[^A-Za-z0-9 ._'-]/g,'').repla
 const clean=v=>String(v||'').replace(/ +/g,' ').trim();
 /* ---- change stamps: the database copy (f/u/{uid}) and a local copy ---- */
 const stLocal=()=>{try{return JSON.parse(localStorage.getItem(SK()))||{}}catch(e){return{}}};
-async function stamps(){const s=stLocal();try{const F=FR_(),{R,db,uid}=F.r,v=(await R.get(R.ref(db,'f/u/'+uid))).val()||{};return{t:Math.max(+v.t||0,+s.t||0),d:Math.max(+v.d||0,+s.d||0)}}catch(e){return{t:+s.t||0,d:+s.d||0}}}
+async function stamps(){const s=stLocal();return{t:+s.t||0,d:+s.d||0}}
 const when=t=>new Date(t).toLocaleDateString([],{dateStyle:'medium'});
 let shown=0,later=0;
-async function box(){const F=FR_(),st=await stamps(),now=Date.now(),hasU=!!F.h,hasD=!!dnGet(),canU=!hasU||now-st.t>U_CD,canD=!hasD||now-st.d>D_CD;
+async function box(){const F={h:window.fwUsername()},st=await stamps(),now=Date.now(),hasU=!!F.h,hasD=!!dnGet(),canU=!hasU||now-st.t>U_CD,canD=!hasD||now-st.d>D_CD;
  if(document.getElementById('onbx'))return;
  const o=document.createElement('div');o.id='onbx';o.style.cssText='position:fixed;inset:0;z-index:99990;background:#000d;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box';
  const first=!hasU||!hasD;
@@ -58,45 +58,63 @@ async function box(){const F=FR_(),st=await stamps(),now=Date.now(),hasU=!!F.h,h
   if(!hasU&&!h){m.textContent='Choose a username.';return}if(!hasD&&!dn){m.textContent='Choose a display name.';return}
   let e='';if(chU)e=fwNameCheck('u',h);if(!e&&chD)e=fwNameCheck('d',dn);if(e){m.textContent=e;snd('err');return}
   if(!chU&&!chD){close();return}
-  s.disabled=true;m.style.color='';m.textContent='Checking…';const{R,db,uid}=F.r,ts=R.serverTimestamp();
-  try{if(chU){const x=await R.get(R.ref(db,'f/n/'+h));if(x.exists()&&x.val()!==uid){m.style.color='#ff9a9a';m.textContent='@'+h+' is taken. Try another.';s.disabled=false;return}}
-   const nh=chU?h:F.h,nd=chD?dn:dnGet(),p={h:nh,nm:nd||fwNameSafe((typeof S=='object'&&S&&S.artist)||''),o:1,rm:'',t:ts},up={['f/p/'+uid]:p},stp={};
-   if(chU){up['f/n/'+h]=uid;if(F.h)up['f/n/'+F.h]=null;stp['f/u/'+uid+'/t']=ts}
-   if(chD||(!hasU&&canD))stp['f/u/'+uid+'/d']=ts;
-   /* with the proposed rules the change stamps must go in the same write; with the older rules they are refused, so try again without them */
-   try{await R.update(R.ref(db),Object.assign({},up,stp))}catch(e1){if(!/permission/i.test(String(e1&&(e1.code||e1.message)||e1)))throw e1;await R.update(R.ref(db),up)}
-   try{localStorage.setItem(UK(),nh)}catch(e5){}try{if(window.fwProfileSync)fwProfileSync(1)}catch(e5){}
-   const L=stLocal();if(chU)L.t=Date.now();if(chD||(!hasU&&canD))L.d=Date.now();try{localStorage.setItem(SK(),JSON.stringify(L));localStorage.setItem(DK(),nd)}catch(e2){}
-   F.h=nh;F.pk='';F.od=0;X().frPresence();close();try{snd('chime');say('Saved: '+nd+' (@'+nh+')')}catch(e3){}}
-  catch(e4){console.warn('[names]',e4);m.style.color='#ff9a9a';s.disabled=false;let msg='Could not save that. Try again.';
-   try{if(chU){const{R,db,uid}=F.r,x=await R.get(R.ref(db,'f/n/'+h));if(x.exists()&&x.val()!==uid)msg='@'+h+' was just taken by someone else. Try another.';else if(/permission/i.test(String(e4&&(e4.code||e4.message)||e4)))msg='The server refused that. The database rules may need publishing (permission denied).'}}catch(e6){}
-   m.textContent=msg;snd('err')}};
+  s.disabled=true;m.style.color='';m.textContent='Checking…';
+  try{const uid=FBU.uid;
+   if(chU){const x=await FBF.getDoc(FBF.doc(FBD,'usernames',h));if(x.exists()&&x.data().uid!==uid){m.style.color='#ff9a9a';m.textContent='@'+h+' is taken. Try another.';s.disabled=false;return}}
+   const nh=chU?h:F.h,nd=chD?dn:dnGet();
+   if(chU)await fsClaim(nh,F.h||'');
+   try{localStorage.setItem(UK(),nh)}catch(e5){}
+   const L=stLocal();if(chU)L.t=Date.now();if(chD||(!hasU&&canD))L.d=Date.now();try{localStorage.setItem(SK(),JSON.stringify(L));if(nd)localStorage.setItem(DK(),nd)}catch(e2){}
+   NM.st='ok';rtMirror(nh,nd,chU,chD||(!hasU&&canD));try{if(window.fwProfileSync)fwProfileSync(1)}catch(e5){}
+   close();try{snd('chime');say('Saved: '+(nd?nd+' ':'')+'(@'+nh+')')}catch(e3){}}
+  catch(e4){console.warn('[names]',e4);dlog('save failed: '+errTxt(e4));m.style.color='#ff9a9a';s.disabled=false;
+   m.textContent=e4&&e4.code=='permission-denied'?'The server refused that. The Firestore rules need publishing (permission denied).':'Could not save that ('+errTxt(e4)+'). Try again.';snd('err')}};
  (!hasU?u:d).focus()}
-window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;const F=FR_();if(!F||!F.ok||!F.r)return;shown=1;box().catch(()=>{shown=0})};
-/* Required username: after a Google sign-in, and on every refresh, an account with no username is asked straight away. It does not depend on the
-   reset date. If the database can not be reached or refuses the read, a blocking notice says why with Retry, instead of staying silent. */
-/* the username is also copied to Firestore profiles/{uid}.h (213-public-profile.js). If the Realtime Database is slow or unreachable, that copy proves
-   the account already has a username, so the player is not bothered; Firestore is the connection sign-in and cloud saves already use */
-let fsAt=0;
-function fsName(){if(Date.now()-fsAt<20000||typeof FBU=='undefined'||!FBU||typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD)return;fsAt=Date.now();
- FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(d=>{const h=d.exists()&&d.data()&&d.data().h;if(typeof h=='string'&&/^[a-z0-9_]{3,16}$/.test(h)){try{localStorage.setItem(UK(),h)}catch(e){}const e=document.getElementById('onbe');if(e)e.remove()}},e=>console.warn('[names] profile read',e&&e.code))}
-let t0=0,eDis=0;
-/* never a blocking box: players keep playing; a small notice says why the check failed, Friends keeps retrying in the background, and the notice goes away once it works */
-function errBox(why){if(document.getElementById('onbe')||document.getElementById('onbx')||Date.now()-eDis<300000)return;const o=document.createElement('div');o.id='onbe';o.style.cssText='position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99991;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);padding:8px 10px 8px 12px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:12px';
- o.innerHTML='<span>Your username could not be checked yet. Still trying in the background.<br><small class=m>'+esc(why)+'</small></span><button class=go id=onre style="margin:0;padding:5px 10px">Retry</button><button id=onro title="Hide" style="margin:0;padding:5px 8px;background:none;border:none;color:var(--m)">\u2715</button>';
- document.body.appendChild(o);o.querySelector('#onre').onclick=()=>{o.remove();t0=Date.now();const x=X();if(x){x.FR.rerr='';x.FR.on=0;x.frStart()}};
+window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;if(typeof FBU=='undefined'||!FBU||typeof FBF=='undefined'||!FBF)return;shown=1;box().catch(()=>{shown=0})};
+/* ---- username gate (v49.80.7): Firestore only. The Realtime Database is no longer needed to know or choose a username.
+   profiles/{uid}.h holds the chosen name; usernames/{name} = {uid,t} reserves it (created in the same batch, so a taken name fails: see firebase-rules/live/firestore.rules).
+   Never blocks play: a failed check shows a small notice with Details and a Copy button, and retries by itself. ---- */
+const NM={st:'idle',busy:0,at:0,log:[],err:''};
+const errTxt=e=>String(e&&(e.code?e.code+': ':'')+(e&&e.message||e||'')).slice(0,200);
+function dlog(t){NM.log.push(new Date().toISOString().slice(11,19)+' '+t);if(NM.log.length>16)NM.log.shift();try{console.info('[names]',t)}catch(e){}}
+function diag(){const F=FR_()||{};let h='';try{h=new URL(FB_CFG.databaseURL).host}catch(e){}
+ return ['WaveFern '+(typeof GAME_VERSION!='undefined'?GAME_VERSION:'?'),'state: '+NM.st,'signed in: '+(typeof FBU!='undefined'&&FBU?'yes uid '+FBU.uid:'NO'),'project: '+FB_CFG.projectId,'database host: '+h,
+  'friends database: '+(F.ok?'connected':'not connected'+(F.rerr?' ('+F.rerr+')':'')),'cached username: '+(uCached()||'none'),'online: '+navigator.onLine,'---'].concat(NM.log).join('\n')}
+async function fsClaim(nh,old){const uid=FBU.uid,F=FBF,b=F.writeBatch(FBD),now=Date.now();let bio='';
+ try{const x=await F.getDoc(F.doc(FBD,'profiles',uid));if(x.exists()&&typeof x.data().bio=='string')bio=x.data().bio.slice(0,160)}catch(e){}
+ b.set(F.doc(FBD,'usernames',nh),{uid,t:now});if(old&&old!==nh)b.delete(F.doc(FBD,'usernames',old));
+ const cl=(v,m)=>Math.max(0,Math.min(m,Math.floor(+v||0)));let fl=0;try{fl=fameLevel()}catch(e){}
+ const a=String((typeof S=='object'&&S&&S.artist)||'Player').replace(/[<>"]/g,'').slice(0,24)||'Player';
+ b.set(F.doc(FBD,'profiles',uid),{a,h:nh,bio,fame:cl(fl,1000),lis:cl(typeof S=='object'&&S&&S.listeners,1e12),t:now});
+ dlog('saving @'+nh);await b.commit();dlog('saved @'+nh)}
+/* copy to the Realtime Database for Friends, best effort only */
+function rtMirror(nh,nd,chU,chD){try{const x=X(),F=x&&x.FR;if(!F||!F.ok||!F.r)return;const{R,db,uid}=F.r,ts=R.serverTimestamp(),up={['f/p/'+uid]:{h:nh,nm:nd||fwNameSafe((typeof S=='object'&&S&&S.artist)||''),o:1,rm:'',t:ts}},stp={};
+ if(chU){up['f/n/'+nh]=uid;if(F.h&&F.h!==nh)up['f/n/'+F.h]=null;stp['f/u/'+uid+'/t']=ts}if(chD)stp['f/u/'+uid+'/d']=ts;
+ R.update(R.ref(db),Object.assign({},up,stp)).catch(()=>R.update(R.ref(db),up)).then(()=>{F.h=nh;F.pk='';F.od=0;x.frPresence()},e=>console.warn('[names] friends copy',e&&e.code))}catch(e){}}
+function fsCheck(){if(NM.busy)return;if(typeof FBU=='undefined'||!FBU){NM.st='nouser';return}if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD){NM.st='nouser';return}
+ NM.busy=1;NM.at=Date.now();const uid=FBU.uid;dlog('reading profile of '+uid.slice(0,6)+'… in '+FB_CFG.projectId);
+ FBU.getIdToken().then(()=>dlog('login token ok'),e=>dlog('login token FAILED '+errTxt(e)));
+ Promise.race([FBF.getDoc(FBF.doc(FBD,'profiles',uid)),new Promise((_,j)=>setTimeout(()=>j(new Error('no answer in 15 seconds')),15000))]).then(d=>{
+  const h=d.exists()&&d.data()&&d.data().h;
+  if(typeof h=='string'&&/^[a-z0-9_]{3,16}$/.test(h)){NM.st='ok';dlog('username is @'+h);try{localStorage.setItem(UK(),h)}catch(e){}const e=document.getElementById('onbe');if(e)e.remove();
+   /* a profile written before usernames/ existed: reserve its name now (ignored if the rules are not published yet) */
+   return FBF.getDoc(FBF.doc(FBD,'usernames',h)).then(r=>{if(!r.exists())return fsClaim(h,'')}).catch(e=>dlog('reserve check skipped: '+errTxt(e)))}
+  const F=FR_();if(F&&F.h&&/^[a-z0-9_]{3,16}$/.test(F.h)){dlog('moving @'+F.h+' from Friends');return fsClaim(F.h,'').then(()=>{NM.st='ok';try{localStorage.setItem(UK(),F.h)}catch(e){}},e=>{NM.st='need';dlog('move failed '+errTxt(e))})}
+  NM.st='need';dlog('no username on this account yet')
+ }).catch(e=>{NM.st='err';NM.err=errTxt(e);dlog('profile read failed: '+NM.err)}).finally(()=>{NM.busy=0})}
+let eDis=0;
+function errBox(why){if(document.getElementById('onbe')||document.getElementById('onbx')||Date.now()-eDis<300000)return;const o=document.createElement('div');o.id='onbe';o.style.cssText='position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99991;max-width:calc(100% - 24px);width:420px;padding:8px 10px 8px 12px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:12px';
+ o.innerHTML='<div style="display:flex;align-items:center;gap:8px"><span style="flex:1">Your username could not be checked yet. You can keep playing; this retries by itself.<br><small class=m>'+esc(why)+'</small></span><button class=go id=onre style="margin:0;padding:5px 10px">Retry</button><button id=onro title="Hide" style="margin:0;padding:5px 8px;background:none;border:none;color:var(--m)">✕</button></div><details style="margin-top:6px"><summary class=m>Details</summary><pre id=ondt style="white-space:pre-wrap;word-break:break-all;font-size:10px;max-height:140px;overflow:auto;margin:4px 0"></pre><button id=oncp style="margin:0;padding:4px 10px">Copy details</button></details>';
+ document.body.appendChild(o);const pre=o.querySelector('#ondt'),fill=()=>{pre.textContent=diag()};fill();o.querySelector('details').addEventListener('toggle',fill);
+ o.querySelector('#oncp').onclick=()=>{fill();const t=diag();try{navigator.clipboard.writeText(t).then(()=>say('Details copied.'),()=>{pre.focus()})}catch(e){const r=document.createRange();r.selectNodeContents(pre);const g=getSelection();g.removeAllRanges();g.addRange(r)}};
+ o.querySelector('#onre').onclick=()=>{o.remove();NM.st='idle';NM.busy=0;dlog('retry pressed');const x=X();if(x){x.FR.rerr='';x.FR.on=0;x.frStart()}};
  o.querySelector('#onro').onclick=()=>{o.remove();eDis=Date.now()}}
-setInterval(()=>{try{if(shown||later||!FW_ACCT||FW_TRL)return;const x=X();if(!x||x.trailer)return;const F=x.FR;
- if(!F.on)x.frStart();
- if(F.ok){const e=document.getElementById('onbe');if(e)e.remove()}
+setInterval(()=>{try{if(shown||later||!FW_ACCT||FW_TRL)return;const x=X();if(x&&!x.trailer&&!x.FR.on)x.frStart();
  if(!['title','creator','play','pause'].includes(mode))return;
- if(F.ok&&F.r){if(F.h){try{localStorage.setItem(UK(),F.h)}catch(e){}}if(F.h&&dnGet())return;if(document.getElementById('annov'))return;fwNameBox();return}
- if(uCached())return;
- fsName();
- if(!t0)t0=Date.now();
- let host='';try{host=new URL(FB_CFG.databaseURL).host}catch(e){}
- if(/sign-in needed|^auth$/i.test(F.rerr||''))errBox('You are not signed in with Google on this device any more (the account moved to a new Firebase project). Sign out and sign in with Google again.');
- else if(F.rerr)errBox(/permission/i.test(F.rerr)?'The database refused the read (permission denied). The Realtime Database rules need publishing.':'Could not reach the database: '+F.rerr);
- else if(Date.now()-t0>25000)errBox('The database ('+host+') did not answer. Check your connection, and that the Realtime Database exists at that address.')}catch(e){}},1000);
+ if(uCached()){NM.st='ok';return}
+ if(NM.st=='idle'||NM.st=='nouser'||NM.st=='err'&&Date.now()-NM.at>20000)fsCheck();
+ if(NM.st=='need'){if(document.getElementById('annov'))return;fwNameBox();return}
+ if(NM.st=='nouser'&&Date.now()-NM.at>0&&typeof FBU!='undefined'&&!FBU){if(!NM.t1)NM.t1=Date.now();if(Date.now()-NM.t1>20000)errBox('You are not signed in with Google on this device. Sign out and sign in again.')}
+ if(NM.st=='err')errBox(NM.err)}catch(e){}},1000);
 /* Friends is only started when needed; start it as soon as someone is signed in after the reset so this can run */
 })();
