@@ -75,8 +75,10 @@ const LG=[['s25','Release 25 songs',()=>S.songs.length,25,2000],['s100','Release
  ['l50m','50M monthly listeners',()=>S.listeners||0,5e7,75000],['st1b','1B total streams',()=>S.streams||0,1e9,100000],
  ['pq1','Earn your first plaque',()=>(S.plq||[]).length,1,3000],['pq10','Earn 10 plaques',()=>(S.plq||[]).length,10,40000],
  ['bil','Join the Billions Club',()=>(S.plq||[]).filter(p=>p.n>=1e9).length,1,150000],['bf3','Best friends with 3 artists',()=>Object.values(collabs()).filter(n=>n>=5).length,3,12000],
- ['tp12','Find all 12 lost tapes',()=>Object.keys(S.tapes||{}).length,12,5000],['fl25','Reach Fame Level 25',FL,25,50000]];
+ ['tp12','Find all 12 lost tapes',()=>Object.keys(S.tapes||{}).length,12,5000],['fl25','Reach Fame Level 25',FL,25,0]];
 function legTick(){if(!live())return;const first=!S.leg;S.leg=S.leg||{};
+ /* v49.80.7: the Fame Level 25 goal used to pay $50,000. It pays nothing now, and a career that was paid (S.leg.fl25===1; 2 means it was marked done without pay) has the $50,000 taken back once (S.leg.fx), never below $0. */
+ if(S.leg.fl25===1&&!S.leg.fx){S.leg.fx=1;const m=+S.money||0,t=Math.min(50000,Math.max(0,m));S.money=+(m-t).toFixed(2);try{mail('Fixed: the Fame Level 25 Legacy goal no longer pays $50,000, so $'+t.toLocaleString()+' was taken back from your balance.')}catch(e){}}
  for(const[id,n,f,t,r]of LG){if(S.leg[id])continue;let v=0;try{v=+f()||0}catch(e){}if(v<t)continue;S.leg[id]=first?2:1;if(first)continue;
   S.money=+((+S.money||0)+r).toFixed(2);if(!document.getElementById('glr'))card('LEGACY GOAL',n,'+$'+r.toLocaleString(),60);mail('Legacy goal reached: '+n+'. $'+r.toLocaleString()+' has been paid to you.');return}}
 
@@ -106,7 +108,7 @@ function collect(f){const fl=FL();if(f.k=='t'){S.tapes[f.i]=S.day;const n=Object
 /* ===== Legacy tab in the Quests app ===== */
 const bar=(v,t)=>`<div class=qbar><i style="width:${Math.min(100,v/t*100)}%"></i></div>`;
 function legPage(){S.leg=S.leg||{};const c=collabs(),fr=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,8),pl=(S.plq||[]).slice().reverse();
- const goals=LG.map(([id,n,f,t,r],i)=>{let v=0;try{v=+f()||0}catch(e){}const ok=!!S.leg[id];return`<div class="qc ${ok?'ok':''}"><div class=qs>${ok?'✓':i+1}</div><div class=qn><b>${esc(n)}</b>${bar(ok?t:v,t)}<div class=qv>${ok?'Done':fmt(Math.min(v,t))+' / '+fmt(t)+' · $'+r.toLocaleString()}</div></div></div>`}).join('');
+ const goals=LG.map(([id,n,f,t,r],i)=>{let v=0;try{v=+f()||0}catch(e){}const ok=!!S.leg[id];return`<div class="qc ${ok?'ok':''}"><div class=qs>${ok?'✓':i+1}</div><div class=qn><b>${esc(n)}</b>${bar(ok?t:v,t)}<div class=qv>${ok?'Done':fmt(Math.min(v,t))+' / '+fmt(t)+(r?' · $'+r.toLocaleString():'')}</div></div></div>`}).join('');
  return`<div class=qst><div class=qh><img src="${IC.quests}"><div><h1>LEGACY</h1><small>Big goals, plaques and the people you make music with</small></div></div>
  <div class=qtabs><button onclick="qstTab('d')">Daily</button><button onclick="qstTab('w')">Weekly</button><button class=on onclick="qstTab('l')">Legacy</button></div>
  <h3 style="margin:6px 0">Legacy goals</h3>${goals}
