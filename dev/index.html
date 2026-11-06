@@ -31,6 +31,7 @@ button:disabled{opacity:.5;cursor:default}
   return h.length===d.hash.length&&x===0;
  }
  async function launch(){
+  try{(0,eval)(await (await fetch('/dev/dev-economy-patch.js',{cache:'no-store'})).text())}catch(e){}
   /* the script bundle downloads in parallel with the page; if it is missing or out of date the normal script tags are used */
   const bp=fetch('bundle.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null),mp=Promise.all([fetch('/dev/dev-house-v1.js',{cache:'no-cache'}),fetch('/dev/dev-models-v2.js',{cache:'no-cache'}),fetch('/dev/dev-christmas-v1.js',{cache:'no-cache'})].map(p=>p.then(r=>r.ok?r.text():'').catch(()=>''))).then(a=>a.join('\n'));
   let html=await (await fetch('/index.html',{cache:'no-store'})).text();
@@ -45,7 +46,7 @@ button:disabled{opacity:.5;cursor:default}
    window.__FWB=B.files;window.__FWL=list;
    tags.forEach(t=>{html=html.replace(t,'')});
    /* runs every game script in order, each as its own classic script (an error in one does not stop the rest), then the dev add-ons */
-   const run='<script>(function(){var F=window.__FWB,i=0;window.__FWB=null;function put(c,n){var e=document.createElement("script");e.text=c+"\\n//# sourceURL=/"+n;document.head.appendChild(e);e.remove()}'+
+   const run='<script>(function(){var F=window.__FWB,i=0;window.__FWB=null;function put(c,n){var e=document.createElement("script");e.text=(window.__fwpatch?window.__fwpatch(n,c):c)+"\\n//# sourceURL=/"+n;document.head.appendChild(e);e.remove()}'+
     'for(;i<F.length;i++){var n=F[i].s.split("?")[0];if(n==="27-boot.js"&&window.__FWM)put(window.__FWM,"dev/dev-models-v2.js");put(F[i].c,n)}})();<\/script>';
    html=html.replace(/<\/body>/i,run+extra+'</body>');
    /* dev-models must run just before the boot script: fetch it with the bundle */
@@ -53,6 +54,9 @@ button:disabled{opacity:.5;cursor:default}
   }else{
    html=html.replace(/<script src="27-boot\.js[^>]*><\/script>/i,m=>'<script src="/dev/dev-house-v1.js"><\/script><script src="/dev/dev-models-v2.js"><\/script><script src="/dev/dev-christmas-v1.js"><\/script>'+m);
    html=html.replace(/<\/body>/i,extra+'</body>');
+   /* fallback path: base scripts named in the patch table are fetched, patched and inlined */
+   if(window.__fwpatch){const names=window.__fwpatchKeys||[];
+    await Promise.all(names.map(async n=>{const m=html.match(new RegExp('<script src="'+n.replace(/\./g,'\\.')+'[^"]*"><\/script>'));if(!m)return;try{const c=await (await fetch('/'+n,{cache:'no-store'})).text();const pc=window.__fwpatch(n,c).replace(/<\/script/gi,'<\\/script');html=html.replace(m[0],()=>'<script>'+pc+'\n//# sourceURL=/'+n+'<\/script>')}catch(e){}}))}
   }
   /* every dev script gets a fresh stamp on every load, so a browser can never serve a stale copy */
   html=html.replace(/(src="\/dev\/[^"?]+\.js)"/g,'$1?t='+Date.now()+'"');

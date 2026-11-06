@@ -18,7 +18,13 @@
  window.FW_XMAS=1;
  const R=(a,b)=>a+Math.random()*(b-a),RI=(a,b)=>Math.floor(R(a,b+1)),pk=a=>a[Math.floor(Math.random()*a.length)];
  const SNOW=new THREE.Color('#f1f5fa'),ICE=new THREE.Color('#bfe0f0');
- const outdoorXZ=(x,z)=>z<260&&x<880;
+ /* ---------- abroad: the tour cities sit far away at x 4000, z -4000 (rooms and the stadium are further out and stay indoors).
+    A city gets snow only in a cold climate: north of 35 degrees and not a palm/desert city, or a city described as snowy. ---------- */
+ const DC=window.DCITY||null,ABROAD={value:0};
+ const abroadX=(x,z)=>!!DC&&x>3800&&x<4900&&z>-4300&&z<-3500;
+ function coldCity(){try{const C=DC&&DC.on&&DC.C;if(!C)return true;const d=C.d||{},s=C.s||{};return !!(s.snow||(d.lat>=35&&!s.palm&&!s.desert))}catch(e){return true}}
+ const hotAbroad=()=>{try{return !!(DC&&DC.on&&DC.C&&!coldCity())}catch(e){return false}};
+ const outdoorXZ=(x,z)=>(z<260&&x<880)||(ABROAD.value>.5&&abroadX(x,z));
  /* the player's own home (and its extension) is left as it was */
  /* only the house itself (and its back wing, once built) is left bare; the garden behind it snows like everywhere else */
  const HZU={value:-.7};
@@ -158,6 +164,7 @@
    if(!S.wx||S.wx.d!==S.day)S.wx={d:S.day,k:S.day<=1?'sun':wxRoll()};
    if(S.wx.k=='rain'||S.wx.k=='storm')S.wx.k='snow';
    const k=S.wx.k;
+   if(k=='snow'&&hotAbroad())return W.kinds.sun;/* too hot to snow here */
    if(!S.wx.said&&k!='sun'&&mode=='play'){S.wx.said=1;setTimeout(()=>{try{say(k=='snow'?'It is snowing today.':'A thick fog has rolled in today.')}catch(e){}},1500)}
    return W.kinds[k]||W.kinds.sun}
  }
@@ -227,6 +234,17 @@
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
   if(lawn){try{const k=lawn.cv.getContext('2d');if(on){/* a dusting over the grass: blades still show through */const W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);k.globalAlpha=.55;k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.globalAlpha=1;for(let i=0;i<W2*H2/6;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),RI(1,3),1)}else k.putImageData(lawn.orig,0,0);lawn.map.needsUpdate=true}catch(e){}}}
  let lawn=null;const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
+ /* abroad: patch the city's merged meshes, and swap the plain ground plane for a snowy one while it snows */
+ const aset=[];
+ function sweepCity(){
+  const C=DC&&DC.on&&DC.C;if(!C||!C.g)return;
+  C.g.traverse(o=>{if(!o.isMesh||o.userData.xmc)return;o.userData.xmc=1;
+   const gm=o.geometry,m=o.material;if(!gm||!m)return;
+   if(gm.attributes&&gm.attributes.color&&gm.attributes.normal){patchMat(m);return}
+   if(gm.type==='PlaneGeometry'&&!Array.isArray(m)&&m.type==='MeshLambertMaterial'&&!m.map&&!m.transparent&&gm.parameters.width>=2000&&gm.parameters.height>=2000&&Math.abs(o.position.y+.06)<.02){
+    const sm=m.clone();sm.color.lerp(SNOW,.8);aset.push({o,orig:m,sn:sm})}})}
+ let aOn=false;
+ function aApply(on){aOn=on;aset.forEach(e=>{if(e.o.parent)e.o.material=on?e.sn:e.orig})}
  function sweepWorld(){
   scene.children.forEach(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&!Array.isArray(o.material))patchMat(o.material)});
   const g=typeof WORLD!='undefined'?WORLD:null;if(!g)return;let added=0;
@@ -274,10 +292,12 @@
  const WSKY=new THREE.Color(0xc9d8e6),WAMB=new THREE.Color(0xe4ecff);
  let sweepT=0,first=true,sT=0;
  function xmasTick(dt,px,pz){
-  sweepT+=dt;if(first||sweepT>2){if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}try{freezePond()}catch(e){}}
+  sweepT+=dt;if(first||sweepT>2){try{sweepCity()}catch(e){}if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}try{freezePond()}catch(e){}}
   const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut',inner=(typeof wxInterior=='function')&&wxInterior();
   /* snow cover follows today's weather */
-  const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live)?1:0;
+  const hotA=hotAbroad();ABROAD.value=(DC&&DC.on&&!hotA)?1:0;
+  const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live&&!hotA)?1:0;
+  {const ao=!!(want&&DC&&DC.on);if(ao!==aOn)aApply(ao)}
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
   HZU.value=-.7-((typeof WGX=='number'&&WGX)||0);
   SNOWU.value+=(snowTarget-SNOWU.value)*Math.min(1,dt*1.2);if(Math.abs(snowTarget-SNOWU.value)<.01)SNOWU.value=snowTarget;
@@ -292,9 +312,9 @@
   if(!live||inner)return;
   /* winter light outdoors */
   const outdoors=!(typeof HIN!='undefined'&&HIN),dayk=1-(S.t<240?0:S.t<300?(S.t-240)/60*.5:S.t<330?.5+(S.t-300)/30*.4:.9);
-  if(outdoors){amb.color.lerp(WAMB,.1+.1*SNOWU.value);scene.background.lerp(WSKY,(.2+.35*SNOWU.value)*dayk)}
+  if(outdoors&&!hotA){amb.color.lerp(WAMB,.1+.1*SNOWU.value);scene.background.lerp(WSKY,(.2+.35*SNOWU.value)*dayk)}
   /* snowfall */
-  const snow=S.wx&&S.wx.k=='snow'&&W;
+  const snow=S.wx&&S.wx.k=='snow'&&W&&!hotA;
   if(snow&&!sMesh)sMesh=snowMesh();
   if(sMesh){sMesh.visible=!!snow;if(snow){const u=sMesh.material.uniforms,hr=wxHouse();u.c.value.set(camT.x,0,camT.z);u.t.value=(u.t.value+dt)%5000;u.hr.value.set(hr[0],hr[1],hr[2],hr[3]);u.hin.value=(typeof HIN!='undefined'&&HIN||mode=='build')?1:0}}
  }
