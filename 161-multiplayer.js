@@ -755,15 +755,15 @@ const frNm=()=>{let d='';try{d=typeof fwDisplayName=='function'?fwDisplayName():
 const okId=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
 function frErr(e){console.warn('[friends]',e);FR.err=/permission/i.test(String(e&&(e.code||e.message)||e))?'Friends is not switched on yet. The database rules need publishing.':'Could not reach Friends. Check your connection.';frDraw()}
 function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
- rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;
-  R.get(R.ref(db,'f/p/'+uid+'/h')).then(s=>{FR.h=s.val()||'';FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
+ rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;console.info('[friends] connected to',RTDB_URL,'as',uid);
+  Promise.race([R.get(R.ref(db,'f/p/'+uid+'/h')),new Promise((_,j)=>setTimeout(()=>j(new Error('The database did not answer within 20 seconds')),20000))]).then(s=>{FR.h=s.val()||'';FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
   R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.od=0;frPresence()}});
   R.onValue(R.ref(db,'f/l/'+uid),s=>{const v=s.val()||{};for(const f in FR.pu)if(!v[f]){try{FR.pu[f]()}catch(e){}delete FR.pu[f];delete FR.P[f]}FR.L=v;
    for(const f in v)if(!FR.pu[f]&&okId(f))FR.pu[f]=R.onValue(R.ref(db,'f/p/'+f),x=>{const o=FR.P[f],n=x.val();FR.P[f]=n;if(o&&!o.o&&n&&n.o&&n.h)say('@'+n.h+' is online.');frDraw()},()=>{});frDraw()},frErr);
   R.onValue(R.ref(db,'f/q/'+uid),s=>{const v=s.val()||{},nw=Object.keys(v).filter(k=>!FR.Q[k]&&v[k]&&v[k].h);if(FR.qd&&nw.length){snd('ping');say('Friend request from @'+v[nw[0]].h+'. Open Friends to answer.')}FR.qd=1;FR.Q=v;frDraw()},frErr);
   R.onValue(R.ref(db,'f/i/'+uid),s=>{FR.I=s.val()||{};frInvite()},()=>{});
   R.onValue(R.ref(db,'f/b/'+uid),s=>{FR.B=s.val()||{};frDraw()},()=>{});
- }).catch(e=>{FR.on=0;frErr(e)})}
+ }).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);console.warn('[friends] start failed:',e);frErr(e)})}
 function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
  if(k===FR.pk)return;FR.pk=k;const ref=R.ref(db,'f/p/'+uid);R.set(ref,Object.assign({t:R.serverTimestamp()},o)).then(()=>{if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{FR.pk='';console.warn('[friends] presence',e)})}
 setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);

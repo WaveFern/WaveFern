@@ -89,7 +89,8 @@ setInterval(()=>{try{if(shown||later||!FW_ACCT||FW_TRL)return;const x=X();if(!x|
  if(uCached()&&dnGet())return;
  if(!t0)t0=Date.now();
  let host='';try{host=new URL(FB_CFG.databaseURL).host}catch(e){}
- if(F.rerr)errBox(/permission/i.test(F.rerr)?'The database refused the read (permission denied). The Realtime Database rules need publishing.':'Could not reach the database: '+F.rerr);
+ if(/sign-in needed|^auth$/i.test(F.rerr||''))errBox('You are not signed in with Google on this device any more (the account moved to a new Firebase project). Sign out and sign in with Google again.');
+ else if(F.rerr)errBox(/permission/i.test(F.rerr)?'The database refused the read (permission denied). The Realtime Database rules need publishing.':'Could not reach the database: '+F.rerr);
  else if(Date.now()-t0>25000)errBox('The database ('+host+') did not answer. Check your connection, and that the Realtime Database exists at that address.')}catch(e){}},1000);
 /* Friends is only started when needed; start it as soon as someone is signed in after the reset so this can run */
 })();
