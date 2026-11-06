@@ -21,3 +21,4 @@ og-image.png -filter -diff -merge binary
 # dev music v1: recorded instrument notes and drum kits, plain files so GitHub Pages serves the real mp3 (the deploy workflow does not fetch LFS)
 audio/inst/**/*.mp3 -filter -diff -merge binary
 audio/kits/**/*.mp3 -filter -diff -merge binary
+audio/refresh.mp3 -filter -diff -merge binary

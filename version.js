@@ -7,6 +7,7 @@ const GAME_VERSION='v49.74.1';
 const VERSION_HISTORY=[
  {v:'v49.74.1',n:'The big update (the fresh start) moved from 18:00 UTC to 13:30 UTC (1:30pm in England) today, Friday 6 November 2026. The countdown and announcement show the new time. Saves still load.'},
  {v:'v49.74.0',n:'A small countdown to the big update (the fresh start at 18:00 UTC on Friday 6 November 2026) now shows in the top right while you play, and goes away once it begins. Saves still load.'},
+ {v:'v49.73.10',n:'The farm and the South suburb are gone from the city and from both maps. Saves still load.'},
  {v:'v49.73.9',n:'New artist Carlos, a pop star with 500 million monthly listeners and a blonde buzz cut. Once you are well known he can message you in Messages, and you can collab with him. Saves still load.'},
  {v:'v49.73.7',n:'When Join a room says No answer, it now also says why the Firebase relay could not find the room, so connection problems can be tracked down. Saves still load.'},
  {v:'v49.73.6',n:'Fixed waking up in an airport in a different country after sleeping on a flight home or to another city. You now wake up where your flight lands. Saves still load.'},

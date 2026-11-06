@@ -207,7 +207,7 @@ function hotelRooms(C){const s=C.s,hn=(C.spots.hotel&&C.spots.hotel.n)||'Hotel',
  const L=D.mkRoom('lobby',lx,lz,lw,ld,{floor:'#c8b89a',wall:'#e8dcc4',h:5,name:hn});if(!L)return;
  L.box(16,.02,6,'#7a2a3a',lx+11,.02,lz+8);L.box(7,1.2,1.2,'#5a3a2a',lx+6,.6,lz+3,1);L.box(7.2,.1,1.3,'#e8d8b0',lx+6,1.25,lz+3);L.box(4,2.2,.3,'#4a2a1a',lx+6,2.2,lz+.4);for(let i=0;i<8;i++)L.box(.2,.2,.1,'#e8c040',lx+4.4+i*.45,2.4,lz+.6);staff(L,lx+5,lz+2,0);staff(L,lx+7.4,lz+2,0);
  L.sign('z',lz+.3,lx+2.5,lx+9.5,3.6,4.6,512,64,(c,W,H)=>D.signArt(c,W,H,hn.toUpperCase(),{bg:'#2a1a26',fg:'#ffd890',neon:1}));
- for(let i=0;i<2;i++){L.box(2,3.2,.2,'#a8a4a0',lx+14+i*3,1.6,lz+.2);L.glow(.25,.25,.05,'#ffd23d',lx+15.2+i*3,1.6,lz+.36)}L.glow(1.6,.4,1.6,'#fff2c0',lx+11,4.4,lz+7);L.glow(.8,.6,.8,'#ffe0a0',lx+11,4,lz+7);
+ for(let i=0;i<2;i++){L.box(2,3.2,.2,'#a8a4a0',lx+14+i*3,1.6,lz+.2);L.glow(.25,.25,.05,'#ffd23d',lx+15.2+i*3,1.6,lz+.36)}
  [[lx+4,lz+10],[lx+18,lz+10]].forEach(([x,z])=>{L.box(3,.5,1.2,'#3a5a6a',x,.25,z,1);L.box(3,.7,.3,'#3a5a6a',x,.75,z-.5);table(L,x,z+1.6,1.2,.8,'#5a3a2a')});plant(L,lx+1,lz+1);plant(L,lx+lw-1,lz+1);plant(L,lx+1,lz+ld-2);
  L.box(1,1.6,.6,'#c8a040',lx+lw-3,.8,lz+6,1);L.box(.8,.6,.5,'#8a4a2a',lx+lw-3,1.9,lz+6);
  dress(C,L,'lobby',lx,lz,lw,ld,'#e8dcc4');L.int(lx+6,lz+4.4,2,'Reception: check in for the night',()=>checkIn(C));L.int(lx+15.5,lz+1.6,2,'Take the lift to your room',()=>lift(C));L.int(lx+4,lz+11.4,1.6,'Sit and rest for an hour',()=>D.hotelRest());
