@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta name="robots" content="noindex,nofollow,noarchive"><title>WaveFern Dev</title><link rel="icon" href="/favicon.png">
+<style>html,body{margin:0;height:100%;background:#000;color:#8aa094;font:14px ui-monospace,Menlo,Consolas,monospace}body{display:flex;align-items:center;justify-content:center}</style></head>
+<body><div id="m">Loading the dev build...</div>
+<script>
+/* WaveFern /dev/: the test slot. It loads the normal game page (/index.html) with dev/dev-shim.js first, which
+   (1) keeps test saves apart from real saves (every localStorage key is stored as "dev:<key>"),
+   (2) blocks all cloud calls, and (3) sets window.FW_DEV, which unlocks everything that is date-locked on the live site
+   (Christmas snow, lights, coats, the advent calendar). No password. */
+(async function(){
+ try{
+  let html=await (await fetch('/index.html',{cache:'no-store'})).text();
+  html=html.replace(/<meta name="robots"[^>]*>/i,'').replace(/<link rel="canonical"[^>]*>/i,'').replace(/<title>[^<]*<\/title>/i,'<title>DEV - WaveFern</title>');
+  html=html.replace(/<head[^>]*>/i,'$&<base href="/"><meta name="robots" content="noindex,nofollow,noarchive"><script src="/dev/dev-shim.js?t='+Date.now()+'"><\/script>');
+  document.open();document.write(html);document.close();
+ }catch(e){document.getElementById('m').textContent='Could not load the game. Reload to try again.'}
+})();
+</script></body></html>
