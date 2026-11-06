@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.85.3';
+const GAME_VERSION='v49.85.4';
 const VERSION_HISTORY=[
+ {v:'v49.85.4',n:'Fan robberies are now much rarer (1% of autographs) and take only 10% of your cash, capped at $500. Saves still load.'},
  {v:'v49.85.3',n:'Profile actions (add friend, invite to band, report, block) are now compact icons next to the name instead of big buttons.'},
  {v:'v49.85.2',n:'Your public profile (with your Google photo) now saves a few seconds after you sign in and whenever you open a profile, so other players see your photo sooner.'},
  {v:'v49.85.1',n:'The version number now shows on the loading screen.'},
