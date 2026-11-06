@@ -1,13 +1,23 @@
-/* v49.74.0 economy rebalance: caps daily listener growth (about 1M listeners after 25 to 30 days of ~30 min play)
-   and ties that night's streams and pay to the capped growth, so big collabs and viral songs cannot skip the grind. */
+/* WaveFern dev: listener pacing (v2). Target in active play (~30 min per day): 1M ~ day 17, 1B ~ 17 hours (day 34), 4B endgame ~ 20 hours (day 40).
+   Max daily growth is exp(r(L)*CAP) (fast, fades as the numbers grow); a player who releases music gets pulled up to exp(r(L)*PACE);
+   one who does not only gets 30% of that. Money follows: over-cap streams are clawed back, lifted growth pays a stream credit.
+   ?noeco skips this file (and the patches). */
 (()=>{
-const GROW=1.36,ADD=250;
+if(/[?&]noeco/.test(location.search))return;
+const CAP=.95,PACE=.78,IDLE=.3,ADD=250,PAY=.04;
+const r=L=>{const x=Math.log10(Math.max(L,1));return x<=4?.75:x<=8?.75-(x-4)/4*.25:x<=9.2?.5-(x-8)/1.2*.22:.28};
 const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0}catch(e){}
- const r=w0.apply(this,arguments);
- try{if(S.cheat)return r;const cap=Math.floor(L0*GROW+ADD),L1=+S.listeners||0;
-  if(L1>cap){const k=cap/L1,h=S.hist&&S.hist[S.hist.length-1];S.listeners=cap;
-   if(h&&h.d===S.day-1&&!h.cp){h.cp=1;const e=+h.e||0,lost=e*(1-k);h.e=+(e*k).toFixed(2);h.st=Math.round((h.st||0)*k);S.money=+Math.max(0,S.money-lost).toFixed(2);S.earn=+((S.earn||0)-lost).toFixed(2)}
-   if(S.monthStreams>cap*(S.mlDiv||3))S.monthStreams=cap*(S.mlDiv||3);
-   if(Array.isArray(S.mlHist)){const m=S.mlHist[S.mlHist.length-1];if(m)m.ml=cap}}}catch(e){console.error('economy cap',e)}
- return r}
+ const r0=w0.apply(this,arguments);
+ try{if(S.cheat)return r0;
+  const Ln=+S.listeners||0,g=r(L0),cap=Math.floor(L0*Math.exp(g*CAP)+ADD),rel=(S.songs||[]).some(s=>s.day==S.day-1);
+  const tgt=Math.floor(L0*Math.exp(g*(rel?PACE:PACE*IDLE))+ADD*(rel?.8:.2));
+  const Lf=Math.min(cap,Math.max(Ln,tgt)),h=S.hist&&S.hist[S.hist.length-1],md=S.mlDiv||3;
+  if(h&&h.d===S.day-1&&!h.cp){h.cp=1;let d=0;
+   if(Ln>cap){const k=cap/Ln,e=+h.e||0;d=-e*(1-k);h.e=+(e*k).toFixed(2);h.st=Math.round((h.st||0)*k)}
+   else if(Lf>Ln){const st=Math.round((Lf-Ln)*md/30*.5);d=st*PAY;h.st=(h.st||0)+st;h.e=+((+h.e||0)+d).toFixed(2);S.streams=(S.streams||0)+st}
+   if(d){S.money=+Math.max(0,S.money+d).toFixed(2);S.earn=+((S.earn||0)+d).toFixed(2)}}
+  S.listeners=Lf;S.monthStreams=Math.max(0,Math.min(S.monthStreams||0,cap*md),Lf*md*.999);
+  if(Array.isArray(S.mlHist)){const m=S.mlHist[S.mlHist.length-1];if(m)m.ml=Lf}
+ }catch(e){console.error('economy pacing',e)}
+ return r0};
 })();
