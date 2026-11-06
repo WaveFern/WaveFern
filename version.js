@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.76.0';
+const GAME_VERSION='v49.77.0';
 const VERSION_HISTORY=[
- {v:'v49.76.0',n:'Second fresh start: the game was too easy, so every career is reset again (money, listeners, apps, songs and the rest). Old careers are kept as Legacy careers, and the Founder badge and Founder items stay.'},
+ {v:'v49.77.0',n:'Second fresh start: the game was too easy, so every career is reset again (money, listeners, apps, songs and the rest). Old careers are kept as Legacy careers, and the Founder badge and Founder items stay.'},
+ {v:'v49.76.0',n:'Listener pacing now follows real play time (a day is about 5 minutes): 2K listeners in the first hour, 1M after about 12 hours, 1B after about 28, 4B after about 35 and 8B after about 40. Growth is uneven, with the odd slow patch of a few days. Fame Level 350 now sits at 8B listeners. Saves still load.'},
  {v:'v49.75.1',n:'Sign-in now loads the new Firebase settings for everyone, including players with an older copy cached. Saves still load.'},
  {v:'v49.75.0',n:'Everything from the test build is now live: island coast, concert crowds, world tour shops, awards, a Christmas advent calendar and much more. Big update: slower, steadier growth (1B monthly listeners after about 17 hours of play, 4B endgame after about 20), harder money and steeper prices, money shown without cents (1K, 2.5M), weaker pop-up events, a stronger first 15 minutes (rookie rush, surprise drops, goal bar, daily streak) and a real endgame at 4B (Road to 4B, Legend era with chart wars, empire projects, records, relics and ascend). Saves still load.'},
  {v:'v49.74.0',n:'A small countdown to the big update (the fresh start at 18:00 UTC on Friday 6 November 2026) now shows in the top right while you play, and goes away once it begins. Saves still load.'},
