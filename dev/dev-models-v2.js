@@ -6,7 +6,7 @@
    No glow, no bright lights: everything is plain lit boxes. Add ?nomodels to the address to skip it entirely.
    Switch on/off in the dev panel (DEV button or the ` key) > Models and houses. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]nomodels/.test(location.search))return;
  const KEY='fw_dmodels';
  let on=true;try{if(localStorage.getItem(KEY)==='0')on=false}catch(e){}

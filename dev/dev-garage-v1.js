@@ -5,7 +5,7 @@
    Pattern numbers never change once added (old saves keep their look). Owned cars use the look everywhere: parked by the house,
    in the garage room and when you drive. Add ?nogarage to the address to skip it. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]nogarage/.test(location.search))return;
 
  const COLS=[['Sunshine','#e6b422'],['Ocean','#3b82f6'],['Forest','#2f8f5a'],['Racing red','#c0392b'],['Midnight','#22252b'],['Pearl','#e8e8ec'],

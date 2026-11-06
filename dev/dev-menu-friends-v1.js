@@ -4,7 +4,7 @@
    Multiplayer button, so a new request is still noticed from the main menu. Invites, the band HUD Friends button and
    the pause menu are untouched. Add ?nofriendsgroup to the address to keep the old menu. */
 (function(){
- if(!window.FW_DEV||/[?&]nofriendsgroup/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nofriendsgroup/.test(location.search))return;
  if(typeof titleUI!='function')return;
  function fix(){
   const m=document.querySelector('#ttl .ttm');if(!m)return;

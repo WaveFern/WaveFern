@@ -10,7 +10,7 @@
      with staff, palms and planters, a play corner, trolleys, vending machines, an ATM, lockers and bins.
    NPC walking lanes and all existing interaction spots are kept clear. Only loaded on /dev/. Add ?noairport to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]noairport/.test(location.search)||typeof THREE=='undefined')return;
+ if(!window.FW_FEAT||/[?&]noairport/.test(location.search)||typeof THREE=='undefined')return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev airport '+t,e)}}};
  const AX=4000,AZ=320,AW=72,AD=56,FONT='"Trebuchet MS","Segoe UI",Arial,sans-serif',GU=i=>6+12*(i-1);
  let outDone=0,inDone=0;const CL=(()=>{try{return cols}catch(e){return null}})();

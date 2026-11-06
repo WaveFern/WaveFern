@@ -8,7 +8,7 @@
    reduced motion on, or the stadium fails for any reason, the still picture simply stays.
    Off switch: add ?nomenuscene (or ?notour) to the address. ?menuscene=force skips the slow-device check. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  const Q=location.search;
  const off=/[?&](nomenuscene|notour)\b/.test(Q)||/[?&]noxcrowd\b/.test(Q),force=/[?&]menuscene=force/.test(Q);
  const M=window.FW_MENUSTAGE={state:off?'off':'idle',shot:0,fps:0,build_ms:0,fans:0};

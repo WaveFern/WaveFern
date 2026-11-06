@@ -1,7 +1,7 @@
 /* WaveFern dev: the "Song recorded!" summary says "Perfect" instead of "100%" (or "Clean") on each section.
    Sections are Beat, Lyrics and Mix. Only loaded on /dev/. Add ?noperfect to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]noperfect/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]noperfect/.test(location.search))return;
  function fix(){
   try{
    document.querySelectorAll('#ui .cards .card').forEach(c=>{

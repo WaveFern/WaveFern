@@ -5,7 +5,7 @@
    3. Hotel lobbies: no hanging chandelier. Every country has its own furniture colours in the lobby and the room.
    4. Snow also settles on destination cities (roads, roofs, pavements), but never in hot climates: there the day counts as dry. */
 (function(){
- if(!window.FW_DEV||/[?&]noabroad/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]noabroad/.test(location.search))return;
  const D=window.DCITY;if(!D||!D.cityHooks)return;
  const warn=(t,e)=>{if(!warn[t]){warn[t]=1;console.warn('dev abroad '+t,e)}};
  /* ---------- 2. green trees ---------- */

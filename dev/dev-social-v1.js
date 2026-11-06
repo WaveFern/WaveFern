@@ -2,7 +2,7 @@
    The icons are pixel-art sprites drawn here as all-white SVG squares (no emoji, no image files, no outside requests).
    Add ?nosocial to the address to skip it. The row sits inside the menu column, so it never overlaps the buttons or the footer. */
 (function(){
- if(!window.FW_DEV||/[?&]nosocial/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nosocial/.test(location.search))return;
  if(typeof titleUI!='function')return;
  window.FW_SOCIAL=1;
  /* 24 x 24 sprites: # is a white pixel */

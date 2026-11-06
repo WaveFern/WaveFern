@@ -2,7 +2,7 @@
    The live game keeps its normal fade (about 12% visible); here a building between the camera and you drops to about 4%,
    a little before it actually covers you, and eases back in smoothly. Add ?nofade to the address to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]nofade/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nofade/.test(location.search))return;
  function boot(){try{
   if(typeof fadeT!=='function'||typeof CT==='undefined'||typeof P==='undefined')return false;
   const f0=fadeT,LOW=.04,MARGIN=1.4;

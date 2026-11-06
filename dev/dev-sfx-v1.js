@@ -3,7 +3,7 @@
    through a low-pass) whose pitch follows speed through 5 gears (it rises, dips at each shift) and whose brightness and volume follow the throttle.
    Footsteps: snow = soft crunch, floorboards = wooden knock, concrete (road and pavement) = sharp click, grass = soft swish. */
 (function(){
- if(!window.FW_DEV||/[?&]nosfx/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nosfx/.test(location.search))return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev sfx '+t,e)}}};
  const R=(a,b)=>a+Math.random()*(b-a);
 

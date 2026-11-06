@@ -3,7 +3,7 @@
    caught on the edges. Every opening is now 3 m wide (the downstairs front door is 2.4 m). The half-height partitions and
    their caps are rebuilt with the new gaps and the matching collision boxes replace the old ones. Nothing else changes. */
 (function(){
- if(!window.FW_DEV||typeof THREE=='undefined'||typeof B!='function'||typeof buildAnnex!='function'||typeof ANX=='undefined')return;
+ if(!window.FW_FEAT||typeof THREE=='undefined'||typeof B!='function'||typeof buildAnnex!='function'||typeof ANX=='undefined')return;
  const o=900,zb=320;
  /* partitions as [x0,z0,x1,z1]: wall at x=8 and at z=9, with 3 m gaps centred on the old doorways */
  const SEG=[[8,0,8,3.5],[8,6.5,8,13],[8,16,8,18],[0,9,2.5,9],[5.5,9,8,9],[8,9,11,9],[14,9,16,9]];

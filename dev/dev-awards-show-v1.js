@@ -7,7 +7,7 @@
    a lathe-turned gold gramophone trophy, a live band. Static geometry is merged into a few meshes. No glow, no additive
    light cones, no colour cycling. Add ?noawards to skip. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]noawards/.test(location.search))return;
  const X=window.AWX;if(!X||typeof AWC==='undefined')return;
 

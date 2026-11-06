@@ -2,7 +2,7 @@
    Everything here is fake or read from the DEV save. No network calls, nothing is written outside the "dev:" storage keys.
    Entry point: the avatar icon in the top right of the main menu. The DEV panel has test shortcuts. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  const g=f=>{try{return f()}catch(e){return undefined}};
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const num=n=>Math.round(+n||0).toLocaleString();

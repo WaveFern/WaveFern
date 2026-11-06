@@ -3,7 +3,7 @@
    listed under them (Blocked you), and picking one works exactly like picking a rival: the diss song, the news, the
    Instagrime drama and their response track all use the name. Add ?nodissblocked to the address to turn it off. */
 (function(){
- if(!window.FW_DEV||/[?&]nodissblocked/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nodissblocked/.test(location.search))return;
  if(typeof recMenu!='function')return;
  const esc1=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
  function blockedList(){

@@ -4,7 +4,7 @@
    reloads, so the game's normal boot loads it with its usual recovery (a code that fails to load is kept under Recovered backups).
    An empty slot is used first. A used slot is only replaced after a confirmation, and the career it replaces is kept under Recovered backups. */
 (function(){
- if(!window.FW_DEV||/[?&]nosc/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nosc/.test(location.search))return;
  if(typeof ttWorlds!='function'||typeof scDecode!='function')return;
  const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  /* returns {code,artist,day} or throws an Error with a message fit to show the player */

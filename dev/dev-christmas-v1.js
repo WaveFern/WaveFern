@@ -13,7 +13,7 @@
    Everything is added on top (a shader patch, extra meshes, wrapped functions); no save data is changed. */
 (function(){
  const XMAS=true;
- if(!window.FW_DEV||!XMAS)return;
+ if(!window.FW_FEAT||!XMAS)return;
  if(/[?&]noxmas/.test(location.search))return;
  window.FW_XMAS=1;
  const R=(a,b)=>a+Math.random()*(b-a),RI=(a,b)=>Math.floor(R(a,b+1)),pk=a=>a[Math.floor(Math.random()*a.length)];

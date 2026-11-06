@@ -1,7 +1,7 @@
 /* WaveFern dev: sitting keeps the camera still (it jittered as the player was pushed off the seat and snapped back each frame),
    and hotels only let you sleep from 20:00. Only loaded on /dev/. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  const late=()=>S.t>=300;/* the clock reads 20:00 at S.t 300 */
  const no=()=>{snd('err');say('You can only sleep at the hotel from 20:00. It is '+clk()+' now.')};
  try{const D=window.DCITY;if(D&&D.hotelSleep){const h0=D.hotelSleep;D.hotelSleep=function(){if(!late())return no();return h0.apply(this,arguments)}}}catch(e){console.warn('dev hotel',e)}

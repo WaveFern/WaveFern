@@ -3,7 +3,7 @@
    dropped and the same bays get real cars (the same models and paint as traffic: hatch, sedan, pickup, sports, van, SUV...),
    in the traffic colours, nose toward the aisle, each slightly turned by a hair so rows do not look cloned. Collisions are untouched. */
 (function(){
- if(!window.FW_DEV||/[?&]noparkedcars/.test(location.search)||typeof xgBox!='function'||typeof AP=='undefined'||typeof carb=='undefined')return;
+ if(!window.FW_FEAT||/[?&]noparkedcars/.test(location.search)||typeof xgBox!='function'||typeof AP=='undefined'||typeof carb=='undefined')return;
  const COLS=['#e6b422','#3b82f6','#2f8f5a','#c0392b','#e8e8ec','#ff8a30','#8e44ad','#1a1a1a','#9aa0a6'],CZ=[46,-6];
  const near=(a,b)=>Math.abs(a-b)<.03;
  const x0=xgBox;

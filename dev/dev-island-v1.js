@@ -11,7 +11,7 @@
      and the flight animation starts and ends there. Flight times and fares are unchanged (they were worked out at load time).
    Only loaded on /dev/. Add ?noisland to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]noisland/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]noisland/.test(location.search))return;
  if(typeof THREE=='undefined'||typeof scene=='undefined'||typeof WB=='undefined')return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev island '+t,e)}}};
 

@@ -5,7 +5,7 @@
      fame high enough). If the city is not a stop, the door says there is no show scheduled today.
    - Only the stadium gate ("Enter <venue>") is gated. The club door and the backstage door keep their own checks. */
 (function(){
- if(!window.FW_DEV||/[?&]nostadiumgate/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nostadiumgate/.test(location.search))return;
  const D=window.DCITY;if(!D||!D.addInt)return;
  const a0=D.addInt;
  D.addInt=function(x,z,r,l,act){

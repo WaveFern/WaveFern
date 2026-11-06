@@ -12,7 +12,7 @@
    None of them is sold anywhere. The shops hide them (clothes, cars and pets are taken out of the shop lists while they are drawn, and
    the furniture is not listed in Amazoom). Nothing here touches the live game. */
 (function(){
- if(!window.FW_DEV||/[?&]noadvent/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]noadvent/.test(location.search))return;
  if(typeof GAR=='undefined'||typeof XNEW=='undefined'||typeof gA3!='function'||typeof F=='undefined')return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('xmas items '+t,e)}}};
  const RED='#c0392b',WHT='#f4f4f4',GRN='#2ecc71',GOLD='#e6b422',DKG='#1f7a3a',BRN='#8d6e4a',INK='#1a1a1a';

@@ -3,7 +3,7 @@
    draw misses their buttons (Leaderboard, Profile avatar). This script loads last: once everything has wrapped, it redraws
    the menu that is already on screen. Redrawing is safe to repeat: each dev button checks for itself before it is added. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  function sync(){
   try{
    if(typeof titleUI=='function'&&document.getElementById('ttl')&&typeof TT=='object'&&TT.on&&!TT.sel&&!document.getElementById('lbd')){

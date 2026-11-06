@@ -6,7 +6,7 @@
    No glow, no bright lights: plain lit boxes only, like the rest of the pets (58-pets.js). Add ?nopets to the address to skip it.
    Saves: the pets list is the same list of numbers as before (0 to 3 are the old pets, 4 to 7 the new ones). */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]nopets/.test(location.search))return;
  if(typeof PETS=='undefined'||typeof ptQuad=='undefined'||typeof ptSpecGet=='undefined')return;
 

@@ -6,7 +6,7 @@
    window.FW_NPCX.build(parent, spots, opts) is used by the stadium show (below) and by the main menu stadium scenes (dev-menustage-v1.js).
    Turn it off with ?noxcrowd (concerts go back to the old block fans). */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  const X=window.FW_NPCX={ready:false,variants:0,tris:0};
  if(/[?&]noxcrowd/.test(location.search))return;
  const NV=8,cache={full:null,lite:null};

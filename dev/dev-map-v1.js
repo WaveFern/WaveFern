@@ -5,7 +5,7 @@
      taxi rank and bus stop, striped car parks with cars, the hangar, the tower and the planting, with a "Fernfield International" tag.
    Only drawn on the maps (mapPaint). Nothing in the world, the saves or the collisions changes. Only loaded on /dev/. Add ?nomapfix to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]nomapfix/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nomapfix/.test(location.search))return;
  if(typeof mapPaint!='function')return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev map '+t,e)}}};
  let farmGone=0;

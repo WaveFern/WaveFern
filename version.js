@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.74.1';
+const GAME_VERSION='v49.75.0';
 const VERSION_HISTORY=[
+ {v:'v49.75.0',n:'The big update: everything from the test build is now in the real game, including new music, an island coast, concert crowds, world tour shops, awards, goals, a new economy and much more. Saves still load.'},
  {v:'v49.74.1',n:'The big update (the fresh start) moved from 18:00 UTC to 13:30 UTC (1:30pm in England) today, Friday 6 November 2026. The countdown and announcement show the new time. Saves still load.'},
  {v:'v49.74.0',n:'A small countdown to the big update (the fresh start at 18:00 UTC on Friday 6 November 2026) now shows in the top right while you play, and goes away once it begins. Saves still load.'},
  {v:'v49.73.10',n:'The farm and the South suburb are gone from the city and from both maps. Saves still load.'},

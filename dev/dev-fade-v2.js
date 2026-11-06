@@ -5,7 +5,7 @@
    3. a depth-only pre-pass is drawn first, so only the nearest surface of each building is tinted: where two see-through
       buildings overlap on screen, the overlap looks the same as one building, not cloudier. */
 (function(){
- if(!window.FW_DEV||/[?&]nofade2/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nofade2/.test(location.search))return;
  window.FW_FADE2=1;
  let DM=null,MAP=null;
  function meshesOf(b){

@@ -3,7 +3,7 @@
    your bodyguards and your pets when they are out with you on foot. A person in the car's lane up to 10 m ahead makes it
    ease off, and it holds still about 3.5 m short of them until they move. Add ?nocarstop to the address to skip it. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]nocarstop/.test(location.search))return;
  if(typeof trafTick!='function'||typeof TRAF=='undefined')return;
  const AHEAD=10,STOP=3.5,HALF=1.5;

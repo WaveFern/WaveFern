@@ -119,12 +119,12 @@ const phGV=()=>(typeof IN!='undefined'&&!!IN)||(typeof HIN!='undefined'&&!!HIN);
 /* v49.75.0: you stand still while the camera is open. A and D turn the view, R and F tilt it (PHOTO), but you cannot walk; the keys, touch stick and gamepad
    stick are cleared every frame and your position is put back after the update. */
 {const u0=update;update=function(dt){
- if(PH.camOn&&!window.FW_DEV){if(mode!='play')closeCamera();else if(!phGV()){for(const k in keys)delete keys[k];
+ if(PH.camOn&&!window.FW_FEAT){if(mode!='play')closeCamera();else if(!phGV()){for(const k in keys)delete keys[k];
   const sp=(PHK.shift?5:2.6)*dt;if(PHK.a||PHK.arrowleft)PH.yaw+=1.6*dt;if(PHK.d||PHK.arrowright)PH.yaw-=1.6*dt;if(PH.cam=='land'){if(PHK.r)PH.pitch=Math.min(.6,PH.pitch+.8*dt);if(PHK.f)PH.pitch=Math.max(-.6,PH.pitch-.8*dt)}
   const m=(PHK.w||PHK.arrowup?1:0)-(PHK.s||PHK.arrowdown?1:0);if(m){const dx=Math.sin(PH.yaw)*m*sp,dz=Math.cos(PH.yaw)*m*sp;if(!hit(P.x+dx,P.z,.28))P.x+=dx;if(!hit(P.x,P.z+dz,.28))P.z+=dz}P.rot=PH.yaw}}
- if(PH.camOn&&window.FW_DEV){if(mode!='play')closeCamera();else{for(const k in keys)delete keys[k];
+ if(PH.camOn&&window.FW_FEAT){if(mode!='play')closeCamera();else{for(const k in keys)delete keys[k];
   if(!phGV()){if(PHK.a||PHK.arrowleft)PH.yaw+=1.6*dt;if(PHK.d||PHK.arrowright)PH.yaw-=1.6*dt;if(PH.cam=='land'){if(PHK.r)PH.pitch=Math.min(.6,PH.pitch+.8*dt);if(PHK.f)PH.pitch=Math.max(-.6,PH.pitch-.8*dt)}P.rot=PH.yaw}}}
- if(!PH.camOn||!window.FW_DEV)return u0(dt);
+ if(!PH.camOn||!window.FW_FEAT)return u0(dt);
  const x=P.x,z=P.z,r=u0(dt);P.x=x;P.z=z;if(P.mesh){P.mesh.position.x=x;P.mesh.position.z=z}return r}}
 addEventListener('keyup',e=>{delete PHK[e.key.toLowerCase()]});addEventListener('blur',()=>{for(const k in PHK)delete PHK[k]});
 function phFlash(){const f=document.getElementById('pcmfla');if(!f)return;f.style.transition='none';f.style.opacity=.9;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .35s';f.style.opacity=0}))}

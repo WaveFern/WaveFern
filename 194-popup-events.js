@@ -182,7 +182,7 @@ function gain(fol,st,song,g){fol=Math.max(0,Math.round(fol));S.followers=(S.foll
  if(g&&S.hype&&S.hype[g]!=null)S.hype[g]=+Math.min(2,(S.hype[g]||1)+.12).toFixed(2);return fol}
 const best=()=>(S.songs||[]).slice().sort((a,b)=>(b.q||0)-(a.q||0));
 const latest=()=>(S.songs||[]).slice().sort((a,b)=>(b.day||0)-(a.day||0)||(b.id||0)-(a.id||0))[0];
-const scale=()=>1+FL()*.6+Math.sqrt(S.listeners||0)*.004;
+const scale=()=>.35+FL()*.08+Math.sqrt(S.listeners||0)*.0004;
 function openEvent(i){const v=today()[i];if(!v||mode!='play')return;const st=state(v),K=KINDS[v.k];
  if(st=='soon'){sn('err');return say(K.n+' at '+PLACES[v.p].n+' opens at '+hm(v.s)+'.')}
  if(st!='open'){sn('err');return say('The '+K.n.toLowerCase()+' is over for today.')}
@@ -196,10 +196,10 @@ function party(v){const L=best().slice(0,5);
  show(frame(v,`<div class=pebunt></div><p class=pebl>${E(KINDS.party.blurb)}</p><div class=pelbl>Pick the song</div><div class=pelist>${rows}</div><div class=row2><button onclick="closeUI()">Not now</button></div>`))}
 window.popParty=function(id){const C=CUR;if(!C)return;const v=C.v,s=(S.songs||[]).find(x=>x.id==id);
  if(!s){S.energy=Math.max(0,(S.energy||0)-5);const f=gain(ri(6,14)*scale());return finish(v,`<h3>You danced all afternoon</h3><p>People saw you having a good time. <b>+${fmt(f)} followers</b>.</p>`)}
- const q=s.q||0,r=Math.min(1,Math.max(.1,q/100+rnd(-.12,.12))),crowd=Math.round((40+r*220)*scale()),f=gain(crowd*r*.45,crowd*(4+r*10),s,s.g);
+ const q=s.q||0,r=Math.min(1,Math.max(.1,q/100+rnd(-.12,.12))),crowd=Math.round((40+r*220)*scale()),f=gain(crowd*r*.45,crowd*(1+r*3),s,s.g);
  const line=r>.8?'The whole street sang the hook back.':r>.6?'Hands up from the front to the back.':r>.4?'People nodded along and a few filmed it.':'A slow start, but some stayed to the end.';
  finish(v,`<h3>${E(s.title)} on the big speakers</h3><div class=pemeter><i style="width:${Math.round(r*100)}%"></i></div><p>${line} About ${fmt(crowd)} people were there.</p>
-  <div class=pegrid><div>Followers<b>+${fmt(f)}</b></div><div>Streams for this song<b>+${fmt(crowd*(4+r*10))}</b></div><div>${E(s.g)} hype<b>up</b></div></div>`)};
+  <div class=pegrid><div>Followers<b>+${fmt(f)}</b></div><div>Streams for this song<b>+${fmt(crowd*(1+r*3))}</b></div><div>${E(s.g)} hype<b>up</b></div></div>`)};
 
 /* signing: stop the pen in the sweet spot */
 function signing(v){const n=Math.min(8,4+FL()),Q={n,k:0,ok:0,perf:0,cash:0,pos:0,dir:1,zone:rnd(.25,.65),w:.16,t0:0,log:[]};CUR.Q=Q;signR(v)}
@@ -213,7 +213,7 @@ function signR(v){const Q=CUR.Q,fans=['Ana','Ben','Chloe','Dev','Ezra','Femi','G
  stopLoops();RAF=requestAnimationFrame(loop);KEY=e=>{if(e.code=='Space'){e.preventDefault();e.stopPropagation();popSign()}};addEventListener('keydown',KEY,true)}
 window.popSign=function(){const C=CUR;if(!C||!C.Q)return;const Q=C.Q,v=C.v,c=Q.zone+Q.w/2,d=Math.abs(Q.pos-c);
  let g;if(d<Q.w*.18){g='Perfect';Q.perf++;Q.ok++}else if(d<Q.w/2){g='Clean';Q.ok++}else g='Smudged';
- const price=g=='Smudged'?ri(4,7):ri(9,15)+(g=='Perfect'?5:0);Q.cash+=price;Q.log.push(g+' +'+money(price));Q.k++;sn(g=='Smudged'?'err':'cash');
+ const price=g=='Smudged'?ri(1,2):ri(3,5)+(g=='Perfect'?2:0);Q.cash+=price;Q.log.push(g+' +'+money(price));Q.k++;sn(g=='Smudged'?'err':'cash');
  Q.zone=rnd(.12,.72);Q.w=Math.max(.08,.16-Q.k*.01);
  if(Q.k<Q.n)return signR(v);
  const f=gain((Q.ok*8+Q.perf*6)*scale(),0,null,(latest()||{}).g);S.money=+((S.money||0)+Q.cash).toFixed(2);
@@ -255,7 +255,7 @@ window.popMicGo=function(){const C=CUR;if(!C)return;const v=C.v;S.energy=Math.ma
 function judge(t){const j=$('pejd');if(j){j.textContent=t;j.className='pejudge '+t.toLowerCase()}}
 window.popHit=function(){const M=CUR&&CUR.M;if(!M)return;let bi=-1,bd=9;M.notes.forEach((n,i)=>{if(n.h)return;const d=Math.abs(n.t-M.t);if(d<bd){bd=d;bi=i}});
  if(bi<0||bd>.3){judge('Early');return}const n=M.notes[bi];if(bd<.08){n.h=2;M.sc+=2;judge('Perfect');sn('click')}else if(bd<.18){n.h=1;M.sc+=1;judge('Good');sn('click')}else{n.h=-1;judge('Miss')}};
-function micEnd(){const C=CUR,M=C.M,v=C.v;stopLoops();const r=M.sc/(M.notes.length*2),tips=+((3+r*30)*scale()).toFixed(2),f=gain((10+r*60)*scale());S.money=+((S.money||0)+tips).toFixed(2);sn('cash');
+function micEnd(){const C=CUR,M=C.M,v=C.v;stopLoops();const r=M.sc/(M.notes.length*2),tips=+((2+r*10)*scale()).toFixed(2),f=gain((10+r*60)*scale());S.money=+((S.money||0)+tips).toFixed(2);sn('cash');
  C.M=null;finish(v,`<h3>${r>.85?'Standing ovation':r>.6?'Big cheer':r>.35?'Polite applause':'Someone coughed'}</h3><div class=pemeter><i style="width:${Math.round(r*100)}%"></i></div>
   <p>${M.notes.filter(n=>n.h==2).length} perfect, ${M.notes.filter(n=>n.h==1).length} good, ${M.notes.filter(n=>n.h<=0).length} missed.</p>
   <div class=pegrid><div>Tips in the hat<b>${money(tips)}</b></div><div>Followers<b>+${fmt(f)}</b></div></div>`)}

@@ -52,7 +52,7 @@ function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
 /* ---- ghost follows the pointer; green = fits, red = does not ---- */
 function groundPoint(){RC.setFromCamera({x:mouse.x,y:pType=='touch'?mouse.y+.14:mouse.y},cam);const p=new THREE.Vector3();return RC.ray.intersectPlane(PLN,p)?p:null}
 /* v49.75.0: the held item glides after the pointer, hovers a little above the floor and turns smoothly; the footprint is a soft tint */
-const DEV=()=>!!window.FW_DEV;/* v49.75.0 changes only run on the /dev/ build */
+const DEV=()=>!!window.FW_FEAT;/* v49.75.0 changes only run on the /dev/ build */
 let gT=0,gFresh=true;const lerpA=(a,b,k)=>{let d=((b-a+Math.PI*3)%(Math.PI*2))-Math.PI;return a+d*k};
 function ghostTick(){const p=groundPoint();if(!p||!ghost)return;const o=fit(hold,p.x,p.z,gp.r,-1);gp.r=o.r;gp.x=o.x;gp.z=o.z;gp.ok=valid(hold,o.x,o.z,o.r,-1);
  if(!DEV()){const c=fb(hold,o.x,o.z,o.r);ghost.position.set(o.x,0,o.z);ghost.rotation.y=o.r*Math.PI/2;GF.position.set(o.x,.05,o.z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.color.set(gp.ok?0x44ff88:0xff4455);return}

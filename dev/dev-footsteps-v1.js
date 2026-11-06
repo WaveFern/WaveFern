@@ -6,7 +6,7 @@
    - grass: a muffled soft swish (everywhere else outdoors)
    All sounds are synthesised live, quiet, and still follow the Footsteps and sound-effect settings (OPT.steps, FX, volume). */
 (function(){
- if(!window.FW_DEV||/[?&]nofootsteps/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nofootsteps/.test(location.search))return;
  if(typeof stepSnd!='function'||typeof sdNz!='function'||typeof sdHit!='function'||typeof STP!='object')return;
  const warn=(t,e)=>{if(!warn[t]){warn[t]=1;console.warn('dev footsteps '+t,e)}};
  const D=window.DCITY;

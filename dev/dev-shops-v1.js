@@ -2,7 +2,7 @@
    to open that shop (Motors, Pet Shop, Security, Property, and the Threadz and Gphones buildings from dev-citystores-v1.js). Buying there is instant,
    no appointment. Only loaded on /dev/. Add ?noshops to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]noshops/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]noshops/.test(location.search))return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev shops '+t,e)}}};
  const css=document.createElement('style');
  css.textContent=`body.fwk #pc .ico,body.fwk #pc .tb,body.fwk #pc .bwu,body.fwk #pc .bwb{display:none!important}

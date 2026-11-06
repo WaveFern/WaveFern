@@ -3,7 +3,7 @@
    (one in the bedroom, one in the living room) are built with the house dressing in dev-models-v2.js. Settings > Graphics > Sunbeams turns a faint shaft of daylight through them
    on or off (on by default, daytime only). Nothing in the save changes; the choice is kept per device with the graphics settings. */
 (function(){
- if(!window.FW_DEV||typeof THREE=='undefined'||typeof scene=='undefined'||typeof B!='function')return;
+ if(!window.FW_FEAT||typeof THREE=='undefined'||typeof scene=='undefined'||typeof B!='function')return;
  const ZS=[2,9],W=1.6,H=1.2,Y=1.8;
  let house=null,beams=[],lastOn=null;
  /* the studio builds its own back-wall window: leave it out, always */

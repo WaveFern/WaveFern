@@ -8,7 +8,7 @@
       People in the crowd lose interest after a while and walk back to the pavement; a new person takes their place.
    Signing an autograph for a crowd member works like the normal fans. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  const C=window.FW_CROWD={force:false,off:false,extra:1,n:0,want:0};
  const now=()=>performance.now()/1000,R=(a,b)=>a+Math.random()*(b-a);
  const clamp=(v,a,b)=>v<a?a:v>b?b:v;

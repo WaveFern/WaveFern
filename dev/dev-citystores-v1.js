@@ -3,7 +3,7 @@
    a sign, a room you can walk into and a keeper who opens the shop (the same shop screen the other city shops use).
    Only loaded on /dev/. Add ?nocitystores to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]nocitystores/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nocitystores/.test(location.search))return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev citystores '+t,e)}}};
  if(typeof mkShop!='function'||typeof SFTY=='undefined'||typeof sfRoom!='function'||typeof WORLD=='undefined')return;
  const STORES=[

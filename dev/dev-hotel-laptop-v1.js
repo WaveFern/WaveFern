@@ -1,7 +1,7 @@
 /* WaveFern dev: the laptop on the desk in every hotel room works. Walk up to it (Use laptop, E) and the same computer as at home opens
    (same desktop, apps, pause and Shut down). Esc / Shut down close it and you are back in the room. Only loaded on /dev/. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  const D=window.DCITY;if(!D||!D.cityHooks)return;
  D.cityHooks.push(C=>{
   try{
