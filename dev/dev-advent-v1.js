@@ -467,36 +467,32 @@
    s.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v-40}px)`,opacity:1,offset:.55},{transform:`translate(${Math.cos(a)*v*1.2}px,${Math.sin(a)*v+90}px)`,opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.15,.6,.4,1)'}).onfinish=()=>s.remove()}}
  function flash(stage,col,ms){const f=document.createElement('div');f.className='fl';f.style.background=col;stage.appendChild(f);f.animate([{opacity:.7},{opacity:.7,offset:.2},{opacity:0}],{duration:ms||500,easing:'steps(4,end)'}).onfinish=()=>f.remove()}
  function shake(el,amp,ms){el.animate([{transform:'translate(0,0)'},{transform:`translate(${-amp}px,${amp*.6}px)`},{transform:`translate(${amp}px,${-amp*.6}px)`},{transform:`translate(${-amp*.6}px,${-amp}px)`},{transform:`translate(${amp*.6}px,${amp}px)`},{transform:'translate(0,0)'}],{duration:ms||400,iterations:2})}
- /* the case opening: the strip speeds up, cruises, slows right down and creeps onto the prize, which then stays lit on the marker.
+ /* the case opening: the strip starts fast and slows down smoothly onto the prize, which then stays lit on the marker.
     The roll was made and saved before this starts. */
  function spin(stage,pr,done){
   const N=56,Wn=44+Math.floor(Math.random()*6),flat=()=>{let r=Math.random()*100;for(let i=0;i<TIERS.length;i++){if(r<TIERS[i].flat)return i;r-=TIERS[i].flat}return 0};
   const items=[];for(let i=0;i<N;i++){const c=byTier(flat());items.push(c.length?pick(c):pick(pool()))}
   const T=pr.rar;items[Wn]={k:pr.k,n:pr.n,tier:T};
-  /* tease: put the best rarity (or the next best) right beside the prize, and let the strip creep over it before settling back */
+  /* tease: put the best rarity (or the next best) right beside the prize */
   const side=Math.random()<.5?1:-1;let teased=0;
-  if(T<4&&Math.random()<.6){items[Wn+side]=pick(byTier(4));teased=4}
-  else if(T<3&&Math.random()<.6){items[Wn+side]=pick(byTier(3));teased=3}
-  else if(T==4&&Math.random()<.6){items[Wn+side]=pick(byTier(3));teased=3}
+  if(T<4&&Math.random()<.4){items[Wn+side]=pick(byTier(4));teased=4}
+  else if(T<3&&Math.random()<.4){items[Wn+side]=pick(byTier(3));teased=3}
+  else if(T==4&&Math.random()<.4){items[Wn+side]=pick(byTier(3));teased=3}
   const tl=it=>`<div class=tl style="--rc:${TIERS[it.tier].c}"><img alt="" src="${pic(it.k)}"><b>${esc2(it.n)}</b><i>${TIERS[it.tier].n}</i></div>`;
   const st0=document.createElement('div');st0.className='strip';
   st0.innerHTML=`<div class=rail>${items.map(tl).join('')}</div><div class=mk></div><div class=sh></div>`;
   stage.appendChild(st0);stage.classList.add('spin');REV.strip=st0;
   const rail=st0.querySelector('.rail'),tiles=rail.children,TW=tiles[0].offsetWidth+parseFloat(getComputedStyle(tiles[0]).marginRight||0)*2||110,SW=stage.clientWidth;
-  const jit=(Math.random()-.5)*TW*.4,X=Wn*TW+TW/2-SW/2+jit,red=matchMedia('(prefers-reduced-motion:reduce)').matches,dur=red?1400:9200;
-  const ov=teased?-side*TW*.42:0;/* creep past the prize toward the teased tile, then slip back */
-  const kf=[{transform:'translateX(0)',offset:0,easing:'cubic-bezier(.5,0,.9,.6)'},
-   {transform:`translateX(${-X*.5}px)`,offset:.3,easing:'linear'},
-   {transform:`translateX(${-X*.86}px)`,offset:.56,easing:'cubic-bezier(.2,.6,.3,1)'},
-   {transform:`translateX(${-(X-ov)*.985}px)`,offset:.92,easing:'ease-in-out'},
-   {transform:`translateX(${-X}px)`,offset:1}];
+  const jit=(Math.random()-.5)*TW*.4,X=Wn*TW+TW/2-SW/2+jit,red=matchMedia('(prefers-reduced-motion:reduce)').matches,dur=red?1400:5600;
+  /* one plain, smooth slow-down: no pauses, no creeping, so the stop says nothing about the prize */
+  const kf=[{transform:'translateX(0)',easing:'cubic-bezier(.12,.55,.18,1)'},{transform:`translateX(${-X}px)`}];
   const an=rail.animate(kf,{duration:dur,fill:'forwards'});
   const mk=st0.querySelector('.mk');let last=-1,raf=0;
   const tick=()=>{if(!REV||REV.o!==stage.closest('#advr')){cancelAnimationFrame(raf);return}
    const m=new DOMMatrix(getComputedStyle(rail).transform),idx=Math.floor((-m.m41+SW/2)/TW);
    if(idx!==last){last=idx;sfx('click');const t=items[idx];
     mk.animate([{transform:'scaleX(2.4)'},{transform:'scaleX(1)'}],{duration:130});
-    if(t&&t.tier>=2){flash(stage,TIERS[t.tier].c,t.tier>=3?420:260);stage.style.setProperty('--rc',TIERS[t.tier].c);if(t.tier>=3)sfx('pop')}}
+    }
    raf=requestAnimationFrame(tick)};tick();
   an.onfinish=()=>{cancelAnimationFrame(raf);if(!REV)return;
    const w=tiles[Wn];
@@ -505,9 +501,9 @@
    const cur=new DOMMatrix(getComputedStyle(rail).transform).m41;an.cancel();rail.style.transform=`translateX(${cur+dx}px)`;
    if(Math.abs(dx)>2)rail.animate([{transform:`translateX(${cur}px)`},{transform:`translateX(${cur+dx}px)`}],{duration:260,easing:'ease-out'});
    w.classList.add('won');st0.classList.add('landed');stage.style.setProperty('--rc',TIERS[T].c);
-   sfx('chime');setTimeout(()=>sfx('cash'),160);if(T>=2)setTimeout(()=>sfx('chime'),340);
-   burst(w,TIERS[T].c,[18,28,46,80,140][T]);flash(stage,TIERS[T].c,T>=3?900:500);if(T>=3){shake(stage,T==4?9:5,T==4?700:400);setTimeout(()=>burst(w,'#ffd23f',T==4?90:40),260)}
-   setTimeout(done,T>=3?900:500)}}
+   sfx('chime');
+   burst(w,TIERS[T].c,12);
+   setTimeout(done,350)}}
  function openCrate(cb){
   if(!REV||REV.opened)return;REV.opened=1;REV.busy=1;const {d,o}=REV,s=Sv(),a=st();
   let pr=a&&a.p&&a.p[d];
