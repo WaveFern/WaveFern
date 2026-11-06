@@ -10,7 +10,8 @@
 
  /* ---------- mock data ---------- */
  const NOW=Date.now(),DAY=864e5;
- const ACH=[['First release','Released a first song'],['Ten songs','Released 10 songs'],['100K listeners','Reached 100,000 monthly listeners'],['Sold-out stage','Sold out a festival stage'],['World tour','Played a show on every continent'],['Gramophone win','Won a Gramophone Award'],['One billion streams','Passed 1,000,000,000 total streams'],['Band streak 30','Kept a 30 day band streak']];
+ const ACH=[['First release','Released a first song'],['Ten songs','Released 10 songs'],['100K listeners','Reached 100,000 monthly listeners'],['1M listeners','Reached 1,000,000 monthly listeners'],['Fame level 25','Reached fame level 25'],['Fame level 50','Reached fame level 50'],['Joined a band','Played in a band'],['One billion streams','Passed 1,000,000,000 total streams']];
+ const achOf=(ns,lq,fl,band,ts)=>[ns>=1,ns>=10,lq>=1e5,lq>=1e6,fl>=25,fl>=50,!!band,ts>=1e9].map((v,i)=>v?i:-1).filter(i=>i>=0);
  const PEOPLE={
   marlo:{id:'marlo',artist:'Marlo Vance',user:'marlovance',seed:11,founder:1,fame:64,listeners:3820000,joined:NOW-212*DAY,bio:'Bedroom pop turned arena. Mostly nights, mostly synths.',
    songs:[['Paper Satellites',182400000,1],['Low Tide Radio',96700000,0],['Glasshouse',41200000,0],['Ninth Floor',2300000,2]],band:{name:'Static Orchard',inst:'Keys',members:4,streak:23},ach:[0,1,2,3,5],online:'In a band room',rel:'friend'},
@@ -49,7 +50,7 @@
    fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:realJoin(st),
    bio:st.bio,songs:songs.length?songs:[['Sample Song One',120400,2],['Sample Song Two',8800,0]],
    band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:(has?null:{name:'The Ferns',inst:'Vocals',members:3,streak:4}),
-   ach:has?[0,1,2].filter((_,i)=>i<1+Math.floor(((D.songs||[]).length)/3)):[0],online:'Online',rel:'self'};
+   ach:has?achOf((D.songs||[]).length,D.listeners||0,fameOf(D),ch.k==='cur'&&g(()=>MPS&&MPS.band),(D.songs||[]).reduce((q,x)=>q+(x.streams||0),0)):[],online:'Online',rel:'self'};
  };
  const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3,career:'cur',userAt:0};
  function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}return Object.assign({},defaults,o,{show:Object.assign({},defaults.show,o.show||{})})}
@@ -154,7 +155,8 @@
   el().dataset.on='1';draw();try{snd('click')}catch(e){}
  }
  function close(){const d=el();if(d)d.remove();V.stack=[]}
- function person(id){return id==='me'?mine():PEOPLE[id]}
+ let PUBP=null;
+ function person(id){return id==='me'?mine():id==='pub'?PUBP:PEOPLE[id]}
  function stateFor(p){
   if(p.me)return V.visitor?'visitor':'self';
   if(p.id in REL)return REL[p.id];return p.rel;
@@ -169,24 +171,24 @@
   const dim=(k,html)=>mineView&&!st.show[k]?html.replace('class="pf-sec"','class="pf-sec" style="opacity:.55"').replace('</h3>',' '+tag('HIDDEN FROM OTHERS')+'</h3>'):html;
   const state=stateFor(p);
   let h=`<div class="fwpc${p.founder?' fdo':''}"><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
-  h+=`<div class=pf-head><div class=pf-av>${p.me&&g(()=>FBU.photoURL)?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=''">`:avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
+  h+=`<div class=pf-head><div class=pf-av>${(p.me?g(()=>FBU.photoURL):p.photo)?`<img src="${esc(p.me?FBU.photoURL:p.photo)}" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=''">`:avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
   h+=p.bio?`<p class=pf-bio>${esc(p.bio)}</p>`:`<p class="pf-bio e">${p.me&&!V.visitor?'No bio yet. Add one in Edit profile.':'No bio.'}</p>`;
   const cells=[['FAME LEVEL',String(p.fame)]];
   if(sh('listeners'))cells.push(['MONTHLY LISTENERS',num(p.listeners)]);else cells.push(['MONTHLY LISTENERS','Private']);
   if(sh('joined'))cells.push(['JOINED',fmtDate(p.joined)]);else cells.push(['JOINED','Private']);
   h+=`<div class=pf-stats>${cells.map(c=>`<div><small>${c[0]}</small><b>${esc(c[1])}</b></div>`).join('')}</div>`;
   if(sh('songs'))h+=dim('songs',`<div class="pf-sec"><h3>TOP SONGS</h3>${p.songs.map((s,i)=>`<div class=pf-row><span class=i>${i+1}</span><span class=n>${esc(s[0])}</span>${songTag(s[2])}<span class=v>${num(s[1])}</span></div>`).join('')||'<span class=pf-user>No songs yet.</span>'}</div>`);
-  if(sh('band')&&p.band)h+=dim('band',`<div class="pf-sec"><h3>BAND</h3><div class=pf-kv><span>Band</span><b>${esc(p.band.name)}</b><span>Plays</span><div>${esc(p.band.inst)}</div><span>Members</span><div>${p.band.members}</div>${sh('streak')?`<span>Streak</span><div>${p.band.streak} day${p.band.streak==1?'':'s'}</div>`:''}</div></div>`);
+  if(sh('band')&&p.band)h+=dim('band',`<div class="pf-sec"><h3>BAND</h3><div class=pf-kv><span>Band</span><b>${esc(p.band.name)}</b><span>Plays</span><div>${esc(p.band.inst)}</div><span>Members</span><div>${p.band.members}</div>${sh('streak')&&p.band.streak!=null?`<span>Streak</span><div>${p.band.streak} day${p.band.streak==1?'':'s'}</div>`:''}</div></div>`);
   if(sh('ach'))h+=dim('ach',`<div class="pf-sec"><h3>ACHIEVEMENTS (${p.ach.length}/${ACH.length})</h3><div class=pf-ach>${ACH.map((a,i)=>`<div class="${p.ach.includes(i)?'':'lk'}"><b>${esc(a[0])}</b><small>${esc(a[1])}</small></div>`).join('')}</div></div>`);
   if(p.me&&!V.visitor)h+=`<p class=pf-priv>Visitors see ${Object.keys(SECS).filter(k=>st.show[k]).length} of ${Object.keys(SECS).length} sections. Your artist name, username, avatar, Founder badge and fame level are always public.</p>`;
-  h+='<div class=pf-acts>';
+  h+=p.pub?'':'<div class=pf-acts>';
   if(p.me&&!V.visitor)h+=`<button class=go data-pf=edit>Edit profile</button><button data-pf=priv>Privacy</button><button data-pf=visitor>View as visitor</button>`;
   else if(p.me)h+=`<button class=go data-pf=visitor>Back to my view</button>`;
   else{
    h+=state=='friend'?`<button disabled>Friends</button>`:state=='requested'?`<button data-pf=cancel>Request sent. Cancel</button>`:`<button class=go data-pf=add>Add friend</button>`;
    h+=`<button data-pf=invite ${state=='blocked'?'disabled':''}>Invite to band</button><span class=sp></span><button data-pf=report>Report</button><button data-pf=block>${state=='blocked'?'Unblock':'Block'}</button>`;
   }
-  h+='</div>';
+  h+=p.pub?'':'</div>';
   if(V.msg)h+=`<p class=pf-note style="padding-top:12px">${esc(V.msg)}</p>`;
   return h+'</div>';
  }
@@ -275,7 +277,10 @@
   if(old)old.replaceWith(b);else c.insertBefore(b,c.firstChild)}catch(e){}return r}});
  /* Friends window: replace with the mock one */
  /* ---------- DEV panel hooks ---------- */
- window.FW_PROFILE={open,friendsWin,mockBand(){
+ /* real players' public profiles: same renderer as the own profile, filled with that player's data */
+ function openData(p){PUBP=Object.assign({id:'pub',pub:1,seed:1,online:''},p);V.stack=[];V.mode='view';V.visitor=0;V.id='pub';V.msg='';
+  if(!el()){const d=document.createElement('div');d.id='pfx';d.onmousedown=e=>{if(e.target===d)close()};document.body.appendChild(d)}draw()}
+ window.FW_PROFILE={open,openData,friendsWin,mockBand(){
   let el2=document.getElementById('mpb');if(!el2){el2=document.createElement('div');el2.id='mpb';el2.className='hb';document.body.appendChild(el2)}
   el2.style.display='';el2.innerHTML='<div class=mph><span><b>Static Orchard</b> <small class=m>Room MOCK1</small></span></div>'+[['You (Keys)','me'],['Marlo','marlo'],['Juno','juno'],['Ines','ines']].map(n=>`<div class=mpr><span><b class=fwpf-n data-pfopen="${n[1]}">${n[0]}</b></span></div>`).join('');
  }};
