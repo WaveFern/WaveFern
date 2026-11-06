@@ -46,8 +46,8 @@
   if(c.hair>=2&&c.hair!=9&&!(c.ht>=0)){const m=B(h,.34,.02,.3,dkc(hc,1.3),.05,.375,.05);m.userData.hair=1}
  }
  try{
-  /* character detail is ON (James: new models switched on); change `if(typeof buildChar` to `if(false&&typeof buildChar` to switch it off */
-  if(typeof buildChar=='function'&&typeof B=='function'){
+  /* player models are the ORIGINAL look (James: the extra character detail did not look good). To bring it back, remove the `false&&` below. */
+  if(false&&typeof buildChar=='function'&&typeof B=='function'){
    const b0=buildChar;
    buildChar=function(c){
     const r=b0.apply(this,arguments);
