@@ -20,6 +20,7 @@ window.fwProfileSync=function(force){try{
  return FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(x=>{if(x.exists()&&typeof x.data().bio=='string')d.bio=x.data().bio.slice(0,160)},()=>{})
   .then(()=>FBF.setDoc(FBF.doc(FBD,'profiles',FBU.uid),Object.assign(d,{t:Date.now()}))).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
 setInterval(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync()}catch(e){}},60000);
+setTimeout(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync(1)}catch(e){}},8000);setInterval(()=>{try{if(mode=='play'||mode=='pause'){const k=live()?FBU.uid:'';if(k&&k!==window.__pfU){window.__pfU=k;fwProfileSync(1)}}}catch(e){}},5000);
 const num=n=>Math.round(+n||0).toLocaleString();
 
 const ACH=[['First release','Released a first song'],['Ten songs','Released 10 songs'],['100K listeners','Reached 100,000 monthly listeners'],['1M listeners','Reached 1,000,000 monthly listeners'],['Fame level 25','Reached fame level 25'],['Fame level 50','Reached fame level 50'],['Joined a band','Played in a band'],['One billion streams','Passed 1,000,000,000 total streams']];
@@ -53,6 +54,7 @@ function ppHtml(p,handle,me){
  h+='<div class=pc><h3>ACHIEVEMENTS ('+got+'/'+ACH.length+')</h3><div class=pl>'+ACH.map((a,i)=>'<div class="'+(ac>>i&1?'':'lk')+'"><b>'+a[0]+'</b><small>'+a[1]+'</small></div>').join('')+'</div></div></div>';
  return h}
 window.fwProfileOpen=async function(handle,byUid){
+ try{fwProfileSync(1)}catch(e){}
  handle=String(handle||'').replace(/^@/,'').toLowerCase();if(!byUid&&!/^[a-z0-9_]{3,16}$/.test(handle))return;
  const X=window.FRX,F=X&&X.FR;if(!F||!F.r||!live())return say('Profiles need you signed in and online.');
  document.getElementById('pubpf')?.remove();
