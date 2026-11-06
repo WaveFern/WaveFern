@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.81.2';
+const GAME_VERSION='v49.81.3';
 const VERSION_HISTORY=[
+ {v:'v49.81.3',n:'Your public profile now always shows the display name and username you chose. The main menu shows only your profile icon in the top right (no sign out or Founder mark), and Founders get a WaveFern green outline around their profile box.'},
  {v:'v49.81.2',n:'It no longer snows every day: snow now falls on about 40% of days (the rest are sunny or foggy). Saves still load.'},
  {v:'v49.81.1',n:'A completely perfect song (every hit Perfect, no misses) now gets a glowing yellow border and a sparkling PERFECT SONG banner on the song summary. Saves still load.'},
  {v:'v49.81.0',n:'Leaderboard: easier category switching (arrows, a title and a scrollable strip), and tapping any player opens their public profile. Founder badges show on rows. Saves still load.'},

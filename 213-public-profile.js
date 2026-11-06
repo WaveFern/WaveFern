@@ -9,7 +9,7 @@ const live=()=>typeof FBU!='undefined'&&FBU&&typeof FBF!='undefined'&&FBF&&typeo
 let lastSig='',lastAt=0,busy=0;
 window.fwProfileSync=function(force){try{
  const h=typeof fwUsername=='function'?fwUsername():'';if(busy||!live()||!h||typeof S!='object'||!S||!S.artist||mode=='creator')return Promise.resolve(0);
- const a=String(S.artist).replace(/[<>"]/g,'').slice(0,24);if(!a)return Promise.resolve(0);
+ const a=String((typeof fwDisplayName=='function'&&fwDisplayName())||S.artist).replace(/[<>"]/g,'').slice(0,24);if(!a)return Promise.resolve(0);
  const d={a,h,bio:'',fame:cl((()=>{try{return fameLevel()}catch(e){return 0}})(),1000),lis:cl(S.listeners,1e12)},sig=JSON.stringify(d)+FBU.uid,n=Date.now();
  if(!force&&sig==lastSig&&n-lastAt<900000)return Promise.resolve(0);busy=1;
  return FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(x=>{if(x.exists()&&typeof x.data().bio=='string')d.bio=x.data().bio.slice(0,160)},()=>{})

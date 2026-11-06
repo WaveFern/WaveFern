@@ -45,7 +45,7 @@
   const songs=((D&&D.songs)||[]).slice().sort((a,b)=>(b.streams||0)-(a.streams||0)).slice(0,5).map(s=>[s.title,s.streams||0,(s.streams||0)>=1e6?1:((s.today||0)>5e4?2:0)]);
   const sk=(D&&D.mp&&D.mp.sk&&D.mp.sk.n)||0;
   const st=load();
-  return{id:'me',me:1,sample:!has,artist:has?D.artist:'Your Artist Name',user:st.user,seed:3,founder:has?!!g(()=>S.founder):1,
+  return{id:'me',me:1,sample:!has,artist:g(()=>window.fwDisplayName&&window.fwDisplayName())||(has?D.artist:'Your Artist Name'),user:g(()=>window.fwUsername&&window.fwUsername())||st.user,seed:3,founder:g(()=>!!(S&&S.fdr)||(window.isFounder&&isFounder()))?1:0,
    fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:realJoin(st),
    bio:st.bio,songs:songs.length?songs:[['Sample Song One',120400,2],['Sample Song Two',8800,0]],
    band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:{name:'The Ferns',inst:'Vocals',members:3,streak:sk||4},
@@ -83,6 +83,7 @@
 #pfx .pf-user{margin:4px 0 0;color:#8aa094}
 #pfx .pf-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 #pfx .pf-tag{display:inline-block;padding:2px 6px;border:1px solid #2e2e2e;color:#8aa094;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:1px;line-height:14px}
+#pfx .fwpc.fdo{border-color:#2fe68a;box-shadow:0 0 0 2px #000,0 0 0 4px #2fe68a66,0 0 22px #2fe68a88,6px 6px 0 #0008}
 #pfx .pf-tag.g{border-color:#2fe68a;color:#2fe68a}
 #pfx .pf-tag.s{background:#2fe68a;border-color:#2fe68a;color:#04120a}
 #pfx .pf-bio{margin:0;padding:0 16px 16px;line-height:1.5;color:#e8f3ec}
@@ -167,7 +168,7 @@
   const sh=k=>mineView||!p.me||st.show[k];
   const dim=(k,html)=>mineView&&!st.show[k]?html.replace('class="pf-sec"','class="pf-sec" style="opacity:.55"').replace('</h3>',' '+tag('HIDDEN FROM OTHERS')+'</h3>'):html;
   const state=stateFor(p);
-  let h=`<div class=fwpc><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
+  let h=`<div class="fwpc${p.founder?' fdo':''}"><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
   h+=`<div class=pf-head><div class=pf-av>${avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
   h+=p.bio?`<p class=pf-bio>${esc(p.bio)}</p>`:`<p class="pf-bio e">${p.me&&!V.visitor?'No bio yet. Add one in Edit profile.':'No bio.'}</p>`;
   const cells=[['FAME LEVEL',String(p.fame)]];

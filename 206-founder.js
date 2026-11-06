@@ -133,8 +133,7 @@ setInterval(()=>window.founderSync(0),4000);
 if(typeof PG=='object'&&PG&&PG.home){const h0=PG.home;PG.home=function(){const r=h0.apply(this,arguments);return isF()&&typeof r=='string'?r.replace('<p class=sfml>',fdChip()+'<p class=sfml>'):r}}
 /* pause menu */
 if(typeof pauseUI=='function'){const p0=pauseUI;pauseUI=function(){const r=p0.apply(this,arguments);try{if(isF()){const b=document.querySelector('#pzm .m');if(b)b.insertAdjacentHTML('afterend',fdChip())}}catch(e){}return r}}
-/* title screen: next to the name, and on the career select rows */
-if(typeof titleUI=='function'){const t0=titleUI;titleUI=function(){const r=t0.apply(this,arguments);try{if(isF()&&typeof TT=='object'&&TT.game){const b=document.querySelector('#ttl .ttpf img,#ttl .ttpf i');if(b)b.insertAdjacentHTML('afterend',fdMark(13))}}catch(e){}return r}}
+/* title screen: no mark (the main menu shows only the profile icon); career select rows keep it */
 if(typeof slotInfo=='function'){const s0=slotInfo;slotInfo=function(n){const r=s0.apply(this,arguments);if(r){try{const c=localStorage.getItem(slotKey(n));if(c&&scDecode(c).S.fdr)r.fd=1}catch(e){}}return r}}
 if(typeof ttWorlds=='function'){const w0=ttWorlds;ttWorlds=function(){const r=w0.apply(this,arguments);try{const a=curSlot();document.querySelectorAll('#ttl .ttsl[data-slot]').forEach(el=>{const n=+el.dataset.slot,f=n==a&&typeof TT=='object'&&TT.game?isF():(slotInfo(n)||{}).fd;const b=el.querySelector('b');if(f&&b&&!el.querySelector('.fdm'))b.insertAdjacentHTML('afterend',fdMark(13))})}catch(e){}return r}}
 /* band: shared with bandmates when they join, and shown next to the name in the band panel and in band chat */
