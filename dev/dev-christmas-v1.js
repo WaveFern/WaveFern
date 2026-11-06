@@ -52,8 +52,8 @@
     vec3 ice=mix(c0,vec3(.75,.88,.94),top*water*.55*ok);/* water is frozen all winter */
     vec3 tgt=mix(vec3(.945,.96,.98),vec3(.78,.82,.87),dark);
     vec3 sn=ice;
-    sn=mix(sn,tgt,top*(1.-water)*mix(.9,.88,dark)*(1.-green*(.42+.12*sin(wq.x*1.7)*sin(wq.z*1.3))));/* grass stays a little green */
-    sn=mix(sn,vec3(.945,.96,.98),(1.-top)*green*step(.9,wq.y)*.42);
+    sn=mix(sn,tgt,top*(1.-water)*mix(.9,.88,dark)*mix(1.,1.11,green));/* every grass top turns fully snowy (same white as the lawn texture and the grass blocks) */
+    sn=mix(sn,vec3(.945,.96,.98),(1.-top)*green*step(.9,wq.y)*.72);
     vColor=mix(ice,sn,min(1.,ok+okF)*uSnow);}
 #endif`);
    m.userData.xmsh=sh};
@@ -61,6 +61,7 @@
   m.needsUpdate=true}
  patchMat(SBM);
  window.FW_XMAS_PATCH=patchMat;
+ const grounds=[];window.FW_XMAS_GROUND=m=>{try{if(m&&m.color&&!grounds.some(g=>g.m===m)){if(grounds.length>20)grounds.shift();grounds.push({m,c0:m.color.clone()})}}catch(e){}};
 
 /* ---------- Christmas lights: a wire that spirals round the tree, with real bulbs sitting on it ---------- */
  const LC=[[1,.23,.19],[1,.76,.2],[.23,.55,1],[.22,.88,.48]];
@@ -227,26 +228,37 @@
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
-  if(lawn){try{const k=lawn.cv.getContext('2d');if(on){/* a dusting over the grass: blades still show through */const W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);k.globalAlpha=.55;k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.globalAlpha=1;for(let i=0;i<W2*H2/6;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),RI(1,3),1)}else k.putImageData(lawn.orig,0,0);lawn.map.needsUpdate=true}catch(e){}}}
- let lawn=null;const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
+  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d'),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
+   if(on){/* solid snow, the same white as the snowy grass everywhere else, with a few slightly cooler flecks */k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.fillStyle='#e6edf5';for(let i=0;i<W2*H2/8;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),1,1)}
+   lawn.map.needsUpdate=true}catch(e){}})}
+ const lawns=[];
+ function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const k=cv.getContext('2d'),gc=k.getImageData(0,0,1,1).data;if(gc[1]>gc[0]*1.12){lawns.push({cv,map:m.map,orig:k.getImageData(0,0,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
+const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
  function sweepWorld(){
   scene.children.forEach(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&!Array.isArray(o.material))patchMat(o.material)});
+  /* the wide ground planes (under the city, and the airport's field) sit in the scene, not in WORLD, so look at the scene's top two levels too */
+  const planeLawn=o=>{if(!o.isMesh||o.userData.xl)return;o.userData.xl=1;const gm=o.geometry,m=o.material,pa=gm&&gm.parameters;
+   if(!gm||gm.type!=='PlaneGeometry'||!m||Array.isArray(m)||m.type!=='MeshLambertMaterial'||!m.map||pa.width<200||pa.height<200||!outdoorXZ(o.position.x,o.position.z))return;
+   addLawn(m)};
+  scene.children.forEach(o=>{planeLawn(o);if(o.children&&o.children.length<80)o.children.forEach(planeLawn)});
   const g=typeof WORLD!='undefined'?WORLD:null;if(!g)return;let added=0;
   g.traverse(o=>{
    if(!o.isMesh||o.userData.xm||o.isInstancedMesh)return;o.userData.xm=1;
    const gm=o.geometry,m=o.material;
    if(gm&&gm.attributes&&gm.attributes.color&&gm.attributes.normal){patchMat(m);return}
-   if(!gm||gm.type!=='BoxGeometry'||Array.isArray(m)||!m||m.type!=='MeshLambertMaterial'||m.transparent||m.opacity<1)return;
+   if(!gm||(gm.type!=='BoxGeometry'&&gm.type!=='PlaneGeometry')||Array.isArray(m)||!m||m.type!=='MeshLambertMaterial'||m.transparent||m.opacity<1)return;
    const p=gm.parameters,x=o.position.x,z=o.position.z;if(!outdoorXZ(x,z)||inHome(x,z))return;
    const c=m.color;
-   if(p.width>=200&&p.depth>=200&&m.map){try{const cv=m.map.image;lawn={cv,map:m.map,orig:cv.getContext('2d').getImageData(0,0,cv.width,cv.height)}}catch(e){}return}
+   /* the big grass ground textures: the old lawn box, the wide ground plane under the city and the airport's grass plane. Each one is snowed (not just the last one found) */
+   if(m.map&&(gm.type=='PlaneGeometry'?p.width>=200&&p.height>=200:p.width>=200&&p.depth>=200)){addLawn(m);return}
+   if(gm.type=='PlaneGeometry')return;
    if(c.b-c.r>.4){const ic=m.clone();ic.color.lerp(ICE,.55);o.material=ic;return}/* frozen all winter */
    const w=p.width*o.scale.x,h=p.height*o.scale.y,d=p.depth*o.scale.z,cy=o.position.y,foliage=c.g>c.r*1.12&&c.g>c.b*1.3;
    if(foliage&&w>=.6&&w<=5&&d>=.6&&d<=5&&h>=.45&&h<=2.6&&cy>=.9){addString(x,cy,z,w,h,d);added++}
-   if(p.height<=.3&&foliage){const sm=m.clone();sm.color.lerp(SNOW,.6);bset.push({o,orig:m,sn:sm});if(bOn)o.material=sm;return}/* thin grass-coloured patches */
-   if(o.position.y-p.height/2>.01||p.height>=.3){let sm=m;if(foliage&&cy>.9){const k=c.getHexString();sm=sideCache[k]||(sideCache[k]=(()=>{const q=m.clone();q.color.lerp(SNOW,.42);return q})())}
+   if(p.height<=.3&&foliage){const sm=m.clone();sm.color.copy(SNOW);bset.push({o,orig:m,sn:sm});if(bOn)o.material=sm;return}/* thin grass-coloured patches */
+   if(o.position.y-p.height/2>.01||p.height>=.3){let sm=m;if(foliage&&cy>.9){const k=c.getHexString();sm=sideCache[k]||(sideCache[k]=(()=>{const q=m.clone();q.color.lerp(SNOW,.72);return q})())}
     const arr=[sm,sm,topM,sm,sm,sm];bset.push({o,orig:m,sn:arr});if(bOn)o.material=arr}});
-  if(added||lt.bp.length)flushLights();if(bOn&&lawn)bApply(true)}
+  if(added||lt.bp.length)flushLights();if(bOn&&lawns.length)bApply(true)}
 
  /* ---------- the park pond: frozen all winter, and you can glide on it ---------- */
  let iceDone=false,gv=[0,0],onIce=false;
@@ -283,6 +295,7 @@
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
   HZU.value=-.7-((typeof WGX=='number'&&WGX)||0);
   SNOWU.value+=(snowTarget-SNOWU.value)*Math.min(1,dt*1.2);if(Math.abs(snowTarget-SNOWU.value)<.01)SNOWU.value=snowTarget;
+  grounds.forEach(g=>{if(g.m)g.m.color.copy(g.c0).lerp(SNOW,SNOWU.value)});/* abroad: the flat ground plane under a destination city turns white with the snow */
   sT+=dt;BU.t.value=sT;
   /* the pond's water jet is switched off while the pond is frozen */
   try{if(typeof FTX!='undefined'){const b=LK,near=(x,z)=>x>b[0]-16&&x<b[2]+16&&z>b[1]-16&&z<b[3]+16;

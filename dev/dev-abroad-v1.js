@@ -19,7 +19,7 @@
   if(fake)w.k='sun';
   try{return u0(dt)}finally{if(fake)w.k='snow'}}}catch(e){warn('update',e)}
  D.hooks.push((ev,C)=>{if(ev!='arrive'||!C||!window.FW_XMAS_PATCH)return;
-  try{C.g.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&o.material.isMeshLambertMaterial)window.FW_XMAS_PATCH(o.material)})}catch(e){warn('patch',e)}});
+  try{C.g.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&o.material.isMeshLambertMaterial)window.FW_XMAS_PATCH(o.material);/* the big flat ground plane under the city and its suburbs */if(o.isMesh&&o.geometry&&o.material&&o.geometry.type=='PlaneGeometry'&&o.geometry.parameters.width>=1000&&!o.material.vertexColors&&!o.material.map&&window.FW_XMAS_GROUND){const c=o.material.color;if(c.g>c.r*1.05&&c.g>c.b*1.2)window.FW_XMAS_GROUND(o.material)}})}catch(e){warn('patch',e)}});
 
  /* ---------- 3. hotel colours, no chandelier ---------- */
  const mk0=D.mkRoom;
