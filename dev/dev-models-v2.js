@@ -6,7 +6,7 @@
    No glow, no bright lights: everything is plain lit boxes. Add ?nomodels to the address to skip it entirely.
    Switch on/off in the dev panel (DEV button or the ` key) > Models and houses. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]nomodels/.test(location.search))return;
  const KEY='fw_dmodels';
  let on=true;try{if(localStorage.getItem(KEY)==='0')on=false}catch(e){}
@@ -68,16 +68,13 @@
   [[0,3,'#7a6a8a'],[4.9,8,'#7a6a8a'],[8,16,'#5a4a6a']].forEach(a=>{const l=a[1]-a[0],cx=(a[0]+a[1])/2;B(g,l,.8,.03,dkc(a[2],.82),cx,.6,.025);B(g,l,.06,.06,tr2,cx,1.03,.03)});
   B(g,.03,.8,6,dkc('#7a6a8a',.82),.025,.6,3);B(g,.06,.06,6,tr2,.03,1.03,3);
   B(g,.03,.8,6,dkc('#8a7f6a',.82),.025,.6,9);B(g,.06,.06,6,tr2,.03,1.03,9);
-  /* window dressing on the two painted windows */
-  const win=(x,cur)=>{
-   B(g,1.8,.1,.07,tr,x,2.45,.05);B(g,1.8,.1,.07,tr,x,1.15,.05);B(g,.1,1.3,.07,tr,x-.85,1.8,.05);B(g,.1,1.3,.07,tr,x+.85,1.8,.05);
-   B(g,.06,1.2,.05,tr,x,1.8,.05);B(g,1.6,.06,.05,tr,x,1.8,.05);B(g,2.0,.08,.22,tr,x,1.09,.12);
-   B(g,2.2,.06,.06,'#3a2f2a',x,2.62,.12);[-1,1].forEach(s=>{B(g,.5,1.55,.08,cur,x+s*1.0,1.85,.12);B(g,.5,.05,.09,dkc(cur,.8),x+s*1.0,1.2,.125)})};
-  win(1.2,'#b8607a');win(9.4,'#3b4a6a');
-  /* living room window on the left wall */
-  B(g,.03,1.2,1.2,'*8fd0ff',.03,1.8,9);
-  B(g,.07,.1,1.5,tr,.05,2.45,9);B(g,.07,.1,1.5,tr,.05,1.15,9);B(g,.07,1.3,.1,tr,.05,1.8,8.2);B(g,.07,1.3,.1,tr,.05,1.8,9.8);B(g,.05,1.2,.06,tr,.05,1.8,9);B(g,.05,.06,1.6,tr,.05,1.8,9);B(g,.22,.08,2.0,tr,.12,1.09,9);
-  [-1,1].forEach(s=>B(g,.08,1.55,.5,'#c9b06a',.12,1.85,9+s*1.0));
+  /* the only windows: two on the left wall (bedroom and living room). The back-wall windows are taken out by dev-windows-v1.js */
+  const lwin=(z,cur)=>{
+   B(g,.03,1.2,1.6,'*8fd0ff',.03,1.8,z);
+   B(g,.07,.1,1.8,tr,.05,2.45,z);B(g,.07,.1,1.8,tr,.05,1.15,z);B(g,.07,1.3,.1,tr,.05,1.8,z-.85);B(g,.07,1.3,.1,tr,.05,1.8,z+.85);
+   B(g,.05,1.2,.06,tr,.05,1.8,z);B(g,.05,.06,1.6,tr,.05,1.8,z);B(g,.22,.08,2.0,tr,.12,1.09,z);
+   B(g,.06,.06,2.2,'#3a2f2a',.12,2.62,z);[-1,1].forEach(s=>{B(g,.08,1.55,.5,cur,.12,1.85,z+s*1.0);B(g,.09,.05,.5,dkc(cur,.8),.125,1.2,z+s*1.0)})};
+  lwin(2,'#b8607a');lwin(9,'#c9b06a');
   /* partition rails and door thresholds */
   [[0,2],[4,8],[10,12]].forEach(s=>B(g,.32,.06,s[1]-s[0],'#8a8f94',8,1.03,(s[0]+s[1])/2));
   [[0,3],[5,11],[13,16]].forEach(s=>B(g,s[1]-s[0],.06,.32,'#8a8f94',(s[0]+s[1])/2,1.03,6));

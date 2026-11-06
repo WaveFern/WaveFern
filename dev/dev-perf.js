@@ -3,7 +3,7 @@
       and offers a reload instead of sitting at 92% forever.
    2. Auto quality (OFF unless the address has ?auto): steps the graphics level down when fps stays under ~40. Never runs by default. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  const errs=[];addEventListener('error',e=>{errs.push((e.message||'error')+' '+(e.filename||'').split('/').pop()+':'+(e.lineno||''))});
  const t0=performance.now();let wd=setInterval(()=>{
   const ld=document.getElementById('load');

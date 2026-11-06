@@ -3,7 +3,7 @@
    Your car (a row of circles, like drvFree) and you on foot can't enter it. A move is refused only if it goes further
    into a car than you already are, so you can always back away. Add ?nobothitbox to the address to skip it. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]nobothitbox/.test(location.search))return;
  if(typeof TRAF=='undefined'||typeof tcB!='function')return;
  function box(c){

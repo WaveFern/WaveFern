@@ -9,27 +9,21 @@
    - ONLY while it is snowing (the shader fades it in and out): snow lies on every upward-facing surface outdoors (roads turn
      icy grey, pavements, grass, roofs, tree tops, cars), tree sides are frosted, and you and the NPCs leave footprints.
    - Always (the winter map): the park pond is frozen over and you glide on it, trees and houses wear chasing Christmas lights,
-     houses get wreaths and snowmen, cars leave tyre tracks (footprints and tracks fade in 10 s), a big decorated tree stands in the City Plaza, and NPCs wear winter jackets and hats.
+     houses get wreaths and snowmen, cars leave tyre tracks (footprints and tracks fade in 5 s), a big decorated tree stands in the City Plaza, and NPCs wear winter jackets and hats.
    Everything is added on top (a shader patch, extra meshes, wrapped functions); no save data is changed. */
 (function(){
  const XMAS=true;
- if(!window.FW_DEV||!XMAS)return;
+ if(!window.FW_FEAT||!XMAS)return;
  if(/[?&]noxmas/.test(location.search))return;
  window.FW_XMAS=1;
  const R=(a,b)=>a+Math.random()*(b-a),RI=(a,b)=>Math.floor(R(a,b+1)),pk=a=>a[Math.floor(Math.random()*a.length)];
  const SNOW=new THREE.Color('#f1f5fa'),ICE=new THREE.Color('#bfe0f0');
- /* ---------- abroad: the tour cities sit far away at x 4000, z -4000 (rooms and the stadium are further out and stay indoors).
-    A city gets snow only in a cold climate: north of 35 degrees and not a palm/desert city, or a city described as snowy. ---------- */
- const DC=window.DCITY||null,ABROAD={value:0};
- const abroadX=(x,z)=>!!DC&&x>3800&&x<4900&&z>-4300&&z<-3500;
- function coldCity(){try{const C=DC&&DC.on&&DC.C;if(!C)return true;const d=C.d||{},s=C.s||{};return !!(s.snow||(d.lat>=35&&!s.palm&&!s.desert))}catch(e){return true}}
- const hotAbroad=()=>{try{return !!(DC&&DC.on&&DC.C&&!coldCity())}catch(e){return false}};
- const outdoorXZ=(x,z)=>(z<260&&x<880)||(ABROAD.value>.5&&abroadX(x,z));
+ const outdoorXZ=(x,z)=>z<260&&x<880;
  /* the player's own home (and its extension) is left as it was */
  /* only the house itself (and its back wing, once built) is left bare; the garden behind it snows like everywhere else */
  const HZU={value:-.7};
  const inHome=(x,z)=>x>-.7&&x<16.7&&z>HZU.value&&z<12.8;
- const SNOWU={value:0};/* 0 = bare winter map, 1 = fully snowed (eases with the weather) */
+ const SNOWU={value:0};window.FW_SNOWU=SNOWU;/* 0 = bare winter map, 1 = fully snowed (eases with the weather) */
  let snowTarget=0;
 
  /* ---------- no farm: its fields, barn, silo, fence, sheep and sign are left out when the world is built (the ground stays grass) ---------- */
@@ -58,8 +52,8 @@
     vec3 ice=mix(c0,vec3(.75,.88,.94),top*water*.55*ok);/* water is frozen all winter */
     vec3 tgt=mix(vec3(.945,.96,.98),vec3(.78,.82,.87),dark);
     vec3 sn=ice;
-    sn=mix(sn,tgt,top*(1.-water)*mix(.9,.88,dark)*(1.-green*(.42+.12*sin(wq.x*1.7)*sin(wq.z*1.3))));/* grass stays a little green */
-    sn=mix(sn,vec3(.945,.96,.98),(1.-top)*green*step(.9,wq.y)*.42);
+    sn=mix(sn,tgt,top*(1.-water)*mix(.9,.88,dark)*mix(1.,1.11,green));/* every grass top turns fully snowy (same white as the lawn texture and the grass blocks) */
+    sn=mix(sn,vec3(.945,.96,.98),(1.-top)*green*step(.9,wq.y)*.72);
     vColor=mix(ice,sn,min(1.,ok+okF)*uSnow);}
 #endif`);
    m.userData.xmsh=sh};
@@ -67,6 +61,7 @@
   m.needsUpdate=true}
  patchMat(SBM);
  window.FW_XMAS_PATCH=patchMat;
+ const grounds=[];window.FW_XMAS_GROUND=m=>{try{if(m&&m.color&&!grounds.some(g=>g.m===m)){if(grounds.length>20)grounds.shift();grounds.push({m,c0:m.color.clone()})}}catch(e){}};
 
 /* ---------- Christmas lights: a wire that spirals round the tree, with real bulbs sitting on it ---------- */
  const LC=[[1,.23,.19],[1,.76,.2],[.23,.55,1],[.22,.88,.48]];
@@ -164,7 +159,6 @@
    if(!S.wx||S.wx.d!==S.day)S.wx={d:S.day,k:S.day<=1?'sun':wxRoll()};
    if(S.wx.k=='rain'||S.wx.k=='storm')S.wx.k='snow';
    const k=S.wx.k;
-   if(k=='snow'&&hotAbroad())return W.kinds.sun;/* too hot to snow here */
    if(!S.wx.said&&k!='sun'&&mode=='play'){S.wx.said=1;setTimeout(()=>{try{say(k=='snow'?'It is snowing today.':'A thick fog has rolled in today.')}catch(e){}},1500)}
    return W.kinds[k]||W.kinds.sun}
  }
@@ -185,20 +179,21 @@
     void main(){if(wp.y<0.)discard;if(inH(wp.xz)&&(hin>.5||wp.y<3.7))discard;if(hin>.5&&inH(wp.xz-vec2(wp.y*${(16/13).toFixed(4)})))discard;gl_FragColor=vec4(.96,.98,1.,op);}`});
   const L=new THREE.Points(g,m);L.frustumCulled=false;L.renderOrder=6;L.visible=false;scene.add(L);return L}
 
- /* ---------- footprints and tyre tracks in the snow: each print slowly fades back into the snow over 10 s ---------- */
- const FADE=10,FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0'),TR_DARK=new THREE.Color('#6a7789'),FPD=new THREE.Object3D();
+ /* ---------- footprints and tyre tracks in the snow: each print slowly fades back into the snow over 5 s ---------- */
+ const FADE=5,FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0'),TR_DARK=new THREE.Color('#6a7789'),FPD=new THREE.Object3D();
  function mkPrints(N,w,l,dark){return{N,w,l,dark,mesh:null,i:0,age:null}}
- const FP=mkPrints(700,.13,.26,FP_DARK),TR=mkPrints(1400,.24,.95,TR_DARK);
+ const FP=mkPrints(700,.13,.26,FP_DARK),TR=mkPrints(1400,.2,.9,TR_DARK);
  let fpMesh=null;/* kept for the visibility switch below */
  function prInit(K){
-  const g=new THREE.BoxGeometry(K.w,.02,K.l),m=new THREE.MeshLambertMaterial({color:0xffffff});
+  const g=new THREE.BoxGeometry(K.w,.01,K.l),m=new THREE.MeshLambertMaterial({color:0xffffff,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
   K.mesh=new THREE.InstancedMesh(g,m,K.N);K.age=new Float32Array(K.N).fill(-1);K.mesh.frustumCulled=false;K.mesh.userData.xm=1;
   FPD.position.set(0,-50,0);FPD.rotation.set(0,0,0);FPD.updateMatrix();
   for(let i=0;i<K.N;i++){K.mesh.setMatrixAt(i,FPD.matrix);K.mesh.setColorAt(i,SNOW)}
   scene.add(K.mesh);if(K===FP)fpMesh=K.mesh}
  function prStamp(K,x,z,rot,y){
   if(!K.mesh)prInit(K);
-  FPD.position.set(x,y||.05,z);FPD.rotation.set(0,rot,0);FPD.updateMatrix();K.mesh.setMatrixAt(K.i,FPD.matrix);K.age[K.i]=0;K.mesh.setColorAt(K.i,K.dark);
+  /* every print sits a hair higher than the one laid before it (cycling through 24 levels), so overlapping prints of different ages never fight over the same pixels = no flicker */
+  FPD.position.set(x,(y||.05)+(K.i%24)*.0009,z);FPD.rotation.set(0,rot,0);FPD.updateMatrix();K.mesh.setMatrixAt(K.i,FPD.matrix);K.age[K.i]=0;K.mesh.setColorAt(K.i,K.dark);
   K.i=(K.i+1)%K.N;K.mesh.instanceMatrix.needsUpdate=true;K.mesh.instanceColor.needsUpdate=true}
  function prFade(K,dt){if(!K.mesh)return;let c=0,mv=0;
   for(let i=0;i<K.N;i++){if(K.age[i]<0)continue;K.age[i]+=dt;let a=Math.min(1,K.age[i]/FADE);a=a*a*(3-2*a);/* slow at the start and the end */
@@ -218,9 +213,10 @@
    prStamp(TR,mx+cx,mz+cz,r,.045);prStamp(TR,mx-cx,mz-cz,r,.045);l[0]=x;l[1]=z}}
  let fpT=0;
  function fpTick(dt,live,inner){
-  const vis=SNOWU.value>.4;[FP,TR].forEach(K=>{if(K.mesh)K.mesh.visible=vis});
+  const indoors=!!(inner||IN||(typeof HIN!='undefined'&&HIN)||inHome(P.x,P.z)),vis=SNOWU.value>.4&&!indoors;/* no prints shown while you are inside a building */
+  [FP,TR].forEach(K=>{if(K.mesh)K.mesh.visible=vis});
   fpT+=dt;if(fpT>.1){[FP,TR].forEach(K=>prFade(K,fpT));fpT=0}
-  if(!(vis&&live&&!inner))return;
+  if(!(vis&&live&&!indoors))return;
   if(mode=='play'&&!IN&&!(typeof HIN!='undefined'&&HIN)&&!P.sit&&!inHome(P.x,P.z))walker(P,P.x,P.z);
   [NPC,typeof VPED!='undefined'?VPED:[]].forEach(L=>L.forEach(n=>{const m=n.m;if(!m||!m.visible)return;
    const x=m.position.x,z=m.position.z;if(Math.abs(x-P.x)>24||Math.abs(z-P.z)>24||inHome(x,z))return;walker(n,x,z)}));
@@ -232,37 +228,42 @@
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
-  if(lawn){try{const k=lawn.cv.getContext('2d');if(on){/* a dusting over the grass: blades still show through */const W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);k.globalAlpha=.55;k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.globalAlpha=1;for(let i=0;i<W2*H2/6;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),RI(1,3),1)}else k.putImageData(lawn.orig,0,0);lawn.map.needsUpdate=true}catch(e){}}}
- let lawn=null;const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
- /* abroad: patch the city's merged meshes, and swap the plain ground plane for a snowy one while it snows */
- const aset=[];
- function sweepCity(){
-  const C=DC&&DC.on&&DC.C;if(!C||!C.g)return;
-  C.g.traverse(o=>{if(!o.isMesh||o.userData.xmc)return;o.userData.xmc=1;
-   const gm=o.geometry,m=o.material;if(!gm||!m)return;
-   if(gm.attributes&&gm.attributes.color&&gm.attributes.normal){patchMat(m);return}
-   if(gm.type==='PlaneGeometry'&&!Array.isArray(m)&&m.type==='MeshLambertMaterial'&&!m.map&&!m.transparent&&gm.parameters.width>=2000&&gm.parameters.height>=2000&&Math.abs(o.position.y+.06)<.02){
-    const sm=m.clone();sm.color.lerp(SNOW,.8);aset.push({o,orig:m,sn:sm})}})}
- let aOn=false;
- function aApply(on){aOn=on;aset.forEach(e=>{if(e.o.parent)e.o.material=on?e.sn:e.orig})}
- function sweepWorld(){
+  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d'),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
+   if(on){/* solid snow, the same white as the snowy grass everywhere else, with a few slightly cooler flecks */k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.fillStyle='#e6edf5';for(let i=0;i<W2*H2/8;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),1,1)}
+   lawn.map.needsUpdate=true}catch(e){}})}
+ const lawns=[];
+ function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const k=cv.getContext('2d'),gc=k.getImageData(0,0,1,1).data;if(gc[1]>gc[0]*1.12){smoothGrass(m.map);lawns.push({cv,map:m.map,orig:k.getImageData(0,0,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
+const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
+   function smoothGrass(t){if(!t||t.userData&&t.userData.smooth)return;t.userData=t.userData||{};t.userData.smooth=1;
+   const c=t.image,k=c.getContext('2d'),W=c.width,H=c.height;let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+   const d=k.getImageData(0,0,W,H),a=d.data;let r=0,g=0,b=0;for(let i=0;i<a.length;i+=4){r+=a[i];g+=a[i+1];b+=a[i+2]}const n=a.length/4;r/=n;g/=n;b/=n;
+   for(let i=0;i<a.length;i+=4){const v=1+(rnd()-.5)*.05;a[i]=r*v;a[i+1]=g*v;a[i+2]=b*v}
+   k.putImageData(d,0,0);t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;try{t.anisotropy=8}catch(e){}t.needsUpdate=true}
+function sweepWorld(){
   scene.children.forEach(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&!Array.isArray(o.material))patchMat(o.material)});
+  /* the wide ground planes (under the city, and the airport's field) sit in the scene, not in WORLD, so look at the scene's top two levels too */
+  const planeLawn=o=>{if(!o.isMesh||o.userData.xl)return;o.userData.xl=1;const gm=o.geometry,m=o.material,pa=gm&&gm.parameters;
+   if(!gm||gm.type!=='PlaneGeometry'||!m||Array.isArray(m)||m.type!=='MeshLambertMaterial'||!m.map||pa.width<200||pa.height<200||!outdoorXZ(o.position.x,o.position.z))return;
+   addLawn(m)};
+  scene.children.forEach(o=>{planeLawn(o);if(o.children&&o.children.length<80)o.children.forEach(planeLawn)});
   const g=typeof WORLD!='undefined'?WORLD:null;if(!g)return;let added=0;
   g.traverse(o=>{
    if(!o.isMesh||o.userData.xm||o.isInstancedMesh)return;o.userData.xm=1;
    const gm=o.geometry,m=o.material;
    if(gm&&gm.attributes&&gm.attributes.color&&gm.attributes.normal){patchMat(m);return}
-   if(!gm||gm.type!=='BoxGeometry'||Array.isArray(m)||!m||m.type!=='MeshLambertMaterial'||m.transparent||m.opacity<1)return;
+   if(!gm||(gm.type!=='BoxGeometry'&&gm.type!=='PlaneGeometry')||Array.isArray(m)||!m||m.type!=='MeshLambertMaterial'||m.transparent||m.opacity<1)return;
    const p=gm.parameters,x=o.position.x,z=o.position.z;if(!outdoorXZ(x,z)||inHome(x,z))return;
    const c=m.color;
-   if(p.width>=200&&p.depth>=200&&m.map){try{const cv=m.map.image;lawn={cv,map:m.map,orig:cv.getContext('2d').getImageData(0,0,cv.width,cv.height)}}catch(e){}return}
+   /* the big grass ground textures: the old lawn box, the wide ground plane under the city and the airport's grass plane. Each one is snowed (not just the last one found) */
+   if(m.map&&(gm.type=='PlaneGeometry'?p.width>=200&&p.height>=200:p.width>=200&&p.depth>=200)){addLawn(m);return}
+   if(gm.type=='PlaneGeometry')return;
    if(c.b-c.r>.4){const ic=m.clone();ic.color.lerp(ICE,.55);o.material=ic;return}/* frozen all winter */
    const w=p.width*o.scale.x,h=p.height*o.scale.y,d=p.depth*o.scale.z,cy=o.position.y,foliage=c.g>c.r*1.12&&c.g>c.b*1.3;
    if(foliage&&w>=.6&&w<=5&&d>=.6&&d<=5&&h>=.45&&h<=2.6&&cy>=.9){addString(x,cy,z,w,h,d);added++}
-   if(p.height<=.3&&foliage){const sm=m.clone();sm.color.lerp(SNOW,.6);bset.push({o,orig:m,sn:sm});if(bOn)o.material=sm;return}/* thin grass-coloured patches */
-   if(o.position.y-p.height/2>.01||p.height>=.3){let sm=m;if(foliage&&cy>.9){const k=c.getHexString();sm=sideCache[k]||(sideCache[k]=(()=>{const q=m.clone();q.color.lerp(SNOW,.42);return q})())}
+   if(p.height<=.3&&foliage){const sm=m.clone();sm.color.copy(SNOW);bset.push({o,orig:m,sn:sm});if(bOn)o.material=sm;return}/* thin grass-coloured patches */
+   if(o.position.y-p.height/2>.01||p.height>=.3){let sm=m;if(foliage&&cy>.9){const k=c.getHexString();sm=sideCache[k]||(sideCache[k]=(()=>{const q=m.clone();q.color.lerp(SNOW,.72);return q})())}
     const arr=[sm,sm,topM,sm,sm,sm];bset.push({o,orig:m,sn:arr});if(bOn)o.material=arr}});
-  if(added||lt.bp.length)flushLights();if(bOn&&lawn)bApply(true)}
+  if(added||lt.bp.length)flushLights();if(bOn&&lawns.length)bApply(true)}
 
  /* ---------- the park pond: frozen all winter, and you can glide on it ---------- */
  let iceDone=false,gv=[0,0],onIce=false;
@@ -292,15 +293,14 @@
  const WSKY=new THREE.Color(0xc9d8e6),WAMB=new THREE.Color(0xe4ecff);
  let sweepT=0,first=true,sT=0;
  function xmasTick(dt,px,pz){
-  sweepT+=dt;if(first||sweepT>2){try{sweepCity()}catch(e){}if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}try{freezePond()}catch(e){}}
+  sweepT+=dt;if(first||sweepT>2){if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}try{freezePond()}catch(e){}}
   const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut',inner=(typeof wxInterior=='function')&&wxInterior();
   /* snow cover follows today's weather */
-  const hotA=hotAbroad();ABROAD.value=(DC&&DC.on&&!hotA)?1:0;
-  const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live&&!hotA)?1:0;
-  {const ao=!!(want&&DC&&DC.on);if(ao!==aOn)aApply(ao)}
+  const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live)?1:0;
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
   HZU.value=-.7-((typeof WGX=='number'&&WGX)||0);
   SNOWU.value+=(snowTarget-SNOWU.value)*Math.min(1,dt*1.2);if(Math.abs(snowTarget-SNOWU.value)<.01)SNOWU.value=snowTarget;
+  grounds.forEach(g=>{if(g.m)g.m.color.copy(g.c0).lerp(SNOW,SNOWU.value)});/* abroad: the flat ground plane under a destination city turns white with the snow */
   sT+=dt;BU.t.value=sT;
   /* the pond's water jet is switched off while the pond is frozen */
   try{if(typeof FTX!='undefined'){const b=LK,near=(x,z)=>x>b[0]-16&&x<b[2]+16&&z>b[1]-16&&z<b[3]+16;
@@ -312,9 +312,9 @@
   if(!live||inner)return;
   /* winter light outdoors */
   const outdoors=!(typeof HIN!='undefined'&&HIN),dayk=1-(S.t<240?0:S.t<300?(S.t-240)/60*.5:S.t<330?.5+(S.t-300)/30*.4:.9);
-  if(outdoors&&!hotA){amb.color.lerp(WAMB,.1+.1*SNOWU.value);scene.background.lerp(WSKY,(.2+.35*SNOWU.value)*dayk)}
+  if(outdoors){amb.color.lerp(WAMB,.1+.1*SNOWU.value);scene.background.lerp(WSKY,(.2+.35*SNOWU.value)*dayk)}
   /* snowfall */
-  const snow=S.wx&&S.wx.k=='snow'&&W&&!hotA;
+  const snow=S.wx&&S.wx.k=='snow'&&W;
   if(snow&&!sMesh)sMesh=snowMesh();
   if(sMesh){sMesh.visible=!!snow;if(snow){const u=sMesh.material.uniforms,hr=wxHouse();u.c.value.set(camT.x,0,camT.z);u.t.value=(u.t.value+dt)%5000;u.hr.value.set(hr[0],hr[1],hr[2],hr[3]);u.hin.value=(typeof HIN!='undefined'&&HIN||mode=='build')?1:0}}
  }

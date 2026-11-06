@@ -2,7 +2,7 @@
    The icons are pixel-art sprites drawn here as all-white SVG squares (no emoji, no image files, no outside requests).
    Add ?nosocial to the address to skip it. The row sits inside the menu column, so it never overlaps the buttons or the footer. */
 (function(){
- if(!window.FW_DEV||/[?&]nosocial/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nosocial/.test(location.search))return;
  if(typeof titleUI!='function')return;
  window.FW_SOCIAL=1;
  /* 24 x 24 sprites: # is a white pixel */
@@ -22,12 +22,14 @@
   let d='';SPR[k].forEach((r,y)=>{for(let x=0;x<24;x++)if(r[x]=='#')d+='M'+x+' '+y+'h1v1h-1z'});
   return '<svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><path fill="#fff" d="'+d+'"/></svg>'}
  /* the dev menu has extra buttons, so on a short phone in landscape it can be taller than the screen: let it scroll (safe centering) so the last buttons and this row can always be reached */
- const CSS='#ttl .fwsoc{position:fixed;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));display:flex;justify-content:flex-end;gap:5px;margin:0;padding:0;list-style:none;z-index:5}'+
+ const CSS='#ttl .fwsoc{position:fixed;right:max(4px,env(safe-area-inset-right));bottom:max(4px,env(safe-area-inset-bottom));display:flex;justify-content:flex-end;gap:5px;margin:0;padding:0;list-style:none;z-index:5}'+
   '#ttl .fwsoc a{display:flex;align-items:center;justify-content:center;width:26px;height:26px;box-sizing:border-box;background:#0b0f0de6;border:2px solid #000;box-shadow:inset 0 0 0 1px #2a352e,2px 2px 0 #000a;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .22s cubic-bezier(.65,0,.35,1),background .22s}'+
   '#ttl .fwsoc a svg{image-rendering:pixelated;display:block;width:16px;height:16px}'+
   '#ttl .fwsoc a:hover{transform:scale(1.15);background:#14301a}#ttl .fwsoc a:active{transform:scale(.95)}'+
   '#ttl .fwsoc a:focus-visible{outline:2px solid #fff;outline-offset:2px;background:#14301a}'+
-  '@media(pointer:coarse){#ttl .fwsoc a{width:34px;height:34px}}';
+  '@media(pointer:coarse){#ttl .fwsoc a{width:34px;height:34px}}'+
+  /* on narrow screens the centred footer line would run under the icons, so lift it above them */
+  '@media(max-width:760px){#ttl .ttft{bottom:calc(max(4px,env(safe-area-inset-bottom)) + 34px)}}@media(max-width:760px) and (pointer:coarse){#ttl .ttft{bottom:calc(max(4px,env(safe-area-inset-bottom)) + 42px)}}';
  function add(){
   const t=document.getElementById('ttl'),m=t&&t.querySelector('.ttm');
   if(!m||m.querySelector('.fwsoc'))return;

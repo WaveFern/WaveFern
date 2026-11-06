@@ -4,7 +4,7 @@
       delivered to Storage like a plaque.
    3. Amazoom sells a Gramophone Shelf. It only holds Gramophone trophies (6 per shelf): walk up to it at home and press E. */
 (function(){
- if(!window.FW_DEV||/[?&]nogshelf/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nogshelf/.test(location.search))return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev polish '+t,e)}}};
  const fmt=n=>Math.round(n).toLocaleString();
  const mail=b=>safe(()=>{if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'WaveFern Team',body:b,state:9,unread:1,day:S.day})},'mail');

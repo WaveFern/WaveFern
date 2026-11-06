@@ -1,7 +1,7 @@
 /* WaveFern dev: no cars on the main menu / loading background. Only loaded on /dev/.
    While the menu is up, every car in the scene (parked, garage room, traffic, a driven car) is hidden; they come back when the game starts. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  let hid=[];
  function cars(){
   const a=[];

@@ -9,7 +9,7 @@
    - Every win pays money, followers and a stream boost on the song, and adds a Gramophone Trophy to Storage.
    Part 2 (dev-awards-show-v1.js) is the 3D hall and the ceremony itself. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  if(/[?&]noawards/.test(location.search))return;
  const X=window.AWX={};
  const YEAR=30,CAT_ORDER=['bna','alb','roty','soty'];

@@ -6,7 +6,7 @@
      friends, room chat, other players' names, toasts) is masked the moment it shows up, so an NPC can never say one, even if you bait it.
    - NPC message logs in the save are scrubbed too, so nothing bad is ever stored or replayed. */
 (function(){
- if(!window.FW_DEV||/[?&]noprofanity/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]noprofanity/.test(location.search))return;
  const FALL=['lol sorry, lost my train of thought. what were we saying?','haha anyway, lets keep it nice. so whats the plan?','hmm, not gonna go there. what else is up?','ok moving on, what do you want to do next?','sorry, my phone is acting up. say that again?'];
  let fi=0;const fall=()=>FALL[(fi++)%FALL.length];
  const NPCB='.bb.a,.bb.n,[data-npc],.npc,.npcbub,.npcsay,#npcsay,#npcbub';

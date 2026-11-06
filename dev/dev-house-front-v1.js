@@ -4,7 +4,7 @@
      panels as the outside, so nothing jumps when you walk in or out. The wall turns see-through while you stand near the
      front of the house so you are never hidden behind it. Its outside face carries a copy of the outside detail (windows, shutters, flower boxes, pipes, siding). Only what is drawn changes: collisions and saves are untouched. */
 (function(){
- if(!window.FW_DEV||typeof THREE=='undefined'||typeof B!='function'||typeof HX=='undefined')return;
+ if(!window.FW_FEAT||typeof THREE=='undefined'||typeof B!='function'||typeof HX=='undefined')return;
  let canopy=false,FW=null;
  function build(){
   if(!canopy&&typeof HX!='undefined')HX.children.forEach(m=>{const p=m.isMesh&&m.geometry&&m.geometry.parameters;

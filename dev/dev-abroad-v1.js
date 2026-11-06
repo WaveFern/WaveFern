@@ -5,7 +5,7 @@
    3. Hotel lobbies: no hanging chandelier. Every country has its own furniture colours in the lobby and the room.
    4. Snow also settles on destination cities (roads, roofs, pavements), but never in hot climates: there the day counts as dry. */
 (function(){
- if(!window.FW_DEV||/[?&]noabroad/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]noabroad/.test(location.search))return;
  const D=window.DCITY;if(!D||!D.cityHooks)return;
  const warn=(t,e)=>{if(!warn[t]){warn[t]=1;console.warn('dev abroad '+t,e)}};
  /* ---------- 2. green trees ---------- */
@@ -19,7 +19,7 @@
   if(fake)w.k='sun';
   try{return u0(dt)}finally{if(fake)w.k='snow'}}}catch(e){warn('update',e)}
  D.hooks.push((ev,C)=>{if(ev!='arrive'||!C||!window.FW_XMAS_PATCH)return;
-  try{C.g.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&o.material.isMeshLambertMaterial)window.FW_XMAS_PATCH(o.material)})}catch(e){warn('patch',e)}});
+  try{C.g.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.normal&&o.material&&o.material.isMeshLambertMaterial)window.FW_XMAS_PATCH(o.material);/* the big flat ground plane under the city and its suburbs */if(o.isMesh&&o.geometry&&o.material&&o.geometry.type=='PlaneGeometry'&&o.geometry.parameters.width>=1000&&!o.material.vertexColors&&!o.material.map&&window.FW_XMAS_GROUND){const c=o.material.color;if(c.g>c.r*1.05&&c.g>c.b*1.2)window.FW_XMAS_GROUND(o.material)}})}catch(e){warn('patch',e)}});
 
  /* ---------- 3. hotel colours, no chandelier ---------- */
  const mk0=D.mkRoom;

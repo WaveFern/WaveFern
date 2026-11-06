@@ -6,7 +6,7 @@
    - Vignette: darker, warmer screen edges (CSS)
    - Glow (Max only): bright things (lamps, neon, stage lights, windows at night) bloom softly */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  /* fail safe: never runs during loading, never throws; add ?nogfx to the address to skip it entirely */
  if(/[?&]nogfx/.test(location.search))return;
  function boot(){try{

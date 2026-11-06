@@ -3,7 +3,7 @@
    Streams, Money, Fame level, Songs released, Followers. The rows are made-up artists; the player is ranked among them using their real stats.
    All data comes from LB.board(cat), which is the one function to swap for the real cloud list later. Add ?nolb to the address to skip it. */
 (function(){
- if(!window.FW_DEV||/[?&]nolb/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nolb/.test(location.search))return;
  if(typeof titleUI!='function'||typeof pauseUI!='function')return;
  const LB=window.LB={};
  const f=n=>Math.round(n||0).toLocaleString();

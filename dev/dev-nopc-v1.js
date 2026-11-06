@@ -3,7 +3,7 @@
    The furniture definition stays, so a PC already in storage or placed in a house still loads, shows and can be moved or stored.
    (The starter Desk + laptop is not an Amazoom item; it stays as the house's own desk.) */
 (function(){
- if(!window.FW_DEV||/[?&]nonopc/.test(location.search))return;
+ if(!window.FW_FEAT||/[?&]nonopc/.test(location.search))return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev nopc '+t,e)}}};
  const NO=['gamingpc'];
  const isPC=k=>NO.indexOf(String(k).replace(/^f:/,''))>=0;

@@ -5,7 +5,7 @@
    4. Every country's hotel (lobby and room) has its own furniture colours.
    Only loaded on /dev/. */
 (function(){
- if(!window.FW_DEV)return;
+ if(!window.FW_FEAT)return;
  /* 1. green trees */
  try{if(typeof blkTree=='function'){const b0=blkTree;blkTree=function(box,x,z,s,seed,col){return b0.call(this,box,x,z,s,seed,Array.isArray(col)?col:null)}}}catch(e){console.warn('world trees',e)}
  try{if(typeof WT_DEST!='undefined')WT_DEST.forEach(d=>{if(d&&d.look)d.look=d.look.replace(/jacaranda|maple/gi,'green')})}catch(e){}
