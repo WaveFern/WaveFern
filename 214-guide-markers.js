@@ -10,10 +10,17 @@ function gdMark(){const m=S&&S.gmark;if(!m)return null;if(Math.hypot(P.x-m.x,P.z
 let GDON=0;
 {const t0=tutTgt;tutTgt=function(){GDON=0;if(IN||(mode!='play'&&mode!='drive'))return t0.apply(this,arguments);
  const o=t0.apply(this,arguments);if(o)return o;const g=gdFest()||gdMark();if(g)GDON=1;return g}}
-{const u0=update;update=function(dt){u0(dt);try{const c=GDON?0x5aa8ff:0xffffff;if(TUTG)TUTG.userData.m.material.color.setHex(c);if(TUTM)TUTM.material.color.setHex(GDON?0x5aa8ff:0xffc400)}catch(e){}}}
+/* the target is a tall light beacon (not the tutorial's pyramid): blue for these guides, gold for tutorial goals */
+let GDB=null;
+{const u0=update;update=function(dt){u0(dt);try{const c=GDON?0x5aa8ff:0xffc400,on=!!(TUTM&&TUTM.visible);if(TUTM)TUTM.scale.setScalar(.0001);
+ if(TUTG)TUTG.userData.m.material.color.setHex(GDON?0x5aa8ff:0xffffff);
+ if(!GDB){GDB=new THREE.Group();const mk=(r,h,o)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,10,1,true),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));m.position.y=h/2;m.renderOrder=997;GDB.add(m)};
+  mk(.45,40,.35);mk(.9,40,.14);const d=new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.3,.1,16),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending}));d.position.y=.1;GDB.add(d);scene.add(GDB)}
+ GDB.visible=on;if(on){GDB.position.set(TUTM.position.x,0,TUTM.position.z);const k=1+Math.sin(tt*3)*.12;GDB.scale.set(k,1,k);GDB.children.forEach(m=>m.material.color.setHex(c))}}catch(e){}}}
 /* map: tap to place / remove a marker, drawn as a blue pin */
 {const d0=mapDraw;mapDraw=function(){d0.apply(this,arguments);try{const c=$('bm'),m=S.gmark;if(!c||!m)return;const x=c.getContext('2d'),M=MAPZ,X=mapSX(m.x)*M.z+M.ox,Z=mapSZ(m.z)*M.z+M.oy;
- x.setTransform(M.R,0,0,M.R,0,0);x.fillStyle='#5aa8ff';x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.arc(X,Z-9,6,0,7);x.fill();x.stroke();x.beginPath();x.moveTo(X-4,Z-5);x.lineTo(X+4,Z-5);x.lineTo(X,Z);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(X,Z-9,2,0,7);x.fill()}catch(e){}}}
+ x.setTransform(M.R,0,0,M.R,0,0);x.imageSmoothingEnabled=false;const px=Math.round(X)-5,pz=Math.round(Z)-18,Q=[[2,0,6,2],[1,2,8,2],[0,4,10,2],[0,6,10,2],[1,8,8,2],[2,10,6,2],[3,12,4,2],[4,14,2,2]];
+ x.fillStyle='#0a1b3d';Q.forEach(r=>x.fillRect(px+r[0]*1-1,pz+r[1]-1,r[2]+2,r[3]+2));x.fillStyle='#3d8bff';Q.forEach(r=>x.fillRect(px+r[0],pz+r[1],r[2],r[3]));x.fillStyle='#9fd0ff';x.fillRect(px+2,pz+2,3,2);x.fillStyle='#fff';x.fillRect(px+4,pz+5,2,2)}catch(e){}}}
 {const b0=bigMap;bigMap=function(){b0.apply(this,arguments);try{const c=$('bm');if(!c)return;let dn=null;
  c.addEventListener('pointerdown',e=>{dn=e.isPrimary?[e.clientX,e.clientY]:null});
  c.addEventListener('pointerup',e=>{if(!dn||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>6)return;dn=null;const r=c.getBoundingClientRect(),M=MAPZ,sx=(e.clientX-r.left)*M.W/r.width,sy=(e.clientY-r.top)*M.H/r.height;
