@@ -31,5 +31,5 @@ function buildStudio(){
 function bedTired(){return S.energy<(typeof REC_E!='undefined'?REC_E:15)}
 const INT=[{x:2.9,z:2.4,r:1.4,get l(){return S.t>=300?'Sleep':bedTired()?'Out of energy, sleep now':'Sleep (night only)'},a:()=>S.t<300&&!bedTired()?say('You can only sleep at night, or early once you are out of energy. Wait for dusk.'):sleepQ()},{x:6,z:1.9,r:1.3,l:'Use laptop',a:()=>openPC()},
 {x:12.2,z:2.2,r:1.2,l:'Record a song',a:()=>recMenu()},{x:14.2,z:1.9,r:1.2,l:'Play guitar',a:()=>say(['You strum a few chords. Not bad.','A string buzzes. Time for an upgrade?','You noodle a riff and hum along.'][RI(0,2)])},
-{x:13.6,z:3.4,r:1,l:'Sit and think',a:()=>say(['You sit and brainstorm lyrics…','"Everyone starts with nothing." A good mentor-line to remember.'][RI(0,1)])}];
+{x:13.6,z:3.4,r:1,l:'Sit and think',a:()=>say(['You sit and brainstorm lyrics…','"Everyone starts with nothing." A good line to remember.'][RI(0,1)])}];
 

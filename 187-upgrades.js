@@ -2,7 +2,7 @@
    The song screens no longer spell out what your gear does (you bought it, so you know). The Upgrades button under the
    genres opens one list of what you own and what each piece adds: song quality, extra streams and what you feel in the
    studio (GFEEL, 176-game-feel.js). Quality and stream numbers come from the same tables the bonus uses (GQ and GSB in
-   52-gear-shop-plus.js; homes, pets and mentors as in mgFinish). Back returns to the genres. */
+   52-gear-shop-plus.js; homes and pets as in mgFinish). Back returns to the genres. */
 (()=>{
 const lv=k=>(S.gear&&+S.gear[k])||0,pct=v=>Math.round(v*100)+'%';
 function rows(){const out=[],Q=typeof GQ!='undefined'?GQ:{},SB=typeof GSB!='undefined'?GSB:{},F=window.GFEEL||{};let q=0,s=0;
@@ -12,10 +12,9 @@ function rows(){const out=[],Q=typeof GQ!='undefined'?GQ:{},SB=typeof GSB!='unde
   if(SB[k]){fx.push('+'+pct(SB[k]*e)+' streams');s+=SB[k]*e}
   if(F[k])fx.push(k=='drums'?'Beat: +'+l+' go'+(l>1?'es':''):k=='chair'?'songs cost '+Math.min(l,3)+' less energy':F[k].replace(/,? (sooner )?each level$/,''));
   out.push([G.lv[l],G.n,l,fx,l>=5])});
- const h=+S.home||0,p=(S.pets||[]).length,m=typeof mentors=='function'?mentors():0;
+ const h=+S.home||0,p=(S.pets||[]).length;
  if(h){out.push([h+' home'+(h>1?'s':''),'Property',0,['+'+3*h+' quality','+'+10*h+'% streams']]);q+=3*h;s+=.1*h}
  if(p){out.push([p+' pet'+(p>1?'s':''),'Pets',0,['+'+p+' quality']]);q+=p}
- if(m){out.push([m+' mentor'+(m>1?'s':''),'Mentors',0,['+'+2*m+' quality']]);q+=2*m}
  return{out,q,s}}
 window.upgradesView=function(){const{out,q,s}=rows();mode='menu';
  $('ui').innerHTML=`<div class="box modal recm upgv"><h2>Upgrades</h2><div class=recl>${out.length?'+'+q+' quality'+(s?' · +'+pct(s)+' streams':''):'None yet'}</div>
