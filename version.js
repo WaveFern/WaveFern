@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.80.6';
+const GAME_VERSION='v49.80.7';
 const VERSION_HISTORY=[
+ {v:'v49.80.7',n:'The Fame Level 25 Legacy goal no longer pays $50,000. Anyone who was paid it has the $50,000 taken back once (never below $0). Saves still load.'},
  {v:'v49.80.5',n:'The username notice now says the real reason when the database check fails (for example you need to sign in with Google again), and the check gives up after 20 seconds instead of waiting silently.'},
  {v:'v49.80.6',n:'Record labels are also gone from the Messages contact list and chat history. Their chats are only tucked away in your save, so nothing is lost. Saves still load.'},
  {v:'v49.80.5',n:'Record labels are switched off for now: no more label offers or messages, and any label messages already in your inbox are cleared. Label HQ stays closed and labels no longer take a cut. Saves still load.'},
