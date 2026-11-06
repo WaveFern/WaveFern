@@ -51,7 +51,7 @@
   '@keyframes lbShine{0%{background-position:-200% 0}100%{background-position:200% 0}}@keyframes lbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes lbFall{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(300px);opacity:0}}'+
   '@keyframes lbGlow{0%,100%{box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008,0 0 0 var(--g)}50%{box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008,0 0 16px var(--g)}}'+
   '#lbd{position:relative;overflow:hidden;font-family:Silkscreen,ui-monospace,monospace}#lbd.top1{border-color:var(--g);animation:lbGlow 1.6s steps(6) infinite}#lbd h2{letter-spacing:2px;text-transform:uppercase}'+
-  '#lbd .tabs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}#lbd .tabs button{padding:5px 8px;font-size:.75em}#lbd .tabs button.on{background:var(--g);color:#04120a;font-weight:700}'+
+  '#lbd .cat{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0}#lbd .cat b{flex:1;text-align:center;letter-spacing:1px;text-transform:uppercase}#lbd .cat button{padding:6px 12px}#lbd .row,#lbd .pod div{cursor:pointer}#lbd .row:hover{filter:brightness(1.25)}#lbd .tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:4px;margin:6px 0;padding-bottom:4px}#lbd .tabs button{white-space:nowrap;flex:none}#lbd .tabs button{padding:5px 8px;font-size:.75em}#lbd .tabs button.on{background:var(--g);color:#04120a;font-weight:700}'+
   '#lbd .ban{margin:6px 0;padding:8px;border:3px solid #000;text-align:center;font-weight:700;letter-spacing:1px;background:linear-gradient(100deg,#1a8a52 20%,#2fe68a 45%,#b8ffd9 50%,#2fe68a 55%,#1a8a52 80%) 0 0/200% 100%;color:#04120a;animation:lbShine 2.4s linear infinite,lbPop .5s steps(5)}'+
   '#lbd .ban.n{background:#161b18;color:var(--t);border-color:#000;box-shadow:inset 0 0 0 2px #2a352e;animation:none;font-weight:400;letter-spacing:0}'+
   '#lbd .pod{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:10px 0 6px}#lbd .pod div{flex:1;max-width:130px;text-align:center;border:3px solid #000;padding:6px 4px;box-shadow:inset 0 -3px #0007,3px 3px 0 #0008;animation:lbPop .45s steps(5) both}'+
@@ -60,22 +60,24 @@
   '#lbd .list{max-height:34vh;overflow:auto;border:3px solid #000;background:#0b0f0d;box-shadow:inset 0 0 0 2px #2a352e}#lbd .row{display:flex;align-items:center;gap:10px;padding:6px 8px;border-bottom:2px solid #000;font-size:.85em}#lbd .row.a{animation:lbIn .25s steps(4) both}#lbd .row b.r{width:2.4em;text-align:right;color:var(--m)}#lbd .row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'+
   '#lbd .row.me{background:var(--g);color:#04120a;font-weight:700}#lbd .row.me b.r{color:#04120a}#lbd .fdm{vertical-align:middle;margin-left:4px}'+
   '#lbd .cf{position:absolute;top:0;width:6px;height:6px;pointer-events:none;animation:lbFall 2.2s steps(14) infinite}</style>';
- function podCell(x,i,c){const h=[0,18,30][i];return`<div class="c${i+1}${x.me?' me':''}" style="order:${[1,0,2][i]};padding:${i==0?16:6}px 4px ${h+6}px"><span class=k>#${i+1}</span><span class=nm>${esc(x.name)}${x.fdr?fm():''}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
+ function podCell(x,i,c){const h=[0,18,30][i];return`<div onclick="LB.view('${x.id}')" class="c${i+1}${x.me?' me':''}" style="order:${[1,0,2][i]};padding:${i==0?16:6}px 4px ${h+6}px"><span class=k>#${i+1}</span><span class=nm>${esc(x.name)}${x.fdr?fm():''}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
  function confetti(){const col=['#2fe68a','#1a8a52','#b8ffd9','#e8f3ec','#26302a'];let o='';for(let i=0;i<22;i++)o+=`<i class=cf style="left:${(i*4.7+((i*37)%9))%100}%;background:${col[i%5]};animation-delay:${(i%8)*.27}s"></i>`;return o}
+ const tabsH=()=>`<div class=cat><button onclick="LB.tab(cur-1)" aria-label=Previous>&#9664;</button><b>${CATS[cur].t} <small>${cur+1}/${CATS.length}</small></b><button onclick="LB.tab(cur+1)" aria-label=Next>&#9654;</button></div><div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div>`;
  function draw(){
   const c=CATS[cur],rows=LB.board(c.k);
-  if(!rows.length){$('ui').innerHTML=css+`<div id=lbd class="box modal" style="width:min(460px,94vw)"><h2>Leaderboard</h2><div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div><div class="ban n">${esc(emptyMsg())}</div><p class=m><small>${c.u} · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;return}
+  if(!rows.length){$('ui').innerHTML=css+`<div id=lbd class="box modal" style="width:min(460px,94vw)"><h2>Leaderboard</h2>${tabsH()}<div class="ban n">${esc(emptyMsg())}</div><p class=m><small>${c.u} · tap a player to view their profile · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;return}
   const mi=rows.findIndex(x=>x.me),rk=mi+1,n=rows.length;
   
   const rkT=mi>=0&&rows[mi].rk?rows[mi].rk:rk;
   const ban=rk==1?`<div class=ban>YOU ARE #1 IN ${c.t.toUpperCase()}</div>`:rk<=3?`<div class=ban>TOP 3 IN ${c.t.toUpperCase()}: #${rk}</div>`:`<div class="ban n">You are #${rkT}${rows[mi]&&rows[mi].rk?'':' of '+n}${rk<=10?'. Top 10!':'.'} ${rows[mi-1]?'Next: '+esc(rows[mi-1].name)+' ('+esc(c.fmt(rows[mi-1].v))+')':''}</div>`;
   const rest=rows.slice(3,25),lastRow=mi>=25?[rows[mi]]:[];
   $('ui').innerHTML=css+`<div id=lbd class="box modal${rk==1?' top1':''}" style="width:min(460px,94vw)">${rk<=3?confetti():''}<h2>Leaderboard</h2>
-   <div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div>${ban}
+   ${tabsH()}${ban}
    <div class=pod>${[0,1,2].filter(i=>rows[i]).map(i=>podCell(rows[i],i,c)).join('')}</div>
-   <div class=list>${rest.concat(lastRow).map((x,j)=>{const i=x.me&&mi>=25?mi:j+3;return`<div class="row${x.me?' me':''}${anim?' a':''}" style="animation-delay:${Math.min(j,12)*.03}s"><b class=r>${x.rk||i+1}</b><span>${esc(x.name)}${x.fdr?fm():''}${x.me?' (you)':''}</span><b>${esc(c.fmt(x.v))}</b></div>`}).join('')}</div>
-   <p class=m><small>${c.u} · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;
-  const me=document.querySelector('#lbd .row.me');if(me&&mi>=3&&mi<25)me.scrollIntoView({block:'nearest'})}
+   <div class=list>${rest.concat(lastRow).map((x,j)=>{const i=x.me&&mi>=25?mi:j+3;return`<div onclick="LB.view('${x.id}')" class="row${x.me?' me':''}${anim?' a':''}" style="animation-delay:${Math.min(j,12)*.03}s"><b class=r>${x.rk||i+1}</b><span>${esc(x.name)}${x.fdr?fm():''}${x.me?' (you)':''}</span><b>${esc(c.fmt(x.v))}</b></div>`}).join('')}</div>
+   <p class=m><small>${c.u} · tap a player to view their profile · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;
+  const ab=document.querySelector('#lbd .tabs .on');if(ab)ab.scrollIntoView({block:'nearest',inline:'center'});const me=document.querySelector('#lbd .row.me');if(me&&mi>=3&&mi<25)me.scrollIntoView({block:'nearest'})}
+ LB.view=id=>{try{if(typeof fwProfileOpen=='function')fwProfileOpen('',id)}catch(e){}};
  LB.tab=i=>{cur=(i+CATS.length)%CATS.length;draw()};
  LB.open=function(from){back=from||(typeof TT!='undefined'&&TT.on?'title':'pause');cur=0;for(const k in cache)delete cache[k];draw();LB.push(1).then(()=>{if(document.getElementById('lbd')){delete cache[CATS[cur].k];LB.load(CATS[cur].k)}});addEventListener('keydown',key,true)};
  LB.close=function(){removeEventListener('keydown',key,true);if(back=='title')titleUI();else pauseUI()};

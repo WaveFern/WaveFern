@@ -16,18 +16,18 @@ window.fwProfileSync=function(force){try{
   .then(()=>FBF.setDoc(FBF.doc(FBD,'profiles',FBU.uid),Object.assign(d,{t:Date.now()}))).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
 setInterval(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync()}catch(e){}},60000);
 const num=n=>Math.round(+n||0).toLocaleString();
-window.fwProfileOpen=async function(handle){
- handle=String(handle||'').replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(handle))return;
+window.fwProfileOpen=async function(handle,byUid){
+ handle=String(handle||'').replace(/^@/,'').toLowerCase();if(!byUid&&!/^[a-z0-9_]{3,16}$/.test(handle))return;
  const X=window.FRX,F=X&&X.FR;if(!F||!F.r||!live())return say('Profiles need you signed in and online.');
  document.getElementById('pubpf')?.remove();
  const o=document.createElement('div');o.id='pubpf';o.style.cssText='position:fixed;inset:0;z-index:9995;background:#000a;display:flex;align-items:center;justify-content:center;padding:12px';o.onclick=e=>{if(e.target===o)o.remove()};
  const box=h=>{o.innerHTML='<div class="box modal" style="width:min(380px,94vw)">'+h+'<div class=row2 style="margin-top:10px"><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div></div>'};
  box('<p class=m>Loading…</p>');document.body.appendChild(o);
- try{const{R,db}=F.r,uid=(await R.get(R.ref(db,'f/n/'+handle))).val();
+ try{const{R,db}=F.r,uid=byUid||(await R.get(R.ref(db,'f/n/'+handle))).val();
   if(!uid){box('<h2>@'+esc(handle)+'</h2><p class=m>No player has that username.</p>');return}
   const d=await FBF.getDoc(FBF.doc(FBD,'profiles',uid)),p=d.exists()?d.data():null;
-  if(!p){box('<h2>@'+esc(handle)+'</h2><p class=m>This player has not opened the game since profiles started, so there is nothing to show yet.</p>');return}
-  const me=uid==FBU.uid;
+  if(!p){box('<h2>'+(handle?'@'+esc(handle):'Player')+'</h2><p class=m>This player has not opened the game since profiles started, so there is nothing to show yet.</p>');return}
+  if(byUid&&p.h)handle=p.h;const me=uid==FBU.uid;
   box('<small class=m>PUBLIC PROFILE</small><h2 style="margin:2px 0">@'+esc(handle)+(me?' (you)':'')+'</h2><p style="margin:2px 0"><b>'+esc(p.a||'')+'</b></p><p class=m style="margin:6px 0">Fame level '+num(p.fame)+' · '+num(p.lis)+' monthly listeners</p>'+(p.bio?'<p>'+esc(p.bio)+'</p>':''))
  }catch(e){console.warn('[profile]',e);box('<h2>@'+esc(handle)+'</h2><p class=m>Could not load this profile.</p>')}};
 })();
