@@ -27,6 +27,6 @@ function updGo(){if(UPD.busy)return;UPD.busy=1;try{sessionStorage.setItem('fw_up
   const todo=urls.filter(u=>!have.has(u));
   if(window.FW_DEV)todo.push('/dev/bundle.json');
   return Promise.all(todo.map(u=>fetch(u,{cache:'reload'}).catch(()=>{})))}).catch(()=>{}),8000);
- Promise.all([cloud,fresh]).then(()=>{if(b)b.textContent='Updating…';if(retry)location.replace(location.pathname+'?r='+Date.now());else location.reload()})}
+ Promise.all([cloud,fresh]).then(()=>{if(b)b.textContent='Updating…';location.replace(location.pathname+'?r='+Date.now())})}
 setTimeout(updCheck,5000);setInterval(updCheck,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)updCheck()});

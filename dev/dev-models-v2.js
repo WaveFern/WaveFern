@@ -9,7 +9,7 @@
  if(!window.FW_FEAT)return;
  if(/[?&]nomodels/.test(location.search))return;
  const KEY='fw_dmodels';
- let on=true;try{if(localStorage.getItem(KEY)==='0')on=false}catch(e){}
+ let on=true;/* live site: always on, ignores any old saved choice */
  const SKN=['#fddcc0','#f2c09a','#d99a6c','#b57248','#8a5230','#5b3420'];
  const dkc=(c,f)=>{try{return dk(c,f)}catch(e){return c}};
 
@@ -46,8 +46,8 @@
   if(c.hair>=2&&c.hair!=9&&!(c.ht>=0)){const m=B(h,.34,.02,.3,dkc(hc,1.3),.05,.375,.05);m.userData.hair=1}
  }
  try{
-  /* player models are back to the original look (James: the extra detail did not look good); set to true to bring it back */
-  if(false&&typeof buildChar=='function'&&typeof B=='function'){
+  /* character detail is ON (James: new models switched on); change `if(typeof buildChar` to `if(false&&typeof buildChar` to switch it off */
+  if(typeof buildChar=='function'&&typeof B=='function'){
    const b0=buildChar;
    buildChar=function(c){
     const r=b0.apply(this,arguments);
@@ -123,5 +123,5 @@
   }
   apply();
  }catch(e){console.warn('dev models failed',e)}}
- let tries=0;const iv=setInterval(()=>{tries++;if(!document.getElementById('load')&&document.getElementById('fwdvb')){clearInterval(iv);boot()}else if(tries>240)clearInterval(iv)},250);
+ let tries=0;const iv=setInterval(()=>{tries++;if(!document.getElementById('load')){clearInterval(iv);boot()}else if(tries>1200)clearInterval(iv)},250);
 })();
