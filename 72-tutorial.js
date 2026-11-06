@@ -78,11 +78,11 @@ const AP_DOOR={x:-328.4,z:20};
 const TIPS=[
  {k:'move',b:1,l:['Yo, new blood! Big Vee. Your manager, hype man and landlord\'s worst nightmare.','WASD to walk, hold Shift to sprint. E uses whatever you are standing next to.'],
   go:{done:b=>Math.hypot(P.x-b.x,P.z-b.z)>4}},
- {k:'name',b:1,skip:()=>!!S.artist,l:['Every legend needs a name. Mine was DJ Gravy. Do not ask.','Use the laptop (E), open WaveFern and pick your artist name. Follow the line.'],pc:['Click WaveFern (the outlined icon), type your artist name and press Create profile.'],
+ {k:'name',b:1,skip:()=>!!S.artist,l:['Every legend needs a name. Mine was DJ Gravy. Do not ask.','Use the laptop (E), open Spotifly and pick your artist name. Follow the line.'],pc:['Click Spotifly (the outlined icon), type your artist name and press Create profile.'],
   go:{w:TUT_LAP,hl:()=>!S.artist&&mode=='pc'&&app!=1?TUT_PC(1):null,done:()=>!!S.artist}},
  {k:'record',b:1,skip:()=>S.songs.length+S.drafts.length>0,l:['Now we cook. The mic is in your studio: pick a genre, then three quick games.','Beat, Lyrics, Mix. It costs 15 energy, so do not be precious.'],
   go:{w:/^Record a song/,done:b=>S.drafts.length>b.d||S.songs.length>b.s}},
- {k:'release',b:1,skip:()=>S.songs.length>0,l:['Do not sit on heat. Laptop, WaveFern, Upload.','Every night your streams pay out, and listeners grow your fame.'],pc:['WaveFern, then the Upload tab, then Upload on your song. Streams start right away.'],
+ {k:'release',b:1,skip:()=>S.songs.length>0,l:['Do not sit on heat. Laptop, Spotifly, Upload.','Every night your streams pay out, and listeners grow your fame.'],pc:['Spotifly, then the Upload tab, then Upload on your song. Streams start right away.'],
   go:{w:TUT_LAP,hl:()=>mode=='pc'?(app!=1?TUT_PC(1):`button[onclick*="pg='upload'"]`):null,done:b=>S.songs.length>b.s}},
  {k:'free',b:1,l:['That is the basics: record, release, sleep, spend, grow.','From now on I only drop in, now and then, when you find something new. Tips off on this box and I stay quiet for good.'],dm:['Yo, it is Big Vee. I will drop in now and then when you find something new. Want me quiet? Tips off on my box or in the pause menu.']},
  /* contextual */
