@@ -10,7 +10,7 @@
 const SEAL_PRE='FW4-',SEAL_IV=16,SEAL_TAG=20;
 /* legacy (unsigned FW1-/FW2-/FW3-) codes keep loading until this date, then are refused (kept as a recovered backup instead of loaded).
    Every game that loads one re-saves it as FW4- straight away, so after the date only a save nobody has opened since the update is affected. */
-const SEAL_LEGACY_UNTIL=Date.UTC(2027,2,1);
+const SEAL_LEGACY_UNTIL=Date.UTC(2026,10,6,13,30,0); /* v49.77.1: ended at the fresh start (RS.CUT). Unsigned FW1-/FW2-/FW3- codes can be forged by hand, so none is loaded any more; the fresh start archives the real ones. */
 const sha256=(()=>{const K=new Uint32Array(64);{let n=2,c=0;while(c<64){let p=1;for(let i=2;i*i<=n;i++)if(n%i==0){p=0;break}if(p){K[c++]=Math.floor((Math.cbrt(n)%1)*4294967296)}n++}}
  const H0=(()=>{const h=new Uint32Array(8);let n=2,c=0;while(c<8){let p=1;for(let i=2;i*i<=n;i++)if(n%i==0){p=0;break}if(p){h[c++]=Math.floor((Math.sqrt(n)%1)*4294967296)}n++}return h})();
  const W=new Uint32Array(64);
