@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.81.0';
+const GAME_VERSION='v49.81.1';
 const VERSION_HISTORY=[
+ {v:'v49.81.1',n:'A completely perfect song (every hit Perfect, no misses) now gets a glowing yellow border and a sparkling PERFECT SONG banner on the song summary. Saves still load.'},
  {v:'v49.81.0',n:'Leaderboard: easier category switching (arrows, a title and a scrollable strip), and tapping any player opens their public profile. Founder badges show on rows. Saves still load.'},
  {v:'v49.80.10',n:'The username check now works on networks and browsers that block the live database connection: Firestore switches to a slower but reliable connection by itself, the same way the Friends connection already did.'},
  {v:'v49.80.9',n:'Usernames no longer depend on the Realtime Database: the name is stored and checked for uniqueness in Firestore, the same connection your sign-in and cloud save use. If the check ever fails it never blocks play, and the notice has Details and a Copy button.'},
