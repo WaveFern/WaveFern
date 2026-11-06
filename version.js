@@ -3,8 +3,9 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.85.8';
+const GAME_VERSION='v49.86.0';
 const VERSION_HISTORY=[
+ {v:'v49.86.0',n:'Taxi home is always available, anywhere in the world and with no daily limit. Taxi fares are now three times higher.'},
  {v:'v49.85.8',n:'Profile saving is more forgiving: if the extra profile fields are refused, the basic profile still saves, and the error notice now shows the real reason.'},
  {v:'v49.85.7',n:'Google profile pictures are now stored on the public profile as a small embedded image (base64), so other players always see them.'},
  {v:'v49.85.6',n:'Profile action icons are now pixel art to match the game.'},
