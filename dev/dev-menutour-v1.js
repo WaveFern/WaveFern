@@ -1,4 +1,4 @@
-/* WaveFern dev: the MAIN MENU (not the pause menu) shows a still picture of the starting house as its background.
+/* WaveFern dev: the MAIN MENU (not the pause menu) shows a still picture of the starting house as its background (dev-menustage-v1.js fades a live stadium scene in over it when it is ready; this picture is the fallback and the ?nomenuscene look).
    The 3D scene is hidden behind it while the menu is up, so no cars or house interior can show through. Pause menu is unchanged.
    Also keeps "Save and quit" as the bottom button of the pause menu. Only loaded on /dev/. */
 (function(){
