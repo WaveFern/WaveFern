@@ -39,16 +39,16 @@ async function box(){const F=FR_(),st=await stamps(),now=Date.now(),hasU=!!F.h,h
  const o=document.createElement('div');o.id='onbx';o.style.cssText='position:fixed;inset:0;z-index:99990;background:#000d;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box';
  const first=!hasU||!hasD;
  o.innerHTML=`<div class="box modal" style="width:min(430px,94vw)"><small style="font:11px Silkscreen,ui-monospace,monospace;letter-spacing:2px;color:var(--g)">${first?'WELCOME TO THE FRESH START':'YOUR NAME'}</small><h2 style="margin:4px 0 8px">${first?'Choose how you appear':'Change your name'}</h2>
-<p class=m>This is how friends and bandmates find and see you. Keep your real name out of it. Names that copy WaveFern, staff or someone else, or that are offensive, are refused.</p>
+<p class=m>${hasU?'':'<b>Pick a username to finish setting up your account.</b> '}This is how friends and bandmates find and see you. Keep your real name out of it. Names that copy WaveFern, staff or someone else, or that are offensive, are refused.</p>
 <label class=m style="display:block;margin-top:8px">Username</label><input id=onbu maxlength=16 autocomplete=off spellcheck=false placeholder="3 to 16 letters, numbers or _" value="${esc(F.h||'')}" ${canU?'':'disabled'} style="width:100%;box-sizing:border-box">
 <p class=m style="margin:2px 0 0"><small>${canU?(hasU?'You can change it once every 30 days.':'Choose carefully: you can change it only once every 30 days.'):'You can change your username again on '+when(st.t+U_CD)+'.'}</small></p>
 <label class=m style="display:block;margin-top:8px">Display name</label><input id=onbd maxlength=24 autocomplete=off placeholder="Shown next to your username" value="${esc(dnGet())}" ${canD?'':'disabled'} style="width:100%;box-sizing:border-box">
 <p class=m style="margin:2px 0 0"><small>${canD?'Letters, numbers, spaces and . _ \' - . You can change it once every 7 days.':'You can change your display name again on '+when(st.d+D_CD)+'.'}</small></p>
 <p id=onbm class=m style="min-height:18px;color:#ff9a9a"></p>
-<div class=row2><button class=go id=onbs ${canU||canD?'':'disabled'}>Save</button><button id=onbl>${first?'Not now':'Close'}</button></div></div>`;
+<div class=row2><button class=go id=onbs ${canU||canD?'':'disabled'}>Save</button>${hasU?`<button id=onbl>${first?'Not now':'Close'}</button>`:''}</div></div>`;
  document.body.appendChild(o);const m=o.querySelector('#onbm'),u=o.querySelector('#onbu'),d=o.querySelector('#onbd'),s=o.querySelector('#onbs');
  const close=()=>{o.remove();shown=0};
- o.querySelector('#onbl').onclick=()=>{if(first)later=1;close()};
+ const lb=o.querySelector('#onbl');if(lb)lb.onclick=()=>{if(first)later=1;close()};
  s.onclick=async()=>{const h=u.value.trim().replace(/^@/,'').toLowerCase(),dn=clean(d.value);
   const chU=canU&&h!==(F.h||''),chD=canD&&dn!==dnGet();
   if(!hasU&&!h){m.textContent='Choose a username.';return}if(!hasD&&!dn){m.textContent='Choose a display name.';return}
@@ -58,18 +58,18 @@ async function box(){const F=FR_(),st=await stamps(),now=Date.now(),hasU=!!F.h,h
   try{if(chU){const x=await R.get(R.ref(db,'f/n/'+h));if(x.exists()&&x.val()!==uid){m.style.color='#ff9a9a';m.textContent='@'+h+' is taken. Try another.';s.disabled=false;return}}
    const nh=chU?h:F.h,nd=chD?dn:dnGet(),p={h:nh,nm:nd||fwNameSafe((typeof S=='object'&&S&&S.artist)||''),o:1,rm:'',t:ts},up={['f/p/'+uid]:p},stp={};
    if(chU){up['f/n/'+h]=uid;if(F.h)up['f/n/'+F.h]=null;stp['f/u/'+uid+'/t']=ts}
-   if(chD)stp['f/u/'+uid+'/d']=ts;
+   if(chD||(!hasU&&canD))stp['f/u/'+uid+'/d']=ts;
    /* with the proposed rules the change stamps must go in the same write; with the older rules they are refused, so try again without them */
    try{await R.update(R.ref(db),Object.assign({},up,stp))}catch(e1){if(!/permission/i.test(String(e1&&(e1.code||e1.message)||e1)))throw e1;await R.update(R.ref(db),up)}
-   const L=stLocal();if(chU)L.t=Date.now();if(chD)L.d=Date.now();try{localStorage.setItem(SK(),JSON.stringify(L));localStorage.setItem(DK(),nd)}catch(e2){}
+   const L=stLocal();if(chU)L.t=Date.now();if(chD||(!hasU&&canD))L.d=Date.now();try{localStorage.setItem(SK(),JSON.stringify(L));localStorage.setItem(DK(),nd)}catch(e2){}
    F.h=nh;F.pk='';F.od=0;X().frPresence();close();try{snd('chime');say('Saved: '+nd+' (@'+nh+')')}catch(e3){}}
   catch(e4){m.style.color='#ff9a9a';m.textContent='Could not save that. Try again later.';s.disabled=false;console.warn('[names]',e4)}};
  (!hasU?u:d).focus()}
-window.fwNameBox=()=>{if(shown)return;const F=FR_();if(!F||!F.ok||!F.r)return;shown=1;box().catch(()=>{shown=0})};
+window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;const F=FR_();if(!F||!F.ok||!F.r)return;shown=1;box().catch(()=>{shown=0})};
 setInterval(()=>{try{if(shown||later||!FW_ACCT||!X()||X().trailer||!rsOn()||FW_TRL)return;
  const F=FR_();if(!F.ok||!F.r)return;if(F.h&&dnGet())return;
- if(document.getElementById('annov')||!['title','play','pause'].includes(mode))return;
- fwNameBox()}catch(e){}},2500);
+ if(document.getElementById('annov')||!['title','creator','play','pause'].includes(mode))return;
+ fwNameBox()}catch(e){}},1000);
 /* Friends is only started when needed; start it as soon as someone is signed in after the reset so this can run */
 setInterval(()=>{try{if(FW_ACCT&&X()&&rsOn()&&!FR_().on&&!X().trailer)X().frStart()}catch(e){}},3000);
 })();
