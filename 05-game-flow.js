@@ -3,7 +3,7 @@ let mode='load',rec=null,near=null,pg='home',app=0;const keys={};
 function say(t){snd('ping');const d=document.createElement('div');d.textContent=t;$('toast').appendChild(d);setTimeout(()=>d.remove(),3200)}
 function closeUI(){$('ui').innerHTML='';mode='play'}
 function clk(){const m=S.t<300?360+S.t/300*840:1200+(S.t-300)/300*600;return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(Math.floor(m%60)).padStart(2,'0')}
-const $$=n=>'$'+(+n).toFixed(2);
+const $$=n=>{n=Math.round(+n||0);const g=n<0?'-':'',a=Math.abs(n),f=(v,u)=>g+'$'+(+v.toFixed(v<10?2:v<100?1:0))+u;return a>=1e12?f(a/1e12,'T'):a>=1e9?f(a/1e9,'B'):a>=1e6?f(a/1e6,'M'):a>=1e3?f(a/1e3,'K'):g+'$'+a};
 const PEN='<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAH0lEQVR4nGNgGN7gPxSMJAP+EwloZwDFXhiGBgwNAABwnY9x8D2CrwAAAABJRU5ErkJggg==" style="width:16px;height:16px;image-rendering:pixelated" />';
 let CPK={k:null,h:140,s:.8,v:.9};
 function hsv2hex(h,s,v){const f=n=>{const k=(n+h/60)%6,x=v-v*s*Math.max(0,Math.min(k,4-k,1));return Math.round(x*255).toString(16).padStart(2,'0')};return'#'+f(5)+f(3)+f(1)}

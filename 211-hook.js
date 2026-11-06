@@ -1,4 +1,4 @@
-/* WaveFern dev: "the hook" - engagement mechanics on top of the base economy (does not retune it). Only loaded on /dev/.
+/* WaveFern dev: "the hook" - engagement mechanics on top of the base economy (does not retune it). 
    Add ?nohook to skip it. All tunables are in H below. State lives in S.hk (saved with the career).
    1 Rookie Rush: streams x1.8 on day 0 easing to x1.0 by day 6 (looks like "you are blowing up", quietly fades).
    2 Surprise drops: in the first 15 min of play, a random reward every 40-90 s (variable ratio): cash, fans, or a stream burst.
@@ -8,7 +8,7 @@
    6 Daily streak: one reward per real day, bigger each day to day 7; one missed day is forgiven (streak freeze), 2 resets it.
    7 Comeback: leaving for 10+ min and returning shows "while you were away" fans. */
 (function(){
- if(!window.FW_DEV||/[?&]nohook/.test(location.search))return;
+ if(/[?&]nohook/.test(location.search))return;
  const H={rushMax:.8,rushDays:6,dropMin:40,dropMax:90,dropWindow:15*60,luckyP:.12,luckyDays:10,
   streak:[30,45,70,100,140,200,400],ladder:[[1,'songs',1,25],[3,'songs',2,50],[25,'lis',0,40],[100,'lis',0,75],[250,'lis',0,120],[500,'lis',0,200],[1000,'lis',0,350],[2500,'lis',0,600],[5000,'lis',0,1000],[10000,'lis',0,1800],[25000,'lis',0,3000],[50000,'lis',0,5000],[100000,'lis',0,9000],[250000,'lis',0,15000],[500000,'lis',0,25000],[1000000,'lis',0,50000]]};
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev hook '+t,e)}}};
