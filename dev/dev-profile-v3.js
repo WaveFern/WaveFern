@@ -34,13 +34,19 @@
   return out;
  }
  const fameOf=o=>{const s0=g(()=>S);if(o===s0)return g(()=>fameLevel())||0;try{S=o;return fameLevel()||0}catch(e){return 0}finally{try{S=s0}catch(e){}}};
+ /* Real-world join date (not the in-game day). Best source first: the Google account creation time; otherwise the first time this device opened the profile, remembered as `first` in the profile storage. Nothing is invented: the fallback is a real timestamp, just a late one for old players. */
+ function realJoin(st){
+  const ct=Date.parse(g(()=>FBU.metadata.creationTime)||'');if(ct>0)return ct;
+  if(+st.first>0)return +st.first;
+  const o=load();o.first=Date.now();save(o);return o.first;
+ }
  const mine=()=>{
   const st0=load(),L=careers(),ch=L.find(c=>c.k===st0.career)||L[0],D=ch?ch.S:null,has=!!D;
   const songs=((D&&D.songs)||[]).slice().sort((a,b)=>(b.streams||0)-(a.streams||0)).slice(0,5).map(s=>[s.title,s.streams||0,(s.streams||0)>=1e6?1:((s.today||0)>5e4?2:0)]);
   const sk=(D&&D.mp&&D.mp.sk&&D.mp.sk.n)||0;
   const st=load();
   return{id:'me',me:1,sample:!has,artist:has?D.artist:'Your Artist Name',user:st.user,seed:3,founder:has?!!g(()=>S.founder):1,
-   fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:has?NOW-Math.max(0,(D.day||1)-1)*DAY:NOW-9*DAY,
+   fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:realJoin(st),
    bio:st.bio,songs:songs.length?songs:[['Sample Song One',120400,2],['Sample Song Two',8800,0]],
    band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:{name:'The Ferns',inst:'Vocals',members:3,streak:sk||4},
    ach:has?[0,1,2].filter((_,i)=>i<1+Math.floor(((D.songs||[]).length)/3)):[0],online:'Online',rel:'self'};
@@ -59,6 +65,7 @@
   const im=document.createElement('img');im.src=k.toDataURL();im.width=im.height=px;im.alt='';im.style.imageRendering='pixelated';return im.outerHTML;
  }
  const tag=(t,cls)=>`<span class="pf-tag ${cls||''}">${t}</span>`;
+ const fmtDate=ts=>new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
  const rel=ts=>{const d=Math.max(1,Math.round((NOW-ts)/DAY));return d<60?d+' days ago':d<700?Math.round(d/30)+' months ago':Math.round(d/365)+' years ago'};
 
  /* ---------- styles ---------- */
@@ -163,7 +170,7 @@
   h+=p.bio?`<p class=pf-bio>${esc(p.bio)}</p>`:`<p class="pf-bio e">${p.me&&!V.visitor?'No bio yet. Add one in Edit profile.':'No bio.'}</p>`;
   const cells=[['FAME LEVEL',String(p.fame)]];
   if(sh('listeners'))cells.push(['MONTHLY LISTENERS',num(p.listeners)]);else cells.push(['MONTHLY LISTENERS','Private']);
-  if(sh('joined'))cells.push(['JOINED',rel(p.joined)]);else cells.push(['JOINED','Private']);
+  if(sh('joined'))cells.push(['JOINED',fmtDate(p.joined)]);else cells.push(['JOINED','Private']);
   h+=`<div class=pf-stats>${cells.map(c=>`<div><small>${c[0]}</small><b>${esc(c[1])}</b></div>`).join('')}</div>`;
   if(sh('songs'))h+=dim('songs',`<div class="pf-sec"><h3>TOP SONGS</h3>${p.songs.map((s,i)=>`<div class=pf-row><span class=i>${i+1}</span><span class=n>${esc(s[0])}</span>${songTag(s[2])}<span class=v>${num(s[1])}</span></div>`).join('')||'<span class=pf-user>No songs yet.</span>'}</div>`);
   if(sh('band')&&p.band)h+=dim('band',`<div class="pf-sec"><h3>BAND</h3><div class=pf-kv><span>Band</span><b>${esc(p.band.name)}</b><span>Plays</span><div>${esc(p.band.inst)}</div><span>Members</span><div>${p.band.members}</div>${sh('streak')?`<span>Streak</span><div>${p.band.streak} day${p.band.streak==1?'':'s'}</div>`:''}</div></div>`);
