@@ -193,7 +193,7 @@ function mapPaint(x,sx,sz,kx,kz,mini){const W=x.canvas.width,H=x.canvas.height,v
  CTD.hfp.forEach(f=>{rect(f,f[4]);roof(f);if(ol){x.strokeStyle='#0005';x.lineWidth=1;x.strokeRect(sx(f[0]),sz(f[1]),(f[2]-f[0])*kx,(f[3]-f[1])*kz)}});
  BLD.forEach(b=>{rect(b,'#8fa6b8');roof(b);if(ol){x.strokeStyle='#4d6070';x.lineWidth=1;x.strokeRect(sx(b[0]),sz(b[1]),(b[2]-b[0])*kx,(b[3]-b[1])*kz)}});
  /* road names */
- if(ROAD_W*kx<7)return;const fs=mini?8:Math.min(13,Math.max(9,Math.round(ROAD_W*kx*.75)));x.font='bold '+fs+'px monospace';x.textAlign='center';x.textBaseline='middle';x.lineWidth=3;x.strokeStyle='#000b';x.fillStyle='#fff';
+ if(ROAD_W*kx<7)return;const fs=mini?8:Math.min(20,Math.max(9,Math.round(ROAD_W*kx*.75)));x.font=fs+'px Silkscreen,monospace';x.textAlign='center';x.textBaseline='middle';x.lineWidth=3;x.strokeStyle='#000b';x.fillStyle='#fff';
  const say=(t,X,Z,rot)=>{x.save();x.translate(X,Z);if(rot)x.rotate(-Math.PI/2);x.strokeText(t,0,0);x.fillText(t,0,0);x.restore()};
  const along=(t,p0,p1,q,v)=>{const tw=x.measureText(t).width+30;if(Math.abs(p1-p0)<tw)return;const lo=Math.max(p0+tw/2,-tw),hi=Math.min(p1-tw/2,(v?H:W)+tw);if(lo>hi)return;
   if(mini){const m=Math.min(hi,Math.max(lo,(v?H:W)/2+(v?-30:30)));say(t,v?q:m,v?m:q,v);return}
