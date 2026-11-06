@@ -1,13 +1,11 @@
 /* ===== dev only: two windows on the left wall of the starting house, with an optional soft sunbeam =====
-   The bedroom window and the studio window on the back wall are taken out here. The two framed, curtained windows on the left wall
+   The detailed back-wall windows stay as they were. The two framed, curtained windows on the left wall
    (one in the bedroom, one in the living room) are built with the house dressing in dev-models-v2.js. Settings > Graphics > Sunbeams turns a faint shaft of daylight through them
    on or off (on by default, daytime only). Nothing in the save changes; the choice is kept per device with the graphics settings. */
 (function(){
  if(!window.FW_FEAT||typeof THREE=='undefined'||typeof scene=='undefined'||typeof B!='function')return;
  const ZS=[2,9],W=1.6,H=1.2,Y=1.8;
  let house=null,beams=[],lastOn=null;
- /* the studio builds its own back-wall window: leave it out, always */
- try{const x0=xb;xb=function(g,w,h,d,c,x,y,z){if(g===studio&&x>8.4&&x<10.4&&z<.2&&y>1&&y<2.6&&(w>1.5||h>1.1||w<.1&&h>1.1))return null;return x0.apply(this,arguments)}}catch(e){console.warn('dev windows xb',e)}
  function beam(g,z){
   /* shaft: window rectangle on the wall to a shifted rectangle on the floor, bright at the glass and fading away */
   const x1=3.4,z1=z+.9,hw=W/2,y0=Y-H/2,y1=Y+H/2;
@@ -31,9 +29,6 @@
  }
  function fix(g){
   if(!g||g.userData.leftWin)return;g.userData.leftWin=1;house=g;
-  /* take out the bedroom window on the back wall */
-  g.children.forEach(m=>{const p=m.isMesh&&m.geometry&&m.geometry.parameters;
-   if(p&&m.material.color.getHexString()=='8fd0ff'&&p.height==1.2&&m.position.y>1.7&&Math.abs(m.position.z-.02)<.06)m.visible=false});
   ZS.forEach(z=>beam(g,z));
   apply()}
  function on(){try{return !(typeof GFX!='undefined'&&GFX.sunOff)}catch(e){return true}}
