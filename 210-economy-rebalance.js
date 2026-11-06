@@ -27,6 +27,13 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
    if(d){S.money=+Math.max(0,S.money+d).toFixed(2);S.earn=+((S.earn||0)+d).toFixed(2)}}
   S.listeners=Lf;S.eco.L=Lf;S.monthStreams=Math.max(0,Math.min(S.monthStreams||0,cap*md),Lf*md*.999);
   if(Array.isArray(S.mlHist)){const m=S.mlHist[S.mlHist.length-1];if(m)m.ml=Lf}
+  /* the morning summary was drawn before the pacing adjustment: redraw its three numbers with the final figures */
+  try{const cs=document.querySelectorAll('#ui .box .cards .card');if(cs.length>=3&&h&&h.d===S.day-1&&/Streams/.test(cs[0].textContent)&&/Monthly listeners/.test(cs[2].textContent)){
+   const b0=cs[0].querySelector('b'),b1=cs[1].querySelector('b'),b2=cs[2].querySelector('b'),sm=cs[2].querySelector('small');
+   if(b0)b0.textContent='+'+(h.st||0).toLocaleString();if(b1)b1.textContent=$$(h.e||0);
+   const ov=Math.min(L0,Lf>L0?Lf:L0);
+   if(b2)b2.textContent=ov.toLocaleString()+' → '+Lf.toLocaleString();
+   if(sm)sm.textContent=Lf>ov?'+'+(Lf-ov).toLocaleString():Lf<ov?'-'+(ov-Lf).toLocaleString():'no change'}}catch(e){}
  }catch(e){console.error('economy pacing',e)}
  return r0};
 })();

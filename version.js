@@ -5,6 +5,7 @@
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
 const GAME_VERSION='v49.77.2';
 const VERSION_HISTORY=[
+ {v:'v..1',n:'The morning summary now shows the real figures: streams, earnings and monthly listeners match what you actually have after the night. Saves still load.'},
  {v:'v49.77.2',n:'Fixed monthly listeners starting too high: catalogue boosts, gifts and stream bursts can no longer lift your listeners during the day, so you start at about 100 after day 1 and the first-hour pace matches the plan. Saves still load.'},
  {v:'v49.77.1',n:'Save codes are tighter after the fresh start: old unsigned codes (FW1-, FW2-, FW3-) are no longer loaded, and only signed saves count as new careers or can carry a Founder claim.'},
  {v:'v49.77.0',n:'Second fresh start: the game was too easy, so every career is reset again (money, listeners, apps, songs and the rest). Old careers are kept as Legacy careers, and the Founder badge and Founder items stay.'},
