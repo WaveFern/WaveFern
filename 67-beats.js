@@ -705,7 +705,7 @@ if(typeof loadCode=='function'){const lc0=loadCode;loadCode=function(){const r=l
 setInterval(songSeeds,500);
 /* recording: the song's beat plays under all four steps; the Beat bar sweeps in time with it */
 if(typeof startRec=='function'){const s0=startRec;startRec=function(i){s0.apply(this,arguments);try{if(rec&&mode=='rec'){rec.bs=(Math.random()*4294967296)>>>0;
- const pk=(typeof S=='object'&&S&&S.bpick)||{};rec.s8=pk.s8!=null?pk.s8:'auto';rec.hh=pk.hh!=null?pk.hh:'auto';rec.sp=Object.assign({bass:'auto',key:'auto',lead:'auto',pad:'auto',pluck:'auto'},pk.smp);
+ const pk=(typeof S=='object'&&S&&S.bpick)||{};rec.s8='auto';rec.hh='auto';rec.sp=Object.assign({bass:'auto',key:'auto',lead:'auto',pad:'auto',pluck:'auto'},pk.smp);
  /* v49.25.0: the sub-genre picked in Extras (132-808-hats.js), if it is for this genre */
  const sp=typeof subPick=='function'?subPick():null;rec.sty=sp&&sp.g==rec.g?sp.i:null;
  rec.bp=!!Beats.play({genre:rec.g,seed:rec.bs,s8:rec.s8,hh:rec.hh,sp:rec.sp,style:rec.sty},{owner:'rec',form:'rec',intensity:.8,pads:1,alive:()=>!!rec&&mode=='rec'})}}catch(e){console.error('beats rec',e)}}}
