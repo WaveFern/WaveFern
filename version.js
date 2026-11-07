@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.23';
+const GAME_VERSION='v49.93.24';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.24',n:'All music and sound now fades out when you leave the tab (soundtrack, menu music, car radios, songs, ambience and effects) and fades back in when you return. Anything you had muted or paused stays that way.'},
  {v:'v49.93.23',n:'Fixed friends going offline with permission denied. Saving your username and online status now sends the name stamp the database rules require, and if it is refused the game retries without the display name. A failed online status now backs off for a while instead of retrying every 4 seconds.'},
  {v:'v49.93.22',n:'Fixed friends going offline with permission denied. Saving your username and online status now sends the name stamp the database rules require, and if it is refused the game retries without the display name. A failed online status now backs off for a while instead of retrying every 4 seconds.'},
  {v:'v49.93.21',n:'Fixed the perfect song screen going off the edge of the screen on phones held upright. The results window now fits the screen and scrolls, so the exit button can always be reached.'},

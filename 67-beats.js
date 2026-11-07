@@ -632,7 +632,8 @@ function resume(E){if(!E.paused)return;E.paused=0;const c=E.c,now=c.currentTime;
  const g=E.out.gain;g.cancelScheduledValues(now);g.setValueAtTime(0,now);g.linearRampToValueAtTime(E.gv||1,now+.2)}
 function tick(){const E=cur;if(!E){clearInterval(timer);timer=0;return}const c=E.c;
  if(c.state=='closed'){cur=null;holdBg(0);return}
- const hide=gamePaused()||document.hidden||!!E.up;if(hide&&!E.paused)pause(E);else if(!hide&&E.paused)resume(E);
+ /* v49.94.0: leaving the tab fades everything (00-tab-fade.js); the song keeps running during the fade and pauses once it is silent. The recording game's Beat bar reads this clock, so it still pauses at once. */
+ const soft=!!window.HF&&E.owner!='rec',hide=(gamePaused()&&!(soft&&HF.fading()))||(soft?HF.silent():document.hidden)||!!E.up;if(hide&&!E.paused)pause(E);else if(!hide&&E.paused)resume(E);
  if((!E.paused||E.up)&&E.alive&&(E.wd=(E.wd||0)+1)%6==0){let ok=1;try{ok=E.alive()}catch(e){ok=0}if(!ok){stop(.6);return}}
  const v=musicVol();if(Math.abs(v-E.vv)>.001){E.vv=v;G.vol.gain.setTargetAtTime(v,c.currentTime,.05)}
  if(!held||(typeof MU!='undefined'&&!MU.hold))holdBg(1);else if(typeof MU!='undefined'&&MU.pl){const a=MU.a&&MU.a[MU.cur];if(a&&!a.paused)a.pause()}
@@ -642,7 +643,8 @@ function tick(){const E=cur;if(!E){clearInterval(timer);timer=0;return}const c=E
  if(E.next<now-.4){E.t0=now+.05-E.step*E.sd;E.next=stepTime(E,E.step)}
  let k=0;while(E.next<now+.6&&k++<96){try{sched(E,E.step,Math.max(E.next,now))}catch(e){if(!E.err){E.err=1;console.error('beats',e)}}E.step++;E.next=stepTime(E,E.step)}}
 function stop(fade){const E=cur;if(!E)return;cur=null;end(E,fade);holdBg(0)}
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&cur)pause(cur);else if(cur)tick()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&cur&&!(window.HF&&cur.owner!='rec'))pause(cur);else if(cur)tick()});
+if(window.HF)HF.sub(()=>{if(cur)tick()});
 addEventListener('pagehide',()=>stop(.02));
 
 /* offline render (tests, previews): returns a Promise of an AudioBuffer */
