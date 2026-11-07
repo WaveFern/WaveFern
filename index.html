@@ -31,10 +31,10 @@ function msg(){lt.classList.remove('in');void lt.offsetWidth;lt.textContent=M[i+
 tip.textContent=T[Math.random()*T.length|0];msg();
 var a=setInterval(function(){if(!document.getElementById('load'))return clearInterval(a),clearInterval(b);msg()},2200),
 b=setInterval(function(){if(!document.getElementById('load'))return clearInterval(b);var w=parseFloat(lb.style.width)||0;if(w>=100){lp.textContent='100%';return}p+=(40-p)*.06;var v=Math.max(w,p);lb.style.width=v.toFixed(1)+'%';lp.textContent=Math.round(v)+'%'},120)})();</script>
-<script>window.FW_FEAT=1</script><script src="00-dev.js?v=49.72.0"></script><script src="00-moved-saves.js?v=49.54.3"></script><script src="00-guard.js?v=49.54.3"></script><script src="00-pixel-icons.js?v=49.54.3"></script>
+<script>window.FW_FEAT=1</script><script src="00-dev.js?v=49.72.0"></script><script src="00-moved-saves.js?v=49.54.3"></script><script src="00-guard.js?v=49.54.3"></script><script src="00-tab-fade.js?v=49.93.24"></script><script src="00-pixel-icons.js?v=49.54.3"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script><script>window.THREE||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>')</script>
 <script src="assets.js?v=49.54.3"></script>
-<script src="version.js?v=49.93.18"></script><script>try{var _l=document.querySelector('#load .ldin'),_v=document.createElement('div');_v.textContent=GAME_VERSION;_v.style.cssText='margin-top:10px;font:12px ui-monospace,monospace;color:#8aa094;text-align:center';_l.appendChild(_v)}catch(e){}</script>
+<script src="version.js?v=49.93.33"></script><script>try{var _l=document.querySelector('#load .ldin'),_v=document.createElement('div');_v.textContent=GAME_VERSION;_v.style.cssText='margin-top:10px;font:12px ui-monospace,monospace;color:#8aa094;text-align:center';_l.appendChild(_v)}catch(e){}</script>
 <script src="01-start.js?v=49.93.12"></script>
 <script src="02-data.js?v=49.78.0"></script>
 <script src="03-character.js?v=49.54.3"></script>
@@ -42,8 +42,8 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="05-game-flow.js?v=49.78.0"></script>
 <script src="06-computer.js?v=49.78.0"></script>
 <script src="07-input-loop.js?v=49.54.3"></script>
-<script src="08-music.js?v=49.75.0"></script>
-<script src="09-settings-effects.js?v=49.75.0"></script>
+<script src="08-music.js?v=49.93.24"></script>
+<script src="09-settings-effects.js?v=49.93.24"></script>
 <script src="10-apps-shop-furniture.js?v=49.54.3"></script>
 <script src="11-os-v2.js?v=49.75.0"></script>
 <script src="12-save-seal.js?v=49.77.1"></script><script src="12-save-load.js?v=49.71.0"></script><script src="12-save-vault.js?v=49.72.0"></script><script src="12-reset.js?v=49.77.1"></script>
@@ -61,7 +61,7 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="24-v19-flat-previews.js?v=49.54.3"></script>
 <script src="25-v21.js?v=49.54.3"></script>
 <script src="26-v24-upstairs-redesign.js?v=49.54.3"></script>
-<script src="28-v25-pause-menu-wardrobe-picker.js?v=49.92.0"></script>
+<script src="28-v25-pause-menu-wardrobe-picker.js?v=49.93.24"></script>
 <script src="29-v26.js?v=49.79.0"></script>
 <script src="30-npc-chat.js?v=49.54.3"></script>
 <script src="31-wide-roads.js?v=49.54.3"></script>
@@ -79,7 +79,7 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="40-city-fixes.js?v=49.93.9"></script>
 <script src="41-fountains.js?v=49.54.3"></script>
 <script src="42-central-park.js?v=49.54.3"></script>
-<script src="53-studio-gear-detail.js?v=49.54.3"></script>
+<script src="53-studio-gear-detail.js?v=49.93.29"></script>
 <script src="54-skyline-meetings.js?v=49.54.3"></script>
 <script src="60-threadz-prints.js?v=49.54.3"></script>
 <script src="55-interiors.js?v=49.54.3"></script>
@@ -90,11 +90,11 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="64-hat-hair.js?v=49.54.3"></script>
 <script src="70-festival.js?v=49.73.2"></script>
 <script src="71-festival-booking.js?v=49.54.3"></script>
-<script src="67-beats.js?v=49.54.3"></script>
+<script src="67-beats.js?v=49.93.27"></script>
 <script src="57-tower-floors.js?v=49.54.3"></script>
 <script src="58-pets.js?v=49.54.3"></script>
 <script src="72-tutorial.js?v=49.75.0"></script>
-<script src="73-ambience.js?v=49.75.0"></script>
+<script src="73-ambience.js?v=49.93.24"></script>
 <script src="75-collab-fees-dms.js?v=49.54.3"></script>
 <script src="76-messages-plus.js?v=49.75.0"></script>
 <script src="77-kiaan.js?v=49.54.3"></script>
@@ -130,7 +130,7 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="107-my-songs-music.js?v=49.54.3"></script>
 <script src="108-catalogue-halo.js?v=49.54.3"></script>
 <script src="109-analytics.js?v=49.54.3"></script>
-<script src="110-awards.js?v=49.54.3"></script>
+<script src="110-awards.js?v=49.93.24"></script>
 <script src="111-spotifly-browse.js?v=49.75.0"></script>
 <script src="112-cover-art.js?v=49.54.3"></script>
 <script src="113-more-symbols.js?v=49.54.3"></script>
@@ -152,7 +152,7 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="129-followers-sprint.js?v=49.54.3"></script>
 <script src="130-song-session.js?v=49.54.3"></script>
 <script src="131-street-flow.js?v=49.79.4"></script>
-<script src="132-808-hats.js?v=49.54.3"></script>
+<script src="132-808-hats.js?v=49.93.27"></script>
 <script src="133-quests.js?v=49.54.3"></script>
 <script src="134-hair-3d.js?v=49.54.3"></script>
 <script src="135-destinations.js?v=49.54.3"></script>
@@ -173,10 +173,10 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="158-placement-overhaul.js?v=49.75.0"></script>
 <script src="159-messages-mobile.js?v=49.73.3"></script>
 <script src="160-tour-shop-menus.js?v=49.54.3"></script>
-<script src="161-multiplayer.js?v=49.93.17"></script>
+<script src="161-multiplayer.js?v=49.93.30"></script>
 <script src="162-fun-admin.js?v=49.54.3"></script>
 <script src="163-hud-left.js?v=49.54.3"></script>
-<script src="165-song-menu.js?v=49.54.3"></script>
+<script src="165-song-menu.js?v=49.93.27"></script>
 <script src="166-genre-focus.js?v=49.54.3"></script>
 <script src="167-resume-spot.js?v=49.54.3"></script>
 <script src="168-gamepad.js?v=49.54.3"></script>
@@ -187,7 +187,7 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="173-career-boost.js?v=49.54.3"></script>
 <script src="174-career-depth.js?v=49.54.3"></script>
 <script src="175-trailer.js?v=49.54.3"></script>
-<script src="176-game-feel.js?v=49.80.11"></script>
+<script src="176-game-feel.js?v=49.93.28"></script>
 <script src="177-early-game.js?v=49.54.3"></script>
 <script src="178-instagrime-photos.js?v=49.54.3"></script>
 <script src="179-tour-shop-kinds.js?v=49.72.0"></script>
@@ -201,13 +201,13 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="187-upgrades.js?v=49.78.0"></script>
 <script src="188-stage-walk.js?v=49.54.3"></script>
 <script src="189-instagrime-talk.js?v=49.54.3"></script>
-<script src="190-pfp-styles.js?v=49.54.3"></script>
+<script src="190-pfp-styles.js?v=49.93.25"></script><script src="217-spotifly-hq-pfp.js?v=49.93.25"></script>
 <script src="191-amazoom-fit.js?v=49.54.3"></script>
 <script src="192-souvenir-shops.js?v=49.54.3"></script>
 <script src="193-clothes-plus.js?v=49.54.3"></script>
 <script src="194-popup-events.js?v=49.75.0"></script>
 <script src="195-themed-popups.js?v=49.54.3"></script>
-<script src="196-never-stuck.js?v=49.54.3"></script>
+<script src="196-never-stuck.js?v=49.93.20"></script>
 <script src="197-gear-levels.js?v=49.79.0"></script>
 <script src="198-game-ui.js?v=49.54.3"></script>
 <script src="199-instrument-samples.js?v=49.54.3"></script>
@@ -216,12 +216,12 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="202-trailer-record.js?v=49.59.1"></script>
 <script src="203-dm-peers.js?v=49.60.2"></script>
 <script src="204-world-offers.js?v=49.65.0"></script>
-<script src="205-announcement.js?v=49.74.1"></script><script src="206-founder.js?v=49.93.0"></script><script src="207-dev-panel.js?v=49.72.0"></script><script src="208-onboarding.js?v=49.80.9"></script><script src="213-public-profile.js?v=49.93.9"></script><script src="209-founder-cloud.js?v=49.93.2"></script><script src="209-carlos.js?v=49.73.9"></script><script src="209-alfonso.js?v=49.79.1"></script><script src="210-countdown.js?v=49.74.1"></script><script src="214-guide-markers.js?v=49.90.0"></script><script src="215-city-brand-stores.js?v=49.84.0"></script>
+<script src="205-announcement.js?v=49.74.1"></script><script src="206-founder.js?v=49.93.0"></script><script src="207-dev-panel.js?v=49.72.0"></script><script src="208-onboarding.js?v=49.93.30"></script><script src="213-public-profile.js?v=49.93.30"></script><script src="209-founder-cloud.js?v=49.93.2"></script><script src="209-carlos.js?v=49.73.9"></script><script src="209-alfonso.js?v=49.79.1"></script><script src="210-countdown.js?v=49.74.1"></script><script src="214-guide-markers.js?v=49.90.0"></script><script src="215-city-brand-stores.js?v=49.93.31"></script>
 <script src="158z-responsive.js?v=1"></script>
 <script src="dev/dev-house-v1.js?v=promo1"></script>
-<script src="dev/dev-models-v2.js?v=49.80.8"></script>
-<script src="dev/dev-christmas-v1.js?v=promo5"></script>
-<script src="27-boot.js?v=49.93.18"></script><script src="210-economy-rebalance.js?v=49.93.14"></script><script src="211-hook.js?v=49.80.1"></script><script src="212-endgame.js?v=49.75.0"></script>
+<script src="dev/dev-models-v2.js?v=49.93.29"></script>
+<script src="dev/dev-christmas-v1.js?v=promo6"></script>
+<script src="27-boot.js?v=49.93.21"></script><script src="210-economy-rebalance.js?v=49.93.19"></script><script src="211-hook.js?v=49.93.26"></script><script src="212-endgame.js?v=49.75.0"></script>
 
 <script src="dev/dev-nohint-v1.js?v=promo1"></script>
 <script src="dev/dev-nopc-v1.js?v=promo1"></script>
@@ -240,7 +240,7 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="dev/dev-carstop-v1.js?v=promo1"></script>
 <script src="dev/dev-leaderboard-v1.js?v=lb4"></script>
 <script src="dev/dev-newcareer-code-v1.js?v=promo1"></script>
-<script src="dev/dev-social-v1.js?v=promo1"></script>
+<script src="dev/dev-social-v1.js?v=49.93.23"></script>
 <script src="dev/dev-wallclear-v1.js?v=promo1"></script>
 <script src="dev/dev-menu-friends-v1.js?v=promo1"></script>
 <script src="dev/dev-menu-sync-v1.js?v=promo1"></script><script src="216-friends-hub.js?v=49.93.8"></script>
@@ -259,7 +259,7 @@ b=setInterval(function(){if(!document.getElementById('load'))return clearInterva
 <script src="dev/dev-abroad-v1.js?v=promo1"></script>
 <script src="dev/dev-map-v1.js?v=promo1"></script>
 <script src="dev/dev-music-v1.js?v=promo1"></script>
-<script src="dev/dev-citystores-v1.js?v=promo1"></script><script src="dev/dev-footsteps-v1.js?v=promo1"></script>
+<script src="dev/dev-footsteps-v1.js?v=promo1"></script>
 <script src="dev/dev-savequit-v1.js?v=promo1"></script>
 <script src="dev/dev-careerhome-v1.js?v=promo1"></script>
 <script src="dev/dev-world-v1.js?v=promo1"></script>

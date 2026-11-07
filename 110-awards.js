@@ -308,7 +308,7 @@ function awShow(F0,song){
   flashes.forEach(m=>{m.visible=A.cl>.3&&Math.random()<.08;if(m.visible)m.position.set(R(-14,14),R(1.8,4),R(6,17))});
   for(let i=0;i<NC;i++){const j=i*3;if(cp[j+1]>-40){cp[j]+=cv[j]*dt;cp[j+1]+=cv[j+1]*dt;cp[j+2]+=cv[j+2]*dt;cv[j]+=Math.sin(A.t*3+i)*dt;if(cp[j+1]<0)cp[j+1]=-50}}cg.attributes.position.needsUpdate=true;cg.attributes.color.needsUpdate=true;
   /* applause sound */
-  const ca=O.clapA;if(ca&&!O.clapFail){const v=(typeof FX!='undefined'&&!FX)?0:Math.min(1,A.cl*.85+(A.cheer>0?.15:0));ca.volume=Math.max(0,Math.min(1,v));if(v>.04&&ca.paused)ca.play().catch(()=>{});else if(v<=.03&&!ca.paused)ca.pause()}
+  const ca=O.clapA;if(ca&&!O.clapFail){const v=(typeof FX!='undefined'&&!FX)?0:Math.min(1,A.cl*.85+(A.cheer>0?.15:0));ca.volume=Math.max(0,Math.min(1,v*(window.HF?HF.f:1)));if(v>.04&&ca.paused)ca.play().catch(()=>{});else if(v<=.03&&!ca.paused)ca.pause()}
   else{A.lastClap-=dt;if(A.cl>.2&&A.lastClap<=0){A.lastClap=.07;nz(.06,1800+R(0,2400),.2*A.cl,1,'bandpass')}}
   /* fades */
   const f=$c('awfade');if(A.si==0&&A.t<.6)f.style.opacity=1-A.t/.6;else if(A.out)f.style.opacity=Math.min(1,A.t/2.8);else if(!A.end)f.style.opacity=A.si==0?0:f.style.opacity>.05?0:0};

@@ -42,13 +42,13 @@ function igPic(c,mine,key){const W=48,H=48,k=document.createElement('canvas');k.
 /* the style comes from the caller, or from the app being drawn (PST.cur) */
 igxPortrait=function(c,mine,st){st=st||PST.cur||'msg';if(st=='msg')return P0(c,mine);
  const key=st+'|'+(mine?'me|':'')+JSON.stringify(c);if(PF[key])return PF[key];
- const u=st=='sf'?sfPic(c,mine,key):igPic(c,mine,key),n=Object.keys(PF);if(n.length>400)delete PF[n[0]];return PF[key]=u};
+ const u=st=='sf'?sfPic(c,mine,key):igPic(c,mine,key),n=Object.keys(PF);if(n.length>1500)delete PF[n[0]];return PF[key]=u};
 const has=(c,mine,st)=>(st||'msg')=='msg'?!!IGX.PF[(mine?'me|':'')+JSON.stringify(c)]:!!PF[st+'|'+(mine?'me|':'')+JSON.stringify(c)];
 /* draw later: return the old picture now, render a few per frame, then swap every <img> still showing the old one */
-const Q=[],QK=new Set;let busy=0;
+const Q=[],QK=new Set;let busy=0,FAIL=0;
 function later(c,mine,st,old){if(!IGX.on||!c)return old;if(has(c,mine,st))return igxPortrait(c,mine,st);const k=st+'|'+old;
  if(!QK.has(k)){QK.add(k);Q.push({c,mine,st,old,k});if(!busy){busy=1;requestAnimationFrame(pump)}}return old}
-function pump(){const t=performance.now();while(Q.length&&performance.now()-t<10){const j=Q.shift();QK.delete(j.k);let u;try{u=igxPortrait(j.c,j.mine,j.st)}catch(e){console.warn('portrait',e);IGX.on=0;Q.length=0;break}
+function pump(){const t=performance.now();while(Q.length&&performance.now()-t<10){const j=Q.shift();QK.delete(j.k);let u;try{u=igxPortrait(j.c,j.mine,j.st)}catch(e){console.warn('portrait',e);if(++FAIL>=4){IGX.on=0;Q.length=0}break}
  if(shown()===j.st)document.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===j.old)i.src=u})}
  if(Q.length)requestAnimationFrame(pump);else busy=0}
 /* the app on screen right now; a late picture only swaps in while its own app is showing */

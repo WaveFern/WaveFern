@@ -632,7 +632,8 @@ function resume(E){if(!E.paused)return;E.paused=0;const c=E.c,now=c.currentTime;
  const g=E.out.gain;g.cancelScheduledValues(now);g.setValueAtTime(0,now);g.linearRampToValueAtTime(E.gv||1,now+.2)}
 function tick(){const E=cur;if(!E){clearInterval(timer);timer=0;return}const c=E.c;
  if(c.state=='closed'){cur=null;holdBg(0);return}
- const hide=gamePaused()||document.hidden||!!E.up;if(hide&&!E.paused)pause(E);else if(!hide&&E.paused)resume(E);
+ /* v49.94.0: leaving the tab fades everything (00-tab-fade.js); the song keeps running during the fade and pauses once it is silent. The recording game's Beat bar reads this clock, so it still pauses at once. */
+ const soft=!!window.HF&&E.owner!='rec',hide=(gamePaused()&&!(soft&&HF.fading()))||(soft?HF.silent():document.hidden)||!!E.up;if(hide&&!E.paused)pause(E);else if(!hide&&E.paused)resume(E);
  if((!E.paused||E.up)&&E.alive&&(E.wd=(E.wd||0)+1)%6==0){let ok=1;try{ok=E.alive()}catch(e){ok=0}if(!ok){stop(.6);return}}
  const v=musicVol();if(Math.abs(v-E.vv)>.001){E.vv=v;G.vol.gain.setTargetAtTime(v,c.currentTime,.05)}
  if(!held||(typeof MU!='undefined'&&!MU.hold))holdBg(1);else if(typeof MU!='undefined'&&MU.pl){const a=MU.a&&MU.a[MU.cur];if(a&&!a.paused)a.pause()}
@@ -642,7 +643,8 @@ function tick(){const E=cur;if(!E){clearInterval(timer);timer=0;return}const c=E
  if(E.next<now-.4){E.t0=now+.05-E.step*E.sd;E.next=stepTime(E,E.step)}
  let k=0;while(E.next<now+.6&&k++<96){try{sched(E,E.step,Math.max(E.next,now))}catch(e){if(!E.err){E.err=1;console.error('beats',e)}}E.step++;E.next=stepTime(E,E.step)}}
 function stop(fade){const E=cur;if(!E)return;cur=null;end(E,fade);holdBg(0)}
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&cur)pause(cur);else if(cur)tick()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&cur&&!(window.HF&&cur.owner!='rec'))pause(cur);else if(cur)tick()});
+if(window.HF)HF.sub(()=>{if(cur)tick()});
 addEventListener('pagehide',()=>stop(.02));
 
 /* offline render (tests, previews): returns a Promise of an AudioBuffer */
@@ -669,6 +671,8 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
  beat:()=>{const E=cur;if(!E||E.t0==null||E.wt)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
  bpm:()=>cur?cur.P.bpm:0,
+ /* try to get a stopped audio clock going again (phones suspend the context) */
+ wake:()=>{if(cur&&cur.c.state!='running'&&cur.c.state!='closed')try{cur.c.resume().catch(()=>{})}catch(e){}},
  /* v43.0.0: the recorded 808 and hi hat names, and a one-shot preview of one (kind '808' or 'hat') */
  drums:{s808:N808.slice(),hats:DHAT.slice()},
  /* v49.51.0: the recorded instrument samples: families, [{f, n (name), old}] per family once the manifest is in, and a preview */
@@ -701,7 +705,7 @@ if(typeof loadCode=='function'){const lc0=loadCode;loadCode=function(){const r=l
 setInterval(songSeeds,500);
 /* recording: the song's beat plays under all four steps; the Beat bar sweeps in time with it */
 if(typeof startRec=='function'){const s0=startRec;startRec=function(i){s0.apply(this,arguments);try{if(rec&&mode=='rec'){rec.bs=(Math.random()*4294967296)>>>0;
- const pk=(typeof S=='object'&&S&&S.bpick)||{};rec.s8=pk.s8!=null?pk.s8:'auto';rec.hh=pk.hh!=null?pk.hh:'auto';rec.sp=Object.assign({bass:'auto',key:'auto',lead:'auto',pad:'auto',pluck:'auto'},pk.smp);
+ const pk=(typeof S=='object'&&S&&S.bpick)||{};rec.s8='auto';rec.hh='auto';rec.sp=Object.assign({bass:'auto',key:'auto',lead:'auto',pad:'auto',pluck:'auto'},pk.smp);
  /* v49.25.0: the sub-genre picked in Extras (132-808-hats.js), if it is for this genre */
  const sp=typeof subPick=='function'?subPick():null;rec.sty=sp&&sp.g==rec.g?sp.i:null;
  rec.bp=!!Beats.play({genre:rec.g,seed:rec.bs,s8:rec.s8,hh:rec.hh,sp:rec.sp,style:rec.sty},{owner:'rec',form:'rec',intensity:.8,pads:1,alive:()=>!!rec&&mode=='rec'})}}catch(e){console.error('beats rec',e)}}}
@@ -710,7 +714,11 @@ function beatsBarTick(dt){rec.t+=dt;rec.cd=Math.max(0,rec.cd-dt);rec.fl=Math.max
  if(rec.bb==null){rec.bn=n;rec.bb=Math.round(b+.5*n)}else if(n!=rec.bn){const k=Math.round((b-rec.bb)/rec.bn),bc=rec.bb+k*rec.bn;rec.bb=k%2?bc-n:bc;rec.bn=n}
  let ph=((b-rec.bb)/rec.bn+.5)%2;if(ph<0)ph+=2;rec.pos=ph<1?ph:2-ph;rec.dir=ph<1?1:-1}
 if(typeof recTick=='function'){const t0=recTick;recTick=function(dt){if(rec&&rec.bp&&Beats.playing()){/* v49.24.0: the beat swells when you play well (rec.swell, set by 176-game-feel.js) and fills out while the Mix level is in the green */
- Beats.setIntensity(Math.min(1,(rec.st==1?.3:rec.st==2?(rec.x&&rec.x.inb?.85:.4):rec.st==3?1:.8)+(rec.swell||0)));if(!rec.st)return beatsBarTick(dt)}return t0.apply(this,arguments)}}
+ Beats.setIntensity(Math.min(1,(rec.st==1?.3:rec.st==2?(rec.x&&rec.x.inb?.85:.4):rec.st==3?1:.8)+(rec.swell||0)));
+ if(!rec.st){/* a phone can leave the audio clock stopped (suspended or interrupted context, blocked autoplay) or slow to start: the bar then stands still.
+   If the beat clock has not moved for a third of a second the bar sweeps on its own timer instead, and snaps back to the beat if the clock wakes up. */
+  const bt=Beats.beat();if(bt>=0&&bt!==rec.lbt){rec.lbt=bt;rec.stl=0}else rec.stl=(rec.stl||0)+dt;
+  if(rec.stl<.35)return beatsBarTick(dt);if(rec.stl<.4)try{Beats.wake()}catch(e){}}}return t0.apply(this,arguments)}}
 /* the beat's seed goes with the draft and the uploaded song, so the released song sounds like the session */
 if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,s8=rec&&rec.s8,hh=rec&&rec.hh,sty=rec&&rec.sty,spk=rec&&rec.sp,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.bs=bs;if(s8!=null){d.s8=s8;d.hh=hh}if(spk)d.sp=spk;if(sty!=null)d.style=sty}const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
 if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}if(x&&d.sp&&x.sp==null)x.sp=d.sp;if(x&&d.style!=null&&x.style==null)x.style=d.style}}catch(e){}return r}}
