@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.2';
+const GAME_VERSION='v49.93.3';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.3',n:'The main menu stadium cutscenes now play on more devices: the live stadium (crane, singer, catwalk, barrier, stands and side shots) no longer gives up and falls back to the still picture of the house just because of the reduced-motion setting, a few slow starting frames, or a cached old script.'},
  {v:'v49.93.2',n:'The Founder flag on a player profile is now named founder (1 is a Founder, 0 is not). Saves still load.'},
  {v:'v49.93.1',n:'The Founder flag now lives on each player profile (1 is a Founder, 0 is not), so it can be set by hand in the cloud and the game keeps it. Saves still load.'},
  {v:'v49.93.0',n:'Founder can now be switched on or off by hand. Each player has a Founder flag in the cloud (1 is a Founder, 0 is not), so a Founder the fresh start missed can be added, and the Founder badge shows on profiles and the leaderboard from it. Saves still load.'},

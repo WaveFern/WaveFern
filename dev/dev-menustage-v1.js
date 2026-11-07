@@ -13,7 +13,7 @@
  const off=/[?&](nomenuscene|notour)\b/.test(Q)||/[?&]noxcrowd\b/.test(Q),force=/[?&]menuscene=force/.test(Q);
  const M=window.FW_MENUSTAGE={state:off?'off':'idle',shot:0,fps:0,build_ms:0,fans:0};
  if(off)return;
- try{if(!force&&window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){M.state='reduced';return}}catch(e){}
+ /* v49.93.3: the OS reduced-motion setting no longer switches the stadium off (it left many players on the still picture); add ?nomenuscene to turn it off */
  const lowEnd=(()=>{try{return(navigator.deviceMemory&&navigator.deviceMemory<=2)||(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)&&(navigator.hardwareConcurrency||4)<=4)}catch(e){return false}})();
  const DENS=lowEnd?.55:1;
 
@@ -238,18 +238,19 @@
   try{SC&&SC.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(o.material.map)&&o.material.map.dispose();o.material.dispose()}})}catch(e){}SC=null}
 
  /* ---- draw it instead of the game world while the menu is up ---- */
- let frames=0,acc=0,slow=0;
+ let frames=0,acc=0,slow=0,warm=0;
  const r0=renderer.render.bind(renderer);
  renderer.render=function(sc,c){
   if(ready&&!failed&&sc===scene&&c===cam&&document.body.classList.contains('fwmenubg')){
-   const n=performance.now();let dt=Math.min(.1,(n-T.last)/1000);T.last=n;T.t+=dt;
+   const n=performance.now(),raw=(n-T.last)/1000;let dt=Math.min(.1,raw);T.last=n;T.t+=dt;
    try{
     const asp=innerWidth/innerHeight;if(Math.abs(CAM.aspect-asp)>.001){CAM.aspect=asp;CAM.updateProjectionMatrix()}
     camera(dt);fx(dt,T.t);
     r0(SC,CAM);
    }catch(e){console.warn('menu stadium',e);fail('render');return r0(sc,c)}
    /* too slow for this device: go back to the picture for good */
-   frames++;acc+=dt;if(frames>=20){M.fps=Math.round(frames/acc);if(!force&&frames<400&&acc/frames>.075){if(++slow>=3)fail('slow')}else slow=0;frames=0;acc=0}
+   if(++warm<=45)return;/* v49.93.3: ignore the first frames (build and fade-in hitches) so a good device is not thrown back to the picture */
+   frames++;acc+=Math.min(.5,raw);if(frames>=20){M.fps=Math.round(frames/acc);if(!force&&acc/frames>.125){if(++slow>=5)fail('slow')}else slow=0;frames=0;acc=0}
    return}
   return r0(sc,c)};
 
