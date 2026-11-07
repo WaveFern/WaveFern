@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.94.0';
+const GAME_VERSION='v49.94.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.94.1',n:'Redesigned the Spotifly choose-a-name and Upload screens so they fill the window instead of leaving empty space. Choose a name now has a live profile preview, name ideas, a roll button and a career guide. Upload now shows a summary strip and a card per song with play, genre, quality meter, title and Upload buttons, or a how-to guide when you have nothing to release. Also added a quality meter, live preview and title ideas to the song-recorded title box, and breathing room between Around town today and the Start day button. Nothing about naming or uploading rules changed.'},
  {v:'v49.94.0',n:'Cars now stay where you park them and never jump back to the garage by themselves. Where each car stands is saved. While you are on foot, every parked car shows as a gold car marker on the minimap and the world map. New mechanic service (Cars page on the computer, and the world map): pay $60 to $100, depending on how far away your furthest car is, to have all your cars returned to the garage. Saves still load; older saves keep their cars in the garage.'},
  {v:'v49.93.33',n:'Interest now always shows its real percentage instead of the word Perfect. 100% only shows when interest is truly maxed out (nothing more you do can raise it); otherwise it is rounded down to at most 99%. Display only: streams, earnings and listener growth are unchanged.'},
  {v:'v49.93.32',n:'The snow on the grass now stays visible while a menu is open (sleep prompt, genre picker, pause and other menus) instead of vanishing.'},
