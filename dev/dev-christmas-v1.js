@@ -266,14 +266,14 @@
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
-  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d'),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
+  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d',{willReadFrequently:true}),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
    if(on){/* solid snow, the same white as the snowy grass everywhere else, with a few slightly cooler flecks */k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.fillStyle='#e6edf5';for(let i=0;i<W2*H2/8;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),1,1)}
    lawn.map.needsUpdate=true}catch(e){}})}
  const lawns=[];
- function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const k=cv.getContext('2d'),gc=k.getImageData(0,0,1,1).data;if(gc[1]>gc[0]*1.12){smoothGrass(m.map);lawns.push({cv,map:m.map,orig:k.getImageData(0,0,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
+ function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const k=cv.getContext('2d',{willReadFrequently:true}),gc=k.getImageData(0,0,1,1).data;if(gc[1]>gc[0]*1.12){smoothGrass(m.map);lawns.push({cv,map:m.map,orig:k.getImageData(0,0,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
 const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
    function smoothGrass(t){if(!t||t.userData&&t.userData.smooth)return;t.userData=t.userData||{};t.userData.smooth=1;
-   const c=t.image,k=c.getContext('2d'),W=c.width,H=c.height;let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+   const c=t.image,k=c.getContext('2d',{willReadFrequently:true}),W=c.width,H=c.height;let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
    const d=k.getImageData(0,0,W,H),a=d.data;let r=0,g=0,b=0;for(let i=0;i<a.length;i+=4){r+=a[i];g+=a[i+1];b+=a[i+2]}const n=a.length/4;r/=n;g/=n;b/=n;
    for(let i=0;i<a.length;i+=4){const v=1+(rnd()-.5)*.05;a[i]=r*v;a[i+1]=g*v;a[i+2]=b*v}
    k.putImageData(d,0,0);t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;try{t.anisotropy=8}catch(e){}t.needsUpdate=true}
