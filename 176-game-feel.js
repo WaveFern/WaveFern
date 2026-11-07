@@ -39,12 +39,14 @@ const calm=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matche
 #mgcd small i{display:block;margin-top:4px;font-style:normal;color:#ffd27a;font-size:11px;letter-spacing:0}
 #ui .cards.fxcards .card{animation:fxcd .45s cubic-bezier(.2,1.6,.4,1) both}@keyframes fxcd{0%{transform:translateY(14px) scale(.85);opacity:0}100%{transform:none;opacity:1}}
 #ui .card b small,#ui .card small.fxbd{display:block;font-size:11px;color:#ffd27a}
-.box.modal.fxperfect{position:relative;overflow:hidden;border:3px solid #ffd27a!important;animation:fxpg 1.6s ease-in-out infinite,fxcd .6s both}@keyframes fxpg{0%,100%{box-shadow:0 0 14px #ffd27a88,inset 0 0 14px #ffd27a33}50%{box-shadow:0 0 38px #ffd27add,inset 0 0 26px #ffd27a66}}
+.box.modal.fxperfect{position:relative;overflow-x:hidden;overflow-y:auto;border:3px solid #ffd27a!important;box-shadow:0 0 16px #ffd27a88}@keyframes fxpg{0%,100%{box-shadow:0 0 14px #ffd27a88,inset 0 0 14px #ffd27a33}50%{box-shadow:0 0 38px #ffd27add,inset 0 0 26px #ffd27a66}}
 .fxpbanner{color:#ffd27a;font-weight:800;letter-spacing:3px;text-align:center;margin-bottom:6px;text-shadow:0 0 12px #ffd27a;animation:fxpb 1.2s ease-in-out infinite}@keyframes fxpb{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-.fxspark{position:absolute;bottom:-8px;width:6px;height:6px;background:#ffd27a;box-shadow:0 0 8px #ffd27a;transform:rotate(45deg);animation:fxsp 2.4s linear infinite;pointer-events:none}@keyframes fxsp{0%{transform:translateY(0) rotate(45deg);opacity:1}100%{transform:translateY(-260px) rotate(405deg);opacity:0}}
+.fxspark{position:absolute;bottom:0;width:6px;height:6px;background:#ffd27a;box-shadow:0 0 8px #ffd27a;transform:rotate(45deg);animation:fxsp 2.4s linear infinite;pointer-events:none}@keyframes fxsp{0%{transform:translateY(0) rotate(45deg);opacity:1}100%{transform:translateY(-260px) rotate(405deg);opacity:0}}
 .fxline{margin:6px 0;font-size:13px}.fxline.best{color:#ffd27a;font-weight:700;animation:fxcd .5s .5s both}
 .fxgoal{margin:8px 0;text-align:left;font-size:12px;color:var(--m)}.fxgoal b{color:var(--t)}.fxgoal .bar{width:100%;height:7px;margin-top:3px}.fxgoal .bar i{transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
-.gfeel{display:block;margin-top:2px;color:#ffd27a!important}`;document.head.appendChild(st)}
+.gfeel{display:block;margin-top:2px;color:#ffd27a!important}
+#ui .box.modal{max-height:calc(100vh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+@media(max-width:600px){.box.modal.fxperfect .fxpbanner{letter-spacing:1px;font-size:14px}#ui .box.modal .cards{flex-wrap:wrap}}`;document.head.appendChild(st)}
 
 /* ---------- little helpers: popups, notes ---------- */
 function pop(t,sub,x,y,c,cls){const e=document.createElement('div');e.className='fxp'+(cls?' '+cls:'');e.style.left=Math.round(x)+'px';e.style.top=Math.round(y)+'px';e.style.color=c||'#2fe68a';
@@ -114,7 +116,7 @@ function countUp(el,from,to,ms,fmt,tick){if(!el)return;const t0=performance.now(
  try{const d=S.drafts[S.drafts.length-1],box=document.querySelector('#ui .box.modal');if(!d||d.id!==n0||!box)return r;
   const cs=box.querySelector('.cards');if(cs)cs.classList.add('fxcards'),cs.querySelectorAll('.card').forEach((c,i)=>c.style.animationDelay=(.15+i*.14)+'s');
   const bc=cs&&[...cs.querySelectorAll('.card')].find(c=>c.firstChild&&c.firstChild.textContent=='Beat'),bb=bc&&bc.querySelector('b');if(bb&&pf)bb.insertAdjacentHTML('beforeend','<small>'+pf+' perfect</small>');
-  if(perf){box.classList.add('fxperfect');box.insertAdjacentHTML('afterbegin','<div class=fxpbanner>★ PERFECT SONG ★</div>');for(let i=0;i<14;i++)box.insertAdjacentHTML('beforeend','<i class=fxspark style="left:'+(4+i*7)+'%;animation-delay:'+(i*.13)+'s"></i>');setTimeout(()=>{try{arp(6);glBurst(46)}catch(e){}},300)}
+  if(perf){box.classList.add('fxperfect');setTimeout(()=>{try{arp(6);glBurst(46)}catch(e){}},300)}
   const p=box.querySelector('p.m');if(p){p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality <b id=fxq>'+d.q+'</b>');countUp($('fxq'),0,d.q,700,null,()=>note(1,.03))}
   let line='';if(best>0&&d.q>best){line=`<p class="fxline best">New best! Your highest quality song yet (was ${best})</p>`;setTimeout(()=>{arp(5);glBurst(34)},650)}
   else if(last&&d.q>qOf(last))line=`<p class="fxline" style="color:var(--g)">▲ ${d.q-qOf(last)} better than your last song</p>`;

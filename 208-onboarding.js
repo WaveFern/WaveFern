@@ -75,6 +75,12 @@ window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;
    profiles/{uid}.h holds the chosen name; usernames/{name} = {uid,t} reserves it (created in the same batch, so a taken name fails: see firebase-rules/live/firestore.rules).
    Never blocks play: a failed check shows a small notice with Details and a Copy button, and retries by itself. ---- */
 const NM={st:'idle',busy:0,at:0,log:[],err:''};
+const errWhy=e=>{const c=String(e&&e.code||'').replace('firestore/',''),m=String(e&&e.message||e||'');
+ if(c=='permission-denied')return'Firestore refused the read (permission denied). The Firestore rules in firebase-rules/v49.93.2/firestore.rules need publishing (Firebase console > Firestore Database > Rules > Publish) in the waveferndata project.';
+ if(c=='unauthenticated')return'Google sign-in has expired on this device. Sign out and sign in again.';
+ if(c=='unavailable'||/offline|no answer|network/i.test(m))return'Could not reach Firestore (blocked by a browser extension or network, or the database is not created in waveferndata). Try another browser or turn off ad blockers for this site.';
+ if(c=='not-found'||/database.*(not exist|not found)/i.test(m))return'The Firestore database does not exist in the waveferndata project. Create it in the Firebase console > Firestore Database.';
+ return'';};
 const errTxt=e=>String(e&&(e.code?e.code+': ':'')+(e&&e.message||e||'')).slice(0,200);
 function dlog(t){NM.log.push(new Date().toISOString().slice(11,19)+' '+t);if(NM.log.length>16)NM.log.shift();try{console.info('[names]',t)}catch(e){}}
 function diag(){const F=FR_()||{};let h='';try{h=new URL(FB_CFG.databaseURL).host}catch(e){}
@@ -101,7 +107,7 @@ function fsCheck(){if(NM.busy)return;if(typeof FBU=='undefined'||!FBU){NM.st='no
    return FBF.getDoc(FBF.doc(FBD,'usernames',h)).then(r=>{if(!r.exists())return fsClaim(h,'')}).catch(e=>dlog('reserve check skipped: '+errTxt(e)))}
   const F=FR_();if(F&&F.h&&/^[a-z0-9_]{3,16}$/.test(F.h)){dlog('moving @'+F.h+' from Friends');return fsClaim(F.h,'').then(()=>{NM.st='ok';try{localStorage.setItem(UK(),F.h)}catch(e){}},e=>{NM.st='need';dlog('move failed '+errTxt(e))})}
   NM.st='need';dlog('no username on this account yet')
- }).catch(e=>{NM.st='err';NM.err=errTxt(e);dlog('profile read failed: '+NM.err)}).finally(()=>{NM.busy=0})}
+ }).catch(e=>{NM.st='err';NM.err=(errWhy(e)?errWhy(e)+' ':'')+errTxt(e);dlog('profile read failed: '+NM.err)}).finally(()=>{NM.busy=0})}
 let eDis=0;
 function errBox(why){if(document.getElementById('onbe')||document.getElementById('onbx')||Date.now()-eDis<300000)return;const o=document.createElement('div');o.id='onbe';o.style.cssText='position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99991;max-width:calc(100% - 24px);width:420px;padding:8px 10px 8px 12px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:12px';
  o.innerHTML='<div style="display:flex;align-items:center;gap:8px"><span style="flex:1">Your username could not be checked yet. You can keep playing; this retries by itself.<br><small class=m>'+esc(why)+'</small></span><button class=go id=onre style="margin:0;padding:5px 10px">Retry</button><button id=onro title="Hide" style="margin:0;padding:5px 8px;background:none;border:none;color:var(--m)">✕</button></div><details style="margin-top:6px"><summary class=m>Details</summary><pre id=ondt style="white-space:pre-wrap;word-break:break-all;font-size:10px;max-height:140px;overflow:auto;margin:4px 0"></pre><button id=oncp style="margin:0;padding:4px 10px">Copy details</button></details>';

@@ -66,12 +66,18 @@ const scalePrices=()=>{try{[[typeof GM!='undefined'&&GM,3],[typeof CLM!='undefin
 scalePrices();setTimeout(scalePrices,3000);
 /* ---- energy: walking drains it; the Energy pack in the gear shop slows the drain (capacity x1 to x4) ---- */
 let said=-1;
+/* tuning (energy per real second). A song costs 15 over roughly 40 s of play (~.37/s), so walking and sprinting stay below that, sprint above walk.
+   Standing still drains nothing. The Energy pack divides both. */
+const MOVE_DRAIN={walk:.08,sprint:.22};
+let lx=null,lz=null,lt=0;
 setInterval(()=>{try{
- if(typeof S!='object'||!S||!S.artist||S.cheat||typeof P=='undefined'||mode!='play'||PAUSED)return;
- if(typeof TT!='undefined'&&TT&&TT.on)return;
- if(!P.moving)return;
- const lv=Math.min(5,(S.gear&&S.gear.stamina)||0),cap=1+.6*lv;
- S.energy=Math.max(0,(+S.energy||0)-.24/cap);
+ const now=performance.now(),el=Math.min(1,(now-lt)/1000);lt=now;
+ if(typeof S!='object'||!S||!S.artist||S.cheat||typeof P=='undefined'||mode!='play'||PAUSED){lx=null;return}
+ if(typeof TT!='undefined'&&TT&&TT.on){lx=null;return}
+ const moved=lx!==null&&Math.hypot(P.x-lx,P.z-lz)>.01;lx=P.x;lz=P.z;
+ if(!moved||el<=0||!isFinite(S.energy))return;
+ const lv=Math.min(5,(S.gear&&S.gear.stamina)||0),cap=1+.6*lv,sprint=(P.sv||0)>4.9;
+ S.energy=Math.max(0,(+S.energy||0)-(sprint?MOVE_DRAIN.sprint:MOVE_DRAIN.walk)*el/cap);
  if(S.energy<=0&&said!==S.day){said=S.day;say('Out of energy! Eat something, or sleep, and look at the Energy pack in the gear shop.')}
 }catch(e){}},200);
 })();

@@ -1,6 +1,6 @@
 /* WaveFern dev: a row of social links under the main menu buttons (TikTok, Instagram, YouTube, Reddit). Only loaded on /dev/.
    The icons are pixel-art sprites drawn here as all-white SVG squares (no emoji, no image files, no outside requests).
-   Add ?nosocial to the address to skip it. The row sits inside the menu column, so it never overlaps the buttons or the footer. */
+   Add ?nosocial to the address to skip it. On desktop it is a small corner row; on phones it sits inside the menu column under the buttons so it never overlaps them, the profile card or the footer. */
 (function(){
  if(!window.FW_FEAT||/[?&]nosocial/.test(location.search))return;
  if(typeof titleUI!='function')return;
@@ -28,9 +28,13 @@
   '#ttl .fwsoc a:hover{transform:scale(1.15);background:#14301a}#ttl .fwsoc a:active{transform:scale(.95)}'+
   '#ttl .fwsoc a:focus-visible{outline:2px solid #fff;outline-offset:2px;background:#14301a}'+
   '@media(pointer:coarse){#ttl .fwsoc a{width:34px;height:34px}}'+
-  /* on narrow screens the centred footer line would run under the icons, so lift it above them */
-  '@media(max-width:760px){#ttl .ttft{bottom:calc(max(4px,env(safe-area-inset-bottom)) + 34px)}}@media(max-width:760px) and (pointer:coarse){#ttl .ttft{bottom:calc(max(4px,env(safe-area-inset-bottom)) + 42px)}}';
- function add(){
+  /* phones (narrow screens, or short landscape touch screens): the row leaves its fixed corner, where it covered the menu buttons and the footer, and sits in the menu column under the buttons as a compact centred row. The menu may then scroll (safe centring) and keeps room for the notch, home bar and footer line. Desktop is unchanged. */
+  '@media(max-width:760px),(pointer:coarse) and (max-height:600px){'+
+  '#ttl{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(max(10px,env(safe-area-inset-bottom)) + 26px) max(16px,env(safe-area-inset-left))}'+
+  '#ttl .ttm{margin:auto 0}'+
+  '#ttl .fwsoc{position:static;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0 0}'+
+  '#ttl .fwsoc a{width:40px;height:40px}#ttl .fwsoc a svg{width:22px;height:22px}}';
+function add(){
   const t=document.getElementById('ttl'),m=t&&t.querySelector('.ttm');
   if(!m||m.querySelector('.fwsoc'))return;
   if(!document.getElementById('fwsoc-css')){const s=document.createElement('style');s.id='fwsoc-css';s.textContent=CSS;document.head.appendChild(s)}
