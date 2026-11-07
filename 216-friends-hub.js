@@ -6,8 +6,10 @@
 const HOUR=3600000,X=()=>window.FRX&&window.FRX.FR,FH={open:0,sel:'',K:{},sub:0,msg:'',tab:'f',cl:{}};
 const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const okU=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
-const PG=['....####....','...######...','...######...','...######...','....####....','............','..########..','.##########.','.##########.','.##########.'];
-const ICON='<svg viewBox="0 0 12 10" width="26" height="22" shape-rendering="crispEdges" style="image-rendering:pixelated" fill="currentColor" aria-hidden="true">'+PG.map((r,y)=>[...r].map((c,x)=>c=='#'?`<rect x="${x}" y="${y}" width="1" height="1"/>`:'').join('')).join('')+'</svg>';
+const PB=['.........####...','........######..','........######..','........######..','.........####...','................','.......#########','......##########','......##########','......##########'];
+const PF=['..####..........','.######.........','.######.........','.######.........','..####..........','................','.#########......','##########......','##########......','##########......'];
+const PX=(g,o)=>g.map((r,y)=>[...r].map((c,x)=>c=='#'?`<rect x="${x}" y="${y}" width="1" height="1"${o?' fill-opacity=".55"':''}/>`:'').join('')).join('');
+const ICON='<svg viewBox="0 0 16 10" width="30" height="19" shape-rendering="crispEdges" style="image-rendering:pixelated" fill="currentColor" aria-hidden="true">'+PX(PB,1)+PX(PF,0)+'</svg>';
 const nm=f=>{const F=X(),p=F&&F.P[f];return p&&p.h?p.h:'friend'};
 const cdKey=f=>'fw_nudge_'+((X()||{}).me||'')+'_'+f;
 const lastN=f=>{try{return+localStorage.getItem(cdKey(f))||0}catch(e){return 0}};

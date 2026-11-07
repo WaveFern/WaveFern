@@ -760,13 +760,13 @@ function fbGet(R,db,path){const to=ms=>new Promise((_,j)=>setTimeout(()=>j(new E
  return Promise.race([R.get(R.ref(db,path)),to(10000)]).catch(e=>{if(!/did not answer/.test(String(e&&e.message)))throw e;console.warn('[friends] no answer over websocket, switching to long-polling');
   try{R.forceLongPolling();R.goOffline(db);R.goOnline(db)}catch(e2){console.warn('[friends] long-polling switch failed',e2)}
   return Promise.race([R.get(R.ref(db,path)),to(15000)])})}
-function frEnsureN(R,db,uid){if(!FR.h)return Promise.resolve();return R.get(R.ref(db,'f/n/'+FR.h)).then(n=>{if(!n.exists())return R.update(R.ref(db),{['f/n/'+FR.h]:uid}).catch(e=>console.warn('[friends] name copy failed',e&&e.code))}).catch(()=>{})}
+function frEnsureN(R,db,uid){if(!FR.h)return Promise.resolve();return R.get(R.ref(db,'f/n/'+FR.h)).then(n=>{if(!n.exists())return R.update(R.ref(db),{['f/n/'+FR.h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp()}).catch(e=>console.warn('[friends] name copy failed',e&&e.code))}).catch(()=>{})}
 function frLookup(R,db,h){return R.get(R.ref(db,'f/n/'+h)).then(s=>{const f=s.val();if(f&&okId(f))return f;
  try{if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD)return null;return FBF.getDoc(FBF.doc(FBD,'usernames',h)).then(d=>{const u=d.exists()&&d.data()&&d.data().uid;return u&&okId(u)?u:null}).catch(()=>null)}catch(e){return null}})}
 function frFromProfile(R,db,uid){try{if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD)return Promise.resolve();
  return FBF.getDoc(FBF.doc(FBD,'profiles',uid)).then(d=>{const h=d.exists()&&d.data()&&d.data().h;if(typeof h!='string'||!/^[a-z0-9_]{3,16}$/.test(h))return;
   return R.get(R.ref(db,'f/n/'+h)).then(n=>{if(n.exists()&&n.val()!==uid)return;FR.h=h;
-   return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:frNm(),o:1,rm:'',t:R.serverTimestamp()}}).catch(e=>console.warn('[friends] username copy failed',e&&e.code))})}).catch(e=>console.warn('[friends] profile read failed',e&&e.code))}catch(e){return Promise.resolve()}}
+   return R.update(R.ref(db),{['f/n/'+h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp(),['f/p/'+uid]:{h,nm:frNm(),o:1,rm:'',t:R.serverTimestamp()}}).catch(e=>console.warn('[friends] username copy failed',e&&e.code))})}).catch(e=>console.warn('[friends] profile read failed',e&&e.code))}catch(e){return Promise.resolve()}}
 function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
  rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;console.info('[friends] connected to',RTDB_URL,'as',uid);
   fbGet(R,db,'f/p/'+uid+'/h').then(s=>{FR.h=s.val()||'';if(FR.h)return;/* v49.92.1: username lives in Firestore profiles/{uid}.h; copy it to Friends if missing here */return frFromProfile(R,db,uid)}).then(()=>frEnsureN(R,db,uid)).then(()=>{FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
@@ -786,7 +786,7 @@ const frName=f=>{const p=FR.P[f];return p&&p.h?'@'+p.h:'Friend'};
 window.FRX={FR,frStart:()=>frStart(),frPresence:()=>frPresence(),rtdb:()=>rtdb(),trailer:MPTR};
 window.frClaim=()=>{const i=$('frh'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='A username has 3 to 16 letters, numbers or _.';snd('err');return frDraw(1)}
  const{R,db,uid}=FR.r;FR.msg='Checking…';frDraw(1);R.get(R.ref(db,'f/n/'+h)).then(s=>{if(s.exists()&&s.val()!==uid){FR.msg='@'+h+' is taken. Try another.';snd('err');return frDraw(1)}
-  return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:frNm(),o:1,rm:MPS&&!MPTR?MPS.code:'',t:R.serverTimestamp()}}).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
+  return R.update(R.ref(db),{['f/n/'+h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp(),['f/p/'+uid]:{h,nm:frNm(),o:1,rm:MPS&&!MPTR?MPS.code:'',t:R.serverTimestamp()}}).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
  .catch(e=>{FR.msg='Could not save that username.';frErr(e)})};
 /* send a request by username */
 window.frAdd=()=>{const i=$('fra'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='Type your friend\'s username (3 to 16 letters, numbers or _).';snd('err');return frDraw(1)}
