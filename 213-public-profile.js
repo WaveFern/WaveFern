@@ -20,9 +20,9 @@ window.fwProfileSync=function(force){try{
  const d={a,h,bio:'',pd:ph&&window.__pfPd||'',fame:fl,lis:lq,p:/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(ph)&&ph.length<=300?ph:'',j:cl(Date.parse(gp(()=>FBU.metadata.creationTime)||''),4e12)||Date.now(),sg:sgs,bn:mb,bi:mb?String(gp(()=>iName(MPS.inst))||'').slice(0,12):'',bm:mb?cl(gp(()=>Object.keys(MB).length)||1,50):0,ac},sig=JSON.stringify(d)+FBU.uid,n=Date.now();
  if(!force&&sig==lastSig&&n-lastAt<900000)return Promise.resolve(0);busy=1;
  return FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(x=>{if(x.exists()&&typeof x.data().bio=='string')d.bio=x.data().bio.slice(0,160);
-   /* v49.93.0: profiles/{uid}.f (number, 1 = Founder, 0 = not) is set by the admin in the console and is kept as it is. Only a Founder with no f yet is written as 1 */
-   const ef=x.exists()?x.data().f:undefined;if(ef===1||ef===0||ef===true||ef===false)d.f=+ef;else if(gp(()=>isFounder()))d.f=1},()=>{})
-  .then(()=>{const core=Object.assign({},d,{t:Date.now()}),rf=FBF.doc(FBD,'profiles',FBU.uid);return FBF.setDoc(rf,core).catch(e0=>{window.__pfErr=(e0&&e0.code)||'error';const c2={a:core.a,h:core.h,bio:core.bio,fame:core.fame,lis:core.lis,t:core.t};if(core.f===0||core.f===1)c2.f=core.f;return FBF.setDoc(rf,c2).then(()=>{throw e0})})}).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);if(!window.__pfWarn){window.__pfWarn=1;try{say('Profile could not save ('+((e&&e.code)||'error')+'). '+(e&&e.message?String(e.message).slice(0,120):'')+' Send James this message.')}catch(x){}}return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
+   /* v49.93.0: profiles/{uid}.founder (number, 1 = Founder, 0 = not) is set by the admin in the console and is kept as it is. Only a Founder with no f yet is written as 1 */
+   const ef=x.exists()?x.data().founder:undefined;if(ef===1||ef===0||ef===true||ef===false)d.founder=+ef;else if(gp(()=>isFounder()))d.founder=1},()=>{})
+  .then(()=>{const core=Object.assign({},d,{t:Date.now()}),rf=FBF.doc(FBD,'profiles',FBU.uid);return FBF.setDoc(rf,core).catch(e0=>{window.__pfErr=(e0&&e0.code)||'error';const c2={a:core.a,h:core.h,bio:core.bio,fame:core.fame,lis:core.lis,t:core.t};if(core.founder===0||core.founder===1)c2.founder=core.founder;return FBF.setDoc(rf,c2).then(()=>{throw e0})})}).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);if(!window.__pfWarn){window.__pfWarn=1;try{say('Profile could not save ('+((e&&e.code)||'error')+'). '+(e&&e.message?String(e.message).slice(0,120):'')+' Send James this message.')}catch(x){}}return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
 setInterval(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync()}catch(e){}},20000);
 setTimeout(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync(1)}catch(e){}},8000);setInterval(()=>{try{if(mode=='play'||mode=='pause'){const k=live()?FBU.uid:'';if(k&&k!==window.__pfU){window.__pfU=k;fwProfileSync(1)}}}catch(e){}},5000);
 const num=n=>Math.round(+n||0).toLocaleString();
@@ -48,8 +48,8 @@ const fd=ts=>ts>0?new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'
 function ppHtml(p,handle,me){
  const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')),ac=+p.ac||0;
  const n=Math.round(+p.fame||0);
- let h='<div class="pp'+(p.f?' fdo':'')+'"><div class=pt><span>'+(me?'YOUR PROFILE':'PLAYER PROFILE')+'</span><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div>';
- h+='<div class=ph><div class=pa>'+pic(p.p)+'</div><div style="min-width:0;flex:1"><h2 class=pn>'+esc(p.a||'')+'</h2><p class=pu>@'+esc(handle)+'</p><div class=pg>'+(p.f?'<span class=g>FOUNDER</span>':'')+'<span>FAME LEVEL '+n+'</span></div></div></div>';
+ let h='<div class="pp'+(p.founder?' fdo':'')+'"><div class=pt><span>'+(me?'YOUR PROFILE':'PLAYER PROFILE')+'</span><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div>';
+ h+='<div class=ph><div class=pa>'+pic(p.p)+'</div><div style="min-width:0;flex:1"><h2 class=pn>'+esc(p.a||'')+'</h2><p class=pu>@'+esc(handle)+'</p><div class=pg>'+(p.founder?'<span class=g>FOUNDER</span>':'')+'<span>FAME LEVEL '+n+'</span></div></div></div>';
  h+=p.bio?'<p class=pb>'+esc(p.bio)+'</p>':'<p class="pb e">No bio.</p>';
  h+='<div class=ps><div><small>FAME LEVEL</small><b>'+n+'</b></div><div><small>MONTHLY LISTENERS</small><b>'+num(p.lis)+'</b></div><div><small>JOINED</small><b>'+fd(+p.j)+'</b></div></div>';
  h+='<div class=pc><h3>TOP SONGS</h3>'+(sg.map((s,i)=>'<div class=pr><span class=i>'+(i+1)+'</span><span class=n>'+esc(s[0])+'</span><span class=v>'+num(s[1])+'</span></div>').join('')||'<span class=pu>No songs yet.</span>')+'</div>';
@@ -65,7 +65,7 @@ window.fwProfileOpen=async function(handle,byUid){
  const o=document.createElement('div');o.id='pubpf';o.style.cssText='position:fixed;inset:0;z-index:99995;background:#000a;display:flex;align-items:center;justify-content:center;padding:12px';o.onclick=e=>{if(e.target===o)o.remove()};
  const box=h=>{o.innerHTML='<div class="box modal" style="width:min(380px,94vw)">'+h+'<div class=row2 style="margin-top:10px"><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div></div>'};
  const full=(p,handle,me,uid)=>{const P=window.FW_PROFILE;if(P&&P.open&&me){o.remove();P.open('me');return}if(P&&P.openData&&!me){o.remove();const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')).map(x=>[x[0],+x[1]||0,0]);
-  const ac=+p.ac||0;const pd=/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p.pd||'')?p.pd:'';P.openData({uid:uid||'',artist:p.a||'',user:handle,founder:p.f?1:0,fame:Math.round(+p.fame||0),listeners:+p.lis||0,joined:+p.j||0,bio:p.bio||'',songs:sg,band:p.bn?{name:p.bn,inst:p.bi||'',members:+p.bm||1}:null,ach:ACH.map((_,i)=>i).filter(i=>ac>>i&1),photo:pd||/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(p.p||'')?p.p:''});return}
+  const ac=+p.ac||0;const pd=/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p.pd||'')?p.pd:'';P.openData({uid:uid||'',artist:p.a||'',user:handle,founder:p.founder?1:0,fame:Math.round(+p.fame||0),listeners:+p.lis||0,joined:+p.j||0,bio:p.bio||'',songs:sg,band:p.bn?{name:p.bn,inst:p.bi||'',members:+p.bm||1}:null,ach:ACH.map((_,i)=>i).filter(i=>ac>>i&1),photo:pd||/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(p.p||'')?p.p:''});return}
   o.innerHTML=ppHtml(p,handle,me)};
  box('<p class=m>Loading…</p>');document.body.appendChild(o);
  try{const{R,db}=F.r,uid=byUid||(await R.get(R.ref(db,'f/n/'+handle))).val();
@@ -73,7 +73,7 @@ window.fwProfileOpen=async function(handle,byUid){
   const [d,lb]=await Promise.all([FBF.getDoc(FBF.doc(FBD,'profiles',uid)),FBF.getDoc(FBF.doc(FBD,'leaderboard',uid)).catch(()=>null)]);let p=d.exists()?d.data():null;
   /* v49.91.0: the leaderboard row is the single source of truth for the numbers, so a profile always shows what the board shows */
   const L=lb&&lb.exists&&lb.exists()?lb.data():null;
-  if(L){if(!p)p={a:L.a||'',h:handle,bio:'',fame:L.fame,lis:L.lis,f:!!L.f};else p=Object.assign({},p,{fame:L.fame,lis:L.lis})}
+  if(L){if(!p)p={a:L.a||'',h:handle,bio:'',fame:L.fame,lis:L.lis,founder:!!L.f};else p=Object.assign({},p,{fame:L.fame,lis:L.lis})}
   if(!p){box('<h2>'+(handle?'@'+esc(handle):'Player')+'</h2><p class=m>This player has not opened the game since profiles started, so there is nothing to show yet.</p>');return}
   if(byUid&&p.h)handle=p.h;const me=uid==FBU.uid;
   full(p,handle,me,uid)

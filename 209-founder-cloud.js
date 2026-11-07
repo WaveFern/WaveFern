@@ -28,7 +28,7 @@ window.fdSnapshot=async function(write){
  let n=0;for(let i=0;i<elig.length;i+=400){const b=F.writeBatch(FBD);elig.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,elig.length-i)}
  console.log('Written: '+n+' Founder entries.');return{seen,founders:n}};
 
-/* v49.93.0: the founder flag. profiles/{uid}.f (a number) is the main switch, and founders/{uid}.f works the same. The rest of this note is about founders/{uid}.f, which is a number: 1 = Founder, 0 = not a Founder. The admin edits it in the Firebase console
+/* v49.93.0: the founder flag. profiles/{uid}.founder (a number) is the main switch, and founders/{uid}.f works the same. The rest of this note is about founders/{uid}.f, which is a number: 1 = Founder, 0 = not a Founder. The admin edits it in the Firebase console
    (Firestore > founders > the player's uid > f). 1 grants Founder even to a player the list missed (create founders/{uid} with f = 1 if there is no
    entry yet), 0 takes it away and beats the local Founder logic. An entry with no f field still means Founder (old entries). */
 let done='',doneAt=0;
@@ -44,10 +44,10 @@ function check(){
  if(!rd()||!rsOn()||FBU.isAnonymous)return;const uid=FBU.uid,k=uid+'|';
  if(done===k&&Date.now()-doneAt<600000)return;
  done=k;doneAt=Date.now();
- /* profiles/{uid}.f (1 or 0, set by the admin) wins over founders/{uid}; with neither flag set, the old Founder logic is left alone */
+ /* profiles/{uid}.founder (1 or 0, set by the admin) wins over founders/{uid}; with neither flag set, the old Founder logic is left alone */
  const g=(c)=>FBF.getDoc(FBF.doc(FBD,c,uid)).catch(e=>{if(!e||e.code!=='permission-denied')throw e;return null});
  Promise.all([g('founders'),g('profiles')]).then(([d,p])=>{
-  const fd=d&&d.exists()?d.data():null,pf=p&&p.exists()?p.data().f:undefined,has=pf===1||pf===0||pf===true||pf===false;
+  const fd=d&&d.exists()?d.data():null,pf=p&&p.exists()?p.data().founder:undefined,has=pf===1||pf===0||pf===true||pf===false;
   if(has)apply(uid,Object.assign({a:(p.data().a||'')},fd||{},{f:+pf}));
   else if(fd)apply(uid,fd);else if(FW_ACCT==uid)window.__fdOff=0},()=>{done=''})}
 setInterval(check,6000);setTimeout(check,2500);

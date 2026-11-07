@@ -1,5 +1,5 @@
 rules_version = '2';
-// WaveFern Firestore rules v49.93.1, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
+// WaveFern Firestore rules v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
 // ADMIN UID: the Google account has a NEW uid in the waveferndata project. Replace wE6oPZIH... below with your uid from Authentication > Users.
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
 // Only what the game uses is allowed; everything else is refused. No get()/exists() lookups, so rules never cost extra reads.
@@ -23,10 +23,10 @@ service cloud.firestore {
     // founders/{their uid} document exists and its f is not 0 (a missing f counts as 1, for older entries). So nobody can give themselves Founder.
     function fdrOn() { return exists(/databases/$(database)/documents/founders/$(me())) && get(/databases/$(database)/documents/founders/$(me())).data.get('f', 1) != 0; }
     function fdrFlagOk(d) { return !('f' in d) || (d.f is bool && (d.f == false || fdrOn())) || (d.f is int && (d.f == 0 || (d.f == 1 && fdrOn()))); }
-    // profiles/{uid}.f (number, 1 = Founder, 0 = not) is the admin's switch, set in the console. A player may only re-write the value that is already there,
+    // profiles/{uid}.founder (number, 1 = Founder, 0 = not) is the admin's switch, set in the console. A player may only re-write the value that is already there,
     // or write 1 when founders/{uid} lists them; they can never raise or lower it to something the admin did not set.
-    function profFlagOk(d) { return !('f' in d) || (resource != null && 'f' in resource.data && d.f == resource.data.f) || (d.f == 1 && fdrOn()); }
-    function lbFlagOk(d) { return fdrFlagOk(d) || (d.f == 1 && exists(/databases/$(database)/documents/profiles/$(me())) && get(/databases/$(database)/documents/profiles/$(me())).data.get('f', 0) == 1); }
+    function profFlagOk(d) { return !('founder' in d) || (resource != null && 'founder' in resource.data && d.founder == resource.data.founder) || ((d.founder == 1 || d.founder == true) && fdrOn()); }
+    function lbFlagOk(d) { return fdrFlagOk(d) || (d.f == 1 && exists(/databases/$(database)/documents/profiles/$(me())) && get(/databases/$(database)/documents/profiles/$(me())).data.get('founder', 0) == 1); }
 
     match /saves/{uid} {
       allow get: if google() && me() == uid || admin();
@@ -77,7 +77,7 @@ service cloud.firestore {
       allow create, update: if google() && me() == uid && profOk(request.resource.data);
       allow delete: if google() && me() == uid || admin();
       function profOk(d) {
-        return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'f', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd'])
+        return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'founder', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd'])
           && str(d.a, 1, 24) && d.a.matches('[^<>"]*') && str(d.h, 0, 16) && d.h.matches('[a-z0-9_]*')
           && str(d.bio, 0, 160) && d.bio.matches('[^<>"]*')
           && d.fame is int && d.fame >= 0 && d.fame <= 1000 && count(d.lis) && stampNear(d.t)
