@@ -1,5 +1,5 @@
 /* WaveFern dev: no browser on the computer. The city shops do what their website did: walk in and talk at the counter
-   to open that shop (Motors, Pet Shop, Security, Property, and the Threadz and Gphones buildings from dev-citystores-v1.js). Buying there is instant,
+   to open that shop (Motors, Pet Shop, Security, Property, and the Threadz and Gphone Store buildings in the city from 215-city-brand-stores.js). Buying there is instant,
    no appointment. Only loaded on /dev/. Add ?noshops to skip it. */
 (function(){
  if(!window.FW_FEAT||/[?&]noshops/.test(location.search))return;
