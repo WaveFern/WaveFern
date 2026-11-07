@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.92.0';
+const GAME_VERSION='v49.92.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.92.1',n:'Fixed the Friends menu asking you to pick a username when you already have one. Friends now picks up the username saved on your profile.'},
  {v:'v49.92.0',n:'The pause menu music now fades out when you switch to another tab and fades back in when you return.'},
  {v:'v49.91.2',n:'The windows on the back wall of the starter house (bedroom and studio) are gone.'},
  {v:'v49.91.0',n:'Leaderboard now lists up to 100 players per category (not just the top few) and refreshes itself while open. Profiles take their listeners and fame from the leaderboard row, so the two always match, and both update about every 20 seconds.'},

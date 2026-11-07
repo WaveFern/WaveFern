@@ -760,9 +760,13 @@ function fbGet(R,db,path){const to=ms=>new Promise((_,j)=>setTimeout(()=>j(new E
  return Promise.race([R.get(R.ref(db,path)),to(10000)]).catch(e=>{if(!/did not answer/.test(String(e&&e.message)))throw e;console.warn('[friends] no answer over websocket, switching to long-polling');
   try{R.forceLongPolling();R.goOffline(db);R.goOnline(db)}catch(e2){console.warn('[friends] long-polling switch failed',e2)}
   return Promise.race([R.get(R.ref(db,path)),to(15000)])})}
+function frFromProfile(R,db,uid){try{if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD)return Promise.resolve();
+ return FBF.getDoc(FBF.doc(FBD,'profiles',uid)).then(d=>{const h=d.exists()&&d.data()&&d.data().h;if(typeof h!='string'||!/^[a-z0-9_]{3,16}$/.test(h))return;
+  return R.get(R.ref(db,'f/n/'+h)).then(n=>{if(n.exists()&&n.val()!==uid)return;FR.h=h;
+   return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:frNm(),o:1,rm:'',t:R.serverTimestamp()}}).catch(e=>console.warn('[friends] username copy failed',e&&e.code))})}).catch(e=>console.warn('[friends] profile read failed',e&&e.code))}catch(e){return Promise.resolve()}}
 function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
  rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;console.info('[friends] connected to',RTDB_URL,'as',uid);
-  fbGet(R,db,'f/p/'+uid+'/h').then(s=>{FR.h=s.val()||'';FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
+  fbGet(R,db,'f/p/'+uid+'/h').then(s=>{FR.h=s.val()||'';if(FR.h)return;/* v49.92.1: username lives in Firestore profiles/{uid}.h; copy it to Friends if missing here */return frFromProfile(R,db,uid)}).then(()=>{FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
   R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.od=0;frPresence()}});
   R.onValue(R.ref(db,'f/l/'+uid),s=>{const v=s.val()||{};for(const f in FR.pu)if(!v[f]){try{FR.pu[f]()}catch(e){}delete FR.pu[f];delete FR.P[f]}FR.L=v;
    for(const f in v)if(!FR.pu[f]&&okId(f))FR.pu[f]=R.onValue(R.ref(db,'f/p/'+f),x=>{const o=FR.P[f],n=x.val();FR.P[f]=n;if(o&&!o.o&&n&&n.o&&n.h)say('@'+n.h+' is online.');frDraw()},()=>{});frDraw()},frErr);
