@@ -15,20 +15,22 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>{
  try{TT.game=restoreSave()}catch(e){fwSoftErr(e,'restoreSave')}
  try{titleOpen()}catch(e){fwSoftErr(e,'titleOpen')}
  const t0=performance.now(),T=15000;let done=0;
+ /* honest progress: the parts are checked in order, the bar rests at a fixed mark when a part is done and eases toward the next mark
+    while it waits, so it keeps moving but never claims a part is ready before it is */
+ const stages=[
+  [55,()=>document.readyState=='complete'], /* every script has loaded and run */
+  [70,()=>{const t=document.getElementById('ttl'),fb=typeof FBU!='undefined'&&FBU; /* menu buttons */
+   return t&&t.querySelector('.ttm')&&(!window.LB||t.querySelector('button[onclick="LB.open()"]'))&&(!fb||!window.FW_PROFILE||t.querySelector('.fwpf-ic'))&&(!fb||typeof menuIcon!='function'||t.querySelector('.fhic'))}],
+  [80,()=>(typeof FB_ON=='undefined'||!FB_ON||window.FW_AUTH_DONE)&&(!(typeof FBU!='undefined'&&FBU)||typeof CLD=='undefined'||CLD.ok||CLD.err)], /* sign-in and profile / cloud save */
+  [100,()=>{const M=window.FW_MENUSTAGE;return !M||!(M.state=='idle'||M.state=='building')||!document.body.classList.contains('fwmenubg')||performance.now()-stT>7000}]]; /* stadium scene (waits at most 7 s, then the still picture shows) */
+ let st=0,stT=performance.now(),shown=0;
  const ready=()=>{
-  if(document.readyState!='complete')return false; /* every script has loaded and run */
-  const t=document.getElementById('ttl');if(!t)return false;
-  if(!t.querySelector('.ttm'))return false;
-  if(window.LB&&!t.querySelector('button[onclick="LB.open()"]'))return false; /* Leaderboard button */
-  if(typeof FBU!='undefined'&&FBU){
-   if(window.FW_PROFILE&&!t.querySelector('.fwpf-ic'))return false; /* Profile avatar */
-   if(typeof menuIcon=='function'&&!t.querySelector('.fhic'))return false; /* Friends icon */
-   if(typeof CLD!='undefined'&&!CLD.ok&&!CLD.err)return false; /* profile / cloud save */
-  }
-  if(typeof FB_ON!='undefined'&&FB_ON&&!window.FW_AUTH_DONE)return false; /* sign-in state known */
-  const M=window.FW_MENUSTAGE;
-  if(M&&(M.state=='idle'||M.state=='building')&&document.body.classList.contains('fwmenubg'))return false; /* stadium scene */
-  return true};
+  let ok=false;
+  while(st<stages.length){let r=false;try{r=!!stages[st][1]()}catch(e){r=true}if(!r)break;st++;stT=performance.now()}
+  ok=st>=stages.length;
+  try{const lo=st?stages[st-1][0]:40,hi=ok?100:stages[st][0],v=ok?100:lo+(hi-lo)*.95*(1-Math.exp(-(performance.now()-stT)/4000));
+   shown=Math.max(shown,v);const b=$('lb'),p=$('lp'),w=parseFloat(b.style.width)||0,x=Math.max(w,shown);b.style.width=x.toFixed(1)+'%';p.textContent=Math.round(x)+'%'}catch(e){}
+  return ok};
  const fin=()=>{if(done)return;done=1;try{const b=$('lb');if(b)b.style.width='100%'}catch(e){}
   setTimeout(()=>{const l=document.getElementById('load');if(l)l.remove();
    try{if(sessionStorage.getItem('fw_go')){sessionStorage.removeItem('fw_go');ttPlay()}}catch(e){}},120)};
