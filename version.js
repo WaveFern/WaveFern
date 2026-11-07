@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.32';
+const GAME_VERSION='v49.93.33';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.33',n:'Interest now always shows its real percentage instead of the word Perfect. 100% only shows when interest is truly maxed out (nothing more you do can raise it); otherwise it is rounded down to at most 99%. Display only: streams, earnings and listener growth are unchanged.'},
  {v:'v49.93.32',n:'The snow on the grass now stays visible while a menu is open (sleep prompt, genre picker, pause and other menus) instead of vanishing.'},
  {v:'v49.93.31',n:'Threadz is in the city with the other shops, not by your house. A leftover add-on had built a second Threadz and Gphones on your street, and the city Threadz never got a door when the city layout left no free building on its row. Both city brand shops now look for a free building on either street row. Threadz and the Gphone Store get a proper storefront: striped awning, display windows (mannequins and clothes, phones on stands), a pink or blue fascia, a hanging blade sign, an A-board and plants. The keeper opens the shop screen.'},
  {v:'v49.93.30',n:'The username check now says in plain words why it failed (rules not published, Firestore blocked, or sign-in expired), and the username script is reloaded fresh instead of an old cached copy. Saves still load.'},
