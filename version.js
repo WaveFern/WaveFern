@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.18';
+const GAME_VERSION='v49.93.19';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.19',n:'Interest now always shows its real percentage instead of the word Perfect. 100% only shows when interest is truly maxed out (nothing more you do can raise it); otherwise it is rounded down to at most 99%. Display only: streams, earnings and listener growth are unchanged.'},
  {v:'v49.93.18',n:'Fixed the loading screen taking ages when signed in: it was waiting for your cloud save, which could not start until the loading screen was gone. It now only waits for sign-in to be known. Saves still load.'},
  {v:'v49.93.17',n:'Fixed friends going offline with permission denied. Saving your username and online status now sends the name stamp the database rules require, and if it is refused the game retries without the display name. A failed online status now backs off for a while instead of retrying every 4 seconds.'},
  {v:'v49.93.16',n:'The loading bar is now properly honest: it moves in steps as scripts, menu buttons, sign-in and the stadium become ready, and keeps easing forward while it waits instead of jumping to 97 percent and sitting there. Saves still load.'},
