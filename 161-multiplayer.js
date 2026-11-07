@@ -781,7 +781,7 @@ function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR
  if(k===FR.pk)return;FR.pk=k;const ref=R.ref(db,'f/p/'+uid);R.set(ref,Object.assign({t:R.serverTimestamp()},o)).then(()=>{if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{FR.pk='';console.warn('[friends] presence',e)})}
 setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);
 const frN=()=>Object.keys(FR.Q||{}).length;
-const frName=f=>{const p=FR.P[f];return p&&p.h?'@'+p.h:'Friend'};
+const frName=f=>{const p=FR.P[f],q=FR.PF&&FR.PF[f],h=p&&p.h||q&&q.h;return h?'@'+h:'Friend'};
 /* pick a username (once) */
 window.FRX={FR,frStart:()=>frStart(),frPresence:()=>frPresence(),rtdb:()=>rtdb(),trailer:MPTR};
 window.frClaim=()=>{const i=$('frh'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='A username has 3 to 16 letters, numbers or _.';snd('err');return frDraw(1)}

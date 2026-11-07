@@ -10,7 +10,16 @@ const PB=['.........####...','........######..','........######..','........####
 const PF=['..####..........','.######.........','.######.........','.######.........','..####..........','................','.#########......','##########......','##########......','##########......'];
 const PX=(g,o)=>g.map((r,y)=>[...r].map((c,x)=>c=='#'?`<rect x="${x}" y="${y}" width="1" height="1"${o?' fill-opacity=".55"':''}/>`:'').join('')).join('');
 const ICON='<svg viewBox="0 0 16 10" width="30" height="19" shape-rendering="crispEdges" style="image-rendering:pixelated" fill="currentColor" aria-hidden="true">'+PX(PB,1)+PX(PF,0)+'</svg>';
-const nm=f=>{const F=X(),p=F&&F.P[f];return p&&p.h?p.h:'friend'};
+/* v49.93.14: a friend whose Realtime Database presence entry (f/p/UID) is missing or unreadable used to show as @FRIEND with a letter and no profile.
+   Their public Firestore profile (profiles/UID, readable by every signed-in player) is now the fallback for username, artist name and photo. */
+const PRF={};
+function pf(f){const F=X();if(!okU(f))return null;if(f in PRF)return PRF[f]||null;PRF[f]=0;
+ try{if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD){delete PRF[f];return null}
+  FBF.getDoc(FBF.doc(FBD,'profiles',f)).then(d=>{const v=d.exists()?d.data():null;PRF[f]=v||0;if(F)F.PF=PRF;draw()}).catch(e=>{console.warn('[friends] profile read failed',e&&e.code);setTimeout(()=>{delete PRF[f]},30000)})}catch(e){delete PRF[f]}
+ return null}
+const hOf=f=>{const F=X(),p=F&&F.P[f],q=PRF[f];return p&&p.h?p.h:q&&q.h?q.h:''};
+const nm=f=>hOf(f)||'friend';
+const picOf=f=>{const q=PRF[f];if(!q)return'';if(/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(q.pd||''))return q.pd;return/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(q.p||'')?q.p:''};
 const cdKey=f=>'fw_nudge_'+((X()||{}).me||'')+'_'+f;
 const lastN=f=>{try{return+localStorage.getItem(cdKey(f))||0}catch(e){return 0}};
 const wait=f=>Math.max(0,lastN(f)+HOUR-Date.now());
@@ -50,14 +59,14 @@ window.fhClose=()=>{FH.open=0;const d=document.getElementById('fhub');if(d)d.rem
 window.fhTab=t=>{FH.tab=t;FH.sel='';FH.msg='';try{snd('click')}catch(e){}draw()};
 window.fhCl=k=>{FH.cl[k]=!FH.cl[k];try{snd('click')}catch(e){}draw()};
 window.fhSel=f=>{FH.sel=FH.sel==f?'':f;FH.msg='';draw()};
-function row(f){const F=X(),p=F.P[f]||{},on=!!p.o,sel=FH.sel==f,w=wait(f),h=p.h||'friend';
- let r=`<div class="fhf${sel?' sel':''}" onclick="fhSel('${f}')"><i class="fhav ${on?'on':''}">${E(h[0]||'?').toUpperCase()}</i><div><b>@${E(h)}</b><small>${on?(p.rm?'In a band room':'Online'):'Offline'}${p.nm?' · '+E(p.nm):''}</small></div></div>`;
- if(sel)r+=`<div class=fhcard><button onclick="fwProfileOpen('${E(h)}')">Profile</button><button class=go ${w?'disabled':''} onclick="fhNudge('${f}')">${w?'Nudged ('+mins(w)+')':'Nudge to play'}</button>${on&&p.rm&&!(typeof MPS!='undefined'&&MPS&&MPS.code===p.rm)?`<button onclick="frJoin('${f}')">Join band</button>`:''}</div>`;
+function row(f){const F=X(),p=F.P[f]||{};pf(f);const on=!!p.o,sel=FH.sel==f,w=wait(f),h=hOf(f)||'friend',q=PRF[f]||{},ph=picOf(f),dn=p.nm||q.a||'';
+ let r=`<div class="fhf${sel?' sel':''}" onclick="fhSel('${f}')"><i class="fhav ${on?'on':''}">${ph?`<img src="${E(ph)}" referrerpolicy=no-referrer alt="" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.remove()">`:E(h[0]||'?').toUpperCase()}</i><div><b>@${E(h)}</b><small>${on?(p.rm?'In a band room':'Online'):'Offline'}${dn?' · '+E(dn):''}</small></div></div>`;
+ if(sel)r+=`<div class=fhcard><button onclick="fwProfileOpen('${E(hOf(f))}','${f}')">Profile</button><button class=go ${w?'disabled':''} onclick="fhNudge('${f}')">${w?'Nudged ('+mins(w)+')':'Nudge to play'}</button>${on&&p.rm&&!(typeof MPS!='undefined'&&MPS&&MPS.code===p.rm)?`<button onclick="frJoin('${f}')">Join band</button>`:''}</div>`;
  return r}
 function draw(){if(!FH.open)return;const F=X();let h='<h2>Friends</h2>';
  if(!F||!F.ok){const er=F&&(F.rerr||F.err),old=Date.now()-(FH.t0||Date.now())>12000,perm=/permission/i.test(String(er||''));FH.t0=FH.t0||Date.now();
   h+=er||old?`<p class=fhm style="color:#e0453a">${E(perm?'The database refused the connection. The Realtime Database rules may be missing or have an error.':er&&!/permission/i.test(er)?'Could not reach Friends: '+er:'Friends is taking too long to connect. Check your internet connection, make sure you are signed in with Google, and try again.')}</p><button class=go onclick="fhRetry()">Try again</button>`:'<p class=fhe>Connecting…</p>'}else if(!F.h)h+='<p class=fhe>Pick a username first so friends can find you.</p><button class=go onclick="fhClose();frOpen()">Choose username</button>';
- else{const L=Object.keys(F.L).filter(okU).sort((a,b)=>nm(a).localeCompare(nm(b))),on=L.filter(f=>(F.P[f]||{}).o),off=L.filter(f=>!(F.P[f]||{}).o);
+ else{Object.keys(F.L).forEach(pf);const L=Object.keys(F.L).filter(okU).sort((a,b)=>nm(a).localeCompare(nm(b))),on=L.filter(f=>(F.P[f]||{}).o),off=L.filter(f=>!(F.P[f]||{}).o);
   const Q=items().filter(i=>i.t=='q');
   h+=`<div class=fhtabs><button class="fht${FH.tab=='f'?' act':''}" onclick="fhTab('f')">Friends (${L.length})</button><button class="fht${FH.tab=='r'?' act':''}" onclick="fhTab('r')">Requests${Q.length?' <span class=fhn2>'+Q.length+'</span>':''}</button></div>`;
   if(FH.tab=='r'){
@@ -88,7 +97,7 @@ setInterval(()=>{try{sub();notif();if(FH.open)draw()}catch(e){}},3000);
 #fhub .fhw{width:min(440px,94vw);max-height:88vh;overflow:auto;display:flex;flex-direction:column;gap:8px}#fhub h2{color:var(--g)}#fhub h3,.fhn h3{margin:8px 0 2px;font-size:14px}
 .fhf{display:flex;align-items:center;gap:10px;background:#0b0f0dd9;border:3px solid #000;padding:8px;cursor:pointer}.fhf.sel,.fhf:hover{border-color:var(--g)}.fhf>div{flex:1;min-width:0;display:flex;flex-direction:column}
 .fhf b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fhf small,.fhrow small,.fhe{color:var(--m)}.fhe{font-size:12px;margin:2px 0}.fhm{color:var(--g);font-size:13px;margin:0}
-.fhav{width:34px;height:34px;flex:none;box-shadow:inset 0 -3px #0007;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;background:#2a352e;border:3px solid #000;color:#8aa094}.fhav.on{background:var(--g);color:#000}
+.fhav{width:34px;height:34px;flex:none;overflow:hidden;box-shadow:inset 0 -3px #0007;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;background:#2a352e;border:3px solid #000;color:#8aa094}.fhav.on{background:var(--g);color:#000}
 .fhcard,.fhr{display:flex;gap:6px;flex-wrap:wrap;padding:6px;background:#0b0f0d;border:3px solid #000;margin-top:-6px}.fhr{background:none;border:0;margin:0;padding:0}.fhcard button,.fhr button{flex:1;padding:7px 9px;font-size:12px}
 .fhrow{display:flex;align-items:center;gap:6px;background:#0b0f0dd9;border:3px solid #000;padding:8px;margin-top:6px}.fhrow>div{flex:1;min-width:0;display:flex;flex-direction:column}.fhrow button{padding:6px 9px;font-size:12px}`;document.head.appendChild(s)}
 })();
