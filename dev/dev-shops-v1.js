@@ -11,7 +11,7 @@ body.fwk #pc .win{left:3vw!important;top:3vh!important;right:auto!important;widt
  document.head.appendChild(css);
  /* the Browser app is gone: it is no longer in the computer's app list (desktop icons, Start menu). The window code stays only
     so the city shops can reuse it. */
- safe(()=>{const src=String(pcR0),n=src.replace("'store','web','msg'","'store','msg'");if(n!==src)(0,eval)('pcR0='+n)},'applist');
+ /* v49.93.10: the app list edit used eval, which the page's security policy refuses (console error on every load), so it never took effect on the live page either. Removed; the list is unchanged. */
  let K=0;
  window.devShop=function(k){if(typeof SITE=='undefined'||!SITE[k]||!PA[k])return;safe(()=>{openPC();K=1;document.body.classList.add('fwk');OA=['web'];app='web';bw=k;pcR()},'open')};
  const kOff=()=>{K=0;document.body.classList.remove('fwk')};

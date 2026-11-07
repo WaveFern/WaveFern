@@ -1,3 +1,5 @@
+/* colours written as '*ffe14a' (the glow marker from B(), without its '#') or as bare 'ffe14a' are read as hex instead of making three.js warn "Unknown color" */
+if(typeof THREE!='undefined'&&THREE.Color&&!THREE.Color.__fwHex){THREE.Color.__fwHex=1;const s0=THREE.Color.prototype.setStyle;THREE.Color.prototype.setStyle=function(v){if(typeof v=='string'){if(v[0]=='*')v=v.slice(1);if(/^[0-9a-f]{6}$/i.test(v))v='#'+v}return s0.apply(this,[v].concat([].slice.call(arguments,1)))}}
 
 const $=id=>document.getElementById(id),R=(a,b)=>a+Math.random()*(b-a),RI=(a,b)=>Math.floor(R(a,b+1)),pick=a=>a[RI(0,a.length-1)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
