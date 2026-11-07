@@ -1,4 +1,4 @@
-/* v49.94.0: ALL audio fades out when the player leaves the tab (switch tab, minimise, lock screen, switch app on a phone) and fades back in on return.
+/* v49.93.24: ALL audio fades out when the player leaves the tab (switch tab, minimise, lock screen, switch app on a phone) and fades back in on return.
    One central place so every sound follows the same rule:
    - HF.f is the fade (1 = full, 0 = silent). Sounds played through the Web Audio API (effects, ambience, car radios, Beats songs) are routed through
      one master gain per output, so they fade without anything else touching them. HTML audio (soundtrack, applause, preview) multiplies its volume by HF.f.
