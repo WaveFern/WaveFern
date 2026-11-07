@@ -63,21 +63,6 @@ PG.upload=()=>{const D=S.drafts||[],ok=D.filter(d=>d.title.trim()).length,best=D
 <div class=udbar><i style="width:${w}%;background:${qCol(q)}"></i></div></div><button class=go onclick="upl(${d.id})">Upload</button></div>`}).join('');
  return`<div class=upw>${head}<div class=upsum><div><b>${D.length}</b><small>Waiting</small></div><div><b>${ok}</b><small>Ready</small></div><div><b>${best}</b><small>Best quality</small></div><div><b>${(S.songs||[]).length}</b><small>Released</small></div></div><div class=udl>${cards}</div>${tips}</div>`};
 
-/* ---- "Song recorded! Give it a title": quality meter, live preview and title ideas ---- */
-const TA=['Midnight','Golden','Neon','Velvet','Paper','Lonely','Crimson','Hollow','Silver','Wild'],TB=['Dreams','Hours','Signals','Roads','Echoes','Summer','Skyline','Letters','Heat','Tides'];
-window.snTP=function(){const i=$('tin'),p=$('sntp');if(i&&p)p.textContent=i.value.trim()||'Untitled'};
-window.snTitle=function(v){const i=$('tin');if(!i)return;i.value=v;i.focus();snTP()};
-function enhanceTitle(b){if(b.dataset.snt)return;const i=b.querySelector('#tin');if(!i||!/^Song recorded/i.test((b.querySelector('h2')||{}).textContent||''))return;b.dataset.snt=1;b.classList.add('snt');
- try{const m=b.querySelector('p.m'),q=+((m&&/mix quality (\d+)/.exec(m.textContent)||[])[1]||0);
-  if(q){const qm=document.createElement('div');qm.className='sntq';qm.innerHTML=`<span style="color:${qCol(q)}">Quality ${q} · ${qWord(q)}</span><div class=udbar><i style="width:${Math.min(100,q)}%;background:${qCol(q)}"></i></div>`;m.after(qm)}
-  const pv=document.createElement('div');pv.className='sntp';pv.innerHTML='<small>TITLE PREVIEW</small><b id=sntp></b>';i.before(pv);
-  const rnd=a=>a[Math.random()*a.length|0],ch=document.createElement('div');ch.className='nmchips';ch.style.margin='8px 0';
-  ch.innerHTML=Array.from({length:4},()=>rnd(TA)+' '+rnd(TB)).map(n=>`<button type=button class=nmchip>${n}</button>`).join('');
-  ch.querySelectorAll('button').forEach(x=>x.onclick=()=>snTitle(x.textContent));
-  i.after(ch);i.addEventListener('input',snTP);snTP()}catch(x){}}
-const uiEl=document.getElementById('ui');
-if(uiEl)new MutationObserver(()=>{try{uiEl.querySelectorAll('.box.modal:not(.snt)').forEach(enhanceTitle)}catch(x){}}).observe(uiEl,{childList:true,subtree:true});
-
 /* ---- the look ---- */
 const st=document.createElement('style');st.textContent=`
 .nmw,.upw{max-width:1040px;margin:0 auto;padding:6px 4px 18px}
@@ -124,9 +109,6 @@ const st=document.createElement('style');st.textContent=`
 .upst .nmst{border:2px solid #1c2620;padding:12px;background:#0b0f0d}.upst .nmst:first-of-type{border-top:2px solid #1c2620}
 @media (max-width:820px){.nmgr{grid-template-columns:1fr}.nmhd h1{font-size:24px}.upsum{grid-template-columns:repeat(2,minmax(0,1fr))}.udl{grid-template-columns:1fr}}
 @media (max-width:480px){.nmcard{padding:14px}.nmact{flex-direction:column}.nmpvb .pf{width:64px;height:64px}.udc.ng{flex-wrap:wrap}.udm{flex-basis:calc(100% - 60px)}.udc>.go{width:100%}.uphd .go{width:100%}}
-body.pcsmall .nmgr{grid-template-columns:1fr}body.pcsmall .udl{grid-template-columns:1fr}
-.snt{min-width:min(420px,92vw)}.snt h2{font-size:22px}.sntq{margin:6px 0 10px;font-size:13px;font-weight:700}.sntq .udbar{margin-top:4px}
-.sntp{padding:10px 12px;margin:8px 0;background:linear-gradient(135deg,#17382a,#0b0f0d 70%);border:2px solid #000}.sntp small{display:block;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:2px;color:var(--m)}.sntp b{font:18px Silkscreen,ui-monospace,monospace;word-break:break-word}
-`;
+body.pcsmall .nmgr{grid-template-columns:1fr}body.pcsmall .udl{grid-template-columns:1fr}`;
 document.head.appendChild(st);
 })();

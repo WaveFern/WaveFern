@@ -3,7 +3,7 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.94.1';
+const GAME_VERSION='v49.94.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
  {v:'v49.94.1',n:'Redesigned the Spotifly choose-a-name and Upload screens so they fill the window instead of leaving empty space. Choose a name now has a live profile preview, name ideas, a roll button and a career guide. Upload now shows a summary strip and a card per song with play, genre, quality meter, title and Upload buttons, or a how-to guide when you have nothing to release. Also added a quality meter, live preview and title ideas to the song-recorded title box, and breathing room between Around town today and the Start day button. Nothing about naming or uploading rules changed.'},
