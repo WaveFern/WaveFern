@@ -16,19 +16,20 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>{
  try{titleOpen()}catch(e){fwSoftErr(e,'titleOpen')}
  const t0=performance.now(),T=15000;let done=0;
  const ready=()=>{
-  if(document.readyState!='complete')return false; /* every script has loaded and run */
-  const t=document.getElementById('ttl');if(!t)return false;
-  if(!t.querySelector('.ttm'))return false;
-  if(window.LB&&!t.querySelector('button[onclick="LB.open()"]'))return false; /* Leaderboard button */
-  if(typeof FBU!='undefined'&&FBU){
-   if(window.FW_PROFILE&&!t.querySelector('.fwpf-ic'))return false; /* Profile avatar */
-   if(typeof menuIcon=='function'&&!t.querySelector('.fhic'))return false; /* Friends icon */
-   if(typeof CLD!='undefined'&&!CLD.ok&&!CLD.err)return false; /* profile / cloud save */
-  }
-  if(typeof FB_ON!='undefined'&&FB_ON&&!window.FW_AUTH_DONE)return false; /* sign-in state known */
-  const M=window.FW_MENUSTAGE;
-  if(M&&(M.state=='idle'||M.state=='building')&&document.body.classList.contains('fwmenubg'))return false; /* stadium scene */
-  return true};
+  const t=document.getElementById('ttl'),M=window.FW_MENUSTAGE,fb=typeof FBU!='undefined'&&FBU;
+  const checks=[
+   ()=>document.readyState=='complete', /* every script has loaded and run */
+   ()=>t&&t.querySelector('.ttm'),
+   ()=>!window.LB||t.querySelector('button[onclick="LB.open()"]'), /* Leaderboard button */
+   ()=>!fb||!window.FW_PROFILE||t.querySelector('.fwpf-ic'), /* Profile avatar */
+   ()=>!fb||typeof menuIcon!='function'||t.querySelector('.fhic'), /* Friends icon */
+   ()=>!fb||typeof CLD=='undefined'||CLD.ok||CLD.err, /* profile / cloud save */
+   ()=>typeof FB_ON=='undefined'||!FB_ON||window.FW_AUTH_DONE, /* sign-in state known */
+   ()=>!M||!(M.state=='idle'||M.state=='building')||!document.body.classList.contains('fwmenubg')]; /* stadium scene */
+  let n=0;for(const c of checks){let ok=false;try{ok=!!c()}catch(e){ok=true}if(ok)n++}
+  /* the bar fills for real as each part is ready (it only ever moves forward), so it never sits on a number */
+  try{const b=$('lb'),p=$('lp'),w=parseFloat(b.style.width)||0,v=Math.max(w,80+19*n/checks.length);b.style.width=v.toFixed(1)+'%';p.textContent=Math.round(v)+'%'}catch(e){}
+  return n==checks.length};
  const fin=()=>{if(done)return;done=1;try{const b=$('lb');if(b)b.style.width='100%'}catch(e){}
   setTimeout(()=>{const l=document.getElementById('load');if(l)l.remove();
    try{if(sessionStorage.getItem('fw_go')){sessionStorage.removeItem('fw_go');ttPlay()}}catch(e){}},120)};
