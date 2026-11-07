@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.5';
+const GAME_VERSION='v49.93.6';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.6',n:'Adding a friend by username now works for every player, including ones whose username is only saved on their profile (no more No player is called that).'},
  {v:'v49.93.5',n:'Friends got a pixel-art makeover: a pixel person icon, the panel restyled to match the game, two tabs (Friends and Requests), and Online and Offline are now drop-downs you can open and close.'},
  {v:'v49.93.4',n:'The Friends panel now shows your incoming friend requests at the top, with Accept and Deny buttons. The Friends icon is now a person silhouette.'},
  {v:'v49.93.3',n:'The main menu stadium cutscenes now play on more devices: the live stadium (crane, singer, catwalk, barrier, stands and side shots) no longer gives up and falls back to the still picture of the house just because of the reduced-motion setting, a few slow starting frames, or a cached old script.'},
