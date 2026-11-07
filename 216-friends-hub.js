@@ -6,8 +6,7 @@
 const HOUR=3600000,X=()=>window.FRX&&window.FRX.FR,FH={open:0,sel:'',K:{},sub:0,msg:''};
 const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const okU=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
-const F2=['..##..##..','.####.####','.#########','.#########','..#######.','...#####..','....###...','.....#....'];
-const ICON='<svg viewBox="0 0 10 8" width="22" height="18" shape-rendering="crispEdges" fill="currentColor">'+F2.map((r,y)=>[...r].map((c,x)=>c=='#'?`<rect x="${x}" y="${y}" width="1" height="1"/>`:'').join('')).join('')+'</svg>';
+const ICON='<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 22c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg>';
 const nm=f=>{const F=X(),p=F&&F.P[f];return p&&p.h?p.h:'friend'};
 const cdKey=f=>'fw_nudge_'+((X()||{}).me||'')+'_'+f;
 const lastN=f=>{try{return+localStorage.getItem(cdKey(f))||0}catch(e){return 0}};
@@ -54,6 +53,8 @@ function draw(){if(!FH.open)return;const F=X();let h='<h2>Friends</h2>';
  if(!F||!F.ok){const er=F&&(F.rerr||F.err),old=Date.now()-(FH.t0||Date.now())>12000,perm=/permission/i.test(String(er||''));FH.t0=FH.t0||Date.now();
   h+=er||old?`<p class=fhm style="color:#e0453a">${E(perm?'The database refused the connection. The Realtime Database rules may be missing or have an error.':er&&!/permission/i.test(er)?'Could not reach Friends: '+er:'Friends is taking too long to connect. Check your internet connection, make sure you are signed in with Google, and try again.')}</p><button class=go onclick="fhRetry()">Try again</button>`:'<p class=fhe>Connecting…</p>'}else if(!F.h)h+='<p class=fhe>Pick a username first so friends can find you.</p><button class=go onclick="fhClose();frOpen()">Choose username</button>';
  else{const L=Object.keys(F.L).filter(okU).sort((a,b)=>nm(a).localeCompare(nm(b))),on=L.filter(f=>(F.P[f]||{}).o),off=L.filter(f=>!(F.P[f]||{}).o);
+  const Q=items().filter(i=>i.t=='q');
+  h+=`<h3>FRIEND REQUESTS${Q.length?' ('+Q.length+')':''}</h3>`+(Q.length?Q.map(i=>`<div class=fhrow><div><b>${E(i.n)}</b><small>${E(i.s)}</small></div><button class=go onclick="fhAct('qa','${i.f}')">Accept</button><button onclick="fhAct('qd','${i.f}')">Deny</button></div>`).join(''):'<p class=fhe>No pending requests.</p>');
   h+=`<h3>ONLINE (${on.length})</h3>`+(on.map(row).join('')||'<p class=fhe>Nobody online right now.</p>')+`<h3>OFFLINE (${off.length})</h3>`+(off.map(row).join('')||'<p class=fhe>No offline friends.</p>');
   if(!L.length)h+='<p class=fhe>No friends yet. Add one by username.</p>';
   h+='<div class=fhr><button onclick="fhClose();frOpen()">Add or manage friends</button></div>';
