@@ -99,7 +99,7 @@ UPR['\u0000tagged']=[];
  return CMT[p.id]=[...add,...out]}}
 
 /* ---------- Instagrime page: verified ticks, the influencer row, influencer profiles and the Tagged tab ---------- */
-{const st=document.createElement('style');st.textContent=`.ig .igvf{display:inline-block;width:13px;height:13px;border-radius:50%;background:#3897f0;color:#fff;font:700 9px/13px system-ui;text-align:center;margin-left:4px;vertical-align:1px}
+{const st=document.createElement('style');st.textContent=`.ig .igvf{display:inline-block;width:13px;height:13px;border-radius:50%;background:#3897f0;color:#fff;font:700 9px/13px ui-monospace,Menlo,Consolas,monospace;text-align:center;margin-left:4px;vertical-align:1px}
 .ig .igst{display:flex;gap:12px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid #262626;scrollbar-width:none}.ig .igst::-webkit-scrollbar{display:none}
 .ig .igst button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:62px;flex:none}
 .ig .igst .rg{width:54px;height:54px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#f9a825,#e91e63,#7b1fa2)}.ig .igst .rg img{width:100%;height:100%;border-radius:50%;border:2px solid #000;box-sizing:border-box;image-rendering:pixelated;background:#222}

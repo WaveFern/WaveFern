@@ -12,7 +12,7 @@
 (function(){
  if(!window.FW_FEAT||/[?&]noairport/.test(location.search)||typeof THREE=='undefined')return;
  const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('dev airport '+t,e)}}};
- const AX=4000,AZ=320,AW=72,AD=56,FONT='"Trebuchet MS","Segoe UI",Arial,sans-serif',GU=i=>6+12*(i-1);
+ const AX=4000,AZ=320,AW=72,AD=56,FONT='ui-monospace,Menlo,Consolas,monospace',GU=i=>6+12*(i-1);
  let outDone=0,inDone=0;const CL=(()=>{try{return cols}catch(e){return null}})();
  const flush=(G,grp,mat)=>(xgFlush(G,mat||SBM)||[]).forEach(m=>{scene.remove(m);grp.add(m)});
  const cv=(w,h,f)=>{const c=document.createElement('canvas');c.width=w;c.height=h;f(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.anisotropy=8;return t};

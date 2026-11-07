@@ -91,18 +91,18 @@ try{IC.sw=mkIc(['..........','.......WW.','......WWC.','WW...WWW..','.WWWWWWW..'
 setInterval(()=>{try{if(S&&S.artist&&S.apps&&!S.apps.sw)S.apps.sw=1}catch(e){}},1000);
 function css(){if($('swcss'))return;const s=document.createElement('style');s.id='swcss';s.textContent=`
 .mn.swmn{padding:0!important;background:#eaf4ff}
-.swa{min-height:100%;box-sizing:border-box;background:linear-gradient(180deg,#bfe0ff 0,#eaf4ff 220px,#f6faff 100%);color:#0b2a5b;font:14px/1.35 "Trebuchet MS","Segoe UI",Arial,sans-serif;padding:0 0 20px}
+.swa{min-height:100%;box-sizing:border-box;background:linear-gradient(180deg,#bfe0ff 0,#eaf4ff 220px,#f6faff 100%);color:#0b2a5b;font:14px/1.35 ui-monospace,Menlo,Consolas,monospace;padding:0 0 20px}
 .swa *{box-sizing:border-box}.swa b{color:#0b2a5b}
 .swa .swh{display:flex;align-items:center;gap:10px;padding:14px 18px 10px;background:linear-gradient(120deg,#0b2a5b,#1565d8 70%,#3fa0ff);color:#fff;border-bottom:4px solid #ff6b4a}
 .swa .swh img{width:34px;height:34px;image-rendering:pixelated;border-radius:9px;box-shadow:0 2px 0 #0004}
-.swa .swh h1{margin:0;font:700 22px "Trebuchet MS",Arial,sans-serif;letter-spacing:.5px;color:#fff}.swa .swh small{display:block;color:#cfe6ff;font-size:12px}
+.swa .swh h1{margin:0;font:700 22px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.5px;color:#fff}.swa .swh small{display:block;color:#cfe6ff;font-size:12px}
 .swa .swh .bal{margin-left:auto;text-align:right;font-size:12px;color:#cfe6ff}.swa .swh .bal b{display:block;color:#fff;font-size:16px}
 .swa .swt{display:flex;gap:6px;padding:10px 18px 0;flex-wrap:wrap}
 .swa .swt button{all:unset;cursor:pointer;padding:8px 16px;border-radius:999px;background:#ffffffaa;color:#1565d8;font-weight:700;font-size:13px;border:2px solid #1565d822}
 .swa .swt button.on{background:#0b2a5b;color:#fff;border-color:#0b2a5b}.swa .swt button:not(.on):hover{background:#fff}
 .swa .swb{padding:12px 18px}
 .swa .swc{background:#fff;border-radius:14px;padding:12px 14px;margin:0 0 10px;box-shadow:0 2px 0 #0b2a5b14,0 6px 18px #1565d814;border:1px solid #d6e6f8}
-.swa h3{margin:4px 0 8px;font:700 13px "Trebuchet MS",Arial,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:#1565d8}
+.swa h3{margin:4px 0 8px;font:700 13px ui-monospace,Menlo,Consolas,monospace;letter-spacing:1.5px;text-transform:uppercase;color:#1565d8}
 .swa .m2{color:#5a7194;font-size:12px}
 .swa button.swgo,.swa button.swb2{all:unset;cursor:pointer;display:inline-block;padding:8px 14px;border-radius:10px;font-weight:700;font-size:13px;text-align:center;min-height:18px}
 .swa button.swgo{background:#ff6b4a;color:#fff;box-shadow:0 3px 0 #c84528}.swa button.swgo:hover{background:#ff8466}
@@ -123,13 +123,13 @@ function css(){if($('swcss'))return;const s=document.createElement('style');s.id
 .swa .swd b{display:block;font-size:14px}.swa .swd small{color:#5a7194}
 .swa .swfl{display:grid;grid-template-columns:auto 1fr auto;gap:6px 12px;align-items:center;padding:10px 0;border-top:1px dashed #c5d9f0}
 .swa .swfl:first-of-type{border-top:0}
-.swa .swtm{font:700 20px "Trebuchet MS",Arial,sans-serif;color:#0b2a5b}.swa .swtm small{display:block;font-size:11px;font-weight:400;color:#5a7194}
+.swa .swtm{font:700 20px ui-monospace,Menlo,Consolas,monospace;color:#0b2a5b}.swa .swtm small{display:block;font-size:11px;font-weight:400;color:#5a7194}
 .swa .chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#e3effd;color:#1565d8}
 .swa .chip.board{background:#dff7e8;color:#147a3d}.swa .chip.final{background:#fff1d6;color:#a8650a}.swa .chip.closed,.swa .chip.missed{background:#ffe1dc;color:#c0391c}.swa .chip.gone,.swa .chip.cancelled{background:#eceff3;color:#6a7686}.swa .chip.flown{background:#e7e3ff;color:#5b3fd0}
 .swa .swbp{display:grid;grid-template-columns:1fr 150px;background:#fff;border-radius:16px;overflow:hidden;margin:0 0 12px;box-shadow:0 3px 0 #0b2a5b1c,0 8px 22px #1565d81a;border:1px solid #d6e6f8}
 .swa .swbp .l{padding:12px 16px;border-right:3px dashed #c5d9f0;position:relative}
 .swa .swbp .r{padding:12px 14px;background:#f2f8ff;display:flex;flex-direction:column;gap:8px;justify-content:center}
-.swa .swbp .cd{display:flex;align-items:center;gap:10px;margin:4px 0 6px}.swa .swbp .cd b{font:700 30px "Trebuchet MS",Arial,sans-serif;letter-spacing:1px}.swa .swbp .cd i{font-style:normal;color:#ff6b4a;font-size:20px}
+.swa .swbp .cd{display:flex;align-items:center;gap:10px;margin:4px 0 6px}.swa .swbp .cd b{font:700 30px ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px}.swa .swbp .cd i{font-style:normal;color:#ff6b4a;font-size:20px}
 .swa .swbp .g{display:grid;grid-template-columns:repeat(4,auto);gap:2px 14px;font-size:11px;color:#5a7194}.swa .swbp .g b{font-size:15px;display:block}
 .swa .swbp .cnt{font-weight:700;font-size:13px;margin-top:8px}.swa .swbp .cnt.warn{color:#c0391c}
 .swa .swbp.hist{opacity:.8}.swa .swrule{font-size:12px;color:#5a7194;margin:6px 0 0;padding-left:16px}.swa .swrule li{margin:2px 0}
@@ -142,7 +142,7 @@ function css(){if($('swcss'))return;const s=document.createElement('style');s.id
 #ph .swa .swdl{grid-template-columns:1fr 1fr}#ph .swa .swfl{grid-template-columns:auto 1fr}#ph .swa .swfl>div:last-child{grid-column:1/3}
 .swdesk{width:min(820px,96vw);max-height:90vh;overflow:auto;padding:0!important;background:#eaf4ff!important}.swdesk .swx{display:flex;justify-content:flex-end;padding:8px 12px;background:#0b2a5b}
 @media (max-width:700px){.swa .swbp{grid-template-columns:1fr}.swa .swbp .l{border-right:0;border-bottom:3px dashed #c5d9f0}.swa .swdl{grid-template-columns:1fr 1fr}}
-#swhud{position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:20;background:#0b2a5bee;color:#fff;border:2px solid #000;border-bottom:3px solid #ff6b4a;border-radius:10px;padding:6px 14px;font:13px "Trebuchet MS",Arial,sans-serif;box-shadow:3px 3px 0 #0007;pointer-events:none;text-align:center;max-width:min(560px,92vw)}
+#swhud{position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:20;background:#0b2a5bee;color:#fff;border:2px solid #000;border-bottom:3px solid #ff6b4a;border-radius:10px;padding:6px 14px;font:13px ui-monospace,Menlo,Consolas,monospace;box-shadow:3px 3px 0 #0007;pointer-events:none;text-align:center;max-width:min(560px,92vw)}
 #swhud b{color:#ffd84a}#swhud.warn{background:#7a1c0cee;border-bottom-color:#ffd84a}#swhud small{display:block;color:#cfe6ff;font-size:11px}
 `;document.head.appendChild(s)}
 const dayLbl=d=>{const t=T.dayOf(T.now());return d==t?'Today':d==t+1?'Tomorrow':'Day '+d};
@@ -241,10 +241,10 @@ function drawMap(){const c=document.getElementById('swmapc');if(!c)return;const 
   x.beginPath();x.arc(q.x,q.y,(on?6.5:me?5.5:4.5)*big,0,7);x.fill();x.stroke();
   if(names&&!me&&!dim||on&&!me)lab.push({q,on});x.globalAlpha=1});
  /* city names once zoomed in: the picked / hovered one first, then any that do not overlap one already drawn */
- const box=[];if(A)box.push([A.x+6,A.y-8,A.x+150,A.y+8]);lab.sort((a,b)=>b.on-a.on).forEach(l=>{const q=l.q,t=T.city(q.p);x.font=(l.on?'bold ':'')+'12px Trebuchet MS,Arial';
+ const box=[];if(A)box.push([A.x+6,A.y-8,A.x+150,A.y+8]);lab.sort((a,b)=>b.on-a.on).forEach(l=>{const q=l.q,t=T.city(q.p);x.font=(l.on?'bold ':'')+'12px ui-monospace,Menlo,Consolas,monospace';
   const bx=[q.x+6,q.y-8,q.x+10+x.measureText(t).width,q.y+8];if(!l.on&&box.some(o=>bx[0]<o[2]&&bx[2]>o[0]&&bx[1]<o[3]&&bx[3]>o[1]))return;box.push(bx);
   x.strokeStyle='#ffffffd0';x.lineWidth=3;x.strokeText(t,q.x+8,q.y);x.fillStyle='#0b2a5b';x.fillText(t,q.x+8,q.y)});
- if(A){x.font='bold 12px Trebuchet MS,Arial';const t=from=='home'?'You · Home':'You · '+T.city(from);x.strokeStyle='#ffffffd0';x.lineWidth=3;x.strokeText(t,A.x+9,A.y);x.fillStyle='#0b2a5b';x.fillText(t,A.x+9,A.y)}
+ if(A){x.font='bold 12px ui-monospace,Menlo,Consolas,monospace';const t=from=='home'?'You · Home':'You · '+T.city(from);x.strokeStyle='#ffffffd0';x.lineWidth=3;x.strokeText(t,A.x+9,A.y);x.fillStyle='#0b2a5b';x.fillText(t,A.x+9,A.y)}
  const zl=document.getElementById('swzl');if(zl)zl.textContent='x'+(Math.round(v.z*10)/10);
  if(!c.dataset.on){c.dataset.on=1;const P=new Map();let drag=false,pinch=null,down=null;
   const pt=e=>{const b=c.getBoundingClientRect();return{x:e.clientX-b.left,y:e.clientY-b.top,w:b.width,h:b.height}};

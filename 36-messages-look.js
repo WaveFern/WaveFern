@@ -3,14 +3,14 @@
    Only the look changes: the wrapper adds a class and a brand bar to the HTML that PA.msg already builds. */
 {const st=document.createElement('style');st.textContent=`
 .chat.msx{--mx-pl:#1e1537;--mx-pl2:#2b1f4f;--mx-tx:#f3ecff;--mx-mu:#b7a7d8;--mx-cr:#fff7f0;--mx-ink:#2a2140;--mx-hd:linear-gradient(120deg,#ff7a59,#ff3d81 55%,#8a4dff);--mx-me:linear-gradient(135deg,#ff6a88,#8a4dff);--mx-co:#ff4f7b;
- background:var(--mx-cr);color:var(--mx-ink);font:14px "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+ background:var(--mx-cr);color:var(--mx-ink);font:14px ui-monospace,Menlo,Consolas,monospace}
 .msx .cl{background:var(--mx-pl);color:var(--mx-tx);border-right:0;box-shadow:2px 0 10px #1e153744;z-index:1}
 .msx .msxb{display:flex;align-items:center;gap:10px;padding:14px 14px 10px;background:var(--mx-hd);color:#fff}
 .msx .msxb b{font-size:19px;letter-spacing:.5px}.msx .msxb small{opacity:.85;font-size:11px;display:block}
 .msx .msxl{width:30px;height:30px;border-radius:50% 50% 50% 8px;background:#fff;position:relative;flex-shrink:0;box-shadow:0 2px 6px #0003}
 .msx .msxl:before,.msx .msxl:after{content:'';position:absolute;top:12px;width:5px;height:5px;border-radius:50%;background:#ff3d81;left:7px;box-shadow:7px 0 0 #b14dff}.msx .msxl:after{left:21px;background:#8a4dff;box-shadow:none}
-.msx .cl h2{background:transparent;padding:10px 14px;font:700 12px "Trebuchet MS",system-ui,sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:var(--mx-mu);border-bottom:1px solid #ffffff12}
-.msx .cl h2 button{background:#ffffff1a;color:#fff;border:0;border-radius:14px;padding:3px 12px;box-shadow:none;font:700 12px "Trebuchet MS",system-ui,sans-serif;letter-spacing:0;text-transform:none}.msx .cl h2 button:hover{background:var(--mx-co)}
+.msx .cl h2{background:transparent;padding:10px 14px;font:700 12px ui-monospace,Menlo,Consolas,monospace;text-transform:uppercase;letter-spacing:1.5px;color:var(--mx-mu);border-bottom:1px solid #ffffff12}
+.msx .cl h2 button{background:#ffffff1a;color:#fff;border:0;border-radius:14px;padding:3px 12px;box-shadow:none;font:700 12px ui-monospace,Menlo,Consolas,monospace;letter-spacing:0;text-transform:none}.msx .cl h2 button:hover{background:var(--mx-co)}
 .msx .cr{border-bottom:0;margin:2px 8px;border-radius:12px;padding:9px 10px;align-items:center}
 .msx .cr:hover{background:var(--mx-pl2)}.msx .cr.on{background:linear-gradient(90deg,#ff3d8155,#8a4dff33);box-shadow:inset 3px 0 0 var(--mx-co)}
 .msx .cr small{color:var(--mx-mu)}
@@ -37,7 +37,7 @@
 .win:has(.chat.msx){border-color:#1e1537;box-shadow:6px 6px 0 #8a4dff55}
 .win:has(.chat.msx) .wt{background:linear-gradient(120deg,#ff7a59,#ff3d81 55%,#8a4dff);color:#fff}
 .win:has(.chat.msx) .wt button{background:#ffffff33;border-color:#0000;box-shadow:none;color:#fff}
-.msx .mloc{background:#fff;color:var(--mx-ink);border-top:1px solid #f1e3ec;font:14px "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+.msx .mloc{background:#fff;color:var(--mx-ink);border-top:1px solid #f1e3ec;font:14px ui-monospace,Menlo,Consolas,monospace}
 
 .msx .mloc span{color:var(--mx-ink);font-weight:600}
 .msx .mloc select{background:#f7eefb;color:var(--mx-ink);border:2px solid transparent;border-radius:22px;padding:6px 12px;font:inherit;font-size:13px;min-height:34px;max-width:100%;cursor:pointer;transition:border-color .15s,background .15s}
@@ -60,12 +60,12 @@
 
 
 
-.msx .msq{padding:8px 12px 6px}.msx .msq input{width:100%;box-sizing:border-box;background:#ffffff1a;color:var(--mx-tx);border:2px solid transparent;border-radius:18px;padding:7px 12px;font:13px "Trebuchet MS",system-ui,sans-serif}.msx .msq input::placeholder{color:var(--mx-mu)}.msx .msq input:focus{outline:0;border-color:#ff3d8188;background:#ffffff26}
-.msx .sgh{padding:10px 14px 6px;color:var(--mx-tx)}.msx .sgh b{display:block;font:700 12px "Trebuchet MS",system-ui,sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:#ffb36b}.msx .sgh small{display:block;color:var(--mx-mu);font-size:12px;line-height:1.35;margin-top:2px}
-.msx .sgh2{padding:10px 14px 2px;font:700 11px "Trebuchet MS",system-ui,sans-serif;text-transform:uppercase;letter-spacing:1.5px;color:var(--mx-mu);border-top:1px solid #ffffff1a;margin-top:6px}
+.msx .msq{padding:8px 12px 6px}.msx .msq input{width:100%;box-sizing:border-box;background:#ffffff1a;color:var(--mx-tx);border:2px solid transparent;border-radius:18px;padding:7px 12px;font:13px ui-monospace,Menlo,Consolas,monospace}.msx .msq input::placeholder{color:var(--mx-mu)}.msx .msq input:focus{outline:0;border-color:#ff3d8188;background:#ffffff26}
+.msx .sgh{padding:10px 14px 6px;color:var(--mx-tx)}.msx .sgh b{display:block;font:700 12px ui-monospace,Menlo,Consolas,monospace;text-transform:uppercase;letter-spacing:1.5px;color:#ffb36b}.msx .sgh small{display:block;color:var(--mx-mu);font-size:12px;line-height:1.35;margin-top:2px}
+.msx .sgh2{padding:10px 14px 2px;font:700 11px ui-monospace,Menlo,Consolas,monospace;text-transform:uppercase;letter-spacing:1.5px;color:var(--mx-mu);border-top:1px solid #ffffff1a;margin-top:6px}
 .msx .cr.sg{border:1px dashed #ffffff33}.msx .sgb{background:#ffffff1a;color:#fff;border-radius:10px;font-size:11px;font-weight:700;padding:2px 9px;align-self:center}
-.msx .cva{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.msx .cva button{background:#f7eefb;color:var(--mx-ink);border:0;border-radius:18px;box-shadow:none;min-height:32px;padding:5px 12px;font:600 12px "Trebuchet MS",system-ui,sans-serif;cursor:pointer;transition:background .15s,transform .1s}.msx .cva button:hover{background:#efe3f2}.msx .cva button:active{transform:scale(.97)}.msx .cva button:focus-visible{outline:2px solid #ff3d81aa;outline-offset:2px}
-.msx .msc{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;background:#fff0e6;color:var(--mx-ink);border-bottom:1px solid #f6d9c8;font-size:13px}.msx .msc span{flex:1;min-width:180px}.msx .msc button{border:0;border-radius:18px;box-shadow:none;background:#efe3f2;color:var(--mx-ink);min-height:32px;padding:5px 14px;font:600 12px "Trebuchet MS",system-ui,sans-serif;cursor:pointer}.msx .msc button.go{background:var(--mx-me);color:#fff}
+.msx .cva{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.msx .cva button{background:#f7eefb;color:var(--mx-ink);border:0;border-radius:18px;box-shadow:none;min-height:32px;padding:5px 12px;font:600 12px ui-monospace,Menlo,Consolas,monospace;cursor:pointer;transition:background .15s,transform .1s}.msx .cva button:hover{background:#efe3f2}.msx .cva button:active{transform:scale(.97)}.msx .cva button:focus-visible{outline:2px solid #ff3d81aa;outline-offset:2px}
+.msx .msc{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;background:#fff0e6;color:var(--mx-ink);border-bottom:1px solid #f6d9c8;font-size:13px}.msx .msc span{flex:1;min-width:180px}.msx .msc button{border:0;border-radius:18px;box-shadow:none;background:#efe3f2;color:var(--mx-ink);min-height:32px;padding:5px 14px;font:600 12px ui-monospace,Menlo,Consolas,monospace;cursor:pointer}.msx .msc button.go{background:var(--mx-me);color:#fff}
 .msx .gtp{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px 2px;background:#fff;border-top:1px solid #f1e3ec}
 `;document.head.appendChild(st)}
 {const pm=PA.msg;PA.msg=function(){const h=pm.apply(this,arguments);if(typeof h!='string')return h;

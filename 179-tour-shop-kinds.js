@@ -136,7 +136,7 @@ const ROOMS={
   rm.box(.5,.4,.4,'#333',x0+2.2,1.25,z0+3.1);staff(rm,x0+4.6,z0+2.1,0);
   /* flour sacks, a chalk board and a table by the window */
   [0,1,2].forEach(i=>rm.box(.7,.8-i*.1,.5,'#f0e8d8',x0+.8,.4,z0+5.2+i*.6,1));rm.title(GN('bakery').toUpperCase(),x0+2,x0+w-4.5,3.05,3.75,{bg:'#3a2414',fg:'#ffd890'});
-  rm.sign('z',back+.12,x0+w-4.2,x0+w-2.8,1.4,2.6,96,96,(c,W,H)=>{c.fillStyle='#22302a';c.fillRect(0,0,W,H);c.fillStyle='#f4f1e8';c.font='12px sans-serif';L.forEach((t,i)=>c.fillText(t.slice(0,12),6,24+i*22));c.strokeStyle='#7a5432';c.lineWidth=6;c.strokeRect(0,0,W,H)});
+  rm.sign('z',back+.12,x0+w-4.2,x0+w-2.8,1.4,2.6,96,96,(c,W,H)=>{c.fillStyle='#22302a';c.fillRect(0,0,W,H);c.fillStyle='#f4f1e8';c.font='12px ui-monospace,Menlo,Consolas,monospace';L.forEach((t,i)=>c.fillText(t.slice(0,12),6,24+i*22));c.strokeStyle='#7a5432';c.lineWidth=6;c.strokeRect(0,0,W,H)});
   table(rm,x0+2.2,z0+7.4,1.1,1.1,'#c8a878');chair(rm,x0+1.2,z0+7.4,'#7a4a2a',1);chair(rm,x0+3.2,z0+7.4,'#7a4a2a',1);plant(rm,x0+w-1,z0+d-2);
   rm.int(x0+4.6,z0+4.4,1.8,'Buy bread and pastries',()=>eatMenu('<i data-k=bakery></i>'+esc(NM('bakery')),'"'+D.words(C.s.lang).hi+'! Fresh out of the oven."',[[L[0],4,6],[L[1],5,7],[L[2],3,5],['Coffee',4,4,1]]))},
  laundry(C,rm){const{x0,z0,w,d,cx,back}=rm;
@@ -184,7 +184,7 @@ const ROOMS={
   /* carpet, the ticket desk, posters, the popcorn machine and the doors to the screens */
   D.quadY(rm.G,x0+1,z0+1,x0+w-1,z0+d-1.4,.012,'#5a1a2a');for(let x=x0+1.5;x<x0+w-1;x+=1.5)D.quadY(rm.G,x,z0+1,x+.08,z0+d-1.4,.016,'#e8c040');
   for(let i=0;i<4;i++){const a=x0+1.4+i*2.6;rm.box(2,2.6,.08,'#e8c040',a+.9,2,back+.08);rm.sign('z',back+.14,a,a+1.8,.8,3.2,96,140,(c,W,H)=>{const P=[['#1a2a6a','#ff4a6a'],['#2a1a1a','#ffb040'],['#0a3a2a','#7affc8'],['#3a0a3a','#ffd23d']][i];const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,P[0]);g.addColorStop(1,'#000');c.fillStyle=g;c.fillRect(0,0,W,H);
-   c.fillStyle=P[1];c.beginPath();c.arc(W/2,H*.4,W*.25,0,7);c.fill();c.fillStyle='#fff';c.font='bold 13px sans-serif';c.textAlign='center';c.fillText(['STAR CITY','LAST BEAT','DEEP GREEN','NIGHT RUN'][i],W/2,H*.8);c.font='9px sans-serif';c.fillText('NOW SHOWING',W/2,H*.9)},'cin'+i)}
+   c.fillStyle=P[1];c.beginPath();c.arc(W/2,H*.4,W*.25,0,7);c.fill();c.fillStyle='#fff';c.font='bold 13px ui-monospace,Menlo,Consolas,monospace';c.textAlign='center';c.fillText(['STAR CITY','LAST BEAT','DEEP GREEN','NIGHT RUN'][i],W/2,H*.8);c.font='9px ui-monospace,Menlo,Consolas,monospace';c.fillText('NOW SHOWING',W/2,H*.9)},'cin'+i)}
   rm.box(4,1.1,1,'#2a1a26',x0+w-3.2,.55,z0+4,1);rm.glow(4,.1,1.02,'#ffd23d',x0+w-3.2,1.12,z0+4);rm.box(.5,.4,.4,'#333',x0+w-4.4,1.3,z0+4);staff(rm,x0+w-3.2,z0+3,0);
   rm.box(1.2,1.4,.9,'#c0392b',x0+w-.8,1.5,z0+6.4,1);rm.box(1,.9,.8,'#f4e0a0',x0+w-.8,1.6,z0+6.4);rm.glow(.9,.5,.05,'#fff2b0',x0+w-.8,1.6,z0+6.82);rm.box(1.2,.8,.9,'#8a1a1a',x0+w-.8,.4,z0+6.4);
   for(let k=0;k<3;k++){rm.box(.12,.9,.12,'#c8a040',x0+3+k*2,.45,z0+6);rm.glow(.16,.1,.16,'#ffd890',x0+3+k*2,.95,z0+6)}rm.box(4,.08,.06,'#a81a2a',x0+5,.8,z0+6);
@@ -206,7 +206,7 @@ const ROOMS={
   rm.int(x0+w-4.4,z0+d-2.2,1.3,'Dance machine ($3)',()=>{if(S.energy<5){snd('err');return say('Too tired to dance.')}if(!pay(3))return;S.energy=Math.max(0,S.energy-5);snd('pop');say(pick(['Perfect combo!','Great!','You kept up with the arrows.'])+' -5 energy')})},
  karaoke(C,rm){const{x0,z0,w,d,cx,back}=rm,ac=C.s.neon||'#ff3a9a';
   D.quadY(rm.G,x0+.5,z0+.5,x0+w-.5,z0+d-1.4,.012,'#2a1a3a');
-  rm.box(5,2.6,.12,'#111',cx,1.9,back+.1);rm.sign('z',back+.18,cx-2.3,cx+2.3,.8,3,256,128,(c,W,H)=>{const g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,'#1a2a6a');g.addColorStop(1,'#6a1a6a');c.fillStyle=g;c.fillRect(0,0,W,H);c.font='bold 20px sans-serif';c.textAlign='center';c.fillStyle='#ffd23d';c.fillText('♪ sing it loud ♪',W/2,H*.55);c.fillStyle='#fff';c.fillText('the whole night through',W/2,H*.78)},'kar');
+  rm.box(5,2.6,.12,'#111',cx,1.9,back+.1);rm.sign('z',back+.18,cx-2.3,cx+2.3,.8,3,256,128,(c,W,H)=>{const g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,'#1a2a6a');g.addColorStop(1,'#6a1a6a');c.fillStyle=g;c.fillRect(0,0,W,H);c.font='bold 20px ui-monospace,Menlo,Consolas,monospace';c.textAlign='center';c.fillStyle='#ffd23d';c.fillText('♪ sing it loud ♪',W/2,H*.55);c.fillStyle='#fff';c.fillText('the whole night through',W/2,H*.78)},'kar');
   /* a U of sofas round a low table with microphones */
   rm.box(.9,.5,3.6,ac,x0+1.6,.25,z0+4.6,1);rm.box(.3,.8,3.6,ac,x0+1.2,.8,z0+4.6);rm.box(.9,.5,3.6,ac,x0+w-1.6,.25,z0+4.6,1);rm.box(.3,.8,3.6,ac,x0+w-1.2,.8,z0+4.6);rm.box(w-6,.5,.9,ac,cx,.25,z0+6.9,1);rm.box(w-6,.8,.3,ac,cx,.8,z0+7.3);
   rm.box(4,.5,1.6,'#2a2a2a',cx,.25,z0+4.8,1);[[-1,0],[1,0]].forEach(([a])=>{rm.box(.12,.12,.4,'#c8ccd0',cx+a,.56,z0+4.6);rm.box(.14,.14,.14,'#333',cx+a,.56,z0+4.4)});for(let k=0;k<5;k++)rm.box(.14,.2,.14,['#e84a3a','#e8c040','#3ad0ff','#7aff6a','#ff3a9a'][k],cx-1.4+k*.7,.6,z0+5.2);
@@ -255,8 +255,8 @@ const ROOMS={
   rm.box(7,1.1,1,'#e84a8a',x0+4.4,.55,z0+2.6,1);rm.box(7.1,.12,1.1,'#f4f4f4',x0+4.4,1.06,z0+2.6);rm.box(7,.06,1.04,'#cfe8f4',x0+4.4,1.14,z0+2.6);
   {for(let k=0;k<4;k++){rm.box(.3,.5,.3,'#cfe8f4',x0+2+k*.8,1.42,z0+2.4);rm.box(.26,.3,.26,['#ff8a30','#e84a6a','#7ac84a','#ffe066'][k],x0+2+k*.8,1.32,z0+2.4)}for(let k=0;k<10;k++)rm.box(.2,.2,.2,['#ff8a30','#ffe066','#7ac84a','#e84a3a'][k%4],x0+4.6+(k%5)*.4,1.27,z0+2.5+(k>4?.3:0))}
   for(let k=0;k<8;k++)rm.box(.45,.12,.4,T[k%T.length],x0+5.6+(k%4)*.5,1.05,z0+2.4+(k>3?.4:0));
-  staff(rm,x0+4.4,z0+1.5,0);rm.sign('z',back+.1,x0+1.5,x0+6,2.2,3.6,256,96,(c,W,H)=>{c.fillStyle='#fff6f8';c.fillRect(0,0,W,H);c.strokeStyle='#e84a8a';c.lineWidth=6;c.strokeRect(0,0,W,H);c.fillStyle='#c0397a';c.font='bold 18px sans-serif';c.textAlign='center';
-   c.fillText('ICE CREAM · JUICE',W/2,28);c.font='14px sans-serif';['Gelato','Fresh juice','Smoothies',L[0]].forEach((t,i)=>c.fillText(t,W/2,50+i*14))},'swt');
+  staff(rm,x0+4.4,z0+1.5,0);rm.sign('z',back+.1,x0+1.5,x0+6,2.2,3.6,256,96,(c,W,H)=>{c.fillStyle='#fff6f8';c.fillRect(0,0,W,H);c.strokeStyle='#e84a8a';c.lineWidth=6;c.strokeRect(0,0,W,H);c.fillStyle='#c0397a';c.font='bold 18px ui-monospace,Menlo,Consolas,monospace';c.textAlign='center';
+   c.fillText('ICE CREAM · JUICE',W/2,28);c.font='14px ui-monospace,Menlo,Consolas,monospace';['Gelato','Fresh juice','Smoothies',L[0]].forEach((t,i)=>c.fillText(t,W/2,50+i*14))},'swt');
   /* pastel tables and stools */
   [[x0+3,z0+5.6],[x0+7,z0+5.6],[x0+w-2,z0+3.8]].forEach(([x,z],i)=>{table(rm,x,z,.9,.9,'#7ad0c8');stool(rm,x-.9,z,T[i]);stool(rm,x+.9,z,T[i+2])});
   rm.box(.6,1.8,.6,'#e84a8a',x0+w-.6,.9,z0+6.8,1);rm.box(.9,.9,.9,'#ffd8e8',x0+w-.6,2.2,z0+6.8);plant(rm,x0+.7,z0+d-2);

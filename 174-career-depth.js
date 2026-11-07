@@ -57,7 +57,7 @@ function plqF(i){const p=(S.plq||[])[i]||{s:'',t:'Gold',c:'#e6b422'},k=p.t+'|'+p
  const c=p.c,y=1.7,z=-.035,b=[[.66,.8,.05,'#141414',0,y,z],[.56,.7,.02,c,0,y,z+.03],[.07,.07,.02,'#141414',0,y+.08,z+.065]];
  const f={n:p.t+' plaque: “'+String(p.s).replace(/[<>&"']/g,'')+'”',p:0,w:.7,d:.12,b,xd:1,wall:1,fx:g=>{try{const d=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.02,20),M(c=='#d8dde3'?'#f4f4f4':c));d.rotation.x=Math.PI/2;d.position.set(0,y+.08,z+.05);g.add(d);
   const cv=document.createElement('canvas');cv.width=256;cv.height=52;const x=cv.getContext('2d');x.fillStyle='#f4f1e8';x.fillRect(0,0,256,52);x.fillStyle='#141414';x.textAlign='center';x.textBaseline='middle';
-  let fs=22;x.font='bold '+fs+'px sans-serif';while(fs>10&&x.measureText(p.s).width>240){fs--;x.font='bold '+fs+'px sans-serif'}x.fillText(p.s,128,18);x.font='14px sans-serif';x.fillText(p.t.toUpperCase()+' · '+fmt(p.n||0)+' STREAMS',128,40);
+  let fs=22;x.font='bold '+fs+'px ui-monospace,Menlo,Consolas,monospace';while(fs>10&&x.measureText(p.s).width>240){fs--;x.font='bold '+fs+'px ui-monospace,Menlo,Consolas,monospace'}x.fillText(p.s,128,18);x.font='14px ui-monospace,Menlo,Consolas,monospace';x.fillText(p.t.toUpperCase()+' · '+fmt(p.n||0)+' STREAMS',128,40);
   const tx=new THREE.CanvasTexture(cv),l=new THREE.Mesh(new THREE.PlaneGeometry(.46,.094),new THREE.MeshBasicMaterial({map:tx}));l.position.set(0,y-.24,z+.042);g.add(l)}catch(e){}}};
  PQC[i]={k,f};return f}
 for(let i=0;i<600;i++)if(!(PQK(i) in F))Object.defineProperty(F,PQK(i),{get:()=>plqF(i),set(){},enumerable:false,configurable:true});
