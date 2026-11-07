@@ -21,7 +21,7 @@ window.fwProfileSync=function(force){try{
  if(!force&&sig==lastSig&&n-lastAt<900000)return Promise.resolve(0);busy=1;
  return FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(x=>{if(x.exists()&&typeof x.data().bio=='string')d.bio=x.data().bio.slice(0,160)},()=>{})
   .then(()=>{const core=Object.assign({},d,{t:Date.now()}),rf=FBF.doc(FBD,'profiles',FBU.uid);return FBF.setDoc(rf,core).catch(e0=>{window.__pfErr=(e0&&e0.code)||'error';const c2={a:core.a,h:core.h,bio:core.bio,fame:core.fame,lis:core.lis,t:core.t};return FBF.setDoc(rf,c2).then(()=>{throw e0})})}).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);if(!window.__pfWarn){window.__pfWarn=1;try{say('Profile could not save ('+((e&&e.code)||'error')+'). '+(e&&e.message?String(e.message).slice(0,120):'')+' Send James this message.')}catch(x){}}return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
-setInterval(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync()}catch(e){}},60000);
+setInterval(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync()}catch(e){}},20000);
 setTimeout(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync(1)}catch(e){}},8000);setInterval(()=>{try{if(mode=='play'||mode=='pause'){const k=live()?FBU.uid:'';if(k&&k!==window.__pfU){window.__pfU=k;fwProfileSync(1)}}}catch(e){}},5000);
 const num=n=>Math.round(+n||0).toLocaleString();
 
@@ -68,7 +68,10 @@ window.fwProfileOpen=async function(handle,byUid){
  box('<p class=m>Loading…</p>');document.body.appendChild(o);
  try{const{R,db}=F.r,uid=byUid||(await R.get(R.ref(db,'f/n/'+handle))).val();
   if(!uid){box('<h2>@'+esc(handle)+'</h2><p class=m>No player has that username.</p>');return}
-  const d=await FBF.getDoc(FBF.doc(FBD,'profiles',uid)),p=d.exists()?d.data():null;
+  const [d,lb]=await Promise.all([FBF.getDoc(FBF.doc(FBD,'profiles',uid)),FBF.getDoc(FBF.doc(FBD,'leaderboard',uid)).catch(()=>null)]);let p=d.exists()?d.data():null;
+  /* v49.91.0: the leaderboard row is the single source of truth for the numbers, so a profile always shows what the board shows */
+  const L=lb&&lb.exists&&lb.exists()?lb.data():null;
+  if(L){if(!p)p={a:L.a||'',h:handle,bio:'',fame:L.fame,lis:L.lis,f:!!L.f};else p=Object.assign({},p,{fame:L.fame,lis:L.lis})}
   if(!p){box('<h2>'+(handle?'@'+esc(handle):'Player')+'</h2><p class=m>This player has not opened the game since profiles started, so there is nothing to show yet.</p>');return}
   if(byUid&&p.h)handle=p.h;const me=uid==FBU.uid;
   full(p,handle,me,uid)
