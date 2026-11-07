@@ -6,7 +6,7 @@
 if(typeof FW_ACCT=='undefined'||!FW_ACCT||typeof FW_TRL!='undefined'&&FW_TRL)return;
 const cl=(v,m)=>Math.max(0,Math.min(m,Math.floor(+v||0)));
 const live=()=>typeof FBU!='undefined'&&FBU&&typeof FBF!='undefined'&&FBF&&typeof FBD!='undefined'&&FBD;
-let lastSig='',lastAt=0,busy=0;
+let lastSig='',lastAt=0,busy=0,ownF=0;
 const enc=u=>new Promise(r=>{const done=v=>{window.__pfPdU=u;window.__pfPd=v;r()};try{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.drawImage(im,0,0,64,64);const v=c.toDataURL('image/jpeg',.7);done(v.length<=12000?v:'')}catch(e){done('')}};im.onerror=()=>done('');im.src=u}catch(e){done('')}setTimeout(()=>{if(window.__pfPdU!==u)done('')},8000)});
 window.fwProfileSync=function(force){try{
  const h=typeof fwUsername=='function'?fwUsername():'';if(busy||!live()||!h||typeof S!='object'||!S||!S.artist||mode=='creator')return Promise.resolve(0);
@@ -21,8 +21,8 @@ window.fwProfileSync=function(force){try{
  if(!force&&sig==lastSig&&n-lastAt<900000)return Promise.resolve(0);busy=1;
  return FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(x=>{if(x.exists()&&typeof x.data().bio=='string')d.bio=x.data().bio.slice(0,160);
    /* v49.93.0: profiles/{uid}.founder (number, 1 = Founder, 0 = not) is set by the admin in the console and is kept as it is. Only a Founder with no f yet is written as 1 */
-   const ef=x.exists()?x.data().founder:undefined;if(ef===1||ef===0||ef===true||ef===false)d.founder=+ef;else if(gp(()=>isFounder()))d.founder=1},()=>{})
-  .then(()=>{const core=Object.assign({},d,{t:Date.now()}),rf=FBF.doc(FBD,'profiles',FBU.uid);return FBF.setDoc(rf,core).catch(e0=>{window.__pfErr=(e0&&e0.code)||'error';const c2={a:core.a,h:core.h,bio:core.bio,fame:core.fame,lis:core.lis,t:core.t};if(core.founder===0||core.founder===1)c2.founder=core.founder;return FBF.setDoc(rf,c2).then(()=>{throw e0})})}).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);if(!window.__pfWarn){window.__pfWarn=1;try{say('Profile could not save ('+((e&&e.code)||'error')+'). '+(e&&e.message?String(e.message).slice(0,120):'')+' Send James this message.')}catch(x){}}return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
+   const ef=x.exists()?x.data().founder:undefined;ownF=0;if(ef===1||ef===0||ef===true||ef===false){d.founder=+ef;ownF=1}else if(gp(()=>isFounder()))d.founder=1},()=>{})
+  .then(()=>{const core=Object.assign({},d,{t:Date.now()}),rf=FBF.doc(FBD,'profiles',FBU.uid);return FBF.setDoc(rf,core).catch(e0=>{window.__pfErr=(e0&&e0.code)||'error';const c2={a:core.a,h:core.h,bio:core.bio,fame:core.fame,lis:core.lis,t:core.t};/* the Founder flag is only repeated when the stored profile already has it; a new flag the rules refuse (no founders/ entry yet) must not stop the rest of the profile saving */if(ownF&&(core.founder===0||core.founder===1))c2.founder=core.founder;return FBF.setDoc(rf,c2).then(()=>{throw e0})})}).then(()=>{lastSig=sig;lastAt=n;return 1},e=>{console.warn('[profile] write',e&&e.code);window.__pfErr=window.__pfErr||((e&&e.code)||'error');return 0}).finally(()=>{busy=0})}catch(e){return Promise.resolve(0)}};
 setInterval(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync()}catch(e){}},20000);
 setTimeout(()=>{try{if(mode=='play'||mode=='pause')fwProfileSync(1)}catch(e){}},8000);setInterval(()=>{try{if(mode=='play'||mode=='pause'){const k=live()?FBU.uid:'';if(k&&k!==window.__pfU){window.__pfU=k;fwProfileSync(1)}}}catch(e){}},5000);
 const num=n=>Math.round(+n||0).toLocaleString();
