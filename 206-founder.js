@@ -120,6 +120,7 @@ const FIDS=[GJ.id,GH.id],PKS=PIECES.map(p=>p[0]);
 const isF=()=>!!(S&&S.fdr);
 window.isFounder=isF;
 window.founderSync=function(first){try{if(typeof S!='object'||!S)return;S.wr=Array.isArray(S.wr)?S.wr:[];
+ if(window.__fdOff&&S.fdr)delete S.fdr; /* v49.93.0: founders/{uid}.f = 0 in Firebase takes Founder away (209-founder-cloud.js) */
  if(!S.fdr){if(S.wr.some(i=>FIDS.includes(i))){S.wr=S.wr.filter(i=>!FIDS.includes(i));if(S.wn)for(const k in S.wn)if(FIDS.includes(S.wn[k]))delete S.wn[k]}
   if(S.inv)PKS.forEach(k=>{if(S.inv[k])delete S.inv[k]});return}
  const g=S.fdr.g=S.fdr.g||{};let n=0;S.wc=S.wc||{};S.inv=S.inv||{};

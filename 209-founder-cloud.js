@@ -1,6 +1,6 @@
 /* ---------- Founder list in the cloud ----------
    Why: a Founder claim lives in the browser (fw_legacy), so clearing site data or switching device would lose it.
-   What: Firestore founders/{uid} = {a:artist, d:day, t:time}. Only the admin can write it (see docs/security/firestore.rules.proposed);
+   What: Firestore founders/{uid} = {a:artist, d:day, t:time, f:1 or 0 (optional, see below)}. Only the admin can write it (see docs/security/firestore.rules.proposed);
    a player can only read their own. Nobody can give themselves a Founder entry.
    1. fdSnapshot(): run ONCE by the admin (signed in with the admin Google account) BEFORE the fresh start, from the browser console.
       fdSnapshot() is a dry run: it reads every cloud save and says how many players would be listed. fdSnapshot(true) writes the list.
@@ -28,14 +28,22 @@ window.fdSnapshot=async function(write){
  let n=0;for(let i=0;i<elig.length;i+=400){const b=F.writeBatch(FBD);elig.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,elig.length-i)}
  console.log('Written: '+n+' Founder entries.');return{seen,founders:n}};
 
-let done='';
+/* v49.93.0: the founder flag. founders/{uid}.f is a number: 1 = Founder, 0 = not a Founder. The admin edits it in the Firebase console
+   (Firestore > founders > the player's uid > f). 1 grants Founder even to a player the list missed (create founders/{uid} with f = 1 if there is no
+   entry yet), 0 takes it away and beats the local Founder logic. An entry with no f field still means Founder (old entries). */
+let done='',doneAt=0;
+const flag=f=>{const v=f&&f.f;return v===undefined||v===null?1:(v===true||+v===1)?1:0};
 function apply(uid,f){
+ const on=flag(f),explicit=f&&f.f!==undefined&&f.f!==null;
+ if(FW_ACCT==uid)window.__fdOff=on?0:1;
+ if(!on){try{if(typeof S=='object'&&S&&S.fdr&&FW_ACCT==uid){delete S.fdr;if(typeof founderSync=='function')founderSync(0);autoSave()}}catch(e){console.warn('founder list apply',e)}return}
  const v=rsGet(),id='fdl-'+uid;
  if(!v.e.some(e=>e.id==id)){v.e.push({id,scope:uid,slot:0,why:'Founder list',t:Date.now(),artist:String(f.a||'').slice(0,24),day:Math.min(9999,+f.d|0),money:0,followers:0,songs:0,bad:0,fd:1,used:0,code:''});rsPut(v)}
- try{if(typeof S=='object'&&S&&S.rv>=RS.V&&!S.fdr&&FW_ACCT==uid){S.fdr={v:1,a:String(f.a||'').slice(0,24),d:Math.min(9999,+f.d|0),g:{}};if(typeof founderSync=='function')founderSync(true);autoSave()}}catch(e){console.warn('founder list apply',e)}}
+ try{if(typeof S=='object'&&S&&(explicit||S.rv>=RS.V)&&!S.fdr&&FW_ACCT==uid){S.fdr={v:1,a:String(f.a||S.artist||'').slice(0,24),d:Math.min(9999,+f.d|0),g:{}};if(typeof founderSync=='function')founderSync(true);autoSave()}}catch(e){console.warn('founder list apply',e)}}
 function check(){
- if(!rd()||!rsOn()||done===FBU.uid||FBU.isAnonymous)return;const uid=FBU.uid;
- FBF.getDoc(FBF.doc(FBD,'founders',uid)).then(d=>{done=uid;if(d.exists())apply(uid,d.data())},e=>{if(!e||e.code!=='permission-denied')done=''});
- done=uid}
+ if(!rd()||!rsOn()||FBU.isAnonymous)return;const uid=FBU.uid,k=uid+'|';
+ if(done===k&&Date.now()-doneAt<600000)return;
+ done=k;doneAt=Date.now();
+ FBF.getDoc(FBF.doc(FBD,'founders',uid)).then(d=>{if(d.exists())apply(uid,d.data());else if(FW_ACCT==uid)window.__fdOff=0},e=>{if(!e||e.code!=='permission-denied'){done='';}})}
 setInterval(check,6000);setTimeout(check,2500);
 })();

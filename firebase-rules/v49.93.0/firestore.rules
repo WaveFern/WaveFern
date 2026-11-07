@@ -1,0 +1,128 @@
+rules_version = '2';
+// WaveFern Firestore rules v49.93.0, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
+// ADMIN UID: the Google account has a NEW uid in the waveferndata project. Replace wE6oPZIH... below with your uid from Authentication > Users.
+// WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
+// Only what the game uses is allowed; everything else is refused. No get()/exists() lookups, so rules never cost extra reads.
+// saves/{uid}: a Google player reads and writes only their own save; the admin reads all.
+// gifts/{id}: the admin creates and deletes; a player reads their own and marks one claimed once.
+// usernames/{name}: reserved usernames (v49.80.7); profiles/{uid}.h must match a name the player reserved.
+// founders/{uid}: cloud Founder list; admin writes, player reads own. leaderboard/{uid}, profiles/{uid}: player writes own row, signed-in players read.
+// rooms/{code}: a band host (anonymous login) writes a heartbeat carrying their own uid; only the admin reads.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function me() { return request.auth.uid; }
+    function google() { return request.auth != null && request.auth.token.firebase.sign_in_provider == 'google.com'; }
+    function admin() { return google() && me() == 'wE6oPZIHYifrqBFxzpPse6ripGY2'; }
+    function fields(k) { return request.resource.data.keys().toSet() == k.toSet(); }
+    function stamp(v) { return v is int && v > 1704067200000 && v < request.time.toMillis() + 604800000; }
+    // tighter for saves: the device clock may be at most 2 days out, either way
+    function stampNear(v) { return v is int && v > request.time.toMillis() - 172800000 && v < request.time.toMillis() + 172800000; }
+    function count(v) { return v is int && v >= 0 && v <= 1000000000000; }
+    function str(v, lo, hi) { return v is string && v.size() >= lo && v.size() <= hi; }
+    // v49.93.0 Founder flag: 1 = Founder, 0 = not. A player may write f = 0 / false any time, but f = 1 / true ONLY if the admin-controlled
+    // founders/{their uid} document exists and its f is not 0 (a missing f counts as 1, for older entries). So nobody can give themselves Founder.
+    function fdrOn() { return exists(/databases/$(database)/documents/founders/$(me())) && get(/databases/$(database)/documents/founders/$(me())).data.get('f', 1) != 0; }
+    function fdrFlagOk(d) { return !('f' in d) || (d.f is bool && (d.f == false || fdrOn())) || (d.f is int && (d.f == 0 || (d.f == 1 && fdrOn()))); }
+
+    match /saves/{uid} {
+      allow get: if google() && me() == uid || admin();
+      allow list: if admin() && request.query.limit <= 100;
+      allow create, update: if google() && me() == uid && saveOk(request.resource.data);
+      function saveOk(d) {
+        // FW4- = sealed save (see 12-save-seal.js). FW3- is accepted while old unsigned saves are still being converted; remove it after SEAL_LEGACY_UNTIL.
+        return fields(['code', 'day', 'artist', 't']) && str(d.code, 5, 1500000) && (d.code[0:4] == 'FW4-' || d.code[0:4] == 'FW3-')
+          && d.day is number && d.day >= 0 && d.day <= 100000 && str(d.artist, 0, 64) && stampNear(d.t);
+      }
+    }
+
+    // founders/{uid}: cloud Founder list (PR #98, 209-founder-cloud.js). Only the admin writes; a player reads only their own entry.
+    match /founders/{uid} {
+      allow get: if google() && me() == uid || admin();
+      allow list: if admin() && request.query.limit <= 100;
+      // f (v49.93.0): 1 = Founder, 0 = not a Founder. Optional, so older entries (no f) still count as Founder. Edit it in the console: founders > uid > f.
+      allow create, update: if admin() && request.resource.data.keys().hasAll(['a', 'd', 't']) && request.resource.data.keys().hasOnly(['a', 'd', 't', 'f'])
+        && str(request.resource.data.a, 0, 24) && count(request.resource.data.d) && stamp(request.resource.data.t)
+        && (!('f' in request.resource.data) || request.resource.data.f is int && (request.resource.data.f == 0 || request.resource.data.f == 1));
+      allow delete: if admin();
+    }
+
+    // leaderboard/{uid}: READY FOR WHEN THE LEADERBOARD GOES LIVE (today /dev/ shows dummy data and writes nothing).
+    // Any signed-in Google player reads the top lists (max 100 rows per query); a player writes only their own row, numbers bounded.
+    // Values are reported by the player's device, so this stops junk and impersonation, not a determined cheater.
+    match /leaderboard/{uid} {
+      allow get: if google();
+      allow list: if google() && request.query.limit <= 100;
+      allow create, update: if google() && me() == uid && lbOk(request.resource.data);
+      allow delete: if google() && me() == uid || admin();
+      function lbOk(d) {
+        return d.keys().hasAll(['a', 'day', 'lis', 'str', 'mon', 'fame', 'sg', 'fol', 't'])
+          && d.keys().hasOnly(['a', 'day', 'lis', 'str', 'mon', 'fame', 'sg', 'fol', 't', 'f'])
+          && fdrFlagOk(d)
+          && str(d.a, 1, 24) && d.a.matches('[^<>"]*')
+          && d.day is int && d.day >= 0 && d.day <= 100000
+          && count(d.lis) && count(d.str) && count(d.mon) && count(d.fol)
+          && d.fame is int && d.fame >= 0 && d.fame <= 1000 && d.sg is int && d.sg >= 0 && d.sg <= 100000
+          && stampNear(d.t);
+      }
+    }
+
+    // profiles/{uid}: READY FOR WHEN PUBLIC PROFILES GO LIVE (today the profile screen is a /dev/ mockup).
+    // Any signed-in Google player can open a profile; only the owner edits theirs. The Founder flag f can only be 1 if founders/{uid} says so (fdrFlagOk).
+    match /profiles/{uid} {
+      allow get: if google();
+      allow create, update: if google() && me() == uid && profOk(request.resource.data);
+      allow delete: if google() && me() == uid || admin();
+      function profOk(d) {
+        return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'f', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd'])
+          && str(d.a, 1, 24) && d.a.matches('[^<>"]*') && str(d.h, 0, 16) && d.h.matches('[a-z0-9_]*')
+          && str(d.bio, 0, 160) && d.bio.matches('[^<>"]*')
+          && d.fame is int && d.fame >= 0 && d.fame <= 1000 && count(d.lis) && stampNear(d.t)
+          // v49.83.0: Google photo (https googleusercontent only), Founder flag (only if the founders/ entry exists), join date, top songs, band, achievements bitmask
+          && (!('p' in d) || d.p is string && d.p.size() <= 300 && d.p.matches('(https://[a-z0-9.-]*googleusercontent[.]com/.*)?'))
+          && fdrFlagOk(d)
+          && (!('j' in d) || (d.j is int && d.j >= 0 && d.j <= 4000000000000)) && (!('sg' in d) || d.sg is list && d.sg.size() <= 5)
+          && (!('bn' in d) || str(d.bn, 0, 24) && d.bn.matches('[^<>"]*')) && (!('bi' in d) || str(d.bi, 0, 12)) && (!('bm' in d) || d.bm is int && d.bm >= 0 && d.bm <= 50)
+          && (!('pd' in d) || d.pd is string && d.pd.size() <= 12000 && (d.pd.size() == 0 || d.pd[0:23] == 'da' + 'ta:image/jpeg;base64,'))
+          && (!('ac' in d) || d.ac is int && d.ac >= 0 && d.ac <= 255)
+          // a profile can carry a username only if nobody else holds it: an unreserved name is allowed (v49.89.1), a reserved one must be this player's (checked against the same batch)
+          && (d.h == '' || !existsAfter(/databases/$(database)/documents/usernames/$(d.h)) || getAfter(/databases/$(database)/documents/usernames/$(d.h)).data.uid == me());
+      }
+    }
+
+    // usernames/{name}: one document per username, the document id IS the name, so two players can never hold the same one.
+    // A player can create a name only if it is free (create is refused when the document exists), release only their own, and nobody edits one.
+    match /usernames/{name} {
+      allow get: if google();
+      allow create: if google() && name.matches('[a-z0-9_]{3,16}') && name.matches('.*[a-z].*') && fields(['uid', 't'])
+        && request.resource.data.uid == me() && stampNear(request.resource.data.t);
+      allow delete: if google() && resource.data.uid == me() || admin();
+    }
+
+    match /gifts/{id} {
+      allow get, list: if admin() || google() && resource.data.to == me();
+      allow create: if admin() && giftOk(request.resource.data);
+      allow update: if google() && resource.data.to == me() && resource.data.claimed == false
+        && request.resource.data.diff(resource.data).affectedKeys() == ['claimed'].toSet()
+        && request.resource.data.claimed == true;
+      allow delete: if admin();
+      function giftOk(d) {
+        return fields(['to', 'from', 'msg', 'money', 'streams', 'listeners', 't', 'claimed'])
+          && d.to is string && d.to.matches('[A-Za-z0-9]{10,128}') && str(d.from, 0, 40) && str(d.msg, 0, 200)
+          && count(d.money) && count(d.streams) && count(d.listeners) && stamp(d.t) && d.claimed == false;
+      }
+    }
+
+    match /rooms/{code} {
+      allow get, list: if admin();
+      allow create: if request.auth != null && roomOk(request.resource.data);
+      allow update: if request.auth != null && resource.data.uid == me() && roomOk(request.resource.data);
+      allow delete: if admin() || request.auth != null && resource.data.uid == me();
+      function roomOk(d) {
+        return code.matches('[A-Z0-9]{5}') && fields(['code', 'band', 'n', 'uid', 't'])
+          && d.code == code && d.uid == me() && str(d.band, 1, 24) && d.n is int && d.n >= 1 && d.n <= 4 && stamp(d.t);
+      }
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
