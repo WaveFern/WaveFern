@@ -41,9 +41,12 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
   if(Array.isArray(S.mlHist)){const m=S.mlHist[S.mlHist.length-1];if(m)m.ml=Lf}
   /* the morning summary was drawn before this adjustment: redraw its three numbers with the final figures */
   try{const cs=document.querySelectorAll('#ui .box .cards .card');if(cs.length>=3&&h&&h.d===S.day-1&&/Streams/.test(cs[0].textContent)&&/Monthly listeners/.test(cs[2].textContent)){
-   const b0=cs[0].querySelector('b'),b1=cs[1].querySelector('b'),b2=cs[2].querySelector('b'),sm=cs[2].querySelector('small'),ov=Math.min(L0,Lf>L0?Lf:L0);
-   if(b0)b0.textContent='+'+(h.st||0).toLocaleString();if(b1)b1.textContent=$$(h.e||0);
-   if(b2)b2.textContent=ov.toLocaleString()+' → '+Lf.toLocaleString();
+   /* the base screen's "before" is the day-before-yesterday entry, and its count-up animation would overwrite these numbers: use the real official figure and detach the animated nodes */
+   const fresh=n=>{if(!n)return n;const c=n.cloneNode(false);n.replaceWith(c);return c},cu=typeof countUp=='function'?countUp:null,
+    b0=fresh(cs[0].querySelector('b')),b1=fresh(cs[1].querySelector('b')),b2=fresh(cs[2].querySelector('b')),sm=cs[2].querySelector('small'),ov=L0;
+   if(b0){b0.textContent='+'+(h.st||0).toLocaleString();if(cu&&h.st>0)cu(b0,0,h.st,1100,v=>'+'+Math.round(v).toLocaleString())}
+   if(b1){b1.textContent=$$(h.e||0);if(cu&&h.e>0)cu(b1,0,h.e,1100,v=>$$(v))}
+   if(b2){b2.textContent=ov.toLocaleString()+' → '+Lf.toLocaleString();if(cu&&Lf>ov)cu(b2,ov,Lf,1100,v=>ov.toLocaleString()+' → '+Math.round(v).toLocaleString())}
    if(sm)sm.textContent=Lf>ov?'+'+(Lf-ov).toLocaleString():Lf<ov?'-'+(ov-Lf).toLocaleString():'no change'}}catch(e){}
  }catch(e){console.error('economy pacing',e)}
  return r0};
