@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.27';
+const GAME_VERSION='v49.93.28';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.28',n:'A perfect song summary now stays centred on screen like a normal one, with just a gold outline as the perfect marker. It was being pushed into the bottom-right corner and cut off.'},
  {v:'v49.93.27',n:'Removed the 808 and Hi hat pickers from Extras on the Make a song screen. New songs now always let the beat pick its own 808 and hi hat. Songs you already made keep the sounds they had. Saves still load.'},
  {v:'v49.93.26',n:'Fan tips and the other early surprise drops (new fans, stream bursts) no longer happen while you have no monthly listeners. They start once you have at least 1 listener. Saves still load.'},
  {v:'v49.93.25',n:'Spotifly profile pictures are now always the detailed 3D ones. Artists in lists, your own picture and the Gphone app no longer get stuck on the small blocky face, and the pictures stay in memory longer. Saves still load.'},
