@@ -3,10 +3,11 @@
    band invites and nudges, each with Accept / Deny. Nudges are limited to one per friend per hour (checked here and in the database rules):
      k/TO/FROM = nudge {nm,t} (the person nudged reads and clears it) · kc/FROM/TO = time you last nudged that friend (1 hour between nudges) ===== */
 (function(){
-const HOUR=3600000,X=()=>window.FRX&&window.FRX.FR,FH={open:0,sel:'',K:{},sub:0,msg:''};
+const HOUR=3600000,X=()=>window.FRX&&window.FRX.FR,FH={open:0,sel:'',K:{},sub:0,msg:'',tab:'f',cl:{}};
 const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const okU=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
-const ICON='<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 22c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg>';
+const PG=['....####....','...######...','...######...','...######...','....####....','............','..########..','.##########.','.##########.','.##########.'];
+const ICON='<svg viewBox="0 0 12 10" width="26" height="22" shape-rendering="crispEdges" style="image-rendering:pixelated" fill="currentColor" aria-hidden="true">'+PG.map((r,y)=>[...r].map((c,x)=>c=='#'?`<rect x="${x}" y="${y}" width="1" height="1"/>`:'').join('')).join('')+'</svg>';
 const nm=f=>{const F=X(),p=F&&F.P[f];return p&&p.h?p.h:'friend'};
 const cdKey=f=>'fw_nudge_'+((X()||{}).me||'')+'_'+f;
 const lastN=f=>{try{return+localStorage.getItem(cdKey(f))||0}catch(e){return 0}};
@@ -44,6 +45,8 @@ function inject(){const c=document.querySelector('#pfx .fwpc');if(!c||c.querySel
 window.fhOpen=()=>{if(typeof needLogin=='function'&&needLogin())return;try{snd('click')}catch(e){}FH.open=1;FH.t0=Date.now();FH.sel='';FH.msg='';try{frStart()}catch(e){}draw()};
 window.fhRetry=()=>{const F=X();FH.t0=Date.now();if(F){F.on=0;F.err='';F.rerr=''}try{frStart()}catch(e){}draw()};
 window.fhClose=()=>{FH.open=0;const d=document.getElementById('fhub');if(d)d.remove()};
+window.fhTab=t=>{FH.tab=t;FH.sel='';FH.msg='';try{snd('click')}catch(e){}draw()};
+window.fhCl=k=>{FH.cl[k]=!FH.cl[k];try{snd('click')}catch(e){}draw()};
 window.fhSel=f=>{FH.sel=FH.sel==f?'':f;FH.msg='';draw()};
 function row(f){const F=X(),p=F.P[f]||{},on=!!p.o,sel=FH.sel==f,w=wait(f),h=p.h||'friend';
  let r=`<div class="fhf${sel?' sel':''}" onclick="fhSel('${f}')"><i class="fhav ${on?'on':''}">${E(h[0]||'?').toUpperCase()}</i><div><b>@${E(h)}</b><small>${on?(p.rm?'In a band room':'Online'):'Offline'}${p.nm?' · '+E(p.nm):''}</small></div></div>`;
@@ -54,11 +57,15 @@ function draw(){if(!FH.open)return;const F=X();let h='<h2>Friends</h2>';
   h+=er||old?`<p class=fhm style="color:#e0453a">${E(perm?'The database refused the connection. The Realtime Database rules may be missing or have an error.':er&&!/permission/i.test(er)?'Could not reach Friends: '+er:'Friends is taking too long to connect. Check your internet connection, make sure you are signed in with Google, and try again.')}</p><button class=go onclick="fhRetry()">Try again</button>`:'<p class=fhe>Connecting…</p>'}else if(!F.h)h+='<p class=fhe>Pick a username first so friends can find you.</p><button class=go onclick="fhClose();frOpen()">Choose username</button>';
  else{const L=Object.keys(F.L).filter(okU).sort((a,b)=>nm(a).localeCompare(nm(b))),on=L.filter(f=>(F.P[f]||{}).o),off=L.filter(f=>!(F.P[f]||{}).o);
   const Q=items().filter(i=>i.t=='q');
-  h+=`<h3>FRIEND REQUESTS${Q.length?' ('+Q.length+')':''}</h3>`+(Q.length?Q.map(i=>`<div class=fhrow><div><b>${E(i.n)}</b><small>${E(i.s)}</small></div><button class=go onclick="fhAct('qa','${i.f}')">Accept</button><button onclick="fhAct('qd','${i.f}')">Deny</button></div>`).join(''):'<p class=fhe>No pending requests.</p>');
-  h+=`<h3>ONLINE (${on.length})</h3>`+(on.map(row).join('')||'<p class=fhe>Nobody online right now.</p>')+`<h3>OFFLINE (${off.length})</h3>`+(off.map(row).join('')||'<p class=fhe>No offline friends.</p>');
-  if(!L.length)h+='<p class=fhe>No friends yet. Add one by username.</p>';
-  h+='<div class=fhr><button onclick="fhClose();frOpen()">Add or manage friends</button></div>';
-  h+='<p class=fhe>Tap a friend to nudge them. One nudge per friend per hour.</p>'}
+  h+=`<div class=fhtabs><button class="fht${FH.tab=='f'?' act':''}" onclick="fhTab('f')">Friends (${L.length})</button><button class="fht${FH.tab=='r'?' act':''}" onclick="fhTab('r')">Requests${Q.length?' <span class=fhn2>'+Q.length+'</span>':''}</button></div>`;
+  if(FH.tab=='r'){
+   h+=Q.length?Q.map(i=>`<div class=fhrow><i class=fhav>${E((i.n.replace('@','')[0]||'?')).toUpperCase()}</i><div><b>${E(i.n)}</b><small>${E(i.s)}</small></div><button class=go onclick="fhAct('qa','${i.f}')">Accept</button><button onclick="fhAct('qd','${i.f}')">Deny</button></div>`).join(''):'<p class=fhe>No pending friend requests.</p>'}
+  else{
+   const sec=(k,t,arr,em)=>`<div class=fhsh onclick="fhCl('${k}')"><span class=fhar>${FH.cl[k]?'▶':'▼'}</span> ${t} (${arr.length})</div>`+(FH.cl[k]?'':(arr.map(row).join('')||`<p class=fhe>${em}</p>`));
+   h+=sec('on','ONLINE',on,'Nobody online right now.')+sec('off','OFFLINE',off,'No offline friends.');
+   if(!L.length)h+='<p class=fhe>No friends yet. Add one by username.</p>';
+   h+='<div class=fhr><button onclick="fhClose();frOpen()">Add or manage friends</button></div>'}
+  if(FH.tab!='r')h+='<p class=fhe>Tap a friend to nudge them. One nudge per friend per hour.</p>'}
  if(FH.msg)h+=`<p class=fhm>${E(FH.msg)}</p>`;h+='<button onclick="fhClose()">Close</button>';
  let d=document.getElementById('fhub');if(!d){d=document.createElement('div');d.id='fhub';d.onclick=e=>{if(e.target===d)fhClose()};document.body.appendChild(d)}
  const sc=d.firstElementChild?d.firstElementChild.scrollTop:0;d.innerHTML='<div class="box modal fhw">'+h+'</div>';d.firstElementChild.scrollTop=sc}
@@ -72,10 +79,14 @@ setInterval(()=>{try{sub();notif();if(FH.open)draw()}catch(e){}},3000);
 {const s=document.createElement('style');s.textContent=`#ttl .fhic{position:fixed;top:12px;left:12px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;background:#0b0f0dd9;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e;color:var(--g);cursor:pointer}
 #ttl .fhic:hover{box-shadow:inset 0 0 0 2px var(--g)}.fhbadge{position:absolute;top:-8px;right:-8px;min-width:18px;padding:1px 4px;background:#e0453a;color:#fff;border:2px solid #000;font-size:11px;line-height:14px;text-align:center}
 #fhub{position:fixed;inset:0;z-index:9991;display:flex;align-items:center;justify-content:center;background:#000a;padding:12px}
+#fhub .fhw{background:#0b0f0de6;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,6px 6px 0 #000a;font-family:Silkscreen,monospace;image-rendering:pixelated}
+.fhtabs{display:flex;gap:6px}.fht{flex:1;padding:8px 6px;font-size:12px;background:#161b18;color:var(--m);border:3px solid #000;box-shadow:inset 0 -3px #0007}.fht.act{background:var(--g);color:#04120a;font-weight:700}
+.fhn2{display:inline-block;min-width:16px;padding:0 4px;background:#e0453a;color:#fff;border:2px solid #000;font-size:10px;line-height:12px;text-align:center}
+.fhsh{display:flex;align-items:center;gap:6px;padding:7px 8px;background:#161b18;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e;font-size:12px;color:var(--g);cursor:pointer;user-select:none}.fhsh:hover{box-shadow:inset 0 0 0 2px var(--g)}.fhar{font-size:10px}
 #fhub .fhw{width:min(440px,94vw);max-height:88vh;overflow:auto;display:flex;flex-direction:column;gap:8px}#fhub h2{color:var(--g)}#fhub h3,.fhn h3{margin:8px 0 2px;font-size:14px}
 .fhf{display:flex;align-items:center;gap:10px;background:#0b0f0dd9;border:3px solid #000;padding:8px;cursor:pointer}.fhf.sel,.fhf:hover{border-color:var(--g)}.fhf>div{flex:1;min-width:0;display:flex;flex-direction:column}
 .fhf b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fhf small,.fhrow small,.fhe{color:var(--m)}.fhe{font-size:12px;margin:2px 0}.fhm{color:var(--g);font-size:13px;margin:0}
-.fhav{width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;background:#2a352e;border:3px solid #000;color:#8aa094}.fhav.on{background:var(--g);color:#000}
+.fhav{width:34px;height:34px;flex:none;box-shadow:inset 0 -3px #0007;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;background:#2a352e;border:3px solid #000;color:#8aa094}.fhav.on{background:var(--g);color:#000}
 .fhcard,.fhr{display:flex;gap:6px;flex-wrap:wrap;padding:6px;background:#0b0f0d;border:3px solid #000;margin-top:-6px}.fhr{background:none;border:0;margin:0;padding:0}.fhcard button,.fhr button{flex:1;padding:7px 9px;font-size:12px}
 .fhrow{display:flex;align-items:center;gap:6px;background:#0b0f0dd9;border:3px solid #000;padding:8px;margin-top:6px}.fhrow>div{flex:1;min-width:0;display:flex;flex-direction:column}.fhrow button{padding:6px 9px;font-size:12px}`;document.head.appendChild(s)}
 })();
