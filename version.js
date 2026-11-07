@@ -3,10 +3,14 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.17';
+const GAME_VERSION='v49.93.21';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v49.93.17',n:'Friend nudges now have an escalating cooldown if you spam: the first wait is 2 minutes, then 5, then 15, then 60 minutes (the maximum). It is per friend and resets after 24 hours without nudging them. The Nudge button shows how long is left.'},
+ {v:'v49.93.21',n:'Friend nudges now have an escalating cooldown if you spam: the first wait is 2 minutes, then 5, then 15, then 60 minutes (the maximum). It is per friend and resets after 24 hours without nudging them. The Nudge button shows how long is left.'},
+ {v:'v49.93.20',n:'Fixed the perfect song screen going off the edge of the screen on phones held upright. The results window now fits the screen and scrolls, so the exit button can always be reached.'},
+ {v:'v49.93.19',n:'Fixed sprinting into a corner of your house sometimes teleporting you outside. The anti-stuck rescue no longer triggers when you are just pressed against a wall, and it now puts you back where you last stood instead of the nearest open spot, which could be on the other side of the wall.'},
+{v:'v49.93.18',n:'Walking and running now wear out your energy, slower than making a song. Sprinting drains it faster than walking, standing still drains nothing, the Energy pack still slows it, and it never drops below 0.'},
+ {v:'v49.93.17',n:'Fixed friends going offline with permission denied. Saving your username and online status now sends the name stamp the database rules require, and if it is refused the game retries without the display name. A failed online status now backs off for a while instead of retrying every 4 seconds.'},
  {v:'v49.93.16',n:'The loading bar is now properly honest: it moves in steps as scripts, menu buttons, sign-in and the stadium become ready, and keeps easing forward while it waits instead of jumping to 97 percent and sitting there. Saves still load.'},
  {v:'v49.93.15',n:'Fixed the loading screen looking stuck on 92 percent. The bar now fills as each part of the main menu becomes ready (menu buttons, stadium, profile) and finishes at 100 percent. Saves still load.'},
 {v:'v49.93.14',n:'Fixed friends showing as a plain letter with no photo or name. If a friend\'s online status entry is missing, the Friends list now reads their public profile instead, so you see their username, artist name and Google photo, and the Profile button opens their profile properly. Both players should refresh to get this.'},
