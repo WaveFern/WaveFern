@@ -28,3 +28,21 @@ let GDB=null;
   if(m&&Math.hypot(mapSX(m.x)*M.z+M.ox-sx,mapSZ(m.z)*M.z+M.oy-sy)<14)S.gmark=null;else S.gmark={x:Math.round(wx),z:Math.round(wz)};
   try{snd('pop')}catch(_){}mapDraw();const h=$('gdhint');if(h)h.textContent=S.gmark?'Marker set. A blue line will lead you there.':'Marker removed.'});
  const p=c.parentNode.nextElementSibling;if(p){const s=document.createElement('span');s.id='gdhint';s.className='m';s.textContent=S.gmark?' Marker set (tap it to remove).':' Tap the map to place a marker.';p.appendChild(s)}}catch(e){}}}
+/* ===== v49.90.0: taxi to your marker =====
+   A "Taxi to marker" button on the world map (shown while a marker is placed). The taxi drops you at the point on the road
+   closest to the marker and you walk the rest; the blue guide line then continues from there. It is one of the day's normal taxi trips:
+   the same fare (0.18 per metre) and the same one-trip-a-day rule as every other destination (S.taxi, 89-taxi-once.js), with the ride back. */
+function gdRoadPt(m){let b=null,bd=1e9;ROADS.forEach(r=>{if(r[3]>=INTERIOR_Z)return;const x=Math.max(r[0],Math.min(r[2],m.x)),z=Math.max(r[1],Math.min(r[3],m.z)),d=Math.hypot(x-m.x,z-m.z);if(d<bd){bd=d;b={x:x,z:z}}});return b}
+function gdTaxiFare(){const m=S.gmark,d=m&&gdRoadPt(m);return d?Math.round(Math.hypot(P.x-d.x,P.z-d.z)*.18):0}
+function taxiMark(){if(IN)return;const m=S.gmark;if(!m)return say('Tap the map to place a marker first.');
+ try{if(inCity())return say('You are abroad. Use the city map (N) for a local taxi.')}catch(e){}
+ const d=gdRoadPt(m);if(!d)return say('No road leads to that marker.');const T=taxiDay();
+ if(T.back){snd('err');return say('You already used your taxi today. A new one comes tomorrow.')}
+ if(T.go){snd('err');return say('Today\'s taxi only takes you back'+(T.fl?' to '+T.fl:'')+' now.')}
+ const c=Math.round(Math.hypot(P.x-d.x,P.z-d.z)*.18);if(S.money<c){snd('err');return say('Taxi costs $'+c)}
+ const px=P.x,pz=P.z;S.money=+(S.money-c).toFixed(2);P.x=d.x;P.z=d.z;camT.x=P.x;camT.z=P.z;
+ T.go=1;T.fx=px;T.fz=pz;T.fl=taxiSpot(px,pz)||'';T.to='the road by your marker';
+ closeUI();snd('whoosh');say('Taxi fare $'+c+'. Dropped at the closest road, walk the rest. Your taxi will wait to take you back once today.')}
+{const b0=bigMap;bigMap=function(){b0.apply(this,arguments);try{const r=document.querySelector('#ui .row2');if(!$('bm')||!r)return;const bt=document.createElement('button');bt.id='gdtaxi';bt.onclick=taxiMark;r.insertBefore(bt,r.lastElementChild);
+ const up=()=>{const T=taxiDay(),on=!!S.gmark&&!T.go;bt.style.display=on?'':'none';if(on)bt.textContent='Taxi to marker ($'+gdTaxiFare()+')'};up();
+ const c=$('bm');if(c)c.addEventListener('pointerup',()=>setTimeout(up,0))}catch(e){}}}
