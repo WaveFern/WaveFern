@@ -170,10 +170,10 @@
  /* ---- the camera shots ---- */
  const lerp=(p,q,u)=>p+(q-p)*u,ease=u=>u*u*(3-2*u);
  const SHOTS=[
-  {n:'crane',d:10,f:(u,c)=>{const th=lerp(-.75,.12,u),R0=66;c.set(Math.sin(th)*R0,lerp(33,23,u),Math.cos(th)*R0,0,6,SZ+8,52)}},
+  {n:'crane',d:10,f:(u,c)=>{const th=lerp(-.75,.12,u),R0=lerp(88,80,u);c.set(Math.sin(th)*R0,lerp(40,32,u),Math.cos(th)*R0,0,6,SZ+8,52)}},
   {n:'singer',d:9,f:(u,c)=>c.set(lerp(-5.5,-3,u),4.3,lerp(SZ-1.5,SZ+3,u),1,3.4,20,60)},
   {n:'catwalk',d:9,f:(u,c)=>c.set(0,3.6,lerp(12,-6,u),lerp(-3,3,u),7,SZ,60)},
-  {n:'barrier',d:9,f:(u,c)=>{const x=lerp(-18,16,u);c.set(x,4.6,SZ+5.4,x+9,2.4,SZ+28,62)}},
+  {n:'barrier',d:9,f:(u,c)=>{const x=lerp(-18,16,u);c.set(x,5.4,SZ+8.2,x+9,2.6,SZ+28,62)}},
   {n:'stands',d:10,f:(u,c)=>c.set(lerp(18,6,u),8.5,34,lerp(2,-2,u),7,SZ+2,52)},
   {n:'side',d:9,f:(u,c)=>c.set(-52,lerp(7,12,u),lerp(6,-6,u),lerp(-8,6,u),4,lerp(-8,-16,u),58)},
   {n:'wide',d:10,f:(u,c)=>c.set(lerp(-40,-30,u),lerp(18,14,u),lerp(-24,-14,u),8,5,12,56)}
@@ -267,5 +267,5 @@
   }catch(e){}
  }
  requestAnimationFrame(tick);
- M.build=build;M.cam=camApi;M.SHOTS=SHOTS;M.jump=i=>{T.shot=(i-1+SHOTS.length)%SHOTS.length;T.shotT=999};
+ M.build=build;M.cam=camApi;M.dbg=()=>({SC,CAM});M.SHOTS=SHOTS;M.jump=i=>{T.shot=(i-1+SHOTS.length)%SHOTS.length;T.shotT=999};
 })();
