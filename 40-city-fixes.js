@@ -20,7 +20,7 @@ const XV=[.62,.47,.62];/* unit vector towards the camera: faces turned away from
 const XC=new THREE.Color();
 function xgNew(){return{c:{}}}
 function xgCell(G,x,z){const k=Math.floor(x/60)+','+Math.floor(z/60);return G.c[k]||(G.c[k]={P:[],N:[],C:[],I:[]})}
-function xgPush(B,pts,col,nx,ny,nz){XC.set(col);const k=B.P.length/3;pts.forEach(q=>{B.P.push(q[0],q[1],q[2]);B.N.push(nx,ny,nz);B.C.push(XC.r,XC.g,XC.b)});return k}
+function xgPush(B,pts,col,nx,ny,nz){XC.set(typeof col=='string'&&col[0]=='*'?'#'+col.slice(1):col);/* '*'+hex means glowing in the box helper B(); merged geometry has no glow, so use the plain colour (an unknown name made three.js warn) */const k=B.P.length/3;pts.forEach(q=>{B.P.push(q[0],q[1],q[2]);B.N.push(nx,ny,nz);B.C.push(XC.r,XC.g,XC.b)});return k}
 function xgNrm(a,b,d){let nx=(b[1]-a[1])*(d[2]-a[2])-(b[2]-a[2])*(d[1]-a[1]),ny=(b[2]-a[2])*(d[0]-a[0])-(b[0]-a[0])*(d[2]-a[2]),nz=(b[0]-a[0])*(d[1]-a[1])-(b[1]-a[1])*(d[0]-a[0]);const l=Math.hypot(nx,ny,nz);return l<1e-9?null:[nx/l,ny/l,nz/l]}
 const xgSeen=n=>n[0]*XV[0]+n[1]*XV[1]+n[2]*XV[2]>-.02;
 /* quad a,b,c,d counter-clockwise seen from its front */
