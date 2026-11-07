@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.8';
+const GAME_VERSION='v49.93.9';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.9',n:'Fixed the profile save that kept failing: the game no longer asks for the Founder flag unless your Founder entry exists in the cloud, and if the full profile is ever refused it saves the basic profile and says so quietly. Also stopped three.js complaining about glowing airport and shop box colours, and stopped repeating the Google photo CORS error.'},
  {v:'v49.93.8',n:'The Friends icon is now two pixel-art people side by side. Also: saving or copying your username to the friends database now includes the once-a-month name stamp the database rules require, which fixes the permission denied errors and lets friend requests send.'},
  {v:'v49.93.7',n:'Removed the "Profile could not save... Send James this message" pop-up. A Founder whose Founder entry is not in the cloud yet no longer stops the rest of the profile (name, level, listeners, songs) from saving.'},
  {v:'v49.93.6',n:'Adding a friend by username now works for every player, including ones whose username is only saved on their profile (no more No player is called that).'},
