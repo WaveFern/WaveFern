@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.11';
+const GAME_VERSION='v49.93.12';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.93.12',n:'Cleaned up the browser console: removed a security-policy error from the dev shops script and the leftover three.js unknown-colour warnings.'},
  {v:'v49.93.11',n:'The main menu stadium cutscenes no longer clip into anything: the crane shot now stays outside and above the roof ring and floodlights, and the barrier shot keeps clear of the barrier and speakers.'},
  {v:'v49.93.10',n:'Fixed the morning summary: the monthly listeners "before" number and the +change underneath now match (the change is always after minus before), and the streams, earned and listeners numbers no longer flip back to older values while counting up. Saves still load.'},
  {v:'v49.93.9',n:'Fixed the profile save that kept failing: the game no longer asks for the Founder flag unless your Founder entry exists in the cloud, and if the full profile is ever refused it saves the basic profile and says so quietly. Also stopped three.js complaining about glowing airport and shop box colours, and stopped repeating the Google photo CORS error.'},
