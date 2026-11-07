@@ -11,6 +11,13 @@ const LAPSE_TXT=['oh hey. so I waited for you all day. no worries though, it is 
  'wow. a whole day waiting and not even a text. I cancelled it and sent your money back.',
  'no, no, do not worry about me, I only waited all day. where were you?',
  'I am not mad, just curious what was more important than the session we booked. I waited a full day.'];
+/* texts for when it was snowing (S.wx.k=='snow', set by the Christmas weather) while they waited */
+const LAPSE_SNOW=['I stood out in the snow for you all day. my toes are gone. where were you?',
+ 'it was snowing and I waited for you anyway. a whole day. I hope the snow was worth it for you, wherever you were.',
+ 'so I froze out there for you all day. no big deal, I love being a snowman. where were you?',
+ 'I had snow in my shoes, snow in my hair, and no you. thanks for that. I cancelled it.',
+ 'the snow stacked up on me while I waited for you. not even a text. I am heading home, your money is back.',
+ 'nice weather for standing around alone, I guess. it snowed on me all day. where were you?'];
 const lapseNow=()=>S.day*600+(S.t||0);
 function lapseCheck(){
  if(typeof S=='undefined'||!S||!S.msgs)return;
@@ -24,7 +31,7 @@ function lapseCheck(){
   try{refundM(m)}catch(e){console.error(e)}
   m.state=0;m.stage=2;m.ready=1;m.paid=0;m.recv=0;delete m.bookT;
   m.rel=(m.rel||0)-1;m.unread=1;
-  m.log.push({f:'a',t:deco(a,pick(LAPSE_TXT)),d:S.day});
+  const snowy=S.wx&&S.wx.k=='snow'&&S.wx.d===S.day;m.log.push({f:'a',t:deco(a,pick(snowy?LAPSE_SNOW:LAPSE_TXT)),d:S.day});
   try{syncArt()}catch(e){}
   try{updateVersion()}catch(e){}
   try{snd('ping')}catch(e){}
