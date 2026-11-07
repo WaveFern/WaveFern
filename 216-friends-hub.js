@@ -42,7 +42,8 @@ function notif(){document.querySelectorAll('.fhn').forEach(e=>{e.innerHTML=nHtml
 function inject(){const c=document.querySelector('#pfx .fwpc');if(!c||c.querySelector('.fhn')||!c.querySelector('[data-pf=edit]'))return;
  const d=document.createElement('div');d.className='pf-sec fhn';d.innerHTML=nHtml();const at=c.querySelector('.pf-priv')||c.querySelector('.pf-acts');at?at.parentNode.insertBefore(d,at):c.appendChild(d)}
 /* ---- the Friends panel ---- */
-window.fhOpen=()=>{if(typeof needLogin=='function'&&needLogin())return;try{snd('click')}catch(e){}FH.open=1;FH.sel='';FH.msg='';try{frStart()}catch(e){}draw()};
+window.fhOpen=()=>{if(typeof needLogin=='function'&&needLogin())return;try{snd('click')}catch(e){}FH.open=1;FH.t0=Date.now();FH.sel='';FH.msg='';try{frStart()}catch(e){}draw()};
+window.fhRetry=()=>{const F=X();FH.t0=Date.now();if(F){F.on=0;F.err='';F.rerr=''}try{frStart()}catch(e){}draw()};
 window.fhClose=()=>{FH.open=0;const d=document.getElementById('fhub');if(d)d.remove()};
 window.fhSel=f=>{FH.sel=FH.sel==f?'':f;FH.msg='';draw()};
 function row(f){const F=X(),p=F.P[f]||{},on=!!p.o,sel=FH.sel==f,w=wait(f),h=p.h||'friend';
@@ -50,7 +51,8 @@ function row(f){const F=X(),p=F.P[f]||{},on=!!p.o,sel=FH.sel==f,w=wait(f),h=p.h|
  if(sel)r+=`<div class=fhcard><button onclick="fwProfileOpen('${E(h)}')">Profile</button><button class=go ${w?'disabled':''} onclick="fhNudge('${f}')">${w?'Nudged ('+mins(w)+')':'Nudge to play'}</button>${on&&p.rm&&!(typeof MPS!='undefined'&&MPS&&MPS.code===p.rm)?`<button onclick="frJoin('${f}')">Join band</button>`:''}</div>`;
  return r}
 function draw(){if(!FH.open)return;const F=X();let h='<h2>Friends</h2>';
- if(!F||!F.ok)h+='<p class=fhe>Connecting…</p>';else if(!F.h)h+='<p class=fhe>Pick a username first so friends can find you.</p><button class=go onclick="fhClose();frOpen()">Choose username</button>';
+ if(!F||!F.ok){const er=F&&(F.rerr||F.err),old=Date.now()-(FH.t0||Date.now())>12000,perm=/permission/i.test(String(er||''));FH.t0=FH.t0||Date.now();
+  h+=er||old?`<p class=fhm style="color:#e0453a">${E(perm?'The database refused the connection. The Realtime Database rules may be missing or have an error.':er&&!/permission/i.test(er)?'Could not reach Friends: '+er:'Friends is taking too long to connect. Check your internet connection, make sure you are signed in with Google, and try again.')}</p><button class=go onclick="fhRetry()">Try again</button>`:'<p class=fhe>Connecting…</p>'}else if(!F.h)h+='<p class=fhe>Pick a username first so friends can find you.</p><button class=go onclick="fhClose();frOpen()">Choose username</button>';
  else{const L=Object.keys(F.L).filter(okU).sort((a,b)=>nm(a).localeCompare(nm(b))),on=L.filter(f=>(F.P[f]||{}).o),off=L.filter(f=>!(F.P[f]||{}).o);
   h+=`<h3>ONLINE (${on.length})</h3>`+(on.map(row).join('')||'<p class=fhe>Nobody online right now.</p>')+`<h3>OFFLINE (${off.length})</h3>`+(off.map(row).join('')||'<p class=fhe>No offline friends.</p>');
   if(!L.length)h+='<p class=fhe>No friends yet. Add one by username.</p>';

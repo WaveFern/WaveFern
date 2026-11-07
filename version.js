@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.90.0';
+const GAME_VERSION='v49.90.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.90.1',n:'The Friends panel now shows a clear error with a Try again button instead of staying on Connecting forever.'},
  {v:'v49.90.0',n:'Taxi to your marker: with a marker on the world map, a Taxi to marker button takes you to the road closest to it and you walk the rest, with the blue guide line continuing from the drop-off. It uses the same fare and one-trip-a-day rule as the other taxi rides.'},
  {v:'v49.89.0',n:'New Friends icon in the top left of the main menu: your friends in alphabetical order, Online and Offline. Tap a friend to view their profile or nudge them to play (one nudge per friend per hour). Your profile now has a Notifications section with friend requests, band invites and nudges you can accept or deny.'},
  {v:'v49.88.0',n:'Followers are nerfed: every follower reward is now four times smaller, and existing careers are divided by four once on load (profile and leaderboard follow). Saves still load.'},
