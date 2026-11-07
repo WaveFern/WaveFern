@@ -21,7 +21,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>{
   [55,()=>document.readyState=='complete'], /* every script has loaded and run */
   [70,()=>{const t=document.getElementById('ttl'),fb=typeof FBU!='undefined'&&FBU; /* menu buttons */
    return t&&t.querySelector('.ttm')&&(!window.LB||t.querySelector('button[onclick="LB.open()"]'))&&(!fb||!window.FW_PROFILE||t.querySelector('.fwpf-ic'))&&(!fb||typeof menuIcon!='function'||t.querySelector('.fhic'))}],
-  [80,()=>(typeof FB_ON=='undefined'||!FB_ON||window.FW_AUTH_DONE)&&(!(typeof FBU!='undefined'&&FBU)||typeof CLD=='undefined'||CLD.ok||CLD.err)], /* sign-in and profile / cloud save */
+  [80,()=>typeof FB_ON=='undefined'||!FB_ON||window.FW_AUTH_DONE], /* sign-in state known (the cloud save check cannot start until this screen is gone, so it is not waited for) */
   [100,()=>{const M=window.FW_MENUSTAGE;return !M||!(M.state=='idle'||M.state=='building')||!document.body.classList.contains('fwmenubg')||performance.now()-stT>7000}]]; /* stadium scene (waits at most 7 s, then the still picture shows) */
  let st=0,stT=performance.now(),shown=0;
  const ready=()=>{
