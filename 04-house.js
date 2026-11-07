@@ -13,11 +13,11 @@ function buildHouse(){
  
  const l1=new THREE.PointLight(0xffc080,.5,9);l1.position.set(3,1.5,1);g.add(l1);lamps.push(l1);
  
- B(g,.9,1.2,.05,'#c8506a',3.8,1.9,.04);B(g,.7,.2,.06,'#ffd27a',3.8,2.2,.05);B(g,1.6,1.2,.05,'*8fd0ff',1.2,1.8,.02);
+ B(g,.9,1.2,.05,'#c8506a',3.8,1.9,.04);B(g,.7,.2,.06,'#ffd27a',3.8,2.2,.05);
  buildStudio();return g}
 function buildStudio(){
  if(studio)scene.remove(studio);const g=studio=new THREE.Group();scene.add(g);dyn=[];const G=S.gear;
- B(g,3.2,.03,3,'#3a2f4a',12.6,.02,2.6);B(g,1.6,1.2,.05,'*8fd0ff',9.4,1.8,.02);
+ B(g,3.2,.03,3,'#3a2f4a',12.6,.02,2.6);
  const l=G.chair,cc=['#8b6b47','#333a44','#2f6fb5','#a8242c'][l];
  B(g,.5+.05*l,.4+.05*l,.5+.05*l,cc,13.6,.2+.03*l,2.8);if(l){B(g,.5+.05*l,.3+.25*l,.08,cc,13.6,.7+.1*l,2.55);B(g,.08,.4,.08,'#222',13.6,.1,2.8)}if(l==3)B(g,.7,.1,.1,'#e6b422',13.6,1.4,2.55);
  B(g,.45,.04,.45,'#222',12.2,.02,1.5);B(g,.06,1.2,.06,'#222',12.2,.6,1.5);const mc=['#555','#2a2a2e','#aab3bd','#c9a227'][G.mic];B(g,.14+.03*G.mic,.25,.14+.03*G.mic,mc,12.2,1.3,1.5);if(G.mic>=2)B(g,.4,.4,.03,'#111',12.2,1.35,1.75);
