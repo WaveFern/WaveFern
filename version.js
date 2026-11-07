@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.12';
+const GAME_VERSION='v49.93.13';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+{v:'v49.93.13',n:'The loading screen now stays up until the main menu is truly ready: the Leaderboard, Profile and Friends buttons, the stadium scene and your profile data are all loaded first. It still gives up after 15 seconds so it can never get stuck. Saves still load.'},
  {v:'v49.93.12',n:'Cleaned up the browser console: removed a security-policy error from the dev shops script and the leftover three.js unknown-colour warnings.'},
  {v:'v49.93.11',n:'The main menu stadium cutscenes no longer clip into anything: the crane shot now stays outside and above the roof ring and floodlights, and the barrier shot keeps clear of the barrier and speakers.'},
  {v:'v49.93.10',n:'Fixed the morning summary: the monthly listeners "before" number and the +change underneath now match (the change is always after minus before), and the streams, earned and listeners numbers no longer flip back to older values while counting up. Saves still load.'},
