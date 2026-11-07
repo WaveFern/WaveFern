@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.93.16';
+const GAME_VERSION='v49.94.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.94.0',n:'All music and sound now fades out when you leave the tab (soundtrack, menu music, car radios, songs, ambience and effects) and fades back in when you return. Anything you had muted or paused stays that way.'},
  {v:'v49.93.16',n:'The loading bar is now properly honest: it moves in steps as scripts, menu buttons, sign-in and the stadium become ready, and keeps easing forward while it waits instead of jumping to 97 percent and sitting there. Saves still load.'},
  {v:'v49.93.15',n:'Fixed the loading screen looking stuck on 92 percent. The bar now fills as each part of the main menu becomes ready (menu buttons, stadium, profile) and finishes at 100 percent. Saves still load.'},
 {v:'v49.93.14',n:'Fixed friends showing as a plain letter with no photo or name. If a friend\'s online status entry is missing, the Friends list now reads their public profile instead, so you see their username, artist name and Google photo, and the Profile button opens their profile properly. Both players should refresh to get this.'},
