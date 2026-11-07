@@ -12,7 +12,7 @@ function bbHue(n){let h=0;for(const c of String(n))h=(h*31+c.charCodeAt(0))>>>0;
 function bbAds(){const ads=ART.filter(a=>a[2]>=BB.ROSTER_LIS).map(a=>({n:a[0],g:a[1],c:bbHue(a[0]),tag:'New music out now'}));
  if(S.listeners>=BB.PLAYER_LIS)ads.push({n:S.artist||'Your name',g:'Your music',c:'#1a6b4a',tag:S.listeners.toLocaleString()+' monthly listeners'});
  return ads}
-function bbDraw(cv,ad){const x=cv.getContext('2d'),W=cv.width,H=cv.height,f=(sz,w)=>`${w?'bold ':''}${sz}px Arial,Helvetica,sans-serif`;
+function bbDraw(cv,ad){const x=cv.getContext('2d'),W=cv.width,H=cv.height,f=(sz,w)=>`${w?'bold ':''}${sz}px ui-monospace,Menlo,Consolas,monospace`;
  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,ad.c);g.addColorStop(1,'#0b0f0d');x.fillStyle=g;x.fillRect(0,0,W,H);
  x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';let fs=56;x.font=f(fs,1);while(fs>20&&x.measureText(ad.n).width>W-40){fs-=2;x.font=f(fs,1)}
  x.fillText(ad.n,W/2,H*.4);

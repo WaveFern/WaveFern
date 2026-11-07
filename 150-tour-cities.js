@@ -120,7 +120,7 @@ D.winMat=winMat;D.WU=WU;D.mkG=mkG;D.own=own;D.flushTo=flushTo;D.quadY=quadY;D.qu
 
 /* ---------- sign painting ---------- */
 const CJK=l=>l=='ja'||l=='zh'||l=='ko';
-const SFONT='"Trebuchet MS","Noto Sans","Noto Sans CJK JP","Hiragino Sans","Microsoft YaHei","Malgun Gothic",Arial,sans-serif';
+const SFONT='ui-monospace,Menlo,Consolas,monospace';
 function fitF(x,t,size,w,bold){let s=size;x.font=(bold===false?'':'bold ')+s+'px '+SFONT;while(x.measureText(t).width>w&&s>8){s--;x.font=(bold===false?'':'bold ')+s+'px '+SFONT}return s}
 function signArt(x,W,H,t,o){o=o||{};const bg=o.bg||'#14121a',fg=o.fg||'#fff';x.fillStyle=bg;x.fillRect(0,0,W,H);
  if(o.neon){x.strokeStyle=fg;x.lineWidth=4;x.shadowColor=fg;x.shadowBlur=14;x.strokeRect(6,6,W-12,H-12)}else{x.fillStyle=o.trim||'rgba(255,255,255,.18)';x.fillRect(0,H-6,W,6)}

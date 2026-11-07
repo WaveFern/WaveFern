@@ -2,7 +2,7 @@
 /* WaveFern logo: black tile, green circle, three black lines (an SVG, so it stays sharp at every size) */
 const SFLOGO='data:image/svg+xml,'+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='#000'/><circle cx='32' cy='32' r='25' fill='#b38cff'/><g stroke='#000' stroke-width='5' stroke-linecap='round'><path d='M18 23h28M20 32h24M22 41h20'/></g></svg>");
 /* the embedded wallpaper still says the old name, so the WaveFern wallpaper is drawn here: the same green with the logo and the name in the corner */
-const WPIMG=(()=>{try{const c=document.createElement('canvas');c.width=1920;c.height=1080;const x=c.getContext('2d');x.fillStyle='#48b170';x.fillRect(0,0,1920,1080);x.fillStyle='#000';x.font='230px Arial,Helvetica,sans-serif';x.textAlign='right';x.fillText('spotifly',1880,930);
+const WPIMG=(()=>{try{const c=document.createElement('canvas');c.width=1920;c.height=1080;const x=c.getContext('2d');x.fillStyle='#48b170';x.fillRect(0,0,1920,1080);x.fillStyle='#000';x.font='230px ui-monospace,Menlo,Consolas,monospace';x.textAlign='right';x.fillText('spotifly',1880,930);
  const w=x.measureText('wavefern').width,s=180,lx=1880-w-s-36,ly=930-s+8,r=32;x.beginPath();x.moveTo(lx+r,ly);x.arcTo(lx+s,ly,lx+s,ly+s,r);x.arcTo(lx+s,ly+s,lx,ly+s,r);x.arcTo(lx,ly+s,lx,ly,r);x.arcTo(lx,ly,lx+s,ly,r);x.fill();
  x.fillStyle='#b38cff';x.beginPath();x.arc(lx+s/2,ly+s/2,s*.39,0,Math.PI*2);x.fill();x.strokeStyle='#000';x.lineCap='round';x.lineWidth=s*.078;[[-.14,.22],[0,.19],[.14,.156]].forEach(([dy,hw])=>{x.beginPath();x.moveTo(lx+s/2-s*hw,ly+s/2+s*dy);x.lineTo(lx+s/2+s*hw,ly+s/2+s*dy);x.stroke()});
  return c.toDataURL('image/jpeg',.9)}catch(e){return window.EMBEDDED_ASSETS.wallpaper}})();

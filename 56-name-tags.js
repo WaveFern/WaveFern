@@ -12,7 +12,7 @@
 const NTL=[];/* labels not yet known to be a name tag or a sign */
 {const l0=lbl;lbl=function(t,w=3){let s;try{const c=document.createElement('canvas');c.width=512;c.height=96;const x=c.getContext('2d');
   x.fillStyle='rgba(8,12,16,.72)';const r=22;x.beginPath();x.moveTo(r,4);x.arcTo(508,4,508,92,r);x.arcTo(508,92,4,92,r);x.arcTo(4,92,4,4,r);x.arcTo(4,4,508,4,r);x.fill();
-  let fs=46;const F=()=>x.font='bold '+fs+'px "Trebuchet MS",Verdana,"DejaVu Sans",sans-serif';F();while(x.measureText(t).width>470&&fs>14){fs--;F()}
+  let fs=46;const F=()=>x.font='bold '+fs+'px ui-monospace,Menlo,Consolas,monospace';F();while(x.measureText(t).width>470&&fs>14){fs--;F()}
   x.textAlign='center';x.textBaseline='middle';x.lineJoin='round';x.lineWidth=7;x.strokeStyle='#05080a';x.strokeText(t,256,50);x.fillStyle='#ffffff';x.fillText(t,256,50);
   const tx=new THREE.CanvasTexture(c);tx.minFilter=THREE.LinearMipmapLinearFilter;tx.magFilter=THREE.LinearFilter;tx.anisotropy=4;
   s=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,depthTest:false,transparent:true}));s.scale.set(w,w*48/256,1)}catch(e){s=l0(t,w)}

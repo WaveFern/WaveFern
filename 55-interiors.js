@@ -33,7 +33,7 @@ function ixTex(kind,a,b,rx,ry){const cv=document.createElement('canvas');cv.widt
 /* ---- wall signs (canvas text, smooth so they stay readable at the game's low resolution) ---- */
 function ixSign(t,fg,bg,w,h,o){o=o||{};const cv=document.createElement('canvas');cv.width=512;cv.height=Math.max(32,Math.pow(2,Math.round(Math.log2(512*h/w))));const x=cv.getContext('2d'),H=cv.height;
  x.fillStyle=bg;x.fillRect(0,0,512,H);if(o.border){x.strokeStyle=o.border;x.lineWidth=Math.max(4,H*.08);x.strokeRect(x.lineWidth/2,x.lineWidth/2,512-x.lineWidth,H-x.lineWidth)}
- let fs=Math.floor(H*(o.k||.62));x.font=(o.f||'bold ')+fs+'px '+(o.ff||'"Trebuchet MS",Verdana,sans-serif');while(x.measureText(t).width>470&&fs>8){fs--;x.font=(o.f||'bold ')+fs+'px '+(o.ff||'"Trebuchet MS",Verdana,sans-serif')}
+ let fs=Math.floor(H*(o.k||.62));x.font=(o.f||'bold ')+fs+'px '+(o.ff||'ui-monospace,Menlo,Consolas,monospace');while(x.measureText(t).width>470&&fs>8){fs--;x.font=(o.f||'bold ')+fs+'px '+(o.ff||'ui-monospace,Menlo,Consolas,monospace')}
  x.textAlign='center';x.textBaseline='middle';if(o.glow){x.shadowColor=o.glow;x.shadowBlur=H*.2}x.lineWidth=Math.max(3,fs*.12);x.strokeStyle=o.stroke||'rgba(0,0,0,.55)';x.strokeText(t,256,H/2+fs*.04);x.fillStyle=fg;x.fillText(t,256,H/2+fs*.04);
  const tx=new THREE.CanvasTexture(cv);tx.minFilter=THREE.LinearMipmapLinearFilter;tx.magFilter=THREE.LinearFilter;tx.anisotropy=4;return new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tx}))}
 

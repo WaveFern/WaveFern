@@ -52,8 +52,8 @@ function tfDiscTex(pl){const k='d'+pl;if(TFTX[k])return TFTX[k];return TFTX[k]=t
  F('#e6d8b0',7,38,W-14,9);F('#8a7a50',10,40,W-20,1);F('#8a7a50',12,43,W-24,1)})}
 function tfBoard(title,lines,fg,bg,ac,w,h){const k='b'+title+lines.join('|')+fg+bg;if(TFTX[k])return TFTX[k];
  return TFTX[k]=tfCan(512,Math.round(512*h/w/32)*32||64,(x,W,H)=>{x.fillStyle=bg;x.fillRect(0,0,W,H);x.strokeStyle=ac;x.lineWidth=8;x.strokeRect(4,4,W-8,H-8);
-  const n=lines.length+1.6,lh=H/n;x.textAlign='center';x.textBaseline='middle';x.fillStyle=ac;x.font='bold '+Math.floor(lh*.62)+'px "Trebuchet MS",Verdana,sans-serif';x.fillText(title,W/2,lh*.85);
-  x.fillStyle=fg;x.font=Math.floor(lh*.5)+'px "Trebuchet MS",Verdana,sans-serif';lines.forEach((t,i)=>{const p=t.split('|');if(p.length>1){x.textAlign='left';x.fillText(p[0],W*.08,lh*(i+1.95));x.textAlign='right';x.fillText(p[1],W*.92,lh*(i+1.95));x.textAlign='center'}else x.fillText(t,W/2,lh*(i+1.95))})},1)}
+  const n=lines.length+1.6,lh=H/n;x.textAlign='center';x.textBaseline='middle';x.fillStyle=ac;x.font='bold '+Math.floor(lh*.62)+'px ui-monospace,Menlo,Consolas,monospace';x.fillText(title,W/2,lh*.85);
+  x.fillStyle=fg;x.font=Math.floor(lh*.5)+'px ui-monospace,Menlo,Consolas,monospace';lines.forEach((t,i)=>{const p=t.split('|');if(p.length>1){x.textAlign='left';x.fillText(p[0],W*.08,lh*(i+1.95));x.textAlign='right';x.fillText(p[1],W*.92,lh*(i+1.95));x.textAlign='center'}else x.fillText(t,W/2,lh*(i+1.95))})},1)}
 /* animated water */
 function tfWaterTex(c1,c2){const k='w'+c1+c2;if(TFTX[k])return TFTX[k];const t=tfCan(32,32,(x,W,H)=>{x.fillStyle=c1;x.fillRect(0,0,W,H);const r=mb(77);for(let i=0;i<26;i++){x.fillStyle=r()<.6?c2:'#ffffff';x.fillRect((r()*W)|0,(r()*H)|0,2+((r()*5)|0),1)}});TFAN.push([t,.05,.03]);return TFTX[k]=t}
 

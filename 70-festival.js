@@ -64,7 +64,7 @@ const fHash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);
 function fRng(seed){let a=seed>>>0||1;return()=>{a=Math.imul(a^a>>>15,a|1);a^=a+Math.imul(a^a>>>7,a|61);return((a^a>>>14)>>>0)/4294967296}}
 function fTex(w,h,fn){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');fn(x,w,h);const t=new THREE.CanvasTexture(c);t.anisotropy=4;t.userData={c,x};return t}
 function fPlane(tex,W,H,x,y,z,ry,par,basic){const m=new THREE.Mesh(new THREE.PlaneGeometry(W,H),basic===false?new THREE.MeshLambertMaterial({map:tex}):new THREE.MeshBasicMaterial({map:tex}));m.position.set(x,y,z);m.rotation.y=ry||0;par.add(m);return m}
-const FFONT='"Trebuchet MS",Verdana,"DejaVu Sans",sans-serif';
+const FFONT='ui-monospace,Menlo,Consolas,monospace';
 function fFit(x,t,max,size,w){let s=size;x.font='bold '+s+'px '+FFONT;while(x.measureText(t).width>w&&s>8){s--;x.font='bold '+s+'px '+FFONT}return s}
 /* a sign: big title, optional small line, on a coloured board */
 function fSignTex(t,sub,bg,fg,w,h){return fTex(w||512,h||128,(x,W,H)=>{x.fillStyle=bg||'#14121a';x.fillRect(0,0,W,H);x.strokeStyle=fg||'#fff';x.lineWidth=6;x.strokeRect(5,5,W-10,H-10);x.fillStyle=fg||'#fff';x.textAlign='center';x.textBaseline='middle';
