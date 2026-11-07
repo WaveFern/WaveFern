@@ -1,4 +1,4 @@
-/* ===== v49.93.18: Spotifly profile pictures are always the detailed 3D press shot =====
+/* ===== v49.93.25: Spotifly profile pictures are always the detailed 3D press shot =====
    Some Spotifly pictures (artists in lists, your own picture in the sidebar and artist page, the Gphone app) stayed as the
    old 16x16 face when their 3D version was not ready in time or the page changed first. This sweeper runs while Spotifly is
    on screen, finds any <img> still showing a 16x16 face (an artist look from the pf2 cache, or your own drawn face) and swaps
