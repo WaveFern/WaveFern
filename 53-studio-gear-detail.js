@@ -153,9 +153,8 @@ function xMerge(root){root.updateMatrixWorld(true);const inv=new THREE.Matrix4()
   const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(pos,3));bg.setAttribute('normal',new THREE.BufferAttribute(nor,3));bg.computeBoundingSphere();const me=new THREE.Mesh(bg,mat);me.userData.merged=1;root.add(me)});kept.forEach(c=>root.add(c))}
 buildStudio=function(){
  if(studio){scene.remove(studio);studio.traverse(o=>{if(o.isMesh&&o.userData.merged)o.geometry.dispose()})}const g=studio=new THREE.Group();scene.add(g);dyn=[];gfill();const G=S.gear,L=k=>Math.min(3,G[k]||0);
- /* rug and window */
+ /* rug */
  xb(g,3.2,.03,3,'#3a2f4a',12.6,.02,2.6);xb(g,3.0,.035,2.8,'#4a3d5e',12.6,.022,2.6);xb(g,2.6,.04,2.4,'#3a2f4a',12.6,.024,2.6);for(let i=0;i<14;i++)[-1,1].forEach(s=>xb(g,.04,.01,.1,'#d9c8a0',11.1+i*.23,.02,2.6+s*1.55));
- xb(g,1.6,1.2,.05,'*8fd0ff',9.4,1.8,.02);xb(g,1.72,.08,.08,'#e8e4da',9.4,2.42,.05);xb(g,1.72,.08,.08,'#e8e4da',9.4,1.18,.05);[-1,1].forEach(s=>xb(g,.08,1.3,.08,'#e8e4da',9.4+s*.82,1.8,.05));xb(g,.05,1.2,.06,'#e8e4da',9.4,1.8,.05);xb(g,1.6,.05,.06,'#e8e4da',9.4,1.8,.05);xb(g,1.9,.05,.18,'#e8e4da',9.4,1.13,.1);
  /* chair, mic, guitar and amp */
  XSTP(g,'chair',L('chair'),13.6,0,2.8,0);XSTP(g,'mic',L('mic'),12.2,0,1.3,0);XSTP(g,'guitar',L('guitar'),14.7,0,1.2,0);
  dyn.push([11.9,1.2,12.5,1.8],[13.3,2.5,13.9,3.1],[14.4,.8,15.1,1.5]);
