@@ -1,7 +1,7 @@
 /* ===== v49.89.0: Friends hub. A friends icon in the top left of the main menu opens a panel with your friends in alphabetical order, Online and Offline.
    Tap a friend's mini profile to see their profile or nudge them to play. Your own profile gets a Notifications section with friend requests,
-   band invites and nudges, each with Accept / Deny. Nudges are limited to one per friend per hour (checked here and in the database rules):
-     k/TO/FROM = nudge {nm,t} (the person nudged reads and clears it) · kc/FROM/TO = time you last nudged that friend (1 hour between nudges) ===== */
+   band invites and nudges, each with Accept / Deny. Nudges have an escalating cooldown per friend (2, 5, 15, then 60 min; resets after 24h quiet), checked here and in the database rules (f/kn/FROM/TO={t,n}):
+     k/TO/FROM = nudge {nm,t} (the person nudged reads and clears it) · kc/FROM/TO = time you last nudged that friend (legacy) ===== */
 (function(){
 const HOUR=3600000,X=()=>window.FRX&&window.FRX.FR,FH={open:0,sel:'',K:{},sub:0,msg:'',tab:'f',cl:{}};
 const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -21,19 +21,25 @@ const hOf=f=>{const F=X(),p=F&&F.P[f],q=PRF[f];return p&&p.h?p.h:q&&q.h?q.h:''};
 const nm=f=>hOf(f)||'friend';
 const picOf=f=>{const q=PRF[f];if(!q)return'';if(/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(q.pd||''))return q.pd;return/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(q.p||'')?q.p:''};
 const cdKey=f=>'fw_nudge_'+((X()||{}).me||'')+'_'+f;
-const lastN=f=>{try{return+localStorage.getItem(cdKey(f))||0}catch(e){return 0}};
-const wait=f=>Math.max(0,lastN(f)+HOUR-Date.now());
-const mins=ms=>Math.ceil(ms/60000)+' min';
+/* v49.93.17: escalating cooldown per sender+recipient: 2, 5, 15, then 60 min; resets after 24h with no nudges. Mirrors f/kn rules. */
+const CDS=[120000,300000,900000,3600000],RESET=86400000;
+const cdOf=n=>CDS[Math.min(Math.max(+n||1,1),4)-1];
+const lastN=f=>{const o=FH.N&&FH.N[f];if(o&&o.t)return o;try{const j=JSON.parse(localStorage.getItem(cdKey(f))||'null');return j&&j.t?j:{t:0,n:0}}catch(e){return{t:0,n:0}}};
+const wait=f=>{const o=lastN(f);return o.t?Math.max(0,o.t+cdOf(o.n)-Date.now()):0};
+const nextN=f=>{const o=lastN(f);return !o.t||Date.now()-o.t>RESET?1:Math.min(o.n+1,4)};
+const setLocal=(f,t,n)=>{try{localStorage.setItem(cdKey(f),JSON.stringify({t,n}))}catch(e){}};
+const mins=ms=>{const m=Math.ceil(ms/60000);return m>=60?'1 hour':m+' min'};
 /* ---- nudges ---- */
 function sub(){const F=X();if(FH.sub||!F||!F.r||!F.h)return;FH.sub=1;const{R,db,uid}=F.r;
  R.onValue(R.ref(db,'f/k/'+uid),s=>{const v=s.val()||{},now=Date.now();let first=!FH.kd;
   for(const k in v){if(!okU(k)||!v[k]||now-(+v[k].t||0)>86400000){try{R.remove(R.ref(db,'f/k/'+uid+'/'+k))}catch(e){}delete v[k]}}
   if(FH.kd)for(const k in v)if(!FH.K[k]||FH.K[k].t!==v[k].t){try{snd('ping');say((v[k].nm||'A friend')+' nudged you to play together.')}catch(e){}}
-  FH.kd=1;FH.K=v;draw();notif()},()=>{})}
+  FH.kd=1;FH.K=v;draw();notif()},()=>{});
+ R.onValue(R.ref(db,'f/kn/'+uid),s=>{FH.N=s.val()||{};draw()},()=>{})}
 window.fhNudge=f=>{const F=X();if(!F||!F.r||!okU(f))return;const w=wait(f);if(w>0){FH.msg='You can nudge @'+nm(f)+' again in '+mins(w)+'.';try{snd('err')}catch(e){}return draw()}
- const{R,db,uid}=F.r,ts=R.serverTimestamp();
- R.update(R.ref(db),{['f/k/'+f+'/'+uid]:{nm:'@'+F.h,t:ts},['f/kc/'+uid+'/'+f]:ts}).then(()=>{try{localStorage.setItem(cdKey(f),String(Date.now()))}catch(e){}FH.msg='Nudged @'+nm(f)+'. They will get a notification.';try{snd('pop')}catch(e){}draw()})
- .catch(()=>{try{localStorage.setItem(cdKey(f),String(Date.now()))}catch(e){}FH.msg='You nudged @'+nm(f)+' recently. Try again in about an hour.';try{snd('err')}catch(e){}draw()})};
+ const{R,db,uid}=F.r,ts=R.serverTimestamp(),n=nextN(f);
+ R.update(R.ref(db),{['f/k/'+f+'/'+uid]:{nm:'@'+F.h,t:ts},['f/kn/'+uid+'/'+f]:{t:ts,n}}).then(()=>{setLocal(f,Date.now(),n);FH.msg='Nudged @'+nm(f)+'. They will get a notification. Next nudge in '+mins(cdOf(n))+'.';try{snd('pop')}catch(e){}draw()})
+ .catch(()=>{FH.msg='You nudged @'+nm(f)+' recently. Try again in a bit.';try{snd('err')}catch(e){}draw()})};
 window.fhClearK=f=>{const F=X();if(!F||!F.r||!okU(f))return;F.r.R.remove(F.r.R.ref(F.r.db,'f/k/'+F.r.uid+'/'+f)).catch(()=>{})};
 /* ---- notifications on your profile ---- */
 function items(){const F=X();if(!F)return[];const a=[];
@@ -76,7 +82,7 @@ function draw(){if(!FH.open)return;const F=X();let h='<h2>Friends</h2>';
    h+=sec('on','ONLINE',on,'Nobody online right now.')+sec('off','OFFLINE',off,'No offline friends.');
    if(!L.length)h+='<p class=fhe>No friends yet. Add one by username.</p>';
    h+='<div class=fhr><button onclick="fhClose();frOpen()">Add or manage friends</button></div>'}
-  if(FH.tab!='r')h+='<p class=fhe>Tap a friend to nudge them. One nudge per friend per hour.</p>'}
+  if(FH.tab!='r')h+='<p class=fhe>Tap a friend to nudge them. Cooldown grows if you spam: 2, 5, 15, then 60 min.</p>'}
  if(FH.msg)h+=`<p class=fhm>${E(FH.msg)}</p>`;h+='<button onclick="fhClose()">Close</button>';
  let d=document.getElementById('fhub');if(!d){d=document.createElement('div');d.id='fhub';d.onclick=e=>{if(e.target===d)fhClose()};document.body.appendChild(d)}
  const sc=d.firstElementChild?d.firstElementChild.scrollTop:0;d.innerHTML='<div class="box modal fhw">'+h+'</div>';d.firstElementChild.scrollTop=sc}
