@@ -51,7 +51,12 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
 /* ---- big purchases need listeners as well as cash ---- */
 const GATE={car:[1e3,1e4,6e4,4e5,2e6],home:[3e4,4e5,5e6],guard:[1e5,1e6,1e7],garage:[5e3]};
 const fm=n=>n>=1e9?n/1e9+'B':n>=1e6?n/1e6+'M':n>=1e3?n/1e3+'K':n;
-if(typeof buyX=='function'){const b0=buyX;buyX=function(t,i){try{const g=GATE[t],need=g&&g[t=='guard'?(S.guards||0):t=='garage'?0:i];if(need&&(+S.listeners||0)<need&&!S.cheat){snd('err');return say('Unlocks at '+fm(need)+' monthly listeners.')}}catch(e){}return b0.apply(this,arguments)}}
+const gateNeed=(t,i)=>{const g=GATE[t];return g&&g[t=='guard'?(S.guards||0):t=='garage'?0:i]||0};
+if(typeof buyX=='function'){const b0=buyX;buyX=function(t,i){try{const need=gateNeed(t,i);if(need&&(+S.listeners||0)<need&&!S.cheat){snd('err');return say('Unlocks at '+fm(need)+' monthly listeners.')}}catch(e){}return b0.apply(this,arguments)}}
+/* the same listener requirement is shown next to every Book button that buys a gated item, and the button stays off until it is met */
+for(const k of ['cars','prop','guard']){const p0=PA[k];if(typeof p0!='function')continue;PA[k]=function(){const h=p0.apply(this,arguments);if(typeof h!='string')return h;
+ try{return h.replace(/<button class=go([^>]*?)onclick="book\('(car|home|garage|guard)',(\d+)\)">([^<]*)<\/button>/g,(m,a,t,i,txt)=>{const need=gateNeed(t,+i);if(!need)return m;const ok=S.cheat||(+S.listeners||0)>=need,a2=ok||/disabled/.test(a)?a:' disabled'+a;
+  return'<button class=go'+a2+'onclick="book(\''+t+'\','+i+')">'+txt+'</button><small class=m style="display:block;margin-top:4px;'+(ok?'':'color:#e07a7a')+'">Needs '+fm(need)+' monthly listeners</small>'})}catch(e){return h}}}
 /* ---- clothes and furniture follow the money curve: clothes x3, furniture x2.5 (each item scaled once) ---- */
 const seen=new WeakSet();
 const scalePrices=()=>{try{[[typeof GM!='undefined'&&GM,3],[typeof CLM!='undefined'&&CLM,3],[typeof F!='undefined'&&F,2.5]].forEach(([m,k])=>{if(!m)return;Object.values(m).forEach(x=>{if(x&&typeof x=='object'&&typeof x.p=='number'&&x.p>0&&!seen.has(x)){seen.add(x);x.p=Math.round(x.p*k)}})})}catch(e){console.error('price scale',e)}};
