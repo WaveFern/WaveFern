@@ -332,7 +332,7 @@ function sweepWorld(){
  let sweepT=0,first=true,sT=0;
  function xmasTick(dt,px,pz){
   sweepT+=dt;if(first||sweepT>2){if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}try{freezePond()}catch(e){}}
-  const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut',inner=(typeof wxInterior=='function')&&wxInterior();
+  const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut'||mode=='menu'||mode=='pause'||mode=='sleep'||mode=='phone'||mode=='fest'||mode=='dshow'||mode=='dcut'||mode=='cutawd',inner=(typeof wxInterior=='function')&&wxInterior();
   /* snow cover follows today's weather */
   const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live)?1:0;
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
