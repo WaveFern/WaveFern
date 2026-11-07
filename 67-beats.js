@@ -669,6 +669,8 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
  beat:()=>{const E=cur;if(!E||E.t0==null||E.wt)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
  bpm:()=>cur?cur.P.bpm:0,
+ /* try to get a stopped audio clock going again (phones suspend the context) */
+ wake:()=>{if(cur&&cur.c.state!='running'&&cur.c.state!='closed')try{cur.c.resume().catch(()=>{})}catch(e){}},
  /* v43.0.0: the recorded 808 and hi hat names, and a one-shot preview of one (kind '808' or 'hat') */
  drums:{s808:N808.slice(),hats:DHAT.slice()},
  /* v49.51.0: the recorded instrument samples: families, [{f, n (name), old}] per family once the manifest is in, and a preview */
@@ -710,7 +712,11 @@ function beatsBarTick(dt){rec.t+=dt;rec.cd=Math.max(0,rec.cd-dt);rec.fl=Math.max
  if(rec.bb==null){rec.bn=n;rec.bb=Math.round(b+.5*n)}else if(n!=rec.bn){const k=Math.round((b-rec.bb)/rec.bn),bc=rec.bb+k*rec.bn;rec.bb=k%2?bc-n:bc;rec.bn=n}
  let ph=((b-rec.bb)/rec.bn+.5)%2;if(ph<0)ph+=2;rec.pos=ph<1?ph:2-ph;rec.dir=ph<1?1:-1}
 if(typeof recTick=='function'){const t0=recTick;recTick=function(dt){if(rec&&rec.bp&&Beats.playing()){/* v49.24.0: the beat swells when you play well (rec.swell, set by 176-game-feel.js) and fills out while the Mix level is in the green */
- Beats.setIntensity(Math.min(1,(rec.st==1?.3:rec.st==2?(rec.x&&rec.x.inb?.85:.4):rec.st==3?1:.8)+(rec.swell||0)));if(!rec.st)return beatsBarTick(dt)}return t0.apply(this,arguments)}}
+ Beats.setIntensity(Math.min(1,(rec.st==1?.3:rec.st==2?(rec.x&&rec.x.inb?.85:.4):rec.st==3?1:.8)+(rec.swell||0)));
+ if(!rec.st){/* a phone can leave the audio clock stopped (suspended or interrupted context, blocked autoplay) or slow to start: the bar then stands still.
+   If the beat clock has not moved for a third of a second the bar sweeps on its own timer instead, and snaps back to the beat if the clock wakes up. */
+  const bt=Beats.beat();if(bt>=0&&bt!==rec.lbt){rec.lbt=bt;rec.stl=0}else rec.stl=(rec.stl||0)+dt;
+  if(rec.stl<.35)return beatsBarTick(dt);if(rec.stl<.4)try{Beats.wake()}catch(e){}}}return t0.apply(this,arguments)}}
 /* the beat's seed goes with the draft and the uploaded song, so the released song sounds like the session */
 if(typeof mgFinish=='function'){const f0=mgFinish;mgFinish=function(){const bs=rec&&rec.bs,s8=rec&&rec.s8,hh=rec&&rec.hh,sty=rec&&rec.sty,spk=rec&&rec.sp,n=S.drafts.length;const r=f0.apply(this,arguments);try{if(bs!=null&&S.drafts.length>n){const d=S.drafts[S.drafts.length-1];d.bs=bs;if(s8!=null){d.s8=s8;d.hh=hh}if(spk)d.sp=spk;if(sty!=null)d.style=sty}const c=Beats.current();if(c&&c.owner=='rec')Beats.stop(1.5)}catch(e){}return r}}
 if(typeof upl=='function'){const u0=upl;upl=function(id){const d=S.drafts.find(x=>x.id==id),bs=d&&d.bs;const r=u0.apply(this,arguments);try{if(bs!=null){const x=S.songs.find(q=>q.id==id);if(x&&x.bs==null)x.bs=bs;if(x&&d.s8!=null&&x.s8==null){x.s8=d.s8;x.hh=d.hh}if(x&&d.sp&&x.sp==null)x.sp=d.sp;if(x&&d.style!=null&&x.style==null)x.style=d.style}}catch(e){}return r}}
