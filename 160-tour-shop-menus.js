@@ -68,7 +68,7 @@ function spin(){if(spinning)return;spinning=1;const f=()=>{const cs=[...document
 .tsm .tsm-hd{padding:14px 18px 8px;text-align:center}.tsm .tsm-k{font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.75}.tsm .tsm-g{font-size:13px;opacity:.85}
 .tsm .tsm-ft{display:flex;align-items:center;gap:8px;padding:10px 16px 14px;font-size:13px}.tsm .tsm-ft span{font-weight:bold}.tsm .tsm-x{margin-left:auto;min-height:36px}
 /* souvenir counter: kraft paper under a striped awning */
-.tsm.sv{background:repeating-linear-gradient(0deg,#c9a46c 0 3px,#c49e66 3px 6px);border:3px solid #5a3a1e;border-radius:10px;color:#3a2410;font-family:ui-monospace,Menlo,Consolas,monospace;overflow:auto}
+.tsm.sv{background:repeating-linear-gradient(0deg,#c9a46c 0 3px,#c49e66 3px 6px);border:3px solid #5a3a1e;border-radius:10px;color:#3a2410;font-family:"Figtree",sans-serif;overflow:auto}
 .tsm.sv .tsm-aw{height:18px;background:repeating-linear-gradient(90deg,var(--ac) 0 24px,#fff6e6 24px 48px);border-bottom:3px solid #5a3a1e;border-radius:7px 7px 0 0}
 .tsm.sv h2{font-family:Silkscreen,ui-monospace,monospace;font-size:28px;color:#3a2410}
 .tsm.sv .tsm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:6px 16px}
@@ -93,7 +93,7 @@ function spin(){if(spinning)return;spinning=1;const f=()=>{const cs=[...document
 .tsm.rs .tsm-row:hover{background:#f1e6cc}.tsm .tsm-row.off{opacity:.5}
 .tsm.rs .tsm-x{background:#7a1f2b;color:#fbf5e6;border:0;border-radius:3px;font-family:inherit}
 /* café: a chalkboard in a wooden frame */
-.tsm.cf{background:radial-gradient(ellipse at 30% 20%,#33443b 0,#22302a 70%);color:#f4f1e8;border:10px solid #7a5432;border-radius:6px;box-shadow:inset 0 0 0 2px #5a3a20,0 10px 40px #0009;font-family:Silkscreen,ui-monospace,monospace}
+.tsm.cf{background:radial-gradient(ellipse at 30% 20%,#33443b 0,#22302a 70%);color:#f4f1e8;border:10px solid #7a5432;border-radius:6px;box-shadow:inset 0 0 0 2px #5a3a20,0 10px 40px #0009;font-family:'Segoe Print','Bradley Hand','Comic Sans MS',cursive}
 .tsm.cf h2{font-family:inherit;font-size:30px;color:#fff;text-shadow:0 0 3px #fff6}
 .tsm.cf .tsm-sec{color:#ffd3a8}.tsm.cf .tsm-p{color:#ffd3a8}
 .tsm.cf .tsm-row:hover{background:#ffffff12}

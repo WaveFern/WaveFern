@@ -5,8 +5,8 @@
    - XPR[name] = {s:[W,H], f(ctx,W,H,colour,variant)}  the artwork
    - XPD[item name] = what an item wears: f / b / s (front, back, sleeve prints placed on the torso), on (custom), pv (preview) */
 const XPR={},XPT={},XPMC={},XPGC={},XPD={};
-const XF={blk:'900 %px Silkscreen,ui-monospace,monospace',ser:'700 %px ui-monospace,Menlo,Consolas,monospace',pix:'700 %px Silkscreen,monospace',
- scr:'italic 700 %px Silkscreen,ui-monospace,monospace',con:'700 %px Silkscreen,ui-monospace,monospace',sans:'700 %px ui-monospace,Menlo,Consolas,monospace'};
+const XF={blk:'900 %px "Anton",sans-serif',ser:'700 %px "Gelasio",serif',pix:'700 %px Silkscreen,monospace',
+ scr:'italic 700 %px "Brush Script MT","Segoe Script","URW Chancery L",cursive',con:'700 %px "Anton",sans-serif',sans:'700 %px "Hanken Grotesk",sans-serif'};
 const xfont=(k,px)=>XF[k].replace('%',Math.round(px));
 /* ---- canvas drawing helpers ---- */
 function xpRR(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath()}

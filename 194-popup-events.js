@@ -282,6 +282,7 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 
 /* ---------- looks: each event dressed as itself ---------- */
 (function css(){if(document.getElementById('pecss'))return;
+ const f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bungee&family=Special+Elite&display=swap';document.head.appendChild(f);
  const s=document.createElement('style');s.id='pecss';s.textContent=`
 #ui .box.modal.pe{width:min(520px,94vw);max-height:92vh;overflow:auto;padding:0;border:3px solid #111;box-shadow:6px 6px 0 #0009;font-family:ui-monospace,Menlo,Consolas,monospace}
 .pe .pehd{padding:14px 18px 10px;position:relative}.pe .pehd h2{margin:2px 0 0;font-size:26px;line-height:1.1}
@@ -297,7 +298,7 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 /* party: a photocopied flyer, yellow paper, tape and bunting */
 .pe-party{background:#ffe45c!important;color:#1a1208;background-image:radial-gradient(#0000000d 1px,transparent 1.4px)!important;background-size:6px 6px!important}
 .pe-party .pehd{background:#ff4f8b;color:#fff;transform:rotate(-1.2deg);margin:14px 14px 4px;border:2px solid #111;box-shadow:3px 3px 0 #111}
-.pe-party .pehd h2{font-family:Silkscreen,ui-monospace,monospace;font-size:34px;letter-spacing:.02em}
+.pe-party .pehd h2{font-family:'Permanent Marker','Silkscreen',cursive;font-size:34px;letter-spacing:.02em}
 .pe-party::before,.pe-party::after{content:'';position:absolute;top:-6px;width:70px;height:20px;background:#ffffffb0;border:1px solid #0002}.pe-party::before{left:20px;transform:rotate(-8deg)}.pe-party::after{right:20px;transform:rotate(7deg)}
 .pe-party .pebunt{height:16px;background:conic-gradient(from 135deg at 50% 0,#ff4f8b 0 90deg,transparent 0) 0 0/24px 16px,conic-gradient(from 135deg at 50% 0,#3ad0ff 0 90deg,transparent 0) 12px 0/24px 16px;margin:0 -18px 6px}
 .pe-party .pesong{background:#fff;color:#1a1208;box-shadow:3px 3px 0 #111}.pe-party .pesong:hover{background:#fff5c0;transform:rotate(-.5deg)}
@@ -311,9 +312,9 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 .pe-signing .pebar .pn{position:absolute;top:-6px;bottom:-6px;width:4px;margin-left:-2px;background:#2a1d14}
 .pe-signing button{background:#f4e2c4;color:#2a1a0c}.pe-signing button.go{background:#2a1d14;color:#f4e2c4}.pe-signing .pegrid div{background:#f4e2c4}
 /* radio: an on-air studio */
-.pe-radio{background:#1b1e24!important;color:#e8ecf2}.pe-radio .pehd{background:linear-gradient(#2a2f38,#1b1e24);border-bottom:3px solid #000}.pe-radio .pehd h2{font-family:Silkscreen,ui-monospace,monospace;font-size:26px;color:#fff}
+.pe-radio{background:#1b1e24!important;color:#e8ecf2}.pe-radio .pehd{background:linear-gradient(#2a2f38,#1b1e24);border-bottom:3px solid #000}.pe-radio .pehd h2{font-family:'Bungee','Silkscreen',sans-serif;font-size:26px;color:#fff}
 .pe-radio .peair{display:flex;align-items:center;gap:10px;background:#0d0f13;border:2px solid #000;padding:8px 10px;margin:4px 0 10px;flex-wrap:wrap}
-.pe-radio .lamp{background:#ff3b3b;color:#fff;font-family:Silkscreen,ui-monospace,monospace;font-size:12px;padding:3px 8px;border-radius:4px;box-shadow:0 0 12px #ff3b3b,0 0 2px #fff inset;animation:pelamp 1.4s infinite}
+.pe-radio .lamp{background:#ff3b3b;color:#fff;font-family:'Bungee',sans-serif;font-size:12px;padding:3px 8px;border-radius:4px;box-shadow:0 0 12px #ff3b3b,0 0 2px #fff inset;animation:pelamp 1.4s infinite}
 @keyframes pelamp{50%{box-shadow:0 0 4px #ff3b3b;opacity:.85}}
 .pe-radio .freq{font-size:12px;color:#9aa6b8;flex:1}.pe-radio .vu{display:flex;gap:2px;align-items:flex-end;height:18px}.pe-radio .vu i{width:4px;background:#3ad07a;animation:pevu .6s infinite alternate}
 .pe-radio .vu i:nth-child(3n){animation-delay:-.2s}.pe-radio .vu i:nth-child(4n+1){animation-delay:-.45s;background:#e8d03a}.pe-radio .vu i:nth-child(n+10){background:#ff3b3b}
@@ -322,23 +323,23 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 .pe-radio button{background:#2a2f38;color:#e8ecf2;border-color:#000}.pe-radio button:hover{background:#363d49}.pe-radio button.go{background:#ff3b3b;color:#fff}.pe-radio .pegrid div{border-color:#3a414d}
 /* open mic: a stage with marquee bulbs and a spotlight */
 .pe-openmic{background:radial-gradient(ellipse at 50% -10%,#ffe9a8 0,#7a1f3a 38%,#2a0a16 75%)!important;color:#fff4e0}
-.pe-openmic .pehd{text-align:center}.pe-openmic .pehd h2{font-family:Silkscreen,ui-monospace,monospace;font-size:32px;color:#ffd23d;text-shadow:0 0 10px #ffb000,2px 2px 0 #000}
+.pe-openmic .pehd{text-align:center}.pe-openmic .pehd h2{font-family:'Bungee','Silkscreen',sans-serif;font-size:32px;color:#ffd23d;text-shadow:0 0 10px #ffb000,2px 2px 0 #000}
 .pe-openmic .pebulbs{height:12px;margin:0 -18px 8px;background:radial-gradient(circle,#fff6c8 0 3px,#ffb000 4px,transparent 5px) 0 0/18px 12px;filter:drop-shadow(0 0 4px #ffb000)}
 .pe-openmic .pelane{position:relative;height:46px;background:#1a0610;border:2px solid #000;border-radius:4px;margin:10px 0;overflow:hidden}
 .pe-openmic .pelane .ln{position:absolute;left:82%;top:0;bottom:0;width:4px;background:#ffd23d;box-shadow:0 0 8px #ffd23d}
 .pe-openmic .pelane b{position:absolute;top:11px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:#ff6ad5;box-shadow:0 0 8px #ff6ad5}
-.pe-openmic .pejudge{text-align:center;font-family:Silkscreen,ui-monospace,monospace;font-size:18px;margin:4px 0}.pe-openmic .pejudge.perfect{color:#ffd23d}.pe-openmic .pejudge.good{color:#9ad0ff}.pe-openmic .pejudge.miss,.pe-openmic .pejudge.early{color:#ff7a7a}
+.pe-openmic .pejudge{text-align:center;font-family:'Bungee',sans-serif;font-size:18px;margin:4px 0}.pe-openmic .pejudge.perfect{color:#ffd23d}.pe-openmic .pejudge.good{color:#9ad0ff}.pe-openmic .pejudge.miss,.pe-openmic .pejudge.early{color:#ff7a7a}
 .pe-openmic button{background:#3a0f20;color:#fff4e0;border-color:#000}.pe-openmic button.go{background:#ffd23d;color:#2a0a16}.pe-openmic .pemeter i{background:#ffd23d}.pe-openmic .pegrid div{border-color:#ffd23d80}
 /* food trucks: an awning and a menu board */
 .pe-food{background:#fff4e0!important;color:#2a1a12}
-.pe-food .pehd{background:#e8343c;color:#fff;padding-bottom:14px}.pe-food .pehd h2{font-family:Silkscreen,ui-monospace,monospace;font-size:26px}
+.pe-food .pehd{background:#e8343c;color:#fff;padding-bottom:14px}.pe-food .pehd h2{font-family:'Bungee','Silkscreen',sans-serif;font-size:26px}
 .pe-food .pechk{height:18px;margin:-4px -18px 8px;background:repeating-linear-gradient(90deg,#e8343c 0 18px,#fff 18px 36px);clip-path:polygon(0 0,100% 0,100% 50%,97.5% 100%,95% 50%,92.5% 100%,90% 50%,87.5% 100%,85% 50%,82.5% 100%,80% 50%,77.5% 100%,75% 50%,72.5% 100%,70% 50%,67.5% 100%,65% 50%,62.5% 100%,60% 50%,57.5% 100%,55% 50%,52.5% 100%,50% 50%,47.5% 100%,45% 50%,42.5% 100%,40% 50%,37.5% 100%,35% 50%,32.5% 100%,30% 50%,27.5% 100%,25% 50%,22.5% 100%,20% 50%,17.5% 100%,15% 50%,12.5% 100%,10% 50%,7.5% 100%,5% 50%,2.5% 100%,0 50%)}
 .pe-food .pemenu{background:#26302a;padding:10px;border:4px solid #6a4a2a;box-shadow:inset 0 0 0 2px #000;display:flex;flex-direction:column;gap:6px}
 .pe-food .pedish{flex-direction:row;align-items:center;gap:10px;background:#2f3a33;color:#f2efe4;border-color:#000}.pe-food .pedish:hover{background:#3a4a40}.pe-food .pedish span{flex:1;display:flex;flex-direction:column}
-.pe-food .pedish small{opacity:.7}.pe-food .pedish em{font-style:normal;color:#9ad0b8;font-size:12px}.pe-food .pedish strong{background:#ffd27a;color:#2a1a12;padding:3px 8px;font-family:Silkscreen,ui-monospace,monospace;font-size:13px}
+.pe-food .pedish small{opacity:.7}.pe-food .pedish em{font-style:normal;color:#9ad0b8;font-size:12px}.pe-food .pedish strong{background:#ffd27a;color:#2a1a12;padding:3px 8px;font-family:'Bungee',sans-serif;font-size:13px}
 .pe-food button{background:#fff;color:#2a1a12}.pe-food button.go{background:#e8343c;color:#fff}.pe-food .pegrid div{background:#fff}
 /* photo shoot: film strip and viewfinders */
-.pe-shoot{background:#141414!important;color:#f2f2f2}.pe-shoot .pehd h2{font-family:Silkscreen,ui-monospace,monospace;font-size:28px;letter-spacing:.04em}
+.pe-shoot{background:#141414!important;color:#f2f2f2}.pe-shoot .pehd h2{font-family:'Special Elite',ui-monospace,monospace;font-size:28px;letter-spacing:.04em}
 .pe-shoot .pehd::after{content:'REC';position:absolute;right:18px;top:16px;font-size:11px;color:#ff4040;padding-left:14px;background:radial-gradient(circle at 5px 50%,#ff4040 4px,transparent 5px)}
 .pe-shoot .pefilm{height:14px;margin:0 -18px 8px;background:#000 radial-gradient(circle,#141414 0 0) ;background:repeating-linear-gradient(90deg,#000 0 6px,#e8e0c8 6px 14px,#000 14px 22px) 0 3px/100% 8px no-repeat,#000}
 .pe-shoot .peframes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -346,7 +347,7 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 .pe-shoot .peshot .vf{display:block;aspect-ratio:4/3;margin-bottom:6px;background:linear-gradient(#0000,#0000),var(--ps);position:relative;
  box-shadow:inset 0 0 0 2px #000;border:1px solid #444}
 .pe-shoot .peshot .vf::before{content:'';position:absolute;inset:6px;border:2px solid #fff8;clip-path:polygon(0 0,25% 0,25% 2px,2px 2px,2px 25%,0 25%,0 75%,2px 75%,2px calc(100% - 2px),25% calc(100% - 2px),25% 100%,75% 100%,75% calc(100% - 2px),calc(100% - 2px) calc(100% - 2px),calc(100% - 2px) 75%,100% 75%,100% 25%,calc(100% - 2px) 25%,calc(100% - 2px) 2px,75% 2px,75% 0,100% 0,100% 100%,0 100%)}
-.pe-shoot .peshot b{font-size:12px;line-height:1.25}.pe-shoot .peshot small{color:#ffb000;font-size:10px;margin-top:3px;font-family:Silkscreen,ui-monospace,monospace}
+.pe-shoot .peshot b{font-size:12px;line-height:1.25}.pe-shoot .peshot small{color:#ffb000;font-size:10px;margin-top:3px;font-family:'Special Elite',monospace}
 .pe-shoot .ps-wall{--ps:linear-gradient(90deg,#8a5a44 0 60%,#d8c8a8 60%)}.pe-shoot .ps-jump{--ps:linear-gradient(#7ac8ff 0 70%,#5a8a4a 70%)}.pe-shoot .ps-close{--ps:radial-gradient(circle at 50% 60%,#e8b890 0 28%,#2a2a2a 29%)}
 .pe-shoot .ps-walk{--ps:linear-gradient(#bcd 0 55%,#777 55%)}.pe-shoot .ps-kerb{--ps:linear-gradient(#a8b0b8 0 45%,#444 45% 60%,#ccc 60%)}.pe-shoot .ps-wide{--ps:linear-gradient(#ffcf9a 0 40%,#4a5a7a 40% 80%,#333 80%)}
 .pe-shoot button{background:#222;color:#f2f2f2;border-color:#000}.pe-shoot button.go{background:#f2f2f2;color:#111}.pe-shoot .pegrid div{border-color:#444}

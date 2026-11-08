@@ -198,12 +198,12 @@ function festBookTick(dt){FBT-=dt;if(FBT<=0){FBT=.5;festBkCheck();festBkChip();i
 {const u0=update;update=function(dt){u0(dt);try{festBookTick(dt)}catch(e){if(!FEST.err2){FEST.err2=1;console.error('festival bookings',e)}}}}
 
 /* ===== v26.71: FestivalApp look: a neon festival poster. Layout rules above stay as they are; this only restyles .fa. */
-{const st=document.createElement('style');st.textContent=`.fa{font-family:Silkscreen,ui-monospace,monospace;text-transform:uppercase;letter-spacing:.6px;color:#f6f0ff;background:radial-gradient(circle at 92% -8%,#ff2e8838,transparent 45%),radial-gradient(circle at -8% 108%,#c6ff3d26,transparent 40%),#100b1c;padding:14px 14px 16px;border-radius:6px}
-.fa h1,.fa h3{font-family:Silkscreen,ui-monospace,monospace}
+{const st=document.createElement('style');st.textContent=`.fa{font-family:"Anton",sans-serif;text-transform:uppercase;letter-spacing:.6px;color:#f6f0ff;background:radial-gradient(circle at 92% -8%,#ff2e8838,transparent 45%),radial-gradient(circle at -8% 108%,#c6ff3d26,transparent 40%),#100b1c;padding:14px 14px 16px;border-radius:6px}
+.fa h1,.fa h3{font-family:"Anton",sans-serif}
 .fa h1{font-size:36px;line-height:1;letter-spacing:2px;margin:0 0 6px;background:linear-gradient(90deg,#ff2e88,#ffb13b 55%,#c6ff3d);-webkit-background-clip:text;background-clip:text;color:transparent}
 .fa h1 img{filter:drop-shadow(0 0 4px #ff2e88)}
 .fa h3{font-size:19px;letter-spacing:1.5px;color:#c6ff3d;border-bottom:2px solid #c6ff3d55;padding-bottom:2px}
-.fa p.m{color:#b9a8dc;font-family:ui-monospace,Menlo,Consolas,monospace;text-transform:none;font-size:13px;letter-spacing:0}
+.fa p.m{color:#b9a8dc;font-family:"Anton",sans-serif;text-transform:none;font-size:13px;letter-spacing:0}
 .fa .card{background:#1d1435;border:2px dashed #ff2e88;border-radius:6px;box-shadow:0 0 0 3px #100b1c,0 0 0 5px #c6ff3d44;padding:10px 12px}
 .fa button{background:#ff2e88;color:#100b1c;border:0;border-radius:2px;font:inherit;font-weight:700;letter-spacing:1px;padding:6px 12px;cursor:pointer;text-transform:uppercase}
 .fa button:hover{background:#ff58a3}

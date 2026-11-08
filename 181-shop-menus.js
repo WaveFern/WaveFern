@@ -84,7 +84,7 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
  const nl=document.querySelector('.shx .shx-list');if(nl&&st)nl.scrollTop=st};
 
 {const st=document.createElement('style');st.textContent=`
-.shx{padding:0;width:min(470px,94vw);max-height:min(640px,90vh);display:flex;flex-direction:column;background:var(--bg);color:var(--ink);border:3px solid var(--ink);border-radius:12px;box-shadow:0 14px 40px #000a,0 0 0 4px #0003;overflow:hidden;font:14px/1.35 ui-monospace,Menlo,Consolas,monospace}
+.shx{padding:0;width:min(470px,94vw);max-height:min(640px,90vh);display:flex;flex-direction:column;background:var(--bg);color:var(--ink);border:3px solid var(--ink);border-radius:12px;box-shadow:0 14px 40px #000a,0 0 0 4px #0003;overflow:hidden;font:14px/1.35 "Figtree",sans-serif}
 .shx *{box-sizing:border-box}
 .shx .shx-aw{height:22px;flex-shrink:0;background:repeating-linear-gradient(90deg,var(--aw) 0 26px,#fff 26px 52px);border-bottom:3px solid var(--ink);position:relative}
 .shx .shx-aw:after{content:'';position:absolute;left:0;right:0;bottom:-11px;height:10px;background:radial-gradient(circle at 13px 0,var(--aw) 9px,transparent 10px) 0 0/52px 10px repeat-x,radial-gradient(circle at 39px 0,#fff 9px,transparent 10px) 0 0/52px 10px repeat-x}
@@ -92,7 +92,7 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
 .shx .shx-ic{width:52px;height:52px;flex-shrink:0;display:grid;place-items:center;font-size:30px;background:var(--card);border:2px solid var(--ink);border-radius:50%;box-shadow:3px 3px 0 var(--ac)}
 .shx .shx-tt{flex:1;min-width:0}.shx .shx-kk{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ac);font-weight:700}
 .shx h2{margin:2px 0 0;font:700 25px/1.1 ui-monospace,monospace;color:var(--ink);text-shadow:none;letter-spacing:0;overflow:hidden;text-overflow:ellipsis}
-.shx h2 small,.shx h2 .m{font:400 13px ui-monospace,Menlo,Consolas,monospace;color:inherit;opacity:.65}
+.shx h2 small,.shx h2 .m{font:400 13px "Figtree",sans-serif;color:inherit;opacity:.65}
 .shx .shx-cash{text-align:right;flex-shrink:0;background:var(--card);border:2px solid var(--ink);border-radius:8px;padding:4px 9px}.shx .shx-cash small{display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:.65}.shx .shx-cash b{font-size:14px;color:var(--ink)}
 .shx .shx-say{margin:6px 16px 8px;padding:9px 12px;background:var(--card);border:2px solid var(--ink);border-radius:12px 12px 12px 3px;position:relative;font-size:13px}
 .shx .shx-say b{display:block;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:1px}.shx .shx-say i{opacity:.9}
@@ -117,10 +117,10 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
 .shx-paper .shx-n b{font-family:Silkscreen,ui-monospace,monospace;font-size:16px}.shx-paper .shx-p{background:none;color:var(--ac);clip-path:none;font-family:Silkscreen,ui-monospace,monospace;font-size:16px;padding:0}.shx-paper .shx-p:before{display:none}
 /* chalk: blackboard in a wooden frame */
 .shx-chalk{border:10px solid #7a5232;border-radius:6px;box-shadow:inset 0 0 0 2px #5a3a20,0 14px 40px #000a;background:var(--bg) radial-gradient(ellipse at 30% 20%,#ffffff10,transparent 70%)}
-.shx-chalk .shx-aw{display:none}.shx-chalk h2,.shx-chalk .shx-n b{font-family:Silkscreen,ui-monospace,monospace;color:#fff}
+.shx-chalk .shx-aw{display:none}.shx-chalk h2,.shx-chalk .shx-n b{font-family:'Comic Sans MS','Chalkboard SE','Marker Felt',cursive;color:#fff}
 .shx-chalk .shx-ic,.shx-chalk .shx-cash,.shx-chalk .shx-say{background:transparent;border:2px dashed #f2efe4aa;box-shadow:none}
 .shx-chalk .shx-it{background:transparent;border:0;border-bottom:2px dashed #f2efe455;border-radius:0;box-shadow:none}.shx-chalk .shx-it:hover{background:#ffffff0d;box-shadow:none;transform:none}
-.shx-chalk .shx-ii{background:transparent;border:0}.shx-chalk .shx-p{background:none;clip-path:none;color:var(--ac);font-family:Silkscreen,ui-monospace,monospace;font-size:17px;padding:0}.shx-chalk .shx-p:before{display:none}
+.shx-chalk .shx-ii{background:transparent;border:0}.shx-chalk .shx-p{background:none;clip-path:none;color:var(--ac);font-family:'Comic Sans MS','Chalkboard SE',cursive;font-size:17px;padding:0}.shx-chalk .shx-p:before{display:none}
 .shx-chalk .shx-x{background:#f2efe4;color:#26332c;border-color:#f2efe4}
 /* neon: dark room, glowing tube border */
 .shx-neon{border:2px solid var(--ac);box-shadow:0 0 0 2px #000,0 0 18px var(--ac),inset 0 0 22px color-mix(in srgb,var(--ac) 30%,transparent),0 14px 40px #000c;background:var(--bg) linear-gradient(180deg,color-mix(in srgb,var(--ac) 14%,transparent),transparent 40%)}
@@ -133,7 +133,7 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
 /* clean: white counter, a coloured stripe, rounded */
 .shx-clean{border:0;border-radius:16px;box-shadow:0 14px 40px #000a,0 0 0 1px #0002}
 .shx-clean .shx-aw{height:8px;border:0;background:var(--ac)}.shx-clean .shx-aw:after{display:none}
-.shx-clean .shx-ic{border:0;background:var(--ac);box-shadow:none;border-radius:14px}.shx-clean h2{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800}
+.shx-clean .shx-ic{border:0;background:var(--ac);box-shadow:none;border-radius:14px}.shx-clean h2{font-family:"Figtree",sans-serif;font-weight:800}
 .shx-clean .shx-cash,.shx-clean .shx-say{border:0;background:var(--card);box-shadow:0 1px 4px #0002}
 .shx-clean .shx-it{border:1px solid #0001;box-shadow:0 1px 4px #0002}.shx-clean .shx-it:hover{border-color:var(--ac);box-shadow:0 3px 10px #0002}
 .shx-clean .shx-p{clip-path:none;border-radius:999px;padding:5px 12px}.shx-clean .shx-p:before{display:none}.shx-clean .shx-x{background:var(--ac);border-color:var(--ac);color:#fff;border-radius:999px}
@@ -152,7 +152,7 @@ smR=function(){const o=SM;if(!o)return;let it;try{it=o.mk()}catch(e){console.err
 .shx-dark .shx-p{background:var(--ac);color:#14110c}.shx-dark .shx-x{background:var(--ac);color:#14110c;border-color:var(--ac)}
 /* kraft: brown paper, stamped, a little hand-made */
 .shx-kraft{background:var(--bg) repeating-linear-gradient(0deg,#0000 0 3px,#00000008 3px 4px);border-radius:8px}
-.shx-kraft h2{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.shx-kraft h2{font-family:"Share Tech Mono",monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px}
 .shx-kraft .shx-ic{border-style:dashed}.shx-kraft .shx-it{border-style:dashed;box-shadow:none;transform:rotate(-.25deg)}.shx-kraft .shx-it:nth-child(even){transform:rotate(.25deg)}
 .shx-kraft .shx-it:hover{box-shadow:3px 3px 0 var(--ac)}.shx-kraft .shx-p{background:#fff;color:var(--ink);border:2px solid var(--ink);clip-path:none;transform:rotate(3deg)}
 @media (max-width:520px){.shx h2{font-size:20px}.shx .shx-hd{flex-wrap:wrap}.shx .shx-cash{order:3;margin-left:64px}.shx .shx-dt{display:none}.shx .shx-n{flex:1}.shx .shx-tip{display:none}}

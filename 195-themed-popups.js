@@ -85,14 +85,14 @@ const st=document.createElement('style');st.id='thcss';st.textContent=`
 #ui .box.th .card{background:var(--cd);border:1px solid var(--ln);border-radius:0;color:var(--ink)}
 #ui .box.th .card b{color:var(--ac)}
 /* police report */
-#ui .box.th-rob{--bg:#f4f0e2;--ink:#1d2333;--mu:#5a6070;--ac:#1d2a4a;--aci:#f4f0e2;--bt:#e6e0cc;width:min(460px,94vw)!important;text-align:left!important;font-family:Silkscreen,ui-monospace,monospace;
+#ui .box.th-rob{--bg:#f4f0e2;--ink:#1d2333;--mu:#5a6070;--ac:#1d2a4a;--aci:#f4f0e2;--bt:#e6e0cc;width:min(460px,94vw)!important;text-align:left!important;font-family:'Special Elite',ui-monospace,monospace;
  background-image:repeating-linear-gradient(#0000 0 25px,#3a5aa022 25px 26px)!important;position:relative;overflow:hidden}
 #ui .box.th-rob .thtape{height:16px;margin:-16px -18px 10px;background:repeating-linear-gradient(-45deg,#ffd200 0 14px,#111 14px 28px)}
 #ui .box.th-rob .thrh{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-bottom:2px solid #1d2333;padding-bottom:6px;margin-bottom:8px}
-#ui .box.th-rob h2{font-family:Silkscreen,ui-monospace,monospace;font-size:24px}
-#ui .box.th-rob .thstamp{position:absolute;right:18px;top:58px;transform:rotate(-12deg);border:4px double #c0262d;color:#c0262d;font:900 22px Silkscreen,ui-monospace,monospace;padding:2px 10px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+#ui .box.th-rob h2{font-family:'Special Elite',ui-monospace,monospace;font-size:24px}
+#ui .box.th-rob .thstamp{position:absolute;right:18px;top:58px;transform:rotate(-12deg);border:4px double #c0262d;color:#c0262d;font:900 22px 'Bungee',Impact,sans-serif;padding:2px 10px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
 #ui .box.th-rob dl{display:grid;grid-template-columns:120px 1fr;gap:5px 10px;margin:6px 0 10px;font-size:13px}#ui .box.th-rob dt{color:var(--mu);text-transform:uppercase;font-size:11px;padding-top:2px}#ui .box.th-rob dd{margin:0;border-bottom:1px dotted #1d233355}#ui .box.th-rob dd.red{color:#c0262d;font-weight:700}
-#ui .box.th-rob .thsig{font-size:12px;color:var(--mu)}#ui .box.th-rob .thsig i{font-family:Silkscreen,ui-monospace,monospace;color:#1d2a4a;font-size:16px}
+#ui .box.th-rob .thsig{font-size:12px;color:var(--mu)}#ui .box.th-rob .thsig i{font-family:'Permanent Marker',cursive;color:#1d2a4a;font-size:16px}
 /* collab meeting: studio lounge */
 #ui .box.th-meet{--bg:#2a1f2e;--ink:#f7ecdf;--mu:#c8b4a8;--ac:#ffb35c;--aci:#2a1f2e;--bt:#3a2c40;--bti:#f7ecdf;
  background:linear-gradient(#3a2838,#22182a)!important;border-color:#000!important}
@@ -126,11 +126,11 @@ const st=document.createElement('style');st.id='thcss';st.textContent=`
 /* lift */
 #ui .box.th-lift{width:min(520px,94vw);--bg:#b8bcc2;--ink:#1a1c20;--mu:#3a3e46;--ac:#1a1c20;--aci:#ffd84a;--bt:#d8dce2;--bti:#1a1c20;
  background:repeating-linear-gradient(90deg,#b4b8be 0 2px,#c0c4ca 2px 3px,#b8bcc2 3px 5px)!important;border-color:#55595f!important;position:relative}
-#ui .box.th-lift .thlcd{display:flex;align-items:center;justify-content:center;gap:10px;background:#120a04;color:#ff8a2a;font:700 28px Silkscreen,ui-monospace,monospace;padding:6px;margin:-4px 0 10px;border:3px solid #55595f;text-shadow:0 0 8px #ff6a00}
+#ui .box.th-lift .thlcd{display:flex;align-items:center;justify-content:center;gap:10px;background:#120a04;color:#ff8a2a;font:700 28px 'Bungee',monospace;padding:6px;margin:-4px 0 10px;border:3px solid #55595f;text-shadow:0 0 8px #ff6a00}
 #ui .box.th-lift .thlcd .arr{font-size:18px}
 #ui .box.th-lift button{border-radius:24px!important;background:radial-gradient(circle at 40% 35%,#f4f6f8,#c8ccd2)!important;border:2px solid #55595f!important;font-weight:700}
 #ui .box.th-lift button:disabled{background:radial-gradient(circle,#ffe9a0,#ffb000)!important;opacity:1;box-shadow:0 0 10px #ffb000}
-#ui .box.th-lift h2{font-family:Silkscreen,ui-monospace,monospace;font-size:20px;letter-spacing:.04em}
+#ui .box.th-lift h2{font-family:'Bungee','Silkscreen',sans-serif;font-size:20px;letter-spacing:.04em}
 /* hotel */
 #ui .box.th-hotel{--bg:#fbf8f0;--ink:#2a2418;--mu:#7a6a4a;--ac:#8a6a2a;--aci:#fff;--bt:#f0e8d4;border:3px double #8a6a2a!important;font-family:Silkscreen,ui-monospace,monospace}
 #ui .box.th-hotel .thcrest{text-align:center;color:#8a6a2a;font-size:11px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid #8a6a2a;padding-bottom:6px;margin-bottom:8px}
@@ -140,14 +140,14 @@ const st=document.createElement('style');st.id='thcss';st.textContent=`
 #ui .box.th-ticket{--bg:#fff3d6;--ink:#2a0f2a;--mu:#7a4a6a;--ac:#e8343c;--aci:#fff;--bt:#ffe6b0;--cd:#ffffff80;--ln:#2a0f2a40;position:relative;padding-right:74px!important;
  background:radial-gradient(circle at 100% 50%,#0000 10px,#fff3d6 11px) right/58px 100% no-repeat,linear-gradient(#fff3d6,#fff3d6)!important;
  border-style:solid;border-image:none}
-#ui .box.th-ticket h2{font:400 24px Silkscreen,ui-monospace,monospace;color:#e8343c}
+#ui .box.th-ticket h2{font:400 24px 'Bungee','Silkscreen',sans-serif;color:#e8343c}
 #ui .box.th-ticket .thstub{position:absolute;right:0;top:0;bottom:0;width:56px;border-left:3px dashed #2a0f2a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#e8343c;color:#fff}
-#ui .box.th-ticket .thstub span,#ui .box.th-ticket .thstub b{writing-mode:vertical-rl;font:400 12px Silkscreen,ui-monospace,monospace;letter-spacing:.12em}
+#ui .box.th-ticket .thstub span,#ui .box.th-ticket .thstub b{writing-mode:vertical-rl;font:400 12px 'Bungee',sans-serif;letter-spacing:.12em}
 /* festival wristband */
 #ui .box.th-fest{--bg:#1a0c2a;--ink:#fbeaff;--mu:#c8a8e0;--ac:#ff6ad5;--aci:#1a0c2a;--bt:#2e1648;--bti:#fbeaff;--cd:#ffffff10;--ln:#ff6ad540;
  background:linear-gradient(160deg,#2a0c3a,#140a24 60%,#0a1a2a)!important}
-#ui .box.th-fest .thband{display:flex;justify-content:space-around;margin:-16px -18px 12px;padding:6px;background:repeating-linear-gradient(90deg,#ff6ad5 0 30px,#ffd23d 30px 60px,#3ad0ff 60px 90px);color:#1a0c2a;font:400 12px Silkscreen,ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
-#ui .box.th-fest h2{font:400 22px Silkscreen,ui-monospace,monospace;color:#ffd23d;text-shadow:0 0 10px #ff6ad5}
+#ui .box.th-fest .thband{display:flex;justify-content:space-around;margin:-16px -18px 12px;padding:6px;background:repeating-linear-gradient(90deg,#ff6ad5 0 30px,#ffd23d 30px 60px,#3ad0ff 60px 90px);color:#1a0c2a;font:400 12px 'Bungee',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+#ui .box.th-fest h2{font:400 22px 'Bungee',sans-serif;color:#ffd23d;text-shadow:0 0 10px #ff6ad5}
 /* paper map */
 #ui .box.th-atlas{--bg:#efe4c8;--ink:#2e2614;--mu:#6a5a3a;--ac:#2e5a3a;--aci:#efe4c8;--bt:#e2d4b0;--bti:#2e2614;
  background:linear-gradient(90deg,#0000 0 33%,#0000000c 33% 33.4%,#0000 0 66%,#0000000c 66% 66.4%,#0000 0),#efe4c8!important}
@@ -157,8 +157,8 @@ const st=document.createElement('style');st.id='thcss';st.textContent=`
 #ui .box.th-atlas .popl{background:#e2d4b0!important;border-color:#2e2614!important;color:#2e2614}#ui .box.th-atlas .popr{border-color:#2e261430!important}#ui .box.th-atlas .popr small{color:#6a5a3a!important}#ui .box.th-atlas .popr em{color:#a8341c!important}
 /* departures board */
 #ui .box.th-depart{--bg:#121418;--ink:#f2f2f2;--mu:#9aa0aa;--ac:#ffc21a;--aci:#121418;--bt:#23262c;--bti:#f2f2f2}
-#ui .box.th-depart .thdep{display:flex;justify-content:space-between;margin:-16px -18px 12px;padding:8px 18px;background:#000;color:#ffc21a;font:400 16px Silkscreen,ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;border-bottom:3px solid #ffc21a}
-#ui .box.th-depart h2{font:400 20px Silkscreen,ui-monospace,monospace;color:#ffc21a}#ui .box.th-depart b{color:#ffc21a}
+#ui .box.th-depart .thdep{display:flex;justify-content:space-between;margin:-16px -18px 12px;padding:8px 18px;background:#000;color:#ffc21a;font:400 16px 'Bungee',monospace;letter-spacing:.14em;text-transform:uppercase;border-bottom:3px solid #ffc21a}
+#ui .box.th-depart h2{font:400 20px 'Bungee',sans-serif;color:#ffc21a}#ui .box.th-depart b{color:#ffc21a}
 `;document.head.appendChild(st);
 try{scan()}catch(e){}
 })();

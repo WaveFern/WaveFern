@@ -289,7 +289,7 @@ function open(C,sp){T={C,sp,items:items(C)};hov=0;GR='';render()}
 
 {const st=document.createElement('style');st.textContent=`
 .modal.svs-wrap{display:flex;align-items:center;justify-content:center;gap:16px;max-width:96vw;width:max-content;min-width:0;max-height:none;overflow:visible;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;outline:0!important;pointer-events:auto}
-.svs{padding:0;width:min(480px,92vw);max-height:88vh;overflow:auto;background:repeating-linear-gradient(0deg,#d4b07a 0 3px,#cfaa72 3px 6px);border:3px solid #4a2c12;border-radius:10px;color:#3a2410;font-family:ui-monospace,Menlo,Consolas,monospace;box-shadow:0 12px 40px #000a}
+.svs{padding:0;width:min(480px,92vw);max-height:88vh;overflow:auto;background:repeating-linear-gradient(0deg,#d4b07a 0 3px,#cfaa72 3px 6px);border:3px solid #4a2c12;border-radius:10px;color:#3a2410;font-family:"Figtree",sans-serif;box-shadow:0 12px 40px #000a}
 .svs-aw{height:22px;background:repeating-linear-gradient(90deg,var(--ac) 0 26px,#fff6e6 26px 52px);border-bottom:3px solid #4a2c12;border-radius:7px 7px 0 0;position:relative}
 .svs-aw:after{content:'';position:absolute;left:0;right:0;bottom:-11px;height:8px;background:radial-gradient(circle at 13px 0,var(--ac) 9px,transparent 10px) 0 0/52px 8px repeat-x,radial-gradient(circle at 39px 0,#fff6e6 9px,transparent 10px) 0 0/52px 8px repeat-x}
 .svs-hd{display:flex;gap:14px;align-items:center;padding:16px 18px 6px}
@@ -306,7 +306,7 @@ function open(C,sp){T={C,sp,items:items(C)};hov=0;GR='';render()}
 .svs-row.poor{opacity:.6}
 .svs-ic{flex:0 0 auto;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#4a2c12;background:#f1dfbc;border:2px solid #b08458;border-radius:50%}
 .svs-n{flex:1;min-width:0;font-weight:bold;font-size:15px}.svs-n small{display:block;font-weight:normal;font-size:11px;color:#7a5a3a;font-style:italic}
-.svs-tag{position:relative;flex:0 0 auto;font:bold 13px ui-monospace,Menlo,Consolas,monospace;color:#3a2410;background:#fff;border:2px solid #3a2410;border-radius:3px 7px 7px 3px;padding:6px 10px 6px 18px;min-height:34px;cursor:pointer;box-shadow:0 2px 0 #3a2410;transform:rotate(-3deg)}
+.svs-tag{position:relative;flex:0 0 auto;font:bold 13px 'Trebuchet MS',sans-serif;color:#3a2410;background:#fff;border:2px solid #3a2410;border-radius:3px 7px 7px 3px;padding:6px 10px 6px 18px;min-height:34px;cursor:pointer;box-shadow:0 2px 0 #3a2410;transform:rotate(-3deg)}
 .svs-tag i{position:absolute;left:5px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#d4b07a;border:1px solid #3a2410}
 .svs-tag:hover:not(:disabled){background:var(--ac);color:var(--act)}.svs-tag:disabled{opacity:.6;cursor:default}
 .svs-ft{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px 16px;font-size:12px}.svs-ft>span:first-child{flex:1 1 100%;opacity:.75;font-style:italic}
