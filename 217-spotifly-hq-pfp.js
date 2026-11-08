@@ -11,7 +11,7 @@ function onSf(){try{return mode=='phone'?(PH.app=='sf'||PH.app=='spot'):mode=='p
 const Q=[],QK=new Set;let busy=0,fail=0;
 function pump(){const t=performance.now();
  while(Q.length&&performance.now()-t<8){const j=Q.shift();QK.delete(j.old);let u;
-  try{u=igxPortrait(j.c,j.mine,'sf')}catch(e){if(++fail>=4)Q.length=0;continue}
+  try{u=igxPortrait(j.c,j.mine,'sf')}catch(e){try{if(IGX.r){IGX.r.dispose();IGX.r=null}}catch(_){IGX.r=null}if(++fail>=4){Q.length=0;fail=0;break}Q.push(j);QK.add(j.old);break}fail=0;
   if(u)document.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===j.old)i.src=u})}
  busy=Q.length?requestAnimationFrame(pump):0}
 function add(c,mine,old){if(QK.has(old))return;QK.add(old);Q.push({c,mine,old});if(!busy)busy=requestAnimationFrame(pump)}

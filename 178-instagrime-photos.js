@@ -14,6 +14,7 @@
 /* ---------- offscreen renderer ---------- */
 const IGX={r:null,s:null,cam:null,L:{},W:160,H:120,PF:{},on:1};
 function igxInit(){if(IGX.r)return IGX.r;const r=new THREE.WebGLRenderer({alpha:true,antialias:false,preserveDrawingBuffer:true});r.setPixelRatio(1);r.setSize(IGX.W,IGX.H,false);
+ try{r.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();if(IGX.r===r)IGX.r=null})}catch(e){}
  const s=new THREE.Scene(),amb=new THREE.AmbientLight(0xffffff,.68),key=new THREE.DirectionalLight(0xffffff,.85),rim=new THREE.DirectionalLight(0xffffff,.45);
  key.position.set(2.5,3.5,5);rim.position.set(-3,2.5,-3);s.add(amb,key,rim);IGX.L={amb,key,rim};IGX.cam=new THREE.PerspectiveCamera(30,4/3,.1,60);IGX.s=s;IGX.r=r;return r}
 const igxRng=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};

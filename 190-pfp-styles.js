@@ -48,7 +48,7 @@ const has=(c,mine,st)=>(st||'msg')=='msg'?!!IGX.PF[(mine?'me|':'')+JSON.stringif
 const Q=[],QK=new Set;let busy=0,FAIL=0;
 function later(c,mine,st,old){if(!IGX.on||!c)return old;if(has(c,mine,st))return igxPortrait(c,mine,st);const k=st+'|'+old;
  if(!QK.has(k)){QK.add(k);Q.push({c,mine,st,old,k});if(!busy){busy=1;requestAnimationFrame(pump)}}return old}
-function pump(){const t=performance.now();while(Q.length&&performance.now()-t<10){const j=Q.shift();QK.delete(j.k);let u;try{u=igxPortrait(j.c,j.mine,j.st)}catch(e){console.warn('portrait',e);if(++FAIL>=4){IGX.on=0;Q.length=0}break}
+function pump(){const t=performance.now();while(Q.length&&performance.now()-t<10){const j=Q.shift();QK.delete(j.k);let u;try{u=igxPortrait(j.c,j.mine,j.st)}catch(e){console.warn('portrait',e);try{if(IGX.r){IGX.r.dispose();IGX.r=null}}catch(_){IGX.r=null}if(++FAIL>=4){IGX.on=0;Q.length=0;setTimeout(()=>{FAIL=0;IGX.on=1},5000)}else Q.push(j);break}FAIL=0;
  if(shown()===j.st)document.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===j.old)i.src=u})}
  if(Q.length)requestAnimationFrame(pump);else busy=0}
 /* the app on screen right now; a late picture only swaps in while its own app is showing */
