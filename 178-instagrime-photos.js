@@ -14,6 +14,7 @@
 /* ---------- offscreen renderer ---------- */
 const IGX={r:null,s:null,cam:null,L:{},W:160,H:120,PF:{},on:1};
 function igxInit(){if(IGX.r)return IGX.r;const r=new THREE.WebGLRenderer({alpha:true,antialias:false,preserveDrawingBuffer:true});r.setPixelRatio(1);r.setSize(IGX.W,IGX.H,false);
+ try{r.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();if(IGX.r===r)IGX.r=null})}catch(e){}
  const s=new THREE.Scene(),amb=new THREE.AmbientLight(0xffffff,.68),key=new THREE.DirectionalLight(0xffffff,.85),rim=new THREE.DirectionalLight(0xffffff,.45);
  key.position.set(2.5,3.5,5);rim.position.set(-3,2.5,-3);s.add(amb,key,rim);IGX.L={amb,key,rim};IGX.cam=new THREE.PerspectiveCamera(30,4/3,.1,60);IGX.s=s;IGX.r=r;return r}
 const igxRng=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
@@ -188,7 +189,7 @@ function igxPhoto(p){const W=IGX.W,H=IGX.H,kd=IGXS[igxKind(p)]?igxKind(p):'studi
  for(let i=0;i<120;i++)igxF(x,r()<.5?'#ffffff0d':'#0000000d',r()*W,r()*H,1,1);
  const o=document.createElement('canvas');o.width=W*2;o.height=H*2;const ox=o.getContext('2d');ox.imageSmoothingEnabled=false;ox.drawImage(k,0,0,W*2,H*2);return o.toDataURL()}
 {const pp0=postPic;postPic=function(p){if(!IGX.on||!p||PICS[p.id])return pp0.apply(this,arguments);try{if(pxOf(p))return pp0.apply(this,arguments)}catch(e){}
- try{return PICS[p.id]=igxPhoto(p)}catch(e){console.warn('instagrime photo',e);IGX.on=0;return pp0.apply(this,arguments)}}}
+ try{return PICS[p.id]=igxPhoto(p)}catch(e){console.warn('instagrime photo',e);return pp0.apply(this,arguments)}}}
 
 /* ---------- head-and-shoulders profile pictures ---------- */
 function igxPortrait(c,mine){const key=(mine?'me|':'')+JSON.stringify(c);if(IGX.PF[key])return IGX.PF[key];
