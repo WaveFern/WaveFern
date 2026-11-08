@@ -58,14 +58,14 @@ trafTick=function(dt){const pl=mode=='play'||mode=='drive';TRAF.forEach(c=>{if(!
   if(!c.ne)nextEdge(c);
   const hx=Math.sin(c.h),hz=Math.cos(c.h),toEnd=c.e.len-c.t,q0=curS(c);
   /* the car ahead: same road, or just round the corner on the road we are turning into */
-  TRAF.forEach(o=>{if(o===c||!o.e)return;let g=-1;if(o.a===c.a&&o.e===c.e)g=o.t-c.t;else if(o.e===c.ne&&o.a===c.e.to)g=toEnd+o.t;if(g>0&&g<9)tg=Math.min(tg,g<4.8?0:o.s)});
+  if(c.fr>0)c.fr-=dt;TRAF.forEach(o=>{if(c.fr>0||o===c||!o.e)return;let g=-1;if(o.a===c.a&&o.e===c.e)g=o.t-c.t;else if(o.e===c.ne&&o.a===c.e.to)g=toEnd+o.t;if(g>0&&g<9)tg=Math.min(tg,g<4.8?0:o.s)});
   if(pl&&!IN){const dx=P.x-c.x,dz=P.z-c.z,al=dx*hx+dz*hz,pp=dx*hz-dz*hx;if(al>0&&al<9&&Math.abs(pp)<1.6)tg=al<5?0:Math.min(tg,2.5)}
   /* brake into a turn, hold the turn speed through it */
   if(q0)tg=Math.min(tg,q0[1].v);else if(c.cv){const v=c.cv;if(c.e===v.e1){const d=toEnd-v.din;tg=Math.min(tg,v.v+Math.max(0,d)*.55)}}
   /* give way: wait before the junction while another car is moving through it */
   const wz=c.cv&&c.e===c.cv.e1?c.cv.din+.8:4;
-  if(toEnd<wz&&!q0&&c.w<5){const to=c.e.to;if(TRAF.some(o=>o!==c&&o.e&&o.s>.5&&Math.hypot(o.x-to.x,o.z-to.z)<4.5&&!(o.a===c.a&&o.e===c.e)))tg=0}
-  c.w=tg<.1&&c.s<.5?c.w+dt:0;c.s+=(tg-c.s)*Math.min(1,dt*(tg<c.s?3:1.1));
+  if(toEnd<wz&&!q0&&c.w<5&&!(c.fr>0)){const to=c.e.to;if(TRAF.some(o=>o!==c&&o.e&&o.s>.5&&Math.hypot(o.x-to.x,o.z-to.z)<4.5&&!(o.a===c.a&&o.e===c.e)))tg=0}
+  c.w=tg<.1&&c.s<.5?c.w+dt:0;/* stuck for 6s (jam or deadlock): ignore cars ahead and give-way for a few seconds so traffic always flows */if(c.w>6&&!(c.fr>0)){c.fr=4;c.w=0}if(c.fr>0&&tg<c.cr*.6&&!(pl&&!IN&&(()=>{const dx=P.x-c.x,dz=P.z-c.z,al=dx*hx+dz*hz,pp=dx*hz-dz*hx;return al>0&&al<9&&Math.abs(pp)<1.6})()))tg=c.cr*.6;c.s+=(tg-c.s)*Math.min(1,dt*(tg<c.s?3:1.1));
   /* on the curve the road distance is not the driven distance: scale so the car really moves at c.s */
   c.t+=c.s*dt*(q0?q0[1].span/q0[1].arc:1);
   while(c.t>=c.e.len){c.t-=c.e.len;const b=c.e.to;if(!c.ne)nextEdge(c);c.a=b;c.e=c.ne;c.cx=c.cv;c.ne=null;c.cv=null;c.w=0}
