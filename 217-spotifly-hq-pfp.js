@@ -11,11 +11,11 @@ function onSf(){try{return mode=='phone'?(PH.app=='sf'||PH.app=='spot'):mode=='p
 const Q=[],QK=new Set;let busy=0,fail=0;
 function pump(){const t=performance.now();
  while(Q.length&&performance.now()-t<8){const j=Q.shift();QK.delete(j.old);let u;
-  try{u=igxPortrait(j.c,j.mine,'sf')}catch(e){try{if(IGX.r){IGX.r.dispose();IGX.r=null}}catch(_){IGX.r=null}if(++fail>=4){Q.length=0;fail=0;break}Q.push(j);QK.add(j.old);break}fail=0;
+  try{u=igxPortrait(j.c,j.mine,'sf')}catch(e){fail++;try{if(IGX.r){IGX.r.dispose();IGX.r=null}}catch(_){IGX.r=null}Q.push(j);QK.add(j.old);busy=1;setTimeout(()=>{busy=0;if(Q.length)busy=requestAnimationFrame(pump)},Math.min(8000,500*fail));return}
   if(u)document.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===j.old)i.src=u})}
- busy=Q.length?requestAnimationFrame(pump):0}
+ fail=0;busy=Q.length?requestAnimationFrame(pump):0}
 function add(c,mine,old){if(QK.has(old))return;QK.add(old);Q.push({c,mine,old});if(!busy)busy=requestAnimationFrame(pump)}
-function sweep(){if(!IGX.on||!onSf())return;
+function sweep(){if(!onSf())return;if(!IGX.on)IGX.on=1;
  let mine=null,mineU=null;try{if(!S.pfpSp){mineU=pfp(ch);mine=ch}}catch(e){}
  const m=rv();
  document.querySelectorAll('img').forEach(i=>{const s=i.getAttribute('src');if(!s||s.length<40||s.slice(0,22)!=='data:image/png;base64,')return;
