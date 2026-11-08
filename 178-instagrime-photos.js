@@ -188,7 +188,7 @@ function igxPhoto(p){const W=IGX.W,H=IGX.H,kd=IGXS[igxKind(p)]?igxKind(p):'studi
  for(let i=0;i<120;i++)igxF(x,r()<.5?'#ffffff0d':'#0000000d',r()*W,r()*H,1,1);
  const o=document.createElement('canvas');o.width=W*2;o.height=H*2;const ox=o.getContext('2d');ox.imageSmoothingEnabled=false;ox.drawImage(k,0,0,W*2,H*2);return o.toDataURL()}
 {const pp0=postPic;postPic=function(p){if(!IGX.on||!p||PICS[p.id])return pp0.apply(this,arguments);try{if(pxOf(p))return pp0.apply(this,arguments)}catch(e){}
- try{return PICS[p.id]=igxPhoto(p)}catch(e){console.warn('instagrime photo',e);IGX.on=0;return pp0.apply(this,arguments)}}}
+ try{return PICS[p.id]=igxPhoto(p)}catch(e){console.warn('instagrime photo',e);return pp0.apply(this,arguments)}}}
 
 /* ---------- head-and-shoulders profile pictures ---------- */
 function igxPortrait(c,mine){const key=(mine?'me|':'')+JSON.stringify(c);if(IGX.PF[key])return IGX.PF[key];
