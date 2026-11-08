@@ -53,7 +53,7 @@
    ach:has?achOf((D.songs||[]).length,D.listeners||0,fameOf(D),ch.k==='cur'&&g(()=>MPS&&MPS.band),(D.songs||[]).reduce((q,x)=>q+(x.streams||0),0)):[],online:'Online',rel:'self'};
  };
  const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3,career:'cur',userAt:0};
- function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}return Object.assign({},defaults,o,{show:Object.assign({},defaults.show,o.show||{})})}
+ function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}const r=Object.assign({},defaults,o,{show:Object.assign({},defaults.show,o.show||{})});/* the real username (from the account) always wins over the cached copy */const u=g(()=>window.fwUsername&&window.fwUsername());if(u)r.user=u;return r}
  function save(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
 
  /* ---------- avatars: deterministic 8x8 mirrored pixel face, drawn to a canvas ---------- */
@@ -153,6 +153,18 @@
 
  /* ---------- render ---------- */
  let V={id:'me',visitor:0,mode:'view',stack:[],msg:''};
+ /* Edit profile always shows the current account details: refreshed when the profile opens, when Edit opens, when the window regains focus, and whenever the cloud profile syncs. Fields the player has started typing in are never overwritten. */
+ let dirty=0;
+ function refresh(){
+  if(!el())return;
+  try{if(window.fwProfileSync)Promise.resolve(fwProfileSync(1)).then(()=>{if(!dirty)draw()},()=>{})}catch(e){}
+  if(!dirty&&V.mode!='priv')draw();
+ }
+ window.addEventListener('fw-profile-synced',()=>{if(el()&&!dirty&&V.mode!='priv')draw()});
+ window.addEventListener('focus',()=>{if(el()&&V.mode=='edit'||el()&&V.mode=='view')refresh()});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+ document.addEventListener('input',e=>{const t=e.target;if(t&&(t.id=='pf-bio'||t.id=='pf-user'||t.id=='pf-car'||t.id=='pf-gp'))dirty=1});
+
  const el=()=>document.getElementById('pfx');
  const signedIn=()=>{try{return !!FBU}catch(e){return false}};
  function open(id,opts){
@@ -162,9 +174,9 @@
   
   V=Object.assign(V,{id,visitor:id==='me'?o.visitor:0,mode:'view',msg:''});
   if(!el()){V.stack=[];const d=document.createElement('div');d.id='pfx';d.onmousedown=e=>{if(e.target===d)close()};document.body.appendChild(d)}
-  el().dataset.on='1';draw();try{snd('click')}catch(e){}
+  el().dataset.on='1';dirty=0;draw();if(id==='me')refresh();try{snd('click')}catch(e){}
  }
- function close(){const d=el();if(d)d.remove();V.stack=[]}
+ function close(){const d=el();if(d)d.remove();V.stack=[];dirty=0}
  let PUBP=null;
  function person(id){return id==='me'?mine():id==='pub'?PUBP:PEOPLE[id]}
  function stateFor(p){
@@ -256,9 +268,9 @@ const PX={
  function act(k,p){
   {if(k=='close')close();
   else if(k=='back'){V.id=V.stack.pop()||'me';V.mode='view';V.msg='';draw()}
-  else if(k=='edit'){V.mode='edit';V.err='';draw()}
+  else if(k=='edit'){V.mode='edit';V.err='';dirty=0;draw();refresh()}
   else if(k=='priv'){V.mode='priv';draw()}
-  else if(k=='done'){V.mode='view';draw()}
+  else if(k=='done'){V.mode='view';dirty=0;draw();refresh()}
   else if(k=='visitor'){V.visitor=V.visitor?0:1;draw()}
   else if(k=='savee'){
    const ue=document.getElementById('pf-user'),be=document.getElementById('pf-bio'),s0=load();
@@ -269,7 +281,7 @@ const PX={
    if(b.length>80){V.err='Bio is over 80 characters.';return draw()}
    if(/[<>{}\[\]\\|^~`]/.test(b)||/[\u0300-\u036f\u200b-\u200f\u202a-\u202e]/.test(b)){V.err='Bio has characters that are not allowed.';return draw()}
    if(BLOCK.test(b)||BLOCK.test(u)){V.err='That text is not allowed. Remove links and rude words.';return draw()}
-   const s=load();const gp=document.getElementById('pf-gp');if(gp){s.gphoto=gp.checked?1:0;try{if(window.fwProfileSync)setTimeout(()=>fwProfileSync(1),300)}catch(e){}}if(u!==s.user){s.user=u;s.userAt=Date.now()}s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
+   const s=load();const gp=document.getElementById('pf-gp');if(gp){s.gphoto=gp.checked?1:0;try{if(window.fwProfileSync)setTimeout(()=>fwProfileSync(1),300)}catch(e){}}if(u!==s.user){s.user=u;s.userAt=Date.now()}s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);dirty=0;try{if(window.fwProfileSync)setTimeout(()=>fwProfileSync(1),300)}catch(e){}V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
   else if(p.pub&&k=='add'){const i=document.createElement('input');i.id='fra';i.value=p.user;i.style.display='none';document.body.appendChild(i);try{frAdd();V.msg='Friend request sent to @'+p.user+'.'}catch(e){V.msg='Could not send a request.'}i.remove();draw()}
   else if(p.pub&&k=='block'){try{frBlock(p.uid);V.msg='';}catch(e){}draw()}
   else if(p.pub&&k=='invite'){try{frInv(p.uid)}catch(e){V.msg='Join a band room first.'}draw()}
