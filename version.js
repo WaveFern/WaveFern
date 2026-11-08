@@ -7,7 +7,6 @@ const GAME_VERSION='v49.95.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
  {v:'v49.95.0',n:'Sign out of Google is on the main menu. When you are signed in, a Sign out of Google button shows under Wiki, with a confirmation first. Your cloud save is kept on your account, your careers on this device are kept, and you go back to the signed-out main menu.'},
-const VERSION_HISTORY=[
  {v:'v49.94.7',n:'Toned down overly bright shops and buildings. The Motors showroom now has darker blue-grey walls and floor with softer lights, and every shop room and shop front tones down glaring near-white colours and over-bright lighting so the look is consistent.'},
  {v:'v49.94.6',n:'The Spotifly Upload page gets a purple banner, a cover tile for each song and a purple quality meter. The Song recorded title box after recording is back to the plain title box, without the quality meter, preview and title ideas.'},
  {v:'v49.94.5',n:'Edit profile now always shows your current username, bio and Google picture setting. It refreshes from your account and cloud profile each time it opens, when you come back to the window, and after any sync, and a bio changed on another device is picked up without overwriting what you are typing.'},
