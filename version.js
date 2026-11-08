@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.94.4';
+const GAME_VERSION='v49.94.5';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.94.5',n:'Edit profile now always shows your current username, bio and Google picture setting. It refreshes from your account and cloud profile each time it opens, when you come back to the window, and after any sync, and a bio changed on another device is picked up without overwriting what you are typing.'},
  {v:'v49.94.4',n:'Fixed Spotifly artist pictures never loading: the detailed picture maker tried to use its renderer before it had been created, so every picture failed and kept retrying. It now creates the renderer first. Nothing about gameplay or balance changed.'},
  {v:'v49.94.3',n:'Spotifly artist pictures recover even if the browser drops its graphics context: the picture maker is rebuilt and the picture retried, so artists always end up with the detailed 3D version. Nothing about gameplay or balance changed.'},
  {v:'v49.94.2',n:'The Spotifly choose-a-name and Upload screens now use the purple Spotifly theme. Artist profile pictures in Spotifly now always load as the detailed 3D ones: a failed render is retried instead of switching the pictures off for the rest of the session, so the old blocky faces no longer come back.'},
