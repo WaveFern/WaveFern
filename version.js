@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.94.8';
+const GAME_VERSION='v49.95.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.95.0',n:'Sign out of Google is on the main menu. When you are signed in, a Sign out of Google button shows under Wiki, with a confirmation first. Your cloud save is kept on your account, your careers on this device are kept, and you go back to the signed-out main menu.'},
  {v:'v49.94.8',n:'Friends stops getting permission denied when a player already owns their username: the database update no longer rewrites the username entry or its 30-day stamp, so presence and the username copy save. An unchanged display name no longer uses up the weekly name stamp, and a refused display name no longer blocks the username from saving. Nothing about gameplay or balance changed.'},
  {v:'v49.94.7',n:'Toned down overly bright shops and buildings. The Motors showroom now has darker blue-grey walls and floor with softer lights, and every shop room and shop front tones down glaring near-white colours and over-bright lighting so the look is consistent.'},
  {v:'v49.94.6',n:'The Spotifly Upload page gets a purple banner, a cover tile for each song and a purple quality meter. The Song recorded title box after recording is back to the plain title box, without the quality meter, preview and title ideas.'},
