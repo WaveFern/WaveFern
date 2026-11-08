@@ -39,7 +39,14 @@ const calm=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matche
 #mgcd small i{display:block;margin-top:4px;font-style:normal;color:#ffd27a;font-size:11px;letter-spacing:0}
 #ui .cards.fxcards .card{animation:fxcd .45s cubic-bezier(.2,1.6,.4,1) both}@keyframes fxcd{0%{transform:translateY(14px) scale(.85);opacity:0}100%{transform:none;opacity:1}}
 #ui .card b small,#ui .card small.fxbd{display:block;font-size:11px;color:#ffd27a}
-.box.modal.fxperfect{position:relative;overflow-x:hidden;overflow-y:auto;border:3px solid #ffd27a!important;box-shadow:0 0 16px #ffd27a88}@keyframes fxpg{0%,100%{box-shadow:0 0 14px #ffd27a88,inset 0 0 14px #ffd27a33}50%{box-shadow:0 0 38px #ffd27add,inset 0 0 26px #ffd27a66}}
+.box.modal.fxperfect{position:relative}
+/* Perfect song: same box (size, padding, border width, fonts) as a normal result, only the colours turn gold. Flat pixel look, no glow. */
+#ui>.box.modal.fxperfect{--g:#f2b632;--ga:#f2b632;--gad:#a87a12;--gat:#1a1100;--sbh:#f2b632;background:#000;color:#f2f2f2;border:2px solid #f2b632;box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px #a87a12,4px 4px 0 #a87a1288}
+#ui>.box.modal.fxperfect h2{color:#f2b632;border-bottom:2px solid #f2b632;padding-bottom:6px}
+#ui>.box.modal.fxperfect .card{background:#0f0f0f;border:2px solid #a87a12;border-radius:0}
+#ui>.box.modal.fxperfect .card b,#ui>.box.modal.fxperfect .card b small{color:#f2b632}
+#ui>.box.modal.fxperfect button.go{background:#f2b632;color:#1a1100;border-color:#f2b632}
+#ui>.box.modal.fxperfect button:hover{border-color:#f2b632}
 .fxpbanner{color:#ffd27a;font-weight:800;letter-spacing:3px;text-align:center;margin-bottom:6px;text-shadow:0 0 12px #ffd27a;animation:fxpb 1.2s ease-in-out infinite}@keyframes fxpb{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 .fxspark{position:absolute;bottom:0;width:6px;height:6px;background:#ffd27a;box-shadow:0 0 8px #ffd27a;transform:rotate(45deg);animation:fxsp 2.4s linear infinite;pointer-events:none}@keyframes fxsp{0%{transform:translateY(0) rotate(45deg);opacity:1}100%{transform:translateY(-260px) rotate(405deg);opacity:0}}
 .fxline{margin:6px 0;font-size:13px}.fxline.best{color:#ffd27a;font-weight:700;animation:fxcd .5s .5s both}
