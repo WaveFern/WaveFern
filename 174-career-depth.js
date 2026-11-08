@@ -6,7 +6,7 @@
    - Legacy goals for the late game, paid once (S.leg). Goals an old save already meets are marked done quietly.
    - Music friends: each collab with an artist deepens your bond (Friend 1, Close friend 3, Best friend 5 songs together).
      Friends charge less to collab, and close friends share your new releases (a day of boosted streams).
-   - City finds: 3 street moments each day (S.smom) with small rewards.
+   - (City finds, the green street cassettes, were removed in v49.x; an old save's S.smom is just ignored.)
    - Band rooms: with bandmates online your songs stream 12% more per extra member.
    All of it shows in a new Legacy tab in the Quests app. */
 (()=>{
@@ -82,27 +82,6 @@ function legTick(){if(!live())return;const first=!S.leg;S.leg=S.leg||{};
  for(const[id,n,f,t,r]of LG){if(S.leg[id])continue;let v=0;try{v=+f()||0}catch(e){}if(v<t)continue;S.leg[id]=first?2:1;if(first)continue;
   S.money=+((+S.money||0)+r).toFixed(2);if(!document.getElementById('glr'))card('LEGACY GOAL',n,'+$'+r.toLocaleString(),60);mail('Legacy goal reached: '+n+'. $'+r.toLocaleString()+' has been paid to you.');return}}
 
-/* ===== city finds ===== */
-let FG=null,FM=[],FK='';
-const paths=()=>typeof VPED!='undefined'&&Array.isArray(VPED)?VPED.filter(v=>isFinite(v.x)&&isFinite(v.mn)&&isFinite(v.mx)):[];
-function seeded(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return()=>{h+=0x6D2B79F5;let t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
-function spot(r,ps){const v=ps[Math.floor(r()*ps.length)];return{x:v.x,z:v.mn+(v.mx-v.mn)*(.1+.8*r())}}
-function mkTape(g,c){const m=new THREE.Group();B(m,.5,.32,.1,c,0,0,0);B(m,.36,.12,.11,'#f4f1e8',0,.04,0);[-.1,.1].forEach(x=>B(m,.07,.07,.12,'#141414',x,-.05,0));g.add(m);return m}
-function finds(){const ps=paths();if(!ps.length)return[];const out=[];
- const m=S.smom&&S.smom.d===S.day?S.smom:(S.smom={d:S.day,got:{}}),r2=seeded('wf-street-'+S.day);for(let i=0;i<3;i++){const p=spot(r2,ps);if(!m.got[i])out.push({k:'m',i,x:p.x,z:p.z})}return out}
-function findsBuild(){const k=S.day+'|'+Object.keys((S.smom||{}).got||{}).length;if(FG&&k===FK)return;FK=k;if(FG)scene.remove(FG);FG=new THREE.Group();FM=finds().map(f=>{const m=mkTape(FG,'#2fe68a');m.position.set(f.x,.7,f.z);return Object.assign(f,{m})});scene.add(FG)}
-const outdoors=()=>mode=='play'&&!IN&&!(window.DCITY&&DCITY.on)&&!(typeof P!='undefined'&&P.sit);
-function collect(f){const fl=FL();
- if(1){S.smom.got[f.i]=1;const g=GEN[Math.floor(Math.random()*GEN.length)],ev=[
-   ()=>{const n=RI(3,12)+Math.round((S.listeners||0)*.001);S.followers=(S.followers||0)+FOLN(n);return'A fan stopped you for a photo: +'+FOLN(n).toLocaleString()+' followers'},
-   ()=>{S.hype[g]=Math.min(2,(S.hype[g]||1)*1.04);return'You jammed with a street busker: '+g+' buzz is up'},
-   ()=>{const c=RI(10,40)*(1+Math.floor(fl/5));S.money=+((+S.money||0)+c).toFixed(2);return'Someone recognised you and bought you lunch: +$'+c},
-   ()=>{S.energy=Math.min(100,(S.energy||0)+20);return'A producer gave you a tip over coffee: +20 energy'}];
-  try{say(ev[Math.floor(Math.random()*ev.length)]());snd('cash')}catch(e){}}
- findsBuild()}
-{const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{if(!live())return r;if(!FG||FK.split('|')[0]!=String(S.day))findsBuild();const on=outdoors()||mode=='drive';FG.visible=on&&!(window.DCITY&&DCITY.on)&&!IN;if(!FG.visible)return r;
- const t=performance.now()/1000;for(const f of FM){f.m.rotation.y=t*1.6;f.m.position.y=.75+Math.sin(t*2+f.i)*.12;if(mode=='play'&&outdoors()&&Math.abs(f.x-P.x)<1.1&&Math.abs(f.z-P.z)<1.1){collect(f);break}}}catch(e){}return r}}
-
 /* ===== Legacy tab in the Quests app ===== */
 const bar=(v,t)=>`<div class=qbar><i style="width:${Math.min(100,v/t*100)}%"></i></div>`;
 function legPage(){S.leg=S.leg||{};const c=collabs(),fr=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,8),pl=(S.plq||[]).slice().reverse();
@@ -111,8 +90,7 @@ function legPage(){S.leg=S.leg||{};const c=collabs(),fr=Object.entries(c).sort((
  <div class=qtabs><button onclick="qstTab('d')">Daily</button><button onclick="qstTab('w')">Weekly</button><button class=on onclick="qstTab('l')">Legacy</button></div>
  <h3 style="margin:6px 0">Legacy goals</h3>${goals}
  <h3 style="margin:14px 0 6px">Plaques (${pl.length})</h3>${pl.length?pl.map(p=>`<div class=qc><div class=qs style="background:${p.c};color:#111">★</div><div class=qn><b>${esc(p.t)} · ${esc(p.s)}</b><div class=qv>${fmt(p.n)} streams · Day ${p.d}</div></div></div>`).join(''):'<div class=qf>A song that passes 1M streams earns a Gold plaque, sent to your Storage so you can hang it in your house.</div>'}
- <h3 style="margin:14px 0 6px">Music friends</h3>${fr.length?fr.map(([n,k])=>{const lv=bondLv(k);return`<div class=qc><div class=qs>${lv}</div><div class=qn><b>${esc(n)} · ${bondName(k)}</b><div class=qv>${k} song${k>1?'s':''} together · ${['','10% off collabs','20% off collabs, shares your releases','30% off collabs, often shares your releases'][lv]}</div></div></div>`}).join(''):'<div class=qf>Collab with an artist to become friends: friends charge less, close friends share your new songs.</div>'}
- <div class=qf>Green cassettes on the city pavements are daily street moments.</div></div>`}
+ <h3 style="margin:14px 0 6px">Music friends</h3>${fr.length?fr.map(([n,k])=>{const lv=bondLv(k);return`<div class=qc><div class=qs>${lv}</div><div class=qn><b>${esc(n)} · ${bondName(k)}</b><div class=qv>${k} song${k>1?'s':''} together · ${['','10% off collabs','20% off collabs, shares your releases','30% off collabs, often shares your releases'][lv]}</div></div></div>`}).join(''):'<div class=qf>Collab with an artist to become friends: friends charge less, close friends share your new songs.</div>'}</div>`}
 if(typeof PA=='object'&&PA.quests){const q0=PA.quests;PA.quests=function(){const Q=S.quests||{},h=q0.apply(this,arguments);/* the original also loads the Quests styles */if(Q.tab=='l'){try{return legPage()}catch(e){console.error('Legacy',e)}}
  return h.replace(/(<div class=qtabs>[\s\S]*?)(<\/div>)/,'$1<button onclick="qstTab(\'l\')">Legacy</button>$2')}}
 {const t0=window.qstTab;window.qstTab=t=>{if(t=='l'){(S.quests=S.quests||{}).tab='l';try{snd('click')}catch(e){}pcR();return}return t0(t)}}
