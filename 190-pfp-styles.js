@@ -26,6 +26,7 @@ function sfPic(c,mine,key){const W=64,H=64,k=document.createElement('canvas');k.
  glow(x,'hsl('+h+',70%,46%)',W*.5,H*.4,30,.42,12);glow(x,'hsl('+h+',85%,72%)',W*.5,H*.36,14,.22,6);
  x.save();x.globalAlpha=.06;for(let i=0;i<3;i++)igxF(x,'#fff',W*.18+i*14+r()*4,0,3,H);x.restore();
  igxF(x,'#00000040',0,H-9,W,9);
+ igxInit();
  const old=IGX.L.key.position.clone(),oldR=IGX.L.rim.position.clone();IGX.L.key.position.set(-2.6,3,5);IGX.L.rim.position.set(3,2.2,-3);
  try{x.drawImage(igxRender([{c,mine}],{shot:'bust',xs:[0],ry:.06,lc:{amb:'#a8a8b0',key:'#fff4e8',rim:'hsl('+h+',90%,65%)'},pose:'none'},W,H),0,0)}
  finally{IGX.L.key.position.copy(old);IGX.L.rim.position.copy(oldR)}
