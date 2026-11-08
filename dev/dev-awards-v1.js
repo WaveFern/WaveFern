@@ -161,6 +161,5 @@
   add('Awards: 7 days before ceremony',()=>{S.day=X.next()-7;S.t=0;say2('Day '+S.day+': notice comes in a second')});
   add('Awards: 1 day before ceremony',()=>{S.day=X.next()-1;S.t=0;say2('Day '+S.day)});
   add('Awards: jump to ceremony day',()=>{S.day=X.next();S.t=0;awS().att=0;say2('Day '+S.day+': the hall is open tonight')});
-  add('Awards: unlock fame, songs, album',()=>{cheat();say2('Test career applied')});
   add('Awards: start the ceremony now',()=>{const n=X.noms();if(!n.list)return say2('Release a song first.');closeUI&&closeUI();mode='menu';awPlay(n);say2('Ceremony started')})})(0);
 })();

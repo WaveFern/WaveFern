@@ -70,7 +70,7 @@
   ['Progress',[
    ['Add 1,000,000 money',need(()=>{S.money=+((S.money||0)+1e6).toFixed(2);sv('Money added')})],
    ['Refill energy',need(()=>{S.energy=100;S.stam=100;sv('Energy full')})],
-   ['Unlock everything (test career)',need(()=>{cheat();sv('Test career applied')})]]]
+   ]]
  ];
  const box=document.getElementById('fwdvb');
  sections.forEach(([h,items])=>{const e=document.createElement('h5');e.textContent=h;box.appendChild(e);items.forEach(([l,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=f;box.appendChild(b)})});
