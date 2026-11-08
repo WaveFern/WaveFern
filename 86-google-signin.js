@@ -59,7 +59,10 @@ function fbSignInAsk(){snd('click');const prev=mode,fresh=prev=='creator'||(prev
 function fbCopy(){const t=$('fbsc');t.value=saveCode();t.style.display='block';t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Save code copied'),()=>say('Copy the code from the box'))}catch(e){say('Copy the code from the box')}}
 function fbSignInBack(){const prev=CLD.pre;CLD.pre=null;if(prev=='title'){mode='title';titleUI()}else if(prev=='creator'){mode='creator';creatorUI()}else if(prev=='pause'){mode='pause';pauseUI()}else closeUI()}
 function fbSignInGo(){fbSignInBack();fbSignIn()}
-function fbSignOut(){if(!FBA)return;snd('click');csPush(1).finally(()=>FBM.signOut(FBA))}
+/* v49.95.0: "Sign out of Google" on the main menu. Asks first, saves the cloud career, then signs out. The auth change
+   reloads into the signed-out set of careers. No save is deleted: cloud save and device careers stay where they are. */
+function fbSignOutAsk(){if(!FBA||!FBU)return;snd('click');if(!confirm('Sign out of Google? Your cloud save stays on your account, and the careers on this device are kept. You will go back to the signed-out menu.'))return;fbSignOut()}
+function fbSignOut(){if(!FBA)return;snd('click');csPush(1).catch(()=>{}).then(()=>FBM.signOut(FBA)).catch(()=>say('Could not sign out. Try again.'))}
 function fbRedraw(){if(mode=='pause')pauseUI();else if(mode=='title'&&document.getElementById('ttl'))titleUI()}
 
 /* v26.84: cloud saves. Signed-in players keep one save in Firestore at saves/{uid} = {code, day, artist, t}.
@@ -116,7 +119,7 @@ function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FB
  const pf=FBU?`<div class=ttpf title="${esc(nm)}">${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="Your Google profile picture" onerror="this.outerHTML=${esc(JSON.stringify(NI))}">`:NI}</div>`:`<div class=ttpf>${NI}</div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN</h1><div class=px>Music Career Sim</div><div class=ttbx>
   <button class=go onclick="ttWorlds()" ${busy?'disabled':''}>${busy?'Loading your save…':'Play'}</button>
-  <button onclick="ttSet()">Settings</button><button onclick="ttWiki()">Wiki</button>${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · <a href="privacy/" target="_blank" rel="noopener">Privacy</a> · <a href="terms/" target="_blank" rel="noopener">Terms</a> · <a href="legal/" target="_blank" rel="noopener">Legal</a></div></div>`}
+  <button onclick="ttSet()">Settings</button><button onclick="ttWiki()">Wiki</button>${FBU?`<button onclick="fbSignOutAsk()" ${busy?'disabled':''}>Sign out of Google</button>`:''}${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · <a href="privacy/" target="_blank" rel="noopener">Privacy</a> · <a href="terms/" target="_blank" rel="noopener">Terms</a> · <a href="legal/" target="_blank" rel="noopener">Legal</a></div></div>`}
 /* v47.3.0: the Wiki button opens the game wiki (wiki/) in a new tab, so the game stays where it is */
 function ttWiki(){snd('click');const w=window.open('wiki/','_blank');if(w)w.opener=null;else location.href='wiki/'}
 function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;TT.sel=0;pauseOverlay(0);menuMusic(0);PAUSED=0;PS='';MU.hold=0;try{const a=MU.a[MU.cur];if(MU.pl&&a&&a.paused)a.play().catch(()=>{})}catch(e){}
