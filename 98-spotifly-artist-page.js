@@ -1,5 +1,5 @@
 /* ===== v26.105: WaveFern looks like a real artist page, with a song player =====
-   Artist page: a big header (your picture as the artwork, your name, "Verified by Spotifly", monthly listeners),
+   Artist page: a big header (your picture as the artwork, your name, "Verified by WaveFern", monthly listeners),
    a play / shuffle row and a numbered Popular list (cover, title, streams, length). A Now playing panel sits on the
    right and a player bar along the bottom of the WaveFern window. Both have a pause button that really pauses the song
    (Beats.hold), and the bar also has previous / next, shuffle and repeat and a volume slider.
@@ -83,7 +83,7 @@ function sfDisco(){const A=S.albums||[];if(!A.length)return'';return`<h2 class=s
  `}
 PG.home=()=>{const L=sfOrder(),sh=SALL?L:L.slice(0,5),c=sfCur(),pl=!!(c&&sfIsSong(c)&&!c.held);
  return`<div class=sfhd style="--acc:${sfAcc()}"><img class=sfart src="${pfp()}" alt=""><div class=sfhi><h1 class=sfnm>${esc(S.artist)}</h1>
- <div class=sfver>${sfIco('ver','sfvi')}<b>Verified by Spotifly</b></div><p class=sfml>${S.listeners.toLocaleString()} monthly listeners</p></div></div>
+ <div class=sfver>${sfIco('ver','sfvi')}<b>Verified by WaveFern</b></div><p class=sfml>${S.listeners.toLocaleString()} monthly listeners</p></div></div>
  <div class=sfbd style="--acc:${sfAcc()}"><div class=sfact><button class=sfgo title="${pl?'Pause':'Play'}" aria-label="${pl?'Pause':'Play'}" onclick="sfBig()" ${L.length?'':'disabled'}>${sfIco(pl?'pause':'play')}</button>
  <button class="sfib${SPQ.sh?' on':''}" title="Shuffle ${SPQ.sh?'on':'off'}" onclick="sfShuf()">${sfIco('shuf')}</button><span class=sfpill>${S.followers.toLocaleString()} followers</span><span class=sfpill>Fame ${fameStr()}</span></div>
  <h2 class=sfh2>Popular</h2>${L.length?sh.map((s,i)=>sfRow(s,i+1,c)).join('')+(L.length>5?`<button class=sfmore onclick="SALL=!SALL;pcR()">${SALL?'Show less':'See more ('+L.length+')'}</button>`:''):'<p class=m>No releases yet. Record a song in the studio, then upload it from the Upload tab.</p>'}

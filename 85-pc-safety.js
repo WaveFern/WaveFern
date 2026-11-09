@@ -46,9 +46,9 @@ function guardDraw(T,k,name){const f=T[k];if(typeof f!='function'||f.guarded)ret
  const g=function(){try{return f.apply(this,arguments)}catch(e){console.error('app failed to draw: '+k,e);
   try{pcSafeFix();return f.apply(this,arguments)}catch(e2){console.error('app failed to draw after repair: '+k,e2)}
   return appFail(name(k))}};g.guarded=1;T[k]=g}
-const appName=k=>{try{return k==1?'Spotifly':k=='store'?'App Barn':k=='msg'?'Messages':k=='web'?'Browser':BI[k]||(APPD[k]&&APPD[k].n)||String(k)}catch(e){return String(k)}};
+const appName=k=>{try{return k==1?'WaveFern':k=='store'?'App Barn':k=='msg'?'Messages':k=='web'?'Browser':BI[k]||(APPD[k]&&APPD[k].n)||String(k)}catch(e){return String(k)}};
 Object.keys(PA).forEach(k=>{if(k!='msg')guardDraw(PA,k,appName)});
-Object.keys(PG).forEach(k=>guardDraw(PG,k,()=>'Spotifly'));
+Object.keys(PG).forEach(k=>guardDraw(PG,k,()=>'WaveFern'));
 
 /* Messages: if the full chat view cannot draw even after repair, a plain list of chats still opens */
 {const pm=PA.msg;PA.msg=function(){try{return pm.apply(this,arguments)}catch(e){console.error('messages failed',e)}
