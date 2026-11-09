@@ -26,14 +26,15 @@
  /* only a career made after the full progress reset counts, never a trailer career or an old one */
  const eligible=()=>{try{return live()&&typeof S=='object'&&S&&!FW_TRL&&typeof RS!='undefined'&&rsOn()&&S.rv>=RS.V&&mode!='creator'&&mode!='load'&&!(typeof TT!='undefined'&&TT.on&&!TT.game)&&!wiping&&!!boardName()}catch(e){return false}};
  const vals=()=>({a:boardName(),day:cl(S.day,1e5),lis:cl(S.listeners,1e12),str:cl(S.streams,1e12),mon:cl(S.money,1e12),fame:cl((()=>{try{return fameLevel()}catch(e){return 0}})(),1000),sg:cl((S.songs||[]).length,1e5),fol:cl(S.followers,1e12)});
- let lastSig='',lastAt=0,noF=0,wbusy=0;
+ let lastSig='',lastAt=0,noFUntil=0,wbusy=0;
  LB.push=function(force){if(wbusy||!eligible())return Promise.resolve(0);
   const v=vals(),sig=JSON.stringify(v)+(S.fdr?1:0)+FBU.uid,n=Date.now();if(!force&&sig==lastSig&&n-lastAt<600000)return Promise.resolve(0);
   /* v49.91.0: the profile is written from the same moment, so the board and the profile never disagree */
   try{if(typeof fwProfileSync=='function')fwProfileSync(1)}catch(e){}
-  const d=Object.assign({},v,{t:n});if(!noF)d.f=S.fdr?1:0;const uid=FBU.uid;wbusy=1;
+  const d=Object.assign({},v,{t:n});if(Date.now()>=noFUntil)d.f=S.fdr?1:0;const uid=FBU.uid;wbusy=1;
   const put=x=>FBF.setDoc(FBF.doc(FBD,'leaderboard',uid),x);
-  return put(d).catch(e=>{if(e&&e.code=='permission-denied'&&!noF){noF=1;delete d.f;return put(d)}throw e}).then(()=>{lastSig=sig;lastAt=n;LBS.werr='';return 1},e=>{LBS.werr=(e&&e.code)||'error';console.warn('leaderboard write',LBS.werr);return 0}).finally(()=>{wbusy=0})};
+  /* v49.95.2: a refused founder flag is not kept off for the whole session: the row is written without it, and the flag is tried again after 10 minutes (so a rules update takes effect without a reload) */
+  return put(d).catch(e=>{if(e&&e.code=='permission-denied'&&d.f!==undefined){noFUntil=Date.now()+600000;delete d.f;return put(d)}throw e}).then(()=>{lastSig=sig;lastAt=n;LBS.werr='';return 1},e=>{LBS.werr=(e&&e.code)||'error';console.warn('leaderboard write',LBS.werr);return 0}).finally(()=>{wbusy=0})};
  LB.load=function(k){if(!live()){LBS.st='out';return Promise.resolve()}
   const c=cache[k];if(c&&Date.now()-c.at<TTL)return Promise.resolve();
   const F=FBF,uid=FBU.uid;LBS.st='load';LBS.err='';
