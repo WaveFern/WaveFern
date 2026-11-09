@@ -1,4 +1,4 @@
-/* ---------- v49.94.0: Spotifly "choose your artist name" and "Upload" screens redesigned ----------
+/* ---------- v49.94.0: WaveFern "choose your artist name" and "Upload" screens redesigned ----------
    Both pages used to be a heading and one thin row in a big empty window. They now fill the window in the game's pixel style
    (Silkscreen headings, dark panels, WaveFern green):
    - Choose a name: a two-column page. Left: step badge, name box with a live counter and "roll a name" / idea chips. Right: a live
@@ -26,7 +26,7 @@ window.nmRoll=function(){IDEAS=[];ideas();const box=$('nmidea');if(box)box.inner
 const ideaHTML=()=>ideas().map(n=>`<button type=button class=nmchip onclick="nmFill(this.dataset.n)" data-n="${E(n)}">${E(n)}</button>`).join('');
 PG.setup=()=>{const step=(n,t,d)=>`<div class=nmst><i>${n}</i><span><b>${t}</b><small>${d}</small></span></div>`;
  return`<div class=nmw>
-<div class=nmhd><span class=nmbadge>STEP 1 OF 3</span><h1 class=sfh><img src="${IC.fw}" alt="">Welcome to Spotifly</h1><p class=m>Streaming for independent artists. Pick the name the world will hear, then record, upload and watch the streams roll in.</p></div>
+<div class=nmhd><span class=nmbadge>STEP 1 OF 3</span><h1 class=sfh><img src="${IC.fw}" alt="">Welcome to WaveFern</h1><p class=m>Streaming for independent artists. Pick the name the world will hear, then record, upload and watch the streams roll in.</p></div>
 <div class=nmgr>
 <div class=nmcard><h3>Choose your artist name</h3>
 <label class=nmlb for=an>ARTIST NAME</label>
@@ -52,7 +52,7 @@ const qCol=q=>q>=70?'#c9a7ff':q>=45?'#a66bff':'#7d52c4';
 const qWord=q=>q>=80?'Hit potential':q>=60?'Strong':q>=40?'Solid':q>=25?'Decent':'Rough';
 PG.upload=()=>{const D=S.drafts||[],ok=D.filter(d=>d.title.trim()).length,best=D.reduce((m,d)=>Math.max(m,d.q||0),0);
  const tip=(h,t)=>`<div class=upt><b>${h}</b><small>${t}</small></div>`;
- const head=`<div class=uphd><div><small class=upk>SPOTIFLY FOR ARTISTS</small><h1>Upload</h1><p>Release your recorded songs and start collecting streams.</p></div>${D.length?`<button class=go ${ok?'':'disabled'} onclick="uplAll()">Upload all (${ok})</button>`:''}</div>`;
+ const head=`<div class=uphd><div><small class=upk>WAVEFERN FOR ARTISTS</small><h1>Upload</h1><p>Release your recorded songs and start collecting streams.</p></div>${D.length?`<button class=go ${ok?'':'disabled'} onclick="uplAll()">Upload all (${ok})</button>`:''}</div>`;
  const tips=`<div class=uptips>${tip('Titles','Edit the title any time before uploading.')}${tip('Collabs','Collab songs keep their (feat. NAME) tag.')}${tip('Quality','A better studio makes better songs. Gear, home and pets all help.')}</div>`;
  if(!D.length)return`<div class=upw>${head}<div class=upem><div class=upmic><svg viewBox="0 0 16 16" width="64" height="64" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><path d="M6 1h4v1h1v6h-1v1H6V8H5V2h1zM3 7h1v2h1v1h6V9h1V7h1v2h-1v2h-2v1H9v2h2v1H5v-1h2v-2H5v-1H3z"/></svg></div>
  <h3>No songs waiting</h3><p class=m>Everything you record shows up here, ready to release.</p>
