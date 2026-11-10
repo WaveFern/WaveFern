@@ -9,7 +9,7 @@ const live=()=>typeof FBU!='undefined'&&FBU&&typeof FBF!='undefined'&&FBF&&typeo
 let lastSig='',lastAt=0,busy=0,ownF=0;
 const enc=u=>new Promise(r=>{const done=v=>{window.__pfPdU=u;window.__pfPd=v;r()};try{if(localStorage.getItem('fw_pd_off')==u)return done('');const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.drawImage(im,0,0,64,64);const v=c.toDataURL('image/jpeg',.7);done(v.length<=12000?v:'')}catch(e){done('')}};im.onerror=()=>{try{localStorage.setItem('fw_pd_off',u)}catch(e){}done('')};/* Google sometimes sends the photo without CORS headers; remember that so the console error is not repeated */im.src=u}catch(e){done('')}setTimeout(()=>{if(window.__pfPdU!==u)done('')},8000)});
 window.fwProfileSync=function(force){try{
- const h=typeof fwUsername=='function'?fwUsername():'';if(busy||!live()||!h||typeof S!='object'||!S||!S.artist||mode=='creator')return Promise.resolve(0);
+ const h=typeof fwUsername=='function'?fwUsername():'';if(busy||!live()||!h||typeof S!='object'||!S||!S.artist||S.noLB||mode=='creator')return Promise.resolve(0);
  const a=String((typeof fwDisplayName=='function'&&fwDisplayName())||S.artist).replace(/[<>"]/g,'').slice(0,24);if(!a)return Promise.resolve(0);
  const gp=f=>{try{return f()}catch(e){return undefined}};
  const ph=gp(()=>JSON.parse(localStorage.getItem('fw_prof_mock')).gphoto)===0?'':String(gp(()=>FBU.photoURL)||'');const sgs=((S.songs)||[]).slice().sort((x,y)=>(y.streams||0)-(x.streams||0)).slice(0,5).map(x=>String(x.title||'Song').replace(/[<>"|]/g,'').slice(0,40)+'|'+cl(x.streams,1e13));
