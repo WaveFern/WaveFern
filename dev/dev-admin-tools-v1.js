@@ -1,4 +1,4 @@
-/* ===== admin tools: screen recording stadium teleports, hidden career, hide all UI ===== (admin account only, isAdmin() from 88-admin.js)
+/* ===== dev only: admin screen-recording tools: stadium teleports, hidden career, hide UI ===== (loaded by dev/index.html, admin account only)
    - Admin panel gets a "Stadium shows" list: teleports to a world tour city and walks on stage at its stadium.
    - The admin's career is flagged S.noLB so its profile is never written to the leaderboard.
    - Key 8 toggles every on-screen UI off and on again. */
