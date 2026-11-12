@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v50.8.1';
+const GAME_VERSION='v50.9.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v50.9.0',n:'Brand sponsorships in Label HQ. Companies based on real brands (Nike, Adidas, Coca-Cola, Apple and more, with their logo as the picture) message you now and then once you are famous. Accept and you shoot a campaign at Prism Studios: pick the mood, lighting and backdrop the brand asks for, take up to 4 photos as your own character, and the best one is posted on Instagrime. You get paid and gain followers. Some deals fly you to a city abroad on a free flight booked for you, and fly you home after. In other countries people now recognise you by your Fame Level, from curious looks to screaming fans. Label HQ is free to install again (team upgrades still wait for record labels). Saves still load.'},
  {v:'v50.8.1',n:'Founder badge on public profiles: if a player\'s leaderboard row says Founder, their profile now shows the Founder badge and outline even when the profile itself has no Founder flag yet. Saves still load.'},
  {v:'v50.8.0',n:'Songs always start with Beat, Lyrics and Mix in that order, and any unlocked extra minigames (Echo, Build It) come after them. The Beat bar is different every take: it starts from a random spot, picks one of four speed patterns (steady with a new speed each bounce, a wave, slow then fast, or a new speed after every hit) and the green zone changes width after each hit. Saves still load.'},
  {v:'v50.7.3',n:'Smoother game: saving your career (every 30 seconds, plus the cloud and vault copies) now takes about a third of the time, so the small freeze each save caused on long careers is gone, and the shadow code no longer walks the whole 3D scene three times a second. Nothing in the game or your saves changed.'},
