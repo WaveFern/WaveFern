@@ -16,7 +16,11 @@ const LABELS=[
  {id:'brick',n:'Brickyard Sound',q:.5,ml:6e3,st:2.5e5,rep:0,adv:8e3,cut:.22,pitch:'An honest independent label with a proper studio and a small team.'},
  {id:'north',n:'Northlight Records',q:.62,ml:2e4,st:1.2e6,rep:1,adv:4e4,cut:.2,pitch:'A respected label with real radio contacts and a pro production crew.'},
  {id:'merid',n:'Meridian Music Group',q:.8,ml:8e4,st:6e6,rep:3,adv:2.5e5,cut:.16,pitch:'A major. Top producers, global marketing and a PR machine.'},
- {id:'crown',n:'Crown & Anchor Records',q:.92,ml:3e5,st:3e7,rep:5,adv:1.5e6,cut:.12,pitch:'The biggest name in music. Legendary studios, worldwide campaigns, the best team money can buy.'}];
+ {id:'crown',n:'Crown & Anchor Records',q:.92,ml:3e5,st:3e7,rep:5,adv:1.5e6,cut:.12,pitch:'The biggest name in music. Legendary studios, worldwide campaigns, the best team money can buy.'},
+ /* v51.9.1: late-game labels, far above Crown & Anchor (billions of streams, reputation 6 to 8) */
+ {id:'vanta',n:'Vantablack Records',q:.95,ml:1.2e6,st:2e8,rep:6,adv:8e6,cut:.1,pitch:'Invite-only. A small roster of global headliners, private studios and a tour budget with no ceiling.'},
+ {id:'solst',n:'Solstice Entertainment',q:.97,ml:5e6,st:9e8,rep:7,adv:3e7,cut:.09,pitch:'Music, film and festivals under one roof. We build careers that sell out stadiums.'},
+ {id:'obel',n:'Obelisk Worldwide',q:1,ml:2e7,st:4e9,rep:8,adv:1.2e8,cut:.07,pitch:'The last stop. Every platform, every country, every award show. We only sign legends.'}];
 const lbById=id=>LABELS.find(l=>l.id==id),lbCur=()=>S.label&&lbById(S.label.id);
 const lbQ=()=>{const l=lbCur();return l?l.q:.5};
 const lbBen=()=>lbCur()?UPX.benBase+UPX.benQ*lbQ():1;

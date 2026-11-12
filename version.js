@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.9.0';
+const GAME_VERSION='v51.9.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.9.1',n:'Label HQ now spans the whole window and uses Instrument Serif headings with Familjen Grotesk text. Open offers are panels (brand, Fame Level, location, expiry, View details and Accept) and the brand directory has All / Open / Higher Fame Level tabs. Three new late-game record labels (Vantablack Records, Solstice Entertainment, Obelisk Worldwide) offer deals far beyond Crown & Anchor. Brand deal logic unchanged. Saves still load.'},
  {v:'v51.9.0',n:'Label HQ redesign: Brand Deals is now a clean white website with a slim top bar (Brand Deals, Active Deals, Past Deals, plus Labels and Team), serif headings, the four figures in one row and a brand directory where each brand opens its own page with its offer. Offers, payments, trips and photoshoots work exactly as before. Saves still load.'},
  {v:'v51.8.4',n:'Fixed: the leaderboard hid too many rows. It now hides only a row whose name is exactly TEST, so every other player is back. Saves still load.'},
  {v:'v51.8.3',n:'Leaderboard rows named test or with impossible numbers are now hidden for everyone. The admin gets an [x] on each Leaderboard row to delete it, and fdClearLeaderboardRow() can remove a row by player name or id. Saves still load.'},
