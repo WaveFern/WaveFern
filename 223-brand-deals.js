@@ -3,9 +3,9 @@
    Koka-Cola, Samsong, Nyke, Guchi, Appel, Lewis Vitton) write to you in Messages, less often than artists. Their profile picture is their logo,
    drawn on a canvas here (no images are fetched). Bigger brands need a higher Fame Level (BRD.tiers).
    - rarity: each morning a 12% chance, never within 8 days of the last offer, never while a deal is open. Needs Fame Level 20,
-     an artist name and a song. The first offer also adds the free Label HQ app to your computer.
-   - the Label HQ app (82-label-hq.js, gated by 101/106) has a Brand deals tab (offers, the active job, past deals, the brand
-     roster) next to the old Team tab (record-label upgrades, still off until labels return).
+     an artist name and a song. Label HQ is not in the App Barn: the first offer's chat has a Download Label HQ link.
+   - the Label HQ app (82-label-hq.js, gated by 101/106) is the Brand deals app (offers, the active job, past deals, the brand
+     roster). The record-label team upgrades live in each label's own app (225-label-apps.js).
    - a deal is one photoshoot day. Pay = a multiple of your last 30 days of income with a floor per tier, then +-25% by how well
      the shoot went. Offers stand for 4 days. Some (from Fame Level 45, 38% of offers) are trips: the brand books you a Swiftwing
      flight to one of the world-tour places. Accept and you get a free, checked-in ticket on the next flight from home that
@@ -25,27 +25,31 @@ const POLY=(x,pts)=>{x.beginPath();pts.forEach((p,i)=>x[i?'lineTo':'moveTo'](p[0
 const TXT=(x,t,cx,cy,font,col,ls)=>{x.font=font;x.fillStyle=col;x.textAlign='center';x.textBaseline='middle';if(ls&&'letterSpacing' in x)x.letterSpacing=ls+'px';x.fillText(t,cx,cy);if('letterSpacing' in x)x.letterSpacing='0px'};
 /* every logo is drawn on a 64x64 grid */
 const BR=[
- {id:'converse',n:'Conversa',t:0,cat:'sneaker',bg:'#f4f1ea',c:'#d4202c',p(x){x.fillStyle='#111';x.beginPath();x.arc(32,32,25,0,7);x.fill();x.fillStyle='#f4f1ea';x.beginPath();x.arc(32,32,21,0,7);x.fill();x.fillStyle='#111';STAR(x,32,33,14,5.6);x.fill();x.fillStyle='#d4202c';x.fillRect(7,28,8,3);x.fillRect(49,28,8,3);x.fillStyle='#1c3f94';x.fillRect(7,33,8,3);x.fillRect(49,33,8,3)}},
- {id:'monster',n:'Monstar Energy',t:0,cat:'drink',bg:'#0b0b0b',c:'#95d600',p(x){x.fillStyle='#95d600';[0,1,2,3].forEach(i=>{const a=7+i*13;POLY(x,[[a,7],[a+9,12],[a+8,38+i*2],[a+12,57],[a+2,50],[a-3,34]]);x.fill()})}},
- {id:'rayban',n:'Ray-Bam',t:0,cat:'eyewear',bg:'#16161a',c:'#d71920',p(x){x.fillStyle='#d71920';x.beginPath();x.ellipse(32,32,29,18,0,0,7);x.fill();TXT(x,'Ray-Bam',32,33,'italic 700 14px Georgia,serif','#fff')}},
- {id:'supreme',n:'Supremo',t:0,cat:'streetwear',bg:'#da1f26',c:'#da1f26',p(x){TXT(x,'Supremo',32,33,'italic 800 16px "Arial Black",Arial,sans-serif','#fff',-.3)}},
- {id:'levis',n:"Leevi's",t:1,cat:'denim',bg:'#c41230',c:'#c41230',p(x){x.strokeStyle='#fff';x.lineWidth=2.2;x.setLineDash([3,2.4]);x.beginPath();x.moveTo(8,14);x.quadraticCurveTo(32,46,56,14);x.stroke();x.setLineDash([]);TXT(x,"Leevi's",32,44,'italic 800 15px Georgia,serif','#fff')}},
- {id:'beats',n:'Beatz by Dro',t:1,cat:'audio',bg:'#f2f2f2',c:'#e01a2d',p(x){x.fillStyle='#e01a2d';x.beginPath();x.arc(32,32,26,0,7);x.fill();TXT(x,'b',32,35,'800 44px "Arial Rounded MT Bold",Arial,sans-serif','#fff')}},
- {id:'pepsi',n:'Pepzi',t:1,cat:'drink',bg:'#f6f8fb',c:'#0a4a96',p(x){x.save();x.beginPath();x.arc(32,32,26,0,7);x.clip();x.fillStyle='#e32934';x.fillRect(0,0,64,64);x.fillStyle='#0a4a96';x.beginPath();x.moveTo(0,64);x.lineTo(0,38);x.bezierCurveTo(18,22,38,52,64,26);x.lineTo(64,64);x.fill();x.strokeStyle='#fff';x.lineWidth=5;x.beginPath();x.moveTo(0,38);x.bezierCurveTo(18,22,38,52,64,26);x.stroke();x.restore()}},
- {id:'adidas',n:'Adadas',t:2,cat:'sportswear',bg:'#ffffff',c:'#111',p(x){x.fillStyle='#111';[0,1,2,3].forEach(i=>{const a=6+i*12,h=10+i*8;POLY(x,[[a,50],[a+8,50],[a+8+h*.5,50-h],[a+h*.5,50-h]]);x.fill()})}},
- {id:'cocacola',n:'Koka-Cola',t:2,cat:'drink',bg:'#e41e2b',c:'#e41e2b',p(x){TXT(x,'Koka-Cola',32,31,'italic 700 17px "Brush Script MT","Segoe Script","Snell Roundhand",cursive','#fff');x.strokeStyle='#fff';x.lineWidth=1.6;x.beginPath();x.moveTo(8,41);x.bezierCurveTo(24,50,42,34,57,43);x.stroke()}},
- {id:'samsung',n:'Samsong',t:2,cat:'tech',bg:'#f4f6fb',c:'#1428a0',p(x){x.fillStyle='#1428a0';x.beginPath();x.ellipse(32,32,30,12.5,0,0,7);x.fill();TXT(x,'SAMSONG',32,33,'800 9.6px Arial,sans-serif','#fff',.4)}},
- {id:'nike',n:'Nyke',t:3,cat:'sportswear',bg:'#f4f4f1',c:'#111',p(x){x.fillStyle='#111';x.beginPath();x.moveTo(59,35);x.bezierCurveTo(51,48,36,50,25,41);x.bezierCurveTo(17,35,11,27,5,18);x.bezierCurveTo(14,25,23,29,32,32);x.bezierCurveTo(42,36,51,37,59,35);x.fill()}},
- {id:'gucci',n:'Guchi',t:3,cat:'luxury',bg:'#0f3d2e',c:'#c9a24b',p(x){TXT(x,'GUCHI',32,29,'700 14px Georgia,"Times New Roman",serif','#e2c06a',1.4);x.fillStyle='#0f3d2e';x.fillRect(8,41,48,4);x.fillStyle='#b5172a';x.fillRect(8,43.2,48,1.6);x.fillStyle='#e2c06a';x.fillRect(8,40,48,.8);x.fillRect(8,45.2,48,.8)}},
- {id:'apple',n:'Appel',t:4,cat:'tech',bg:'#f2f2f4',c:'#111',p(x){x.fillStyle='#111';x.beginPath();x.arc(26,38,15,0,7);x.arc(38,38,15,0,7);x.fill();x.fillRect(27,25,10,12);x.fillStyle='#f2f2f4';x.beginPath();x.arc(12,31,7.5,0,7);x.fill();x.fillStyle='#111';x.save();x.translate(35,15);x.rotate(-.7);x.beginPath();x.ellipse(0,0,8,3.6,0,0,7);x.fill();x.restore()}},
- {id:'lv',n:'Lewis Vitton',t:4,cat:'luxury',bg:'#4a2e18',c:'#c9a24b',p(x){x.fillStyle='#d8b45e';[[10,10],[54,10],[10,54],[54,54],[32,6],[32,58],[6,32],[58,32]].forEach(q=>{STAR(x,q[0],q[1],4.2,1.5);x.fill()});TXT(x,'LV',32,33,'700 28px Georgia,serif','#e2c06a')}}];
+ {id:'converse',n:'Conversa',t:0,cat:'sneaker',bg:'#f4f1ea',c:'#d4202c',p(x){x.fillStyle='#1c3f94';POLY(x,[[32,5],[59,32],[32,59],[5,32]]);x.fill();x.fillStyle='#f4f1ea';POLY(x,[[32,11],[53,32],[32,53],[11,32]]);x.fill();x.fillStyle='#d4202c';STAR(x,32,33,13,5.2);x.fill();x.fillStyle='#1c3f94';x.fillRect(27,30,10,2)}},
+ {id:'monster',n:'Monstar Energy',t:0,cat:'drink',bg:'#0b0b0b',c:'#95d600',p(x){x.fillStyle='#95d600';STAR(x,32,32,26,10);x.fill();x.fillStyle='#0b0b0b';x.beginPath();x.arc(32,32,8,0,7);x.fill();x.fillStyle='#95d600';x.fillRect(30,24,4,16)}},
+ {id:'rayban',n:'Ray-Bam',t:0,cat:'eyewear',bg:'#16161a',c:'#d71920',p(x){x.fillStyle='#d71920';x.beginPath();x.ellipse(32,32,29,18,0,0,7);x.fill();x.fillStyle='#16161a';[18,46].forEach(cx=>{x.beginPath();x.ellipse(cx,31,9,7,0,0,7);x.fill()});x.fillRect(26,29,12,3);TXT(x,'Bam',32,48,'800 9px Arial,sans-serif','#fff',.5)}},
+ {id:'supreme',n:'Supremo',t:0,cat:'streetwear',bg:'#f1ece0',c:'#1d4ed8',p(x){x.fillStyle='#1d4ed8';x.fillRect(7,19,50,26);x.fillStyle='#f1ece0';x.fillRect(10,22,44,20);TXT(x,'SUP',32,33,'800 17px "Arial Black",Arial,sans-serif','#1d4ed8')}},
+ {id:'levis',n:"Leevi's",t:1,cat:'denim',bg:'#f2b705',c:'#1e3f8a',p(x){x.strokeStyle='#1e3f8a';x.lineWidth=2.4;x.setLineDash([3,2.4]);x.beginPath();x.moveTo(10,12);x.lineTo(10,34);x.quadraticCurveTo(32,58,54,34);x.lineTo(54,12);x.closePath();x.stroke();x.setLineDash([]);TXT(x,'Leevi',32,26,'800 12px Georgia,serif','#1e3f8a')}},
+ {id:'beats',n:'Beatz by Dro',t:1,cat:'audio',bg:'#f2f2f2',c:'#6a2bd9',p(x){x.fillStyle='#6a2bd9';x.fillRect(8,8,48,48);x.fillStyle='#f2f2f2';x.beginPath();x.arc(22,36,8,0,7);x.arc(42,36,8,0,7);x.fill();x.fillRect(29,14,3,22);x.fillRect(49,14,3,22);x.fillRect(29,14,23,4)}},
+ {id:'pepsi',n:'Pepzi',t:1,cat:'drink',bg:'#f6f8fb',c:'#0a4a96',p(x){x.save();x.beginPath();x.moveTo(32,5);x.lineTo(59,32);x.lineTo(32,59);x.lineTo(5,32);x.closePath();x.clip();x.fillStyle='#e32934';x.fillRect(0,0,64,64);x.fillStyle='#0a4a96';x.fillRect(0,32,64,32);x.strokeStyle='#fff';x.lineWidth=4;x.beginPath();x.moveTo(0,32);x.bezierCurveTo(16,22,32,42,64,30);x.stroke();x.restore()}},
+ {id:'adidas',n:'Adadas',t:2,cat:'sportswear',bg:'#ffffff',c:'#111',p(x){x.strokeStyle='#111';x.lineWidth=5;[0,1,2].forEach(i=>{x.beginPath();x.arc(32,46,10+i*9,Math.PI*1.12,Math.PI*1.88);x.stroke()})}},
+ {id:'cocacola',n:'Koka-Cola',t:2,cat:'drink',bg:'#e41e2b',c:'#e41e2b',p(x){x.fillStyle='#fff';x.beginPath();x.arc(32,32,24,0,7);x.fill();x.fillStyle='#e41e2b';x.beginPath();x.arc(32,32,21,0,7);x.fill();TXT(x,'Koka',32,27,'800 14px "Arial Black",Arial,sans-serif','#fff');x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.moveTo(14,38);x.bezierCurveTo(26,46,38,30,50,38);x.stroke()}},
+ {id:'samsung',n:'Samsong',t:2,cat:'tech',bg:'#f4f6fb',c:'#1428a0',p(x){x.fillStyle='#1428a0';x.fillRect(6,16,52,32);x.fillStyle='#f4f6fb';x.beginPath();x.ellipse(20,38,5,3.6,-.3,0,7);x.fill();x.fillRect(24,20,2.4,18);x.fillRect(24,20,9,3);x.fillRect(36,24,3,14);x.fillRect(44,24,3,14);x.fillRect(52,24,3,14)}},
+ {id:'nike',n:'Nyke',t:3,cat:'sportswear',bg:'#f4f4f1',c:'#111',p(x){x.strokeStyle='#111';x.lineCap='round';x.lineWidth=7;x.beginPath();x.moveTo(10,24);x.quadraticCurveTo(24,52,56,16);x.stroke();x.lineWidth=3;x.beginPath();x.moveTo(12,44);x.quadraticCurveTo(28,54,40,46);x.stroke()}},
+ {id:'gucci',n:'Guchi',t:3,cat:'luxury',bg:'#0f3d2e',c:'#c9a24b',p(x){x.strokeStyle='#e2c06a';x.lineWidth=3.4;[23,41].forEach(cx=>{x.beginPath();x.arc(cx,26,12,0,7);x.stroke()});TXT(x,'GUCHI',32,50,'700 9px Georgia,serif','#e2c06a',1.2)}},
+ {id:'apple',n:'Appel',t:4,cat:'tech',bg:'#f2f2f4',c:'#111',p(x){x.fillStyle='#111';x.beginPath();x.arc(32,42,15,0,7);x.fill();x.beginPath();x.arc(32,24,9,0,7);x.fill();x.fillRect(30,8,3,10);x.fillStyle='#2e9a58';x.save();x.translate(40,12);x.rotate(.5);x.beginPath();x.ellipse(0,0,8,3.4,0,0,7);x.fill();x.restore()}},
+ {id:'lv',n:'Lewis Vitton',t:4,cat:'luxury',bg:'#4a2e18',c:'#c9a24b',p(x){x.strokeStyle='#d8b45e55';x.lineWidth=1;for(let i=-64;i<128;i+=12){x.beginPath();x.moveTo(i,0);x.lineTo(i+64,64);x.stroke();x.beginPath();x.moveTo(i+64,0);x.lineTo(i,64);x.stroke()}x.fillStyle='#4a2e18';x.beginPath();x.arc(32,32,19,0,7);x.fill();x.strokeStyle='#e2c06a';x.lineWidth=2;x.stroke();TXT(x,'LW',32,33,'700 22px Georgia,serif','#e2c06a')}}];
 BRD.brands=BR;BRD.tiers=FAME;
 BRD.by=id=>BR.find(b=>b.id==id)||BR[0];
-const LC={};
-BRD.logo=function(id,px){const k=id+'|'+(px||64);if(LC[k])return LC[k];const b=BRD.by(id),s=px||64,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');
- x.scale(s/64,s/64);x.fillStyle=b.bg;x.fillRect(0,0,64,64);try{b.p(x)}catch(e){}return LC[k]=c.toDataURL()};
+const LC={},PX={},GRID=32;
+/* the logos are pixel art: drawn on a 32x32 grid, colours cut to a few levels, shown with hard pixel edges */
+function pix(id){if(PX[id])return PX[id];const b=BRD.by(id),c=document.createElement('canvas');c.width=c.height=GRID;const x=c.getContext('2d');
+ x.scale(GRID/64,GRID/64);x.fillStyle=b.bg;x.fillRect(0,0,64,64);try{b.p(x)}catch(e){}x.setTransform(1,0,0,1,0,0);
+ try{const d=x.getImageData(0,0,GRID,GRID),a=d.data;for(let i=0;i<a.length;i+=4){for(let k=0;k<3;k++)a[i+k]=Math.min(255,Math.round(a[i+k]/48)*48);a[i+3]=255}x.putImageData(d,0,0)}catch(e){}
+ return PX[id]=c}
+BRD.logo=function(id,px){const k=id+'|'+(px||64);if(LC[k])return LC[k];const s=px||64,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(pix(id),0,0,s,s);return LC[k]=c.toDataURL()};
 /* draw a logo onto any canvas context (the studio sets use it) */
-BRD.paint=function(x,id,px,py,s){const b=BRD.by(id);x.save();x.translate(px,py);x.scale(s/64,s/64);x.fillStyle=b.bg;x.fillRect(0,0,64,64);try{b.p(x)}catch(e){}x.restore()};
+BRD.paint=function(x,id,px,py,s){const o=x.imageSmoothingEnabled;x.imageSmoothingEnabled=false;x.drawImage(pix(id),px,py,s,s);x.imageSmoothingEnabled=o};
 
 /* ---------- state ---------- */
 function st(){if(!S.brands||typeof S.brands!='object')S.brands={last:-999,list:[],done:0,earned:0};const b=S.brands;if(!Array.isArray(b.list))b.list=[];if(!(b.done>=0))b.done=0;if(!(b.earned>=0))b.earned=0;if(typeof b.last!='number')b.last=-999;return b}
@@ -74,7 +78,7 @@ function mk(){const s=st(),b=pickBrand();if(!b)return;const trip=fl()>=TRIP_FAME
  t+=k=='trip'?'The shoot is in '+pl+'. We book and pay your Swiftwing flight and a car in the city, and you fly the next flight out as soon as you accept. ':'The studio is here in your home city and a car will take you there. ';
  t+='Our brief: a '+o.brief.mood.toLowerCase()+' mood with '+o.brief.light.toLowerCase()+' lighting. This offer stands for '+EXPIRE+' days.';
  S.msgs.push({id:S.nid++,from:b.n+' Partnerships',state:9,unread:1,day:S.day,bd:o.id,body:t});
- if(!S.apps)S.apps={};if(!S.apps.hq){S.apps.hq=1;try{say('Label HQ was added to your computer for brand deals.')}catch(e){}}
+ S.hqLink=1;
  try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}}
 
 /* ---------- flights: a free, checked-in ticket on the company ---------- */
@@ -120,19 +124,18 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Messages: logo as the profile picture, Accept / Decline buttons ---------- */
 {const pm=PA.msg;PA.msg=function(){let h=pm.apply(this,arguments);if(typeof h!='string')return h;
  try{const L=S.msgs.filter(m=>m.bd!=null);
-  L.forEach(m=>{const o=job(m.bd);if(!o)return;const lg=BRD.logo(o.b,48);
+  L.forEach(m=>{const o=job(m.bd);if(!o)return;const lg=BRD.logo(o.b,64);
    h=h.replace(new RegExp('(onclick="openChat\\('+m.id+'\\)">)<img src="[^"]*"'),'$1<img src="'+lg+'" style="border-radius:50%"');
    if(S.chat==m.id){h=h.replace(/(<div class=cvh>(?:<button[^>]*>[^<]*<\/button>)?)<img src="[^"]*"/,'$1<img src="'+lg+'" style="border-radius:50%"');
     const b=BRD.by(o.b),sub=b.n+' · official brand account';h=h.replace(/(<div class=cvh>[\s\S]*?<br><small[^>]*>)[^<]*/,'$1'+sub);
+    if(!(S.apps&&S.apps.hq))h=h.replace('<div class=cin','<div class=cfm><span>'+esc(b.n)+' sent a link: Label HQ app</span><button class=go onclick="bdGetHQ()">Download Label HQ</button></div><div class=cin');
     if(o.st==0&&S.day<=o.exp)h=h.replace(/<div class=cin><small[^>]*>Official account\. No replies\.<\/small><\/div>/,`<div class=cin style="gap:8px;padding:8px"><button class=go onclick="bdAccept(${o.id})">Accept ${fm(o.pay)} shoot${o.k=='trip'?' + flight':''}</button><button onclick="bdDecline(${o.id})">Decline</button></div>`);
     else if(o.st==1&&o.k=='home')h=h.replace(/<div class=cin><small[^>]*>Official account\. No replies\.<\/small><\/div>/,`<div class=cin style="gap:8px;padding:8px"><button class=go onclick="BRD.go(${o.id})">Go to the studio</button></div>`);
     else h=h.replace(/Official account\. No replies\./,o.st==2?'You declined this offer.':o.st==3?'Shoot done. Thanks!':o.st==1?'Deal accepted. Fly to the shoot.':o.st==5?'This deal has fallen through.':o.st==4?'This offer has expired.':'Official account. No replies.')}})}catch(e){console.error('brand msg',e)}
  return h}}
 
 /* ---------- Label HQ: Brand deals tab ---------- */
-let HQT='deals';window.bdTab=t=>{HQT=t;pcR()};
-const css=document.createElement('style');css.textContent=`.bdw .bdtabs{display:flex;gap:6px;margin:6px 0 10px}.bdw .bdtabs button{padding:6px 12px}.bdw .bdtabs button.on{background:var(--g);color:#04120a;font-weight:700}
-.bdw .bdban{width:100%;max-width:640px;display:block;image-rendering:pixelated;border:2px solid #000;border-radius:6px;box-shadow:0 4px 0 #0008}
+const css=document.createElement('style');css.textContent=`.bdw .bdban{width:100%;max-width:640px;display:block;image-rendering:pixelated;border:2px solid #000;border-radius:6px;box-shadow:0 4px 0 #0008}
 .bdw .bdrow{display:flex;gap:10px;align-items:center;background:#151a17;border-radius:6px;padding:10px;margin:8px 0;max-width:640px}.bdw .bdrow img.lg{width:52px;height:52px;border-radius:50%;border:2px solid #000;flex:none}
 .bdw .bdrow .tx{flex:1;min-width:0}.bdw .bdrow .tx b{font-size:15px}.bdw .bdrow .tx small{display:block;color:var(--m)}.bdw .bdrow .bt{display:flex;gap:6px;flex-wrap:wrap}
 .bdw .bdrow.act{box-shadow:inset 0 0 0 2px #e6b422}.bdw .bdg{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;max-width:640px}.bdw .bdg div{text-align:center;background:#151a17;border-radius:6px;padding:8px 4px;font-size:11px}
@@ -149,12 +152,11 @@ function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),past=s.
  h+='<h3>Offers</h3>'+(offs.length?offs.map(o=>row(o,`<button class=go onclick="bdAccept(${o.id})">Accept</button><button onclick="bdDecline(${o.id})">Decline</button>`)).join(''):`<p class=m>${L<FAME[0]?'Brands start writing at Fame Level '+FAME[0]+'.':'No offers right now. Brands write now and then as your fame grows.'}</p>`);
  if(past.length)h+='<h3>Past deals</h3>'+past.map(o=>row(o)).join('');
  h+='<h3>Brands</h3><div class=bdg>'+BR.map(b=>{const lk=FAME[b.t]>L;return`<div class="${lk?'lk':''}"><img src="${BRD.logo(b.id,64)}"><b>${esc(b.n)}</b><small>${lk?'Fame '+FAME[b.t]:'Open'}</small></div>`}).join('')+'</div></div>';return h}
-function teamSoon(){return`<div class=hqx><div class=card style="max-width:420px"><b style="font-size:15px;color:#e6b422">Team upgrades are coming soon</b><p class=m>The manager, producer, studio build-out, PR team and marketing upgrades belong to record labels. Labels are not open yet.</p></div></div>`}
-{const h0=PA.hq;PA.hq=function(){
- const labels=typeof LABELS_ENABLED!='undefined'&&LABELS_ENABLED,tabs=`<div class=bdtabs><button class="${HQT=='deals'?'on':''}" onclick="bdTab('deals')">Brand deals</button><button class="${HQT=='team'?'on':''}" onclick="bdTab('team')">Team</button></div>`;
- let body;try{body=HQT=='team'?(labels?h0.apply(this,arguments):teamSoon()):dealsTab()}catch(e){console.error('label hq',e);body='<p class=m>Label HQ hit a problem. Close and open it again.</p>'}
- return`<div class="bdw"><h1 style="margin:0 0 4px"><img src="${IC.hq}" style="width:32px;image-rendering:pixelated;vertical-align:middle"> Label HQ</h1>${tabs}${body}</div>`}}
-{const s0=PA.store;PA.store=function(){return s0.apply(this,arguments).replace(/(onclick="inst\('hq'\)">)[^<]*</,'$1Get · Free<')}}
-{const o0=openPC;openPC=function(){HQT='deals';return o0.apply(this,arguments)}}
+{const h0=PA.hq;BRD.teamPage=h0;PA.hq=function(){let body;try{body=dealsTab()}catch(e){console.error('label hq',e);body='<p class=m>Label HQ hit a problem. Close and open it again.</p>'}
+ return`<div class="bdw"><h1 style="margin:0 0 4px"><img src="${IC.hq}" style="width:32px;image-rendering:pixelated;vertical-align:middle"> Label HQ</h1>${body}</div>`}}
+/* Label HQ (brand deals) never shows in the App Barn: a sponsor's Messages link downloads it. Each record label has its own app (225-label-apps.js) */
+{const s0=PA.store;PA.store=function(){return s0.apply(this,arguments).replace(/<div class=card data-pv="a:hq[^"]*"[\s\S]*?<\/button><\/div>/g,'')}}
+{const i0=inst;inst=function(k){if(/^hq/.test(k)){snd('err');return say('This app is not in the App Barn. It arrives by a link in Messages.')}return i0.apply(this,arguments)}}
+window.bdGetHQ=function(){S.hqLink=1;if(S.apps&&S.apps.hq)return;S.apps=S.apps||{};S.apps.hq=1;snd('chime');say('Label HQ downloaded. Find it on your desktop.');updateVersion();pcR()};
 {const lc=loadCode;loadCode=function(){const r=lc.apply(this,arguments);try{st()}catch(e){}return r}}
 })();
