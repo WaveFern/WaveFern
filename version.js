@@ -7,6 +7,7 @@ const GAME_VERSION='v52.2.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
  {v:'v52.2.0',n:'Pausing now stops everything. While the game is paused, waiting NPC replies, app and Label HQ downloads, brand trip timers, tip pacing, flight map and other short timers stand still and carry on with the time they had left when you resume, with no jump. Animations on the game screens freeze, and time spent paused no longer earns the Welcome back followers. Playing online, time still runs while anyone else in your band is playing. Saves still load.'},
+ {v:'v52.1.1',n:'Fixed: the heavier Norman headings in Label HQ were not showing. Headings now use font-weight 600 directly. Nothing else changed. Saves still load.'},
  {v:'v52.1.0',n:'Label HQ: a slow scrolling strip of Our partnered brands on Brand Deals (click a name to open the brand), and each brand page now shows that brand\'s made-up logo in solid black. Headings are a little heavier (Norman at weight 600) so they read more easily. Game logic unchanged. Saves still load.'},
  {v:'v52.0.2',n:'The normal mouse cursor in the computer is now a blocky pixel-art arrow to match the pixel hand. Saves still load.'},
  {v:'v52.0.1',n:'Label HQ text and navigation now use Helvetica LT Pro from Adobe Fonts and headings use Norman at weight 400, both from Adobe Fonts. If Adobe Fonts cannot load, Helvetica Neue or Arial is used. Nothing else changed. Saves still load.'},
