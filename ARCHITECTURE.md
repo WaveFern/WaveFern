@@ -7,7 +7,7 @@ Keep it accurate: update it in the same commit as any structural change (new fil
 
 WaveFern is a static browser game (GitHub Pages, no build step, no bundler). Everything is **classic `<script>` files sharing one global scope**, loaded by `index.html` in the order the tags appear. There are no ES modules and no imports: a file uses a function or variable simply because an earlier file declared it.
 
-- 220 game scripts in the repo root + 60 files in `dev/` = **280 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
+- 226 game scripts in the repo root + 60 files in `dev/` = **286 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
 - Three.js r128 (CDN, with a cdnjs fallback) renders the 3D world. The "computer", phone and menus are plain DOM (`style.css`, see `docs/THEMES.md`).
 - Firebase (Auth, Firestore, Analytics) is optional: the game runs fully offline as a guest. Rules are in `firebase-rules/`.
 - Version and changelog live in `version.js` (`GAME_VERSION`, `VERSION_HISTORY`). Bump both in the same commit as every change.
@@ -43,13 +43,13 @@ Numbers are file prefixes (`NN-*.js`). "Newest wins" files are listed last in ea
 | **Economy & shop** | `02-data` (tuning knobs), `10-apps-shop-furniture`, `101-economy-labels` (`UPX`), `82-label-hq`, `83-promotions`, `210-economy-rebalance`, `211-hook`, `212-endgame`, `185-instagrime-buzz`, `63-car-speed` | Income, listener pacing, promos, prices |
 | **Inventory, homes & furniture** | `15-homes-shop-interiors`, `79`/`182`/`191` (Amazoom), `95-property-no-starter`, `99-starter-furniture`, `104-furniture-storage`, `158-placement-overhaul`, `123-property-polish`, `26-v24-upstairs-redesign` | Properties, Storage, placing furniture |
 | **Cars** | `14`, `39-car-models`, `63-car-speed`, `218-parked-cars` | Models, speed, parking |
-| **World (home city)** | `16-big-world...`, `18`, `31-wide-roads`, `32-map-zoom`, `38-city-detail`, `40-city-fixes`, `41-fountains`, `42-central-park`, `54`, `55-interiors`, `57-tower-floors`, `81-billboards`, `90-barbershop`, `91`/`93`/`180`/`181` (shops), `97-weather`, `131-street-flow`, `194`/`195` (pop-up events), `196-never-stuck` | Roads, buildings, interiors, NPC pedestrians |
+| **World (home city)** | `16-big-world...`, `18`, `31-wide-roads`, `32-map-zoom`, `38-city-detail`, `40-city-fixes`, `41-fountains`, `42-central-park`, `54`, `55-interiors`, `57a`-`57e` (tower floors: kit, Skyline, Pulse, Aurora, Nova), `81-billboards`, `90-barbershop`, `91`/`93`/`180`/`181` (shops), `97-weather`, `131-street-flow`, `194`/`195` (pop-up events), `196-never-stuck` | Roads, buildings, interiors, NPC pedestrians |
 | **Travel & world tour** | `135-destinations`, `137-travel` (`TRAVEL`), `138-flights`, `139-airport`, `145-world-map-data`, `146-world-tour`, `150-tour-cities`, `151-tour-shows`, `152-tour-city-life`, `160`, `179`, `192` | Destinations (`WT_*`), airline, abroad cities, stadium shows |
-| **Festival & stage** | `70-festival`, `71-festival-booking`, `188-stage-walk` | Weekly Park Fields Festival, crowd, stage |
+| **Festival & stage** | `70a-festival-core` (schedule, stages, ground), `70b-festival-crowds` (board, crowds, interactions), `70c-festival-set` (performing a set, frame loop, maps), `71-festival-booking`, `188-stage-walk` | Weekly Park Fields Festival, crowd, stage |
 | **Messaging & NPC social** | `20-wider-understanding`, `30-npc-chat` (intent parser), `33-haggle`, `36`, `76`, `75`, `78`, `102-messaging`, `128-dm-variety`, `159-messages-mobile`; apps: `103`/`178`/`185`/`189` (Instagrime), `37`/`98`/`111`/`157`/`186`/`217-spotifly-hq-pfp` (the "WaveFern" music app; old name Spotifly in code) | Chat engine, collabs, social apps |
 | **Artist roster** | `21-v7`, `29-v26`, `77`, `80`, `125`, `126`, `153`, `209-carlos`, `209-alfonso`, `120`, `184-parody-names` | `ART` roster: **append only**, saves refer to artists by index |
 | **Phone & computer UI** | `06-computer`, `11-os-v2`, `115`/`116-gphone-plus`/`118` (Gphone), `105`, `119`, `155`, `198-game-ui`, `172-settings-plus`, `09-settings-effects`, `00-pixel-icons`, `style.css` | Desktop, apps, pause menu, settings |
-| **Audio** | `08-music`, `67-beats` (procedural beat engine), `73-ambience`, `107-my-songs-music`, `132-808-hats`, `200-sfx-polish`, `00-tab-fade`, `156` | Music, sfx, ambience |
+| **Audio** | `08-music`, `67-beats` (procedural beat engine; one closure, read whole by `tools/music-test.js` and `tools/mix-*.js`, so do not split), `73-ambience`, `107-my-songs-music`, `132-808-hats`, `200-sfx-polish`, `00-tab-fade`, `156` | Music, sfx, ambience |
 | **Graphics & rendering** | `04-house`, `23`/`24` (previews), `56-name-tags`, `84-pixel-pictures`, `190-pfp-styles`, `122-graphics`, `116-perf` | Meshes, canvas textures, profile pictures |
 | **Multiplayer & leaderboards** | `161-multiplayer` (band rooms, PeerJS, leaderboard), `216-friends-hub` | Band rooms, friends, presence |
 | **Input** | `07-input-loop`, `154-touch-controls`, `168-gamepad`, `155`/`158z` (responsive) | Keyboard, touch, controller |
@@ -60,7 +60,7 @@ Numbers are file prefixes (`NN-*.js`). "Newest wins" files are listed last in ea
 Separate pages that are **not** the game: `wiki/`, `trailer/`, `mtrailer/`, `vtrailer/`, `about/`, `legal/`, `privacy/`, `terms/`, `dev/index.html` (password-protected preview that rewrites the script list).
 
 ### Split files
-When a big top-level file is split, the pieces take consecutive tag positions (same order, same code), so behaviour is identical. Comments in other files that mention `22-v8...js` mean the `22a`–`22f` group. Files wrapped in one closure (for example `161-multiplayer.js`, `150-tour-cities.js`, `139-airport.js`) share closure-local state and **cannot** be split mechanically; they need a deliberate refactor.
+When a big top-level file is split, the pieces take consecutive tag positions (same order, same code), so behaviour is identical. Comments in other files that mention `22-v8...js` mean the `22a`–`22f` group; `57-tower-floors.js` means `57a`–`57e`; `70-festival.js` means `70a`–`70c` (all split in v50.0.1, tag order = old order). `67-beats.js` is one closure and is read as a whole by `tools/`, so it stays one file. Files wrapped in one closure (for example `161-multiplayer.js`, `150-tour-cities.js`, `139-airport.js`) share closure-local state and **cannot** be split mechanically; they need a deliberate refactor.
 
 ## 3. Shared globals that many files depend on
 
@@ -79,7 +79,7 @@ The real order is the order of tags in `index.html`, not file numbers. Known non
 
 - `00-*` first, then Three.js, `assets.js`, `version.js` (everything reads `GAME_VERSION`).
 - `12-save-seal` → `12-save-load` → `12-save-vault` → `12-reset`, all right after `11-os-v2`. `86-vault-cloud` must follow `86-google-signin`.
-- `50`, `51`, `52`, `53`, `60`, `61`, `62` load *between* `37` and `64`, and `67-beats`, `57-tower-floors` between `62` and `70`: they append to `GAR` / gear after the base data of `22-v8` and must stay after their parents.
+- `50`, `51`, `52`, `53`, `60`, `61`, `62` load *between* `37` and `64`, and `67-beats`, `57a`-`57e` (tower floors; keep in that order) between `71` and `58-pets`: they append to `GAR` / gear after the base data of `22-v8` and must stay after their parents.
 - `27-boot.js` is **not last**; `210`–`212`, `216`, `217-name-upload-ui`, `218-parked-cars` and all `dev/` scripts load after it.
 - `208-onboarding` → `213-public-profile` → `209-founder-cloud` / `209-carlos` / `209-alfonso`; `158z-responsive` after `215`; `dev-menu-sync-v1` before `216-friends-hub`.
 - Cache-busting `?v=` query strings in `index.html` are per file; bump the one for a file you change (and `GAME_VERSION`), or players keep the old file.
@@ -116,7 +116,7 @@ The real order is the order of tags in `index.html`, not file numbers. Known non
 5. Update the system table above if a new system or file appears.
 
 **Testing** (no framework; tools in `tools/`)
-- `node tools/check-globals.js` (needs `acorn`, `eslint-scope`): duplicate declarations, early reads, syntax newer than ES2020. Baseline: **18 UNDEFINED reports, no CLASH/SYNTAX errors**, all pre-existing (not yet investigated; likely names that are guarded or defined in a closure). New reports are regressions.
+- `node tools/check-globals.js` (needs `acorn`, `eslint-scope`): duplicate declarations, early reads, syntax newer than ES2020. Baseline: **0 problems**. The 18 old UNDEFINED reports were investigated (v50.0.1) and are listed with reasons in the `KNOWN` table at the top of `tools/check-globals.js` (`--known` prints them): almost all are names private to a closure (`MPS`, `frStart`, `needLogin` in `161`; `fade`, `AP` in `139`; `inCity` in `150`; `toast` in `169`; `countUp` in `176`) read from another file behind a `typeof`/`try` guard, so that branch never runs. Any new report is a regression; fix it, do not add it to `KNOWN`. To make one of those branches work, expose the name from its closure on purpose (and check the behaviour change first).
 - `node tools/seal-test.js`: save codec and tamper checks.
 - `node tools/music-test.js`: beat engine variety checks.
 - `node tools/load-test.js [url]`: headless boot, new career, open phone apps, save; prints page errors. Serve with `python3 -m http.server 8099`.

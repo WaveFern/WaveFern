@@ -67,7 +67,7 @@ page('billboards','Billboards','career',{e:'',sum:'When your name goes up beside
 <p class=lead>Billboards beside the main roads rotate every 10 seconds through roster artists with 5,000+ monthly listeners. Once you reach 10,000 monthly listeners, your own name joins the rotation.</p>`});
 
 /* ===================== Live ===================== */
-page('festival','Park Fields Festival','live',{e:'',sum:'The weekly festival: stages, crowds, pay and crowd minigames.',src:['70-festival.js','71-festival-booking.js'],kw:'festival stage crowd tent pit riverside main stage set',body:()=>`
+page('festival','Park Fields Festival','live',{e:'',sum:'The weekly festival: stages, crowds, pay and crowd minigames.',src:['70a-festival-core.js','70b-festival-crowds.js','70c-festival-set.js','71-festival-booking.js'],kw:'festival stage crowd tent pit riverside main stage set',body:()=>`
 ${IB('Park Fields Festival','',[['When','Every 7th day'],['Where','The field east of Park Avenue'],['Book','FestivalApp, 2+ days ahead'],['Set','Up to 4 hours'],['Energy','15 per set'],['Pay per song','$0.08 × stage × crowd']])}
 <p class=lead>A festival opens on every day that is a multiple of 7 (day 7, 14, 21...). The day before, a crew builds it; the day after, they take it down.</p>
 ${H2('Stages')}${T(['Stage',['Fame level','n'],['Pay','n'],['Base crowd','n'],['Max crowd','n']],(D.stages||[]).map(s=>[s.n,s.req,mul(s.mult),big(s.base),big(s.cap)]))}
