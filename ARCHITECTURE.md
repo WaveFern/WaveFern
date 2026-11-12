@@ -7,7 +7,7 @@ Keep it accurate: update it in the same commit as any structural change (new fil
 
 WaveFern is a static browser game (GitHub Pages, no build step, no bundler). Everything is **classic `<script>` files sharing one global scope**, loaded by `index.html` in the order the tags appear. There are no ES modules and no imports: a file uses a function or variable simply because an earlier file declared it.
 
-- 212 game scripts in the repo root + 60 files in `dev/` = **272 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
+- 217 game scripts in the repo root + 60 files in `dev/` = **277 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
 - Three.js r128 (CDN, with a cdnjs fallback) renders the 3D world. The "computer", phone and menus are plain DOM (`style.css`, see `docs/THEMES.md`).
 - Firebase (Auth, Firestore, Analytics) is optional: the game runs fully offline as a guest. Rules are in `firebase-rules/`.
 - Version and changelog live in `version.js` (`GAME_VERSION`, `VERSION_HISTORY`). Bump both in the same commit as every change.
@@ -36,7 +36,7 @@ Numbers are file prefixes (`NN-*.js`). "Newest wins" files are listed last in ea
 | **Auth & accounts** | `86-google-signin`, `208-onboarding` (username/display name), `213-public-profile`, `88-admin`, `124`/`127`/`162` (admin tools), `207-dev-panel` | Google sign-in, `isAdmin()`, usernames, public profile |
 | **Saving & player data** | `12-save-seal`, `12-save-load`, `12-save-vault`, `12-reset`, `00-moved-saves`, `86-vault-cloud`, `209-founder-cloud`, `206-founder` | Save codes, slots, vault backups, fresh-start reset, cloud copy (see §5) |
 | **Character & look** | `03-character`, `64-hat-hair`, `134-hair-3d`, `171-wardrobe-fit`, `114-real-looks`, `129-followers-sprint` | `buildChar`, hair, faces |
-| **Clothes shop (Threadz)** | `22-v8` (big catalogue, also Amazoom, pixel posts), `50`, `51`, `60`, `61`, `62`, `193-clothes-plus`, `215-city-brand-stores` | Clothing data `GAR`, previews, prints |
+| **Clothes shop (Threadz)** | `22a-v8-wardrobe-catalogues` (clothes, furniture/food/property catalogues, Instagrime posts), `22c-v8-clothes-colours`, `50`, `51`, `60`, `61`, `62`, `193-clothes-plus`, `215-city-brand-stores` | Clothing data `GAR`, previews, prints |
 | **Song creation** | `13-shops-v3-recording-game`, `34-studio-minigames`, `130-song-session`, `165-song-menu`, `187-upgrades`, `166-genre-focus`, `96-album-song-picker`, `112`/`113` (covers), `199-instrument-samples`, `217-name-upload-ui` | Beat/Lyrics/Mix minigames, album picker, release flow, covers |
 | **Studio & equipment** | `52-gear-shop-plus`, `53-studio-gear-detail`, `197-gear-levels`, `04-house`, `17-fixes`, `25-v21` | Gear lines and levels, studio room models |
 | **Career progression** | `14-world-fame-cars-pets-collabs`, `16-big-world-fame-chat-instagrime-v2` (fame levels `FT`), `136-fame-350`, `133-quests`, `173-career-boost`, `174-career-depth`, `177-early-game`, `100-stats`, `110-awards`, `203-dm-peers`, `204-world-offers` | Fame, quests, awards, milestones |
@@ -58,6 +58,9 @@ Numbers are file prefixes (`NN-*.js`). "Newest wins" files are listed last in ea
 | **`dev/` scripts** | 60 `dev/dev-*.js` loaded at the very end of `index.html` | Features promoted from the dev build; many are numbered `-v1`/`-v2` patches. Some (`dev-music-v1.js`, 100 KB) are full forks of an earlier file. Check them when looking for the live behaviour of anything in `dev-*` areas |
 
 Separate pages that are **not** the game: `wiki/`, `trailer/`, `mtrailer/`, `vtrailer/`, `about/`, `legal/`, `privacy/`, `terms/`, `dev/index.html` (password-protected preview that rewrites the script list).
+
+### Split files
+When a big top-level file is split, the pieces take consecutive tag positions (same order, same code), so behaviour is identical. Comments in other files that mention `22-v8...js` mean the `22a`–`22f` group. Files wrapped in one closure (for example `161-multiplayer.js`, `150-tour-cities.js`, `139-airport.js`) share closure-local state and **cannot** be split mechanically; they need a deliberate refactor.
 
 ## 3. Shared globals that many files depend on
 
@@ -97,13 +100,13 @@ The real order is the order of tags in `index.html`, not file numbers. Known non
 **Where to look**
 - Money/price balance → `02-data.js` tuning block, `101-economy-labels.js` (`UPX`), `210-economy-rebalance.js`.
 - Making a song → `34`, `130`, `165`, `187`, `13`. New song UI step → `165-song-menu.js`.
-- A shop's stock → the catalogue file for it (`22`/`50`/`61` clothes, `52`/`197` gear, `79`/`182` furniture).
+- A shop's stock → the catalogue file for it (`22a`/`22c`/`50`/`61` clothes, `52`/`197` gear, `79`/`182` furniture).
 - Artist chat behaviour → `30-npc-chat.js` (parser), `102-messaging.js`, `33-haggle.js`.
 - A bug in a named function → `grep -n "function name\|name=" *.js dev/*.js`, read the **last** match in tag order.
 - Abroad cities → `150`/`151`/`152`/`179`/`192`; home city → `16`/`38`/`42`/`55`/`91`/`93`.
 - UI colours/classes → `docs/THEMES.md` and `style.css` before touching any app UI.
 
-**Most interconnected files** (change with care): `02-data.js` (`S`), `05-game-flow.js`, `07-input-loop.js`, `16-big-world-fame-chat-instagrime-v2.js`, `22-v8-clothes-wardrobe-big-catalogues-pixel.js`, `29-v26.js`, `12-save-load.js`, `161-multiplayer.js`.
+**Most interconnected files** (change with care): `02-data.js` (`S`), `05-game-flow.js`, `07-input-loop.js`, `16-big-world-fame-chat-instagrime-v2.js`, `22a`–`22f` (the old single `22-v8` file, split by topic: `22b` post pictures/figures, `22d` album covers, `22e` towers, `22f` home annex/pets/property), `29-v26.js`, `12-save-load.js`, `161-multiplayer.js`.
 
 **Adding a feature safely**
 1. Prefer a new small `NNN-name.js` over editing a giant file; use the next free number, put its tag where its dependencies are already loaded (usually before `27-boot` unless it patches boot output), and give it a version + purpose header comment.
