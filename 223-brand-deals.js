@@ -132,10 +132,12 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
     else h=h.replace(/Official account\. No replies\./,o.st==2?'You declined this offer.':o.st==3?'Shoot done. Thanks!':o.st==1?'Deal accepted. Fly to their HQ.':o.st==5?'This deal has fallen through.':o.st==4?'This offer has expired.':'Official account. No replies.')}})}catch(e){console.error('brand msg',e)}
  return h}}
 
-/* ---------- Label HQ (v51.7.0): a plain corporate web portal. No pictures: type, hairline rules, tables and cards.
-   Tabs: Brand deals | Labels | Team (once signed). A signed label sets the accent colour and the type of the wordmark (THM).
-   The layout follows the width of the app window (container queries), so it works maximised, windowed and on phones. ---------- */
-const STT=['Offer','In progress','Declined','Completed','Expired','Fell through'],STK=['ac','ac','','ok','','bad'];
+/* ---------- Label HQ (v51.9.0): the Brand Deals website. White page, black type, light grey hairlines; no pictures, logos,
+   icons, cards or colour. A slim top bar holds the pages: Brand Deals (overview + brand directory), Active Deals, Past Deals,
+   and on the right Labels and Team (record labels, unchanged; a signed label only tints those two pages).
+   Clicking a brand in the directory opens its page (HQB). Type: Inter for text, Newsreader for headings (Google Fonts, loaded the
+   first time the app opens; system fonts if offline). The layout follows the window width (container queries). ---------- */
+const STT=['Offer','In progress','Declined','Completed','Expired','Fell through'];
 const cityOf=id=>{try{const d=wtDest(id);return d.city||d.country}catch(e){return''}};
 const THM={disc:{a:'#b42318',f:'"Arial Black","Helvetica Neue",Arial,sans-serif',t:'uppercase',w:900,s:'.02em'},
  flip:{a:'#b54708',f:'Impact,"Haettenschweiler","Arial Narrow Bold",sans-serif',t:'uppercase',w:400,s:'.06em'},
@@ -143,37 +145,68 @@ const THM={disc:{a:'#b42318',f:'"Arial Black","Helvetica Neue",Arial,sans-serif'
  north:{a:'#0b6b93',f:'"Helvetica Neue",Helvetica,Arial,sans-serif',t:'uppercase',w:300,s:'.22em'},
  merid:{a:'#4f3cc9',f:'Georgia,"Times New Roman",serif',t:'none',w:400,s:'.04em',v:'small-caps'},
  crown:{a:'#8a6a12',f:'Didot,"Bodoni 72","Bodoni MT",Georgia,serif',t:'uppercase',w:400,s:'.16em'}};
-const ini=n=>String(n).replace(/[^A-Za-z& ]/g,'').split(/\s+/).filter(w=>w&&!/^(by|and|the|of|&)$/i.test(w)).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'?';
-const bm=b=>`<span class=lh-mg style="--bc:${b.c}">${esc(ini(b.n))}</span>`;
-const lm=l=>`<span class=lh-mg style="--bc:${(THM[l.id]||{}).a||'#1f3a5f'}">${esc(ini(l.n))}</span>`;
+const lm=()=>'';
+const cap=s=>String(s||'').charAt(0).toUpperCase()+String(s||'').slice(1);
 const pill=(t,k)=>`<span class="lh-pill ${k||''}">${t}</span>`;
 const kpi=(k,v,s)=>`<div class=lh-kpi><span>${k}</span><b>${v}</b>${s?`<small>${s}</small>`:''}</div>`;
-const phead=(eb,t,lede)=>`<div class=lh-ph><div class=lh-eb>${eb}</div><div class=lh-h1>${t}</div>${lede?`<p class=lh-lede>${lede}</p>`:''}</div>`;
-const sec=(t,meta,body)=>`<section class=lh-sec><div class=lh-sh><div class=lh-h2>${t}</div>${meta?`<span class=lh-meta>${meta}</span>`:''}</div>${body}</section>`;
-const empty=t=>`<div class=lh-empty>${t}</div>`;
+const phead=(eb,t,lede)=>`<header class=lh-ph><h1 class=lh-h1>${t}</h1>${lede?`<p class=lh-lede>${lede}</p>`:''}</header>`;
+const sec=(t,meta,body)=>`<section class=lh-sec><div class=lh-sh><h2 class=lh-h2>${t}</h2>${meta?`<span class=lh-meta>${meta}</span>`:''}</div>${body}</section>`;
+const empty=t=>`<p class=lh-empty>${t}</p>`;
 const td=(l,v,c)=>`<td data-l="${l}"${c?` class=${c}`:''}>${v}</td>`;
-const bcell=(b,sub)=>`<div class=lh-bn>${bm(b)}<div><b>${esc(b.n)}</b>${sub?`<small>${sub}</small>`:''}</div></div>`;
-/* the four stages of a trip, with the current one lit */
+const lk=(t,on)=>`<button class=lh-lk onclick="${on}">${t}</button>`;
+const offerFrom=id=>BRD.open().find(o=>o.b==id)||null;
+const day0=o=>Math.max(1,(o.exp||1)-EXPIRE);
+/* the four stages of a trip, with the current one marked */
 function steps(o){const tr=T(),tk=tr?tr.st().tickets.find(q=>q.id===o.tk):null,there=tr&&tr.loc()==o.d,hqIn=BRD.inStudio&&BRD.inStudio();
  const cur=hqIn?2:there?1:0,L=['Flight out','Car to HQ','Photoshoot','Flight home'];
- const msg=cur==0?(tk&&tk.st=='booked'?'Flight '+esc(tk.fl)+' · Gate '+tk.gate+' · boards '+tr.hm(tk.dep-120)+' · gate closes '+tr.hm(tk.dep-10)+'. Everything is paid for.':'Fly to '+esc(BRD.place(o))+'.')
+ const msg=cur==0?(tk&&tk.st=='booked'?'Flight '+esc(tk.fl)+', gate '+tk.gate+'. Boarding '+tr.hm(tk.dep-120)+', gate closes '+tr.hm(tk.dep-10)+'. Everything is paid for.':'Fly to '+esc(BRD.place(o))+'.')
   :cur==1?'You are in '+esc(cityOf(o.d))+'. A company car waits outside the airport, or walk: the HQ is marked on the city map. Walk through the front door to reach the studio.':'You are in the studio. Press Start the photoshoot by the camera.';
- return`<ol class=lh-steps>${L.map((n,i)=>`<li class="${i<cur?'dn':i==cur?'on':''}"><i>${i<cur?'&#10003;':i+1}</i><span>${n}</span></li>`).join('')}</ol><p class=lh-note><b>Next step.</b> ${msg}</p>`}
-function actCard(o){const b=BRD.by(o.b);
- return`<div class="lh-card lh-act"><div class=lh-acth>${bm(b)}<div class=lh-grow><div class=lh-h3>${esc(b.n)}</div><div class=lh-mut>${esc(b.cat)} campaign · ${esc(BRD.place(o))}</div></div><div class=lh-fee><span>Fee</span><b>${fm(o.pay)}</b></div></div>
- <dl class=lh-dl><div><dt>Creative brief</dt><dd>${esc(o.brief.mood)} mood, ${esc(o.brief.light)} light</dd></div><div><dt>Location</dt><dd>Brand HQ, ${esc(BRD.place(o))}</dd></div><div><dt>Travel</dt><dd>Flights and car paid by the brand</dd></div><div><dt>Status</dt><dd>${pill('In progress','ac')}</dd></div></dl>${steps(o)}</div>`}
-function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),past=s.list.filter(o=>o.st>=2).slice(-8).reverse(),early=L<FAME[0];
- let h=phead('Partnerships','Brand deals','Brands book you for one photoshoot day at their own headquarters abroad. Every trip is paid for by the brand, and the fee is set by your recent income.');
- h+=`<div class=lh-kpis>${kpi('Completed shoots',s.done)}${kpi('Earned from brands',fm(s.earned))}${kpi('Open offers',offs.length)}${kpi('Fame Level',L,early?'Brands write from Level '+FAME[0]:'')}</div>`;
- h+=sec('Active engagement',act?'1 booking':'',act?actCard(act):empty(early?'Brands start writing at Fame Level '+FAME[0]+'.':'No shoot booked. Brands write now and then as your fame grows. Every deal is at the brand\'s own HQ abroad and the brand pays for the whole trip.'));
- h+=sec('Open offers',offs.length?offs.length+' awaiting reply':'',offs.length?`<div class=lh-tw><table class=lh-t><thead><tr><th>Brand</th><th>Location</th><th>Creative brief</th><th>Expires</th><th class=lh-r>Fee</th><th class=lh-r>Action</th></tr></thead><tbody>${offs.map(o=>{const b=BRD.by(o.b);
-   return`<tr>${td('Brand',bcell(b,esc(b.cat)+' campaign'))}${td('Location',esc(BRD.place(o)))}${td('Brief',esc(o.brief.mood)+' mood, '+esc(o.brief.light)+' light')}${td('Expires','Day '+o.exp)}${td('Fee','<b>'+fm(o.pay)+'</b>','lh-r')}<td class="lh-r lh-acts"><button class="lh-btn pri" onclick="bdAccept(${o.id})">Accept</button><button class=lh-btn onclick="bdDecline(${o.id})">Decline</button></td></tr>`}).join('')}</tbody></table></div>`:empty(early?'Brands start writing at Fame Level '+FAME[0]+'.':'No offers right now. New offers arrive in Messages.'));
- if(past.length)h+=sec('History','Last '+past.length,`<div class=lh-tw><table class=lh-t><thead><tr><th>Brand</th><th>Location</th><th>Status</th><th class=lh-r>Fee</th></tr></thead><tbody>${past.map(o=>{const b=BRD.by(o.b);
-   return`<tr>${td('Brand',bcell(b,esc(b.cat)))}${td('Location',esc(BRD.place(o)))}${td('Status',pill(STT[o.st],STK[o.st]))}${td('Fee',o.res?'<b>'+fm(o.res.pay)+'</b>':'<span class=lh-mut>'+fm(o.pay)+'</span>','lh-r')}</tr>`}).join('')}</tbody></table></div>`);
- h+=sec('Brand directory',BR.filter(b=>FAME[b.t]<=L).length+' of '+BR.length+' open to you',`<div class=lh-dir>${BR.map(b=>{const lk=FAME[b.t]>L;
-   return`<div class="lh-dc${lk?' lk':''}">${bm(b)}<div class=lh-grow><b>${esc(b.n)}</b><small>${esc(cityOf(HQC[b.id]))} · ${esc(b.cat)}</small></div>${lk?pill('Level '+FAME[b.t]):pill('Open','ok')}</div>`}).join('')}</div>`);
+ return`<ol class=lh-steps>${L.map((n,i)=>`<li class="${i<cur?'dn':i==cur?'on':''}"><span>${i+1}</span>${n}</li>`).join('')}</ol><p class=lh-next><b>Next step</b>${msg}</p>`}
+/* the booked shoot, in full (Active Deals) */
+function actBlock(o){const b=BRD.by(o.b);
+ return`<div class=lh-act><div class=lh-acth><div><h3 class=lh-h3>${esc(b.n)}</h3><p class=lh-mut>${esc(cap(b.cat))} campaign, ${esc(BRD.place(o))}</p></div><div class=lh-fee><span>Fee</span><b>${fm(o.pay)}</b></div></div>
+ <dl class=lh-dl><div><dt>Creative brief</dt><dd>${esc(cap(o.brief.mood))} mood, ${esc(o.brief.light.toLowerCase())} light</dd></div><div><dt>Location</dt><dd>Brand HQ, ${esc(BRD.place(o))}</dd></div><div><dt>Travel</dt><dd>Flights and car paid by the brand</dd></div><div><dt>Status</dt><dd>In progress</dd></div></dl>${steps(o)}</div>`}
+/* open offers as a table with the accept / decline buttons (Active Deals) */
+function offersTable(offs,nob){return`<table class=lh-t><thead><tr>${nob?'':'<th>Brand</th>'}<th>Location</th><th>Creative brief</th><th>Expires</th><th class=lh-r>Fee</th><th class=lh-r></th></tr></thead><tbody>${offs.map(o=>{const b=BRD.by(o.b);
+ return`<tr>${nob?'':td('Brand',`<button class=lh-bnm onclick="bdBrand('${b.id}')">${esc(b.n)}</button>`)}${td('Location',esc(BRD.place(o)))}${td('Brief',esc(cap(o.brief.mood))+' mood, '+esc(o.brief.light.toLowerCase())+' light')}${td('Expires','Day '+o.exp)}${td('Fee',fm(o.pay),'lh-r lh-num')}<td class="lh-r lh-acts"><button class="lh-btn pri" onclick="bdAccept(${o.id})">Accept</button><button class=lh-btn onclick="bdDecline(${o.id})">Decline</button></td></tr>`}).join('')}</tbody></table>`}
+function pastTable(past){return`<table class=lh-t><thead><tr><th>Brand</th><th>Location</th><th>Offered</th><th>Outcome</th><th class=lh-r>Fee</th></tr></thead><tbody>${past.map(o=>{const b=BRD.by(o.b);
+ return`<tr class="${o.st==3?'':'lh-dim'}">${td('Brand',`<button class=lh-bnm onclick="bdBrand('${b.id}')">${esc(b.n)}</button>`)}${td('Location',esc(BRD.place(o)))}${td('Offered','Day '+day0(o))}${td('Outcome',STT[o.st]||'')}${td('Fee',o.res?fm(o.res.pay):fm(o.pay),'lh-r lh-num')}</tr>`}).join('')}</tbody></table>`}
+const pastList=()=>st().list.filter(o=>o.st>=2).slice().reverse();
+const early=()=>fl()<FAME[0];
+/* Brand Deals: heading, the four figures, the booked shoot and offers in brief, the Fame Level note and the brand directory */
+function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),open=BR.filter(b=>FAME[b.t]<=L).length;
+ let h=phead('','Brand Deals','Brands book you for one photoshoot day at their own headquarters abroad. Every trip is paid for by the brand, and the fee is set by your recent income.');
+ h+=`<div class=lh-kpis>${kpi('Completed shoots',s.done)}${kpi('Earned from brands',fm(s.earned))}${kpi('Open offers',offs.length)}${kpi('Fame Level',L)}</div>`;
+ const ab=act?(()=>{const b=BRD.by(act.b);return`<div class=lh-sum><p class=lh-big>${esc(b.n)}</p><p class=lh-mut>${esc(cap(b.cat))} campaign in ${esc(BRD.place(act))}. Fee ${fm(act.pay)}.</p>${lk('View the booking',"bdTab('active')")}</div>`})()
+  :empty(early()?'Brands start writing at Fame Level '+FAME[0]+'.':'No shoot booked. Brands write now and then as your fame grows. Every deal is at the brand\'s own HQ abroad and the brand pays for the whole trip.');
+ const ob=`<div class=lh-sum><p class=lh-big>${offs.length} ${offs.length==1?'offer':'offers'}</p><p class=lh-mut>${offs.length?'Waiting for your reply. Each offer stands for '+EXPIRE+' days.':'New offers arrive in Messages.'}</p>${offs.length?lk('View offers',"bdTab('active')"):''}</div>`;
+ const nx=FAME.find(f=>f>L);
+ h+=`<div class=lh-two><section class=lh-sec><div class=lh-sh><h2 class=lh-h2>Active Engagement</h2></div>${ab}</section><section class=lh-sec><div class=lh-sh><h2 class=lh-h2>Open Offers</h2></div>${ob}</section></div>`;
+ h+=`<div class=lh-fame><h2 class=lh-h4>About Fame Level</h2><p>Brands only write to artists they have heard of. The first offers come at Fame Level ${FAME[0]}, and the larger names wait for Fame Level ${FAME.slice(1,-1).join(', ')} or ${FAME[FAME.length-1]}. ${L<FAME[0]?'You are at Fame Level '+L+'.':nx?'You are at Fame Level '+L+', and the next brands open at Fame Level '+nx+'.':'You are at Fame Level '+L+': every brand can write to you.'}</p></div>`;
+ h+=`<section class="lh-sec lh-cat"><div class=lh-sh><h2 class=lh-h2>Brand directory</h2><span class=lh-meta>${open} of ${BR.length} open to you</span></div><ul class=lh-grid>${BR.map(b=>{const lkd=FAME[b.t]>L,of=offerFrom(b.id);
+   return`<li class="${lkd?'lk':''}"><button class=lh-item onclick="bdBrand('${b.id}')"><span class=lh-in1>${esc(b.n)}</span><span class=lh-in2><span>Fame Level ${FAME[b.t]}${of?' · Offer waiting':''}</span><span class=lh-vo>View offer</span></span></button></li>`}).join('')}</ul></section>`;
  return h}
-let HQT='deals',HQJ=0;window.bdTab=t=>{HQT=t;pcR()};window.bdOffer=id=>{HQJ=id;pcR()};
+/* Active Deals: the booked shoot and every open offer */
+function activeTab(){const act=BRD.active(),offs=BRD.open();
+ let h=phead('','Active Deals','Your booked photoshoot and the offers waiting for a reply. Offers also arrive in Messages, where you can accept them too.');
+ h+=sec('In progress',act?'1 booking':'',act?actBlock(act):empty(early()?'Brands start writing at Fame Level '+FAME[0]+'.':'No shoot booked. Accept an offer below or in Messages and the brand books your flight at once.'));
+ h+=sec('Open offers',offs.length?offs.length+' waiting':'',offs.length?offersTable(offs):empty(early()?'Brands start writing at Fame Level '+FAME[0]+'.':'No offers right now. New offers arrive in Messages.'));
+ return h}
+/* Past Deals: every finished, declined, expired or failed offer the save still holds */
+function pastTab(){const s=st(),past=pastList();
+ let h=phead('','Past Deals','Every brand offer that has ended: shoots you completed, offers you declined and ones that ran out of time.');
+ h+=`<div class="lh-kpis lh-k3">${kpi('Completed shoots',s.done)}${kpi('Earned from brands',fm(s.earned))}${kpi('Offers ended',past.length)}</div>`;
+ h+=sec('History',past.length?past.length+(past.length==1?' deal':' deals'):'',past.length?pastTable(past):empty('Nothing here yet. Finished and declined offers are listed here.'));
+ return h}
+/* one brand's page, opened from the directory */
+function brandPage(id){const b=BR.find(x=>x.id==id);if(!b)return dealsTab();const L=fl(),need=FAME[b.t],of=offerFrom(b.id),act=BRD.active(),mine=act&&act.b==b.id?act:null,hist=pastList().filter(o=>o.b==b.id);
+ let h=`<nav class=lh-crumb>${lk('Brand Deals',"bdTab('deals')")}<span>/</span><span>${esc(b.n)}</span></nav>`+phead('',esc(b.n),'');
+ h+=`<dl class="lh-dl lh-bdl"><div><dt>Headquarters</dt><dd>${esc(cityOf(HQC[b.id]))}</dd></div><div><dt>Category</dt><dd>${esc(cap(b.cat))}</dd></div><div><dt>Required Fame Level</dt><dd>${need}</dd></div><div><dt>Your Fame Level</dt><dd>${L}${L>=need?'':' (needs '+(need-L)+' more)'}</dd></div></dl>`;
+ const body=mine?actBlock(mine):of?offersTable([of],1):empty(L<need?esc(b.n)+' works with artists from Fame Level '+need+'. Keep growing and they may write to you.':'No offer from '+esc(b.n)+' right now. When they want you for a campaign, the offer arrives in Messages and appears here.');
+ h+=sec(mine?'Your booking':'Offer',mine?'In progress':of?'Expires Day '+of.exp:'',body);
+ if(hist.length)h+=sec('History with '+esc(b.n),'',pastTable(hist));
+ return h}
+let HQT='deals',HQJ=0,HQB=0;window.bdTab=t=>{HQT=t;HQB=0;pcR();hqTop()};window.bdOffer=id=>{HQJ=id;pcR()};
 const labels=()=>typeof LABELS_ENABLED!='undefined'&&LABELS_ENABLED&&typeof LABELS!='undefined';
 const offerOf=mid=>S.msgs.find(m=>m.id==mid&&m.lo&&m.lo.st==0);
 /* the link in a label's offer message: opens Label HQ and asks if you want to join */
@@ -204,173 +237,211 @@ function teamTab(){hqFill();const l=lbCur();if(!l)return'';const fee=Math.round(
   +sec('Team effect','',`<div class=lh-kpis>${kpi('Streams','+'+Math.round(s*100)+'%')}${kpi('Song quality','+'+q)}${kpi('Hit chance','+'+Math.round(hh*100)+'%')}${kpi('Promotions',pr?pr*10+'% cheaper':'Standard',pr?'+'+pr+' day'+(pr>1?'s':''):'')}</div>`)
   +sec('Upgrades',Object.keys(HQ).length+' roles',`<div class=lh-ups>${Object.keys(HQ).map(up).join('')}</div>`)}
 const h0=PA.hq;BRD.teamPage=h0;
-PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='deals';if(!labels()&&HQT=='labels')HQT='deals';
- const th=L?THM[L.id]:null,sty=th?`--ac:${th.a};--wf:${th.f};--wt:${th.t};--ww:${th.w};--ws:${th.s};--wv:${th.v||'normal'}`:'';
- const tab=(k,n,b)=>`<button class="${HQT==k?'on':''}" onclick="bdTab('${k}')">${n}${b?`<em>${b}</em>`:''}</button>`;
- const nav=tab('deals','Brand deals')+(labels()?tab('labels','Labels',HQJ?1:0):'')+(L?tab('team','Team'):'');
- let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():joinCard()+dealsTab()}catch(e){console.error('label hq',e);body=empty('Label HQ hit a problem. Close and open it again.')}
- return`<div class="bdw lhq${L?' lhth':''}" style="${sty}"><header class=lh-top><div class=lh-in><div class=lh-brand><span class=lh-wm>${L?esc(L.n):'Label HQ'}</span><span class=lh-sub>${L?'Artist portal':'Artist services'}</span></div><nav class=lh-nav>${nav}</nav><div class=lh-user><span>${esc(S.artist||'Artist')}</span><b>${fm(S.money)}</b></div></div></header>
- <main class=lh-main><div class=lh-in>${body}</div></main><footer class=lh-foot><div class=lh-in><span>${L?esc(L.n)+' · ':''}Label HQ</span><span>Artist services · Brand partnerships · Representation</span></div></footer></div>`};
+const hqTop=()=>{try{const m=document.querySelector('#pc .mn');if(m)m.scrollTop=0}catch(e){}};
+window.bdBrand=id=>{HQT='deals';HQB=id;pcR();hqTop()};
+const hqFont=()=>{if(document.getElementById('lhqfont'))return;const l=document.createElement('link');l.id='lhqfont';l.rel='stylesheet';
+ l.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap';document.head.appendChild(l)};
+PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='deals';if(!labels()&&HQT=='labels')HQT='deals';if(HQT!='deals')HQB=0;
+ try{hqFont()}catch(e){}
+ const th=L&&(HQT=='labels'||HQT=='team')?THM[L.id]:null,sty=th?`--ac:${th.a}`:'';
+ const tab=(k,n,b)=>`<button class="${HQT==k?'on':''}" onclick="bdTab('${k}')"${HQT==k?' aria-current="page"':''}>${n}${b?`<em>${b}</em>`:''}</button>`;
+ const nav=tab('deals','Brand Deals')+tab('active','Active Deals',BRD.open().length||'')+tab('past','Past Deals');
+ const nav2=(labels()?tab('labels','Labels',HQJ?1:''):'')+(L?tab('team','Team'):'');
+ let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():HQT=='active'?activeTab():HQT=='past'?pastTab():HQB?brandPage(HQB):joinCard()+dealsTab()}catch(e){console.error('label hq',e);body=empty('Label HQ hit a problem. Close and open it again.')}
+ return`<div class="bdw lhq${th?' lhth':''}" style="${sty}"><header class=lh-top><div class=lh-in><nav class=lh-nav aria-label="Brand Deals">${nav}</nav>${nav2?`<nav class="lh-nav lh-nav2" aria-label="Labels">${nav2}</nav>`:''}</div></header>
+ <main class=lh-main><div class=lh-in>${body}</div></main></div>`};
 /* the app fills its window edge to edge */
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('lhqmn',app=='hq'&&!!m.querySelector('.lhq'))}catch(e){}return r}}
-{const st=document.createElement('style');st.textContent=`#pc .lhqmn{padding:0!important;background:#f6f5f1}
-#pc .lhq{--ac:#1f3a5f;--wf:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--wt:none;--ww:600;--ws:.01em;--wv:normal;--bg:#f6f5f1;--sf:#fff;--ln:#e4e1d9;--ln2:#d3cfc4;--ink:#16181d;--mu:#5d6169;--mu2:#8b8e94;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
- container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none}
+{const st=document.createElement('style');st.textContent=`#pc .lhqmn{padding:0!important;background:#fff}
+#pc .lhq{--ac:#111;--bg:#fff;--soft:#f5f5f4;--ln:#e8e8e6;--ln2:#d4d4d1;--ink:#111;--mu:#666;--mu2:#9b9b98;--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:Newsreader,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+ container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none;letter-spacing:0}
 #pc .lhq *{box-sizing:border-box}
-#pc .lhq .lh-in{max-width:1160px;margin:0 auto;padding:0 32px;width:100%}
-#pc .lhq .lh-top{background:var(--sf);border-top:3px solid var(--ac);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:2}
-#pc .lhq .lh-top .lh-in{display:flex;align-items:center;gap:28px;min-height:60px}
-#pc .lhq .lh-brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
-#pc .lhq .lh-wm{font-family:var(--wf);text-transform:var(--wt);font-weight:var(--ww);letter-spacing:var(--ws);font-variant:var(--wv);font-size:19px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pc .lhq.lhth .lh-wm{color:var(--ac)}
-#pc .lhq .lh-sub{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mu2);margin-top:3px}
-#pc .lhq .lh-nav{display:flex;gap:4px;flex:1;align-self:stretch}
-#pc .lhq .lh-nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0 12px;font:500 13.5px var(--sans);color:var(--mu);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+#pc .lhq h1,#pc .lhq h2,#pc .lhq h3,#pc .lhq p,#pc .lhq ul,#pc .lhq ol,#pc .lhq dl{margin:0;padding:0}
+#pc .lhq button{font-family:var(--sans)}
+#pc .lhq .lh-in{max-width:1120px;margin:0 auto;padding:0 40px;width:100%}
+#pc .lhq .lh-top{background:var(--bg);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:2}
+#pc .lhq .lh-top .lh-in{display:flex;align-items:stretch;justify-content:space-between;gap:24px;height:48px}
+#pc .lhq .lh-nav{display:flex;gap:28px;align-items:stretch;min-width:0}
+#pc .lhq .lh-nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:5px;font:400 13px var(--sans);color:var(--mu);border-bottom:1px solid transparent;margin-bottom:-1px;white-space:nowrap}
 #pc .lhq .lh-nav button:hover{color:var(--ink)}
-#pc .lhq .lh-nav button.on{color:var(--ink);border-bottom-color:var(--ac);font-weight:600}
-#pc .lhq .lh-nav em{font-style:normal;font-size:10.5px;font-weight:700;background:var(--ac);color:#fff;border-radius:9px;padding:0 6px;line-height:16px}
-#pc .lhq .lh-user{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;font-size:12px;color:var(--mu);white-space:nowrap}
-#pc .lhq .lh-user b{font-size:14px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
-#pc .lhq .lh-main{flex:1;padding:36px 0 48px}
-#pc .lhq .lh-ph{margin:0 0 28px;max-width:760px}
-#pc .lhq .lh-eb{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);margin:0 0 6px}
-#pc .lhq .lh-h1{font:400 34px/1.15 var(--serif);letter-spacing:-.01em;color:var(--ink)}
-#pc .lhq .lh-h2{font:600 15px/1.3 var(--sans);color:var(--ink)}
-#pc .lhq .lh-h3{font:600 16px/1.3 var(--sans);color:var(--ink)}
-#pc .lhq .lh-lede{margin:10px 0 0;font-size:15px;line-height:1.6;color:var(--mu)}
-#pc .lhq .lh-mut{color:var(--mu);font-size:13px}
+#pc .lhq .lh-nav button.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:500}
+#pc .lhq .lh-nav em{font-style:normal;font-size:11px;color:var(--mu2);font-variant-numeric:tabular-nums}
+#pc .lhq .lh-main{flex:1;padding:48px 0 80px}
+#pc .lhq .lh-ph{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:24px 64px;align-items:end;margin:0 0 44px}
+#pc .lhq .lh-h1{font:400 34px/1.1 var(--serif);letter-spacing:-.01em;color:var(--ink)}
+#pc .lhq .lh-lede{font-size:14.5px;line-height:1.6;color:var(--mu);max-width:470px;justify-self:end}
+#pc .lhq .lh-h2{font:400 21px/1.25 var(--serif);color:var(--ink)}
+#pc .lhq .lh-h3{font:400 26px/1.2 var(--serif);color:var(--ink)}
+#pc .lhq .lh-h4{font:500 13px/1.4 var(--sans);color:var(--ink);margin:0 0 6px}
+#pc .lhq .lh-mut{color:var(--mu);font-size:13.5px}
 #pc .lhq .lh-grow{flex:1;min-width:0}
-#pc .lhq .lh-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--sf);border:1px solid var(--ln);border-radius:6px;margin:0 0 32px}
-#pc .lhq .lh-kpi{padding:16px 20px;border-left:1px solid var(--ln);min-width:0}
-#pc .lhq .lh-kpi:first-child{border-left:0}
-#pc .lhq .lh-kpi span{display:block;font-size:11.5px;color:var(--mu);letter-spacing:.02em}
-#pc .lhq .lh-kpi b{display:block;font:400 24px/1.25 var(--serif);color:var(--ink);margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pc .lhq .lh-kpi small{display:block;font-size:11.5px;color:var(--mu2);margin-top:2px}
-#pc .lhq .lh-sec{margin:0 0 36px}
+#pc .lhq .lh-lk{all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--ink);text-decoration:underline;text-decoration-color:var(--ln2);text-underline-offset:4px;transition:text-decoration-color .12s}
+#pc .lhq .lh-lk:hover{text-decoration-color:var(--ink)}
+/* the four figures: one row, hairlines between, no boxes */
+#pc .lhq .lh-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--ln);margin:0 0 64px}
+#pc .lhq .lh-kpis.lh-k3{grid-template-columns:repeat(3,minmax(0,1fr))}
+#pc .lhq .lh-kpi{padding:16px 24px 18px;border-left:1px solid var(--ln);min-width:0}
+#pc .lhq .lh-kpi:first-child{border-left:0;padding-left:0}
+#pc .lhq .lh-kpi span{display:block;font-size:12.5px;color:var(--mu)}
+#pc .lhq .lh-kpi b{display:block;font:400 26px/1.25 var(--serif);color:var(--ink);margin-top:6px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pc .lhq .lh-kpi small{display:block;font-size:12px;color:var(--mu2);margin-top:2px}
+#pc .lhq .lh-sec{margin:0 0 56px}
 #pc .lhq .lh-sec .lh-kpis{margin:0}
-#pc .lhq .lh-sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--ink);padding:0 0 8px;margin:0 0 16px}
-#pc .lhq .lh-meta{font-size:12px;color:var(--mu)}
-#pc .lhq .lh-card{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:20px 22px}
-#pc .lhq .lh-empty{background:var(--sf);border:1px dashed var(--ln2);border-radius:6px;padding:22px;color:var(--mu);font-size:13.5px}
-#pc .lhq .lh-mg{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--ln2);border-radius:4px;background:var(--sf);font:600 14px/1 var(--serif);letter-spacing:.03em;color:var(--ink);box-shadow:inset 0 -3px 0 var(--bc)}
-#pc .lhq .lh-acth{display:flex;align-items:center;gap:14px}
-#pc .lhq .lh-fee{text-align:right}
-#pc .lhq .lh-fee span{display:block;font-size:11.5px;color:var(--mu)}
-#pc .lhq .lh-fee b{font:400 24px var(--serif);font-variant-numeric:tabular-nums}
-#pc .lhq .lh-dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;margin:18px 0 0;border-top:1px solid var(--ln)}
-#pc .lhq .lh-dl>div{padding:12px 16px 0 0}
-#pc .lhq dt{font-size:11.5px;color:var(--mu);margin:0}
-#pc .lhq dd{margin:2px 0 0;font-size:13.5px;color:var(--ink)}
-#pc .lhq .lh-dl dd:first-letter{text-transform:uppercase}
-#pc .lhq .lh-steps{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));counter-reset:s}
-#pc .lhq .lh-steps li{position:relative;display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--mu2);padding-right:8px;min-width:0}
-#pc .lhq .lh-steps li:before{content:'';position:absolute;left:26px;right:0;top:11px;height:1px;background:var(--ln2)}
-#pc .lhq .lh-steps li:last-child:before{display:none}
-#pc .lhq .lh-steps li.dn:before{background:var(--ac)}
-#pc .lhq .lh-steps i{position:relative;font-style:normal;width:23px;height:23px;border-radius:50%;border:1px solid var(--ln2);background:var(--sf);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--mu)}
-#pc .lhq .lh-steps li.dn i{background:var(--ac);border-color:var(--ac);color:#fff}
-#pc .lhq .lh-steps li.on i{border:2px solid var(--ac);color:var(--ac)}
-#pc .lhq .lh-steps li.on,#pc .lhq .lh-steps li.dn{color:var(--ink)}
-#pc .lhq .lh-steps li.on span{font-weight:600}
-#pc .lhq .lh-steps span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#pc .lhq .lh-note{margin:18px 0 0;padding:12px 14px;background:var(--bg);border-left:2px solid var(--ac);font-size:13.5px;color:var(--ink)}
-#pc .lhq .lh-tw{background:var(--sf);border:1px solid var(--ln);border-radius:6px;overflow:hidden}
-#pc .lhq .lh-t{width:100%;border-collapse:collapse;font-size:13.5px}
-#pc .lhq .lh-t th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);padding:11px 16px;border-bottom:1px solid var(--ln);background:#fbfaf7;white-space:nowrap}
-#pc .lhq .lh-t td{padding:14px 16px;border-bottom:1px solid var(--ln);vertical-align:middle;color:var(--ink)}
-#pc .lhq .lh-t tr:last-child td{border-bottom:0}
-#pc .lhq .lh-t .lh-r{text-align:right}
-#pc .lhq .lh-t td b{font-weight:600;font-variant-numeric:tabular-nums}
-#pc .lhq .lh-t tr.sg td{background:#fbfaf7}
-#pc .lhq .lh-t tr.sg td:first-child{box-shadow:inset 3px 0 0 var(--ac)}
+#pc .lhq .lh-sh{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:0 0 14px;margin:0 0 4px;border-bottom:1px solid var(--ln)}
+#pc .lhq .lh-meta{font-size:12.5px;color:var(--mu);white-space:nowrap}
+#pc .lhq .lh-empty{padding:18px 0 0;color:var(--mu);font-size:14px;max-width:560px}
+/* overview: booked shoot and offers side by side, then the Fame Level note */
+#pc .lhq .lh-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 64px}
+#pc .lhq .lh-two .lh-sec{margin-bottom:48px}
+#pc .lhq .lh-sum{padding:18px 0 0}
+#pc .lhq .lh-big{font:400 22px/1.3 var(--serif);color:var(--ink)}
+#pc .lhq .lh-sum .lh-mut{margin:4px 0 14px}
+#pc .lhq .lh-fame{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 64px;border-top:1px solid var(--ln);padding:20px 0 0;margin:0 0 80px}
+#pc .lhq .lh-fame .lh-h4{margin:0}
+#pc .lhq .lh-fame p{font-size:14px;color:var(--mu);max-width:520px}
+/* brand directory: a catalogue of names */
+#pc .lhq .lh-cat .lh-sh{border-bottom:0;margin:0 0 4px}
+#pc .lhq .lh-grid{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 40px}
+#pc .lhq .lh-grid li{border-top:1px solid var(--ln);min-width:0}
+#pc .lhq .lh-item{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;gap:28px;width:100%;min-height:106px;padding:20px 0 18px}
+#pc .lhq .lh-in1{font:400 22px/1.2 var(--serif);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pc .lhq .lh-in2{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12.5px;color:var(--mu)}
+#pc .lhq .lh-in2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pc .lhq .lh-vo{color:var(--ink);font-weight:500;white-space:nowrap;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:text-decoration-color .12s}
+#pc .lhq .lh-item:hover .lh-vo,#pc .lhq .lh-item:focus-visible .lh-vo{text-decoration-color:var(--ink)}
+#pc .lhq .lh-grid li.lk .lh-in1{color:var(--mu2)}
+#pc .lhq .lh-grid li.lk .lh-vo{color:var(--mu)}
+/* a booked shoot */
+#pc .lhq .lh-act{padding:22px 0 0}
+#pc .lhq .lh-acth{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+#pc .lhq .lh-acth .lh-mut{margin-top:4px}
+#pc .lhq .lh-fee{text-align:right;white-space:nowrap}
+#pc .lhq .lh-fee span{display:block;font-size:12.5px;color:var(--mu)}
+#pc .lhq .lh-fee b{font:400 26px/1.2 var(--serif);font-variant-numeric:tabular-nums}
+#pc .lhq .lh-dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:24px 0 0;border-top:1px solid var(--ln)}
+#pc .lhq .lh-dl>div{padding:14px 20px 14px 0;min-width:0}
+#pc .lhq dt{font-size:12.5px;color:var(--mu);margin:0}
+#pc .lhq dd{margin:3px 0 0;font-size:14px;color:var(--ink)}
+#pc .lhq .lh-bdl{margin:0 0 56px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ln)}
+#pc .lhq .lh-steps{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 4px;margin:8px 0 0}
+#pc .lhq .lh-steps li{border-top:1px solid var(--ln);padding:12px 12px 0 0;font-size:13.5px;color:var(--mu2);min-width:0}
+#pc .lhq .lh-steps li span{display:block;font-size:12px;margin:0 0 2px;font-variant-numeric:tabular-nums}
+#pc .lhq .lh-steps li.dn{color:var(--mu);border-top-color:var(--ink)}
+#pc .lhq .lh-steps li.on{color:var(--ink);font-weight:500;border-top:2px solid var(--ink);padding-top:11px}
+#pc .lhq .lh-next{margin:24px 0 0;font-size:14px;color:var(--ink);max-width:680px}
+#pc .lhq .lh-next b{display:block;font-weight:500;font-size:12.5px;color:var(--mu);margin:0 0 3px}
+/* tables: offers, history, labels */
+#pc .lhq .lh-tw{overflow:hidden}
+#pc .lhq .lh-t{width:100%;border-collapse:collapse;font-size:14px}
+#pc .lhq .lh-t th{text-align:left;font-size:12.5px;font-weight:400;color:var(--mu);padding:14px 16px 10px 0;border-bottom:1px solid var(--ln);white-space:nowrap}
+#pc .lhq .lh-t td{padding:16px 16px 16px 0;border-bottom:1px solid var(--ln);vertical-align:middle;color:var(--ink)}
+#pc .lhq .lh-t .lh-r{text-align:right;padding-right:0}
+#pc .lhq .lh-t th.lh-r+th.lh-r,#pc .lhq .lh-t td.lh-r+td.lh-r{padding-left:24px}
+#pc .lhq .lh-num{font-variant-numeric:tabular-nums;white-space:nowrap}
+#pc .lhq .lh-t tr.lh-dim td{color:var(--mu)}
+#pc .lhq .lh-t tr.sg td{background:var(--soft)}
+#pc .lhq .lh-bnm{all:unset;cursor:pointer;font:400 18px/1.25 var(--serif);color:var(--ink)}
+#pc .lhq .lh-bnm:hover{text-decoration:underline;text-decoration-color:var(--ln2);text-underline-offset:4px}
+#pc .lhq .lh-t tr.lh-dim .lh-bnm{color:var(--mu)}
 #pc .lhq .lh-bn{display:flex;align-items:center;gap:12px;min-width:0}
-#pc .lhq .lh-bn b{display:block}
-#pc .lhq .lh-bn small{display:block;font-size:12.5px;color:var(--mu);margin-top:1px}
-#pc .lhq .lh-lt .lh-bn small{max-width:340px}
+#pc .lhq .lh-bn b{display:block;font:400 18px/1.25 var(--serif)}
+#pc .lhq .lh-bn small{display:block;font-size:13px;color:var(--mu);margin-top:2px}
+#pc .lhq .lh-lt .lh-bn small{max-width:380px}
 #pc .lhq .lh-acts{white-space:nowrap}
 #pc .lhq .lh-acts .lh-btn+.lh-btn{margin-left:8px}
-#pc .lhq .lh-req{font-size:12px;color:var(--mu)}
-#pc .lhq .lh-star{color:var(--ink);letter-spacing:.1em;white-space:nowrap}
-#pc .lhq .lh-pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid var(--ln2);color:var(--mu);white-space:nowrap;background:var(--sf)}
-#pc .lhq .lh-pill.ok{border-color:#a8d5b8;color:#1e6b3c;background:#eef8f1}
-#pc .lhq .lh-pill.ac{border-color:var(--ac);color:var(--ac)}
-#pc .lhq .lh-pill.bad{border-color:#e7b4ae;color:#a12a1e;background:#fcf1ef}
-#pc .lhq .lh-btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 16px;border-radius:4px;border:1px solid var(--ln2);background:var(--sf);color:var(--ink);font:500 13px var(--sans);white-space:nowrap;transition:background .12s,border-color .12s}
-#pc .lhq .lh-btn:hover:not([disabled]){border-color:var(--ink)}
+#pc .lhq .lh-req{font-size:12.5px;color:var(--mu)}
+#pc .lhq .lh-star{color:var(--ink);white-space:nowrap}
+#pc .lhq .lh-pill{display:inline-block;font-size:13px;color:var(--mu);white-space:nowrap}
+#pc .lhq .lh-pill.ok,#pc .lhq .lh-pill.ac{color:var(--ink);font-weight:500}
+#pc .lhq .lh-crumb{display:flex;gap:8px;align-items:baseline;font-size:13px;color:var(--mu);margin:-24px 0 28px}
+#pc .lhq .lh-crumb .lh-lk{font-weight:400;color:var(--mu)}
+#pc .lhq .lh-crumb .lh-lk:hover{color:var(--ink)}
+/* buttons: square, black or outlined */
+#pc .lhq .lh-btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 18px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);font:500 13px var(--sans);white-space:nowrap;transition:background .12s,color .12s}
+#pc .lhq .lh-btn:hover:not([disabled]){background:var(--soft)}
 #pc .lhq .lh-btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
-#pc .lhq .lh-btn.pri:hover:not([disabled]){filter:brightness(1.12);border-color:var(--ac)}
-#pc .lhq .lh-btn.dng{background:#a12a1e;border-color:#a12a1e;color:#fff}
-#pc .lhq .lh-btn[disabled]{cursor:default;opacity:1;background:#f1efea;border-color:var(--ln);color:var(--mu2)}
-#pc .lhq .lh-btn:focus-visible,#pc .lhq .lh-nav button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-#pc .lhq .lh-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
-#pc .lhq .lh-offer{background:var(--sf);border:1px solid var(--ln);border-top:3px solid var(--oa,var(--ac));border-radius:6px;padding:24px;margin:0 0 32px}
-#pc .lhq .lh-offer .lh-eb{color:var(--oa,var(--ac))}
+#pc .lhq .lh-btn.pri:hover:not([disabled]){background:#333;border-color:#333}
+#pc .lhq.lhth .lh-btn.pri:hover:not([disabled]){background:var(--ac);border-color:var(--ac);opacity:.88}
+#pc .lhq .lh-btn.dng{background:#111;border-color:#111;color:#fff}
+#pc .lhq .lh-btn[disabled]{cursor:default;background:var(--soft);border-color:var(--ln);color:var(--mu2)}
+#pc .lhq .lh-btn:focus-visible,#pc .lhq .lh-nav button:focus-visible,#pc .lhq .lh-lk:focus-visible,#pc .lhq .lh-item:focus-visible,#pc .lhq .lh-bnm:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+#pc .lhq .lh-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+/* label pages (Labels, Team): same type and rules; a signed label tints only the buttons */
+#pc .lhq .lh-card{border-top:1px solid var(--ln);padding:20px 0 0}
+#pc .lhq .lh-offer{border-top:1px solid var(--ink);border-bottom:1px solid var(--ln);padding:24px 0;margin:0 0 48px}
+#pc .lhq .lh-offer .lh-eb{font-size:12.5px;color:var(--mu);margin:0 0 6px}
 #pc .lhq .lh-offer .lh-h2{font:400 24px/1.25 var(--serif)}
-#pc .lhq .lh-offer .lh-btn.pri{background:var(--oa,var(--ac));border-color:var(--oa,var(--ac))}
-#pc .lhq .lh-dir{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));background:var(--sf);border:1px solid var(--ln);border-radius:6px;overflow:hidden}
-#pc .lhq .lh-dc{display:flex;align-items:center;gap:12px;background:var(--sf);padding:14px 16px;min-width:0;box-shadow:1px 0 0 var(--ln),0 1px 0 var(--ln)}
-#pc .lhq .lh-dc b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pc .lhq .lh-dc small{display:block;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pc .lhq .lh-dc.lk .lh-mg{box-shadow:inset 0 -3px 0 var(--ln2);color:var(--mu2)}
-#pc .lhq .lh-dc.lk b{color:var(--mu)}
-#pc .lhq .lh-ups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-#pc .lhq .lh-up{display:flex;flex-direction:column;gap:4px}
-#pc .lhq .lh-up.mx{border-color:var(--ac)}
+#pc .lhq .lh-offer .lh-lede{justify-self:auto;margin-top:8px;max-width:620px}
+#pc .lhq .lh-offer .lh-btn.pri{background:var(--ink);border-color:var(--ink)}
+#pc .lhq .lh-offer .lh-dl,#pc .lhq .lh-acc .lh-dl{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+#pc .lhq .lh-acc{border-top:0;padding-top:16px}
+#pc .lhq .lh-acc .lh-h3{font-size:22px}
+#pc .lhq .lh-ups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:0 40px}
+#pc .lhq .lh-up{display:flex;flex-direction:column;gap:2px;padding:20px 0 28px}
+#pc .lhq .lh-up .lh-eb{font-size:12.5px;color:var(--mu)}
+#pc .lhq .lh-up .lh-h3{font-size:20px}
+#pc .lhq .lh-up.mx{border-top-color:var(--ink)}
 #pc .lhq .lh-up .lh-mut{min-height:20px}
 #pc .lhq .lh-lvl{display:flex;align-items:center;gap:4px;margin:12px 0 4px}
-#pc .lhq .lh-lvl i{flex:1;max-width:36px;height:4px;border-radius:2px;background:var(--ln)}
-#pc .lhq .lh-lvl i.on{background:var(--ac)}
+#pc .lhq .lh-lvl i{flex:1;max-width:36px;height:2px;background:var(--ln)}
+#pc .lhq .lh-lvl i.on{background:var(--ink)}
 #pc .lhq .lh-lvl i.x{background:repeating-linear-gradient(90deg,var(--ln) 0 3px,transparent 3px 5px)}
-#pc .lhq .lh-lvl span{margin-left:8px;font-size:11.5px;color:var(--mu)}
+#pc .lhq .lh-lvl span{margin-left:8px;font-size:12px;color:var(--mu)}
 #pc .lhq .lh-dl1{margin:8px 0 16px;flex:1}
 #pc .lhq .lh-dl1>div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--ln)}
 #pc .lhq .lh-dl1 dd{margin:0;text-align:right;font-size:13px}
 #pc .lhq .lh-up .lh-btn{width:100%}
-#pc .lhq .lh-acc .lh-dl{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-#pc .lhq .lh-foot{border-top:1px solid var(--ln);background:var(--sf);font-size:12px;color:var(--mu2)}
-#pc .lhq .lh-foot .lh-in{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:16px;padding-bottom:16px}
+@container (max-width:980px){
+ #pc .lhq .lh-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #pc .lhq .lh-dl{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @container (max-width:860px){
- #pc .lhq .lh-user span{display:none}
+ #pc .lhq .lh-in{padding:0 28px}
+ #pc .lhq .lh-main{padding:40px 0 64px}
+ #pc .lhq .lh-ph{grid-template-columns:1fr;gap:12px}
+ #pc .lhq .lh-lede{justify-self:start}
  #pc .lhq .lh-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
- #pc .lhq .lh-kpi:nth-child(3){border-left:0}
- #pc .lhq .lh-kpi:nth-child(n+3){border-top:1px solid var(--ln)}
+ #pc .lhq .lh-kpis.lh-k3{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #pc .lhq .lh-kpis:not(.lh-k3) .lh-kpi:nth-child(3){border-left:0;padding-left:0}
+ #pc .lhq .lh-kpis:not(.lh-k3) .lh-kpi:nth-child(n+3){border-top:1px solid var(--ln)}
+ #pc .lhq .lh-two{grid-template-columns:1fr}
+ #pc .lhq .lh-fame{grid-template-columns:1fr}
  #pc .lhq .lh-t thead{display:none}
  #pc .lhq .lh-t,#pc .lhq .lh-t tbody,#pc .lhq .lh-t tr,#pc .lhq .lh-t td{display:block;width:100%}
- #pc .lhq .lh-t tr{padding:14px 16px;border-bottom:1px solid var(--ln)}
- #pc .lhq .lh-t tr:last-child{border-bottom:0}
+ #pc .lhq .lh-t tr{padding:16px 0;border-bottom:1px solid var(--ln)}
  #pc .lhq .lh-t td{border:0;padding:3px 0;display:flex;justify-content:space-between;align-items:center;gap:16px;text-align:right}
+ #pc .lhq .lh-t td.lh-r+td.lh-r{padding-left:0}
  #pc .lhq .lh-t td:not(:first-child)>*{margin-left:auto}
- #pc .lhq .lh-t td:before{content:attr(data-l);font-size:12px;color:var(--mu);text-align:left;flex:none}
+ #pc .lhq .lh-t td:before{content:attr(data-l);font-size:12.5px;color:var(--mu);text-align:left;flex:none}
  #pc .lhq .lh-t td:first-child{padding:0 0 8px;text-align:left}
  #pc .lhq .lh-t td:first-child:before{display:none}
- #pc .lhq .lh-t td.lh-acts{justify-content:flex-end;padding-top:10px}
+ #pc .lhq .lh-t td.lh-acts{justify-content:flex-end;padding-top:12px}
  #pc .lhq .lh-t td.lh-acts:before{display:none}
- #pc .lhq .lh-t tr.sg{box-shadow:inset 3px 0 0 var(--ac)}
- #pc .lhq .lh-t tr.sg td:first-child{box-shadow:none}
+ #pc .lhq .lh-t tr.sg{background:var(--soft)}
+ #pc .lhq .lh-t tr.sg td{background:none}
  #pc .lhq .lh-lt .lh-bn small{max-width:none}
 }
 @container (max-width:600px){
  #pc .lhq .lh-in{padding:0 16px}
- #pc .lhq .lh-top .lh-in{flex-wrap:wrap;gap:0 12px;min-height:0;padding-top:10px}
- #pc .lhq .lh-brand{flex:1}
- #pc .lhq .lh-nav{order:3;flex:0 0 100%;height:42px;overflow-x:auto;scrollbar-width:none}
- #pc .lhq .lh-nav button{padding:0 10px}
- #pc .lhq .lh-nav button:first-child{padding-left:0}
- #pc .lhq .lh-main{padding:24px 0 32px}
- #pc .lhq .lh-h1{font-size:27px}
+ #pc .lhq .lh-top .lh-in{gap:20px;overflow-x:auto;scrollbar-width:none}
+ #pc .lhq .lh-nav{gap:20px}
+ #pc .lhq .lh-main{padding:28px 0 48px}
+ #pc .lhq .lh-h1{font-size:28px}
  #pc .lhq .lh-lede{font-size:14px}
- #pc .lhq .lh-kpi{padding:12px 14px}
- #pc .lhq .lh-kpi b{font-size:20px}
- #pc .lhq .lh-card,#pc .lhq .lh-offer{padding:16px}
+ #pc .lhq .lh-kpi{padding:12px 14px 14px}
+ #pc .lhq .lh-kpi b{font-size:21px}
+ #pc .lhq .lh-kpis.lh-k3{grid-template-columns:1fr}
+ #pc .lhq .lh-kpis.lh-k3 .lh-kpi{border-left:0;padding-left:0;border-top:1px solid var(--ln)}
+ #pc .lhq .lh-kpis.lh-k3 .lh-kpi:first-child{border-top:0}
+ #pc .lhq .lh-grid{grid-template-columns:1fr}
+ #pc .lhq .lh-item{min-height:0;gap:14px}
  #pc .lhq .lh-acth{flex-wrap:wrap}
- #pc .lhq .lh-fee{text-align:left;flex:0 0 100%;padding-left:54px}
- #pc .lhq .lh-acc .lh-acth .lh-btn{flex:0 0 100%;margin-top:4px}
+ #pc .lhq .lh-fee{text-align:left;flex:0 0 100%}
+ #pc .lhq .lh-dl{grid-template-columns:1fr 1fr}
  #pc .lhq .lh-steps{grid-template-columns:1fr 1fr;row-gap:14px}
- #pc .lhq .lh-steps li:nth-child(2):before{display:none}
- #pc .lhq .lh-dir{grid-template-columns:1fr}
+ #pc .lhq .lh-acc .lh-acth .lh-btn{flex:0 0 100%;margin-top:4px}
  #pc .lhq .lh-ups{grid-template-columns:1fr}
  #pc .lhq .lh-btns .lh-btn{flex:1}
- #pc .lhq .lh-foot .lh-in{flex-direction:column;gap:2px}
 }`;document.head.appendChild(st)}
 /* Label HQ is in the App Barn (free), and links in Messages download it too */
 {const s0=PA.store;PA.store=function(){return s0.apply(this,arguments).replace(/(onclick="inst\('hq'\)">)[^<]*</,'$1Get · Free<')}}
