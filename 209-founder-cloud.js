@@ -10,12 +10,12 @@
    Guest players (no Google account) cannot be listed server-side; their claim stays on their device. */
 (function(){
 if(typeof RS=='undefined'||typeof rsGet!='function'||typeof FB_ON=='undefined'||!FB_ON)return;
-const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
+const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';const ADMINS=typeof ADMIN_UIDS!='undefined'?ADMIN_UIDS:[ADMIN];
 const rd=()=>FBF&&FBD&&FBU;
 
 window.fdSnapshot=async function(write){
  if(!rd())return console.warn('Sign in with the admin Google account first.');
- if(FBU.uid!==ADMIN)return console.warn('Only the admin account can do this.');
+ if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');
  const F=FBF,col=F.collection(FBD,'saves');let last=null,seen=0,elig=[],skipped=0;
  for(;;){
   const q=last?F.query(col,F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(col,F.orderBy(F.documentId()),F.limit(100));

@@ -76,7 +76,7 @@ window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;
    Never blocks play: a failed check shows a small notice with Details and a Copy button, and retries by itself. ---- */
 const NM={st:'idle',busy:0,at:0,log:[],err:''};
 const errWhy=e=>{const c=String(e&&e.code||'').replace('firestore/',''),m=String(e&&e.message||e||'');
- if(c=='permission-denied')return'Firestore refused the read (permission denied). The Firestore rules in firebase-rules/v49.93.2/firestore.rules need publishing (Firebase console > Firestore Database > Rules > Publish) in the waveferndata project.';
+ if(c=='permission-denied')return'Firestore refused the read (permission denied). The Firestore rules in firebase-rules/v51.3.0/firestore.rules need publishing (Firebase console > Firestore Database > Rules > Publish) in the waveferndata project.';
  if(c=='unauthenticated')return'Google sign-in has expired on this device. Sign out and sign in again.';
  if(c=='unavailable'||/offline|no answer|network/i.test(m))return'Could not reach Firestore (blocked by a browser extension or network, or the database is not created in waveferndata). Try another browser or turn off ad blockers for this site.';
  if(c=='not-found'||/database.*(not exist|not found)/i.test(m))return'The Firestore database does not exist in the waveferndata project. Create it in the Firebase console > Firestore Database.';

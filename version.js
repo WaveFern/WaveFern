@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.2.0';
+const GAME_VERSION='v51.3.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.3.0',n:'A second admin account can use the Admin panel: gifts, players, own-game controls, a Cheat mode toggle that unlocks the Gphone Teleport app, and quick teleports around the home city. Saves still load.'},
  {v:'v51.2.0',n:'Instagrime has a post studio. New post now lets you choose the place, backdrop, pose, shot and which way you face, with a live preview, and write your own caption or pick a suggested one. Photos are far more varied everywhere: every kind of post has several backdrops (clubs, festivals, bedrooms, kitchens, beaches, garages, deserts, record shops and more), poses, camera angles and framings, and car posts now show different car shapes, front and side views, five places, and sometimes just the car. Brand shoot posts and game balance are unchanged. Saves still load.'},
  {v:'v51.1.0',n:'Brand shoots are now real trips. Every brand deal flies you out, paid by the brand, to that brand\'s own HQ in a world city. The HQ is a real building you can walk up to and into, and each of the 14 brands has a different HQ outside and a different studio inside, with its own backdrop, props and colours. A company car meets you at the airport. The camera in the studio starts the photoshoot, and the brand books your flight home. Label HQ now fills the whole app window, with a trip tracker for your active shoot and each brand\'s HQ city.'},
  {v:'v51.0.4',n:'Label HQ is back in the App Barn as a free app, so you can always get it. Links in sponsor and label messages still download it too. Saves still load.'},

@@ -1,5 +1,5 @@
 rules_version = '2';
-// WaveFern Firestore rules v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
+// WaveFern Firestore rules v51.3.0, 12 Nov 2026. Second admin uid added (admin() now accepts a list). Previous v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
 // ADMIN UID: the Google account has a NEW uid in the waveferndata project. Replace wE6oPZIH... below with your uid from Authentication > Users.
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
 // Only what the game uses is allowed; everything else is refused. No get()/exists() lookups, so rules never cost extra reads.
@@ -12,7 +12,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function me() { return request.auth.uid; }
     function google() { return request.auth != null && request.auth.token.firebase.sign_in_provider == 'google.com'; }
-    function admin() { return google() && me() == 'wE6oPZIHYifrqBFxzpPse6ripGY2'; }
+    function admin() { return google() && me() in ['wE6oPZIHYifrqBFxzpPse6ripGY2', 'T79oEtO29fUBYv4P9qq0vBDzZZt2']; }
     function fields(k) { return request.resource.data.keys().toSet() == k.toSet(); }
     function stamp(v) { return v is int && v > 1704067200000 && v < request.time.toMillis() + 604800000; }
     // tighter for saves: the device clock may be at most 2 days out, either way
