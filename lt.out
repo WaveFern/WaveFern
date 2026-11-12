@@ -1,4 +1,0 @@
-chromium: boot {"stuck":false,"fatal":false,"mode":"title"}
-firefox: not installed, skipped
-webkit: not installed, skipped
-END
