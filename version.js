@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.6.0';
+const GAME_VERSION='v51.7.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.7.0',n:'Label HQ is redesigned as a proper artist services website: a clean header with tabs, page titles, key figures, tables for offers, history and labels, and cards for your team upgrades. The pixel pictures and logos are gone; brands and labels show as simple lettered marks. Once you sign, the site takes on your label\'s colour and wordmark style. It fills the app window and fits phone screens. Everything works as before. Saves still load.'},
  {v:'v51.6.0',n:'You cannot send a message while the contact is still typing: the box and Send button grey out until their reply lands. Saves still load.'},
  {v:'v51.5.1',n:'Founder badge: new admin console tool fdBackfill() adds the missing cloud Founder entries (for Founders whose cloud save is already a new career), which is what the Founder badge on the leaderboard and other profiles needs. Saves still load.'},
  {v:'v51.5.0',n:'Things take a believable moment now. Artists, agents and other contacts show "typing..." before their reply appears, longer for longer messages. Installing an app from the App Barn, or the Download Label HQ link in Messages, shows a download bar for a few seconds before the app lands on your desktop. Replies and installs are saved if you quit or reload mid-wait. Saves still load.'},
