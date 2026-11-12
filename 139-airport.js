@@ -326,8 +326,8 @@ function takeOff(){const tk=AP.tk;if(!tk)return;AP.ph='fly';T.emit('depart',tk);
  <div style="position:relative;font:700 28px ${FONT}">${esc(tk.fl)} · ${esc(T.city(tk.from))} → ${esc(T.city(tk.to))}</div>
  <canvas id=apflc width=720 height=300 style="position:relative;width:min(720px,94vw);aspect-ratio:720/300;border-radius:14px;border:3px solid #0b2a5b;background:#7cc2ff"></canvas>
  <div id=apflt style="position:relative;font:700 18px ${FONT}"></div><div style="position:relative;display:flex;gap:10px"><button onclick="apLand()">Skip</button></div>`;
- document.body.appendChild(d);const t0=performance.now(),DUR=8500,A=T.dest(tk.from)||WT_HOME,B=T.dest(tk.to)||WT_HOME;AP.flv=null;
- const step=()=>{if(!document.getElementById('apfly')||AP.ph!='fly')return;const k=Math.min(1,(performance.now()-t0)/DUR),c=document.getElementById('apflc');if(c&&T.paintWorld){const r=c.getBoundingClientRect(),W0=r.width||720,H0=r.height||300,dpr=Math.min(3,window.devicePixelRatio||1),W=Math.round(W0*dpr),H=Math.round(H0*dpr);
+ document.body.appendChild(d);const t0=(window.FWP?FWP.now():performance.now()),DUR=8500,A=T.dest(tk.from)||WT_HOME,B=T.dest(tk.to)||WT_HOME;AP.flv=null;
+ const step=()=>{if(!document.getElementById('apfly')||AP.ph!='fly')return;const k=Math.min(1,((window.FWP?FWP.now():performance.now())-t0)/DUR),c=document.getElementById('apflc');if(c&&T.paintWorld){const r=c.getBoundingClientRect(),W0=r.width||720,H0=r.height||300,dpr=Math.min(3,window.devicePixelRatio||1),W=Math.round(W0*dpr),H=Math.round(H0*dpr);
   if(c.width!=W||c.height!=H){c.width=W;c.height=H}const x=c.getContext('2d'),pa=T.proj(A.lat,A.lon),pb=T.proj(B.lat,B.lon);
   /* sharp vector map (138-flights.js), framed on the route */
   if(!AP.flv)AP.flv=T.fitView([pa,pb],W0,H0,1.7);const v=AP.flv,s=T.clampView(v,W0,H0),ox=W0/2-v.cx*s,oy=H0/2-v.cy*s;T.paintWorld(x,s*dpr,ox*dpr,oy*dpr,W,H,dpr);x.setTransform(dpr,0,0,dpr,0,0);

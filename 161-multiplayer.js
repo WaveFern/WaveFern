@@ -386,6 +386,8 @@ function go(d){const r=ME.rd;for(const k in MB)MB[k].rd=null;ME.rd=null;if(!r||r
 /* v49.45.0: pausing only stops time when the whole band is paused. While you are paused and anyone else is still playing, your
    clock keeps running (the host's clock keeps coming in and corrects it). It stops below the end of the day, so the night itself
    starts when you come back. */
+/* v52.2.0: 229-pause-freeze.js reads this: freeze nothing while someone else in the band is still playing */
+window.fwMpRuns=()=>{try{return !!(MPS&&S&&list().some(m=>m.id!==ME.id&&!m.pz))}catch(e){return false}};
 function pausedTime(now){const dt=Math.min(1,(now-(NET.pzT||now))/1000);NET.pzT=now;
  if(!S||typeof PAUSED=='undefined'||!PAUSED||mode!='pause')return;
  if(!list().some(m=>m.id!==ME.id&&!m.pz))return;
