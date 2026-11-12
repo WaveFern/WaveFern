@@ -9,15 +9,21 @@
    Stored per device in localStorage 'fw_gfx' (missing = Auto), so saves are untouched. ===== */
 /* bg: when the tab/window is in the background: 0 full, 1 reduced (10 fps), 2 rendering paused. blur: blurred backdrop behind the pause menu.
    bat (Battery Saver) cuts frame rate, crowds, rain and draw distance first and keeps the normal pixel size and every visual feature. */
-const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1},low:{px:4,fps:30,crowd:1,wx:0,far:0,bg:0,blur:1},bat:{px:3,fps:30,crowd:2,wx:1,far:0,bg:1,blur:0}};
+const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,cg:1},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,cg:1},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:2,shd:1,cg:1},low:{px:4,fps:30,crowd:1,wx:0,far:0,bg:0,blur:1,sh:1,shd:0,cg:0},bat:{px:3,fps:30,crowd:2,wx:1,far:0,bg:1,blur:0,sh:2,shd:0,cg:1}};
 const GFX_LV=['high','med','low'];
-const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1};let GFX=Object.assign({},GFX_DEF);
+const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,cg:1};let GFX=Object.assign({},GFX_DEF);
 try{const g=JSON.parse(localStorage.getItem('fw_gfx')||'null');if(g&&typeof g=='object')Object.assign(GFX,g)}catch(e){}
 if(!GFX_PRE[GFX.al])GFX.al='high';
+if(GFX.p!='auto'&&GFX.p!='custom'&&!GFX_PRE[GFX.p])GFX.p='auto';
+/* shadows: sh 0 off, 1-4 = 512/1024/2048/4096 map (3 = the long-standing look); shd 0 near, 1 normal, 2 far; cg: colour grade and vignette */
+for(const k in GFX_DEF)if(k!='p'&&k!='al'&&typeof GFX[k]!='number')GFX[k]=GFX_DEF[k];
 const gfxSv=()=>{try{localStorage.setItem('fw_gfx',JSON.stringify(GFX))}catch(e){}};
 /* the values in force: a preset's, or the custom ones */
 function gfxCur(){return GFX.p=='custom'?GFX:GFX_PRE[GFX.p=='auto'?GFX.al:GFX.p]||GFX_PRE.high}
 let gfxFocus=true;addEventListener('blur',()=>{gfxFocus=false});addEventListener('focus',()=>{gfxFocus=true});
+
+/* screen refresh rate: measured once from a short run of animation frames, so 90/120/Uncapped only show on screens that can use them */
+let gfxHz=0;setTimeout(()=>{const g=[];let l=0;const f=t=>{if(l)g.push(t-l);l=t;if(g.length<90&&!document.hidden)requestAnimationFrame(f);else if(g.length>=60){g.sort((a,b)=>a-b);gfxHz=Math.round(1000/Math.max(4,g[Math.floor(g.length*.2)]))}};requestAnimationFrame(f)},6000);
 
 /* pixel size */
 let gfxPX=0;
@@ -61,15 +67,23 @@ gfxApply();
   if(t&&!t.querySelector('[data-t=gfx]')){const b=document.createElement('button');b.dataset.t='gfx';b.textContent='Graphics';b.onclick=()=>{STAB='gfx';stDraw()};const g=t.querySelector('[data-t=game]');g?g.after(b):t.appendChild(b);if(STAB=='gfx')stDraw()}return r}}
 function gfxReset(){const f=GFX.fpsOn;GFX=Object.assign({},GFX_DEF);if(f)GFX.fpsOn=f;gfxSv();gfxApply();stDraw();say('Graphics reset')}
 function gfxSet(k,v){if(k=='p'){GFX.p=v;if(v=='auto')GFX.al='high'}else{if(GFX.p!='custom')Object.assign(GFX,gfxCur());GFX.p='custom';GFX[k]=v}gfxSv();gfxApply();stDraw()}
-const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];return`<div class=so><span>${l}${n?`<small class=m>${n}</small>`:''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${opts.map(([v,t])=>`<button class="${c==v?'go':''}" onclick="gfxSet('${k}',${typeof v=='string'?`'${v}'`:v})">${t}</button>`).join('')}</span></div>`};
+const gfxH=t=>`<div class=so style="border:0;padding-bottom:0"><b style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7">${t}</b></div>`;
+const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];if(k=='fps'&&gfxHz)opts=opts.filter(o=>o[0]==c||(o[0]?o[0]<=gfxHz+6:gfxHz>66));return`<div class=so><span>${l}${n?`<small class=m>${n}</small>`:''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${opts.map(([v,t])=>`<button class="${c==v?'go':''}" onclick="gfxSet('${k}',${typeof v=='string'?`'${v}'`:v})">${t}</button>`).join('')}</span></div>`};
 {const b0=stBody;stBody=function(){if(STAB!='gfx')return b0.apply(this,arguments);
   return gfxSlider()
+  +gfxH('Look')
   +gfxRow('Pixel size','px',[[2,'Sharp'],[3,'Normal'],[4,'Chunky'],[5,'Chunkier']],'Bigger pixels run faster')
-  +gfxRow('Frame rate cap','fps',[[30,'30'],[45,'45'],[60,'60'],[90,'90'],[120,'120'],[0,'Uncapped']],'Limited by your screen\'s refresh rate: 90, 120 and Uncapped only help on faster screens')
+  +gfxRow('Shadows','sh',[[0,'Off'],[1,'Low'],[2,'Medium'],[3,'High'],[4,'Ultra']],'Quality is the shadow map size (512 / 1024 / 2048 / 4096). High is the normal look')
+  +gfxRow('Shadow distance','shd',[[0,'Near'],[1,'Normal'],[2,'Far']],'How far from the camera shadows are drawn')
+  +stTog('Colour grade and vignette',gfxCur().cg,"gfxSet('cg',gfxCur().cg?0:1)",'The warm contrast and darker screen edges')
+  +gfxH('Performance')
+  +gfxRow('Frame rate cap','fps',[[30,'30'],[45,'45'],[60,'60'],[90,'90'],[120,'120'],[0,'Uncapped']],'Limited by your screen\'s refresh rate'+(gfxHz?' (about '+gfxHz+' Hz here)':''))
+  +gfxH('World')
   +gfxRow('Crowds','crowd',[[4,'All'],[2,'Half'],[1,'Few']])
   +gfxRow('Weather effects','wx',[[2,'Full'],[1,'Light'],[0,'Off']])
   +stTog('FPS counter',GFX.fpsOn,"GFX.fpsOn=GFX.fpsOn?0:1;gfxSv();fpsShow()",'Frames per second, top of the screen')
   +gfxRow('Draw distance','far',[[1,'Normal'],[0,'Near']],'People and cars near the edge of the screen')
+  +gfxH('Battery')
   +gfxRow('When in the background','bg',[[0,'Full'],[1,'Reduced'],[2,'Pause']],'Tab hidden or window not focused: Reduced draws 10 fps, Pause stops drawing')
   +gfxRow('Pause menu blur','blur',[[1,'On'],[0,'Off']],'Off saves battery behind the pause menu')
   +`<div class=so><span>Reset graphics<small class=m>Back to Auto, the default look</small></span><button onclick="gfxReset()">Reset</button></div>`}}
