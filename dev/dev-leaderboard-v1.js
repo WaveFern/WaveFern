@@ -50,8 +50,8 @@
  LB.board=function(k){const c=cache[k];if(!c||Date.now()-c.at>=TTL)LB.load(k);return c?c.rows:[]};
  const emptyMsg=()=>!live()?'Sign in with Google to see the leaderboard and join it.':LBS.st=='err'?(LBS.err=='permission-denied'?'The leaderboard is not switched on yet.':'Could not load the leaderboard. Try again soon.'):LBS.st=='load'||LBS.st=='idle'?'Loading...':!eligible()&&0?'':'No ranked players yet.';
  /* v51.8.2: automatic clean-up. A row of your own that came from a test career is deleted without console steps: when the career in play is a test career, or when the stored row has numbers no real career can reach (listeners over 100M, fame level over 100). Done once per account and test/real state, and the board is redrawn without it. A clean real career then writes its own row as usual. Deleting your own row is allowed by the rules, so no Firebase change is needed. */
- /* v51.8.3: rows that are plainly test data are hidden for everyone before they are deleted: a name that is just test/tester, or numbers no real career can reach */
- const junk=x=>/^\s*(test|tester|testing)\s*$/i.test(x.a||'')||(+x.lis||0)>1e8||(+x.fame||0)>100;
+ /* v51.8.3: rows that are plainly test data are hidden for everyone before they are deleted: a name that is exactly TEST (any case); nothing else is hidden */
+ const junk=x=>/^\s*test\s*$/i.test(x.a||'');
  const swept={};
  const sweep=()=>{try{if(!live()||wbusy)return;const uid=FBU.uid,t=window.fwTainted(),key=uid+(t?'T':'R');if(swept[key])return;swept[key]=1;
   FBF.getDoc(FBF.doc(FBD,'leaderboard',uid)).then(m=>{if(!m.exists())return;const x=m.data()||{};const bogus=t||(+x.lis||0)>1e8||(+x.fame||0)>100;if(!bogus)return;
