@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.96.0';
+const GAME_VERSION='v49.96.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.96.1',n:'Behind the scenes: the old 22-v8 script is split into six smaller topic files (wardrobe and catalogues, post pictures, clothes colours, album covers, towers, home annex). Nothing in the game changed. Saves still load.'},
  {v:'v49.96.0',n:'More graphics settings: Settings > Graphics has frame rate caps of 30, 45, 60, 90, 120 or Uncapped, a Battery Saver preset (30 fps, fewer crowds, lighter rain, nearer draw distance, same look), a When in the background option (Full, Reduced or Pause), a pause menu blur switch and a Reset graphics button. The pause menu scene draws at 20 fps at most. The default look and saves are unchanged.'},
  {v:'v49.95.3',n:'Faster loading: the live site now loads all game scripts as one minified file (about 20 requests instead of about 290) instead of one request per script. Nothing in the game changed; the scripts still run in the same order, and the old separate files are used automatically if the bundle is ever missing.'},
  {v:'v49.95.2',n:'Founder badge on the leaderboard: a refused Founder flag is now retried after 10 minutes instead of being switched off until the game is reloaded. The badge needs the v49.93.2 Firestore rules published in the Firebase console. Saves still load.'},
