@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.95.2';
+const GAME_VERSION='v49.95.3';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.95.3',n:'Faster loading: the live site now loads all game scripts as one minified file (about 20 requests instead of about 290) instead of one request per script. Nothing in the game changed; the scripts still run in the same order, and the old separate files are used automatically if the bundle is ever missing.'},
  {v:'v49.95.2',n:'Founder badge on the leaderboard: a refused Founder flag is now retried after 10 minutes instead of being switched off until the game is reloaded. The badge needs the v49.93.2 Firestore rules published in the Firebase console. Saves still load.'},
  {v:'v49.95.1',n:'The music app is called WaveFern again, not Spotifly. Its name changed on the computer, the Gphone, the choose-a-name and Upload screens, the Browse and artist pages (Verified by WaveFern), delete prompts, the tutorial and Big Vee. The desktop wallpaper no longer has the Spotifly text in its corner; it now shows the WaveFern logo and name. Saves still load, and the old Spotifly Team messages still show up as WaveFern Team.'},
  {v:'v49.95.0',n:'Sign out of Google is on the main menu. When you are signed in, a Sign out of Google button shows under Wiki, with a confirmation first. Your cloud save is kept on your account, your careers on this device are kept, and you go back to the signed-out main menu.'},
