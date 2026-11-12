@@ -24,7 +24,7 @@ const BROWSER=new Set(require('./browser-globals.json'));
  'InstallTrigger','safari','opera','chrome','netscape','globalThis','undefined','NaN','Infinity','arguments'].forEach(n=>BROWSER.add(n));
 
 const html=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
-const files=[...html.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)].map(m=>m[1]).filter(s=>!/^https?:/.test(s));
+const files=[...html.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)].map(m=>m[1].split("?")[0]).filter(s=>!/^https?:/.test(s));
 
 const lexical=new Map(),varlike=new Map(),firstDef=new Map(),issues=[],redefs=[];
 const parsed=[];
