@@ -17,10 +17,21 @@ const rd=()=>FBF&&FBD&&FBU;
    This reads every cloud save, and for each career that carries a Founder claim (S.fdr) or is an eligible old career it creates the missing founders/{uid} entry. Existing entries (including f:0 set by hand) are never changed.
    fdBackfill() is a dry run; fdBackfill(true) writes. */
 /* v51.8.1: fdClearLeaderboardRow(uid) deletes one leaderboard/{uid} row (no uid = your own). Your own row can always be deleted; another player's needs the admin account and the v51.3.0 rules published. */
-window.fdClearLeaderboardRow=async function(uid){
+window.fdClearLeaderboardRow=async function(who){
  if(!rd()||!FBU)return console.warn('Sign in with Google first.');
- uid=uid||FBU.uid;if(uid!==FBU.uid&&!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can clear another player\'s row.');
- try{await FBF.deleteDoc(FBF.doc(FBD,'leaderboard',uid));console.log('Leaderboard row deleted for '+uid+'. Open the Leaderboard again to see it gone.');return 1}catch(e){console.warn('Could not delete the row: '+((e&&e.code)||e)+(e&&e.code=='permission-denied'?'. Publish firebase-rules/v51.3.0/firestore.rules in Firebase console > Firestore > Rules.':''));return 0}};
+ const F=FBF,admin=ADMINS.includes(FBU.uid);let ids=[];
+ if(!who)ids=[FBU.uid];
+ else if(/^[A-Za-z0-9]{20,40}$/.test(who))ids=[who];
+ else{/* a display name: look it up in the top 100 rows of each category (admin only) */
+  if(!admin)return console.warn('Only the admin account can remove a row by name.');
+  const w=String(who).trim().toLowerCase(),seen=new Set();
+  for(const k of ['day','lis','str','mon','fame','sg','fol']){try{const sn=await F.getDocs(F.query(F.collection(FBD,'leaderboard'),F.orderBy(k,'desc'),F.limit(100)));sn.forEach(d=>{const x=d.data();if(x&&String(x.a||'').trim().toLowerCase()==w&&!seen.has(d.id)){seen.add(d.id);ids.push(d.id)}})}catch(e){console.warn('lookup '+k,(e&&e.code)||e)}}
+  if(!ids.length)return console.warn('No leaderboard row named "'+who+'" found in the top 100 of any tab.')}
+ if(ids.some(u=>u!==FBU.uid)&&!admin)return console.warn('Only the admin account can clear another player\'s row.');
+ let n=0;for(const u of ids){try{await F.deleteDoc(F.doc(FBD,'leaderboard',u));n++;console.log('Leaderboard row deleted: '+u)}catch(e){console.warn('Could not delete '+u+': '+((e&&e.code)||e)+(e&&e.code=='permission-denied'?'. Publish firebase-rules/v51.3.0/firestore.rules in Firebase console > Firestore > Rules.':''))}}
+ try{if(window.LB&&LB.refresh)LB.refresh()}catch(e){}
+ return n};
+/* v51.8.3: fdClearLeaderboardRow() = your own row; fdClearLeaderboardRow('uid') = that account (admin); fdClearLeaderboardRow('TEST') = every row with that display name (admin). The admin also gets an x on each Leaderboard row. */
 window.fdBackfill=async function(write){
  if(!rd())return console.warn('Sign in with the admin Google account first.');
  if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');

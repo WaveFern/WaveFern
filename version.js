@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.8.2';
+const GAME_VERSION='v51.8.3';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.8.3',n:'Leaderboard rows named test or with impossible numbers are now hidden for everyone. The admin gets an [x] on each Leaderboard row to delete it, and fdClearLeaderboardRow() can remove a row by player name or id. Saves still load.'},
  {v:'v51.8.2',n:'A leaderboard row left over from a test career is now removed automatically when you sign in: no console steps. It is removed when the career in play is a test career, or when the stored row has numbers no real career can reach. A real career then posts its own row as usual. Saves still load.'},
  {v:'v51.8.1',n:'Test careers no longer post to the leaderboard or public profile. Any career that used test mode or the dev test code is marked for good and stays off the board. New console tool fdClearLeaderboardRow() removes a bogus row. Saves still load.'},
  {v:'v51.8.0',n:'On the dev build only: typing test as the save code unlocks everything in the career that is open (money, gear, apps, furniture, cars, pets, clothes, best home, every contact, test mode). On the real game it does nothing. Saves still load.'},
