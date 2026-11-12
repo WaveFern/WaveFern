@@ -13,6 +13,28 @@ if(typeof RS=='undefined'||typeof rsGet!='function'||typeof FB_ON=='undefined'||
 const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';const ADMINS=typeof ADMIN_UIDS!='undefined'?ADMIN_UIDS:[ADMIN];
 const rd=()=>FBF&&FBD&&FBU;
 
+/* v51.5.1: fdBackfill(write). Admin only. fdSnapshot lists only careers made before the fresh start, so a Founder whose cloud save is already a new career (or who was missed) has no founders/{uid} entry, and the rules then refuse their Founder flag on the leaderboard and profile.
+   This reads every cloud save, and for each career that carries a Founder claim (S.fdr) or is an eligible old career it creates the missing founders/{uid} entry. Existing entries (including f:0 set by hand) are never changed.
+   fdBackfill() is a dry run; fdBackfill(true) writes. */
+window.fdBackfill=async function(write){
+ if(!rd())return console.warn('Sign in with the admin Google account first.');
+ if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');
+ const F=FBF,have=new Set();
+ for(let last=null;;){const q=last?F.query(F.collection(FBD,'founders'),F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(F.collection(FBD,'founders'),F.orderBy(F.documentId()),F.limit(100));
+  const s=await F.getDocs(q);if(s.empty)break;s.forEach(d=>have.add(d.id));last=s.docs[s.docs.length-1];if(s.size<100)break}
+ const col=F.collection(FBD,'saves');let last=null,seen=0,add=[],listed=0;
+ for(;;){
+  const q=last?F.query(col,F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(col,F.orderBy(F.documentId()),F.limit(100));
+  const s=await F.getDocs(q);if(s.empty)break;
+  s.forEach(d=>{seen++;if(have.has(d.id)){listed++;return}const x=d.data();let st=null;try{st=rsStats(x.code)}catch(e){}if(!st)return;
+   const claim=st.s&&st.s.fdr,old=!(st.rv>=RS.V)&&rsEligible(st,x.code);
+   if(claim||old)add.push({uid:d.id,a:String((claim&&claim.a)||st.artist||'').slice(0,24),d:Math.min(9999,(claim?claim.d:st.day)|0)})});
+  last=s.docs[s.docs.length-1];if(s.size<100)break}
+ console.log('Cloud saves read: '+seen+'. Already listed: '+listed+'. Founders missing from the list: '+add.length+'.');
+ if(!write){console.log('Dry run: nothing written. Run fdBackfill(true) to add them.');return{seen,listed,missing:add.length}}
+ let n=0;for(let i=0;i<add.length;i+=400){const b=F.writeBatch(FBD);add.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,add.length-i)}
+ console.log('Written: '+n+' Founder entries.');return{seen,listed,written:n}};
+
 window.fdSnapshot=async function(write){
  if(!rd())return console.warn('Sign in with the admin Google account first.');
  if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');
