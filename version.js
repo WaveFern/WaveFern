@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v50.7.2';
+const GAME_VERSION='v50.7.3';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v50.7.3',n:'Smoother game: saving your career (every 30 seconds, plus the cloud and vault copies) now takes about a third of the time, so the small freeze each save caused on long careers is gone, and the shadow code no longer walks the whole 3D scene three times a second. Nothing in the game or your saves changed.'},
  {v:'v50.7.2',n:'Clothes that were the same shape in a different colour now look different: Chinos have a crease and turn-ups, Cargo Trousers have side pockets with flaps, Joggers have elastic cuffs and a drawstring, Slim Jeans have faded whiskers, Denim Shorts have a frayed hem, Baggy Shorts are wider and longer, Wide-Leg Jeans have a high waist and flared hem, and Baggy Jeans have faded knees and stacked hems. Item names, ids and saved outfits are unchanged.'},
  {v:'v50.7.1',n:'The social icons now sit in the bottom right corner of the screen on computers and are hidden completely on phones.'},
  {v:'v50.7.0',n:'You now start with three song minigames (Beat, Lyrics and Mix, as always) and every song uses all three. Echo unlocks at Studio Level 3 and Build It at Studio Level 5, and higher levels make songs use 4 and then 5 activities. The gear shop explains what the next level gives. Saves still load.'},

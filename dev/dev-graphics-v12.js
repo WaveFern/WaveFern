@@ -53,6 +53,8 @@
  }
  /* flag meshes that should cast / receive shadows: solid lit (Lambert) meshes only; glass, sky, beams and glow stay out */
  const done=new WeakSet();
+ /* v50.7.0: the whole scene (about 32,000 objects) was walked every 20 frames to flag new meshes, a 2 ms hitch about 3 times a second; now it only runs after something was added to a scene object */
+ let markDirty=1;{const add0=THREE.Object3D.prototype.add;THREE.Object3D.prototype.add=function(){markDirty=1;return add0.apply(this,arguments)}}
  function mark(all){
   const on=shOn;
   scene.traverse(o=>{
@@ -74,7 +76,7 @@
   if(Math.abs(shRange-r)>.5){shRange=r;c.left=c.bottom=-r;c.right=c.top=r;c.near=1;c.far=70;c.updateProjectionMatrix()}
   /* sky light follows the day and night level of the ambient light */
   hemi.intensity=.13*Math.min(1.3,amb.intensity/.75);
-  if(!(frame%20))mark(false);
+  if(!(frame%20)&&markDirty){markDirty=0;mark(false)}
  }
  const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(),SW=new THREE.Color();
  const r0=renderer.render.bind(renderer);
