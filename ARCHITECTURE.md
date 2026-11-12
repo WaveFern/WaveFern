@@ -1,0 +1,121 @@
+# WaveFern architecture
+
+Read this first. It tells you which files to open for a task so you do not have to read the whole codebase.
+Keep it accurate: update it in the same commit as any structural change (new file, renamed file, changed load order, new global others depend on).
+
+## 1. Overview
+
+WaveFern is a static browser game (GitHub Pages, no build step, no bundler). Everything is **classic `<script>` files sharing one global scope**, loaded by `index.html` in the order the tags appear. There are no ES modules and no imports: a file uses a function or variable simply because an earlier file declared it.
+
+- 212 game scripts in the repo root + 60 files in `dev/` = **272 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
+- Three.js r128 (CDN, with a cdnjs fallback) renders the 3D world. The "computer", phone and menus are plain DOM (`style.css`, see `docs/THEMES.md`).
+- Firebase (Auth, Firestore, Analytics) is optional: the game runs fully offline as a guest. Rules are in `firebase-rules/`.
+- Version and changelog live in `version.js` (`GAME_VERSION`, `VERSION_HISTORY`). Bump both in the same commit as every change.
+
+### The "patch layering" style (most important thing to understand)
+The game grew version by version. The first files (`01`–`29`) define the core; **later files re-assign or wrap earlier functions** (for example `recMenu` from `05-game-flow.js` is wrapped by `165-song-menu.js`). Each file's top comment names the version and says which earlier file it patches. Consequences:
+
+1. The **last file that defines/wraps a function wins**. To find the live behaviour, search for the name across the repo and read the newest file, not the first.
+2. Moving or renaming a file or reordering tags can silently change which version of a function is live. Do not reorder without checking.
+3. A top-level `let/const/class` name declared twice makes the browser skip the whole later file. Run `node tools/check-globals.js` after any edit (CLASH check).
+
+### Startup sequence
+1. `index.html` inline scripts: update lockout, loading-screen messages.
+2. `00-*.js` (dev clock, old-address save mover, startup guard, tab audio fade, pixel icons), then Three.js, `assets.js` (music/wallpaper URLs), `version.js`.
+3. the numbered game files (`01`…`215`) in tag order (see §4 for the real order; it is not purely numeric).
+4. `27-boot.js` runs mid-list: builds the world in separately try/caught steps (`buildHouse`, `buildWorld`, `buildBigWorld`, `buildCity` ...), starts `loop`, and after two animation frames calls `restoreSave()` then `titleOpen()` (main menu). Files that load after it (`210`–`218`, `216`, `217`, the `dev/` block) are still parsed before those frames, so they can patch what boot built. The loading screen waits for the menu, Firebase auth and the stadium menu scene (15 s max).
+5. Game loop is `loop` in `07-input-loop.js` (patched later by many files).
+
+## 2. System directory
+
+Numbers are file prefixes (`NN-*.js`). "Newest wins" files are listed last in each row.
+
+| System | Files | What lives there |
+|---|---|---|
+| **Core infrastructure** | `00-guard`, `01-start`, `02-data` (state `S`, tuning), `05-game-flow` (`mode`, `recMenu`), `07-input-loop` (input + `loop`), `27-boot`, `94-update-check`, `169-popups`, `176-game-feel`, `116-perf`, `122-graphics`, `85-pc-safety` | Global state, main loop, boot, error guard, popup stack, graphics presets |
+| **Auth & accounts** | `86-google-signin`, `208-onboarding` (username/display name), `213-public-profile`, `88-admin`, `124`/`127`/`162` (admin tools), `207-dev-panel` | Google sign-in, `isAdmin()`, usernames, public profile |
+| **Saving & player data** | `12-save-seal`, `12-save-load`, `12-save-vault`, `12-reset`, `00-moved-saves`, `86-vault-cloud`, `209-founder-cloud`, `206-founder` | Save codes, slots, vault backups, fresh-start reset, cloud copy (see §5) |
+| **Character & look** | `03-character`, `64-hat-hair`, `134-hair-3d`, `171-wardrobe-fit`, `114-real-looks`, `129-followers-sprint` | `buildChar`, hair, faces |
+| **Clothes shop (Threadz)** | `22-v8` (big catalogue, also Amazoom, pixel posts), `50`, `51`, `60`, `61`, `62`, `193-clothes-plus`, `215-city-brand-stores` | Clothing data `GAR`, previews, prints |
+| **Song creation** | `13-shops-v3-recording-game`, `34-studio-minigames`, `130-song-session`, `165-song-menu`, `187-upgrades`, `166-genre-focus`, `96-album-song-picker`, `112`/`113` (covers), `199-instrument-samples`, `217-name-upload-ui` | Beat/Lyrics/Mix minigames, album picker, release flow, covers |
+| **Studio & equipment** | `52-gear-shop-plus`, `53-studio-gear-detail`, `197-gear-levels`, `04-house`, `17-fixes`, `25-v21` | Gear lines and levels, studio room models |
+| **Career progression** | `14-world-fame-cars-pets-collabs`, `16-big-world-fame-chat-instagrime-v2` (fame levels `FT`), `136-fame-350`, `133-quests`, `173-career-boost`, `174-career-depth`, `177-early-game`, `100-stats`, `110-awards`, `203-dm-peers`, `204-world-offers` | Fame, quests, awards, milestones |
+| **Economy & shop** | `02-data` (tuning knobs), `10-apps-shop-furniture`, `101-economy-labels` (`UPX`), `82-label-hq`, `83-promotions`, `210-economy-rebalance`, `211-hook`, `212-endgame`, `185-instagrime-buzz`, `63-car-speed` | Income, listener pacing, promos, prices |
+| **Inventory, homes & furniture** | `15-homes-shop-interiors`, `79`/`182`/`191` (Amazoom), `95-property-no-starter`, `99-starter-furniture`, `104-furniture-storage`, `158-placement-overhaul`, `123-property-polish`, `26-v24-upstairs-redesign` | Properties, Storage, placing furniture |
+| **Cars** | `14`, `39-car-models`, `63-car-speed`, `218-parked-cars` | Models, speed, parking |
+| **World (home city)** | `16-big-world...`, `18`, `31-wide-roads`, `32-map-zoom`, `38-city-detail`, `40-city-fixes`, `41-fountains`, `42-central-park`, `54`, `55-interiors`, `57-tower-floors`, `81-billboards`, `90-barbershop`, `91`/`93`/`180`/`181` (shops), `97-weather`, `131-street-flow`, `194`/`195` (pop-up events), `196-never-stuck` | Roads, buildings, interiors, NPC pedestrians |
+| **Travel & world tour** | `135-destinations`, `137-travel` (`TRAVEL`), `138-flights`, `139-airport`, `145-world-map-data`, `146-world-tour`, `150-tour-cities`, `151-tour-shows`, `152-tour-city-life`, `160`, `179`, `192` | Destinations (`WT_*`), airline, abroad cities, stadium shows |
+| **Festival & stage** | `70-festival`, `71-festival-booking`, `188-stage-walk` | Weekly Park Fields Festival, crowd, stage |
+| **Messaging & NPC social** | `20-wider-understanding`, `30-npc-chat` (intent parser), `33-haggle`, `36`, `76`, `75`, `78`, `102-messaging`, `128-dm-variety`, `159-messages-mobile`; apps: `103`/`178`/`185`/`189` (Instagrime), `37`/`98`/`111`/`157`/`186`/`217-spotifly-hq-pfp` (the "WaveFern" music app; old name Spotifly in code) | Chat engine, collabs, social apps |
+| **Artist roster** | `21-v7`, `29-v26`, `77`, `80`, `125`, `126`, `153`, `209-carlos`, `209-alfonso`, `120`, `184-parody-names` | `ART` roster: **append only**, saves refer to artists by index |
+| **Phone & computer UI** | `06-computer`, `11-os-v2`, `115`/`116-gphone-plus`/`118` (Gphone), `105`, `119`, `155`, `198-game-ui`, `172-settings-plus`, `09-settings-effects`, `00-pixel-icons`, `style.css` | Desktop, apps, pause menu, settings |
+| **Audio** | `08-music`, `67-beats` (procedural beat engine), `73-ambience`, `107-my-songs-music`, `132-808-hats`, `200-sfx-polish`, `00-tab-fade`, `156` | Music, sfx, ambience |
+| **Graphics & rendering** | `04-house`, `23`/`24` (previews), `56-name-tags`, `84-pixel-pictures`, `190-pfp-styles`, `122-graphics`, `116-perf` | Meshes, canvas textures, profile pictures |
+| **Multiplayer & leaderboards** | `161-multiplayer` (band rooms, PeerJS, leaderboard), `216-friends-hub` | Band rooms, friends, presence |
+| **Input** | `07-input-loop`, `154-touch-controls`, `168-gamepad`, `155`/`158z` (responsive) | Keyboard, touch, controller |
+| **Trailers** | `175-trailer`, `183-band-trailer`, `201`, `202` | `?trailer` modes, recording |
+| **Tutorial** | `72-tutorial` (Big Vee), `78-big-vee-smarter`, `214-guide-markers`, `205-announcement` | Tips, guide line, announcements |
+| **`dev/` scripts** | 60 `dev/dev-*.js` loaded at the very end of `index.html` | Features promoted from the dev build; many are numbered `-v1`/`-v2` patches. Some (`dev-music-v1.js`, 100 KB) are full forks of an earlier file. Check them when looking for the live behaviour of anything in `dev-*` areas |
+
+Separate pages that are **not** the game: `wiki/`, `trailer/`, `mtrailer/`, `vtrailer/`, `about/`, `legal/`, `privacy/`, `terms/`, `dev/index.html` (password-protected preview that rewrites the script list).
+
+## 3. Shared globals that many files depend on
+
+Do not rename these; hundreds of references exist. Search before changing.
+
+- `S` (`02-data.js`): the whole player state (money, songs, followers, gear, day, ...). Saved as one object. Other saved globals: `ch` (character), `PL` (placed furniture), `VOL`, `FX`.
+- `THREE`, `scene`, `camera`, `P` (player) and `mode` (current screen/state string) drive the world and loop.
+- `ART`: artist roster (append only). `GAR`: clothes catalogue. `PROPS`: properties. `FT`: fame thresholds.
+- `TRAVEL` (`137`), `WT_*` destination tables (`135`), `UPX` (`101`), `MSGU` (`102`), `TT` (title screen state).
+- Helper functions: `isAdmin()` (`88`), `pxIcon` (`00-pixel-icons`), `fwSoftErr` (`00-guard`), `popup/toast` (`169`), `FW_CLOCK.now()` (`00-dev`, use instead of `Date.now()` for anything tied to the fresh start).
+- `localStorage` keys: `fw_save_1/2` (careers, `fw_u_{uid}_save_N` when signed in), `fw_slot`, `fw_set`, `fw_gfx`, `fw_vault`, `fw_bak_N` (recovered backups), `fw_fbproj`.
+
+## 4. Load order rules that must not be broken
+
+The real order is the order of tags in `index.html`, not file numbers. Known non-numeric spots:
+
+- `00-*` first, then Three.js, `assets.js`, `version.js` (everything reads `GAME_VERSION`).
+- `12-save-seal` → `12-save-load` → `12-save-vault` → `12-reset`, all right after `11-os-v2`. `86-vault-cloud` must follow `86-google-signin`.
+- `50`, `51`, `52`, `53`, `60`, `61`, `62` load *between* `37` and `64`, and `67-beats`, `57-tower-floors` between `62` and `70`: they append to `GAR` / gear after the base data of `22-v8` and must stay after their parents.
+- `27-boot.js` is **not last**; `210`–`212`, `216`, `217-name-upload-ui`, `218-parked-cars` and all `dev/` scripts load after it.
+- `208-onboarding` → `213-public-profile` → `209-founder-cloud` / `209-carlos` / `209-alfonso`; `158z-responsive` after `215`; `dev-menu-sync-v1` before `216-friends-hub`.
+- Cache-busting `?v=` query strings in `index.html` are per file; bump the one for a file you change (and `GAME_VERSION`), or players keep the old file.
+- The dev bundle builder (`tools/build-dev-bundle.js`) and `dev/index.html` read the script list from `index.html`, so adding a tag there is all that is needed, but **renaming or moving a file needs those and `tools/*` checked**.
+- No dynamic script loading of game files exists. The only runtime script injection is `161-multiplayer.js` (loads PeerJS from a list of CDNs) and `dev/index.html` (re-serves the tag list). Keep both working.
+
+## 5. Data and saving
+
+- State is one JSON object: `{S, ch, PL, VOL, FX}` packed by `saveCode()` in `12-save-load.js`. Formats: `FW1-` base64, `FW2-`/`FW3-` LZW-packed (3 is chat-safe), `FW4-` sealed (encrypted + tamper-evident, `12-save-seal.js`). Old formats still load, so never remove a decoder.
+- Two career slots (`fw_save_1`, `fw_save_2`; `fw_slot` is the active one), autosaved to `localStorage`. `loadCode` is tolerant: missing fields fall back to defaults taken from the snapshot `S0` (`snapS`), and a code that fails to load is kept as `fw_bak_N`.
+- `12-save-vault.js` keeps a rolling vault copy (`fw_vault`), and handles export/import and Firebase project moves.
+- Cloud saves (`86-google-signin.js`, `86-vault-cloud.js`): when signed in, careers live under `fw_u_{uid}_save_N` and Firestore holds a second copy; on sign-in the **cloud save wins** over a guest career, and a cloud load never overwrites a career with an empty or unreadable one. Signing out keeps the cloud copy and the device careers.
+- `12-reset.js` holds the scheduled fresh start (`RS`) with Founder rewards (`206`, `209-founder-cloud`).
+- Adding a saved field: add a default in `S` (`02-data.js`) so old saves load, never rely on it existing, and bump nothing in the codec.
+
+## 6. Development guidance
+
+**Where to look**
+- Money/price balance → `02-data.js` tuning block, `101-economy-labels.js` (`UPX`), `210-economy-rebalance.js`.
+- Making a song → `34`, `130`, `165`, `187`, `13`. New song UI step → `165-song-menu.js`.
+- A shop's stock → the catalogue file for it (`22`/`50`/`61` clothes, `52`/`197` gear, `79`/`182` furniture).
+- Artist chat behaviour → `30-npc-chat.js` (parser), `102-messaging.js`, `33-haggle.js`.
+- A bug in a named function → `grep -n "function name\|name=" *.js dev/*.js`, read the **last** match in tag order.
+- Abroad cities → `150`/`151`/`152`/`179`/`192`; home city → `16`/`38`/`42`/`55`/`91`/`93`.
+- UI colours/classes → `docs/THEMES.md` and `style.css` before touching any app UI.
+
+**Most interconnected files** (change with care): `02-data.js` (`S`), `05-game-flow.js`, `07-input-loop.js`, `16-big-world-fame-chat-instagrime-v2.js`, `22-v8-clothes-wardrobe-big-catalogues-pixel.js`, `29-v26.js`, `12-save-load.js`, `161-multiplayer.js`.
+
+**Adding a feature safely**
+1. Prefer a new small `NNN-name.js` over editing a giant file; use the next free number, put its tag where its dependencies are already loaded (usually before `27-boot` unless it patches boot output), and give it a version + purpose header comment.
+2. Wrap/patch an existing function by saving the old one (`const _old=fn; fn=function(...a){...;return _old.apply(this,a)}`), as existing files do.
+3. Keep new state inside a single global object (like `TRAVEL`, `UPX`) rather than many loose globals, and persist it under `S`.
+4. Register the tag in `index.html` with `?v=` and bump `GAME_VERSION` and `VERSION_HISTORY`.
+5. Update the system table above if a new system or file appears.
+
+**Testing** (no framework; tools in `tools/`)
+- `node tools/check-globals.js` (needs `acorn`, `eslint-scope`): duplicate declarations, early reads, syntax newer than ES2020. Baseline: **18 UNDEFINED reports, no CLASH/SYNTAX errors**, all pre-existing (not yet investigated; likely names that are guarded or defined in a closure). New reports are regressions.
+- `node tools/seal-test.js`: save codec and tamper checks.
+- `node tools/music-test.js`: beat engine variety checks.
+- `node tools/load-test.js [url]`: headless boot, new career, open phone apps, save; prints page errors. Serve with `python3 -m http.server 8099`.
+- `node tools/wiki-data.js` refreshes `wiki/data.js` from the live game (also runs in deploy).
+- Manual: new career, make and release a song, save, reload and load the save, sign-in and cloud save if touched.
