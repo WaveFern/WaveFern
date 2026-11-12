@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v49.98.0';
+const GAME_VERSION='v49.99.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v49.99.0',n:'The Song recorded screen is now the same size and in the same place as the minigame panel, so finishing a song flows straight on from playing it. It lists your score for each minigame, and a run of 90% or more with no weak game turns it gold as a Perfect song. Saves still load.'},
  {v:'v49.98.0',n:'Ten new song minigames replace the fixed Beat, Lyrics and Mix steps: Beat Match, Tempo Tap, Sound Catcher, Sample Search, Perfect Mix, Crowd Control, Rhythm Memory, Vinyl Rush, DJ Scratch and Melody Builder. Each lasts 15 seconds at most and is the same difficulty at every level. You start with one; your Studio Level unlocks 2, 4, 6, 8 and finally all 10, and a song uses 1 to 6 of them in a random order. Higher Studio Levels also raise the quality a great performance can reach. Band rooms still use the old steps. Saves still load.'},
  {v:'v49.97.0',n:'The gear shop now has six categories: Bass, Keys, Microphone, Room, Drums and Getting Heard. All your existing gear is filed under them and nothing was removed. Your gear also sets a Studio Level from 1 to 6 (shown at the top of the shop), worked out from what you already own, so existing players keep the progress they earned. Higher levels will unlock more song minigames. Saves still load.'},
  {v:'v49.96.1',n:'Behind the scenes: the old 22-v8 script is split into six smaller topic files (wardrobe and catalogues, post pictures, clothes colours, album covers, towers, home annex). Nothing in the game changed. Saves still load.'},
