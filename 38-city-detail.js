@@ -74,9 +74,14 @@ function boxGeo(L){const cc=new THREE.Color(),N=L.length,Pp=new Float32Array(N*3
 /* tall towers between the camera and you were sliced diagonally by the camera's near plane (-20): push it back */
 cam.near=-80;cam.updateProjectionMatrix();
 /* v50.8.2: a fading tower used to flicker and pop: the box and its detail mesh were both sorted as see-through objects by their own centres, so which one drew first flipped as the camera moved, and the box stayed "transparent" for ever. Now the box always draws before its details, and is only see-through while it is actually faded. */
-{const f0=fadeT;let rdOk=0;fadeT=function(dt){f0(dt);
+{const f0=fadeT;let rdOk=0;fadeT=function(dt){f0(dt);CT.forEach(c=>{c.mat.depthWrite=true;if(c.dm)c.dm.depthWrite=true});
  if(rdOk!==CT.length){rdOk=CT.length;const mp=new Map(CT.map(c=>[c.mat,c]));scene.traverse(o=>{if(!o.isMesh)return;const c=mp.get(o.material);if(c){o.renderOrder=1;c.mat.polygonOffset=true;c.mat.polygonOffsetFactor=1;c.mat.polygonOffsetUnits=1}else{const d=CT.find(q=>q.dm===o.material);if(d)o.renderOrder=2}})}
- CT.forEach(c=>{const m=c.mat,tr=m.opacity<.999;if(m.transparent!==tr){m.transparent=tr;m.needsUpdate=true}if(c.dm){c.dm.opacity=m.opacity;c.dm.depthWrite=m.depthWrite;if(c.dm.transparent!==tr){c.dm.transparent=tr;c.dm.needsUpdate=true}}})}}
+ CT.forEach(c=>{dtherFade(c.mat,c);if(c.dm)dtherFade(c.dm,c)})}}
+/* v50.9.0: the see-through fade used real transparency, so a fading tower was drawn in the see-through pass: it was sorted against every other see-through thing (name tags, glass, smoke, other fading towers) by its centre, it stopped writing depth, and its shader was rebuilt every time it started or stopped fading. That is what made buildings flash, go fully invisible and mess up what was drawn behind them. Now a tower is always a solid object and "fading" just dithers it (a checker of holes whose size follows the fade), so the depth buffer and draw order never change. */
+function dtherFade(m,c){if(m.dth)return;m.dth=1;m.transparent=false;m.depthWrite=true;m.needsUpdate=true;
+ m.onBeforeCompile=function(sh){sh.uniforms.uFade={get value(){return .25+.75*Math.max(0,Math.min(1,c.mat.opacity))}};
+  sh.fragmentShader='uniform float uFade;\nfloat dthB2(vec2 a){return mod(2.*a.x+3.*a.y,4.);}\nfloat dthB4(vec2 p){vec2 l=mod(floor(p),2.),h=mod(floor(p/2.),2.);return (4.*dthB2(l)+dthB2(h)+.5)/16.;}\n'+sh.fragmentShader.replace('void main() {','void main() {\n if(uFade<.999&&dthB4(gl_FragCoord.xy)>=uFade)discard;')};
+ m.customProgramCacheKey=function(){return 'dthfade'}}
 /* tower details are one mesh per tower whose material follows the tower's see-through fade (19-v6...js fadeT),
    so a faded tower does not leave its ledges, roof and shop front hanging in front of you */
 function cdTower(c){const T=[],tb=(...a)=>T.push(a),w=c.x1-c.x0,d=c.z1-c.z0,h=c.h,cx=(c.x0+c.x1)/2,fz=c.z1,col='#'+c.mat.color.getHexString(),dc=dk(col,.72);
