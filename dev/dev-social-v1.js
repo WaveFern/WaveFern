@@ -28,15 +28,14 @@
   '#ttl .fwsoc a:hover{transform:scale(1.15);background:#14301a}#ttl .fwsoc a:active{transform:scale(.95)}'+
   '#ttl .fwsoc a:focus-visible{outline:2px solid #fff;outline-offset:2px;background:#14301a}'+
   '@media(pointer:coarse){#ttl .fwsoc a{width:34px;height:34px}}'+
-  /* phones (narrow screens, or short landscape touch screens): the row leaves its fixed corner, where it covered the menu buttons and the footer, and sits in the menu column under the buttons as a compact centred row. The menu may then scroll (safe centring) and keeps room for the notch, home bar and footer line. Desktop is unchanged. */
+  /* phones (narrow screens, or short landscape touch screens): the social row is hidden completely (desktop keeps it in the bottom right corner). The menu may then scroll (safe centring) and keeps room for the notch, home bar and footer line. Desktop is unchanged. */
   '@media(max-width:760px),(pointer:coarse) and (max-height:600px){'+
   '#ttl{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(max(10px,env(safe-area-inset-bottom)) + 26px) max(16px,env(safe-area-inset-left))}'+
   '#ttl .ttm{margin:auto 0}'+
-  '#ttl .fwsoc{position:static;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0 0}'+
-  '#ttl .fwsoc a{width:40px;height:40px}#ttl .fwsoc a svg{width:22px;height:22px}}';
+  '#ttl .fwsoc{display:none}}';
 function add(){
   const t=document.getElementById('ttl'),m=t&&t.querySelector('.ttm');
-  if(!m||m.querySelector('.fwsoc'))return;
+  if(!m||t.querySelector('.fwsoc'))return;
   if(!document.getElementById('fwsoc-css')){const s=document.createElement('style');s.id='fwsoc-css';s.textContent=CSS;document.head.appendChild(s)}
   const ul=document.createElement('ul');ul.className='fwsoc';ul.setAttribute('aria-label','WaveFern on social media');
   LINKS.forEach(l=>{
@@ -44,6 +43,6 @@ function add(){
    const a=document.createElement('a');a.href=l[3];a.target='_blank';a.rel='noopener noreferrer';
    a.title=l[1]+' '+l[2];a.setAttribute('aria-label',l[1]+' '+l[2]+' (opens in a new tab)');a.innerHTML=icon(l[0]);
    li.appendChild(a);ul.appendChild(li)});
-  m.appendChild(ul)}
+  t.appendChild(ul)}
  const t0=titleUI;titleUI=function(){const r=t0.apply(this,arguments);try{add()}catch(e){console.error('social',e)}return r};
 })();
