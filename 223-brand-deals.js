@@ -69,16 +69,19 @@ const placeOf=id=>{try{return id&&id!='home'?wtPlace(wtDest(id)):'your home city
 BRD.place=o=>placeOf(o.d);
 const CAMP={sneaker:'sneaker',drink:'summer drinks',eyewear:'eyewear',streetwear:'streetwear drop',denim:'denim',audio:'headphone',sportswear:'sportswear',tech:'tech',luxury:'luxury'};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
+/* each brand writes through a named agent with a face of their own */
+const AGN=['Dana Reyes','Marcus Hale','Priya Nair','Jonas Weber','Chloe Martin','Theo Bianchi','Aiko Tanaka','Sam Okafor','Lena Novak','Rafael Costa'];
+BRD.agent=function(o){const b=BRD.by(o.b);if(!o.ag||!o.ag.n){let cfg=null;try{cfg=fCfg()}catch(e){}o.ag={n:pick(AGN),cfg}}o.ag.from=o.ag.n+' · '+b.n;return o.ag};
 function mk(){const s=st(),b=pickBrand();if(!b)return;const d=HQC[b.id];
  const pay=Math.max(FLOOR[b.t],Math.round(monthly()*(.8+Math.random()*.8)/100)*100)*1.2,
   o={id:S.nid++,b:b.id,k:'trip',d,pay:Math.round(pay/100)*100,exp:S.day+EXPIRE,st:0,due:0,brief:{mood:pick(BRD.mood),light:pick(BRD.light)}};
  s.list.push(o);s.last=S.day;if(s.list.length>24)s.list=s.list.filter(q=>q.st<2||q.st==3&&q.res).slice(-24);
  const pl=BRD.place(o),open=(S.artist||'there');
- const A=['Hi '+open+', it is the partnerships team at '+b.n+'. ','Hello '+open+'. '+b.n+' here (partnerships). '];
- let t=pick(A)+'We have watched you rise to Fame Level '+fl()+' and we want you as the face of our next '+CAMP[b.cat]+' campaign. It is one photoshoot day at our own headquarters in '+pl+', in our studio. Fee: '+fm(o.pay)+', paid when the shoot wraps, and the photos go on your Instagrime tagged as a partnership. ';
+ const ag=BRD.agent(o),A=['Hi '+open+', it is '+ag.n.split(' ')[0]+', the partnerships agent at '+b.n+'. ','Hello '+open+'. '+ag.n+' here, I handle sponsorships for '+b.n+'. '];
+ let t=pick(A)+'We at '+b.n+' have watched you rise to Fame Level '+fl()+' and we want you as the face of our next '+CAMP[b.cat]+' campaign. It is one photoshoot day at our own headquarters in '+pl+', in our studio. Fee: '+fm(o.pay)+', paid when the shoot wraps, and the photos go on your Instagrime tagged as a partnership. ';
  t+='We pay for everything: your Swiftwing flight out (booked and checked in the moment you accept), a company car in the city, and your flight home. ';
  t+='Our brief: a '+o.brief.mood.toLowerCase()+' mood with '+o.brief.light.toLowerCase()+' lighting. This offer stands for '+EXPIRE+' days.';
- S.msgs.push({id:S.nid++,from:b.n+' Partnerships',state:9,unread:1,day:S.day,bd:o.id,body:t});
+ S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:t});
  S.hqLink=1;
  try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}}
 
@@ -90,7 +93,7 @@ function flightFor(from,to,lead){const n=T().now();return T().upcoming(from,80).
 BRD.dayWord=f=>{const d=T().dayOf(f.dep)-T().dayOf(T().now());return d<=0?'today':d==1?'tomorrow':'in '+d+' days'};
 
 /* ---------- accept / decline ---------- */
-function note(o,body){const b=BRD.by(o.b);S.msgs.push({id:S.nid++,from:b.n+' Partnerships',state:9,unread:1,day:S.day,bd:o.id,body})}
+function note(o,body){S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body})}
 function book(o){const b=BRD.by(o.b),f=flightFor('home',o.d,TICKET_LEAD);if(!f)return null;
  const tk=giveTicket(f,o.b);o.tk=tk.id;o.due=S.day+4;o.st=1;
  note(o,'Confirmed. Your '+tk.fl+' ticket to '+placeOf(o.d)+' is booked and checked in: Gate '+tk.gate+', seat '+tk.seat+', boarding '+T().hm(tk.dep-120)+', gate closes '+T().hm(tk.dep-10)+' ('+BRD.dayWord(f)+'). Be at the airport. When you land a company car takes you to our HQ, and we cover the flight home too. Miss the gate and we have to give the slot to another artist.');
@@ -120,10 +123,10 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Messages: logo as the profile picture, Accept / Decline buttons ---------- */
 {const pm=PA.msg;PA.msg=function(){let h=pm.apply(this,arguments);if(typeof h!='string')return h;
  try{const L=S.msgs.filter(m=>m.bd!=null);
-  L.forEach(m=>{const o=job(m.bd);if(!o)return;const lg=BRD.logo(o.b,64);
+  L.forEach(m=>{const o=job(m.bd);if(!o)return;const ag=BRD.agent(o);let lg=BRD.logo(o.b,64);try{if(ag.cfg)lg=pfp(ag.cfg)}catch(e){}
    h=h.replace(new RegExp('(onclick="openChat\\('+m.id+'\\)">)<img src="[^"]*"'),'$1<img src="'+lg+'" style="border-radius:50%"');
    if(S.chat==m.id){h=h.replace(/(<div class=cvh>(?:<button[^>]*>[^<]*<\/button>)?)<img src="[^"]*"/,'$1<img src="'+lg+'" style="border-radius:50%"');
-    const b=BRD.by(o.b),sub=b.n+' · official brand account';h=h.replace(/(<div class=cvh>[\s\S]*?<br><small[^>]*>)[^<]*/,'$1'+sub);
+    const b=BRD.by(o.b),sub=ag.n+' · agent for '+b.n;h=h.replace(/(<div class=cvh>[\s\S]*?<br><small[^>]*>)[^<]*/,'$1'+sub);
     if(!(S.apps&&S.apps.hq))h=h.replace('<div class=cin','<div class=cfm><span>'+esc(b.n)+' sent a link: Label HQ app</span><button class=go onclick="bdGetHQ()">Download Label HQ</button></div><div class=cin');
     if(o.st==0&&S.day<=o.exp)h=h.replace(/<div class=cin><small[^>]*>Official account\. No replies\.<\/small><\/div>/,`<div class=cin style="gap:8px;padding:8px"><button class=go onclick="bdAccept(${o.id})">Accept ${fm(o.pay)} shoot + paid trip</button><button onclick="bdDecline(${o.id})">Decline</button></div>`);
     else h=h.replace(/Official account\. No replies\./,o.st==2?'You declined this offer.':o.st==3?'Shoot done. Thanks!':o.st==1?'Deal accepted. Fly to their HQ.':o.st==5?'This deal has fallen through.':o.st==4?'This offer has expired.':'Official account. No replies.')}})}catch(e){console.error('brand msg',e)}
