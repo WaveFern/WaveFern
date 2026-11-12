@@ -31,19 +31,22 @@
  scene.add(sun.target);
  const sunOff=sun.position.clone();
  sun.shadow.bias=-.0004;sun.shadow.normalBias=.03;
- let applied='',frame=0,shRange=0;
+ let applied='',frame=0,shRange=0,shOn=false,cgOn=true,shK='',shForce=true,lastSh=0,maxTex=2048;try{maxTex=renderer.capabilities.maxTextureSize||2048}catch(e){}
+ /* Settings > Graphics (122-graphics.js) sets shadow quality, distance and the colour grade: sh 0 off, 1-4 = 512/1024/2048/4096; shd 0/1/2 = near/normal/far; cg 1/0 */
+ const gcfg=()=>{try{const c=gfxCur();return{sh:c.sh==null?3:+c.sh,shd:c.shd==null?1:+c.shd,cg:c.cg==null?1:+c.cg}}catch(e){return{sh:3,shd:1,cg:1}}};
  function apply(){
-  const on=lv!='off',mx=lv=='max';
-  renderer.shadowMap.enabled=on;renderer.shadowMap.type=THREE.BasicShadowMap;
-  sun.castShadow=on;
-  const sz=mx?2048:1024;
-  if(sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  cv.style.filter=on?'contrast(1.08) saturate('+TONES[tone].sat+') brightness(.98)':'';
-  vg.style.display=on?'block':'none';
+  const g=gcfg(),on=lv!='off',mx=lv=='max',wasSh=shOn;
+  shOn=on&&g.sh>0;cgOn=!!g.cg;shK=g.sh+'|'+g.cg;shForce=true;
+  renderer.shadowMap.enabled=shOn;renderer.shadowMap.type=THREE.BasicShadowMap;renderer.shadowMap.autoUpdate=false;
+  sun.castShadow=shOn;
+  const sz=Math.min(maxTex,mx?[0,512,1024,2048,4096][g.sh]||2048:1024);
+  if(shOn&&sun.shadow.mapSize.x!=sz){sun.shadow.mapSize.set(sz,sz);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
+  cv.style.filter=on&&cgOn?'contrast(1.08) saturate('+TONES[tone].sat+') brightness(.98)':'';
+  vg.style.display=on&&cgOn?'block':'none';
   bc.style.display='none';
   if(!on){hemi.intensity=0;sun.position.copy(sunOff);sun.target.position.set(0,0,0)}
   /* materials need to rebuild when shadows switch on or off */
-  scene.traverse(o=>{if(o.isMesh){if(o.material&&!Array.isArray(o.material))o.material.needsUpdate=true}});
+  if(wasSh!=shOn)scene.traverse(o=>{if(o.isMesh){if(o.material&&!Array.isArray(o.material))o.material.needsUpdate=true}});
   applied=lv;mark(true);
   try{localStorage.setItem(KEY,lv)}catch(e){}
   refresh();
@@ -51,7 +54,7 @@
  /* flag meshes that should cast / receive shadows: solid lit (Lambert) meshes only; glass, sky, beams and glow stay out */
  const done=new WeakSet();
  function mark(all){
-  const on=lv!='off';
+  const on=shOn;
   scene.traverse(o=>{
    if(!o.isMesh)return;
    if(!all&&done.has(o))return;done.add(o);
@@ -62,7 +65,8 @@
  }
  function frameFx(){
   if(lv=='off')return;
-  const a=Math.max(1.4,innerWidth/innerHeight),r=Math.max(10,Math.min(60,viewH*a*.62+6));
+  const g=gcfg();if(shK!=g.sh+'|'+g.cg)apply();
+  const a=Math.max(1.4,innerWidth/innerHeight),r=Math.max(10,Math.min(80,(viewH*a*.62+6)*[.6,1,1.4][g.shd==null?1:g.shd]));
   /* shadow box follows the camera, snapped to a grid so shadows do not shimmer when it moves */
   const q=lv=='max'?.25:.5,tx=Math.round(camT.x/q)*q,tz=Math.round(camT.z/q)*q;
   sun.position.set(tx+sunOff.x*1.3,sunOff.y*1.3,tz+sunOff.z*1.3);sun.target.position.set(tx,0,tz);
@@ -81,6 +85,8 @@
    const d=Math.max(0,Math.min(1,(a0-.55)/.2));ac0.copy(amb.color);sc0.copy(sun.color);
    amb.intensity=a0*(.84-.09*d)*BR[bri];sun.intensity=s0*(1.32-.42*d)*BR[bri];
    const T=TONES[tone];AW.setHex(T.aw);SW.setHex(T.sw);amb.color.lerp(AW,T.a*d);sun.color.lerp(SW,T.s*d)}}
+  /* the shadow map is redrawn at most about 60 times a second (fast screens do not need more) and not at all while the game is paused */
+  if(dp&&shOn){const n=performance.now();if(shForce||(n-lastSh>=14&&!(typeof PAUSED!='undefined'&&PAUSED))){renderer.shadowMap.needsUpdate=true;lastSh=n;shForce=false}}
   let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0;amb.color.copy(ac0);sun.color.copy(sc0)}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
   if(GLOW&&lv=='max'&&c===cam&&!(frame&1))try{bx.drawImage(cv,0,0,bc.width,bc.height)}catch(e){}
