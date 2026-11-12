@@ -132,28 +132,47 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
     else h=h.replace(/Official account\. No replies\./,o.st==2?'You declined this offer.':o.st==3?'Shoot done. Thanks!':o.st==1?'Deal accepted. Fly to their HQ.':o.st==5?'This deal has fallen through.':o.st==4?'This offer has expired.':'Official account. No replies.')}})}catch(e){console.error('brand msg',e)}
  return h}}
 
-/* ---------- Label HQ: Brand deals tab ---------- */
-const STT=['Offer','In progress','Declined','Done','Expired','Fell through'];
+/* ---------- Label HQ (v51.7.0): a plain corporate web portal. No pictures: type, hairline rules, tables and cards.
+   Tabs: Brand deals | Labels | Team (once signed). A signed label sets the accent colour and the type of the wordmark (THM).
+   The layout follows the width of the app window (container queries), so it works maximised, windowed and on phones. ---------- */
+const STT=['Offer','In progress','Declined','Completed','Expired','Fell through'],STK=['ac','ac','','ok','','bad'];
 const cityOf=id=>{try{const d=wtDest(id);return d.city||d.country}catch(e){return''}};
-function row(o,btns){const b=BRD.by(o.b);return`<div class="bdrow${o.st==1?' act':''}"><img class=lg src="${BRD.logo(o.b,64)}"><div class=tx><b>${esc(b.n)}</b><small>${esc(b.cat)} campaign · HQ in ${esc(BRD.place(o))}</small><small>${fm(o.pay)} · ${o.brief.mood} mood, ${o.brief.light} light${o.st==0?' · expires Day '+o.exp:''}${o.st>=2?' · '+STT[o.st]+(o.res?' · paid '+fm(o.res.pay):''):''}</small></div>${btns?`<div class=bt>${btns}</div>`:''}</div>`}
+const THM={disc:{a:'#b42318',f:'"Arial Black","Helvetica Neue",Arial,sans-serif',t:'uppercase',w:900,s:'.02em'},
+ flip:{a:'#b54708',f:'Impact,"Haettenschweiler","Arial Narrow Bold",sans-serif',t:'uppercase',w:400,s:'.06em'},
+ brick:{a:'#9c4221',f:'Rockwell,"Roboto Slab","Courier New",serif',t:'none',w:700,s:'0'},
+ north:{a:'#0b6b93',f:'"Helvetica Neue",Helvetica,Arial,sans-serif',t:'uppercase',w:300,s:'.22em'},
+ merid:{a:'#4f3cc9',f:'Georgia,"Times New Roman",serif',t:'none',w:400,s:'.04em',v:'small-caps'},
+ crown:{a:'#8a6a12',f:'Didot,"Bodoni 72","Bodoni MT",Georgia,serif',t:'uppercase',w:400,s:'.16em'}};
+const ini=n=>String(n).replace(/[^A-Za-z& ]/g,'').split(/\s+/).filter(w=>w&&!/^(by|and|the|of|&)$/i.test(w)).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'?';
+const bm=b=>`<span class=lh-mg style="--bc:${b.c}">${esc(ini(b.n))}</span>`;
+const lm=l=>`<span class=lh-mg style="--bc:${(THM[l.id]||{}).a||'#1f3a5f'}">${esc(ini(l.n))}</span>`;
+const pill=(t,k)=>`<span class="lh-pill ${k||''}">${t}</span>`;
+const kpi=(k,v,s)=>`<div class=lh-kpi><span>${k}</span><b>${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+const phead=(eb,t,lede)=>`<div class=lh-ph><div class=lh-eb>${eb}</div><div class=lh-h1>${t}</div>${lede?`<p class=lh-lede>${lede}</p>`:''}</div>`;
+const sec=(t,meta,body)=>`<section class=lh-sec><div class=lh-sh><div class=lh-h2>${t}</div>${meta?`<span class=lh-meta>${meta}</span>`:''}</div>${body}</section>`;
+const empty=t=>`<div class=lh-empty>${t}</div>`;
+const td=(l,v,c)=>`<td data-l="${l}"${c?` class=${c}`:''}>${v}</td>`;
+const bcell=(b,sub)=>`<div class=lh-bn>${bm(b)}<div><b>${esc(b.n)}</b>${sub?`<small>${sub}</small>`:''}</div></div>`;
 /* the four stages of a trip, with the current one lit */
 function steps(o){const tr=T(),tk=tr?tr.st().tickets.find(q=>q.id===o.tk):null,there=tr&&tr.loc()==o.d,hqIn=BRD.inStudio&&BRD.inStudio();
  const cur=hqIn?2:there?1:0,L=['Flight out','Car to HQ','Photoshoot','Flight home'];
  const msg=cur==0?(tk&&tk.st=='booked'?'Flight '+esc(tk.fl)+' · Gate '+tk.gate+' · boards '+tr.hm(tk.dep-120)+' · gate closes '+tr.hm(tk.dep-10)+'. Everything is paid for.':'Fly to '+esc(BRD.place(o))+'.')
   :cur==1?'You are in '+esc(cityOf(o.d))+'. A company car waits outside the airport, or walk: the HQ is marked on the city map. Walk through the front door to reach the studio.':'You are in the studio. Press Start the photoshoot by the camera.';
- return`<div class=bdsteps>${L.map((n,i)=>`<span class="${i<cur?'dn':i==cur?'on':''}">${i+1}. ${n}</span>`).join('')}</div><p class=m style="margin:6px 0 0">${msg}</p>`}
-function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),past=s.list.filter(o=>o.st>=2).slice(-8).reverse();
- const ban=BRD.facade?`<img class=bdban src="${BRD.facade(act?act.b:null,act?BRD.place(act):null)}">`:'';
- let side=`<div class=bdst><span><small>Brand shoots</small><b>${s.done}</b></span><span><small>Earned</small><b>${fm(s.earned)}</b></span><span><small>Fame Level</small><b>${L}</b></span></div>`;
- side+='<h3>Active shoot</h3>'+(act?`${row(act)}${steps(act)}`:`<p class=m>No shoot booked. ${L<FAME[0]?'Brands start writing at Fame Level '+FAME[0]+'.':'Brands write now and then as your fame grows. Every deal is at the brand\'s own HQ abroad and the brand pays for the whole trip.'}</p>`);
- let h=`<div class=hqx><div class=bdtop><div class=bdhero>${ban}</div><div class=bdside>${side}</div></div>`;
- h+='<h3>Offers</h3>'+(offs.length?`<div class=bdlist>${offs.map(o=>row(o,`<button class=go onclick="bdAccept(${o.id})">Accept</button><button onclick="bdDecline(${o.id})">Decline</button>`)).join('')}</div>`:`<p class=m>${L<FAME[0]?'Brands start writing at Fame Level '+FAME[0]+'.':'No offers right now.'}</p>`);
- if(past.length)h+='<h3>Past deals</h3><div class=bdlist>'+past.map(o=>row(o)).join('')+'</div>';
- h+='<h3>Brands</h3><div class=bdg>'+BR.map(b=>{const lk=FAME[b.t]>L;return`<div class="${lk?'lk':''}"><img src="${BRD.logo(b.id,64)}"><b>${esc(b.n)}</b><small>HQ ${esc(cityOf(HQC[b.id]))}</small><small>${lk?'Fame '+FAME[b.t]:'Open'}</small></div>`}).join('')+'</div></div>';return h}
-/* ---- Label HQ: Brand deals | Labels | Team (once signed). Each record label themes the whole app. ---- */
-const COL={disc:['#e05252','#2a1517'],flip:['#ffb300','#2a2211'],brick:['#d2763f','#2a1c14'],north:['#5ac8fa','#102230'],merid:['#9c7bff','#1a1633'],crown:['#e6b422','#1f1b3a']};
-const LROWS=['....GG....','...GGGG...','..NNNNNN..','..NWNNWN..','..NNNNNN..','..NWNNWN..','..NNNNNN..','..NWNNWN..','..NNDDNN..','KKKKDDKKKK'];
-const LIC={};const lIc=id=>LIC[id]||(LIC[id]=mkIc(LROWS,{G:COL[id][0],N:COL[id][0]+'99',W:'#ffffffcc',D:COL[id][0],K:'#1a1d2b'}));
+ return`<ol class=lh-steps>${L.map((n,i)=>`<li class="${i<cur?'dn':i==cur?'on':''}"><i>${i<cur?'&#10003;':i+1}</i><span>${n}</span></li>`).join('')}</ol><p class=lh-note><b>Next step.</b> ${msg}</p>`}
+function actCard(o){const b=BRD.by(o.b);
+ return`<div class="lh-card lh-act"><div class=lh-acth>${bm(b)}<div class=lh-grow><div class=lh-h3>${esc(b.n)}</div><div class=lh-mut>${esc(b.cat)} campaign · ${esc(BRD.place(o))}</div></div><div class=lh-fee><span>Fee</span><b>${fm(o.pay)}</b></div></div>
+ <dl class=lh-dl><div><dt>Creative brief</dt><dd>${esc(o.brief.mood)} mood, ${esc(o.brief.light)} light</dd></div><div><dt>Location</dt><dd>Brand HQ, ${esc(BRD.place(o))}</dd></div><div><dt>Travel</dt><dd>Flights and car paid by the brand</dd></div><div><dt>Status</dt><dd>${pill('In progress','ac')}</dd></div></dl>${steps(o)}</div>`}
+function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),past=s.list.filter(o=>o.st>=2).slice(-8).reverse(),early=L<FAME[0];
+ let h=phead('Partnerships','Brand deals','Brands book you for one photoshoot day at their own headquarters abroad. Every trip is paid for by the brand, and the fee is set by your recent income.');
+ h+=`<div class=lh-kpis>${kpi('Completed shoots',s.done)}${kpi('Earned from brands',fm(s.earned))}${kpi('Open offers',offs.length)}${kpi('Fame Level',L,early?'Brands write from Level '+FAME[0]:'')}</div>`;
+ h+=sec('Active engagement',act?'1 booking':'',act?actCard(act):empty(early?'Brands start writing at Fame Level '+FAME[0]+'.':'No shoot booked. Brands write now and then as your fame grows. Every deal is at the brand\'s own HQ abroad and the brand pays for the whole trip.'));
+ h+=sec('Open offers',offs.length?offs.length+' awaiting reply':'',offs.length?`<div class=lh-tw><table class=lh-t><thead><tr><th>Brand</th><th>Location</th><th>Creative brief</th><th>Expires</th><th class=lh-r>Fee</th><th class=lh-r>Action</th></tr></thead><tbody>${offs.map(o=>{const b=BRD.by(o.b);
+   return`<tr>${td('Brand',bcell(b,esc(b.cat)+' campaign'))}${td('Location',esc(BRD.place(o)))}${td('Brief',esc(o.brief.mood)+' mood, '+esc(o.brief.light)+' light')}${td('Expires','Day '+o.exp)}${td('Fee','<b>'+fm(o.pay)+'</b>','lh-r')}<td class="lh-r lh-acts"><button class="lh-btn pri" onclick="bdAccept(${o.id})">Accept</button><button class=lh-btn onclick="bdDecline(${o.id})">Decline</button></td></tr>`}).join('')}</tbody></table></div>`:empty(early?'Brands start writing at Fame Level '+FAME[0]+'.':'No offers right now. New offers arrive in Messages.'));
+ if(past.length)h+=sec('History','Last '+past.length,`<div class=lh-tw><table class=lh-t><thead><tr><th>Brand</th><th>Location</th><th>Status</th><th class=lh-r>Fee</th></tr></thead><tbody>${past.map(o=>{const b=BRD.by(o.b);
+   return`<tr>${td('Brand',bcell(b,esc(b.cat)))}${td('Location',esc(BRD.place(o)))}${td('Status',pill(STT[o.st],STK[o.st]))}${td('Fee',o.res?'<b>'+fm(o.res.pay)+'</b>':'<span class=lh-mut>'+fm(o.pay)+'</span>','lh-r')}</tr>`}).join('')}</tbody></table></div>`);
+ h+=sec('Brand directory',BR.filter(b=>FAME[b.t]<=L).length+' of '+BR.length+' open to you',`<div class=lh-dir>${BR.map(b=>{const lk=FAME[b.t]>L;
+   return`<div class="lh-dc${lk?' lk':''}">${bm(b)}<div class=lh-grow><b>${esc(b.n)}</b><small>${esc(cityOf(HQC[b.id]))} · ${esc(b.cat)}</small></div>${lk?pill('Level '+FAME[b.t]):pill('Open','ok')}</div>`}).join('')}</div>`);
+ return h}
 let HQT='deals',HQJ=0;window.bdTab=t=>{HQT=t;pcR()};window.bdOffer=id=>{HQJ=id;pcR()};
 const labels=()=>typeof LABELS_ENABLED!='undefined'&&LABELS_ENABLED&&typeof LABELS!='undefined';
 const offerOf=mid=>S.msgs.find(m=>m.id==mid&&m.lo&&m.lo.st==0);
@@ -161,33 +180,198 @@ const offerOf=mid=>S.msgs.find(m=>m.id==mid&&m.lo&&m.lo.st==0);
 window.bdJoin=function(mid){if(!offerOf(mid)||S.label)return;S.hqLink=1;S.apps=S.apps||{};S.apps.hq=1;HQJ=mid;HQT='labels';openPC();app='hq';pcR()};
 window.bdJoinYes=function(){const mid=HQJ;HQJ=0;if(offerOf(mid)&&!S.label){lbSign(mid);HQT='team'}pcR()};
 window.bdJoinNo=function(){HQJ=0;snd('pop');pcR()};
-function joinCard(){const m=HQJ&&offerOf(HQJ);if(!m||S.label){HQJ=0;return''}const l=lbById(m.lo.id);if(!l)return'';
- return`<div class=bdjoin><img src="${lIc(l.id)}" style="width:44px;image-rendering:pixelated"><div class=tx><b>Do you want to join ${esc(l.n)}?</b><small>${esc(l.pitch)}</small><small>Signing bonus $${l.adv.toLocaleString()} · they keep ${Math.round(l.cut*100)}% of your streaming income · you can leave later for a fee.</small></div><div class=bt><button class=go onclick="bdJoinYes()">Join ${esc(l.n)}</button><button onclick="bdJoinNo()">Not now</button></div></div>`}
-function labelsTab(){const L=S.label,rows=LABELS.map(l=>{const sg=L&&L.id==l.id,off=S.msgs.find(m=>m.lo&&m.lo.id==l.id&&m.lo.st==0),ok=typeof lbElig=='function'&&lbElig(l);
-  const stt=sg?'<b style="color:var(--hqa)">Signed</b>':off?`<button class=go onclick="bdOffer(${off.id})">Offer waiting</button>`:ok?'<small class=m>Eligible. They may send an offer.</small>':`<small class=m>Needs ${l.ml.toLocaleString()} monthly listeners and ${l.st.toLocaleString()} streams${l.rep>0?' and reputation '+l.rep:''}</small>`;
-  return`<div class="bdrow${sg?' act':''}"><img class=lg style="border-radius:6px;image-rendering:pixelated;border:0" src="${lIc(l.id)}"><div class=tx><b>${esc(l.n)}</b> <small style="display:inline">${esc(lbStars(l.q))}</small><small>${esc(l.pitch)}</small><small>Keeps ${Math.round(l.cut*100)}% · signing bonus $${l.adv.toLocaleString()}</small></div><div class=bt>${stt}</div></div>`}).join('');
- return`<div class=hqx>${joinCard()}<p class=m>${L?'You are signed with '+esc(lbCur().n)+'. Leave on the Team tab.':'Labels send offers to Messages when your numbers are high enough. The offer links here.'}</p><div class=bdlist>${rows}</div></div>`}
-const teamTab=()=>{HQAUTH=true;let h=BRD.teamPage?BRD.teamPage():'';return h.replace(/<button onclick="HQAUTH=false;pcR\(\)">Sign out<\/button> ?/,'').replace(/<h1><img [^>]*> Label HQ<\/h1>/,'')};
+function joinCard(){const m=HQJ&&offerOf(HQJ);if(!m||S.label){HQJ=0;return''}const l=lbById(m.lo.id);if(!l)return'';const a=(THM[l.id]||{}).a||'';
+ return`<div class=lh-offer style="--oa:${a}"><div class=lh-eb>Offer received</div><div class=lh-h2>Do you want to join ${esc(l.n)}?</div><p class=lh-lede>${esc(l.pitch)}</p>
+ <dl class=lh-dl><div><dt>Signing bonus</dt><dd>$${l.adv.toLocaleString()}</dd></div><div><dt>Label share</dt><dd>${Math.round(l.cut*100)}% of your streaming income</dd></div><div><dt>Rating</dt><dd class=lh-star>${esc(lbStars(l.q))}</dd></div><div><dt>Term</dt><dd>You can leave later for a fee</dd></div></dl>
+ <div class=lh-btns><button class="lh-btn pri" onclick="bdJoinYes()">Join ${esc(l.n)}</button><button class=lh-btn onclick="bdJoinNo()">Not now</button></div></div>`}
+function labelsTab(){const L=S.label;
+ const rows=LABELS.map(l=>{const sg=L&&L.id==l.id,off=S.msgs.find(m=>m.lo&&m.lo.id==l.id&&m.lo.st==0),ok=typeof lbElig=='function'&&lbElig(l);
+  const stt=sg?pill('Signed','ok'):off?`<button class="lh-btn pri" onclick="bdOffer(${off.id})">Review offer</button>`:ok?pill('Eligible','ac'):`<span class=lh-req>Requires ${l.ml.toLocaleString()} monthly listeners · ${l.st.toLocaleString()} streams${l.rep>0?' · reputation '+l.rep:''}</span>`;
+  return`<tr class="${sg?'sg':''}">${td('Label',`<div class=lh-bn>${lm(l)}<div><b>${esc(l.n)}</b><small>${esc(l.pitch)}</small></div></div>`)}${td('Rating','<span class=lh-star>'+esc(lbStars(l.q))+'</span>')}${td('Label share',Math.round(l.cut*100)+'%','lh-r')}${td('Signing bonus','$'+l.adv.toLocaleString(),'lh-r')}${td('Status',stt,'lh-r')}</tr>`}).join('');
+ return phead('Representation','Record labels',L?'You are signed with '+esc(lbCur().n)+'. You can leave on the Team page.':'Labels send offers to Messages once your numbers are high enough. Each offer links here, where you can review the terms.')
+  +joinCard()+sec('Label directory',LABELS.length+' labels',`<div class=lh-tw><table class="lh-t lh-lt"><thead><tr><th>Label</th><th>Rating</th><th class=lh-r>Label share</th><th class=lh-r>Signing bonus</th><th class=lh-r>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`)}
+/* Team: the label account and the five upgrades of 82-label-hq.js (no login: signing is enough) */
+function teamTab(){hqFill();const l=lbCur();if(!l)return'';const fee=Math.round(l.adv*UPX.leaveFee),s=hqS(),q=hqQ(),hh=hqH(),pr=hqPR(),mxL=hqMax();
+ const up=k=>{const H=HQ[k],lv=hqL(k),mx=lv>=mxL,lk=hqLock(k),c=mx?0:lbCost(H.c[lv]);
+  const btn=mx?`<button class=lh-btn disabled>Top level</button>`:lk?`<button class=lh-btn disabled>Unlocks at Fame Level ${lk}</button>`:`<button class="lh-btn pri" ${S.money<c?'disabled':''} onclick="hqBuy('${k}')">${H.b||'Hire'} · ${$k(c)}</button>`;
+  return`<div class="lh-card lh-up${mx?' mx':''}"><div class=lh-eb>${esc(H.n)}</div><div class=lh-h3>${esc(H.lv[lv])}</div><div class=lh-mut>${esc(H.d)}</div>
+  <div class=lh-lvl>${[1,2,3,4].map(i=>`<i class="${i<=lv?'on':''}${i>mxL?' x':''}"></i>`).join('')}<span>Level ${lv} of ${mxL}</span></div>
+  <dl class=lh-dl1><div><dt>Effect</dt><dd>${hqEff(k)}</dd></div><div><dt>Next</dt><dd>${mx?'None, top level reached':esc(H.lv[lv+1])+(lk?'':' · '+$k(c))}</dd></div></dl>${btn}</div>`};
+ return phead('Your label','Team and studio','Hire your team and build out your studio through '+esc(l.n)+'. Prices and benefits depend on the label, and upgrades unlock as your fame grows.')
+  +`<div class=lh-kpis>${kpi('Balance',$k(S.money))}${kpi('Fame Level',fameLevel())}${kpi('Monthly listeners',S.listeners.toLocaleString())}${kpi('Paid to label',$k(S.lbPaid||0))}</div>`
+  +sec('Account','Signed Day '+((S.label&&S.label.since)||1),`<div class="lh-card lh-acc"><div class=lh-acth>${lm(l)}<div class=lh-grow><div class=lh-h3>${esc(l.n)}</div><div class="lh-mut lh-star">${esc(lbStars(l.q))}</div></div><button class="lh-btn${LBLQ?' dng':''}" onclick="lbLeave()">${LBLQ?'Confirm: leave for $'+fee.toLocaleString():'Leave label'}</button></div>
+  <dl class=lh-dl><div><dt>Label share</dt><dd>${Math.round(l.cut*100)}% of streaming income</dd></div><div><dt>Upgrade prices</dt><dd>×${(UPX.priceBase+UPX.priceQ*l.q).toFixed(2)}</dd></div><div><dt>Team benefits</dt><dd>×${(UPX.benBase+UPX.benQ*l.q).toFixed(2)}</dd></div><div><dt>Highest level</dt><dd>${mxL}</dd></div><div><dt>Exit fee</dt><dd>$${fee.toLocaleString()}</dd></div></dl></div>`)
+  +sec('Team effect','',`<div class=lh-kpis>${kpi('Streams','+'+Math.round(s*100)+'%')}${kpi('Song quality','+'+q)}${kpi('Hit chance','+'+Math.round(hh*100)+'%')}${kpi('Promotions',pr?pr*10+'% cheaper':'Standard',pr?'+'+pr+' day'+(pr>1?'s':''):'')}</div>`)
+  +sec('Upgrades',Object.keys(HQ).length+' roles',`<div class=lh-ups>${Object.keys(HQ).map(up).join('')}</div>`)}
 const h0=PA.hq;BRD.teamPage=h0;
 PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='deals';if(!labels()&&HQT=='labels')HQT='deals';
- const th=L?COL[L.id]:null,sty=th?`--hqa:${th[0]};--hqb:${th[1]};`:'',tabs=`<div class=bdtabs><button class="${HQT=='deals'?'on':''}" onclick="bdTab('deals')">Brand deals</button>${labels()?`<button class="${HQT=='labels'?'on':''}" onclick="bdTab('labels')">Labels${HQJ?' (1)':''}</button>`:''}${L?`<button class="${HQT=='team'?'on':''}" onclick="bdTab('team')">Team</button>`:''}</div>`;
- let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():joinCard()+dealsTab()}catch(e){console.error('label hq',e);body='<p class=m>Label HQ hit a problem. Close and open it again.</p>'}
- return`<div class="bdw${L?' bdth':''}" style="${sty}"><div class=bdhd><h1><img src="${L?lIc(L.id):IC.hq}"> ${L?esc(L.n)+' · ':''}Label HQ</h1>${tabs}</div>${body}</div>`};
-{const st=document.createElement('style');st.textContent=`.bdw{--hqa:#e6b422;width:100%;box-sizing:border-box;min-height:100%}
-.bdw .bdhd{display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap;margin:0 0 10px}.bdw .bdhd h1{margin:0;font-size:28px;display:flex;align-items:center;gap:10px}.bdw .bdhd h1 img{width:34px;image-rendering:pixelated}
-.bdw .bdtabs{display:flex;gap:6px;flex-wrap:wrap}.bdw .bdtabs button{padding:7px 14px}.bdw .bdtabs button.on{background:var(--hqa);color:#0a0a0a;font-weight:700}
-.bdw.bdth{background:linear-gradient(180deg,var(--hqb),#0000 55%);border-radius:8px;padding:10px 14px;box-shadow:inset 0 0 0 2px var(--hqa)}
-.bdw h3{margin:18px 0 8px;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--hqa)}
-.bdw .bdtop{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:16px;align-items:start}@media(max-width:820px){.bdw .bdtop{grid-template-columns:1fr}}
-.bdw .bdhero{border:3px solid #000;border-radius:8px;overflow:hidden;box-shadow:0 5px 0 #0008;background:#000;line-height:0}.bdw .bdban{width:100%;height:auto;display:block;image-rendering:pixelated}
-.bdw .bdside h3{margin-top:6px}.bdw .bdst{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 8px}.bdw .bdst span{background:#151a17;border-radius:8px;padding:8px 10px;min-width:0}.bdw .bdst span small{display:block;color:var(--m);font-size:11px}.bdw .bdst b{display:block;color:var(--hqa);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bdw .bdlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:10px}
-.bdw .bdrow{display:flex;gap:12px;align-items:center;background:#151a17;border-radius:8px;padding:10px 12px;margin:0;min-width:0}.bdw .bdrow img.lg{width:54px;height:54px;border-radius:50%;border:2px solid #000;flex:none;image-rendering:pixelated}
-.bdw .bdrow .tx{flex:1;min-width:0}.bdw .bdrow .tx b{font-size:15px}.bdw .bdrow .tx small{display:block;color:var(--m);margin-top:2px}.bdw .bdrow .bt{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.bdw .bdrow.act{box-shadow:inset 0 0 0 2px var(--hqa)}
-.bdw .bdsteps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:8px}.bdw .bdsteps span{background:#151a17;border-radius:6px;padding:6px 4px;font-size:11px;text-align:center;color:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bdw .bdsteps span.dn{color:var(--hqa)}.bdw .bdsteps span.on{background:var(--hqa);color:#0a0a0a;font-weight:700}
-.bdw .bdg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}.bdw .bdg div{text-align:center;background:#151a17;border-radius:8px;padding:10px 6px;font-size:12px;min-width:0}.bdw .bdg img{width:56px;height:56px;border-radius:50%;border:2px solid #000;display:block;margin:0 auto 6px;image-rendering:pixelated}.bdw .bdg .lk img{filter:grayscale(1) brightness(.5)}.bdw .bdg small{display:block;color:var(--m)}.bdw .bdg b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bdw .bdjoin{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:#151a17;border:2px solid var(--hqa);border-radius:8px;padding:14px;margin:8px 0}.bdw .bdjoin .tx{flex:1;min-width:220px}.bdw .bdjoin small{display:block;color:var(--m);margin-top:3px}.bdw .bdjoin .bt{display:flex;gap:6px}
-.bdw button.go{background:var(--hqa);color:#0a0a0a}.bdw .hqx{border-color:var(--hqa)!important}.bdw .hqx .gpip i.on{background:var(--hqa)}.bdw .hqx .hqc.hqmax{box-shadow:inset 0 0 0 2px var(--hqa)}.bdw .hqx .cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))!important}`;document.head.appendChild(st)}
+ const th=L?THM[L.id]:null,sty=th?`--ac:${th.a};--wf:${th.f};--wt:${th.t};--ww:${th.w};--ws:${th.s};--wv:${th.v||'normal'}`:'';
+ const tab=(k,n,b)=>`<button class="${HQT==k?'on':''}" onclick="bdTab('${k}')">${n}${b?`<em>${b}</em>`:''}</button>`;
+ const nav=tab('deals','Brand deals')+(labels()?tab('labels','Labels',HQJ?1:0):'')+(L?tab('team','Team'):'');
+ let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():joinCard()+dealsTab()}catch(e){console.error('label hq',e);body=empty('Label HQ hit a problem. Close and open it again.')}
+ return`<div class="bdw lhq${L?' lhth':''}" style="${sty}"><header class=lh-top><div class=lh-in><div class=lh-brand><span class=lh-wm>${L?esc(L.n):'Label HQ'}</span><span class=lh-sub>${L?'Artist portal':'Artist services'}</span></div><nav class=lh-nav>${nav}</nav><div class=lh-user><span>${esc(S.artist||'Artist')}</span><b>${fm(S.money)}</b></div></div></header>
+ <main class=lh-main><div class=lh-in>${body}</div></main><footer class=lh-foot><div class=lh-in><span>${L?esc(L.n)+' · ':''}Label HQ</span><span>Artist services · Brand partnerships · Representation</span></div></footer></div>`};
+/* the app fills its window edge to edge */
+{const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('lhqmn',app=='hq'&&!!m.querySelector('.lhq'))}catch(e){}return r}}
+{const st=document.createElement('style');st.textContent=`#pc .lhqmn{padding:0!important;background:#f6f5f1}
+#pc .lhq{--ac:#1f3a5f;--wf:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--wt:none;--ww:600;--ws:.01em;--wv:normal;--bg:#f6f5f1;--sf:#fff;--ln:#e4e1d9;--ln2:#d3cfc4;--ink:#16181d;--mu:#5d6169;--mu2:#8b8e94;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+ container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none}
+#pc .lhq *{box-sizing:border-box}
+#pc .lhq .lh-in{max-width:1160px;margin:0 auto;padding:0 32px;width:100%}
+#pc .lhq .lh-top{background:var(--sf);border-top:3px solid var(--ac);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:2}
+#pc .lhq .lh-top .lh-in{display:flex;align-items:center;gap:28px;min-height:60px}
+#pc .lhq .lh-brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+#pc .lhq .lh-wm{font-family:var(--wf);text-transform:var(--wt);font-weight:var(--ww);letter-spacing:var(--ws);font-variant:var(--wv);font-size:19px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pc .lhq.lhth .lh-wm{color:var(--ac)}
+#pc .lhq .lh-sub{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mu2);margin-top:3px}
+#pc .lhq .lh-nav{display:flex;gap:4px;flex:1;align-self:stretch}
+#pc .lhq .lh-nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0 12px;font:500 13.5px var(--sans);color:var(--mu);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+#pc .lhq .lh-nav button:hover{color:var(--ink)}
+#pc .lhq .lh-nav button.on{color:var(--ink);border-bottom-color:var(--ac);font-weight:600}
+#pc .lhq .lh-nav em{font-style:normal;font-size:10.5px;font-weight:700;background:var(--ac);color:#fff;border-radius:9px;padding:0 6px;line-height:16px}
+#pc .lhq .lh-user{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;font-size:12px;color:var(--mu);white-space:nowrap}
+#pc .lhq .lh-user b{font-size:14px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+#pc .lhq .lh-main{flex:1;padding:36px 0 48px}
+#pc .lhq .lh-ph{margin:0 0 28px;max-width:760px}
+#pc .lhq .lh-eb{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);margin:0 0 6px}
+#pc .lhq .lh-h1{font:400 34px/1.15 var(--serif);letter-spacing:-.01em;color:var(--ink)}
+#pc .lhq .lh-h2{font:600 15px/1.3 var(--sans);color:var(--ink)}
+#pc .lhq .lh-h3{font:600 16px/1.3 var(--sans);color:var(--ink)}
+#pc .lhq .lh-lede{margin:10px 0 0;font-size:15px;line-height:1.6;color:var(--mu)}
+#pc .lhq .lh-mut{color:var(--mu);font-size:13px}
+#pc .lhq .lh-grow{flex:1;min-width:0}
+#pc .lhq .lh-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--sf);border:1px solid var(--ln);border-radius:6px;margin:0 0 32px}
+#pc .lhq .lh-kpi{padding:16px 20px;border-left:1px solid var(--ln);min-width:0}
+#pc .lhq .lh-kpi:first-child{border-left:0}
+#pc .lhq .lh-kpi span{display:block;font-size:11.5px;color:var(--mu);letter-spacing:.02em}
+#pc .lhq .lh-kpi b{display:block;font:400 24px/1.25 var(--serif);color:var(--ink);margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pc .lhq .lh-kpi small{display:block;font-size:11.5px;color:var(--mu2);margin-top:2px}
+#pc .lhq .lh-sec{margin:0 0 36px}
+#pc .lhq .lh-sec .lh-kpis{margin:0}
+#pc .lhq .lh-sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--ink);padding:0 0 8px;margin:0 0 16px}
+#pc .lhq .lh-meta{font-size:12px;color:var(--mu)}
+#pc .lhq .lh-card{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:20px 22px}
+#pc .lhq .lh-empty{background:var(--sf);border:1px dashed var(--ln2);border-radius:6px;padding:22px;color:var(--mu);font-size:13.5px}
+#pc .lhq .lh-mg{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--ln2);border-radius:4px;background:var(--sf);font:600 14px/1 var(--serif);letter-spacing:.03em;color:var(--ink);box-shadow:inset 0 -3px 0 var(--bc)}
+#pc .lhq .lh-acth{display:flex;align-items:center;gap:14px}
+#pc .lhq .lh-fee{text-align:right}
+#pc .lhq .lh-fee span{display:block;font-size:11.5px;color:var(--mu)}
+#pc .lhq .lh-fee b{font:400 24px var(--serif);font-variant-numeric:tabular-nums}
+#pc .lhq .lh-dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;margin:18px 0 0;border-top:1px solid var(--ln)}
+#pc .lhq .lh-dl>div{padding:12px 16px 0 0}
+#pc .lhq dt{font-size:11.5px;color:var(--mu);margin:0}
+#pc .lhq dd{margin:2px 0 0;font-size:13.5px;color:var(--ink)}
+#pc .lhq .lh-dl dd:first-letter{text-transform:uppercase}
+#pc .lhq .lh-steps{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));counter-reset:s}
+#pc .lhq .lh-steps li{position:relative;display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--mu2);padding-right:8px;min-width:0}
+#pc .lhq .lh-steps li:before{content:'';position:absolute;left:26px;right:0;top:11px;height:1px;background:var(--ln2)}
+#pc .lhq .lh-steps li:last-child:before{display:none}
+#pc .lhq .lh-steps li.dn:before{background:var(--ac)}
+#pc .lhq .lh-steps i{position:relative;font-style:normal;width:23px;height:23px;border-radius:50%;border:1px solid var(--ln2);background:var(--sf);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--mu)}
+#pc .lhq .lh-steps li.dn i{background:var(--ac);border-color:var(--ac);color:#fff}
+#pc .lhq .lh-steps li.on i{border:2px solid var(--ac);color:var(--ac)}
+#pc .lhq .lh-steps li.on,#pc .lhq .lh-steps li.dn{color:var(--ink)}
+#pc .lhq .lh-steps li.on span{font-weight:600}
+#pc .lhq .lh-steps span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pc .lhq .lh-note{margin:18px 0 0;padding:12px 14px;background:var(--bg);border-left:2px solid var(--ac);font-size:13.5px;color:var(--ink)}
+#pc .lhq .lh-tw{background:var(--sf);border:1px solid var(--ln);border-radius:6px;overflow:hidden}
+#pc .lhq .lh-t{width:100%;border-collapse:collapse;font-size:13.5px}
+#pc .lhq .lh-t th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);padding:11px 16px;border-bottom:1px solid var(--ln);background:#fbfaf7;white-space:nowrap}
+#pc .lhq .lh-t td{padding:14px 16px;border-bottom:1px solid var(--ln);vertical-align:middle;color:var(--ink)}
+#pc .lhq .lh-t tr:last-child td{border-bottom:0}
+#pc .lhq .lh-t .lh-r{text-align:right}
+#pc .lhq .lh-t td b{font-weight:600;font-variant-numeric:tabular-nums}
+#pc .lhq .lh-t tr.sg td{background:#fbfaf7}
+#pc .lhq .lh-t tr.sg td:first-child{box-shadow:inset 3px 0 0 var(--ac)}
+#pc .lhq .lh-bn{display:flex;align-items:center;gap:12px;min-width:0}
+#pc .lhq .lh-bn b{display:block}
+#pc .lhq .lh-bn small{display:block;font-size:12.5px;color:var(--mu);margin-top:1px}
+#pc .lhq .lh-lt .lh-bn small{max-width:340px}
+#pc .lhq .lh-acts{white-space:nowrap}
+#pc .lhq .lh-acts .lh-btn+.lh-btn{margin-left:8px}
+#pc .lhq .lh-req{font-size:12px;color:var(--mu)}
+#pc .lhq .lh-star{color:var(--ink);letter-spacing:.1em;white-space:nowrap}
+#pc .lhq .lh-pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid var(--ln2);color:var(--mu);white-space:nowrap;background:var(--sf)}
+#pc .lhq .lh-pill.ok{border-color:#a8d5b8;color:#1e6b3c;background:#eef8f1}
+#pc .lhq .lh-pill.ac{border-color:var(--ac);color:var(--ac)}
+#pc .lhq .lh-pill.bad{border-color:#e7b4ae;color:#a12a1e;background:#fcf1ef}
+#pc .lhq .lh-btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 16px;border-radius:4px;border:1px solid var(--ln2);background:var(--sf);color:var(--ink);font:500 13px var(--sans);white-space:nowrap;transition:background .12s,border-color .12s}
+#pc .lhq .lh-btn:hover:not([disabled]){border-color:var(--ink)}
+#pc .lhq .lh-btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+#pc .lhq .lh-btn.pri:hover:not([disabled]){filter:brightness(1.12);border-color:var(--ac)}
+#pc .lhq .lh-btn.dng{background:#a12a1e;border-color:#a12a1e;color:#fff}
+#pc .lhq .lh-btn[disabled]{cursor:default;opacity:1;background:#f1efea;border-color:var(--ln);color:var(--mu2)}
+#pc .lhq .lh-btn:focus-visible,#pc .lhq .lh-nav button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+#pc .lhq .lh-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+#pc .lhq .lh-offer{background:var(--sf);border:1px solid var(--ln);border-top:3px solid var(--oa,var(--ac));border-radius:6px;padding:24px;margin:0 0 32px}
+#pc .lhq .lh-offer .lh-eb{color:var(--oa,var(--ac))}
+#pc .lhq .lh-offer .lh-h2{font:400 24px/1.25 var(--serif)}
+#pc .lhq .lh-offer .lh-btn.pri{background:var(--oa,var(--ac));border-color:var(--oa,var(--ac))}
+#pc .lhq .lh-dir{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));background:var(--sf);border:1px solid var(--ln);border-radius:6px;overflow:hidden}
+#pc .lhq .lh-dc{display:flex;align-items:center;gap:12px;background:var(--sf);padding:14px 16px;min-width:0;box-shadow:1px 0 0 var(--ln),0 1px 0 var(--ln)}
+#pc .lhq .lh-dc b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pc .lhq .lh-dc small{display:block;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pc .lhq .lh-dc.lk .lh-mg{box-shadow:inset 0 -3px 0 var(--ln2);color:var(--mu2)}
+#pc .lhq .lh-dc.lk b{color:var(--mu)}
+#pc .lhq .lh-ups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+#pc .lhq .lh-up{display:flex;flex-direction:column;gap:4px}
+#pc .lhq .lh-up.mx{border-color:var(--ac)}
+#pc .lhq .lh-up .lh-mut{min-height:20px}
+#pc .lhq .lh-lvl{display:flex;align-items:center;gap:4px;margin:12px 0 4px}
+#pc .lhq .lh-lvl i{flex:1;max-width:36px;height:4px;border-radius:2px;background:var(--ln)}
+#pc .lhq .lh-lvl i.on{background:var(--ac)}
+#pc .lhq .lh-lvl i.x{background:repeating-linear-gradient(90deg,var(--ln) 0 3px,transparent 3px 5px)}
+#pc .lhq .lh-lvl span{margin-left:8px;font-size:11.5px;color:var(--mu)}
+#pc .lhq .lh-dl1{margin:8px 0 16px;flex:1}
+#pc .lhq .lh-dl1>div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--ln)}
+#pc .lhq .lh-dl1 dd{margin:0;text-align:right;font-size:13px}
+#pc .lhq .lh-up .lh-btn{width:100%}
+#pc .lhq .lh-acc .lh-dl{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+#pc .lhq .lh-foot{border-top:1px solid var(--ln);background:var(--sf);font-size:12px;color:var(--mu2)}
+#pc .lhq .lh-foot .lh-in{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:16px;padding-bottom:16px}
+@container (max-width:860px){
+ #pc .lhq .lh-user span{display:none}
+ #pc .lhq .lh-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #pc .lhq .lh-kpi:nth-child(3){border-left:0}
+ #pc .lhq .lh-kpi:nth-child(n+3){border-top:1px solid var(--ln)}
+ #pc .lhq .lh-t thead{display:none}
+ #pc .lhq .lh-t,#pc .lhq .lh-t tbody,#pc .lhq .lh-t tr,#pc .lhq .lh-t td{display:block;width:100%}
+ #pc .lhq .lh-t tr{padding:14px 16px;border-bottom:1px solid var(--ln)}
+ #pc .lhq .lh-t tr:last-child{border-bottom:0}
+ #pc .lhq .lh-t td{border:0;padding:3px 0;display:flex;justify-content:space-between;align-items:center;gap:16px;text-align:right}
+ #pc .lhq .lh-t td:not(:first-child)>*{margin-left:auto}
+ #pc .lhq .lh-t td:before{content:attr(data-l);font-size:12px;color:var(--mu);text-align:left;flex:none}
+ #pc .lhq .lh-t td:first-child{padding:0 0 8px;text-align:left}
+ #pc .lhq .lh-t td:first-child:before{display:none}
+ #pc .lhq .lh-t td.lh-acts{justify-content:flex-end;padding-top:10px}
+ #pc .lhq .lh-t td.lh-acts:before{display:none}
+ #pc .lhq .lh-t tr.sg{box-shadow:inset 3px 0 0 var(--ac)}
+ #pc .lhq .lh-t tr.sg td:first-child{box-shadow:none}
+ #pc .lhq .lh-lt .lh-bn small{max-width:none}
+}
+@container (max-width:600px){
+ #pc .lhq .lh-in{padding:0 16px}
+ #pc .lhq .lh-top .lh-in{flex-wrap:wrap;gap:0 12px;min-height:0;padding-top:10px}
+ #pc .lhq .lh-brand{flex:1}
+ #pc .lhq .lh-nav{order:3;flex:0 0 100%;height:42px;overflow-x:auto;scrollbar-width:none}
+ #pc .lhq .lh-nav button{padding:0 10px}
+ #pc .lhq .lh-nav button:first-child{padding-left:0}
+ #pc .lhq .lh-main{padding:24px 0 32px}
+ #pc .lhq .lh-h1{font-size:27px}
+ #pc .lhq .lh-lede{font-size:14px}
+ #pc .lhq .lh-kpi{padding:12px 14px}
+ #pc .lhq .lh-kpi b{font-size:20px}
+ #pc .lhq .lh-card,#pc .lhq .lh-offer{padding:16px}
+ #pc .lhq .lh-acth{flex-wrap:wrap}
+ #pc .lhq .lh-fee{text-align:left;flex:0 0 100%;padding-left:54px}
+ #pc .lhq .lh-acc .lh-acth .lh-btn{flex:0 0 100%;margin-top:4px}
+ #pc .lhq .lh-steps{grid-template-columns:1fr 1fr;row-gap:14px}
+ #pc .lhq .lh-steps li:nth-child(2):before{display:none}
+ #pc .lhq .lh-dir{grid-template-columns:1fr}
+ #pc .lhq .lh-ups{grid-template-columns:1fr}
+ #pc .lhq .lh-btns .lh-btn{flex:1}
+ #pc .lhq .lh-foot .lh-in{flex-direction:column;gap:2px}
+}`;document.head.appendChild(st)}
 /* Label HQ is in the App Barn (free), and links in Messages download it too */
 {const s0=PA.store;PA.store=function(){return s0.apply(this,arguments).replace(/(onclick="inst\('hq'\)">)[^<]*</,'$1Get · Free<')}}
 window.bdGetHQ=function(){S.hqLink=1;if(S.apps&&S.apps.hq)return;S.apps=S.apps||{};S.apps.hq=1;snd('chime');say('Label HQ downloaded. Find it on your desktop.');updateVersion();pcR()};
