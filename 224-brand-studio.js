@@ -1,14 +1,14 @@
-/* ===== v51.0.0: Prism Studios, brand photoshoots and being recognised abroad =====
+/* ===== v51.0.0: brand photoshoots and being recognised abroad =====
    Part 2 of brand sponsorships (223-brand-deals.js). Needs the Instagrime photo renderer in 178-instagrime-photos.js.
-   - Studio: Prism Studios is drawn as a pixel facade (BRD.facade: day or night sky, skyline, glass doors, red carpet, the brand's
-     logo on a roof billboard) and a pixel set inside (BRD.photo: backdrop wall with the brand's logo, softboxes, floor).
-   - Photoshoot (BRD.go): you stand in the set as your own 3D character. The brief asks for a mood (pose) and a lighting style;
-     pick pose, light and backdrop, then Shoot up to 4 frames. A frame scores 35 + 30 for the right mood + 25 for the right light
-     + 10 for the brand backdrop + 0-5. The average of your best two frames sets the pay (75% to 125% of the fee) and the
-     followers. The best frame is posted on Instagrime ("Paid partnership with ..."), saved as {brand, bs:[mood,light,bg,seed]}
-     and drawn again from that on every load. The shoot costs 12 energy.
-   - Home deals: Go to the studio in Label HQ or in the brand's message. Trips: after you land and walk out into the city, a car
-     offers the studio drive; after the shoot the brand books a free flight home.
+   - BRD.facade: a pixel picture of a brand HQ (day or night skyline, the brand's logo on a roof billboard), used as the Label HQ
+     banner and in the company-car prompt. The real, walkable HQ buildings and studios are in 225-brand-hq.js. BRD.photo: the
+     pixel set of a shot (backdrop wall with the brand's logo, softboxes, floor).
+   - Photoshoot (BRD.begin, started by the camera in the HQ studio): you stand in the set as your own 3D character. The brief asks
+     for a mood (pose) and a lighting style; pick pose, light and backdrop, then Shoot up to 4 frames. A frame scores 35 + 30 for
+     the right mood + 25 for the right light + 10 for the brand backdrop + 0-5. The average of your best two frames sets the pay
+     (75% to 125% of the fee) and the followers. The best frame is posted on Instagrime ("Paid partnership with ..."), saved as
+     {brand, bs:[mood,light,bg,seed]} and drawn again from that on every load. The shoot costs 12 energy and the brand books a
+     free flight home.
    - Fame abroad: walking past people in a world-tour city, they react by your Fame Level (nothing under 15; unsure looks, then
      "are you ...?", then fans who know your songs, then screaming crowds), in the city's own greeting. A fan may take a photo with
      you for a few followers (3 a day per game day). */
@@ -71,7 +71,7 @@ BRD.photo=function(su){const W=160,H=120,b=BRD.by(su.b),L=LT[su.l%4],seed=(su.se
  fgSet(x,su,r,b,L);grade(x,su,L,W,H,seed,r);
  const o=document.createElement('canvas');o.width=W*2;o.height=H*2;const ox=o.getContext('2d');ox.imageSmoothingEnabled=false;ox.drawImage(k,0,0,W*2,H*2);return o.toDataURL()};
 
-/* ---------- Prism Studios, the building (pixel facade, 320x168) ---------- */
+/* ---------- a brand HQ as a picture (pixel facade, 320x168) ---------- */
 const FC={};
 BRD.facade=function(bid,place){const night=(+S.t||0)>=260,key=(bid||'x')+'|'+night+'|'+(place||'');if(FC[key])return FC[key];
  const W=320,H=168,k=document.createElement('canvas');k.width=W;k.height=H;const x=k.getContext('2d'),r=igxRng(41),b=bid?BRD.by(bid):null;
@@ -89,7 +89,7 @@ BRD.facade=function(bid,place){const night=(+S.t||0)>=260,key=(bid||'x')+'|'+nig
  F(dk,BX-3,BY-4,BW+6,6);F(body,BX,BY,BW,BH);F(lt,BX,BY,BW,2);F(dk,BX,BY+BH-4,BW,4);for(let i=0;i<BW;i+=14)F('#00000014',BX+i,BY+2,1,BH-6);
  /* sign band */
  F('#0d0f18',BX+22,BY+6,BW-44,18);F(night?'#e9c24a':'#3a3a48',BX+23,BY+7,BW-46,1);F(night?'#e9c24a':'#3a3a48',BX+23,BY+22,BW-46,1);
- const tx='PRISM STUDIOS',tw=igxTW(tx,2);igxTxt(x,tx,BX+Math.round((BW-tw)/2)+1,BY+10,'#000',2);igxTxt(x,tx,BX+Math.round((BW-tw)/2),BY+9,night?'#ffe58a':'#fff',2);
+ const tx=b?igxClip(b.n.toUpperCase()+' HQ',22):'LABEL HQ',sc=igxTW(tx,2)<=BW-50?2:1,tw=igxTW(tx,sc),ty=sc==2?9:12;igxTxt(x,tx,BX+Math.round((BW-tw)/2)+1,BY+ty+1,'#000',sc);igxTxt(x,tx,BX+Math.round((BW-tw)/2),BY+ty,night?'#ffe58a':'#fff',sc);
  /* window rows */
  for(let row=0;row<2;row++)for(let i=0;i<8;i++){const wx=BX+8+i*23,wy=BY+30+row*22,lit=night||r()<.5;F('#10121a',wx-1,wy-1,20,19);F(lit?(night?'#ffd98a':'#bfe3ff'):'#7a8fae',wx,wy,18,17);
   if(night&&r()<.55){F('#00000040',wx+4+Math.floor(r()*8),wy+6,3,11);F('#00000040',wx+3+Math.floor(r()*8),wy+4,5,3)}if(night){F('#ffffff30',wx,wy,18,2)}F('#ffffff30',wx+8,wy,1,17);F('#ffffff22',wx,wy+8,18,1)}
@@ -133,21 +133,12 @@ const $e=id=>document.getElementById(id);
 const modal=h=>{mode='menu';$('ui').innerHTML=h};
 function fade(mid){let f=$e('bsfade');if(!f){f=document.createElement('div');f.id='bsfade';f.className='bsfade';document.body.appendChild(f)}f.style.opacity=1;setTimeout(()=>{try{mid()}catch(e){console.error(e)}setTimeout(()=>{f.style.opacity=0},220)},430)}
 {const c0=closeUI;closeUI=function(){BRD.shootOn=0;SH=null;return c0.apply(this,arguments)}}
-/* the drive to the studio, then the front of the building */
-BRD.go=function(id){const o=BRD.job(id);if(!o||o.st!=1)return;
- if(o.k=='trip'&&(!T()||T().loc()!=o.d)){snd('err');return say('Fly to '+BRD.place(o)+' first.')}
- if(mode=='pc')closeUI();else if(mode=='menu'&&!SH)closeUI();
- BRD.shootOn=1;fade(()=>arrive(o))};
-function arrive(o){const b=BRD.by(o.b);SH={o,step:0,m:0,l:0,bg:0,shots:[],sel:0,seed:(Math.random()*1e6)|0};snd('whoosh');
- modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} photoshoot <small>${esc(BRD.place(o))}</small></h2><img class=bsfac src="${BRD.facade(o.b,BRD.place(o))}">
- <p class=m>A car from ${esc(b.n)} drops you at Prism Studios. Fee ${fm(o.pay)}, plus up to 25% more for a great shoot. The best frame goes on your Instagrime.</p><div class=bsb>Brief: <b>${o.brief.mood}</b> mood, <b>${o.brief.light}</b> lighting. ${esc(b.n)} also likes its logo in frame.</div>
- <div class=row2><button class=go onclick="bsIn()">Go inside</button><button onclick="bsLater()">${o.k=='trip'?'Later':'Not now'}</button></div></div>`)}
-window.bsLater=function(){if(SH&&SH.o)SH.o.nx=Date.now()+60000;closeUI()};
-window.bsIn=function(){if(!SH)return;fade(()=>{SH.step=1;snd('chime');set()})};
+/* start the photoshoot: called by the camera inside the HQ studio (225-brand-hq.js) */
+BRD.begin=function(o){if(!o||o.st!=1)return;BRD.shootOn=1;SH={o,step:1,m:0,l:0,bg:0,shots:[],sel:0,seed:(Math.random()*1e6)|0};snd('chime');set()};
 const note=(m,l,o)=>{const g=m==o.brief.mood,h=l==o.brief.light;return g&&h?'That is exactly the brief. Great frame.':g?'Pose is right, but the lighting is off-brief.':h?'Lighting is right, but the pose is off-brief.':'Neither pose nor lighting matches the brief.'};
 function su(){return{b:SH.o.b,m:SH.m,l:SH.l,bg:SH.bg,seed:SH.seed,cfg:ch}}
 function set(){const o=SH.o,b=BRD.by(o.b),n=SH.shots.length;
- modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} · Prism Studios <small id=bsct>Frame ${Math.min(4,n+1)} of 4</small></h2>
+ modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} · HQ studio <small id=bsct>Frame ${Math.min(4,n+1)} of 4</small></h2>
  <div class=bsg><div><div class=bspw><img class=bspv id=bspv alt=""><div class=bsfl id=bsfl></div></div><div class=bsth id=bsth></div></div>
  <div><div class=bsb>Brief: <b>${o.brief.mood}</b> mood, <b>${o.brief.light}</b> lighting. ${esc(b.n)} likes its logo in frame.</div>
  <div class=bsl>Mood</div><div class=bsc id=bsm>${MOODS.map((q,i)=>`<button data-i=${i} class="${i==SH.m?'on':''}" onclick="bsPick('m',${i})">${q}</button>`).join('')}</div>
@@ -171,7 +162,7 @@ window.bsWrap=function(){if(!SH||!SH.shots.length)return;const o=SH.o,b=BRD.by(o
  q=((best[0].sc+(best[1]?best[1].sc:best[0].sc))/2)/100,pay=Math.round(o.pay*(.75+.5*q)/100)*100,fol=FOLN(Math.round((60+(S.followers||0)*.01)*(.6+q)*(1+b.t*.5))),
  fans=(S.followers||0)+(S.igF||0),likes=Math.round(fans*(.12+q*.25))+20+Math.floor(Math.random()*30);
  S.money=+(S.money+pay).toFixed(2);S.earn=(S.earn||0)+pay;S.followers=(S.followers||0)+fol;S.energy=Math.max(0,(S.energy||0)-12);
- const cap='Paid partnership with '+b.n+'. '+['Campaign day at Prism Studios.','New campaign, new look.','Lights, camera, '+b.n+'.','Thank you '+b.n+' for having me.'][Math.floor(Math.random()*4)]+(o.k=='trip'?' '+BRD.place(o):'');
+ const cap='Paid partnership with '+b.n+'. '+['Campaign day at the '+b.n+' HQ.','New campaign, new look.','Lights, camera, '+b.n+'.','Thank you '+b.n+' for having me.'][Math.floor(Math.random()*4)]+' '+BRD.place(o);
  const p={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap,day:S.day,l:likes,brand:o.b,bs:[pick.m,pick.l,pick.bg,pick.seed]};
  try{S.igPosts=S.igPosts||[];S.igPosts.push(p);if(S.lastPost!=S.day){S.lastPost=S.day;if(typeof igbOn=='function'&&igbOn())igbNow()}}catch(e){console.error('brand post',e)}
  PICS[p.id]=pick.u;o.st=3;o.res={pay,q:Math.round(q*100),post:p.id,day:S.day};const bd=BRD.st();bd.done++;bd.earned+=pay;
@@ -188,12 +179,6 @@ window.bsWrap=function(){if(!SH||!SH.shots.length)return;const o=SH.o,b=BRD.by(o
 
 /* the Instagrime photo of a brand post is drawn from its shoot setup (the cache is not saved) */
 {const pp0=postPic;postPic=function(p){try{if(p&&p.brand&&Array.isArray(p.bs)){if(PICS[p.id])return PICS[p.id];return PICS[p.id]=BRD.photo({b:p.brand,m:p.bs[0],l:p.bs[1],bg:p.bs[2],seed:p.bs[3],cfg:p.cfg})}}catch(e){console.warn('brand photo',e)}return pp0.apply(this,arguments)}}
-
-/* ---------- trips: a company car is waiting once you are out in the city ---------- */
-setInterval(()=>{try{const o=BRD.active();if(!o||o.k!='trip'||SH||BRD.shootOn)return;const D=window.DCITY;
- if(!(D&&D.on&&D.id==o.d&&T()&&T().loc()==o.d)||typeof mode=='undefined'||mode!='play'||D.view||D.room)return;
- if(typeof window.apWhere=='function'&&window.apWhere())return;if(o.nx&&Date.now()<o.nx)return;
- BRD.shootOn=1;arrive(o)}catch(e){console.error('brand trip',e)}},1500);
 
 /* ---------- fame abroad: people recognise you ---------- */
 const TXT=[[250,4,'Crowds of fans spot you!'],[150,3,'People point and whisper: it is {A}!'],[60,2,'Some locals recognise you.'],[15,1,'A few people glance at you.']];
