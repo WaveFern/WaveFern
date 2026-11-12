@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.8.0';
+const GAME_VERSION='v51.8.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.8.1',n:'Test careers no longer post to the leaderboard or public profile. Any career that used test mode or the dev test code is marked for good and stays off the board. New console tool fdClearLeaderboardRow() removes a bogus row. Saves still load.'},
  {v:'v51.8.0',n:'On the dev build only: typing test as the save code unlocks everything in the career that is open (money, gear, apps, furniture, cars, pets, clothes, best home, every contact, test mode). On the real game it does nothing. Saves still load.'},
  {v:'v51.7.1',n:'Test mode (the cheat flag that a test save code carries) now only works on the dev build. On the real game it is removed when a save code loads. Normal save codes and saves are unchanged.'},
  {v:'v51.7.0',n:'Label HQ is redesigned as a proper artist services website: a clean header with tabs, page titles, key figures, tables for offers, history and labels, and cards for your team upgrades. The pixel pictures and logos are gone; brands and labels show as simple lettered marks. Once you sign, the site takes on your label\'s colour and wordmark style. It fills the app window and fits phone screens. Everything works as before. Saves still load.'},
