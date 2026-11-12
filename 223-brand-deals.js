@@ -49,6 +49,12 @@ function pix(id){if(PX[id])return PX[id];const b=BRD.by(id),c=document.createEle
  try{const d=x.getImageData(0,0,GRID,GRID),a=d.data;for(let i=0;i<a.length;i+=4){for(let k=0;k<3;k++)a[i+k]=Math.min(255,Math.round(a[i+k]/48)*48);a[i+3]=255}x.putImageData(d,0,0)}catch(e){}
  return PX[id]=c}
 BRD.logo=function(id,px){const k=id+'|'+(px||64);if(LC[k])return LC[k];const s=px||64,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(pix(id),0,0,s,s);return LC[k]=c.toDataURL()};
+/* the same logo as a smooth black-only mark on a transparent background (Label HQ brand pages): anything that differs from the logo's own background becomes black, so cut-outs stay clear */
+const MC={};
+BRD.mono=function(id,px){const s=px||256,k=id+'|'+s;if(MC[k])return MC[k];const b=BRD.by(id),c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');
+ try{x.scale(s/64,s/64);x.fillStyle=b.bg;x.fillRect(0,0,64,64);const bg=x.getImageData(0,0,1,1).data;try{b.p(x)}catch(e){}x.setTransform(1,0,0,1,0,0);
+  const d=x.getImageData(0,0,s,s),a=d.data;for(let i=0;i<a.length;i+=4){const df=Math.max(Math.abs(a[i]-bg[0]),Math.abs(a[i+1]-bg[1]),Math.abs(a[i+2]-bg[2])),al=Math.max(0,Math.min(1,(df-105)/40));a[i]=a[i+1]=a[i+2]=0;a[i+3]=Math.round(al*255)}x.putImageData(d,0,0)}catch(e){}
+ return MC[k]=c.toDataURL()};
 /* draw a logo onto any canvas context (the studio sets use it) */
 BRD.paint=function(x,id,px,py,s){const o=x.imageSmoothingEnabled;x.imageSmoothingEnabled=false;x.drawImage(pix(id),px,py,s,s);x.imageSmoothingEnabled=o};
 
@@ -135,7 +141,7 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Label HQ (v51.9.0): the Brand Deals website. White page, black type, light grey hairlines; no pictures, logos,
    icons, cards or colour. A slim top bar holds the pages: Brand Deals (overview + brand directory), Active Deals, Past Deals,
    and on the right Labels and Team (record labels, unchanged; a signed label only tints those two pages).
-   Clicking a brand in the directory opens its page (HQB). Type: Helvetica LT Pro for text and Norman (variable, weight 400) for headings, both from Adobe Fonts kit ngq0vsd, loaded the
+   Clicking a brand in the directory opens its page (HQB). Type: Helvetica LT Pro for text and Norman (variable, weight 600) for headings, both from Adobe Fonts kit ngq0vsd, loaded the
    first time the app opens; system fonts if offline). The layout follows the window width (container queries). ---------- */
 const STT=['Offer','In progress','Declined','Completed','Expired','Fell through'];
 const cityOf=id=>{try{const d=wtDest(id);return d.city||d.country}catch(e){return''}};
@@ -184,6 +190,7 @@ const early=()=>fl()<FAME[0];
 function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),open=BR.filter(b=>FAME[b.t]<=L).length;
  let h=phead('','Brand Deals','Brands book you for one photoshoot day at their own headquarters abroad. Every trip is paid for by the brand, and the fee is set by your recent income.');
  h+=`<div class=lh-kpis>${kpi('Completed shoots',s.done)}${kpi('Earned from brands',fm(s.earned))}${kpi('Open offers',offs.length)}${kpi('Fame Level',L)}</div>`;
+ h+=`<section class=lh-par aria-label="Our partnered brands"><div class=lh-parh><h2 class=lh-h4>Our partnered brands</h2></div><div class=lh-mq><div class=lh-mt>${[0,1].map(n=>`<ul${n?' aria-hidden=true':''}>${BR.map(b=>`<li><button class=lh-pn${n?' tabindex=-1':''} onclick="bdBrand('${b.id}')">${esc(b.n)}</button></li>`).join('')}</ul>`).join('')}</div></div></section>`;
  const ab=act?(()=>{const b=BRD.by(act.b);return`<div class=lh-sum><p class=lh-big>${esc(b.n)}</p><p class=lh-mut>${esc(cap(b.cat))} campaign in ${esc(BRD.place(act))}. Fee ${fm(act.pay)}.</p>${lk('View the booking',"bdTab('active')")}</div>`})()
   :empty(early()?'Brands start writing at Fame Level '+FAME[0]+'.':'No shoot booked. Brands write now and then as your fame grows. Every deal is at the brand\'s own HQ abroad and the brand pays for the whole trip.');
  const nx=FAME.find(f=>f>L);
@@ -207,7 +214,7 @@ function pastTab(){const s=st(),past=pastList();
  return h}
 /* one brand's page, opened from the directory */
 function brandPage(id){const b=BR.find(x=>x.id==id);if(!b)return dealsTab();const L=fl(),need=FAME[b.t],of=offerFrom(b.id),act=BRD.active(),mine=act&&act.b==b.id?act:null,hist=pastList().filter(o=>o.b==b.id);
- let h=`<nav class=lh-crumb>${lk('Brand Deals',"bdTab('deals')")}<span>/</span><span>${esc(b.n)}</span></nav>`+phead('',esc(b.n),'');
+ let h=`<nav class=lh-crumb>${lk('Brand Deals',"bdTab('deals')")}<span>/</span><span>${esc(b.n)}</span></nav><img class=lh-logo src="${BRD.mono(b.id)}" alt="${esc(b.n)} logo" width=104 height=104>`+phead('',esc(b.n),'');
  h+=`<dl class="lh-dl lh-bdl"><div><dt>Headquarters</dt><dd>${esc(cityOf(HQC[b.id]))}</dd></div><div><dt>Category</dt><dd>${esc(cap(b.cat))}</dd></div><div><dt>Required Fame Level</dt><dd>${need}</dd></div><div><dt>Your Fame Level</dt><dd>${L}${L>=need?'':' (needs '+(need-L)+' more)'}</dd></div></dl>`;
  const body=mine?actBlock(mine):of?offerCards([of],1):empty(L<need?esc(b.n)+' works with artists from Fame Level '+need+'. Keep growing and they may write to you.':'No offer from '+esc(b.n)+' right now. When they want you for a campaign, the offer arrives in Messages and appears here.');
  h+=sec(mine?'Your booking':'Offer',mine?'In progress':of?'Expires Day '+of.exp:'',body);
@@ -260,7 +267,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('lhqmn',app=='hq'&&!!m.querySelector('.lhq'))}catch(e){}return r}}
 {const st=document.createElement('style');st.textContent=`#pc .lhqmn{padding:0!important;background:#fff}
 #pc .lhq{--ac:#111;--bg:#fff;--soft:#f5f5f4;--ln:#e8e8e6;--ln2:#d4d4d1;--ink:#111;--mu:#666;--mu2:#9b9b98;--sans:helvetica-lt-pro,"Helvetica Neue",Helvetica,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:"norman-variable","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
- font-variation-settings:"wght" 400;container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none;letter-spacing:0}
+ font-variation-settings:"wght" 600;container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none;letter-spacing:0}
 #pc .lhq *{box-sizing:border-box}
 #pc .lhq h1,#pc .lhq h2,#pc .lhq h3,#pc .lhq p,#pc .lhq ul,#pc .lhq ol,#pc .lhq dl{margin:0;padding:0}
 #pc .lhq button{font-family:var(--sans)}
@@ -297,6 +304,18 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-meta{font-size:12.5px;color:var(--mu);white-space:nowrap}
 #pc .lhq .lh-empty{padding:18px 0 0;color:var(--mu);font-size:14px;max-width:560px}
 /* overview: booked shoot and offers side by side, then the Fame Level note */
+#pc .lhq .lh-logo{display:block;width:104px;height:104px;margin:0 0 22px}
+#pc .lhq .lh-par{margin:-24px 0 56px}
+#pc .lhq .lh-parh .lh-h4{margin:0 0 10px;color:var(--mu);font-weight:400}
+#pc .lhq .lh-mq{overflow:hidden;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln)}
+#pc .lhq .lh-mt{display:flex;width:max-content;animation:lhmq 70s linear infinite}
+#pc .lhq .lh-mq:hover .lh-mt,#pc .lhq .lh-mq:focus-within .lh-mt{animation-play-state:paused}
+#pc .lhq .lh-mt ul{list-style:none;display:flex;flex:none}
+#pc .lhq .lh-pn{all:unset;cursor:pointer;display:block;padding:20px 28px 20px 0;margin-right:28px;font:400 30px/1.1 var(--serif);white-space:nowrap;color:var(--ink)}
+#pc .lhq .lh-pn:hover{color:var(--mu)}
+#pc .lhq .lh-pn:focus-visible{outline:1px solid var(--ink);outline-offset:-4px}
+@keyframes lhmq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){#pc .lhq .lh-mq{overflow-x:auto}#pc .lhq .lh-mt{animation:none}}
 #pc .lhq .lh-ocs{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:20px;padding-top:20px}
 #pc .lhq .lh-oc{border:1px solid var(--ln);padding:22px 22px 18px;display:flex;flex-direction:column;min-width:0}
 #pc .lhq .lh-oct{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--ln)}
