@@ -6,9 +6,9 @@
    How it drives the originals: it starts Lyrics or Mix by calling the previous mgStage, starts Beat by resetting the beat bar, and catches the call each one makes when it ends
    (finishRec / mgStage(1) for Beat, mgStage(2) for Lyrics, mgStage(3) for Mix). */
 (()=>{
-const ORDER=['beat','lyrics','mix','echo','punch','hype'];
-const NM={beat:'Beat',lyrics:'Lyrics',mix:'Mix',echo:'Echo',punch:'Punch In',hype:'Build It'};
-const HOW={echo:'Watch the pads light up, then tap them in the same order.',punch:'Hit record when the marker is in the green. 3 takes. SPACE or tap.',hype:'Mash SPACE (or tap) to fill the meter before time runs out. 2 builds.'};
+const ORDER=['beat','lyrics','mix','echo','hype'];
+const NM={beat:'Beat',lyrics:'Lyrics',mix:'Mix',echo:'Echo',hype:'Build It'};
+const HOW={echo:'Watch the pads light up, then tap them in the same order.',hype:'Mash SPACE (or tap) to fill the meter before time runs out. 2 builds.'};
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),shuf=a=>{for(let i=a.length-1;i>0;i--){const j=ri(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
 const NOTE=[262,294,330,392,440,523,587,659];
 const pad=i=>{try{sfx(MG_NOTE[i],.25,'triangle',.14)}catch(e){}},nt=i=>{try{sfx(NOTE[i],.4,'triangle',.14)}catch(e){}},good=()=>{try{snd('cash')}catch(e){}},bad=()=>{try{snd('err')}catch(e){}};
@@ -24,10 +24,6 @@ const NG={
   endR(g){g.tot+=g.seq.length;g.ph='fb';g.t=0},
   press(g,p){if(g.ph!='in')return;pad(p);g.lit=p;g.lt=.15;if(p==g.seq[g.i]){g.ok++;g.i++;good();if(g.i>=g.seq.length)this.endR(g)}else{bad();g.bad=p;this.endR(g)}},
   score:g=>g.tot?g.ok/g.tot:g.ok/7,txt:g=>g.ph=='show'?'Watch…':g.ph=='in'?'Your turn':'',key:null},
- punch:{dur:9,init(g){g.pos=0;g.dir=1;g.sp=1.1;g.z0=.25+Math.random()*.35;g.zw=.16;g.hits=0;g.tries=0;g.fl=0},
-  tick(g,dt){g.t+=dt;g.pos+=g.dir*g.sp*dt;if(g.pos>1){g.pos=1;g.dir=-1}if(g.pos<0){g.pos=0;g.dir=1}g.fl*=.9;if(g.t>=this.dur)g.over=1},
-  press(g){g.tries++;const ok=g.pos>g.z0&&g.pos<g.z0+g.zw;if(ok){g.hits++;good()}else bad();g.fl=ok?.35:-.35;g.z0=.15+Math.random()*.55;if(g.tries>=3)g.over=1},
-  score:g=>g.hits/3,txt:g=>'· take '+Math.min(3,g.tries+1)+'/3'},
  hype:{dur:9,init(g){g.r=0;g.sc=[];this.round(g)},
   round(g){g.lv=0;g.best=0;g.t=0},
   tick(g,dt){g.t+=dt;g.lv=Math.max(0,g.lv-.32*dt);g.best=Math.max(g.best,g.lv);if(g.lv>=1)this.endR(g,1);else if(g.t>=4.5)this.endR(g,g.best)},
@@ -55,12 +51,10 @@ function nmDraw(){const q=rec.q,k=q.cur,g=q.g;let el=$('mg');if(!el){el=document
  const strip='<div class=mgs>'+planStrip()+'</div>',key=k+'|'+(rec.wait?'w':'')+(g?(g.r||0)+(g.ph||''):'');
  if(key!=MGK){MGK=key;el.className='box';el.style.bottom='';
   if(rec.wait)el.innerHTML=strip+`<b>${NM[k]}</b><p class=m style="margin:8px 0">${HOW[k]}</p><button class=go onpointerdown="mgGo()">Start (Space)</button>`;
-  else if(k=='punch')el.innerHTML=strip+`<b>${NM[k]}</b> <small class=m id=nmx></small><div class=tbar><div class=tg id=nmz style="width:16%"></div><div class=ti id=nmk></div></div><button class=go style="width:100%" onpointerdown="nmIn(0)">Record (Space)</button><div class=bar style="width:100%;height:8px"><i id=nmtm></i></div>`;
   else if(k=='hype')el.innerHTML=strip+`<b>${NM[k]}</b> <small class=m id=nmx></small><div class=tbar><div id=nmv style="position:absolute;left:0;top:0;bottom:0;width:0;background:#2fe68a"></div></div><button class=go style="width:100%" onpointerdown="nmIn(0)">Mash! (Space)</button><div class=bar style="width:100%;height:8px"><i id=nmtm></i></div>`;
   else el.innerHTML=strip+`<b>${NM[k]}</b> <small class=m id=nmx></small><div class=mgpads>${[0,1,2,3].map(i=>`<button class=mgp style="--c:${MG_PADC[i]}" onpointerdown="nmIn(${i})">${i+1}</button>`).join('')}</div><div class=bar style="width:100%;height:8px"><i id=nmtm></i></div>`}
  if(rec.wait||!g)return;const x=$('nmx'),tm=$('nmtm'),d=NG[k];if(x)x.textContent=d.txt(g);
- if(k=='punch'){const z=$('nmz'),kn=$('nmk');if(z)z.style.left=g.z0*100+'%';if(kn){kn.style.left=g.pos*100+'%';kn.style.background=g.fl>.05?'#2fe68a':g.fl<-.05?'#ff4455':'#fff'}if(tm)tm.style.width=Math.max(0,100-g.t/g.dur*100)+'%'}
- else if(k=='hype'){const v=$('nmv');if(v)v.style.width=Math.min(100,g.lv*100)+'%';if(tm)tm.style.width=Math.max(0,100-g.t/4.5*100)+'%'}
+ if(k=='hype'){const v=$('nmv');if(v)v.style.width=Math.min(100,g.lv*100)+'%';if(tm)tm.style.width=Math.max(0,100-g.t/4.5*100)+'%'}
  else{el.querySelectorAll('.mgp').forEach((b,i)=>{b.classList.toggle('on',g.lit==i);b.style.outline=g.ph=='fb'&&g.bad==i?'3px solid #ff4455':''});if(tm)tm.style.width=g.ph=='in'?Math.max(0,100-g.t/5*100)+'%':'0%'}}
 function run(names,res){const avg=res.reduce((a,b)=>a+b,0)/res.length,bonus=Math.round(avg*GT.qMax()),n0=S.nid;
  rec.sc={l:avg,x:avg};rec.miss=Math.round((1-avg)*8);rec.cdn=0;
@@ -72,7 +66,7 @@ function run(names,res){const avg=res.reduce((a,b)=>a+b,0)/res.length,bonus=Math
 {const t0=recTick;recTick=function(dt){if(rec&&rec.nm===undefined){rec.nm=0;if(rec.st===0&&!rec.band&&!rec.ig&&typeof GT!='undefined'&&mode=='rec'){try{const p=plan();rec.q={p,i:0,res:[],cur:p[0],g:null};if(p[0]!='beat')startItem();else rec.q.cur='beat'}catch(e){console.error('nmg',e);rec.q=null}}}
  if(rec&&rec.q&&rec.st==9){nmTick(dt);return}return t0.apply(this,arguments)}}
 {const d0=mgDraw;mgDraw=function(){const o=$('mg');if(o&&o.offsetHeight>120)LASTH=o.offsetHeight;if(rec&&rec.q){if(rec.st==9){nmDraw();return}d0.apply(this,arguments);const s=document.querySelector('#mg .mgs');if(s)s.innerHTML=planStrip();return}return d0.apply(this,arguments)}}
-addEventListener('keydown',e=>{if(!rec||!rec.q||rec.st!=9||rec.wait||(e.repeat&&rec.q.cur!='hype')||/INPUT|TEXTAREA/.test(e.target.tagName))return;const n=parseInt(e.key);if(n>=1&&n<=4&&rec.q.cur=='echo')nmIn(n-1);if((e.key==' '||e.key=='Enter'||e.key.toLowerCase()=='e')&&(rec.q.cur=='punch'||rec.q.cur=='hype'))nmIn(0)});
+addEventListener('keydown',e=>{if(!rec||!rec.q||rec.st!=9||rec.wait||(e.repeat&&rec.q.cur!='hype')||/INPUT|TEXTAREA/.test(e.target.tagName))return;const n=parseInt(e.key);if(n>=1&&n<=4&&rec.q.cur=='echo')nmIn(n-1);if((e.key==' '||e.key=='Enter'||e.key.toLowerCase()=='e')&&rec.q.cur=='hype')nmIn(0)});
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const u=$('ui');if(u)u.innerHTML=u.innerHTML.replace(/Three steps:[^<]*?Costs 15 energy\./,GT.need()+' quick minigame'+(GT.need()>1?'s':'')+'. Costs 15 energy.')}catch(e){}return r}}
 {const st=document.createElement('style');st.textContent='#ui>.box.modal.fxperfect{position:absolute}#ui>.box.modal.nmw{width:min(380px,92vw);box-sizing:border-box}';document.head.appendChild(st)}
 window.NMG={games:NG,order:ORDER,names:NM};

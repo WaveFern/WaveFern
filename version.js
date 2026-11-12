@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v50.5.0';
+const GAME_VERSION='v50.6.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v50.6.0',n:'There are now five song minigames: Beat, Lyrics, Mix, Echo and Build It. Punch In is gone (it was too close to Beat). Studio Level unlocks them one at a time (all five from Level 5), and a song uses 1, 2, 2, 3, 4 or 4 of them. Saves still load.'},
  {v:'v50.5.0',n:'Two song minigames replaced, and both work with the sound off: Punch In (hit record when the marker is in the green, 3 takes, like the festival Drop bar) and Build It (mash SPACE or tap to fill the meter before time runs out, like the festival Hype meter). They take the place of Higher or Lower and Tap the Light. Saves still load.'},
  {v:'v50.4.0',n:'The Upload page is the plain original again (the release-page redesign is gone), and the Song recorded screen is back to its normal look. A perfect song now keeps the same width as a normal one instead of stretching across the whole screen. Saves still load.'},
  {v:'v50.3.0',n:'Song minigames rebuilt in the original style: there are now six, not ten. Beat, Lyrics and Mix are the same as always, plus three new ones that use the same panel, pads and buttons: Echo (copy the pads), Higher or Lower (hear two notes) and Tap the Light. Studio Level unlocks them one at a time (1 to 6) and a song uses 1, 2, 2, 3, 4 or 4 of them at random. Saves still load.'},
