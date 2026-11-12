@@ -3,7 +3,9 @@
    gifts and other players' saves is docs/firestore.rules, which only lets this UID create gifts or read every save.
    "My game" edits only the admin's own save on this device (then saves it to the cloud). */
 const ADMIN_UID='wE6oPZIHYifrqBFxzpPse6ripGY2';
-const isAdmin=()=>!!(FBU&&FBU.uid==ADMIN_UID);
+/* v51.3.0: more than one admin. Add a uid here AND to admin() in firebase-rules/.../firestore.rules (then publish) so gifts and the players list work for them too. */
+const ADMIN_UIDS=[ADMIN_UID,'T79oEtO29fUBYv4P9qq0vBDzZZt2'];
+const isAdmin=()=>!!(FBU&&ADMIN_UIDS.includes(FBU.uid));
 const ADM={from:'admin',players:null,gifts:null,msg:''};
 const admGame=()=>mode=='title'?!!TT.game:true;
 function admOpen(){if(!isAdmin())return;snd('click');ADM.from=mode=='title'?'title':'pause';admUI()}
@@ -33,7 +35,12 @@ const ADMA={
  home:()=>{S.home=3;S.guards=3;S.bling=4;return'Best home, guards and bling'},
  contacts:()=>{ART.forEach((a,i)=>{if(!S.msgs.some(m=>m.a===i))newConv(i,1)});return'Every artist added to Messages'},
  tutoff:()=>{S.tut={on:0,i:0,f:{}};return'Tutorial turned off'},
+ /* v51.3.0: cheat mode turns on the Teleport app on the Gphone (jump to any world city) and lifts the unlock gates. It is saved with the career. */
+ cheat:()=>{S.cheat=S.cheat?0:1;return S.cheat?'Cheat mode ON: open the Teleport app on your Gphone for every city':'Cheat mode off'},
 };
+/* teleport inside the home city (admin only) */
+const ADTP=[['Studio',8,14],['Jewellery shop',34,12.9],['Property office',44,12.9],['Corner shop',54,12.9],['Airport front',-322,20]];
+function admTp(i){if(!isAdmin()||!admGame()||ADM.from=='title')return;const t=ADTP[i];if(!t)return;try{admClose();IN=null;if(mode=='drive'&&typeof exitDrive=='function')exitDrive();P.x=t[1];P.z=t[2];P.rot=0;camT.x=P.x;camT.z=P.z;mode='play';say('Teleported: '+t[0])}catch(e){console.error(e);say('That did not work.')}}
 function admClose(){if(ADM.from=='title')ttPlay();else resumeGame()}
 function adm(k){if(!isAdmin()||!admGame())return;try{const r=ADMA[k]();if(r)admDone(r)}catch(e){console.error(e);say('That did not work.')}}
 /* gifts and players (Firestore; the rules refuse these for anyone but the admin) */
@@ -58,7 +65,7 @@ function admUI(){if(!isAdmin())return;mode=ADM.from=='title'?'title':'pause';con
   <div class=r><input id=as type=number min=0 placeholder="Streams"><button onclick="adm('streams')">Add</button></div>
   <div class=r><input id=af type=number min=0 placeholder="Followers"><button onclick="adm('followers')">Add</button></div>
   <div class=r><input id=ad type=number min=1 placeholder="Day"><button onclick="adm('day')">Set day</button></div>
-  <div class=admg>${B('energy','Full energy')}${B('morning','Morning')}${B('evening','Evening')}${B('sleep','Skip to next day')}${B('hype','All genres trending')}${B('gear','Max gear')}${B('apps','All apps')}${B('furniture','All furniture')}${B('cars','All cars')}${B('pets','All pets')}${B('clothes','All clothes')}${B('home','Best home')}${B('contacts','All contacts')}${B('tutoff','Tutorial off')}</div>`:`<p class=m><small>Start or load a game to use the My game options.</small></p>`;
+  <div class=admg>${B('energy','Full energy')}${B('morning','Morning')}${B('evening','Evening')}${B('sleep','Skip to next day')}${B('hype','All genres trending')}${B('gear','Max gear')}${B('apps','All apps')}${B('furniture','All furniture')}${B('cars','All cars')}${B('pets','All pets')}${B('clothes','All clothes')}${B('home','Best home')}${B('contacts','All contacts')}${B('tutoff','Tutorial off')}${B('cheat',S.cheat?'Cheat mode: ON (tap to turn off)':'Cheat mode + Teleport app')}</div><h3>Teleport (home city)</h3><div class=admg>${ADTP.map((t,i)=>`<button onclick="admTp(${i})">${t[0]}</button>`).join('')}</div><p class=m><small>For other cities turn on Cheat mode, then open the Teleport app on your Gphone.</small></p>`:`<p class=m><small>Start or load a game to use the My game options.</small></p>`;
  const pl=ADM.players==null?`<button onclick="admPlayers()">Load players</button>`:typeof ADM.players=='string'?`<p class=m><small>${esc(ADM.players)}</small></p>`:`<div class=adml>${ADM.players.map(p=>`<div><span><b>${esc(p.artist||'(no name)')}</b> · Day ${n(p.day)}<br><small class=m>${esc(p.uid)}</small></span><button onclick="admPick('${esc(p.uid)}')">Gift</button><button onclick="admCode('${esc(p.uid)}')">Copy save</button></div>`).join('')||'<small class=m>No saves yet.</small>'}</div>`;
  const gl=ADM.gifts==null?'':typeof ADM.gifts=='string'?`<p class=m><small>${esc(ADM.gifts)}</small></p>`:`<div class=adml>${ADM.gifts.map(g=>`<div><span>${g.claimed?'✓ claimed':'waiting'} · ${esc(g.from)} → <small class=m>${esc(g.to)}</small><br><small>${[g.money?'$'+n(g.money):'',g.streams?n(g.streams)+' streams':'',g.listeners?n(g.listeners)+' listeners':''].filter(Boolean).join(' · ')}</small></span>${g.claimed?'':`<button onclick="admDel('${esc(g.id)}')">Delete</button>`}</div>`).join('')||'<small class=m>No gifts sent yet.</small>'}</div>`;
  const rm=ADM.rooms==null?'':typeof ADM.rooms=='string'?`<p class=m><small>${esc(ADM.rooms)}</small></p>`:ADM.rooms.length?`<div class=adml>${ADM.rooms.map(o=>`<div><span><b>${esc(o.band)}</b> · Room ${esc(o.code)}<br><small class=m>${n(o.n)}/4 players${Date.now()-o.t>90000?' · last seen '+Math.round((Date.now()-o.t)/60000)+' min ago (may have closed)':''}</small></span><button onclick="mpAdminJoin('${esc(o.code)}')">Join</button></div>`).join('')}</div>`:'<p class=m><small>No active rooms right now. '+esc(ADM.roomsNote||'')+'</small></p>';
