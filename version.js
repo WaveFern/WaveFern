@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v50.8.1';
+const GAME_VERSION='v50.8.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v50.8.2',n:'Fixed: buildings that fade out of the way no longer glitch and flicker. Their windows, ledges and roofs now always draw in the right order. Saves still load.'},
  {v:'v50.8.1',n:'Founder badge on public profiles: if a player\'s leaderboard row says Founder, their profile now shows the Founder badge and outline even when the profile itself has no Founder flag yet. Saves still load.'},
  {v:'v50.8.0',n:'Songs always start with Beat, Lyrics and Mix in that order, and any unlocked extra minigames (Echo, Build It) come after them. The Beat bar is different every take: it starts from a random spot, picks one of four speed patterns (steady with a new speed each bounce, a wave, slow then fast, or a new speed after every hit) and the green zone changes width after each hit. Saves still load.'},
  {v:'v50.7.3',n:'Smoother game: saving your career (every 30 seconds, plus the cloud and vault copies) now takes about a third of the time, so the small freeze each save caused on long careers is gone, and the shadow code no longer walks the whole 3D scene three times a second. Nothing in the game or your saves changed.'},
