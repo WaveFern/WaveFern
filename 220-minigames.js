@@ -61,19 +61,16 @@ function nmDraw(){const q=rec.q,k=q.cur,g=q.g;let el=$('mg');if(!el){el=document
  else{el.querySelectorAll('.mgp').forEach((b,i)=>{const on=(k=='echo'&&(g.lit==i))||(k=='rush'&&g.lit==i);b.classList.toggle('on',on);b.style.outline=k=='echo'&&g.ph=='fb'&&g.bad==i?'3px solid #ff4455':''});if(tm)tm.style.width=k=='rush'?(g.lit>=0?Math.max(0,100-g.t/1.05*100):0)+'%':g.ph=='in'?Math.max(0,100-g.t/5*100)+'%':'0%'}}
 function run(names,res){const avg=res.reduce((a,b)=>a+b,0)/res.length,bonus=Math.round(avg*GT.qMax()),n0=S.nid;
  rec.sc={l:avg,x:avg};rec.miss=Math.round((1-avg)*8);rec.cdn=0;
- const H0=Math.max(240,LASTH||300);document.body.classList.remove('mgon');const o=$('mg');if(o)o.remove();
+ document.body.classList.remove('mgon');const o=$('mg');if(o)o.remove();
  mgFinish();
- try{const d=S.drafts[S.drafts.length-1];if(d&&d.id===n0){d.q+=bonus;const box=document.querySelector('#ui .box.modal');if(box){const cs=box.querySelector('.cards');if(cs){cs.style.setProperty('grid-template-columns','repeat(3,1fr)','important');cs.style.setProperty('gap','6px','important');cs.innerHTML=names.map((m,i)=>`<div class=card style="padding:6px;font-size:12px">${m}<b>${Math.round(res[i]*100)}%</b></div>`).join('')}
-  box.classList.add('nmres');box.style.height=H0+'px';if(avg>=.9&&res.every(v=>v>=.75)){box.classList.add('fxperfect');const h=box.querySelector('h2');if(h)h.textContent='Perfect song!'}
+ try{const d=S.drafts[S.drafts.length-1];if(d&&d.id===n0){d.q+=bonus;const box=document.querySelector('#ui .box.modal');if(box){const cs=box.querySelector('.cards');if(cs){cs.innerHTML=names.map((m,i)=>`<div class=card>${m}<b>${Math.round(res[i]*100)}%</b></div>`).join('')}
+  box.classList.add('nmw');if(avg>=.9&&res.every(v=>v>=.75))box.classList.add('fxperfect');
   const fq=document.getElementById('fxq');if(fq){const nf=fq.cloneNode();nf.textContent=d.q;fq.replaceWith(nf)}else{const p=box.querySelector('p.m');if(p)p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality '+d.q)}}}}catch(e){console.error('nmg result',e)}}
 {const t0=recTick;recTick=function(dt){if(rec&&rec.nm===undefined){rec.nm=0;if(rec.st===0&&!rec.band&&!rec.ig&&typeof GT!='undefined'&&mode=='rec'){try{const p=plan();rec.q={p,i:0,res:[],cur:p[0],g:null};if(p[0]!='beat')startItem();else rec.q.cur='beat'}catch(e){console.error('nmg',e);rec.q=null}}}
  if(rec&&rec.q&&rec.st==9){nmTick(dt);return}return t0.apply(this,arguments)}}
 {const d0=mgDraw;mgDraw=function(){const o=$('mg');if(o&&o.offsetHeight>120)LASTH=o.offsetHeight;if(rec&&rec.q){if(rec.st==9){nmDraw();return}d0.apply(this,arguments);const s=document.querySelector('#mg .mgs');if(s)s.innerHTML=planStrip();return}return d0.apply(this,arguments)}}
 addEventListener('keydown',e=>{if(!rec||!rec.q||rec.st!=9||rec.wait||e.repeat||/INPUT|TEXTAREA/.test(e.target.tagName))return;const n=parseInt(e.key);if(n>=1&&n<=4)nmIn(n-1)});
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const u=$('ui');if(u)u.innerHTML=u.innerHTML.replace(/Three steps:[^<]*?Costs 15 energy\./,GT.need()+' quick minigame'+(GT.need()>1?'s':'')+'. Costs 15 energy.')}catch(e){}return r}}
+{const st=document.createElement('style');st.textContent='#ui>.box.modal.fxperfect{position:absolute}#ui>.box.modal.nmw{width:min(380px,92vw);box-sizing:border-box}';document.head.appendChild(st)}
 window.NMG={games:NG,order:ORDER,names:NM};
-{const st=document.createElement('style');st.textContent=`/* the finished-song panel keeps the exact size and place of the minigame panel (height is copied when the last game ends) */
-#ui>.box.modal.nmres{position:fixed;left:50%;top:auto;bottom:90px;transform:translateX(-50%);width:min(440px,92vw);box-sizing:border-box;margin:0;padding:8px;overflow:auto;max-height:none}
-#ui>.box.modal.nmres h2{font-size:15px;margin:0 0 4px;padding-bottom:4px}#ui>.box.modal.nmres p{margin:3px 0;font-size:12px}#ui>.box.modal.nmres .cards{margin:4px 0}#ui>.box.modal.nmres .card b{font-size:15px}#ui>.box.modal.nmres input{padding:4px 6px}#ui>.box.modal.nmres button{padding:6px 10px}
-`;document.head.appendChild(st)}
 })();
