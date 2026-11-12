@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v52.0.1';
+const GAME_VERSION='v52.0.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v52.0.2',n:'The normal mouse cursor in the computer is now a blocky pixel-art arrow to match the pixel hand. Saves still load.'},
  {v:'v52.0.1',n:'Label HQ text and navigation now use Helvetica LT Pro from Adobe Fonts and headings use Norman at weight 400, both from Adobe Fonts. If Adobe Fonts cannot load, Helvetica Neue or Arial is used. Nothing else changed. Saves still load.'},
  {v:'v52.0.0',n:'The computer now has a second mouse cursor: a pixel hand that shows when you hover buttons, icons, links, tabs and other clickable things (desktop, apps and taskbar). Text boxes keep the normal cursor and disabled buttons stay as arrows. Saves still load.'},
  {v:'v51.9.1',n:'Label HQ now spans the whole window and uses Instrument Serif headings with Familjen Grotesk text. Open offers are panels (brand, Fame Level, location, expiry, View details and Accept) and the brand directory has All / Open / Higher Fame Level tabs. Three new late-game record labels (Vantablack Records, Solstice Entertainment, Obelisk Worldwide) offer deals far beyond Crown & Anchor. Brand deal logic unchanged. Saves still load.'},
