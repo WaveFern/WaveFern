@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.5.1';
+const GAME_VERSION='v51.6.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.6.0',n:'You cannot send a message while the contact is still typing: the box and Send button grey out until their reply lands. Saves still load.'},
  {v:'v51.5.1',n:'Founder badge: new admin console tool fdBackfill() adds the missing cloud Founder entries (for Founders whose cloud save is already a new career), which is what the Founder badge on the leaderboard and other profiles needs. Saves still load.'},
  {v:'v51.5.0',n:'Things take a believable moment now. Artists, agents and other contacts show "typing..." before their reply appears, longer for longer messages. Installing an app from the App Barn, or the Download Label HQ link in Messages, shows a download bar for a few seconds before the app lands on your desktop. Replies and installs are saved if you quit or reload mid-wait. Saves still load.'},
  {v:'v51.4.1',n:'Buildings now fade out smoothly and properly see-through when you walk behind them, like the walls of your house, instead of the dotted look. Characters and signs behind them stay drawn correctly with no flicker. Saves still load.'},
