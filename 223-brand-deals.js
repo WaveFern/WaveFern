@@ -141,7 +141,7 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Label HQ (v51.9.0): the Brand Deals website. White page, black type, light grey hairlines; no pictures, logos,
    icons, cards or colour. A slim top bar holds the pages: Brand Deals (overview + brand directory), Active Deals, Past Deals,
    and on the right Labels and Team (record labels, unchanged; a signed label only tints those two pages).
-   Clicking a brand in the directory opens its page (HQB). Type: Helvetica LT Pro for text and Norman (variable, weight 600) for headings, both from Adobe Fonts kit ngq0vsd, loaded the
+   Clicking a brand in the directory opens its page (HQB). Type: Helvetica LT Pro for text and Norman (variable) for headings, font-weight 600 set in each heading's font shorthand (a font shorthand resets font-variation-settings), both from Adobe Fonts kit ngq0vsd, loaded the
    first time the app opens; system fonts if offline). The layout follows the window width (container queries). ---------- */
 const STT=['Offer','In progress','Declined','Completed','Expired','Fell through'];
 const cityOf=id=>{try{const d=wtDest(id);return d.city||d.country}catch(e){return''}};
@@ -267,7 +267,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('lhqmn',app=='hq'&&!!m.querySelector('.lhq'))}catch(e){}return r}}
 {const st=document.createElement('style');st.textContent=`#pc .lhqmn{padding:0!important;background:#fff}
 #pc .lhq{--ac:#111;--bg:#fff;--soft:#f5f5f4;--ln:#e8e8e6;--ln2:#d4d4d1;--ink:#111;--mu:#666;--mu2:#9b9b98;--sans:helvetica-lt-pro,"Helvetica Neue",Helvetica,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:"norman-variable","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
- font-variation-settings:"wght" 600;container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none;letter-spacing:0}
+ container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none;letter-spacing:0}
 #pc .lhq *{box-sizing:border-box}
 #pc .lhq h1,#pc .lhq h2,#pc .lhq h3,#pc .lhq p,#pc .lhq ul,#pc .lhq ol,#pc .lhq dl{margin:0;padding:0}
 #pc .lhq button{font-family:var(--sans)}
@@ -281,10 +281,10 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-nav em{font-style:normal;font-size:11px;color:var(--mu2);font-variant-numeric:tabular-nums}
 #pc .lhq .lh-main{flex:1;padding:48px 0 80px}
 #pc .lhq .lh-ph{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:24px 64px;align-items:end;margin:0 0 44px}
-#pc .lhq .lh-h1{font:400 44px/1.05 var(--serif);letter-spacing:-.01em;color:var(--ink)}
+#pc .lhq .lh-h1{font:600 44px/1.05 var(--serif);letter-spacing:-.01em;color:var(--ink)}
 #pc .lhq .lh-lede{font-size:15px;line-height:1.6;color:var(--mu);max-width:520px;justify-self:end}
-#pc .lhq .lh-h2{font:400 26px/1.2 var(--serif);color:var(--ink)}
-#pc .lhq .lh-h3{font:400 26px/1.2 var(--serif);color:var(--ink)}
+#pc .lhq .lh-h2{font:600 26px/1.2 var(--serif);color:var(--ink)}
+#pc .lhq .lh-h3{font:600 26px/1.2 var(--serif);color:var(--ink)}
 #pc .lhq .lh-h4{font:700 13px/1.4 var(--sans);color:var(--ink);margin:0 0 6px}
 #pc .lhq .lh-mut{color:var(--mu);font-size:13.5px}
 #pc .lhq .lh-grow{flex:1;min-width:0}
@@ -296,7 +296,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-kpi{padding:16px 24px 18px;border-left:1px solid var(--ln);min-width:0}
 #pc .lhq .lh-kpi:first-child{border-left:0;padding-left:0}
 #pc .lhq .lh-kpi span{display:block;font-size:12.5px;color:var(--mu)}
-#pc .lhq .lh-kpi b{display:block;font:400 34px/1.15 var(--serif);color:var(--ink);margin-top:6px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pc .lhq .lh-kpi b{display:block;font:600 34px/1.15 var(--serif);color:var(--ink);margin-top:6px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #pc .lhq .lh-kpi small{display:block;font-size:12px;color:var(--mu2);margin-top:2px}
 #pc .lhq .lh-sec{margin:0 0 56px}
 #pc .lhq .lh-sec .lh-kpis{margin:0}
@@ -311,7 +311,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-mt{display:flex;width:max-content;animation:lhmq 70s linear infinite}
 #pc .lhq .lh-mq:hover .lh-mt,#pc .lhq .lh-mq:focus-within .lh-mt{animation-play-state:paused}
 #pc .lhq .lh-mt ul{list-style:none;display:flex;flex:none}
-#pc .lhq .lh-pn{all:unset;cursor:pointer;display:block;padding:20px 28px 20px 0;margin-right:28px;font:400 30px/1.1 var(--serif);white-space:nowrap;color:var(--ink)}
+#pc .lhq .lh-pn{all:unset;cursor:pointer;display:block;padding:20px 28px 20px 0;margin-right:28px;font:600 30px/1.1 var(--serif);white-space:nowrap;color:var(--ink)}
 #pc .lhq .lh-pn:hover{color:var(--mu)}
 #pc .lhq .lh-pn:focus-visible{outline:1px solid var(--ink);outline-offset:-4px}
 @keyframes lhmq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -319,13 +319,13 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-ocs{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:20px;padding-top:20px}
 #pc .lhq .lh-oc{border:1px solid var(--ln);padding:22px 22px 18px;display:flex;flex-direction:column;min-width:0}
 #pc .lhq .lh-oct{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--ln)}
-#pc .lhq .lh-ocn{font:400 26px/1.15 var(--serif);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pc .lhq .lh-ocn{font:600 26px/1.15 var(--serif);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #pc .lhq .lh-tag{font-size:12.5px;color:var(--mu);white-space:nowrap}
 #pc .lhq .lh-ocf{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 20px}
 #pc .lhq .lh-ocf>div{background:var(--soft);padding:10px 12px;min-width:0}
 #pc .lhq .lh-ocf span{display:block;font-size:12px;color:var(--mu)}
 #pc .lhq .lh-ocf b{display:block;font-weight:700;font-size:13.5px;margin-top:1px;line-height:1.35}
-#pc .lhq .lh-oh{font:400 22px/1.2 var(--serif);margin:0 0 6px}
+#pc .lhq .lh-oh{font:600 22px/1.2 var(--serif);margin:0 0 6px}
 #pc .lhq .lh-ocd{font-size:13.5px;color:var(--mu);flex:1;margin:0 0 20px}
 #pc .lhq .lh-ocb{display:flex;gap:8px}
 #pc .lhq .lh-ocb .lh-btn{flex:1;padding:0 10px}
@@ -339,7 +339,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 64px}
 #pc .lhq .lh-two .lh-sec{margin-bottom:48px}
 #pc .lhq .lh-sum{padding:18px 0 0}
-#pc .lhq .lh-big{font:400 22px/1.3 var(--serif);color:var(--ink)}
+#pc .lhq .lh-big{font:600 22px/1.3 var(--serif);color:var(--ink)}
 #pc .lhq .lh-sum .lh-mut{margin:4px 0 14px}
 #pc .lhq .lh-fame{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 64px;border-top:1px solid var(--ln);padding:20px 0 0;margin:0 0 80px}
 #pc .lhq .lh-fame .lh-h4{margin:0}
@@ -349,7 +349,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-grid{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0 48px}
 #pc .lhq .lh-grid li{border-top:1px solid var(--ln);min-width:0}
 #pc .lhq .lh-item{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;gap:28px;width:100%;min-height:106px;padding:20px 0 18px}
-#pc .lhq .lh-in1{font:400 28px/1.15 var(--serif);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pc .lhq .lh-in1{font:600 28px/1.15 var(--serif);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #pc .lhq .lh-in2{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12.5px;color:var(--mu)}
 #pc .lhq .lh-in2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #pc .lhq .lh-vo{color:var(--ink);font-weight:700;white-space:nowrap;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:text-decoration-color .12s}
@@ -362,7 +362,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-acth .lh-mut{margin-top:4px}
 #pc .lhq .lh-fee{text-align:right;white-space:nowrap}
 #pc .lhq .lh-fee span{display:block;font-size:12.5px;color:var(--mu)}
-#pc .lhq .lh-fee b{font:400 26px/1.2 var(--serif);font-variant-numeric:tabular-nums}
+#pc .lhq .lh-fee b{font:600 26px/1.2 var(--serif);font-variant-numeric:tabular-nums}
 #pc .lhq .lh-dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:24px 0 0;border-top:1px solid var(--ln)}
 #pc .lhq .lh-dl>div{padding:14px 20px 14px 0;min-width:0}
 #pc .lhq dt{font-size:12.5px;color:var(--mu);margin:0}
@@ -385,11 +385,11 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-num{font-variant-numeric:tabular-nums;white-space:nowrap}
 #pc .lhq .lh-t tr.lh-dim td{color:var(--mu)}
 #pc .lhq .lh-t tr.sg td{background:var(--soft)}
-#pc .lhq .lh-bnm{all:unset;cursor:pointer;font:400 22px/1.2 var(--serif);color:var(--ink)}
+#pc .lhq .lh-bnm{all:unset;cursor:pointer;font:600 22px/1.2 var(--serif);color:var(--ink)}
 #pc .lhq .lh-bnm:hover{text-decoration:underline;text-decoration-color:var(--ln2);text-underline-offset:4px}
 #pc .lhq .lh-t tr.lh-dim .lh-bnm{color:var(--mu)}
 #pc .lhq .lh-bn{display:flex;align-items:center;gap:12px;min-width:0}
-#pc .lhq .lh-bn b{display:block;font:400 22px/1.2 var(--serif)}
+#pc .lhq .lh-bn b{display:block;font:600 22px/1.2 var(--serif)}
 #pc .lhq .lh-bn small{display:block;font-size:13px;color:var(--mu);margin-top:2px}
 #pc .lhq .lh-lt .lh-bn small{max-width:380px}
 #pc .lhq .lh-acts{white-space:nowrap}
@@ -415,7 +415,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-card{border-top:1px solid var(--ln);padding:20px 0 0}
 #pc .lhq .lh-offer{border-top:1px solid var(--ink);border-bottom:1px solid var(--ln);padding:24px 0;margin:0 0 48px}
 #pc .lhq .lh-offer .lh-eb{font-size:12.5px;color:var(--mu);margin:0 0 6px}
-#pc .lhq .lh-offer .lh-h2{font:400 24px/1.25 var(--serif)}
+#pc .lhq .lh-offer .lh-h2{font:600 24px/1.25 var(--serif)}
 #pc .lhq .lh-offer .lh-lede{justify-self:auto;margin-top:8px;max-width:620px}
 #pc .lhq .lh-offer .lh-btn.pri{background:var(--ink);border-color:var(--ink)}
 #pc .lhq .lh-offer .lh-dl,#pc .lhq .lh-acc .lh-dl{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}

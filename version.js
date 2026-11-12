@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v52.1.0';
+const GAME_VERSION='v52.1.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v52.1.1',n:'Fixed: the heavier Norman headings in Label HQ were not showing. Headings now use font-weight 600 directly. Nothing else changed. Saves still load.'},
  {v:'v52.1.0',n:'Label HQ: a slow scrolling strip of Our partnered brands on Brand Deals (click a name to open the brand), and each brand page now shows that brand\'s made-up logo in solid black. Headings are a little heavier (Norman at weight 600) so they read more easily. Game logic unchanged. Saves still load.'},
  {v:'v52.0.2',n:'The normal mouse cursor in the computer is now a blocky pixel-art arrow to match the pixel hand. Saves still load.'},
  {v:'v52.0.1',n:'Label HQ text and navigation now use Helvetica LT Pro from Adobe Fonts and headings use Norman at weight 400, both from Adobe Fonts. If Adobe Fonts cannot load, Helvetica Neue or Arial is used. Nothing else changed. Saves still load.'},
