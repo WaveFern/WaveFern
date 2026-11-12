@@ -1,5 +1,5 @@
-/* ===== v50.9.0: Prism Studios, brand photoshoots and being recognised abroad =====
-   Part 2 of brand sponsorships (222-brand-deals.js). Needs the Instagrime photo renderer in 178-instagrime-photos.js.
+/* ===== v51.0.0: Prism Studios, brand photoshoots and being recognised abroad =====
+   Part 2 of brand sponsorships (223-brand-deals.js). Needs the Instagrime photo renderer in 178-instagrime-photos.js.
    - Studio: Prism Studios is drawn as a pixel facade (BRD.facade: day or night sky, skyline, glass doors, red carpet, the brand's
      logo on a roof billboard) and a pixel set inside (BRD.photo: backdrop wall with the brand's logo, softboxes, floor).
    - Photoshoot (BRD.go): you stand in the set as your own 3D character. The brief asks for a mood (pose) and a lighting style;

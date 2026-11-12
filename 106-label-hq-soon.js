@@ -1,4 +1,4 @@
-/* ===== v26.113: record labels are coming soon. v50.9.0: Label HQ itself is open again (free) for brand deals and photoshoots (222/223); only the label team upgrades and label messages stay off ===== */
+/* ===== v26.113: record labels are coming soon. v50.9.0: Label HQ itself is open again (free) for brand deals and photoshoots (223/224); only the label team upgrades and label messages stay off ===== */
 APPD.hq.d='Brand sponsorships and photoshoots: companies send you deals, you shoot the campaign and post it on Instagrime. Label team upgrades come with record labels.';
 /* labels off: label messages (offers, welcome, login) and their contact threads move out of the Messages inbox into S.lbStash; switching LABELS_ENABLED back on puts them back. S.label and the rest of the save are left alone */
 function lbMsgClean(){try{if(!Array.isArray(S.msgs))return;const names=LABELS.map(l=>l.n),isL=m=>m&&(m.lo||names.indexOf(m.from)>=0);

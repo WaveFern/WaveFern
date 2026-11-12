@@ -1,4 +1,4 @@
-/* ===== v50.9.0: brand sponsorships (Label HQ app) =====
+/* ===== v51.0.0: brand sponsorships (Label HQ app) =====
    Companies based on real brands (Converse, Monster Energy, Ray-Ban, Supreme, Levi's, Beats, Pepsi, Adidas, Coca-Cola, Samsung,
    Nike, Gucci, Apple, Louis Vuitton) write to you in Messages, less often than artists. Their profile picture is their logo,
    drawn on a canvas here (no images are fetched). Bigger brands need a higher Fame Level (BRD.tiers).
@@ -10,7 +10,7 @@
      the shoot went. Offers stand for 4 days. Some (from Fame Level 45, 38% of offers) are trips: the brand books you a Swiftwing
      flight to one of the world-tour places. Accept and you get a free, checked-in ticket on the next flight from home that
      leaves at least 90 minutes from now (usually today). After you land and reach the city, a company car takes you to the studio
-     (223-brand-studio.js). When the shoot is done the brand books a free flight home.
+     (224-brand-studio.js). When the shoot is done the brand books a free flight home.
    State: S.brands={last,list:[{id,b:brandId,k:'home'|'trip',d:destId,pay,exp,st,due,tk,brief:{mood,light},res}],done,earned}
      st: 0 offer, 1 accepted (shoot to do), 2 declined, 3 done, 4 expired, 5 failed (missed flight or ran out of time). */
 (function(){
