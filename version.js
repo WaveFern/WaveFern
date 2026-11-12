@@ -6,6 +6,7 @@
 const GAME_VERSION='v51.0.8';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.0.4',n:'Label HQ is back in the App Barn as a free app, so you can always get it. Links in sponsor and label messages still download it too. Saves still load.'},
  {v:'v51.0.8',n:'Added padding around the finished song screen (Song recorded!) so the cards, title box and button no longer sit tight against the edge, on desktop and phone. Saves still load.'},
  {v:'v51.0.7',n:'Fixed: buildings that fade out of the way when you walk behind them no longer glitch, go fully invisible or make everything behind them look wrong. They now fade with a clean dotted pattern instead of see-through blending. Saves still load.'},
  {v:'v51.0.6',n:'The Streams number on the morning summary now lines up with your Monthly listeners change (for example +400 listeners no longer shows only 500 streams). Display only: real streams, earnings and difficulty are unchanged.'},
