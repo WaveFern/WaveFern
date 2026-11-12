@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.0.6';
+const GAME_VERSION='v51.0.7';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.0.7',n:'Added padding around the finished song screen (Song recorded!) so the cards, title box and button no longer sit tight against the edge, on desktop and phone. Saves still load.'},
  {v:'v51.0.6',n:'The Streams number on the morning summary now lines up with your Monthly listeners change (for example +400 listeners no longer shows only 500 streams). Display only: real streams, earnings and difficulty are unchanged.'},
  {v:'v51.0.5',n:'Fixed the day, time, money and listeners display staying on screen over the main menu after Save and quit. It is now hidden whenever the main menu is open and comes back when you press Play or load a save. Saves still load.'},
  {v:'v51.0.4',n:'Fixed a console error where an item preview with no 3D model data (food, app, pet, house, clothes or furniture) crashed the preview loop. Those previews now show a plain grey block instead. Saves still load.'},

@@ -277,3 +277,10 @@ body.notags #ntags{display:none}
 .pzav img{width:100%;height:100%;object-fit:cover}
 
 body.gfx-noblur #pzo{backdrop-filter:none!important;background:rgba(0,0,0,.72)}
+
+/* v51.0.7: more breathing room around the finished-song screen (the "Song recorded!" box with the title field) */
+#ui>.box.modal:has(#tin){padding:24px 28px;max-height:94vh;overflow:auto}
+#ui>.box.modal:has(#tin) h2{margin-top:0}
+#ui>.box.modal:has(#tin) .cards{margin:16px 0}
+#ui>.box.modal:has(#tin) .row2{margin-top:16px}
+@media(max-width:480px){#ui>.box.modal:has(#tin){padding:16px 18px;min-width:0;width:calc(100vw - 32px)}}
