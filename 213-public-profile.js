@@ -75,7 +75,7 @@ window.fwProfileOpen=async function(handle,byUid){
   const [d,lb]=await Promise.all([FBF.getDoc(FBF.doc(FBD,'profiles',uid)),FBF.getDoc(FBF.doc(FBD,'leaderboard',uid)).catch(()=>null)]);let p=d.exists()?d.data():null;
   /* v49.91.0: the leaderboard row is the single source of truth for the numbers, so a profile always shows what the board shows */
   const L=lb&&lb.exists&&lb.exists()?lb.data():null;
-  if(L){if(!p)p={a:L.a||'',h:handle,bio:'',fame:L.fame,lis:L.lis,founder:!!L.f};else p=Object.assign({},p,{fame:L.fame,lis:L.lis})}
+  if(L){if(!p)p={a:L.a||'',h:handle,bio:'',fame:L.fame,lis:L.lis,founder:!!L.f};else p=Object.assign({},p,{fame:L.fame,lis:L.lis,founder:(p.founder===1||p.founder===true||L.f===1||L.f===true)?1:p.founder})}
   if(!p){box('<h2>'+(handle?'@'+esc(handle):'Player')+'</h2><p class=m>This player has not opened the game since profiles started, so there is nothing to show yet.</p>');return}
   if(byUid&&p.h)handle=p.h;const me=uid==FBU.uid;
   full(p,handle,me,uid)
