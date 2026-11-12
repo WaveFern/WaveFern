@@ -152,11 +152,40 @@ function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),past=s.
  h+='<h3>Offers</h3>'+(offs.length?offs.map(o=>row(o,`<button class=go onclick="bdAccept(${o.id})">Accept</button><button onclick="bdDecline(${o.id})">Decline</button>`)).join(''):`<p class=m>${L<FAME[0]?'Brands start writing at Fame Level '+FAME[0]+'.':'No offers right now. Brands write now and then as your fame grows.'}</p>`);
  if(past.length)h+='<h3>Past deals</h3>'+past.map(o=>row(o)).join('');
  h+='<h3>Brands</h3><div class=bdg>'+BR.map(b=>{const lk=FAME[b.t]>L;return`<div class="${lk?'lk':''}"><img src="${BRD.logo(b.id,64)}"><b>${esc(b.n)}</b><small>${lk?'Fame '+FAME[b.t]:'Open'}</small></div>`}).join('')+'</div></div>';return h}
-{const h0=PA.hq;BRD.teamPage=h0;PA.hq=function(){let body;try{body=dealsTab()}catch(e){console.error('label hq',e);body='<p class=m>Label HQ hit a problem. Close and open it again.</p>'}
- return`<div class="bdw"><h1 style="margin:0 0 4px"><img src="${IC.hq}" style="width:32px;image-rendering:pixelated;vertical-align:middle"> Label HQ</h1>${body}</div>`}}
-/* Label HQ (brand deals) never shows in the App Barn: a sponsor's Messages link downloads it. Each record label has its own app (225-label-apps.js) */
+/* ---- Label HQ: Brand deals | Labels | Team (once signed). Each record label themes the whole app. ---- */
+const COL={disc:['#e05252','#2a1517'],flip:['#ffb300','#2a2211'],brick:['#d2763f','#2a1c14'],north:['#5ac8fa','#102230'],merid:['#9c7bff','#1a1633'],crown:['#e6b422','#1f1b3a']};
+const LROWS=['....GG....','...GGGG...','..NNNNNN..','..NWNNWN..','..NNNNNN..','..NWNNWN..','..NNNNNN..','..NWNNWN..','..NNDDNN..','KKKKDDKKKK'];
+const LIC={};const lIc=id=>LIC[id]||(LIC[id]=mkIc(LROWS,{G:COL[id][0],N:COL[id][0]+'99',W:'#ffffffcc',D:COL[id][0],K:'#1a1d2b'}));
+let HQT='deals',HQJ=0;window.bdTab=t=>{HQT=t;pcR()};window.bdOffer=id=>{HQJ=id;pcR()};
+const labels=()=>typeof LABELS_ENABLED!='undefined'&&LABELS_ENABLED&&typeof LABELS!='undefined';
+const offerOf=mid=>S.msgs.find(m=>m.id==mid&&m.lo&&m.lo.st==0);
+/* the link in a label's offer message: opens Label HQ and asks if you want to join */
+window.bdJoin=function(mid){if(!offerOf(mid)||S.label)return;S.hqLink=1;S.apps=S.apps||{};S.apps.hq=1;HQJ=mid;HQT='labels';openPC();app='hq';pcR()};
+window.bdJoinYes=function(){const mid=HQJ;HQJ=0;if(offerOf(mid)&&!S.label){lbSign(mid);HQT='team'}pcR()};
+window.bdJoinNo=function(){HQJ=0;snd('pop');pcR()};
+function joinCard(){const m=HQJ&&offerOf(HQJ);if(!m||S.label){HQJ=0;return''}const l=lbById(m.lo.id);if(!l)return'';
+ return`<div class=bdjoin><img src="${lIc(l.id)}" style="width:44px;image-rendering:pixelated"><div class=tx><b>Do you want to join ${esc(l.n)}?</b><small>${esc(l.pitch)}</small><small>Signing bonus $${l.adv.toLocaleString()} · they keep ${Math.round(l.cut*100)}% of your streaming income · you can leave later for a fee.</small></div><div class=bt><button class=go onclick="bdJoinYes()">Join ${esc(l.n)}</button><button onclick="bdJoinNo()">Not now</button></div></div>`}
+function labelsTab(){const L=S.label,rows=LABELS.map(l=>{const sg=L&&L.id==l.id,off=S.msgs.find(m=>m.lo&&m.lo.id==l.id&&m.lo.st==0),ok=typeof lbElig=='function'&&lbElig(l);
+  const stt=sg?'<b style="color:var(--hqa)">Signed</b>':off?`<button class=go onclick="bdOffer(${off.id})">Offer waiting</button>`:ok?'<small class=m>Eligible. They may send an offer.</small>':`<small class=m>Needs ${l.ml.toLocaleString()} monthly listeners and ${l.st.toLocaleString()} streams${l.rep>0?' and reputation '+l.rep:''}</small>`;
+  return`<div class="bdrow${sg?' act':''}"><img class=lg style="border-radius:6px;image-rendering:pixelated;border:0" src="${lIc(l.id)}"><div class=tx><b>${esc(l.n)}</b> <small style="display:inline">${esc(lbStars(l.q))}</small><small>${esc(l.pitch)}</small><small>Keeps ${Math.round(l.cut*100)}% · signing bonus $${l.adv.toLocaleString()}</small></div><div class=bt>${stt}</div></div>`}).join('');
+ return`<div class=hqx>${joinCard()}<p class=m>${L?'You are signed with '+esc(lbCur().n)+'. Leave on the Team tab.':'Labels send offers to Messages when your numbers are high enough. The offer links here.'}</p>${rows}</div>`}
+const teamTab=()=>{HQAUTH=true;let h=BRD.teamPage?BRD.teamPage():'';return h.replace(/<button onclick="HQAUTH=false;pcR\(\)">Sign out<\/button> ?/,'').replace(/<h1><img [^>]*> Label HQ<\/h1>/,'')};
+const h0=PA.hq;BRD.teamPage=h0;
+PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='deals';if(!labels()&&HQT=='labels')HQT='deals';
+ const th=L?COL[L.id]:null,sty=th?`--hqa:${th[0]};--hqb:${th[1]};`:'',tabs=`<div class=bdtabs><button class="${HQT=='deals'?'on':''}" onclick="bdTab('deals')">Brand deals</button>${labels()?`<button class="${HQT=='labels'?'on':''}" onclick="bdTab('labels')">Labels${HQJ?' (1)':''}</button>`:''}${L?`<button class="${HQT=='team'?'on':''}" onclick="bdTab('team')">Team</button>`:''}</div>`;
+ let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():joinCard()+dealsTab()}catch(e){console.error('label hq',e);body='<p class=m>Label HQ hit a problem. Close and open it again.</p>'}
+ return`<div class="bdw${L?' bdth':''}" style="${sty}"><h1 style="margin:0 0 4px"><img src="${L?lIc(L.id):IC.hq}" style="width:32px;image-rendering:pixelated;vertical-align:middle"> ${L?esc(L.n)+' · ':''}Label HQ</h1>${tabs}${body}</div>`};
+{const st=document.createElement('style');st.textContent='.bdw{--hqa:#e6b422}.bdw .bdtabs{display:flex;gap:6px;margin:6px 0 10px}.bdw .bdtabs button.on{background:var(--hqa);color:#0a0a0a;font-weight:700}.bdw.bdth{background:linear-gradient(180deg,var(--hqb),#0000 60%);border-radius:8px;padding:8px 10px;box-shadow:inset 0 0 0 2px var(--hqa)}.bdw .bdrow.act{box-shadow:inset 0 0 0 2px var(--hqa)}.bdw h3{color:var(--hqa)}.bdw .bdst b{color:var(--hqa)}.bdw .bdjoin{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#151a17;border:2px solid var(--hqa);border-radius:8px;padding:12px;margin:8px 0;max-width:640px}.bdw .bdjoin .tx{flex:1;min-width:220px}.bdw .bdjoin small{display:block;color:var(--m);margin-top:3px}.bdw .bdjoin .bt{display:flex;gap:6px}.bdw button.go{background:var(--hqa);color:#0a0a0a}.bdw .hqx{border-color:var(--hqa)!important}.bdw .hqx .gpip i.on{background:var(--hqa)}.bdw .hqx .hqc.hqmax{box-shadow:inset 0 0 0 2px var(--hqa)}';document.head.appendChild(st)}
+/* Label HQ never shows in the App Barn: links in Messages download it */
 {const s0=PA.store;PA.store=function(){return s0.apply(this,arguments).replace(/<div class=card data-pv="a:hq[^"]*"[\s\S]*?<\/button><\/div>/g,'')}}
 {const i0=inst;inst=function(k){if(/^hq/.test(k)){snd('err');return say('This app is not in the App Barn. It arrives by a link in Messages.')}return i0.apply(this,arguments)}}
 window.bdGetHQ=function(){S.hqLink=1;if(S.apps&&S.apps.hq)return;S.apps=S.apps||{};S.apps.hq=1;snd('chime');say('Label HQ downloaded. Find it on your desktop.');updateVersion();pcR()};
+/* label offers in Messages: the Sign button becomes the link into Label HQ */
+{const pm=PA.msg;PA.msg=function(){let h=pm.apply(this,arguments);if(typeof h!='string')return h;
+ try{h=h.replace(/<button class=go onclick="lbSign\((\d+)\)">Sign the deal<\/button>/,(m,id)=>{const o=offerOf(id),l=o&&lbById(o.lo.id);return`<button class=go onclick="bdJoin(${id})">Open link: join ${l?esc(l.n):'label'}</button>`})}catch(e){}return h}}
+/* signing: no login; the welcome message points at the app. Old saves: drop the old per-label apps */
+{const s1=lbSign;lbSign=function(mid){const say0=say;say=function(t){return say0.call(this,String(t).replace(' Login details are in Messages.',' Label HQ now has their theme.'))};let r;try{r=s1.apply(this,arguments)}finally{say=say0}
+ try{if(S.label){const w=S.msgs[S.msgs.length-1],l=lbCur();if(w&&/Label HQ login/.test(w.body||''))w.body='Welcome to '+l.n+'! Your signing bonus of $'+l.adv.toLocaleString()+' has been paid. Open Label HQ: it now has the '+l.n+' theme and your team and studio upgrades.';S.apps=S.apps||{};S.apps.hq=1;S.hqLink=1;HQT='team'}}catch(e){console.error('label join',e)}return r}}
+{const fix=()=>{try{if(S.apps){Object.keys(S.apps).forEach(k=>{if(/^hq_/.test(k))delete S.apps[k]});if(S.label)S.apps.hq=1}}catch(e){}};const lc2=loadCode;loadCode=function(){const r=lc2.apply(this,arguments);fix();return r};fix()}
 {const lc=loadCode;loadCode=function(){const r=lc.apply(this,arguments);try{st()}catch(e){}return r}}
 })();
