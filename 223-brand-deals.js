@@ -135,7 +135,7 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Label HQ (v51.9.0): the Brand Deals website. White page, black type, light grey hairlines; no pictures, logos,
    icons, cards or colour. A slim top bar holds the pages: Brand Deals (overview + brand directory), Active Deals, Past Deals,
    and on the right Labels and Team (record labels, unchanged; a signed label only tints those two pages).
-   Clicking a brand in the directory opens its page (HQB). Type: Familjen Grotesk for text, Instrument Serif for headings (Google Fonts, loaded the
+   Clicking a brand in the directory opens its page (HQB). Type: Helvetica LT Pro for text and Norman (variable, weight 400) for headings, both from Adobe Fonts kit ngq0vsd, loaded the
    first time the app opens; system fonts if offline). The layout follows the window width (container queries). ---------- */
 const STT=['Offer','In progress','Declined','Completed','Expired','Fell through'];
 const cityOf=id=>{try{const d=wtDest(id);return d.city||d.country}catch(e){return''}};
@@ -246,8 +246,7 @@ function teamTab(){hqFill();const l=lbCur();if(!l)return'';const fee=Math.round(
 const h0=PA.hq;BRD.teamPage=h0;
 const hqTop=()=>{try{const m=document.querySelector('#pc .mn');if(m)m.scrollTop=0}catch(e){}};
 window.bdBrand=id=>{HQT='deals';HQB=id;pcR();hqTop()};
-const hqFont=()=>{if(document.getElementById('lhqfont'))return;const l=document.createElement('link');l.id='lhqfont';l.rel='stylesheet';
- l.href='https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600&family=Instrument+Serif&display=swap';document.head.appendChild(l)};
+const hqFont=()=>{if(document.getElementById('lhqtk'))return;const a=document.createElement('link');a.id='lhqtk';a.rel='stylesheet';a.href='https://use.typekit.net/ngq0vsd.css';document.head.appendChild(a)};
 PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='deals';if(!labels()&&HQT=='labels')HQT='deals';if(HQT!='deals')HQB=0;
  try{hqFont()}catch(e){}
  const th=L&&(HQT=='labels'||HQT=='team')?THM[L.id]:null,sty=th?`--ac:${th.a}`:'';
@@ -260,8 +259,8 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 /* the app fills its window edge to edge */
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('lhqmn',app=='hq'&&!!m.querySelector('.lhq'))}catch(e){}return r}}
 {const st=document.createElement('style');st.textContent=`#pc .lhqmn{padding:0!important;background:#fff}
-#pc .lhq{--ac:#111;--bg:#fff;--soft:#f5f5f4;--ln:#e8e8e6;--ln2:#d4d4d1;--ink:#111;--mu:#666;--mu2:#9b9b98;--sans:"Familjen Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:"Instrument Serif","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
- container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none;letter-spacing:0}
+#pc .lhq{--ac:#111;--bg:#fff;--soft:#f5f5f4;--ln:#e8e8e6;--ln2:#d4d4d1;--ink:#111;--mu:#666;--mu2:#9b9b98;--sans:helvetica-lt-pro,"Helvetica Neue",Helvetica,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:"norman-variable","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+ font-variation-settings:"wght" 400;container-type:inline-size;display:flex;flex-direction:column;min-height:100%;width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);text-align:left;-webkit-font-smoothing:antialiased;text-shadow:none;letter-spacing:0}
 #pc .lhq *{box-sizing:border-box}
 #pc .lhq h1,#pc .lhq h2,#pc .lhq h3,#pc .lhq p,#pc .lhq ul,#pc .lhq ol,#pc .lhq dl{margin:0;padding:0}
 #pc .lhq button{font-family:var(--sans)}
@@ -271,7 +270,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-nav{display:flex;gap:28px;align-items:stretch;min-width:0}
 #pc .lhq .lh-nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:5px;font:400 13px var(--sans);color:var(--mu);border-bottom:1px solid transparent;margin-bottom:-1px;white-space:nowrap}
 #pc .lhq .lh-nav button:hover{color:var(--ink)}
-#pc .lhq .lh-nav button.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:500}
+#pc .lhq .lh-nav button.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
 #pc .lhq .lh-nav em{font-style:normal;font-size:11px;color:var(--mu2);font-variant-numeric:tabular-nums}
 #pc .lhq .lh-main{flex:1;padding:48px 0 80px}
 #pc .lhq .lh-ph{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:24px 64px;align-items:end;margin:0 0 44px}
@@ -279,10 +278,10 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-lede{font-size:15px;line-height:1.6;color:var(--mu);max-width:520px;justify-self:end}
 #pc .lhq .lh-h2{font:400 26px/1.2 var(--serif);color:var(--ink)}
 #pc .lhq .lh-h3{font:400 26px/1.2 var(--serif);color:var(--ink)}
-#pc .lhq .lh-h4{font:500 13px/1.4 var(--sans);color:var(--ink);margin:0 0 6px}
+#pc .lhq .lh-h4{font:700 13px/1.4 var(--sans);color:var(--ink);margin:0 0 6px}
 #pc .lhq .lh-mut{color:var(--mu);font-size:13.5px}
 #pc .lhq .lh-grow{flex:1;min-width:0}
-#pc .lhq .lh-lk{all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--ink);text-decoration:underline;text-decoration-color:var(--ln2);text-underline-offset:4px;transition:text-decoration-color .12s}
+#pc .lhq .lh-lk{all:unset;cursor:pointer;font:700 13px var(--sans);color:var(--ink);text-decoration:underline;text-decoration-color:var(--ln2);text-underline-offset:4px;transition:text-decoration-color .12s}
 #pc .lhq .lh-lk:hover{text-decoration-color:var(--ink)}
 /* the four figures: one row, hairlines between, no boxes */
 #pc .lhq .lh-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--ln);margin:0 0 64px}
@@ -306,7 +305,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-ocf{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 20px}
 #pc .lhq .lh-ocf>div{background:var(--soft);padding:10px 12px;min-width:0}
 #pc .lhq .lh-ocf span{display:block;font-size:12px;color:var(--mu)}
-#pc .lhq .lh-ocf b{display:block;font-weight:500;font-size:13.5px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pc .lhq .lh-ocf b{display:block;font-weight:700;font-size:13.5px;margin-top:1px;line-height:1.35}
 #pc .lhq .lh-oh{font:400 22px/1.2 var(--serif);margin:0 0 6px}
 #pc .lhq .lh-ocd{font-size:13.5px;color:var(--mu);flex:1;margin:0 0 20px}
 #pc .lhq .lh-ocb{display:flex;gap:8px}
@@ -334,7 +333,7 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-in1{font:400 28px/1.15 var(--serif);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #pc .lhq .lh-in2{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12.5px;color:var(--mu)}
 #pc .lhq .lh-in2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#pc .lhq .lh-vo{color:var(--ink);font-weight:500;white-space:nowrap;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:text-decoration-color .12s}
+#pc .lhq .lh-vo{color:var(--ink);font-weight:700;white-space:nowrap;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:text-decoration-color .12s}
 #pc .lhq .lh-item:hover .lh-vo,#pc .lhq .lh-item:focus-visible .lh-vo{text-decoration-color:var(--ink)}
 #pc .lhq .lh-grid li.lk .lh-in1{color:var(--mu2)}
 #pc .lhq .lh-grid li.lk .lh-vo{color:var(--mu)}
@@ -354,9 +353,9 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-steps li{border-top:1px solid var(--ln);padding:12px 12px 0 0;font-size:13.5px;color:var(--mu2);min-width:0}
 #pc .lhq .lh-steps li span{display:block;font-size:12px;margin:0 0 2px;font-variant-numeric:tabular-nums}
 #pc .lhq .lh-steps li.dn{color:var(--mu);border-top-color:var(--ink)}
-#pc .lhq .lh-steps li.on{color:var(--ink);font-weight:500;border-top:2px solid var(--ink);padding-top:11px}
+#pc .lhq .lh-steps li.on{color:var(--ink);font-weight:700;border-top:2px solid var(--ink);padding-top:11px}
 #pc .lhq .lh-next{margin:24px 0 0;font-size:14px;color:var(--ink);max-width:680px}
-#pc .lhq .lh-next b{display:block;font-weight:500;font-size:12.5px;color:var(--mu);margin:0 0 3px}
+#pc .lhq .lh-next b{display:block;font-weight:700;font-size:12.5px;color:var(--mu);margin:0 0 3px}
 /* tables: offers, history, labels */
 #pc .lhq .lh-tw{overflow:hidden}
 #pc .lhq .lh-t{width:100%;border-collapse:collapse;font-size:14px}
@@ -379,12 +378,12 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-req{font-size:12.5px;color:var(--mu)}
 #pc .lhq .lh-star{color:var(--ink);white-space:nowrap}
 #pc .lhq .lh-pill{display:inline-block;font-size:13px;color:var(--mu);white-space:nowrap}
-#pc .lhq .lh-pill.ok,#pc .lhq .lh-pill.ac{color:var(--ink);font-weight:500}
+#pc .lhq .lh-pill.ok,#pc .lhq .lh-pill.ac{color:var(--ink);font-weight:700}
 #pc .lhq .lh-crumb{display:flex;gap:8px;align-items:baseline;font-size:13px;color:var(--mu);margin:-24px 0 28px}
 #pc .lhq .lh-crumb .lh-lk{font-weight:400;color:var(--mu)}
 #pc .lhq .lh-crumb .lh-lk:hover{color:var(--ink)}
 /* buttons: square, black or outlined */
-#pc .lhq .lh-btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 18px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);font:500 13px var(--sans);white-space:nowrap;transition:background .12s,color .12s}
+#pc .lhq .lh-btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 18px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);font:700 13px var(--sans);white-space:nowrap;transition:background .12s,color .12s}
 #pc .lhq .lh-btn:hover:not([disabled]){background:var(--soft)}
 #pc .lhq .lh-btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
 #pc .lhq .lh-btn.pri:hover:not([disabled]){background:#333;border-color:#333}
