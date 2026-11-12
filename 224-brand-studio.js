@@ -139,7 +139,7 @@ BRD.go=function(id){const o=BRD.job(id);if(!o||o.st!=1)return;
  if(mode=='pc')closeUI();else if(mode=='menu'&&!SH)closeUI();
  BRD.shootOn=1;fade(()=>arrive(o))};
 function arrive(o){const b=BRD.by(o.b);SH={o,step:0,m:0,l:0,bg:0,shots:[],sel:0,seed:(Math.random()*1e6)|0};snd('whoosh');
- modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,48)}">${esc(b.n)} photoshoot <small>${esc(BRD.place(o))}</small></h2><img class=bsfac src="${BRD.facade(o.b,BRD.place(o))}">
+ modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} photoshoot <small>${esc(BRD.place(o))}</small></h2><img class=bsfac src="${BRD.facade(o.b,BRD.place(o))}">
  <p class=m>A car from ${esc(b.n)} drops you at Prism Studios. Fee ${fm(o.pay)}, plus up to 25% more for a great shoot. The best frame goes on your Instagrime.</p><div class=bsb>Brief: <b>${o.brief.mood}</b> mood, <b>${o.brief.light}</b> lighting. ${esc(b.n)} also likes its logo in frame.</div>
  <div class=row2><button class=go onclick="bsIn()">Go inside</button><button onclick="bsLater()">${o.k=='trip'?'Later':'Not now'}</button></div></div>`)}
 window.bsLater=function(){if(SH&&SH.o)SH.o.nx=Date.now()+60000;closeUI()};
@@ -147,7 +147,7 @@ window.bsIn=function(){if(!SH)return;fade(()=>{SH.step=1;snd('chime');set()})};
 const note=(m,l,o)=>{const g=m==o.brief.mood,h=l==o.brief.light;return g&&h?'That is exactly the brief. Great frame.':g?'Pose is right, but the lighting is off-brief.':h?'Lighting is right, but the pose is off-brief.':'Neither pose nor lighting matches the brief.'};
 function su(){return{b:SH.o.b,m:SH.m,l:SH.l,bg:SH.bg,seed:SH.seed,cfg:ch}}
 function set(){const o=SH.o,b=BRD.by(o.b),n=SH.shots.length;
- modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,48)}">${esc(b.n)} · Prism Studios <small id=bsct>Frame ${Math.min(4,n+1)} of 4</small></h2>
+ modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} · Prism Studios <small id=bsct>Frame ${Math.min(4,n+1)} of 4</small></h2>
  <div class=bsg><div><div class=bspw><img class=bspv id=bspv alt=""><div class=bsfl id=bsfl></div></div><div class=bsth id=bsth></div></div>
  <div><div class=bsb>Brief: <b>${o.brief.mood}</b> mood, <b>${o.brief.light}</b> lighting. ${esc(b.n)} likes its logo in frame.</div>
  <div class=bsl>Mood</div><div class=bsc id=bsm>${MOODS.map((q,i)=>`<button data-i=${i} class="${i==SH.m?'on':''}" onclick="bsPick('m',${i})">${q}</button>`).join('')}</div>
@@ -180,7 +180,7 @@ window.bsWrap=function(){if(!SH||!SH.shots.length)return;const o=SH.o,b=BRD.by(o
  try{snd('cash');updateVersion()}catch(e){}
  const av=(typeof igxPortrait=='function'?igxPortrait(ch,1):pfp(ch));
  SH=null;BRD.shootOn=0;
- modal(`<div class="box modal bsx" style="max-width:560px"><h2><img src="${BRD.logo(o.b,48)}">${esc(b.n)} shoot wrapped <small>quality ${Math.round(q*100)}/100</small></h2>
+ modal(`<div class="box modal bsx" style="max-width:560px"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} shoot wrapped <small>quality ${Math.round(q*100)}/100</small></h2>
  <div class=bsig><div class=bshd><img src="${av}"><div><b>${esc(S.artist||'you')}</b><small>Paid partnership with ${esc(b.n)}</small></div></div><img class=bspic src="${pick.u}"><div class=bsft><b>${likes.toLocaleString()} likes</b><br>${esc(cap)}</div></div>
  <div class=bsr><span>Fee (${fm(o.pay)} base)</span><b>+${fm(pay)}</b></div><div class=bsr><span>New followers</span><b>+${fol.toLocaleString()}</b></div>${back?`<div class=bsr><span>Flight home (${esc(b.n)} pays)</span><b style="font-size:12px">${esc(back)}</b></div>`:''}
  <p class=m>Posted on Instagrime. You are a little tired from the day (-12 energy).</p><div class=row2><button class=go onclick="closeUI()">Done</button></div></div>`);
