@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v50.1.1';
+const GAME_VERSION='v50.1.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v50.1.2',n:'Behind the scenes only (no gameplay change): the Christmas snow lawn reads its grass pixels through a scratch canvas, which stops the browser console warning about repeated getImageData reads.'},
  {v:'v50.1.1',n:'Faster start: the sign-in files now begin downloading together with the page instead of partway through starting up, so the main menu knows your sign-in state sooner. The one-file script bundle also recovers better: if it ever stops part way, only the scripts it had not run yet are loaded separately. Nothing in the game changed. Saves still load.'},
  {v:'v50.1.0',n:'Graphics polish: Settings > Graphics now groups its options and adds Shadows (Off, Low, Medium, High, Ultra, where High is the normal look), Shadow distance (Near, Normal, Far) and a Colour grade and vignette switch. Every preset sets them (Battery Saver keeps shadows but smaller and nearer). 90, 120 and Uncapped only show on screens fast enough to use them. The shadow map is now redrawn at most about 60 times a second and not while paused, which saves power on fast screens. The default look and saves are unchanged.'},
  {v:'v50.0.1',n:'Behind the scenes only (no gameplay change): the tower floors and the festival code are split into smaller files, and the code checker now explains its known warnings.'},
