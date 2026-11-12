@@ -152,9 +152,10 @@ function setup(){const n=rec.nm,k=n.p[n.i],d=G_[k];n.ph='ready';n.t=0;n.g={t:0,o
 function finishGame(){const n=rec.nm,k=n.p[n.i],s=cl(G_[k].score(n.g));n.res.push(s);n.ph='result';n.t=0;n.s=s;try{snd(s>=.85?'perfect':s>=.6?'great':s>=.35?'good':'miss')}catch(e){}}
 function finishSong(){const n=rec.nm,avg=n.res.reduce((a,b)=>a+b,0)/n.res.length,bonus=Math.round(avg*GT.qMax(n.L)),n0=S.nid;
  rec.sc={l:avg,x:avg};rec.miss=Math.round((1-avg)*8);rec.cdn=0;const names=n.p.map(k=>G_[k].n),res=n.res.slice();
- el.remove();el=null;document.body.classList.remove('mgon');
+ const H0=el.offsetHeight;el.remove();el=null;document.body.classList.remove('mgon');
  mgFinish();
  try{const d=S.drafts[S.drafts.length-1];if(d&&d.id===n0){d.q+=bonus;const box=document.querySelector('#ui .box.modal');if(box){const cs=box.querySelector('.cards');if(cs){cs.style.setProperty('grid-template-columns','repeat(3,1fr)','important');cs.style.setProperty('gap','6px','important');cs.innerHTML=names.map((m,i)=>`<div class=card style="padding:6px;font-size:12px">${m}<b>${Math.round(res[i]*100)}%</b></div>`).join('')}
+  box.classList.add('nmres');box.style.height=H0+'px';if(avg>=.9&&res.every(v=>v>=.75)){box.classList.add('fxperfect');const h=box.querySelector('h2');if(h)h.textContent='Perfect song!'}
   const fq=document.getElementById('fxq');if(fq){const nf=fq.cloneNode();nf.textContent=d.q;fq.replaceWith(nf)}else{const p=box.querySelector('p.m');if(p)p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality '+d.q)}}}}catch(e){console.error('nmg result',e)}}
 function draw(){const n=rec.nm,k=n.p[n.i],d=G_[k],g=n.g;d.draw(g,cx);
  if(n.ph=='ready'){cx.fillStyle='#000c';cx.fillRect(0,0,W,H);txt(cx,d.n,W/2,92,GOLD,'center','bold 20px Silkscreen,ui-monospace,monospace');txt(cx,n.t<1.1?'GET READY':'GO!',W/2,126,G);}
@@ -176,7 +177,10 @@ const kh=(e,up)=>{if(!rec||!rec.nm||rec.st!=9||!el||/INPUT|TEXTAREA/.test(e.targ
 addEventListener('keydown',e=>kh(e,0));addEventListener('keyup',e=>kh(e,1));
 /* the Make a song screen says what the song is made of */
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const u=$('ui');if(u)u.innerHTML=u.innerHTML.replace(/Three steps:[^<]*?Costs 15 energy\./,GT.need()+' quick minigame'+(GT.need()>1?'s':'')+', 15 seconds at most each. Costs 15 energy.')}catch(e){}return r}}
-{const st=document.createElement('style');st.textContent=`#nmg{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;width:min(440px,92vw);z-index:5;pointer-events:auto;text-align:center;padding:8px}
+{const st=document.createElement('style');st.textContent=`/* the finished-song panel keeps the exact size and place of the minigame panel (height is copied when the last game ends) */
+#ui>.box.modal.nmres{position:fixed;left:50%;top:auto;bottom:90px;transform:translateX(-50%);width:min(440px,92vw);box-sizing:border-box;margin:0;padding:8px;overflow:auto;max-height:none}
+#ui>.box.modal.nmres h2{font-size:15px;margin:0 0 4px;padding-bottom:4px}#ui>.box.modal.nmres p{margin:3px 0;font-size:12px}#ui>.box.modal.nmres .cards{margin:4px 0}#ui>.box.modal.nmres .card b{font-size:15px}#ui>.box.modal.nmres input{padding:4px 6px}#ui>.box.modal.nmres button{padding:6px 10px}
+#nmg{box-sizing:border-box;position:fixed;left:50%;transform:translateX(-50%);bottom:90px;width:min(440px,92vw);z-index:5;pointer-events:auto;text-align:center;padding:8px}
 #nmg .nmh{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 6px;font-family:Silkscreen,ui-monospace,monospace;font-size:13px}#nmg .nmh b{color:var(--g)}#nmg .nmh span{color:var(--m)}
 #nmg canvas{display:block;width:100%;aspect-ratio:${W}/${H};image-rendering:pixelated;border:2px solid #000;touch-action:none;cursor:pointer}
 #nmg .nmb{height:6px;background:#1d2a22;margin:6px 0 4px;border:2px solid #000}#nmg .nmb i{display:block;height:100%;background:var(--g)}#nmg small{font-size:11px}`;document.head.appendChild(st)}
