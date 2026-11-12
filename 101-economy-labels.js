@@ -6,8 +6,8 @@
    Signing gives an advance and login details for Label HQ. HQ is locked until you sign and you must log in with the
    details the label sent. Label quality q (0..1) scales HQ prices (lbCost), HQ benefits (lbBen), the highest HQ level (hqMax),
    the advance and the cut the label keeps from streaming income. */
-/* LABELS_ENABLED: record labels are switched off for now. Set to true to bring offers, messages, deals and the label cut back. */
-const LABELS_ENABLED=false;
+/* LABELS_ENABLED: record labels (on since v51.0.1; set false to switch them off again). Set to true to bring offers, messages, deals and the label cut back. */
+const LABELS_ENABLED=true;
 const UPX={gearK:6,gearBoost:1.5,offerChance:.2,offerCooldown:20,leaveFee:.3,firstOfferDay:5,
  priceBase:.6,priceQ:1,benBase:.5,benQ:1};
 const LABELS=[
