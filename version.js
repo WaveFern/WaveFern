@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v50.1.3';
+const GAME_VERSION='v50.2.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v50.2.0',n:'Song minigames are simpler: every game now opens with a big two-line instruction and waits until you tap Start, Perfect Mix is one slider you drag into a green zone, and DJ Scratch is just tapping the left or right side the arrow points to. The original Beat, Lyrics and Mix steps are back as the Classic session, which can come up in any song as one of its activities at every Studio Level. Saves still load.'},
  {v:'v50.1.3',n:'Behind the scenes only (no gameplay change): Friends remembers for a day when the database refuses the display-name stamp, so it stops printing a permission_denied warning in the console on every start.'},
  {v:'v50.1.2',n:'Behind the scenes only (no gameplay change): the Christmas snow lawn reads its grass pixels through a scratch canvas, which stops the browser console warning about repeated getImageData reads.'},
  {v:'v50.1.1',n:'Faster start: the sign-in files now begin downloading together with the page instead of partway through starting up, so the main menu knows your sign-in state sooner. The one-file script bundle also recovers better: if it ever stops part way, only the scripts it had not run yet are loaded separately. Nothing in the game changed. Saves still load.'},
