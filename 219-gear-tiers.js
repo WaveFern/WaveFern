@@ -14,7 +14,7 @@ const CATS=[
  {id:'drums',n:'Drums',d:'Drums, decks and the finish',lines:['drums','decks','mastering']},
  {id:'heard',n:'Getting Heard',d:'How far released music travels',lines:['promo','content','merch','press','live'],reach:1}];
 const NAMES=['Bedroom Setup','Home Studio','Project Studio','Pro Studio','Commercial Studio','Legendary Studio'];
-const MG_TOTAL=[1,2,3,4,5,6],NEED=[1,2,2,3,4,4],QMAX=[0,4,9,15,22,30],TH=[0,3,8,14,21,28];
+const MG_TOTAL=[1,2,3,4,5,5],NEED=[1,2,2,3,4,4],QMAX=[0,4,9,15,22,30],TH=[0,3,8,14,21,28];
 const lv=k=>Math.max(0,Math.min(5,+(S.gear&&S.gear[k])||0));
 /* any line a later file adds that is not listed above goes to Room, so nothing is ever left out of the shop */
 const lines=c=>{const l=c.lines.filter(k=>GEAR[k]);if(c.id=='room')Object.keys(GEAR).forEach(k=>{if(!CATS.some(x=>x.lines.includes(k)))l.push(k)});return l};
@@ -45,7 +45,7 @@ const lvl=(l,n)=>`<span class=gpip>${Array.from({length:n||5},(_,i)=>`<i class="
 PG.shop=()=>{gfill();const L=level(),pts=GT.pts(),q=Math.round(Object.keys(GQ).reduce((a,k)=>a+gearX(k)*GQ[k],0)),s=gearSx();
  const nx=L<6?(()=>{const need=[];if(pts<TH[L])need.push((TH[L]-pts)+' more category level'+(TH[L]-pts>1?'s':''));const w=CATS.filter(c=>catLv(c)<L-2).map(c=>c.n);if(w.length)need.push('every category at '+(L-2)+'+ ('+w.join(', ')+')');return need.join(' and ')})():'';
  const head=`<div class=gtl><div class=gtl-top><b>Studio Level ${L}</b> <span>${NAMES[L-1]}</span>${lvl(L,6)}</div>
-  <p>${GT.mgTotal(L)} of 6 minigames unlocked · each song uses ${GT.need(L)} · up to +${GT.qMax(L)} quality for a great performance${q?` · gear adds +${q} quality`:''}${s?` and +${Math.round(s*100)}% streams`:''}</p>
+  <p>${GT.mgTotal(L)} of 5 minigames unlocked · each song uses ${GT.need(L)} · up to +${GT.qMax(L)} quality for a great performance${q?` · gear adds +${q} quality`:''}${s?` and +${Math.round(s*100)}% streams`:''}</p>
   ${L<6?`<p class=m>Level ${L+1} unlocks ${GT.mgTotal(L+1)-GT.mgTotal(L)} more minigame${GT.mgTotal(L+1)-GT.mgTotal(L)>1?'s':''} and ${GT.need(L+1)} per song. Needs ${nx||'a few more upgrades'}.</p>`:'<p class=m>Top level reached.</p>'}</div>`;
  const sec=c=>{const ks=lines(c),l=catLv(c),n=nextUp(ks),eff=c.reach?'Raises how many listeners released music reaches. It does not change how the song sounds.':'Raises song quality and counts toward your Studio Level.';
   return`<h3 class=gsh>${c.n} <span class=gtc>Level ${l}/5 ${lvl(l)}</span></h3><p class=m style="margin:0 14px 6px">${c.d}. ${eff}${n?` Next: <b>${GEAR[n.k].lv[gl(n.k)+1]}</b> (${GEAR[n.k].n}) ${n.lk?'at Fame Level '+n.lk:$$(n.c)}.`:' Everything here is maxed.'}</p><div class=cards>${ks.map(card).join('')}</div>`};
