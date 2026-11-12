@@ -112,6 +112,8 @@ if(FB_ON)fbLoad().catch(()=>{window.FW_AUTH_DONE=1});
 /* v26.87: main menu shown when the site opens: Play, Settings, Google sign-in, profile in the top right.
    The world stays paused behind it; Save & quit in the pause menu comes back here. */
 const TT={on:0,game:0};
+/* v51.0.5: the in-game HUD (day, time, money, listeners, minimap) is hidden whenever the main menu is open, e.g. after Save and quit. TT.on drives a body class so every exit path is covered. */
+{let on=0;Object.defineProperty(TT,'on',{get:()=>on,set(v){on=v;try{document.body.classList.toggle('ttitle',!!v)}catch(e){}},enumerable:true});const st=document.createElement('style');st.textContent='body.ttitle #hud,body.ttitle #swhud,body.ttitle #mpb,body.ttitle #ntags{display:none!important}';document.head.appendChild(st)}
 function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionStorage.removeItem('fw_msg');say(m)}}catch(e){}}
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';

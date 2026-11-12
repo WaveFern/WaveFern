@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.0.4';
+const GAME_VERSION='v51.0.5';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.0.5',n:'Fixed the day, time, money and listeners display staying on screen over the main menu after Save and quit. It is now hidden whenever the main menu is open and comes back when you press Play or load a save. Saves still load.'},
  {v:'v51.0.4',n:'Fixed a console error where an item preview with no 3D model data (food, app, pet, house, clothes or furniture) crashed the preview loop. Those previews now show a plain grey block instead. Saves still load.'},
  {v:'v51.0.3',n:'Label HQ is one app with every record label in it. A label offer in Messages has a link that opens Label HQ and asks if you want to join. Once you are signed, the whole app takes on that label\'s colours and shows your team upgrades. The separate per-label apps are gone. Saves still load.'},
  {v:'v51.0.2',n:'Every record label now has its own app (for example Northlight Records HQ), added to your computer when you sign and deleted when you leave. Label apps and Label HQ never show in the App Barn: a sponsor sends a Download Label HQ link in Messages for brand deals. Brand logos are pixel art. Saves still load.'},
