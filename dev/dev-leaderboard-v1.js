@@ -15,6 +15,10 @@
   {k:'sg',t:'Songs released',u:'songs',me:()=>(S.songs||[]).length,fmt:f,max:400,pw:1.8},
   {k:'fol',t:'Followers',u:'total',me:()=>S.followers||0,fmt:f,max:60e6,pw:3.2}
  ];
+ /* v51.8.1: a career that used test mode (cheat) or the dev test code is marked S.tainted for good and never posts to the leaderboard or the public profile, even after cheat is turned off or the code is loaded on the real game */
+ window.fwTainted=()=>{try{if(S&&S.cheat&&!S.tainted)S.tainted=1;return !!(S&&(S.cheat||S.tainted))}catch(e){return false}};
+ setInterval(()=>{try{window.fwTainted()}catch(e){}},1000);
+ const ps0=window.fwProfileSync;if(typeof ps0=='function')window.fwProfileSync=function(){if(window.fwTainted())return Promise.resolve(0);return ps0.apply(this,arguments)};
  const meName=()=>S.artist||'You';
  /* Real data: Firestore leaderboard/{uid} = {a,day,lis,str,mon,fame,sg,fol,f,t} (see firebase-rules/live/firestore.rules).
     A signed-in player writes only their own row (from the career being played); everyone signed in reads the top rows per category. */
@@ -24,7 +28,7 @@
  /* the name on the board: the chosen username when the profile feature provides one, else the artist name */
  const boardName=()=>{let n='';try{if(typeof fwUsername=='function')n=fwUsername()||''}catch(e){}if(!n)n=(S&&S.artist)||'';return String(n).replace(/[<>"]/g,'').slice(0,24)};
  /* only a career made after the full progress reset counts, never a trailer career or an old one */
- const eligible=()=>{try{return live()&&typeof S=='object'&&S&&!FW_TRL&&typeof RS!='undefined'&&rsOn()&&S.rv>=RS.V&&mode!='creator'&&mode!='load'&&!(typeof TT!='undefined'&&TT.on&&!TT.game)&&!wiping&&!!boardName()}catch(e){return false}};
+ const eligible=()=>{try{return live()&&!window.fwTainted()&&typeof S=='object'&&S&&!FW_TRL&&typeof RS!='undefined'&&rsOn()&&S.rv>=RS.V&&mode!='creator'&&mode!='load'&&!(typeof TT!='undefined'&&TT.on&&!TT.game)&&!wiping&&!!boardName()}catch(e){return false}};
  const vals=()=>({a:boardName(),day:cl(S.day,1e5),lis:cl(S.listeners,1e12),str:cl(S.streams,1e12),mon:cl(S.money,1e12),fame:cl((()=>{try{return fameLevel()}catch(e){return 0}})(),1000),sg:cl((S.songs||[]).length,1e5),fol:cl(S.followers,1e12)});
  let lastSig='',lastAt=0,noFUntil=0,wbusy=0;
  LB.push=function(force){if(wbusy||!eligible())return Promise.resolve(0);

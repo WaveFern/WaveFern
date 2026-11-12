@@ -8,7 +8,7 @@ loadCode=function(c){
  if(String(c==null?'':c).trim().toLowerCase()!=='test')return l0.apply(this,arguments);
  try{
   if(mode=='title'&&!(typeof TT!='undefined'&&TT.game)||mode=='creator'||mode=='load'){snd('err');say('Start or continue a career first, then type test.');return}
-  S.money=Math.max(+S.money||0,5e7);S.cheat=1;
+  S.money=Math.max(+S.money||0,5e7);S.cheat=1;S.tainted=1;
   ['energy','gear','apps','furniture','cars','pets','clothes','home','contacts','tutoff'].forEach(k=>{try{ADMA[k]()}catch(e){console.warn('test unlock',k,e)}});
   try{S.followers=Math.max(S.followers||0,1e6);S.listeners=Math.max(S.listeners||0,1e7)}catch(e){}
   try{buildStudio();refresh();parkCars();syncF();buildLots();syncArt()}catch(e){}

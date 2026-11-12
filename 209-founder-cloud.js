@@ -16,6 +16,11 @@ const rd=()=>FBF&&FBD&&FBU;
 /* v51.5.1: fdBackfill(write). Admin only. fdSnapshot lists only careers made before the fresh start, so a Founder whose cloud save is already a new career (or who was missed) has no founders/{uid} entry, and the rules then refuse their Founder flag on the leaderboard and profile.
    This reads every cloud save, and for each career that carries a Founder claim (S.fdr) or is an eligible old career it creates the missing founders/{uid} entry. Existing entries (including f:0 set by hand) are never changed.
    fdBackfill() is a dry run; fdBackfill(true) writes. */
+/* v51.8.1: fdClearLeaderboardRow(uid) deletes one leaderboard/{uid} row (no uid = your own). Your own row can always be deleted; another player's needs the admin account and the v51.3.0 rules published. */
+window.fdClearLeaderboardRow=async function(uid){
+ if(!rd()||!FBU)return console.warn('Sign in with Google first.');
+ uid=uid||FBU.uid;if(uid!==FBU.uid&&!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can clear another player\'s row.');
+ try{await FBF.deleteDoc(FBF.doc(FBD,'leaderboard',uid));console.log('Leaderboard row deleted for '+uid+'. Open the Leaderboard again to see it gone.');return 1}catch(e){console.warn('Could not delete the row: '+((e&&e.code)||e)+(e&&e.code=='permission-denied'?'. Publish firebase-rules/v51.3.0/firestore.rules in Firebase console > Firestore > Rules.':''));return 0}};
 window.fdBackfill=async function(write){
  if(!rd())return console.warn('Sign in with the admin Google account first.');
  if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');

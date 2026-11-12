@@ -52,7 +52,7 @@ Numbers are file prefixes (`NN-*.js`). "Newest wins" files are listed last in ea
 | **Phone & computer UI** | `06-computer`, `11-os-v2`, `115`/`116-gphone-plus`/`118` (Gphone), `105`, `119`, `155`, `198-game-ui`, `172-settings-plus`, `09-settings-effects`, `00-pixel-icons`, `style.css` | Desktop, apps, pause menu, settings |
 | **Audio** | `08-music`, `67-beats` (procedural beat engine; one closure, read whole by `tools/music-test.js` and `tools/mix-*.js`, so do not split), `73-ambience`, `107-my-songs-music`, `132-808-hats`, `200-sfx-polish`, `00-tab-fade`, `156` | Music, sfx, ambience |
 | **Graphics & rendering** | `04-house`, `23`/`24` (previews), `56-name-tags`, `84-pixel-pictures`, `190-pfp-styles`, `122-graphics`, `116-perf` | Meshes, canvas textures, profile pictures |
-| **Multiplayer & leaderboards** | `161-multiplayer` (band rooms, PeerJS, leaderboard), `216-friends-hub` | Band rooms, friends, presence |
+| **Multiplayer & leaderboards** | `161-multiplayer` (band rooms, PeerJS, leaderboard), `216-friends-hub` | Band rooms, friends, presence | Leaderboard row/profile writes are blocked for tainted careers (`S.tainted`, `window.fwTainted`, `dev/dev-leaderboard-v1.js`); `fdClearLeaderboardRow` is in `209-founder-cloud.js`.
 | **Input** | `07-input-loop`, `154-touch-controls`, `168-gamepad`, `155`/`158z` (responsive) | Keyboard, touch, controller |
 | **Trailers** | `175-trailer`, `183-band-trailer`, `201`, `202` | `?trailer` modes, recording |
 | **Tutorial** | `72-tutorial` (Big Vee), `78-big-vee-smarter`, `214-guide-markers`, `205-announcement` | Tips, guide line, announcements |
