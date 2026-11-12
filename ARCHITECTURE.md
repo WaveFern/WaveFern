@@ -5,7 +5,7 @@ Keep it accurate: update it in the same commit as any structural change (new fil
 
 ## 1. Overview
 
-WaveFern is a static browser game (GitHub Pages, no build step, no bundler). Everything is **classic `<script>` files sharing one global scope**, loaded by `index.html` in the order the tags appear. There are no ES modules and no imports: a file uses a function or variable simply because an earlier file declared it.
+WaveFern is a static browser game (GitHub Pages; the repo has no build step, but the deploy workflow bundles and minifies the scripts into `fw-bundle.js`, see §4). Everything is **classic `<script>` files sharing one global scope**, loaded by `index.html` in the order the tags appear. There are no ES modules and no imports: a file uses a function or variable simply because an earlier file declared it.
 
 - 220 game scripts in the repo root + 60 files in `dev/` = **280 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
 - Three.js r128 (CDN, with a cdnjs fallback) renders the 3D world. The "computer", phone and menus are plain DOM (`style.css`, see `docs/THEMES.md`).
@@ -84,6 +84,7 @@ The real order is the order of tags in `index.html`, not file numbers. Known non
 - `208-onboarding` → `213-public-profile` → `209-founder-cloud` / `209-carlos` / `209-alfonso`; `158z-responsive` after `215`; `dev-menu-sync-v1` before `216-friends-hub`.
 - Cache-busting `?v=` query strings in `index.html` are per file; bump the one for a file you change (and `GAME_VERSION`), or players keep the old file.
 - The dev bundle builder (`tools/build-dev-bundle.js`) and `dev/index.html` read the script list from `index.html`, so adding a tag there is all that is needed, but **renaming or moving a file needs those and `tools/*` checked**.
+- **Production bundle**: `.github/workflows/static.yml` runs `tools/build-prod-bundle.js` on the deployed copy only. It joins every local script after the 3D library into `fw-bundle.js` (run in the same order, each as its own classic script) and rewrites that copy's `index.html`; the original page is kept as `index-src.html`. An inline fallback writes the normal tags (from the first script the bundle had not run) if the bundle is missing or stops. Nothing is committed from this step, so edit scripts and tags as usual. `index.html` also has `modulepreload` links for the three Firebase files (keep the version equal to `FB_V` in `86-google-signin.js`).
 - No dynamic script loading of game files exists. The only runtime script injection is `161-multiplayer.js` (loads PeerJS from a list of CDNs) and `dev/index.html` (re-serves the tag list). Keep both working.
 
 ## 5. Data and saving
