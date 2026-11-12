@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.4.1';
+const GAME_VERSION='v51.5.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.5.0',n:'Things take a believable moment now. Artists, agents and other contacts show "typing..." before their reply appears, longer for longer messages. Installing an app from the App Barn, or the Download Label HQ link in Messages, shows a download bar for a few seconds before the app lands on your desktop. Replies and installs are saved if you quit or reload mid-wait. Saves still load.'},
  {v:'v51.4.1',n:'Buildings now fade out smoothly and properly see-through when you walk behind them, like the walls of your house, instead of the dotted look. Characters and signs behind them stay drawn correctly with no flicker. Saves still load.'},
  {v:'v51.4.0',n:'Brand sponsorships now come from a named agent. A brand\'s partnerships agent messages you with their own face and name, says which brand they represent, and sends all the follow-ups. The brand logo is still on the deal cards in Label HQ.'},
  {v:'v51.3.0',n:'A second admin account can use the Admin panel: gifts, players, own-game controls, a Cheat mode toggle that unlocks the Gphone Teleport app, and quick teleports around the home city. Saves still load.'},
