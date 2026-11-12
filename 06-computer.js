@@ -1,5 +1,8 @@
 /* ---------- computer ---------- */
 const CUR=`url("data:image/svg+xml,${encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='22' height='26' viewBox='0 0 11 13'><path d='M.5.5v10l3-2.8 2 4.6 2-.9-2-4.5h4z' fill='white' stroke='black'/></svg>")}") 0 0,default`;
+/* hover/pointer cursor for clickable things in the computer: pixel hand, same white+black outline style as CUR */
+const CURP=(()=>{const g=['....OO......','...OWWO.....','...OWWO.....','...OWWO.....','...OWWOOO...','...OWWOWWOO.','.OOOWWOWWOWO','OWWOWWWWWWWO','OWWWWWWWWWWO','.OWWWWWWWWWO','.OWWWWWWWWO.','..OWWWWWWWO.','..OWWWWWWO..','..OOOOOOOO..'];let r='';g.forEach((l,y)=>{[...l].forEach((c,x)=>{if(c!='.')r+=`<rect x='${x}' y='${y}' width='1' height='1' fill='${c=='O'?'black':'white'}'/>`})});return `url("data:image/svg+xml,${encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='24' height='28' viewBox='0 0 12 14' shape-rendering='crispEdges'>"+r+"</svg>")}") 10 1,pointer`})();
+
 function openPC(){mode='pc';OA=[];app=0;smo=0;wpo=null;pg='home';pcR()}
 function closePC(){closeUI()}
 const row=(i,s,x='')=>`<div class="sr${x?' sd':''}"><span class=m>${i}</span><b>${esc(s.title)}${typeof luckTag=='function'?luckTag(s):''}<br><small class=m>${esc(s.g)} · Day ${s.day}</small></b><span>${s.streams.toLocaleString()} streams</span><span class=m>+${s.today||0}</span>${x}</div>`;
