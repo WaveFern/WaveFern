@@ -58,7 +58,7 @@
  }catch(e){}return r}}
  /* ---- one tick: finish anything due, including after a reload ---- */
  setInterval(()=>{try{
-  if(!S)return;const t=now(),T=typ();
+  if(!S)return;if(window.FWP&&FWP.frozen())return;const t=now(),T=typ();
   for(let j=T.length-1;j>=0;j--){if(T[j].end<=t){const p=T.splice(j,1)[0];deliver(p)}}
   if(T.length&&!TY)TY=T[0].id;
   const D=dl();for(const k in D)if(D[k].end<=t)finish(k)
