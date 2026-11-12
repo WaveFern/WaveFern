@@ -2,6 +2,7 @@
    1. Replies from artists, agents and other contacts show "typing..." for a time that grows with the reply length (about 1-3 s).
       The reply is worked out the moment you send (so game state is the same as before); its message lines are held in S.typ
       and added to the chat when the time is up. S.typ is saved, so a save, quit or reload never loses a held reply.
+   (While a reply is held, the chat's input and Send button are disabled; this is drawn from S.typ on every redraw so it cannot stick.)
    2. App Barn installs and the Download Label HQ link take 2-3 s with a progress bar. The payment happens at once; the app itself
       is held in S.dl (saved) and appears on the desktop when the bar fills, even if you left the screen or reloaded.
    Wraps sendMsg (16/76), inst (10/103/146), bdGetHQ (223), pcR. Loads after 227. Balance is untouched. */
@@ -24,7 +25,7 @@
  }}
  function deliver(p){
   const m=S.msgs.find(x=>x.id==p.id);
-  if(m&&Array.isArray(m.log)){p.ent.forEach(x=>m.log.push(x));if(chatOpen(m.id)){snd('ping');pcR()}else m.unread=1}
+  if(m&&Array.isArray(m.log)){p.ent.forEach(x=>m.log.push(x));if(chatOpen(m.id)){snd('ping');pcR();try{const i=$('cin');if(i)i.focus()}catch(e){}}else m.unread=1}
   if(TY==p.id&&!typ().some(q=>q!==p&&q.id==p.id))TY=0;
  }
  /* ---- installs ---- */
@@ -48,9 +49,10 @@
   if(mode=='pc'){try{pcR()}catch(e){}}
  }
  /* ---- progress bar on the buttons (re-applied on every redraw; the CSS animation resumes at the right point) ---- */
- {const st=document.createElement('style');st.textContent='.dlbar{position:relative;min-width:120px;height:26px;border:2px solid #3c5a4a;background:#10201a;border-radius:4px;overflow:hidden;color:#cfe;font:10px Silkscreen,monospace;display:inline-flex;align-items:center;justify-content:center}.dlbar i{position:absolute;left:0;top:0;bottom:0;width:100%;background:#3fae6a;transform-origin:left;transform:scaleX(0);animation:dlfill linear forwards}.dlbar span{position:relative}@keyframes dlfill{to{transform:scaleX(1)}}';document.head.appendChild(st)}
+ {const st=document.createElement('style');st.textContent='.cin input:disabled{opacity:.55;cursor:not-allowed}.cin button:disabled{opacity:.45;cursor:not-allowed}.dlbar{position:relative;min-width:120px;height:26px;border:2px solid #3c5a4a;background:#10201a;border-radius:4px;overflow:hidden;color:#cfe;font:10px Silkscreen,monospace;display:inline-flex;align-items:center;justify-content:center}.dlbar i{position:absolute;left:0;top:0;bottom:0;width:100%;background:#3fae6a;transform-origin:left;transform:scaleX(0);animation:dlfill linear forwards}.dlbar span{position:relative}@keyframes dlfill{to{transform:scaleX(1)}}';document.head.appendChild(st)}
  function bar(d){const el=document.createElement('div');el.className='dlbar';const left=Math.max(0,d.end-now()),i=document.createElement('i');i.style.animationDuration=(d.ms||left)+'ms';i.style.animationDelay='-'+Math.max(0,(d.ms||left)-left)+'ms';const s=document.createElement('span');s.textContent='Downloading...';el.appendChild(i);el.appendChild(s);return el}
  {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{
+  if(chatOpen(S.chat)&&typ().some(p=>p.id==S.chat)){const i=$('cin');if(i){i.disabled=true;i.placeholder='Waiting for a reply...';const b=i.parentNode&&i.parentNode.querySelector('button');if(b)b.disabled=true}}
   const D=dl();for(const k in D){if(S.apps&&S.apps[k])continue;
    document.querySelectorAll('#pc button[onclick="inst(\''+k+'\')"]'+(k=='hq'?',#pc button[onclick="bdGetHQ()"]':'')).forEach(b=>b.replaceWith(bar(D[k])))}
  }catch(e){}return r}}
