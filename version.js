@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v51.0.2';
+const GAME_VERSION='v51.0.3';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v51.0.3',n:'Label HQ is one app with every record label in it. A label offer in Messages has a link that opens Label HQ and asks if you want to join. Once you are signed, the whole app takes on that label\'s colours and shows your team upgrades. The separate per-label apps are gone. Saves still load.'},
  {v:'v51.0.2',n:'Every record label now has its own app (for example Northlight Records HQ), added to your computer when you sign and deleted when you leave. Label apps and Label HQ never show in the App Barn: a sponsor sends a Download Label HQ link in Messages for brand deals. Brand logos are pixel art. Saves still load.'},
  {v:'v51.0.1',n:'Record labels are back on. Labels send you offers in Messages, signing gives a bonus and a Label HQ login, and the Team tab in Label HQ (manager, producer, studio, PR, marketing) works again. Brand deals in Label HQ need no label. The brand sponsors now have parody names (Nyke, Adadas, Koka-Cola and so on) and redrawn logos that only echo the real ones. Saves still load.'},
  {v:'v51.0.0',n:'Brand sponsorships in Label HQ. Companies with parody names of real brands (Nyke, Adadas, Koka-Cola, Appel and more, each with its own logo as the picture) message you now and then once you are famous. Accept and you shoot a campaign at Prism Studios: pick the mood, lighting and backdrop the brand asks for, take up to 4 photos as your own character, and the best one is posted on Instagrime. You get paid and gain followers. Some deals fly you to a city abroad on a free flight booked for you, and fly you home after. In other countries people now recognise you by your Fame Level, from curious looks to screaming fans. Label HQ is free to install again (team upgrades still wait for record labels). Saves still load.'},
