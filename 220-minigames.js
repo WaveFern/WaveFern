@@ -13,8 +13,8 @@ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ri=(a,b)=>a+Math.floor(Math.rand
 const NOTE=[262,294,330,392,440,523,587,659];
 const pad=i=>{try{sfx(MG_NOTE[i],.25,'triangle',.14)}catch(e){}},nt=i=>{try{sfx(NOTE[i],.4,'triangle',.14)}catch(e){}},good=()=>{try{snd('cash')}catch(e){}},bad=()=>{try{snd('err')}catch(e){}};
 let LASTH=0;
-function plan(){const pool=ORDER.slice(0,Math.min(ORDER.length,GT.mgTotal()));let p=shuf(pool.slice()).slice(0,Math.min(GT.need(),pool.length));
- if(window.NMG_FORCE)p=window.NMG_FORCE.slice();else if(p.length>1&&pool.length>p.length&&p[0]==S.lmg)p.push(p.shift());S.lmg=p[0];return p}
+/* Beat, Lyrics and Mix always come first, in that order; unlocked extras (Echo, Build It) are added after them in random order */
+function plan(){if(window.NMG_FORCE)return window.NMG_FORCE.slice();const tot=Math.min(ORDER.length,GT.mgTotal()),extra=shuf(ORDER.slice(3,tot));return ORDER.slice(0,3).concat(extra.slice(0,Math.max(0,GT.need()-3)))}
 /* ---- the three new activities ---- */
 const NG={
  echo:{dur:15,init(g){g.r=0;g.ok=0;g.tot=0;this.round(g)},
@@ -64,7 +64,16 @@ function run(names,res){const avg=res.reduce((a,b)=>a+b,0)/res.length,bonus=Math
   box.classList.add('nmw');if(avg>=.9&&res.every(v=>v>=.75))box.classList.add('fxperfect');
   const fq=document.getElementById('fxq');if(fq){const nf=fq.cloneNode();nf.textContent=d.q;fq.replaceWith(nf)}else{const p=box.querySelector('p.m');if(p)p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality '+d.q)}}}}catch(e){console.error('nmg result',e)}}
 {const t0=recTick;recTick=function(dt){if(rec&&rec.nm===undefined){rec.nm=0;if(rec.st===0&&!rec.band&&!rec.ig&&typeof GT!='undefined'&&mode=='rec'){try{const p=plan();rec.q={p,i:0,res:[],cur:p[0],g:null};if(p[0]!='beat')startItem();else rec.q.cur='beat'}catch(e){console.error('nmg',e);rec.q=null}}}
- if(rec&&rec.q&&rec.st==9){nmTick(dt);return}return t0.apply(this,arguments)}}
+ if(rec&&rec.q&&rec.st==9){nmTick(dt);return}
+ if(rec&&rec.q&&rec.st===0&&!rec.wait&&!(rec.cdn>0))dt*=beatVar(dt);return t0.apply(this,arguments)}}
+/* Beat variation: every take picks a different speed pattern, starts from a random spot, and the green zone changes width after each hit */
+function beatVar(dt){const r=rec;if(r.bm===undefined){r.bm=ri(0,3);r.bph=Math.random()*6;r.zb=r.zw||.08;r.lh=r.hits||0;r.bs=1;r.pos=Math.random();r.dir=Math.random()<.5?-1:1;r.bk=0}
+ r.bt=(r.bt||0)+dt;if(r.hits>r.lh){r.lh=r.hits;r.zw=r.zb*(.75+Math.random()*.55);if(r.bm==3)r.bs=.75+Math.random()*.75}
+ if(r.bm==0){if(r.pos>=1||r.pos<=0){if(!r.bk){r.bk=1;r.bs=.8+Math.random()*.55}}else r.bk=0;return r.bs}
+ if(r.bm==1)return 1+.45*Math.sin(r.bt*2.2+r.bph);
+ if(r.bm==2){const c=Math.floor(r.bt/.9+r.bph);return (c%2?1.55:.6)}
+ return r.bs}
+
 {const d0=mgDraw;mgDraw=function(){const o=$('mg');if(o&&o.offsetHeight>120)LASTH=o.offsetHeight;if(rec&&rec.q){if(rec.st==9){nmDraw();return}d0.apply(this,arguments);const s=document.querySelector('#mg .mgs');if(s)s.innerHTML=planStrip();return}return d0.apply(this,arguments)}}
 addEventListener('keydown',e=>{if(!rec||!rec.q||rec.st!=9||rec.wait||(e.repeat&&rec.q.cur!='hype')||/INPUT|TEXTAREA/.test(e.target.tagName))return;const n=parseInt(e.key);if(n>=1&&n<=4&&rec.q.cur=='echo')nmIn(n-1);if((e.key==' '||e.key=='Enter'||e.key.toLowerCase()=='e')&&rec.q.cur=='hype')nmIn(0)});
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const u=$('ui');if(u)u.innerHTML=u.innerHTML.replace(/Three steps:[^<]*?Costs 15 energy\./,GT.need()+' quick minigame'+(GT.need()>1?'s':'')+'. Costs 15 energy.')}catch(e){}return r}}
