@@ -122,7 +122,7 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
  try{const L=S.msgs.filter(m=>m.bd!=null);
   L.forEach(m=>{const o=job(m.bd);if(!o)return;const lg=BRD.logo(o.b,48);
    h=h.replace(new RegExp('(onclick="openChat\\('+m.id+'\\)">)<img src="[^"]*"'),'$1<img src="'+lg+'" style="border-radius:50%"');
-   if(S.chat==m.id){h=h.replace(/(<div class=cvh>)<img src="[^"]*"/,'$1<img src="'+lg+'" style="border-radius:50%"');
+   if(S.chat==m.id){h=h.replace(/(<div class=cvh>(?:<button[^>]*>[^<]*<\/button>)?)<img src="[^"]*"/,'$1<img src="'+lg+'" style="border-radius:50%"');
     const b=BRD.by(o.b),sub=b.n+' · official brand account';h=h.replace(/(<div class=cvh>[\s\S]*?<br><small[^>]*>)[^<]*/,'$1'+sub);
     if(o.st==0&&S.day<=o.exp)h=h.replace(/<div class=cin><small[^>]*>Official account\. No replies\.<\/small><\/div>/,`<div class=cin style="gap:8px;padding:8px"><button class=go onclick="bdAccept(${o.id})">Accept ${fm(o.pay)} shoot${o.k=='trip'?' + flight':''}</button><button onclick="bdDecline(${o.id})">Decline</button></div>`);
     else if(o.st==1&&o.k=='home')h=h.replace(/<div class=cin><small[^>]*>Official account\. No replies\.<\/small><\/div>/,`<div class=cin style="gap:8px;padding:8px"><button class=go onclick="BRD.go(${o.id})">Go to the studio</button></div>`);

@@ -99,8 +99,8 @@ BRD.facade=function(bid,place){const night=(+S.t||0)>=260,key=(bid||'x')+'|'+nig
  F(b?b.c:'#d4202c',BX+BW/2-26,BY+70,52,5);F('#00000030',BX+BW/2-26,BY+75,52,2);for(let i=0;i<52;i+=6)F('#ffffff30',BX+BW/2-26+i,BY+70,3,5);
  [BX+14,BX+BW-52].forEach((lx,i)=>{F('#0d0f18',lx-1,BY+79,38,13);F(i?'#3a3f4e':'#ffe9a8',lx,BY+80,36,11);if(!i){for(let q=0;q<4;q++)F(q%2?'#e9c24a':'#d4202c',lx+3+q*8,BY+82,6,7)}else{for(let q=0;q<6;q++)F('#ffffff22',lx+q*6,BY+80,1,11)}});
  /* brand billboard on the roof */
- if(b){const px=BX+BW-60,py=BY-24;F('#14161e',px+8,py+34,3,8);F('#14161e',px+38,py+34,3,8);F('#14161e',px,py,50,36);F(night?'#fff4c8':'#f2f2f2',px+2,py+2,46,32);BRD.paint(x,b.id,px+7,py+3,34);
-  if(night){x.save();x.globalAlpha=.16;igxDisc(x,'#ffe9a8',px+25,py+18,34);x.restore()}[0,1,2,3].forEach(i=>F(night?'#ffe58a':'#888',px+6+i*11,py-2,5,2))}
+ if(b){const px=BX+BW-50,py=BY-36;F('#14161e',px+6,py+30,3,10);F('#14161e',px+31,py+30,3,10);F('#14161e',px,py,40,31);F(night?'#fff4c8':'#f2f2f2',px+2,py+2,36,27);BRD.paint(x,b.id,px+7,py+3,26);
+  if(night){x.save();x.globalAlpha=.16;igxDisc(x,'#ffe9a8',px+20,py+15,30);x.restore()}[0,1,2].forEach(i=>F(night?'#ffe58a':'#888',px+6+i*11,py-2,5,2))}
  /* red carpet, ropes, planters */
  x.fillStyle='#b5172a';x.beginPath();x.moveTo(BX+BW/2-9,118);x.lineTo(BX+BW/2+9,118);x.lineTo(BX+BW/2+22,142);x.lineTo(BX+BW/2-22,142);x.closePath();x.fill();
  x.fillStyle='#e9c24a';[[-12,121],[12,121],[-19,136],[19,136]].forEach(q=>{x.fillRect(BX+BW/2+q[0]-1,q[1]-5,2,6);x.fillRect(BX+BW/2+q[0]-2,q[1]+1,4,1)});F('#8a1020',BX+BW/2-12,118,1,18);F('#8a1020',BX+BW/2+12,118,1,18);
@@ -127,7 +127,7 @@ const css=document.createElement('style');css.textContent=`.bsx{max-width:700px;
 .bsx .bsb{background:#151a17;border-radius:6px;padding:8px 10px;margin-bottom:8px}.bsx .bsb b{color:#e6b422}.bsx .bsl{font-size:11px;color:var(--m);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.5px}
 .bsx .bsc{display:flex;flex-wrap:wrap;gap:5px}.bsx .bsc button{padding:5px 9px}.bsx .bsc button.on{background:var(--g);color:#04120a;font-weight:700}.bsx .bsn{min-height:34px;font-size:12px;color:var(--m);margin-top:8px}
 .bsx .bsr{display:flex;gap:10px;align-items:center;justify-content:space-between;background:#151a17;border-radius:6px;padding:8px 12px;margin:6px 0}.bsx .bsr b{color:var(--g);font-size:16px}
-.bsx .bsig{background:#0d100e;border:2px solid #000;border-radius:6px;overflow:hidden;max-width:340px;margin:0 auto}.bsx .bsig .hd{display:flex;gap:8px;align-items:center;padding:7px 10px}.bsx .bsig .hd img{width:30px;height:30px;border-radius:50%;image-rendering:pixelated}.bsx .bsig .hd small{display:block;color:var(--m);font-size:11px}.bsx .bsig .ph{width:100%;display:block;image-rendering:pixelated}.bsx .bsig .ft{padding:7px 10px;font-size:12px}
+.bsx .bsig{background:#0d100e;border:2px solid #000;border-radius:6px;overflow:hidden;max-width:340px;margin:0 auto}.bsx .bsig .bshd{display:flex;gap:8px;align-items:center;padding:7px 10px}.bsx .bsig .bshd img{width:30px;height:30px;border-radius:50%;image-rendering:pixelated}.bsx .bsig .bshd small{display:block;color:var(--m);font-size:11px}.bsx .bsig .bspic{width:100%;display:block;image-rendering:pixelated}.bsx .bsig .bsft{padding:7px 10px;font-size:12px}
 .bsfade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .4s;z-index:9990}`;document.head.appendChild(css);
 const $e=id=>document.getElementById(id);
 const modal=h=>{mode='menu';$('ui').innerHTML=h};
@@ -181,7 +181,7 @@ window.bsWrap=function(){if(!SH||!SH.shots.length)return;const o=SH.o,b=BRD.by(o
  const av=(typeof igxPortrait=='function'?igxPortrait(ch,1):pfp(ch));
  SH=null;BRD.shootOn=0;
  modal(`<div class="box modal bsx" style="max-width:560px"><h2><img src="${BRD.logo(o.b,48)}">${esc(b.n)} shoot wrapped <small>quality ${Math.round(q*100)}/100</small></h2>
- <div class=bsig><div class=hd><img src="${av}"><div><b>${esc(S.artist||'you')}</b><small>Paid partnership with ${esc(b.n)}</small></div></div><img class=ph src="${pick.u}"><div class=ft><b>${likes.toLocaleString()} likes</b><br>${esc(cap)}</div></div>
+ <div class=bsig><div class=bshd><img src="${av}"><div><b>${esc(S.artist||'you')}</b><small>Paid partnership with ${esc(b.n)}</small></div></div><img class=bspic src="${pick.u}"><div class=bsft><b>${likes.toLocaleString()} likes</b><br>${esc(cap)}</div></div>
  <div class=bsr><span>Fee (${fm(o.pay)} base)</span><b>+${fm(pay)}</b></div><div class=bsr><span>New followers</span><b>+${fol.toLocaleString()}</b></div>${back?`<div class=bsr><span>Flight home (${esc(b.n)} pays)</span><b style="font-size:12px">${esc(back)}</b></div>`:''}
  <p class=m>Posted on Instagrime. You are a little tired from the day (-12 energy).</p><div class=row2><button class=go onclick="closeUI()">Done</button></div></div>`);
  try{say('Posted: Paid partnership with '+b.n+'. +'+fm(pay))}catch(e){}};
@@ -210,7 +210,7 @@ function fill(t,C){const song=((S.songs||[]).slice().sort((a,b)=>(b.streams||0)-
 let BUB=null,lastT=0;
 function bubble(g,txt){if(BUB)BUB.el.remove();const el=document.createElement('div');el.className='bsbub';el.textContent=txt;document.body.appendChild(el);const v=new THREE.Vector3(),B={el,g,t0:performance.now()};BUB=B;
  const upd=()=>{if(BUB!==B)return;const t=performance.now()-B.t0;if(t>3600||!g.visible||typeof mode=='undefined'||mode!='play'){el.remove();BUB=null;return}
-  v.set(g.position.x,2.4,g.position.z).project(camera);el.style.left=((v.x*.5+.5)*innerWidth)+'px';el.style.top=((-v.y*.5+.5)*innerHeight)+'px';el.style.opacity=t<250?t/250:t>3200?(3600-t)/400:1;requestAnimationFrame(upd)};upd()}
+  v.set(g.position.x,2.4,g.position.z).project(cam);el.style.left=((v.x*.5+.5)*innerWidth)+'px';el.style.top=((-v.y*.5+.5)*innerHeight)+'px';el.style.opacity=t<250?t/250:t>3200?(3600-t)/400:1;requestAnimationFrame(upd)};upd()}
 {const s=document.createElement('style');s.textContent='.bsbub{position:fixed;z-index:60;transform:translate(-50%,-100%);max-width:210px;background:#f4f1ea;color:#15171a;border:2px solid #000;border-radius:6px;padding:6px 9px;font:12px/1.3 ui-monospace,Menlo,Consolas,monospace;box-shadow:2px 3px 0 #000a;pointer-events:none;text-align:center}.bsbub:after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-5px;border:5px solid transparent;border-top-color:#000;border-bottom:0}';document.head.appendChild(s)}
 function fanPhoto(){const d=S.brands=S.brands||{};d.fan=d.fan&&d.fan.d==S.day?d.fan:{d:S.day,n:0};if(d.fan.n>=3)return;d.fan.n++;const f=Math.max(1,FOLN(Math.round(6+Math.sqrt(S.followers||0)*.15*tier())));S.followers=(S.followers||0)+f;setTimeout(()=>{try{say('A fan took a photo with you. +'+f+' followers')}catch(e){}},900)}
 setInterval(()=>{try{const D=window.DCITY;if(!(D&&D.on&&D.C&&typeof mode!='undefined'&&mode=='play'&&!D.room&&!D.view&&S.artist&&typeof P!='undefined'))return;
