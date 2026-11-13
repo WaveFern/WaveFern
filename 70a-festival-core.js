@@ -53,7 +53,7 @@ const FACTS=['Neon Ferns','Paper Satellites','Velvet Static','Kid Comet','Glass 
 const FEST_EVERY=7;/* a festival every 7 days (v26.38.1; was 14) */
 const festPhaseOf=d=>d>0&&d%FEST_EVERY==0?'fest':d%FEST_EVERY==FEST_EVERY-1?'build':d>FEST_EVERY&&d%FEST_EVERY==1?'down':null;
 const festNext=d=>Math.ceil((d+(festPhaseOf(d)=='fest'?0:1))/FEST_EVERY)*FEST_EVERY;
-const festPhase=()=>festPhaseOf(S.day);
+const festPhase=()=>FEST.adm===S.day?'fest':festPhaseOf(S.day);/* v53.5.0: FEST.adm = the day an admin switched the festival on from the Teleport app */
 /* festival progress for the current (or just finished) festival, saved with the game; old saves just start without it */
 function festS(){const k=Math.round(S.day/FEST_EVERY);if(!S.fest||S.fest.k!==k||typeof S.fest.p!='object')S.fest={k,p:{}};return S.fest}
 const festLv=()=>{try{return fameLevel()}catch(e){return 0}};

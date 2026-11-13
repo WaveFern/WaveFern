@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.4.0';
+const GAME_VERSION='v53.5.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.5.0',n:'Admin accounts only: the Teleport app on the Gphone now has a "Start festival now" button. It puts the festival on for today, moves the clock into a slot, teleports you to the first stage and starts your set straight away (with the backstage gate and autographs as usual). The Teleport app also shows for admin accounts without Cheat mode. Normal players are unchanged.'},
  {v:'v53.4.0',n:'Dev version, test mode only: the DEV panel has a new "Brand sponsors me" section where you pick which brand sponsors you. It sends the offer and accepts it for you, so the flight, studio photoshoot and payout play out exactly as after accepting a normal offer. Normal play is unchanged and test careers still never post to the leaderboard.'},
  {v:'v53.2.2',n:'Fixed: if you slept or passed out while in a car (the day ending or running out of energy), you woke up invisible. The game now gets you out of the car first (and parks it), and shows your character again if it was ever left hidden after driving.'},
  {v:'v53.2.1',n:'The pen and the outline of your signature in the signature game are now chunky hard-edged pixels (4x blocks) instead of smooth lines.'},
