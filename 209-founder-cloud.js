@@ -51,6 +51,20 @@ window.fdBackfill=async function(write){
  let n=0;for(let i=0;i<add.length;i+=400){const b=F.writeBatch(FBD);add.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,add.length-i)}
  console.log('Written: '+n+' Founder entries.');return{seen,listed,written:n}};
 
+/* v52.4.2: automatic backfill. When the admin account is signed in, the missing founders/{uid} entries are created without a console step: first the admin's own (if this career is a Founder one), then everyone else's from the cloud saves (fdBackfill(true)).
+   It runs at most once a day per browser, and only ever adds entries that do not exist yet, so an f set by hand is never changed. */
+{const KEY='fw_fd_auto',DAY=864e5;
+ const auto=async()=>{try{
+  if(!rd()||!FBU||FBU.isAnonymous||!ADMINS.includes(FBU.uid))return;
+  let at=0;try{at=+localStorage.getItem(KEY)||0}catch(e){}if(Date.now()-at<DAY)return;
+  try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}
+  const F=FBF,r=F.doc(FBD,'founders',FBU.uid);
+  try{const m=await F.getDoc(r);if(!m.exists()&&typeof S=='object'&&S&&S.fdr)await F.setDoc(r,{a:String(S.fdr.a||S.artist||'').slice(0,24),d:Math.min(9999,S.fdr.d|0),t:Date.now()})}catch(e){console.warn('founder auto (own)',(e&&e.code)||e)}
+  const o=console.log;console.log=()=>{};let res;try{res=await window.fdBackfill(true)}finally{console.log=o}
+  if(res&&res.written)console.log('[founders] added '+res.written+' missing Founder entries automatically');
+ }catch(e){try{localStorage.removeItem(KEY)}catch(x){}console.warn('founder auto',(e&&e.code)||e)}};
+ setInterval(auto,15000);setTimeout(auto,6000)}
+
 window.fdSnapshot=async function(write){
  if(!rd())return console.warn('Sign in with the admin Google account first.');
  if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');
