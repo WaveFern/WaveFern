@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v52.9.1';
+const GAME_VERSION='v53.0.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.0.0',n:'Your own signature. The first time you open Label HQ you draw the signature you will sign everything with (Redraw is on the Vinyl & CD tab). From then on every signing, from street fans to festival and tour autographs to pressed vinyls and CDs, is paid by how closely the signature you draw matches your saved one, up to $10 plus 35% per Fame Level. Street fans scale their tip by the match too.'},
  {v:'v52.9.1',n:'Street fans only hand you flat things to sign (lined paper, a poster, a ticket, an album, or a vinyl/CD you have pressed), no caps or shirts.'},
  {v:'v52.9.0',n:'Vinyl & CD tab redesigned: record and CD icons, quantity and price quick-picks, a bar showing how many you print against how many fans would buy, a clear verdict badge and sell-through bars on running pressings. Fans now only ask you to sign vinyls or CDs once you have actually pressed that format (and albums once you have one).'},
  {v:'v52.8.0',n:'Fans on the street who ask for an autograph now open the signature game: draw your signature and the tip depends on how neat it is. Skipping sends the fan away with no tip.'},
