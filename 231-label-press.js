@@ -9,13 +9,15 @@
    - Time: CDs arrive after 1 day, vinyl after 3. Then the copies sell over 10 days, front loaded. Money arrives each morning;
      after the last day unsold copies are written off and a result card (sold, revenue, cost, profit) is mailed and kept in the tab.
    - State: S.press={nid,runs:[{id,alb,fmt,qty,price,cost,day,ready,dem,sold,rev,state,sg}],sold:{'albumId|fmt':copies},rev,cost,printed,units}.
-     state 0 = being pressed / on sale, 1 = finished. sg (copies signed) is reserved for the signing step on vinyl.
+     state 0 = being pressed / on sale, 1 = finished. sg = copies signed so far, sgs = signed copies already sold.
+   Signing (BRD.pressSign, uses signGame of 232-signature-game.js): each signed item adds ~SGC copies (scaled by signature quality), only
+   to copies still unsold. Signed copies sell for +60% and each signed share of the run lifts total demand up to +25%.
    - UI: BRD.press() returns the page body; 223-brand-deals.js adds the tab and calls it. Styles reuse the .lhq classes. */
 (function(){
 const FM={
  vinyl:{n:'Vinyl',ref:28,unit:8.5,per:.35,setup:450,lead:3},
  cd:{n:'CD',ref:12,unit:1.6,per:.05,setup:120,lead:1}};
-const WIN=10,DECAY=.78,MINQ=10,MAXQ=20000,NOISE=.15;
+const SGP=.6,SGD=.25,SGN=5,SGC=10,WIN=10,DECAY=.78,MINQ=10,MAXQ=20000,NOISE=.15;
 const fm=n=>'$'+Math.round(n).toLocaleString('en-US'),fm2=n=>'$'+(+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),num=n=>Math.round(n).toLocaleString('en-US');
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function st(){if(!S.press||typeof S.press!='object')S.press={nid:1,runs:[],sold:{},rev:0,cost:0,printed:0,units:0};const p=S.press;
@@ -57,8 +59,8 @@ const mail=b=>{try{if(Array.isArray(S.msgs))S.msgs.push({id:S.nid++,from:'WaveFe
 /* each morning: sell what the days since the last visit would have sold, pay for it, and close finished runs */
 function daily(){const p=st();p.runs.forEach(r=>{if(r.state!=0)return;const k=clamp(S.day-r.ready,0,WIN),a=albById(r.alb),nm=a?a.name:'your album',F=FM[r.fmt];
   if(!r.arr&&S.day>=r.ready){r.arr=1;mail('Your '+F.n+' pressing of "'+nm+'" has arrived: '+num(r.qty)+' copies at '+fm2(r.price)+'. Sales have started and run for '+WIN+' days. Open Label HQ, Vinyl & CD, to follow them.')}
-  const total=Math.min(r.qty,r.dem),sold=Math.min(total,Math.round(total*cumW(k))),d=sold-r.sold;
-  if(d>0){const e=+(d*r.price).toFixed(2);r.sold=sold;r.rev=+(r.rev+e).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn=+((S.earn||0)+e).toFixed(2);p.rev+=e;p.units+=d;p.sold[key(r.alb,r.fmt)]=(p.sold[key(r.alb,r.fmt)]||0)+d}
+  const total=Math.min(r.qty,Math.round(r.dem*(1+SGD*(r.sg||0)/r.qty))),sold=Math.min(total,Math.round(total*cumW(k))),d=sold-r.sold;
+  if(d>0){const un=r.qty-r.sold,sa=Math.max(0,(r.sg||0)-(r.sgs||0)),ds=un>0?Math.min(d,sa,Math.round(d*sa/un)):0;r.sgs=(r.sgs||0)+ds;const e=+((d+ds*SGP)*r.price).toFixed(2);r.sold=sold;r.rev=+(r.rev+e).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn=+((S.earn||0)+e).toFixed(2);p.rev+=e;p.units+=d;p.sold[key(r.alb,r.fmt)]=(p.sold[key(r.alb,r.fmt)]||0)+d}
   if(k>=WIN){r.state=1;r.res={sold:r.sold,left:r.qty-r.sold,rev:r.rev,cost:r.cost,profit:+(r.rev-r.cost).toFixed(2)};
    mail('Pressing result for "'+nm+'" on '+F.n+': sold '+num(r.sold)+' of '+num(r.qty)+' copies at '+fm2(r.price)+'. Revenue '+fm(r.rev)+', cost '+fm(r.cost)+', '+(r.res.profit>=0?'profit '+fm(r.res.profit):'loss '+fm(-r.res.profit))+'.'+(r.res.left>0?' '+num(r.res.left)+' unsold copies were written off.':' Sold out.'))}})}
 {const w0=wakeUp;wakeUp=function(){const r=w0.apply(this,arguments);try{daily()}catch(e){console.error('label press',e)}return r}}
@@ -79,7 +81,13 @@ function forecastHTML(a){if(!a)return'';const f=PRD.fmt,qty=Math.floor(+PRD.qty)
 function runCard(r){const a=albById(r.alb),F=FM[r.fmt],wait=r.ready-S.day,k=clamp(S.day-r.ready,0,WIN);
  const stat=wait>0?`Arrives in ${wait} day${wait>1?'s':''}`:`Day ${k} of ${WIN} on sale`;
  return`<article class=lh-oc><div class=lh-oct><h3 class=lh-ocn>${esc(a?a.name:'Album')}</h3><span class=lh-tag>${F.n}</span></div>
- <div class=lh-ocf><div><span>Printed</span><b>${num(r.qty)} at ${fm2(r.price)}</b></div><div><span>Status</span><b>${stat}</b></div><div><span>Sold so far</span><b>${num(r.sold)} copies</b></div><div><span>Revenue so far</span><b>${fm(r.rev)} of ${fm(r.cost)} cost</b></div></div></article>`}
+ <div class=lh-ocf><div><span>Printed</span><b>${num(r.qty)} at ${fm2(r.price)}</b></div><div><span>Status</span><b>${stat}</b></div><div><span>Sold so far</span><b>${num(r.sold)} copies</b></div><div><span>Revenue so far</span><b>${fm(r.rev)} of ${fm(r.cost)} cost</b></div><div><span>Signed copies left</span><b>${num(Math.max(0,(r.sg||0)-(r.sgs||0)))}</b></div></div>${canSign(r)?`<div class=lh-ocb><button class="lh-btn pri" onclick="BRD.pressSign(${r.id})">Sign ${F.n=='CD'?'CDs':'vinyls'}</button></div>`:''}</article>`}
+const canSign=r=>r.state==0&&S.day>=r.ready&&typeof signGame=='function'&&(r.qty-r.sold)-Math.max(0,(r.sg||0)-(r.sgs||0))>0;
+BRD.pressSign=function(id){const r=st().runs.find(x=>x.id==id);if(!r||!canSign(r))return say('Nothing left to sign on this pressing.');const a=albById(r.alb),F=FM[r.fmt];
+ const items=[];for(let i=0;i<SGN;i++)items.push({kind:r.fmt,art:{title:a?a.name:'Album',artist:S.artist||'Artist'}});
+ signGame({items,title:'Sign your '+F.n+' copies of '+(a?a.name:'your album'),onDone:()=>{}}).then(res=>{try{if(!res||res.cancelled)return;
+  const room=(r.qty-r.sold)-Math.max(0,(r.sg||0)-(r.sgs||0));let n=0;(res.items||[]).forEach(it=>{if(it.signed)n+=Math.round(SGC*(.5+.5*(+it.q||0)))});n=Math.min(n,Math.max(0,room));
+  if(n>0){r.sg=(r.sg||0)+n;try{updateVersion()}catch(e){}say('Signed '+num(n)+' '+F.n+' copies. Signed copies sell for more.')}else say('No copies signed.');pcR()}catch(e){console.error('label press sign',e)}})};
 function pastTable(rs){return`<table class=lh-t><thead><tr><th>Album</th><th>Format</th><th class=lh-r>Printed</th><th class=lh-r>Sold</th><th class=lh-r>Price</th><th class=lh-r>Revenue</th><th class=lh-r>Cost</th><th class=lh-r>Result</th></tr></thead><tbody>${rs.map(r=>{const a=albById(r.alb),p=r.res?r.res.profit:r.rev-r.cost;
  return`<tr><td>${esc(a?a.name:'Album')}</td><td>${FM[r.fmt].n}</td><td class=lh-r>${num(r.qty)}</td><td class=lh-r>${num(r.sold)}</td><td class=lh-r>${fm2(r.price)}</td><td class=lh-r>${fm(r.rev)}</td><td class=lh-r>${fm(r.cost)}</td><td class=lh-r><b>${p>=0?'Profit '+fm(p):'Loss '+fm(-p)}</b></td></tr>`}).join('')}</tbody></table>`}
 BRD.press=function(){const p=st(),al=albums();ensure();const act=p.runs.filter(r=>r.state==0),past=p.runs.filter(r=>r.state==1).reverse(),last=past[0];
