@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.0.1';
+const GAME_VERSION='v53.1.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.1.0',n:'The signature game is now in the game\'s pixel style: every item you sign (lined paper, poster, ticket, cap, album, shirt, vinyl, CD) is flat pixel art, the signing screen uses the game\'s fonts, borders and buttons, and the pen draws in chunky pixels. The Choose your signature page in Label HQ now uses the game\'s own look and fonts.'},
  {v:'v53.0.1',n:'The signature game no longer says "Sign inside the red box" when you did sign inside it: a normal-sized signature is accepted (it used to need ink as long as 70% of the box width, now 35%), and a signature that is too small says to sign bigger and longer instead.'},
  {v:'v53.0.0',n:'Your own signature. The first time you open Label HQ you draw the signature you will sign everything with (Redraw is on the Vinyl & CD tab). From then on every signing, from street fans to festival and tour autographs to pressed vinyls and CDs, is paid by how closely the signature you draw matches your saved one, up to $10 plus 35% per Fame Level. Street fans scale their tip by the match too.'},
  {v:'v52.9.1',n:'Street fans only hand you flat things to sign (lined paper, a poster, a ticket, an album, or a vinyl/CD you have pressed), no caps or shirts.'},
