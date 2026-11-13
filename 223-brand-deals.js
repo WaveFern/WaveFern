@@ -78,7 +78,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 /* each brand writes through a named agent with a face of their own */
 const AGN=['Dana Reyes','Marcus Hale','Priya Nair','Jonas Weber','Chloe Martin','Theo Bianchi','Aiko Tanaka','Sam Okafor','Lena Novak','Rafael Costa'];
 BRD.agent=function(o){const b=BRD.by(o.b);if(!o.ag||!o.ag.n){let cfg=null;try{cfg=fCfg()}catch(e){}o.ag={n:pick(AGN),cfg}}o.ag.from=o.ag.n+' · '+b.n;return o.ag};
-function mk(){const s=st(),b=pickBrand();if(!b)return;const d=HQC[b.id];
+function mk(bid){const s=st(),b=bid?BRD.by(bid):pickBrand();if(!b)return;const d=HQC[b.id];
  const pay=Math.max(FLOOR[b.t],Math.round(monthly()*(.8+Math.random()*.8)/100)*100)*1.2,
   o={id:S.nid++,b:b.id,k:'trip',d,pay:Math.round(pay/100)*100,exp:S.day+EXPIRE,st:0,due:0,brief:{mood:pick(BRD.mood),light:pick(BRD.light)}};
  s.list.push(o);s.last=S.day;if(s.list.length>24)s.list=s.list.filter(q=>q.st<2||q.st==3&&q.res).slice(-24);
@@ -89,7 +89,8 @@ function mk(){const s=st(),b=pickBrand();if(!b)return;const d=HQC[b.id];
  t+='Our brief: a '+o.brief.mood.toLowerCase()+' mood with '+o.brief.light.toLowerCase()+' lighting. This offer stands for '+EXPIRE+' days.';
  S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:t});
  S.hqLink=1;
- try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}}
+ try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}return o}
+BRD.mk=mk;
 
 /* ---------- flights: a free, checked-in ticket on the company ---------- */
 const T=()=>window.TRAVEL;
