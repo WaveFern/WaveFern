@@ -767,9 +767,9 @@ function fbGet(R,db,path){const to=ms=>new Promise((_,j)=>setTimeout(()=>j(new E
    rewrites an existing entry, and they refuse the 30-day username stamp f/u/UID/t while it is still cooling down, so an owned name must not send either,
    or the whole update (presence included) is denied. The display-name stamp is sent only when the name really changed, so an unchanged name does not use up the weekly stamp. */
 /* v50.1.3: when the rules refuse the display-name stamp, the retry without it works but Firebase still prints a permission_denied warning for the first try. Remember the refusal for a day so later page loads go straight to the version that works. */
-const frNmDenied=()=>{try{return Date.now()-(+localStorage.getItem('fw_frnm_no')||0)<864e5}catch(e){return false}};
+const frNmDenied=()=>{try{return Date.now()-(+localStorage.getItem('fw_frnm_no')||0)<6048e5}catch(e){return false}};
 const frNmMark=()=>{try{localStorage.setItem('fw_frnm_no',String(Date.now()))}catch(e){}};
-function frUpd(R,db,uid,h,rm,extra,owned){const base=Object.assign(owned?{}:{['f/n/'+h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp()},extra||{}),nm=frNm(),mk=(withNm)=>{const o={h,o:1,rm:rm||'',t:R.serverTimestamp()};if(withNm&&nm)o.nm=nm;return o};
+function frUpd(R,db,uid,h,rm,extra,owned){const base=Object.assign(owned?{}:{['f/n/'+h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp()},extra||{}),nm=frNm(),mk=(withNm)=>{const o={h,o:1,rm:rm||'',t:R.serverTimestamp()};if(withNm&&nm)o.nm=nm;else if(FR.snm)o.nm=FR.snm;return o};
  if(frNmDenied())return R.update(R.ref(db),Object.assign({},base,{['f/p/'+uid]:mk(0)}));
  const a=Object.assign({},base,{['f/p/'+uid]:mk(1)});if(nm&&nm!==FR.snm)a['f/u/'+uid+'/d']=R.serverTimestamp();
  return R.update(R.ref(db),a).then(r=>{FR.snm=nm;return r}).catch(e=>{if(!nm||!/PERMISSION/i.test(String(e&&(e.code||e.message))))throw e;frNmMark();return R.update(R.ref(db),Object.assign({},base,{['f/p/'+uid]:mk(0)}))})}
@@ -793,7 +793,7 @@ function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;
 function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
  if(k===FR.pk||Date.now()<(FR.pbo||0))return;FR.pk=k;
  /* send the name stamp with a changed name; if the stamp or nm is refused, retry once without nm */
- const nmChanged=o.nm&&o.nm!==FR.snm&&!frNmDenied(),go=(withNm)=>{const v=Object.assign({},o);if(!withNm||frNmDenied())delete v.nm;const u={['f/p/'+uid]:Object.assign({t:R.serverTimestamp()},v)};if(withNm&&nmChanged)u['f/u/'+uid+'/d']=R.serverTimestamp();return R.update(R.ref(db),u).then(()=>{if(withNm)FR.snm=o.nm})};
+ const nmChanged=o.nm&&o.nm!==FR.snm&&!frNmDenied(),go=(withNm)=>{const v=Object.assign({},o);if(!withNm||frNmDenied()){if(FR.snm)v.nm=FR.snm;else delete v.nm}/* v52.4.3: keep the stored name (always accepted) instead of wiping it */const u={['f/p/'+uid]:Object.assign({t:R.serverTimestamp()},v)};if(withNm&&nmChanged)u['f/u/'+uid+'/d']=R.serverTimestamp();return R.update(R.ref(db),u).then(()=>{if(withNm)FR.snm=o.nm})};
  go(1).catch(e=>{if(!/PERMISSION/i.test(String(e&&(e.code||e.message)))||!nmChanged)throw e;frNmMark();return go(0)}).then(()=>{FR.pbf=0;if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{
   /* back off instead of retrying every 4 seconds: 30s, 60s, 2min ... up to 10min, and keep the failed key so it is not re-sent until then */
   FR.pbf=Math.min((FR.pbf||0)+1,6);FR.pbo=Date.now()+Math.min(600000,15000*Math.pow(2,FR.pbf));FR.pk='';
