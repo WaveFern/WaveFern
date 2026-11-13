@@ -101,9 +101,9 @@ function build(C,bk,o){const b=BRD.by(o.b),sp=HQB[o.b],G=D.mkG(),Gw=D.mkG(),q=D.
   /* forecourt: carpet, bollards, two flags in the brand's colour */
   D.quadY(G,mx-1.6,fz+.2,mx+1.6,bk.z1-.4,.06,'#b5172a');[-2,2].forEach(s=>{B(G,.18,.7,.18,'#e9c24a',mx+s*1.9,.35,fz+1.2);B(G,.18,.7,.18,'#e9c24a',mx+s*1.9,.35,fz+3)});
   const fc=b.c==b.bg||/^#f/i.test(b.c)?'#3a3a48':b.c;[ex[0]-1.4,ex[1]+1.4].forEach(x=>{B(G,.14,7.4,.14,'#cfd2d8',x,3.7,fz+1.2);B(G,1.7,1.1,.06,fc,x+(x<mx?.85:-.85),6.7,fz+1.2);B(Gw,.5,.5,.07,'#fff',x+(x<mx?.85:-.85),6.7,fz+1.26)});
-  D.col(ex[0]-.3,(c.zb2==null?c.zb:c.zb2)-.3,ex[1]+.3,fz-.1);D.unit(C,G,Gw,q,[bk.x0,bk.z0,bk.x1,bk.z1,H]);
+  try{if(BRD.hqExterior)BRD.hqExterior(c,H,ex,fz,mx,b)}catch(e){console.error('hq exterior',e)}D.col(ex[0]-.3,(c.zb2==null?c.zb:c.zb2)-.3,ex[1]+.3,fz-.1);D.unit(C,G,Gw,q,[bk.x0,bk.z0,bk.x1,bk.z1,H]);
   C.spots.land={x:mx,z:fz+1.2,n:b.n+' HQ'};C.hq={bid:o.b,x:mx,z:fz,out:{x:mx,z:fz+2.2},n:b.n};
-  D.addInt(mx,fz+1.7,2.4,'Enter '+b.n+' HQ',()=>{const j=BRD.active();if(!j||j.b!=o.b)return say('Reception: "We have no shoot booked with you today."');D.fade(()=>D.goRoom('brand',RMX+RMW/2,RMZ+RMD-1.8,Math.PI),()=>say('Welcome to '+b.n+'. The studio is ready: the camera is by the lights.'))});
+  D.addInt(mx,fz+1.7,2.4,'Enter '+b.n+' HQ',()=>{const j=BRD.active();if(!j||j.b!=o.b)return say('Reception: "We have no shoot booked with you today."');D.fade(()=>{if(BRD.hqEnter&&C.rooms.hq_lobby)BRD.hqEnter();else D.goRoom('brand',RMX+RMW/2,RMZ+RMD-1.8,Math.PI)},()=>say('Welcome to '+b.n+'. Reception is ahead; the photo studio is the door on the left.'))});
   return true}finally{D.building=prev}}
 
 /* ---------- the studios: backdrop art, floors, props. One per brand ---------- */
@@ -208,7 +208,7 @@ function studio(C,o){const b=BRD.by(o.b),sp=STU[o.b],pc=sp.nc,x0=RMX,z0=RMZ,w=RM
  rm.int(x0+w-3.4,z0+d-1.4,1.8,'Company car to the airport',()=>D.fade(()=>D.goOut(C.air.x1+10,C.mid+1.5,Math.PI/2),()=>say(b.n+' sends a car: it drops you at the airport.')));
  rm.int(x0+4.6,z0+13.2,2,'Ask the front desk',()=>{const j=BRD.active();say(j&&j.d==C.id?'Front desk: "The studio is through here. Meet the photographer by the lights, and the car back to the airport is on '+b.n+'."':'Front desk: "Thanks for visiting."')});
  rm.done()}
-D.cityHooks.push(C=>{const o=BRD.active();if(!(o&&o.k=='trip'&&o.d==C.id&&C.hq&&STU[o.b]))return;try{studio(C,o)}catch(e){console.error('brand studio',e);C.hq=null}});
+D.cityHooks.push(C=>{const o=BRD.active();if(!(o&&o.k=='trip'&&o.d==C.id&&C.hq&&STU[o.b]))return;try{if(BRD.hqBuild)try{BRD.hqBuild(C,o);return}catch(e){console.error('brand rooms',e)}studio(C,o)}catch(e){console.error('brand studio',e);C.hq=null}});
 
 /* ---------- a company car waits when you walk out of the airport ---------- */
 const modal=h=>{mode='menu';$('ui').innerHTML=h};
