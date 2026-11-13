@@ -4,6 +4,7 @@
    - every item (paper, poster, ticket, cap, album, shirt, vinyl, CD) is redrawn as flat-colour pixel art on a 180 x 110 canvas and
      scaled x4 with no smoothing (no gradients, black and WaveFern green like 198-game-ui.js). It is added as the item's `draw`
      when the caller gave none, so custom items still win; the vinyl has a big paper label for the signature;
+   - while signing, a dashed green outline of your saved signature (S.sig) is drawn in the box to copy (item.noGhost turns it off);
    - the overlay uses the game's fonts (Silkscreen headings, system monospace text), square pixel borders and buttons;
    - the pen layer is a half-resolution canvas shown pixelated, so the ink looks like pixels too (the signature itself is still
      recorded at full precision);
@@ -60,11 +61,19 @@ const ART={
   const bands=['#ff6ad5','#ffe066','#7dffb0','#7ad7ff'];for(let i=0;i<4;i++)ring(x,bands[i],90,55,40-i*3);
   disc(x,'#f6f6fa',90,55,16);disc(x,'#9aa0b2',90,55,5);disc(x,'#16161c',90,55,3);
   T(x,(String((o.art&&o.art.artist)||'')+' ').toUpperCase(),90,16,'#2b3140','center',8)}};
+/* the outline of your saved signature, fitted into the item's signing box, for you to copy (not shown while setting the signature) */
+function ghost(c,o){try{const me=S.sig;if(!me||!me.s||o.noGhost)return;const z=o.zone||ZONE[o.kind]||ZONE.paper,zx=z.x*W,zy=z.y*H,zw=z.w*W,zh=z.h*H,sw=me.a[0],sh=me.a[1];
+ let x0=9,x1=-9,y0=9,y1=-9;me.s.forEach(st=>st.forEach(p=>{x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1])}));if(x1<x0)return;
+ const bw=Math.max((x1-x0)*sw,1),bh=Math.max((y1-y0)*sh,1),k=Math.min(zw*.9/bw,zh*.8/bh),ox=zx+zw/2-bw*k/2-x0*sw*k,oy=zy+zh/2-bh*k/2-y0*sh*k;
+ c.save();c.lineCap='round';c.lineJoin='round';c.setLineDash([10,9]);c.lineWidth=6;c.strokeStyle='#000000a0';
+ for(let pass=0;pass<2;pass++){if(pass)c.strokeStyle='#2fe68a';c.lineWidth=pass?4:7;
+  me.s.forEach(st=>{if(!st.length)return;c.beginPath();st.forEach((p,i)=>{const u=ox+p[0]*sw*k,v=oy+p[1]*sh*k;i?c.lineTo(u,v):c.moveTo(u,v)});if(st.length==1)c.lineTo(ox+st[0][0]*sw*k+.1,oy+st[0][1]*sh*k);c.stroke()})}
+ c.restore()}catch(e){console.error('signature outline',e)}}
 const draw=kind=>function(c,o){const cv=document.createElement('canvas');cv.width=BW;cv.height=BH;const x=cv.getContext('2d');x.imageSmoothingEnabled=false;
-(ART[kind]||ART.paper)(x,o||{});c.imageSmoothingEnabled=false;c.drawImage(cv,0,0,W,H)};
+(ART[kind]||ART.paper)(x,o||{});c.imageSmoothingEnabled=false;c.drawImage(cv,0,0,W,H);ghost(c,o||{})};
 /* ---- hook the items and the pen into every signing session ---- */
 const PEN={paper:'#1b2a6b'};
-function prep(o){o=o||{};if(o.items&&o.items.length)o.items=o.items.map(it=>{const a=Object.assign({},it);if(!a.draw&&ART[a.kind]){a.draw=draw(a.kind);if(!a.zone)a.zone=ZONE[a.kind]}if(!a.ink&&PEN[a.kind])a.ink=PEN[a.kind];return a});return o}
+function prep(o){o=o||{};if(S.sig&&o.items&&!o.items.some(i=>i.noGhost))o.intro='Copy your own signature: follow the green dashed outline in the red box. The closer it matches, the more you are paid. Enter = next, Backspace = clear, Esc = skip.';if(o.items&&o.items.length)o.items=o.items.map(it=>{const a=Object.assign({},it);if(!a.draw&&ART[a.kind]){a.draw=draw(a.kind);if(!a.zone)a.zone=ZONE[a.kind]}else if(a.draw&&!a.ghosted){const d0=a.draw;a.draw=function(c,it){d0.apply(this,arguments);ghost(c,it||a)};a.ghosted=1}if(!a.ink&&PEN[a.kind])a.ink=PEN[a.kind];return a});return o}
 {const g0=window.signGame;window.signGame=function(o){o=prep(o);if(!o.items||!o.items.length){o.items=SIGN.random(3);o=prep(o)}
  const p=g0.call(this,o);try{const cv=document.getElementById('sgin');if(cv){cv.width=W/2;cv.height=H/2;cv.getContext('2d').scale(.5,.5);const bg=document.getElementById('sgbg');if(bg)bg.style.imageRendering='pixelated';cv.style.imageRendering='pixelated'}}catch(e){console.error('signature pixel pen',e)}return p}}
 /* ---- the overlay in the game's pixel theme ---- */
