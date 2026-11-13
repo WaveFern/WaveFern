@@ -15,10 +15,10 @@
 {const s0=sign;sign=function(n){
  if(!n||typeof signGame!='function'||typeof SIGN=='undefined'||SIGN.busy()||mode!='play')return s0.apply(this,arguments);
  mode='menu';let it;try{it=SIGN.street(1)}catch(e){it=null}
- signGame({title:'Autograph · a fan on the street',items:it||undefined,intro:'Draw your signature in the red box. Enter = next, Backspace = clear, Esc = skip.'}).then(r=>{
+ signGame({noPay:true,title:'Autograph · a fan on the street',items:it||undefined,intro:'Draw your signature in the red box. Enter = next, Backspace = clear, Esc = skip.'}).then(r=>{
   try{if(mode=='menu')mode='play';if(!r||r.cancelled)return;
    if(!r.signed){n.st=2;n.cool=25;n.fan=false;say('You skipped the fan.');return}
-   const m0=+S.money||0,q=+r.avg||0;s0.call(this,n);const d=(+S.money||0)-m0;
+   const m0=+S.money||0,q=r.sim!=null&&S.sig?.3+1.1*r.sim-.6:+r.avg||0;s0.call(this,n);const d=(+S.money||0)-m0;
    if(d>0){const k=.6+.8*q,adj=+(d*k-d).toFixed(2);S.money=+(S.money+adj).toFixed(2);say('Fan tipped '+$$(d*k)+(q>=.8?' for a lovely signature':''))}}
   catch(e){console.error('street autograph',e);if(mode=='menu')mode='play'}});
 }}
