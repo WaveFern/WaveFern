@@ -72,16 +72,19 @@ function forecastHTML(a){if(!a)return'';const f=PRD.fmt,qty=Math.floor(+PRD.qty)
  if(!(qty>=MINQ&&qty<=MAXQ&&price>=1))return`<p class=lh-mut>Enter between ${MINQ} and ${num(MAXQ)} copies and a price of at least $1.</p>`;
  const x=forecast(a,f,qty,price),m=x.mid,sell=Math.round(x.base),pos=m.profit>=0;
  const over=sell<qty*.8?`Fans would buy about <b>${num(sell)}</b>, so roughly <b>${num(Math.max(0,qty-sell))}</b> copies would be left unsold.`:sell>qty*1.15?`Demand looks higher than <b>${num(qty)}</b> copies, so you would sell out. A bigger run or a higher price would earn more.`:`Demand roughly matches the run.`;
- return`<dl class=lh-dl><div><dt>Cost</dt><dd>${fm(x.c.total)} <span class=lh-mut>(${fm(x.c.setup)} setup + ${fm2(x.c.unit)} a copy${x.c.disc>0?', '+Math.round(x.c.disc*100)+'% volume discount':''})</span></dd></div>
+ const top=Math.max(qty,x.hi.sold,Math.round(x.base*(1+NOISE)))*1.08||1,pc=v=>(clamp(v/top,0,1)*100).toFixed(1)+'%';
+ const vclass=x.verdict=='Profitable'?'ok':x.verdict=='Risky'?'risk':'loss';
+ const bar=`<div class=lh-sd><div class=lh-sdh><span class="lh-vd ${vclass}">${x.verdict}</span><span class=lh-mut>Printed vs fans who would buy</span></div><div class=lh-sdt aria-hidden=true><i class=lh-sdb style="left:${pc(x.base*(1-NOISE))};width:calc(${pc(x.base*(1+NOISE))} - ${pc(x.base*(1-NOISE))})"></i><i class=lh-sdp style="left:${pc(qty)}"></i></div><div class=lh-sdl><span><u class=lh-k1></u>Likely buyers ${num(x.base*(1-NOISE))} to ${num(x.base*(1+NOISE))}</span><span><u class=lh-k2></u>You print ${num(qty)}</span></div></div>`;
+ return bar+`<dl class=lh-dl><div><dt>Cost</dt><dd>${fm(x.c.total)} <span class=lh-mut>(${fm(x.c.setup)} setup + ${fm2(x.c.unit)} a copy${x.c.disc>0?', '+Math.round(x.c.disc*100)+'% volume discount':''})</span></dd></div>
  <div><dt>Likely sales</dt><dd>${x.lo.sold==x.hi.sold?num(m.sold)+' copies (sell-out)':num(x.lo.sold)+' to '+num(x.hi.sold)+' copies, about '+num(m.sold)}</dd></div>
  <div><dt>Revenue</dt><dd>${x.lo.rev==x.hi.rev?fm(m.rev):fm(x.lo.rev)+' to '+fm(x.hi.rev)}</dd></div>
  <div><dt>Profit</dt><dd>${x.lo.profit==x.hi.profit?'<b>'+money(m.profit)+'</b>':'<b>'+money(x.lo.profit)+' to '+money(x.hi.profit)+'</b> <span class=lh-mut>(about '+money(m.profit)+')</span>'}</dd></div>
  <div><dt>Break-even</dt><dd>${isFinite(x.be)?num(x.be)+' copies sold at this price':'Price is below the unit cost'}</dd></div></dl>
- <p class="lh-pv ${pos?'':'lh-bad'}"><b>${x.verdict}.</b> ${over}${price>x.ref*1.4?' At '+fm2(price)+' fewer fans will pay; a fair price is about '+fm(x.ref)+'.':''}${x.P.pool<5?' This album has very few fans so far: streams and monthly listeners drive physical sales.':''}</p>`}
+ <p class="lh-pv ${pos?'':'lh-bad'}">${over}${price>x.ref*1.4?' At '+fm2(price)+' fewer fans will pay; a fair price is about '+fm(x.ref)+'.':''}${x.P.pool<5?' This album has very few fans so far: streams and monthly listeners drive physical sales.':''}</p>`}
 function runCard(r){const a=albById(r.alb),F=FM[r.fmt],wait=r.ready-S.day,k=clamp(S.day-r.ready,0,WIN);
  const stat=wait>0?`Arrives in ${wait} day${wait>1?'s':''}`:`Day ${k} of ${WIN} on sale`;
  return`<article class=lh-oc><div class=lh-oct><h3 class=lh-ocn>${esc(a?a.name:'Album')}</h3><span class=lh-tag>${F.n}</span></div>
- <div class=lh-ocf><div><span>Printed</span><b>${num(r.qty)} at ${fm2(r.price)}</b></div><div><span>Status</span><b>${stat}</b></div><div><span>Sold so far</span><b>${num(r.sold)} copies</b></div><div><span>Revenue so far</span><b>${fm(r.rev)} of ${fm(r.cost)} cost</b></div><div><span>Signed copies left</span><b>${num(Math.max(0,(r.sg||0)-(r.sgs||0)))}</b></div></div>${canSign(r)?`<div class=lh-ocb><button class="lh-btn pri" onclick="BRD.pressSign(${r.id})">Sign ${F.n=='CD'?'CDs':'vinyls'}</button></div>`:''}</article>`}
+ <div class=lh-ocf><div><span>Printed</span><b>${num(r.qty)} at ${fm2(r.price)}</b></div><div><span>Status</span><b>${stat}</b></div><div><span>Sold so far</span><b>${num(r.sold)} copies</b></div><div><span>Revenue so far</span><b>${fm(r.rev)} of ${fm(r.cost)} cost</b></div><div class=lh-wide><span>Sell-through</span><i class=lh-pg><b style="width:${Math.round(100*r.sold/r.qty)}%"></b></i></div><div><span>Signed copies left</span><b>${num(Math.max(0,(r.sg||0)-(r.sgs||0)))}</b></div></div>${canSign(r)?`<div class=lh-ocb><button class="lh-btn pri" onclick="BRD.pressSign(${r.id})">Sign ${F.n=='CD'?'CDs':'vinyls'}</button></div>`:''}</article>`}
 const canSign=r=>r.state==0&&S.day>=r.ready&&typeof signGame=='function'&&(r.qty-r.sold)-Math.max(0,(r.sg||0)-(r.sgs||0))>0;
 BRD.pressSign=function(id){const r=st().runs.find(x=>x.id==id);if(!r||!canSign(r))return say('Nothing left to sign on this pressing.');const a=albById(r.alb),F=FM[r.fmt];
  const items=[];for(let i=0;i<SGN;i++)items.push({kind:r.fmt,art:{title:a?a.name:'Album',artist:S.artist||'Artist'}});
@@ -99,15 +102,19 @@ BRD.press=function(){const p=st(),al=albums();ensure();const act=p.runs.filter(r
  const a=albById(PRD.alb),f=PRD.fmt;
  const cov=typeof cover=='function'&&a?(()=>{try{return`<img class=lh-pcv src="${cover(a)}" alt="" width=96 height=96>`}catch(e){return''}})():'';
  const form=`<div class=lh-pform>${cov}<label>Album<select onchange="BRD.pressSet('alb',this.value)">${al.map(x=>`<option value="${x.id}"${x.id==PRD.alb?' selected':''}>${esc(x.name)} (${(x.songs||[]).length} songs)</option>`).join('')}</select></label>
- <div class=lh-pfmt role=group aria-label="Format">${Object.keys(FM).map(k=>`<button class="${f==k?'on':''}" onclick="BRD.pressSet('fmt','${k}')">${FM[k].n}<em>fair price ${fm(FM[k].ref)}</em></button>`).join('')}</div>
- <label>Copies to press<input type=number min=${MINQ} max=${MAXQ} step=10 value="${PRD.qty}" oninput="BRD.pressIn('qty',this.value)"></label>
- <label>Price per copy ($)<input type=number min=1 max=500 step=1 value="${PRD.price}" oninput="BRD.pressIn('price',this.value)"></label></div>`;
- h+=sec('New pressing',FM[f].n+' arrives in '+FM[f].lead+' day'+(FM[f].lead>1?'s':'')+', then sells for '+WIN+' days',`<div class=lh-two><div>${form}</div><div><div id=lhpfv>${forecastHTML(a)}</div><button id=lhpgo class="lh-btn pri" onclick="BRD.pressGo()">Order pressing</button></div></div>`);
+ <div class=lh-pfmt role=group aria-label="Format">${Object.keys(FM).map(k=>`<button class="${f==k?'on':''}" onclick="BRD.pressSet('fmt','${k}')"><span class="lh-disc ${k}"></span><span><b>${FM[k].n}</b><em>fair price ${fm(FM[k].ref)} · arrives in ${FM[k].lead} day${FM[k].lead>1?'s':''}</em></span></button>`).join('')}</div>
+ <label>Copies to press<input id=lhpq type=number min=${MINQ} max=${MAXQ} step=10 value="${PRD.qty}" oninput="BRD.pressIn('qty',this.value)"></label>
+ <div class=lh-chips>${[50,100,250,500,1000,2500].map(q=>`<button type=button onclick="BRD.pressQ(${q})">${num(q)}</button>`).join('')}</div>
+ <label>Price per copy ($)<input id=lhpp type=number min=1 max=500 step=1 value="${PRD.price}" oninput="BRD.pressIn('price',this.value)"></label>
+ <div class=lh-chips><button type=button onclick="BRD.pressP(${Math.round(FM[f].ref*.8)})">Cheap ${fm(FM[f].ref*.8)}</button><button type=button onclick="BRD.pressP(${FM[f].ref})">Fair ${fm(FM[f].ref)}</button><button type=button onclick="BRD.pressP(${Math.round(FM[f].ref*1.3)})">Premium ${fm(FM[f].ref*1.3)}</button></div></div>`;
+ h+=sec('New pressing',FM[f].n+' arrives in '+FM[f].lead+' day'+(FM[f].lead>1?'s':'')+', then sells for '+WIN+' days',`<div class=lh-two><div>${form}</div><div><div id=lhpfv>${forecastHTML(a)}</div><button id=lhpgo class="lh-btn pri" onclick="BRD.pressGo()">Order pressing</button><p class="lh-mut lh-fine">Money for the pressing is taken now. Sales are paid each morning.</p></div></div>`);
  if(act.length)h+=sec('In production and on sale',act.length+(act.length==1?' pressing':' pressings'),`<div class=lh-ocs>${act.map(runCard).join('')}</div>`);
  if(past.length)h+=sec('Past pressings',past.length+(past.length==1?' pressing':' pressings'),`<div class=lh-tw>${pastTable(past)}</div>`);
  return h};
 /* inputs update the forecast without redrawing the page, so typing never loses focus */
 BRD.pressIn=(k,v)=>{PRD[k]=+v;const el=document.getElementById('lhpfv');if(el)el.innerHTML=forecastHTML(albById(PRD.alb))};
+BRD.pressQ=q=>{PRD.qty=q;const e=document.getElementById('lhpq');if(e)e.value=q;BRD.pressIn('qty',q)};
+BRD.pressP=v=>{PRD.price=v;const e=document.getElementById('lhpp');if(e)e.value=v;BRD.pressIn('price',v)};
 BRD.pressSet=(k,v)=>{if(k=='fmt'){if(PRD.fmt!=v){PRD.fmt=v;PRD.price=FM[v].ref}}else PRD[k]=+v;pcR()};
 BRD.pressGo=()=>{try{order()}catch(e){console.error('label press',e)}};
 BRD.pressModel={forecast,costOf,poolOf,priceMult,cumW,FM,WIN};
@@ -125,5 +132,26 @@ BRD.pressModel={forecast,costOf,poolOf,priceMult,cumW,FM,WIN};
 #pc .lhq #lhpfv .lh-dl{display:block;border-top:1px solid var(--ink);margin:0}
 #pc .lhq #lhpfv .lh-dl>div{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:11px 0;border:0;border-bottom:1px solid var(--ln);font-size:14px}
 #pc .lhq #lhpfv .lh-dl dt{font-size:12.5px;color:var(--mu);white-space:nowrap;margin:0}#pc .lhq #lhpfv .lh-dl dd{margin:0;text-align:right}
-#pc .lhq #lhpgo{margin-top:4px}`;document.head.appendChild(s)}
+#pc .lhq #lhpgo{margin-top:4px}
+#pc .lhq .lh-pfmt button{display:flex;align-items:center;gap:12px}#pc .lhq .lh-pfmt button>span:last-child{display:grid;gap:2px}
+#pc .lhq .lh-disc{flex:none;width:34px;height:34px;border-radius:50%;position:relative;background:#111;box-shadow:inset 0 0 0 1px #555}
+#pc .lhq .lh-disc::after{content:"";position:absolute;inset:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px #888}
+#pc .lhq .lh-disc.cd{background:linear-gradient(135deg,#f5f5f4,#c9c9c6 45%,#f5f5f4 70%,#b5b5b2);box-shadow:inset 0 0 0 1px #888}
+#pc .lhq .lh-disc.cd::after{inset:13px;background:#fff;box-shadow:0 0 0 1px #999}
+#pc .lhq .lh-pfmt button.on .lh-disc{box-shadow:0 0 0 2px #fff}
+#pc .lhq .lh-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:-8px}
+#pc .lhq .lh-chips button{all:unset;cursor:pointer;border:1px solid var(--ln2);padding:5px 11px;font:400 12.5px var(--sans);color:var(--mu)}
+#pc .lhq .lh-chips button:hover{border-color:var(--ink);color:var(--ink)}
+#pc .lhq .lh-sd{margin:0 0 20px}#pc .lhq .lh-sdh{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-size:12.5px}
+#pc .lhq .lh-vd{font:700 12px var(--sans);padding:4px 10px;border:1px solid var(--ink);letter-spacing:.02em}
+#pc .lhq .lh-vd.ok{background:var(--ink);color:var(--bg)}#pc .lhq .lh-vd.loss{border-style:dashed}
+#pc .lhq .lh-sdt{position:relative;height:14px;background:var(--soft);border:1px solid var(--ln)}
+#pc .lhq .lh-sdb{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,#111 0 2px,#fff 2px 5px);opacity:.75}
+#pc .lhq .lh-sdp{position:absolute;top:-6px;bottom:-6px;width:3px;margin-left:-1px;background:var(--ink)}
+#pc .lhq .lh-sdl{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:12px;color:var(--mu);flex-wrap:wrap}
+#pc .lhq .lh-sdl u{display:inline-block;width:10px;height:10px;margin-right:6px;text-decoration:none;vertical-align:-1px}
+#pc .lhq .lh-k1{background:repeating-linear-gradient(135deg,#111 0 2px,#fff 2px 4px);border:1px solid var(--ink)}#pc .lhq .lh-k2{background:var(--ink);width:3px!important;margin-right:8px!important}
+#pc .lhq .lh-pg{display:block;height:6px;background:var(--soft);border:1px solid var(--ln);margin-top:8px}#pc .lhq .lh-pg b{display:block;height:100%;background:var(--ink)}
+#pc .lhq .lh-ocf .lh-wide{grid-column:1/-1}
+#pc .lhq .lh-fine{font-size:12px;margin-top:10px}`;document.head.appendChild(s)}
 })();
