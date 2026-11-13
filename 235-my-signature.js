@@ -29,7 +29,7 @@ SIGNME.sim=function(strokes,kind,zone){const me=S.sig;if(!me||!me.s||!strokes||!
 SIGNME.fee=()=>{let L=0;try{L=fameLv()||0}catch(e){}return 10*(1+.35*L)};
 SIGNME.setup=function(){if(typeof signGame!='function')return say('The signature game is not available.');
  signGame({title:'Your signature',noPay:true,skippable:false,intro:'Sign the way you will sign everything from now on. Enter = done, Backspace = clear.',
-  items:[{kind:'paper',who:'WaveFern',ask:'Draw your signature. Every signature you give later is paid by how closely it matches this one.'}]}).then(r=>{
+  items:[{kind:'paper',noGhost:true,who:'WaveFern',ask:'Draw your signature. Every signature you give later is paid by how closely it matches this one.'}]}).then(r=>{
   try{const it=r&&r.items&&r.items[0];if(!r||r.cancelled||!it||!it.signed)return pcR();
    S.sig={s:it.strokes,a:zsize('paper'),day:S.day};try{updateVersion();snd('chime')}catch(e){}say('Signature saved. You are paid for each signing by how closely you match it.');pcR()}catch(e){console.error('signature setup',e)}})};
 /* score and pay every signing session */
