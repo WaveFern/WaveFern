@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v52.3.0';
+const GAME_VERSION='v52.4.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v52.4.0',n:'Bigger parking. There is now a large City Car Park (aisles and three rows of 12 bays) on the open block east of City Plaza, and two big Festival car parks on either side of Park Avenue by the festival gate. Every lot now has a few decoration cars parked in it (about a third of the bays, never the whole lot), and they are solid, so you cannot drive through them. Cars you park still glide into the nearest free bay. The big lots show a larger blue P on the world map. Saves still load.'},
  {v:'v52.3.0',n:'Parking lots. Painted car parks with marked bays now sit beside the roads at the key places: your Home and Garage, the Corner Shop and Radio, Motors and Pet Shop, the Security Agency, and in the city the Music Store, Threadz, Pulse Records HQ, Aurora Residences, Nova Mall, the Gramophone Awards, City Plaza, Skyline Tower and the Barbershop. Get out of your car inside a lot and it glides straight into the nearest free bay, and you step out beside it. The car stays there as before, and every lot shows as a blue P on the world map. The lots are flat, so nothing blocks the view or fades. Saves still load.'},
  {v:'v52.2.0',n:'Pausing now stops everything. While the game is paused, waiting NPC replies, app and Label HQ downloads, brand trip timers, tip pacing, flight map and other short timers stand still and carry on with the time they had left when you resume, with no jump. Animations on the game screens freeze, and time spent paused no longer earns the Welcome back followers. Playing online, time still runs while anyone else in your band is playing. Saves still load.'},
  {v:'v52.1.1',n:'Fixed: the heavier Norman headings in Label HQ were not showing. Headings now use font-weight 600 directly. Nothing else changed. Saves still load.'},
