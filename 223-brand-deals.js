@@ -91,6 +91,7 @@ function mk(){const s=st(),b=pickBrand();if(!b)return;const d=HQC[b.id];
  S.hqLink=1;
  try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}}
 
+BRD.mk=mk; /* v53.3.0: used by dev/dev-brandtest-v1.js (test mode only) */
 /* ---------- flights: a free, checked-in ticket on the company ---------- */
 const T=()=>window.TRAVEL;
 function giveTicket(f,co){const t=T().st(),id='T'+(t.nid++),r=3+Math.floor(Math.random()*18),seat=r+'ABCDEF'[Math.floor(Math.random()*6)],
