@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.2.1';
+const GAME_VERSION='v53.2.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.2.2',n:'Fixed: if you slept or passed out while in a car (the day ending or running out of energy), you woke up invisible. The game now gets you out of the car first (and parks it), and shows your character again if it was ever left hidden after driving.'},
  {v:'v53.2.1',n:'The pen and the outline of your signature in the signature game are now chunky hard-edged pixels (4x blocks) instead of smooth lines.'},
  {v:'v53.2.0',n:'When you sign something you now see a dashed green outline of your saved signature inside the red box to copy. The closer your signature matches it, the more you are paid.'},
  {v:'v53.1.0',n:'The signature game is now in the game\'s pixel style: every item you sign (lined paper, poster, ticket, cap, album, shirt, vinyl, CD) is flat pixel art, the signing screen uses the game\'s fonts, borders and buttons, and the pen draws in chunky pixels. The Choose your signature page in Label HQ now uses the game\'s own look and fonts.'},
