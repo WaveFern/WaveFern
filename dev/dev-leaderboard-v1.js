@@ -16,7 +16,8 @@
   {k:'fol',t:'Followers',u:'total',me:()=>S.followers||0,fmt:f,max:60e6,pw:3.2}
  ];
  /* v51.8.1: a career that used test mode (cheat) or the dev test code is marked S.tainted for good and never posts to the leaderboard or the public profile, even after cheat is turned off or the code is loaded on the real game */
- window.fwTainted=()=>{try{if(S&&S.cheat&&!S.tainted)S.tainted=1;return !!(S&&(S.cheat||S.tainted))}catch(e){return false}};
+ /* v52.4.1: the admin account is only held back while test mode is on right now (S.tainted is ignored for it), so its Founder flag and profile reach other players; the sweep below still removes a row with impossible numbers */
+ window.fwTainted=()=>{try{if(S&&S.cheat&&!S.tainted)S.tainted=1;const ad=typeof isAdmin=='function'&&isAdmin();return !!(S&&(S.cheat||(S.tainted&&!ad)))}catch(e){return false}};
  setInterval(()=>{try{window.fwTainted()}catch(e){}},1000);
  const ps0=window.fwProfileSync;if(typeof ps0=='function')window.fwProfileSync=function(){if(window.fwTainted())return Promise.resolve(0);return ps0.apply(this,arguments)};
  const meName=()=>S.artist||'You';
