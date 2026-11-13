@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v52.4.2';
+const GAME_VERSION='v52.5.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v52.5.0',n:'Label HQ has a new Vinyl & CD tab. Pick one of your albums, a format, how many copies to press and the price. Costs are paid up front, CDs arrive in 1 day and vinyl in 3, then the copies sell over 10 days depending on your album\'s streams, your monthly listeners, the song quality and the price. Overprint for a small audience or price too high and you make a loss; a forecast shows cost, likely sales, profit and break-even before you order, and a result card shows sold, revenue, cost and profit when the run ends.'},
  {v:'v52.4.2',n:'Founder entries are now created automatically: when the admin account is signed in, the missing Founder entries in the cloud (the admin\'s own and every Founder found in the cloud saves) are added once a day, so Founder badges show on profiles and the leaderboard without running fdBackfill by hand. Existing entries are never changed. Saves still load.'},
  {v:'v52.4.1',n:'Fixed: the admin account\'s Founder badge and profile now reach other players. A career that once used test mode used to be blocked from the leaderboard and public profile for good (and its row was deleted each time you opened the game); the admin account is now only held back while test mode is on, and rows with impossible numbers are still removed. Saves still load.'},
  {v:'v52.4.0',n:'Bigger parking. There is now a large City Car Park (aisles and three rows of 12 bays) on the open block east of City Plaza, and two big Festival car parks on either side of Park Avenue by the festival gate. Every lot now has a few decoration cars parked in it (about a third of the bays, never the whole lot), and they are solid, so you cannot drive through them. Cars you park still glide into the nearest free bay. The big lots show a larger blue P on the world map. Saves still load.'},

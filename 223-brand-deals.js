@@ -258,9 +258,9 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
  try{hqFont()}catch(e){}
  const th=L&&(HQT=='labels'||HQT=='team')?THM[L.id]:null,sty=th?`--ac:${th.a}`:'';
  const tab=(k,n,b)=>`<button class="${HQT==k?'on':''}" onclick="bdTab('${k}')"${HQT==k?' aria-current="page"':''}>${n}${b?`<em>${b}</em>`:''}</button>`;
- const nav=tab('deals','Brand Deals')+tab('active','Active Deals',BRD.open().length||'')+tab('past','Past Deals');
+ const nav=tab('deals','Brand Deals')+tab('active','Active Deals',BRD.open().length||'')+tab('past','Past Deals')+tab('press','Vinyl & CD');
  const nav2=(labels()?tab('labels','Labels',HQJ?1:''):'')+(L?tab('team','Team'):'');
- let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():HQT=='active'?activeTab():HQT=='past'?pastTab():HQB?brandPage(HQB):joinCard()+dealsTab()}catch(e){console.error('label hq',e);body=empty('Label HQ hit a problem. Close and open it again.')}
+ let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():HQT=='active'?activeTab():HQT=='past'?pastTab():HQT=='press'&&BRD.press?BRD.press():HQB?brandPage(HQB):joinCard()+dealsTab()}catch(e){console.error('label hq',e);body=empty('Label HQ hit a problem. Close and open it again.')}
  return`<div class="bdw lhq${th?' lhth':''}" style="${sty}"><header class=lh-top><div class=lh-in><nav class=lh-nav aria-label="Brand Deals">${nav}</nav>${nav2?`<nav class="lh-nav lh-nav2" aria-label="Labels">${nav2}</nav>`:''}</div></header>
  <main class=lh-main><div class=lh-in>${body}</div></main></div>`};
 /* the app fills its window edge to edge */
