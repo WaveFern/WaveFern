@@ -25,9 +25,15 @@
     if(n[i+1]<-.99&&n[i+4]<-.99&&n[i+7]<-.99)continue;
     for(let j=0;j<9;j+=3){P.push(p[i+j],p[i+j+1],p[i+j+2]);N.push(n[i+j],n[i+j+1],n[i+j+2]);C.push(k.r,k.g,k.b);A.push(arm);V.push(pv?pv.x:0,pv?pv.y:0,pv?pv.z:0)}}
    gg.dispose()});
+  /* v53.4.1: index the figure. Corners that share the same position, normal, colour and arm data are stored once (a box went from 36 corners to 24),
+     so the GPU shades about a third fewer vertices per person. The triangles, their order and every attribute value are unchanged. */
+  const nv=P.length/3,map=new Map(),ix=[],oP=[],oN=[],oC=[],oA=[],oV=[];
+  for(let i=0;i<nv;i++){const j=i*3,key=P[j]+','+P[j+1]+','+P[j+2]+'|'+N[j]+','+N[j+1]+','+N[j+2]+'|'+C[j]+','+C[j+1]+','+C[j+2]+'|'+A[i]+'|'+V[j]+','+V[j+1]+','+V[j+2];
+   let k=map.get(key);if(k===undefined){k=oA.length;map.set(key,k);oP.push(P[j],P[j+1],P[j+2]);oN.push(N[j],N[j+1],N[j+2]);oC.push(C[j],C[j+1],C[j+2]);oA.push(A[i]);oV.push(V[j],V[j+1],V[j+2])}ix.push(k)}
   const geo=new THREE.BufferGeometry();
-  geo.setAttribute('position',new THREE.Float32BufferAttribute(P,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(C,3));
-  geo.setAttribute('aArm',new THREE.Float32BufferAttribute(A,1));geo.setAttribute('aPiv',new THREE.Float32BufferAttribute(V,3));
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(oP,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(oN,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(oC,3));
+  geo.setAttribute('aArm',new THREE.Float32BufferAttribute(oA,1));geo.setAttribute('aPiv',new THREE.Float32BufferAttribute(oV,3));
+  geo.setIndex(oA.length<65536?new THREE.Uint16BufferAttribute(ix,1):new THREE.Uint32BufferAttribute(ix,1));
   geo.computeBoundingSphere();return geo}
 
  function variants(lite){
@@ -37,7 +43,7 @@
   const L=[];for(let i=0;i<NV;i++){
    const c={skin:ri(0,5),eyes:ri(0,4),mouth:ri(0,3),hair:ri(0,11),hc:ri(0,11),top:ri(0,4),tc:ri(0,9),pc:ri(0,7),body:rr()*.6,hgt:.5};
    try{L.push(flat(c,lite))}catch(e){console.warn('npc crowd variant',e)}}
-  cache[k]=L;if(!lite){X.variants=L.length;X.tris=L.length?Math.round(L.reduce((a,g)=>a+g.attributes.position.count/3,0)/L.length):0}
+  cache[k]=L;if(!lite){X.variants=L.length;X.tris=L.length?Math.round(L.reduce((a,g)=>a+(g.index?g.index.count:g.attributes.position.count)/3,0)/L.length):0}
   return L}
  X.variantGeos=variants;
 
@@ -46,14 +52,14 @@
  X.material=function(u){
   const m=new THREE.MeshLambertMaterial({vertexColors:true});
   m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,u);
-   sh.vertexShader=sh.vertexShader.replace('void main() {','attribute float aArm;attribute vec3 aPiv;uniform float uT,uAmp,uRate,uHype,uWave;\nvoid main() {')
+   sh.vertexShader=sh.vertexShader.replace('void main() {','attribute float aArm;attribute vec3 aPiv;attribute vec2 aPA;uniform float uT,uAmp,uRate,uHype,uWave;\nvoid main() {')
     .replace('#include <begin_vertex>',`#include <begin_vertex>
 #ifdef USE_INSTANCING
- vec3 ip=vec3(instanceMatrix[3][0],instanceMatrix[3][1],instanceMatrix[3][2]);float ph=fract(sin(dot(ip.xz,vec2(12.9898,78.233)))*43758.5453);
- float ang=atan(ip.z,ip.x);float wv=uWave*max(0.,1.-abs(mod(ang-uT*1.4+3.1416,6.2832)-3.1416)*2.2);
+ float ph=aPA.x;float wv=0.;
+ if(uWave>0.)wv=uWave*max(0.,1.-abs(mod(aPA.y-uT*1.4+3.1416,6.2832)-3.1416)*2.2);
  if(aArm>.5){float up=step(ph*1.15,uHype*.95+.12);float sd=aArm>1.5?1.:-1.;float w=sin(uT*uRate*.5+ph*40.+sd*1.3)*.4+sin(uT*uRate*.25+ph*9.)*.15;
   float a=-(mix(.12,2.65,up)+w*up+wv*.6);vec3 d=transformed-aPiv;float cs=cos(a),sn=sin(a);transformed=aPiv+vec3(d.x,d.y*cs-d.z*sn,d.y*sn+d.z*cs);}
- float jp=uAmp*max(0.,sin(uT*uRate+ph*6.2832))*step(ph,uHype*1.2+.08);transformed.y+=jp+wv*.7;
+ float jp=0.;if(ph<=uHype*1.2+.08)jp=uAmp*max(0.,sin(uT*uRate+ph*6.2832));transformed.y+=jp+wv*.7;
 #endif`)};
   m.customProgramCacheKey=()=>'npcx';m.userData={npcx:1};return m};
 
@@ -75,6 +81,9 @@
     const im=new THREE.InstancedMesh(g,mat,L.length);im.instanceMatrix.setUsage(THREE.StaticDrawUsage);
     L.forEach((p,i)=>{q.setFromAxisAngle(Y,p.r||0);const h=.9+rr()*.2;v.set(p.x,p.y||0,p.z);s.set(1,h,1);M.compose(v,q,s);im.setMatrixAt(i,M);
      const b=.82+rr()*.28;col.setRGB(b,b*(.95+rr()*.1),b*(.95+rr()*.1));im.setColorAt(i,col)});
+    /* v53.4.1: each person's jump phase (a hash of where they stand) and their angle round the stage are worked out once here, not for every vertex on every frame */
+    const pa=new Float32Array(L.length*2);L.forEach((p,i)=>{const d=Math.sin(p.x*12.9898+p.z*78.233)*43758.5453;pa[i*2]=d-Math.floor(d);pa[i*2+1]=Math.atan2(p.z,p.x)});
+    g.setAttribute('aPA',new THREE.InstancedBufferAttribute(pa,2));
     im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.frustumCulled=true;im.userData.npcx=1;grp.add(im)})});
   grp.userData.npcx=1;return grp};
 
