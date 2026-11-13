@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v52.9.0';
+const GAME_VERSION='v52.9.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v52.9.1',n:'Street fans only hand you flat things to sign (lined paper, a poster, a ticket, an album, or a vinyl/CD you have pressed), no caps or shirts.'},
  {v:'v52.9.0',n:'Vinyl & CD tab redesigned: record and CD icons, quantity and price quick-picks, a bar showing how many you print against how many fans would buy, a clear verdict badge and sell-through bars on running pressings. Fans now only ask you to sign vinyls or CDs once you have actually pressed that format (and albums once you have one).'},
  {v:'v52.8.0',n:'Fans on the street who ask for an autograph now open the signature game: draw your signature and the tip depends on how neat it is. Skipping sends the fan away with no tip.'},
  {v:'v52.7.0',n:'You can now sign your printed vinyls and CDs. In Label HQ, Vinyl & CD, a pressing that has arrived has a Sign button that opens the signature game: each signed item adds about 10 signed copies (better signatures count for more). Signed copies sell for 60% more and a signed run draws more buyers.'},
