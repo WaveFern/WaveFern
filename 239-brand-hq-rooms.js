@@ -79,7 +79,7 @@ function Kit(C,k,o){const[x0,w,d]=RD[k],z0=RZ,h=H7;
   else R.pl(face,c,a,b,y0,y1,pw,ph,(x,W,H)=>{if(kind=='brick')brickTex(x,W,H,mix(hd.wl,'#a05a3a',.5));else if(kind=='panels')panelTex(x,W,H,hd.wl,hd.ac);else if(kind=='marble')wallMarble(x,W,H,mix(hd.wl,'#000',.1),hd.ac);else{x.fillStyle=mix(hd.wl,'#fff',.35);x.fillRect(0,0,W,H);x.fillStyle=hd.ac+'30';for(let i=0;i<W;i+=W/6)x.fillRect(i,0,6,H)}})};
  R.ducts=(xa,xb,z,y)=>{bx(xb-xa,.5,.5,'#9aa0a8',(xa+xb)/2,y,z);bx(xb-xa,.36,.36,'#7a8088',(xa+xb)/2,y-.45,z+.12);for(let x=xa+2;x<xb;x+=5)bx(.06,.9,.06,'#555',x,y+.2,z)};
  R.ductsX=(za,zb,x,y)=>{bx(.5,.5,zb-za,'#9aa0a8',x,y,(za+zb)/2);bx(.36,.36,zb-za,'#7a8088',x+.12,y-.45,(za+zb)/2)};
- R.beam=(x,za,zb,y)=>{bx(.3,.3,zb-za,'#2e3138',x,y,(za+zb)/2)};
+ R.beam=()=>{};
  R.pend=(x,z,y,kind,col)=>{const lc=col||'#ffe9b0';bx(.03,.9,.03,'#222',x,y+.45,z);
   if(kind=='globe'){gl(.5,.5,.5,lc,x,y-.2,z);bx(.58,.58,.58,'#fff6dd',x,y-.2,z)}else if(kind=='cone'){bx(.7,.4,.7,'#2a2a2e',x,y,z);gl(.5,.1,.5,lc,x,y-.22,z)}else if(kind=='chand'){bx(.1,.5,.1,'#c9a24b',x,y+.2,z);gl(1.6,.12,1.6,lc,x,y-.3,z);gl(.9,.5,.9,'#fff2c0',x,y-.1,z);[[-.9,0],[.9,0],[0,-.9],[0,.9]].forEach(q=>gl(.14,.3,.14,lc,x+q[0],y-.4,z+q[1]))}else{gl(2.4,.1,.16,lc,x,y-.1,z);bx(2.5,.06,.2,'#222',x,y+.02,z)}};
  R.tree=(x,z,s)=>{s=s||1;bx(.7*s,.55*s,.7*s,'#8a5a3a',x,.28*s,z,1);bx(.12*s,1.4*s,.12*s,'#6a4a2a',x,1.2*s,z);const cl=['#2f7a4a','#3fa66a','#4a9a5a','#2a6a3e'];for(let i=0;i<6;i++){const a=i*2.1;bx((1.1-i*.07)*s,.5*s,(1.1-i*.07)*s,cl[i%4],x+Math.sin(a)*.25*s,(1.6+i*.38)*s,z+Math.cos(a)*.25*s)}};
@@ -96,9 +96,35 @@ function Kit(C,k,o){const[x0,w,d]=RD[k],z0=RZ,h=H7;
  R.npc=(x,z,ry,seat,pose)=>{try{const q=buildChar(fCfg());q.g.position.set(OX+x,seat?-.03:0,OZ+z);q.g.rotation.y=ry||0;if(seat){q.legs.forEach(l=>l.rotation.x=-1.5);q.arms.forEach(a=>a.rotation.x=-1.1)}else if(pose=='talk'){q.arms[1].rotation.x=-.9}scene.add(q.g);rm.extra.push(q.g)}catch(e){}};
  R.shoe=(x,y,z,col,sole)=>{bx(.5,.1,.9,sole||'#f4f1ea',x,y,z);bx(.46,.22,.6,col,x,y+.14,z-.1);bx(.4,.2,.28,col,x,y+.2,z+.28)};
  R.rack=(x,z,cols,face)=>{const al=face!='x';bx(.08,1.8,.08,'#888',x-(al?1.3:0),.9,z-(al?0:1.3));bx(.08,1.8,.08,'#888',x+(al?1.3:0),.9,z+(al?0:1.3));bx(al?2.7:.08,.08,al?.08:2.7,'#bbb',x,1.75,z);cols.forEach((c,i)=>{const t=-1.1+i*2.2/Math.max(1,cols.length-1);if(al)bx(.12,1,.5,c,x+t,1.15,z);else bx(.5,1,.12,c,x,1.15,z+t)})};
- R.door=(face,pos,label,tk,sx,sz,rot)=>{const T=tk;
-  if(face=='z'){bx(2.6,.3,.5,'#1a1c20',pos,3.55,z0+.2);bx(.3,3.4,.5,'#1a1c20',pos-1.15,1.7,z0+.2);bx(.3,3.4,.5,'#1a1c20',pos+1.15,1.7,z0+.2);gl(2,3.2,.1,mix(R.hd.ac,'#fff',.6),pos,1.65,z0+.12);R.txt('z',z0+.5,pos-1.3,pos+1.3,3.85,4.6,label,'#fff',mix(R.pcol,'#000',.3));rm.int(pos,z0+2,2.2,'Go to '+label,()=>go(T))}
-  else{bx(.5,.3,2.6,'#1a1c20',x0+.2,3.55,pos);bx(.5,3.4,.3,'#1a1c20',x0+.2,1.7,pos-1.15);bx(.5,3.4,.3,'#1a1c20',x0+.2,1.7,pos+1.15);gl(.1,3.2,2,mix(R.hd.ac,'#fff',.6),x0+.12,1.65,pos);R.txt('x',x0+.5,pos-1.3,pos+1.3,3.85,4.6,label,'#fff',mix(R.pcol,'#000',.3));rm.int(x0+2,pos,2.2,'Go to '+label,()=>go(T))}};
+ /* real doors: dark architrave, two glass leaves with push bars, lit sign, sconces and a mat */
+ R.door=(face,pos,label,tk)=>{const T=tk,fz=face=='z',hd=R.hd,ac=hd.ac,ink='#15171c',steel='#d4d8de',gcol='#9cc6dc';
+  const B=(u,y,v,su,sh,sv,col,g)=>{const a=fz?[su,sh,sv,u,v]:[sv,sh,su,v,u];(g?gl:bx)(a[0],a[1],a[2],col,fz?u:x0+v,y,fz?z0+v:u)};
+  const W=fz?z0:x0;
+  B(pos,1.6,.12,2.5,3.3,.2,'#07080b');                                         /* dark recess */
+  B(pos,1.7,.2,2.5,3.2,.04,mix(ac,'#fff',.55),1);                              /* light spilling from the next room */
+  [-.57,.57].forEach(s=>{const u=pos+s;
+   B(u,1.62,.34,1.1,3.2,.12,ink);                                              /* leaf frame */
+   B(u,2.08,.42,.86,2.3,.06,gcol,1);                                           /* glass */
+   B(u,.5,.4,.86,.78,.06,mix(R.pcol,'#000',.3));                               /* lower panel */
+   B(u,.1,.42,.9,.12,.1,steel);                                                /* kick plate */
+   B(u,1.62,.43,1,.05,.07,ink);                                                /* mid rail */
+   B(pos+s*.22,1.5,.5,.06,.9,.08,steel);                                        /* push bar */
+  });
+  B(pos,1.62,.44,.05,3.1,.08,ink);                                             /* meeting stile */
+  [-1,1].forEach(s=>{B(pos+s*1.3,1.75,.3,.4,3.5,.45,ink);B(pos+s*1.1,1.75,.54,.05,3.4,.06,ac,1);B(pos+s*2.1,2.7,.2,.18,.42,.22,'#222');B(pos+s*2.1,2.7,.32,.1,.3,.06,'#ffe9b0',1)});  /* posts, accent line, sconces */
+  B(pos,3.5,.3,3,.4,.45,ink);B(pos,4.16,.3,2.9,.66,.3,'#0c0d10');B(pos,3.78,.46,2.6,.05,.08,ac,1);   /* lintel + lit sign box */
+  R.txt(face,W+.47,pos-1.3,pos+1.3,3.86,4.46,label,'#fff',mix(R.pcol,'#000',.3));
+  B(pos,.05,1.2,2.8,.07,1.6,mix(R.pcol,'#000',.35));B(pos,.09,1.2,2.4,.02,1.2,ac,1);  /* mat */
+  rm.int(fz?pos:x0+2,fz?z0+2:pos,2.2,'Go to '+label,()=>go(T))};
+ /* trim on the two tall walls: skirting, chair rail, crown */
+ R.trim=()=>{const lo=mix(R.o.wl,'#000',.55),mid=mix(R.o.wl,'#fff',.22),hi=mix(R.o.wl,'#fff',.4);
+  bx(w-.2,.32,.1,lo,R.cx,.16,z0+.05);bx(w-.2,.07,.07,mid,R.cx,1.12,z0+.04);bx(w-.2,.24,.16,hi,R.cx,h-.12,z0+.08);bx(w-.2,.05,.1,mix(R.hd.ac,'#000',.2),R.cx,h-.3,z0+.05);
+  bx(.1,.32,d-.2,lo,x0+.05,.16,R.cz);bx(.07,.07,d-.2,mid,x0+.04,1.12,R.cz);bx(.16,.24,d-.2,hi,x0+.08,h-.12,R.cz);bx(.1,.05,d-.2,mix(R.hd.ac,'#000',.2),x0+.05,h-.3,R.cz)};
+ R.trim();
+ R.finish=()=>{const ac=R.hd.ac,warm='#ffe2a8',x1=R.x1,z1=R.z1;gl(w-.6,.05,.1,warm,R.cx,h-.34,z0+.14);gl(.1,.05,d-.6,warm,x0+.14,h-.34,R.cz);
+  gl(w-2.4,.03,.12,ac,R.cx,.04,z0+1.1);gl(.12,.03,d-2.4,ac,x0+1.1,.04,R.cz);gl(w-2.4,.03,.12,ac,R.cx,.04,z1-1.1);gl(.12,.03,d-2.4,ac,x1-1.1,.04,R.cz);
+  const n=Math.max(2,Math.floor((w-6)/8));for(let i=0;i<n;i++){const x=x0+4+(w-8)*(i+.5)/n;bx(1.1,.55,.9,'#2a2c32',x,.28,z1-.65);R.bush(x,z1-.65,1)}
+  for(const [px,pz] of [[x1-.7,z0+.8],[x1-.7,z1-.7]]){bx(.35,.1,.35,'#2a2c32',px,.05,pz);bx(.06,1.7,.06,'#333',px,.9,pz);bx(.5,.38,.5,warm,px,1.9,pz)}};
  return R}
 function go(k){const C=D.C,rm=C&&C.rooms[KEY(k)];if(!rm){snd('err');return say('That part of the building is closed today.')}
  const[x0,w,d]=RD[k];let x=x0+2.8,z=RZ+d-6,r=Math.PI/2;if(k=='lobby'){x=x0+w/2;z=RZ+d-3;r=Math.PI}
@@ -224,7 +250,9 @@ function studio(R,sp){const{x0,z0,w,d,cx,x1,z1,hd,b,id,pcol}=R,bx=R.bx,gl=R.gl,p
  R.rm.int(x0+4,z0+17,2.2,'Wardrobe rack',()=>say('Wardrobe: "You will wear or hold the '+b.n+' product in the shoot. Pick in the Pose tab."'))}
 
 BRD.hqBuild=function(C,o){const id=o.b,sp=BRD.studios&&BRD.studios[id];if(!HD[id])throw new Error('no HD for '+id);let n=0;
- const mk=(k,fn,ex)=>{try{const R=Kit(C,k,Object.assign({id,fl:HD[id].fl,wl:HD[id].wl,name:BRD.by(id).n+' '+NM[k].toLowerCase()},ex||{}));if(!R)return;if(k!='lobby')R.floor0=1;fn(R);R.rm.done();n++}catch(e){console.error('hq room '+k,e)}};
+ /* dark plinth under and around all six rooms, so no grass or void shows past the low front and right walls */
+ try{const g=new THREE.BoxGeometry(470,.3,260),m=new THREE.MeshBasicMaterial({color:'#1b1d23'}),me=new THREE.Mesh(g,m);g.userData.dsOwn=1;m.userData.dsOwn=1;me.userData.dsOwn=1;me.position.set(OX+1500,-.14,OZ+RZ+10);scene.add(me);(C.extra=C.extra||[]).push(me)}catch(e){console.error('hq plinth',e)}
+ const mk=(k,fn,ex)=>{try{const R=Kit(C,k,Object.assign({id,fl:HD[id].fl,wl:HD[id].wl,name:BRD.by(id).n+' '+NM[k].toLowerCase()},ex||{}));if(!R)return;if(k!='lobby')R.floor0=1;fn(R);try{R.finish()}catch(e){console.error('finish',k,e)}R.rm.done();n++}catch(e){console.error('hq room '+k,e)}};
  mk('office',office);mk('cafe',cafe);mk('board',board);mk('show',R=>(SHOW[id]||SHOW.generic)(R));mk('brand',R=>studio(R,sp),{name:BRD.by(id).n+' HQ studio'});mk('lobby',lobby);
  if(!n)throw new Error('no rooms built')};
 
