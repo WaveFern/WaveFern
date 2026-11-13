@@ -10,7 +10,8 @@
 
  /* ---------- mock data ---------- */
  const NOW=Date.now(),DAY=864e5;
- const ACH=[['First release','Released a first song'],['Ten songs','Released 10 songs'],['100K listeners','Reached 100,000 monthly listeners'],['Sold-out stage','Sold out a festival stage'],['World tour','Played a show on every continent'],['Gramophone win','Won a Gramophone Award'],['One billion streams','Passed 1,000,000,000 total streams'],['Band streak 30','Kept a 30 day band streak']];
+ const ACH=[['First release','Released a first song'],['Ten songs','Released 10 songs'],['100K listeners','Reached 100,000 monthly listeners'],['1M listeners','Reached 1,000,000 monthly listeners'],['Fame level 25','Reached fame level 25'],['Fame level 50','Reached fame level 50'],['Joined a band','Played in a band'],['One billion streams','Passed 1,000,000,000 total streams']];
+ const achOf=(ns,lq,fl,band,ts)=>[ns>=1,ns>=10,lq>=1e5,lq>=1e6,fl>=25,fl>=50,!!band,ts>=1e9].map((v,i)=>v?i:-1).filter(i=>i>=0);
  const PEOPLE={
   marlo:{id:'marlo',artist:'Marlo Vance',user:'marlovance',seed:11,founder:1,fame:64,listeners:3820000,joined:NOW-212*DAY,bio:'Bedroom pop turned arena. Mostly nights, mostly synths.',
    songs:[['Paper Satellites',182400000,1],['Low Tide Radio',96700000,0],['Glasshouse',41200000,0],['Ninth Floor',2300000,2]],band:{name:'Static Orchard',inst:'Keys',members:4,streak:23},ach:[0,1,2,3,5],online:'In a band room',rel:'friend'},
@@ -45,14 +46,14 @@
   const songs=((D&&D.songs)||[]).slice().sort((a,b)=>(b.streams||0)-(a.streams||0)).slice(0,5).map(s=>[s.title,s.streams||0,(s.streams||0)>=1e6?1:((s.today||0)>5e4?2:0)]);
   const sk=(D&&D.mp&&D.mp.sk&&D.mp.sk.n)||0;
   const st=load();
-  return{id:'me',me:1,sample:!has,artist:has?D.artist:'Your Artist Name',user:st.user,seed:3,founder:has?!!g(()=>S.founder):1,
+  return{id:'me',me:1,sample:!has,artist:g(()=>window.fwDisplayName&&window.fwDisplayName())||(has?D.artist:'Your Artist Name'),user:g(()=>window.fwUsername&&window.fwUsername())||st.user,seed:3,founder:g(()=>!!(S&&S.fdr)||(window.isFounder&&isFounder()))?1:0,
    fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:realJoin(st),
    bio:st.bio,songs:songs.length?songs:[['Sample Song One',120400,2],['Sample Song Two',8800,0]],
-   band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:{name:'The Ferns',inst:'Vocals',members:3,streak:sk||4},
-   ach:has?[0,1,2].filter((_,i)=>i<1+Math.floor(((D.songs||[]).length)/3)):[0],online:'Online',rel:'self'};
+   band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:(has?null:{name:'The Ferns',inst:'Vocals',members:3,streak:4}),
+   ach:has?achOf((D.songs||[]).length,D.listeners||0,fameOf(D),ch.k==='cur'&&g(()=>MPS&&MPS.band),(D.songs||[]).reduce((q,x)=>q+(x.streams||0),0)):[],online:'Online',rel:'self'};
  };
  const defaults={user:'yourname',bio:'',show:{listeners:1,songs:1,band:1,streak:1,ach:1,joined:1,status:1},req:'everyone',pfp:3,career:'cur',userAt:0};
- function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}return Object.assign({},defaults,o,{show:Object.assign({},defaults.show,o.show||{})})}
+ function load(){let o={};try{o=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}const r=Object.assign({},defaults,o,{show:Object.assign({},defaults.show,o.show||{})});/* the real username (from the account) always wins over the cached copy */const u=g(()=>window.fwUsername&&window.fwUsername());if(u)r.user=u;return r}
  function save(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
 
  /* ---------- avatars: deterministic 8x8 mirrored pixel face, drawn to a canvas ---------- */
@@ -65,7 +66,7 @@
   const im=document.createElement('img');im.src=k.toDataURL();im.width=im.height=px;im.alt='';im.style.imageRendering='pixelated';return im.outerHTML;
  }
  const tag=(t,cls)=>`<span class="pf-tag ${cls||''}">${t}</span>`;
- const fmtDate=ts=>new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+ const fmtDate=ts=>!(ts>0)?'Unknown':new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
  const rel=ts=>{const d=Math.max(1,Math.round((NOW-ts)/DAY));return d<60?d+' days ago':d<700?Math.round(d/30)+' months ago':Math.round(d/365)+' years ago'};
 
  /* ---------- styles ---------- */
@@ -73,6 +74,15 @@
  css.textContent=`#pfx{position:fixed;inset:0;z-index:9995;display:flex;align-items:center;justify-content:center;background:#000b;padding:12px;font:14px ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec}
 #pfx *{box-sizing:border-box}
 #pfx .fwpc{height:auto;border-radius:0;width:min(520px,100%);max-height:92vh;overflow:auto;background:#000;border:3px solid #2e2e2e;box-shadow:6px 6px 0 #0008;display:flex;flex-direction:column}
+#pfx .pf-ask{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px}
+#pfx .pf-ask-b{background:#0a0d0b;border:2px solid #2fe68a;padding:16px;max-width:320px;width:100%}
+#pfx .pf-ask-b p{margin:0 0 10px;color:#e8f3ec}
+#pfx .pf-ask-c{display:block;width:100%;margin:0 0 6px;padding:8px;text-align:left;background:#0a0d0b;border:2px solid #2e2e2e;color:#e8f3ec;font:11px Silkscreen,ui-monospace,monospace;cursor:pointer}
+#pfx .pf-ask-c.on{border-color:#2fe68a;color:#2fe68a}
+#pfx .pf-ask-r{display:flex;gap:8px;margin-top:10px}
+#pfx .pf-ask-r button{flex:1;padding:8px;background:#0a0d0b;border:2px solid #2e2e2e;color:#e8f3ec;font:11px Silkscreen,ui-monospace,monospace;cursor:pointer}
+#pfx .pf-ask-r .y{border-color:#2fe68a;color:#2fe68a}
+#pfx .pf-ask-r button:disabled{opacity:.4;cursor:not-allowed}
 #pfx .pf-top{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:2px solid #2e2e2e;font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#8aa094}
 #pfx .pf-top button{padding:5px 10px;font-size:12px}
 #pfx .pf-head{display:flex;gap:16px;padding:20px 16px 16px;align-items:flex-start}
@@ -83,6 +93,7 @@
 #pfx .pf-user{margin:4px 0 0;color:#8aa094}
 #pfx .pf-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 #pfx .pf-tag{display:inline-block;padding:2px 6px;border:1px solid #2e2e2e;color:#8aa094;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:1px;line-height:14px}
+#pfx .fwpc.fdo{border-color:#2fe68a;box-shadow:0 0 0 2px #000,0 0 0 4px #2fe68a66,0 0 22px #2fe68a88,6px 6px 0 #0008}
 #pfx .pf-tag.g{border-color:#2fe68a;color:#2fe68a}
 #pfx .pf-tag.s{background:#2fe68a;border-color:#2fe68a;color:#04120a}
 #pfx .pf-bio{margin:0;padding:0 16px 16px;line-height:1.5;color:#e8f3ec}
@@ -109,6 +120,7 @@
 #pfx .pf-acts{display:flex;gap:8px;flex-wrap:wrap;padding:16px;border-top:2px solid #2e2e2e;background:#0b0f0d}
 #pfx .pf-acts button{padding:9px 14px}
 #pfx .pf-acts .sp{flex:1}
+#pfx .pf-icons{display:flex;gap:6px;margin-top:12px}#pfx .pf-ic{padding:0;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:2px solid #2e2e2e;background:#0a0d0b;color:#8aa094;box-shadow:none;border-radius:0}#pfx .pf-ic:hover:not(:disabled){border-color:#2fe68a;color:#2fe68a}#pfx .pf-ic.on{border-color:#2fe68a;color:#2fe68a}#pfx .pf-ic:disabled{opacity:.6}
 #pfx .pf-note{color:#8aa094;font-size:12px;line-height:1.45;margin:0;padding:0 16px 16px}
 #pfx .pf-priv{color:#8aa094;font-size:12px;padding:12px 16px;border-top:2px solid #2e2e2e;margin:0}
 #pfx label.pf-sw{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1c221e;cursor:pointer}
@@ -141,6 +153,18 @@
 
  /* ---------- render ---------- */
  let V={id:'me',visitor:0,mode:'view',stack:[],msg:''};
+ /* Edit profile always shows the current account details: refreshed when the profile opens, when Edit opens, when the window regains focus, and whenever the cloud profile syncs. Fields the player has started typing in are never overwritten. */
+ let dirty=0;
+ function refresh(){
+  if(!el())return;
+  try{if(window.fwProfileSync)Promise.resolve(fwProfileSync(1)).then(()=>{if(!dirty)draw()},()=>{})}catch(e){}
+  if(!dirty&&V.mode!='priv')draw();
+ }
+ window.addEventListener('fw-profile-synced',()=>{if(el()&&!dirty&&V.mode!='priv')draw()});
+ window.addEventListener('focus',()=>{if(el()&&V.mode=='edit'||el()&&V.mode=='view')refresh()});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+ document.addEventListener('input',e=>{const t=e.target;if(t&&(t.id=='pf-bio'||t.id=='pf-user'||t.id=='pf-car'||t.id=='pf-gp'))dirty=1});
+
  const el=()=>document.getElementById('pfx');
  const signedIn=()=>{try{return !!FBU}catch(e){return false}};
  function open(id,opts){
@@ -150,16 +174,27 @@
   
   V=Object.assign(V,{id,visitor:id==='me'?o.visitor:0,mode:'view',msg:''});
   if(!el()){V.stack=[];const d=document.createElement('div');d.id='pfx';d.onmousedown=e=>{if(e.target===d)close()};document.body.appendChild(d)}
-  el().dataset.on='1';draw();try{snd('click')}catch(e){}
+  el().dataset.on='1';dirty=0;draw();if(id==='me')refresh();try{snd('click')}catch(e){}
  }
- function close(){const d=el();if(d)d.remove();V.stack=[]}
- function person(id){return id==='me'?mine():PEOPLE[id]}
+ function close(){const d=el();if(d)d.remove();V.stack=[];dirty=0}
+ let PUBP=null;
+ function person(id){return id==='me'?mine():id==='pub'?PUBP:PEOPLE[id]}
  function stateFor(p){
   if(p.me)return V.visitor?'visitor':'self';
   if(p.id in REL)return REL[p.id];return p.rel;
  }
  const REL={};
  const SECS={listeners:'Monthly listeners',songs:'Top songs',band:'Band',streak:'Band streak',ach:'Achievements',joined:'Join date',status:'Online status'};
+const PX={
+  add:['..XX....','..XX..X.','...X.XXX','.XXXX.X.','XXXXXX..','XXXXXX..','........','........'],
+  friend:['........','......XX','.....XX.','X...XX..','XX.XX...','.XXX....','..X.....','........'],
+  req:['..XXXX..','.X....X.','X..X...X','X..X...X','X..XXX.X','X......X','.X....X.','..XXXX..'],
+  inv:['...XX...','..XXXX..','.XXXXXX.','XXXXXXXX','.XXXXXX.','.XX..XX.','.XX..XX.','.XX..XX.'],
+  rep:['XX......','XXXXXXX.','XXXXXXXX','XXXXXXX.','XXXXXX..','XX......','XX......','XX......'],
+  blk:['..XXXX..','.XX..XX.','XX...XXX','XX..XX.X','XX.XX..X','.XXX..X.','..XXXX..','........']};
+ const pix=k=>`<svg viewBox="0 0 8 8" width=22 height=22 shape-rendering=crispEdges fill=currentColor>${PX[k].map((r,y)=>[...r].map((c,x)=>c=='X'?`<rect x=${x} y=${y} width=1 height=1 />`:'').join('')).join('')}</svg>`;
+ const ib=(k,t,on,dis)=>`<button class="pf-ic${on?' on':''}" data-pf=${k} title="${t}" aria-label="${t}" ${dis?'disabled':''}>${pix({add:'add',cancel:'req',invite:'inv',report:'rep',block:'blk',fr:'friend'}[k])}</button>`;
+ function icons(p,state){return`<div class=pf-icons>${state=='friend'?ib('fr','Friends',1,1):state=='requested'?ib('cancel','Request sent. Tap to cancel',1):ib('add','Add friend',1)}${ib('invite','Invite to band',0,state=='blocked')}${ib('report','Report',0)}${ib('block',state=='blocked'?'Unblock':'Block',state=='blocked')}</div>`}
  function songTag(k){return k===1?tag('HIT','g'):k===2?tag('VIRAL','s'):''}
 
  function view(p){
@@ -167,26 +202,21 @@
   const sh=k=>mineView||!p.me||st.show[k];
   const dim=(k,html)=>mineView&&!st.show[k]?html.replace('class="pf-sec"','class="pf-sec" style="opacity:.55"').replace('</h3>',' '+tag('HIDDEN FROM OTHERS')+'</h3>'):html;
   const state=stateFor(p);
-  let h=`<div class=fwpc><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
-  h+=`<div class=pf-head><div class=pf-av>${avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div></div></div>`;
+  let h=`<div class="fwpc${p.founder?' fdo':''}"><div class=pf-top><span>${p.me?(V.visitor?'VIEWING AS A VISITOR':'YOUR PROFILE'):'PLAYER PROFILE'}</span><span>${V.stack.length?`<button data-pf=back>Back</button> `:''}<button data-pf=close>Close</button></span></div>`;
+  h+=`<div class=pf-head><div class=pf-av>${(p.me?(st.gphoto===0?'':g(()=>FBU.photoURL)):p.photo)?`<img src="${esc(p.me?FBU.photoURL:p.photo)}" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=''">`:avatar(p.me?st.pfp:p.seed,96)}</div><div class=pf-id><h2 class=pf-name>${esc(p.artist)}</h2><p class=pf-user>@${esc(p.user)}</p><div class=pf-tags>${p.founder?tag('FOUNDER','g'):''}${tag('FAME LEVEL '+p.fame)}${sh('status')&&p.online?tag(esc(p.online).toUpperCase()):''}</div>${p.me?'':icons(p,state)}</div></div>`;
   h+=p.bio?`<p class=pf-bio>${esc(p.bio)}</p>`:`<p class="pf-bio e">${p.me&&!V.visitor?'No bio yet. Add one in Edit profile.':'No bio.'}</p>`;
   const cells=[['FAME LEVEL',String(p.fame)]];
   if(sh('listeners'))cells.push(['MONTHLY LISTENERS',num(p.listeners)]);else cells.push(['MONTHLY LISTENERS','Private']);
   if(sh('joined'))cells.push(['JOINED',fmtDate(p.joined)]);else cells.push(['JOINED','Private']);
   h+=`<div class=pf-stats>${cells.map(c=>`<div><small>${c[0]}</small><b>${esc(c[1])}</b></div>`).join('')}</div>`;
   if(sh('songs'))h+=dim('songs',`<div class="pf-sec"><h3>TOP SONGS</h3>${p.songs.map((s,i)=>`<div class=pf-row><span class=i>${i+1}</span><span class=n>${esc(s[0])}</span>${songTag(s[2])}<span class=v>${num(s[1])}</span></div>`).join('')||'<span class=pf-user>No songs yet.</span>'}</div>`);
-  if(sh('band')&&p.band)h+=dim('band',`<div class="pf-sec"><h3>BAND</h3><div class=pf-kv><span>Band</span><b>${esc(p.band.name)}</b><span>Plays</span><div>${esc(p.band.inst)}</div><span>Members</span><div>${p.band.members}</div>${sh('streak')?`<span>Streak</span><div>${p.band.streak} day${p.band.streak==1?'':'s'}</div>`:''}</div></div>`);
-  else if(!p.band&&sh('band'))h+=`<div class=pf-sec><h3>BAND</h3><span class=pf-user>Not in a band.</span></div>`;
+  if(sh('band')&&p.band)h+=dim('band',`<div class="pf-sec"><h3>BAND</h3><div class=pf-kv><span>Band</span><b>${esc(p.band.name)}</b><span>Plays</span><div>${esc(p.band.inst)}</div><span>Members</span><div>${p.band.members}</div>${sh('streak')&&p.band.streak!=null?`<span>Streak</span><div>${p.band.streak} day${p.band.streak==1?'':'s'}</div>`:''}</div></div>`);
   if(sh('ach'))h+=dim('ach',`<div class="pf-sec"><h3>ACHIEVEMENTS (${p.ach.length}/${ACH.length})</h3><div class=pf-ach>${ACH.map((a,i)=>`<div class="${p.ach.includes(i)?'':'lk'}"><b>${esc(a[0])}</b><small>${esc(a[1])}</small></div>`).join('')}</div></div>`);
   if(p.me&&!V.visitor)h+=`<p class=pf-priv>Visitors see ${Object.keys(SECS).filter(k=>st.show[k]).length} of ${Object.keys(SECS).length} sections. Your artist name, username, avatar, Founder badge and fame level are always public.</p>`;
-  h+='<div class=pf-acts>';
+  h+=p.me?'<div class=pf-acts>':'';
   if(p.me&&!V.visitor)h+=`<button class=go data-pf=edit>Edit profile</button><button data-pf=priv>Privacy</button><button data-pf=visitor>View as visitor</button>`;
   else if(p.me)h+=`<button class=go data-pf=visitor>Back to my view</button>`;
-  else{
-   h+=state=='friend'?`<button disabled>Friends</button>`:state=='requested'?`<button data-pf=cancel>Request sent. Cancel</button>`:`<button class=go data-pf=add>Add friend</button>`;
-   h+=`<button data-pf=invite ${state=='blocked'?'disabled':''}>Invite to band</button><span class=sp></span><button data-pf=report>Report</button><button data-pf=block>${state=='blocked'?'Unblock':'Block'}</button>`;
-  }
-  h+='</div>';
+  h+=p.me?'</div>':'';
   if(V.msg)h+=`<p class=pf-note style="padding-top:12px">${esc(V.msg)}</p>`;
   return h+'</div>';
  }
@@ -200,6 +230,7 @@
   const st=load(),bad=V.err||'';
   return`<div class=fwpc><div class=pf-top><span>EDIT PROFILE</span><button data-pf=done>Cancel</button></div><div class=pf-sec>
   <div class=pf-f><label>Avatar</label><div class=pf-av-pick>${[3,8,14,21,34,55].map(s=>`<button data-av="${s}" class="${st.pfp==s?'on':''}">${avatar(s,44)}</button>`).join('')}</div></div>
+  ${g(()=>FBU.photoURL)?`<div class=pf-f><label class=pf-sw style="display:flex;gap:10px;align-items:center"><input type=checkbox id=pf-gp ${st.gphoto===0?'':'checked'}><span>Show my Google profile picture</span></label><small>When off, you use the pixel avatar above and your photo is removed from your public profile.</small></div>`:''}
   <div class=pf-f><label for=pf-user>Username (letters, numbers and underscore, 3 to 16)</label><input id=pf-user maxlength=16 value="${esc(st.user)}" autocomplete=off spellcheck=false ${left(st)?'disabled':''}><small>${left(st)?'You changed your username recently. You can change it again in '+left(st)+' day'+(left(st)==1?'':'s')+'.':'You can change your username once every 30 days. Friends find you by it.'}</small></div>
   <div class=pf-f><label for=pf-bio>Bio</label><textarea id=pf-bio maxlength=80>${esc(st.bio)}</textarea><small class="${bad?'er':''}">${bad||'Up to 80 characters. Bios and usernames are checked before they show to other players.'}</small></div>
   <div class=pf-f><label for=pf-car>Career shown on your profile</label><select id=pf-car>${(careers().length?careers():[{k:'cur',label:'Sample career'}]).map(c=>`<option value="${c.k}" ${(mine().career||st.career)==c.k||st.career==c.k?'selected':''}>${esc(c.label)}</option>`).join('')}</select><small>Visitors see this career's artist name, fame level, listeners, songs and band. Your friends can still find you by username.</small></div></div>
@@ -215,6 +246,9 @@
   const keep=d.firstElementChild?d.firstElementChild.scrollTop:0;
   d.innerHTML=V.mode=='priv'?privacy():V.mode=='edit'?edit():view(p);
   if(d.firstElementChild)d.firstElementChild.scrollTop=V.mode=='view'?keep:0;
+  if(V.ask&&V.mode=='view'){const a=V.ask,n='@'+p.user,CATS=[['spam','Spam'],['harassment','Harassment or bullying'],['bad name or bio','Inappropriate name or bio'],['bad photo','Inappropriate photo'],['cheating','Cheating'],['other','Other']];
+   const body=a=='report'?`<h3>REPORT ${n}</h3><p>Choose a reason:</p>${CATS.map(c=>`<button class="pf-ask-c${V.cat==c[0]?' on':''}" data-pf=cat data-c="${c[0]}">${c[1]}</button>`).join('')}`:`<h3>ARE YOU SURE?</h3><p>${a=='add'?'Send a friend request to '+n+'?':'Invite '+n+' to your band?'}</p>`;
+   const o=document.createElement('div');o.className='pf-ask';o.innerHTML=`<div class=pf-ask-b>${body}<div class=pf-ask-r><button data-pf=askno>CANCEL</button><button data-pf=askyes class=y ${a=='report'&&!V.cat?'disabled':''}>${a=='report'?'SEND REPORT':'YES'}</button></div></div>`;d.appendChild(o)}
  }
  document.addEventListener('click',e=>{
   const d=el();
@@ -224,11 +258,19 @@
   if(!d||!d.contains(t))return;
   if(t.dataset.req){const s=load();s.req=t.dataset.req;save(s);return draw()}
   if(t.dataset.av){const s=load();s.pfp=+t.dataset.av;save(s);return draw()}
-  if(k=='close')close();
+  if(k=='cat'){V.cat=t.dataset.c;return draw()}
+  if(k=='askno'){V.ask=0;V.cat=0;return draw()}
+  let kk=k;
+  if(k=='askyes'){if(V.ask=='report'&&!V.cat)return;kk=V.ask;V.rc=V.cat;V.ask=0;V.cat=0}
+  else if((k=='add'||k=='invite'||k=='report')&&!t.disabled){V.ask=k;V.cat=0;return draw()}
+  act(kk,p);
+ });
+ function act(k,p){
+  {if(k=='close')close();
   else if(k=='back'){V.id=V.stack.pop()||'me';V.mode='view';V.msg='';draw()}
-  else if(k=='edit'){V.mode='edit';V.err='';draw()}
+  else if(k=='edit'){V.mode='edit';V.err='';dirty=0;draw();refresh()}
   else if(k=='priv'){V.mode='priv';draw()}
-  else if(k=='done'){V.mode='view';draw()}
+  else if(k=='done'){V.mode='view';dirty=0;draw();refresh()}
   else if(k=='visitor'){V.visitor=V.visitor?0:1;draw()}
   else if(k=='savee'){
    const ue=document.getElementById('pf-user'),be=document.getElementById('pf-bio'),s0=load();
@@ -239,13 +281,17 @@
    if(b.length>80){V.err='Bio is over 80 characters.';return draw()}
    if(/[<>{}\[\]\\|^~`]/.test(b)||/[\u0300-\u036f\u200b-\u200f\u202a-\u202e]/.test(b)){V.err='Bio has characters that are not allowed.';return draw()}
    if(BLOCK.test(b)||BLOCK.test(u)){V.err='That text is not allowed. Remove links and rude words.';return draw()}
-   const s=load();if(u!==s.user){s.user=u;s.userAt=Date.now()}s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
+   const s=load();const gp=document.getElementById('pf-gp');if(gp){s.gphoto=gp.checked?1:0;try{if(window.fwProfileSync)setTimeout(()=>fwProfileSync(1),300)}catch(e){}}if(u!==s.user){s.user=u;s.userAt=Date.now()}s.bio=b;const cs=document.getElementById('pf-car');if(cs)s.career=cs.value;save(s);dirty=0;try{if(window.fwProfileSync)setTimeout(()=>fwProfileSync(1),300)}catch(e){}V.err='';V.mode='view';V.msg='Saved to the dev save.';draw()}
+  else if(p.pub&&k=='add'){const i=document.createElement('input');i.id='fra';i.value=p.user;i.style.display='none';document.body.appendChild(i);try{frAdd();V.msg='Friend request sent to @'+p.user+'.'}catch(e){V.msg='Could not send a request.'}i.remove();draw()}
+  else if(p.pub&&k=='block'){try{frBlock(p.uid);V.msg='';}catch(e){}draw()}
+  else if(p.pub&&k=='invite'){try{frInv(p.uid)}catch(e){V.msg='Join a band room first.'}draw()}
+  else if(p.pub&&k=='report'){V.msg='Report sent ('+V.rc+'). Thank you.';draw()}
   else if(k=='add'){REL[p.id]='requested';V.msg='Friend request sent to @'+p.user+'. (Mock: nothing was sent.)';draw()}
   else if(k=='cancel'){REL[p.id]='none';V.msg='Request cancelled.';draw()}
   else if(k=='invite'){V.msg=p.rel=='friend'||REL[p.id]=='friend'?'Invite sent to @'+p.user+'. (Mock: nothing was sent.)':'You can invite friends only. Add them first.';draw()}
   else if(k=='block'){REL[p.id]=stateFor(p)=='blocked'?'none':'blocked';V.msg=REL[p.id]=='blocked'?'Blocked. They cannot send you requests or invites.':'Unblocked.';draw()}
-  else if(k=='report'){V.msg='Report sent. (Mock: a real report would flag the name, bio and avatar for review.)';draw()}
- });
+  else if(k=='report'){V.msg='Report sent ('+V.rc+'). (Mock: a real report would flag the name, bio and avatar for review.)';draw()}}
+ }
  document.addEventListener('change',e=>{const s=e.target.dataset&&e.target.dataset.sw;if(!s)return;const o=load();o.show[s]=e.target.checked?1:0;save(o)});
  document.addEventListener('keydown',e=>{if(e.key=='Escape'&&el()){e.stopImmediatePropagation();close()}},true);
 
@@ -275,7 +321,10 @@
   if(old)old.replaceWith(b);else c.insertBefore(b,c.firstChild)}catch(e){}return r}});
  /* Friends window: replace with the mock one */
  /* ---------- DEV panel hooks ---------- */
- window.FW_PROFILE={open,friendsWin,mockBand(){
+ /* real players' public profiles: same renderer as the own profile, filled with that player's data */
+ function openData(p){PUBP=Object.assign({id:'pub',pub:1,seed:1,online:''},p);V.stack=[];V.mode='view';V.visitor=0;V.id='pub';V.msg='';
+  if(!el()){const d=document.createElement('div');d.id='pfx';d.onmousedown=e=>{if(e.target===d)close()};document.body.appendChild(d)}draw()}
+ window.FW_PROFILE={open,openData,friendsWin,mockBand(){
   let el2=document.getElementById('mpb');if(!el2){el2=document.createElement('div');el2.id='mpb';el2.className='hb';document.body.appendChild(el2)}
   el2.style.display='';el2.innerHTML='<div class=mph><span><b>Static Orchard</b> <small class=m>Room MOCK1</small></span></div>'+[['You (Keys)','me'],['Marlo','marlo'],['Juno','juno'],['Ines','ines']].map(n=>`<div class=mpr><span><b class=fwpf-n data-pfopen="${n[1]}">${n[0]}</b></span></div>`).join('');
  }};

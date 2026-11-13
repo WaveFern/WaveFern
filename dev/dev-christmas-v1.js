@@ -9,7 +9,7 @@
    - ONLY while it is snowing (the shader fades it in and out): snow lies on every upward-facing surface outdoors (roads turn
      icy grey, pavements, grass, roofs, tree tops, cars), tree sides are frosted, and you and the NPCs leave footprints.
    - Always (the winter map): the park pond is frozen over and you glide on it, trees and houses wear chasing Christmas lights,
-     houses get wreaths and snowmen, cars leave tyre tracks (footprints and tracks fade in 5 s), a big decorated tree stands in the City Plaza, and NPCs wear winter jackets and hats.
+     houses get wreaths and snowmen, cars leave tyre tracks (footprints and tracks fade in 5 s), a big decorated tree stands in the City Plaza, and NPCs wear winter hats, scarves and long coats with fur collars, and many wear a string of twinkling Christmas lights.
    Everything is added on top (a shader patch, extra meshes, wrapped functions); no save data is changed. */
 (function(){
  const XMAS=true;
@@ -33,9 +33,9 @@
     if(typeof WORLD!='undefined')WORLD.children.slice().forEach(o=>{if(o.isSprite&&Math.abs(o.position.x+150)<1&&Math.abs(o.position.z+70)<1)WORLD.remove(o)})}catch(e){console.warn('xmas farm',e)}
    f0()}}
 
- /* LOCKED UNTIL 1 DECEMBER on the real site: snow, ice, lights, wreaths, winter clothes and the plaza tree only happen in December. Always on in /dev/. */
- if(!window.FW_DEV&&new Date().getMonth()!==11)return;
+ /* Snow, ice, wreaths, winter clothes and the plaza tree are on now. Only the Christmas LIGHTS are LOCKED UNTIL 1 DECEMBER on the real site (always on in /dev/). */
  window.FW_XMAS=1;
+ const LIGHTS=!!window.FW_DEV||new Date().getMonth()===11;
 
  /* ---------- snow cover: one shader patch on every vertex-coloured material, driven by SNOWU ---------- */
  function patchMat(m){
@@ -73,8 +73,9 @@
  const BS=.065,FACE=[[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1],.72],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1],1],[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],.86]];
  /* one bulb: a small cube (three visible faces) */
  function bulb(x,y,z,ph,ci){
+  if(!LIGHTS)return;
   FACE.forEach(f=>{[0,1,2,0,2,3].forEach(k=>{const q=f[k];lt.bp.push(x+q[0]*BS,y+q[1]*BS,z+q[2]*BS);lt.bph.push(ph);lt.bci.push(ci);lt.bsh.push(f[4])})})}
- const wire=(x0,y0,z0,x1,y1,z1)=>lt.wp.push(x0,y0,z0,x1,y1,z1);
+ const wire=(x0,y0,z0,x1,y1,z1)=>LIGHTS&&lt.wp.push(x0,y0,z0,x1,y1,z1);
  /* a wire spiralling round a foliage box, hugging its surface, with a bulb every ~.42 */
  function addString(cx,cy,cz,w,h,d){
   const OFF=.03,turns=h>.6?1.6:1,pw=w+OFF*2,pd=d+OFF*2,per=2*(pw+pd),Ls=turns*per,o=R(0,per),y0=cy-h*.42,y1=cy+h*.36;
@@ -141,6 +142,39 @@
     SB(.6,.05,.6,'#222',sx,1.93,sz);SB(.4,.3,.4,'#222',sx,2.1,sz);SB(.52,.06,.52,'#c0392b',sx,1.97,sz)}
   }catch(e){}}}
 
+
+ /* ---------- coats and worn Christmas lights on people ---------- */
+ const COATC=['#8e2b2b','#2f4f7f','#2f6b46','#5a4a3a','#3a3a44','#b8892b','#6b3a7a','#d9d9de'];
+ const dkk=(col,f)=>{const k=new THREE.Color(col);k.multiplyScalar(f);return'#'+k.getHexString()};
+ /* a long winter coat: body and skirt down to the knees, sleeves to the wrists, a fur collar, buttons and a belt */
+ function xmasCoat(o,c){
+  const g=o.g,w=.42+(c.body||0)*.5,d=.3+(c.body||0)*.28,col=pk(COATC),dark=dkk(col,.7),fur=pk(['#f6f6f6','#e8dcc8','#cfcfd6']);
+  B(g,w+.12,.66,d+.12,col,0,.8,0);/* chest */
+  B(g,w+.16,.36,d+.16,col,0,.34,0);/* skirt of the coat, to the knees */
+  B(g,w+.18,.05,d+.18,dark,0,.16,0);/* hem */
+  B(g,w+.14,.07,d+.14,dark,0,.6,0);/* belt */
+  B(g,.1,.07,.03,'#e6b422',0,.6,d/2+.08);/* buckle */
+  B(g,.04,.66,.02,dark,0,.8,d/2+.07);/* front seam */
+  [.96,.78].forEach(y=>[-.07,.07].forEach(x=>B(g,.05,.05,.03,'#e6b422',x,y,d/2+.075)));/* buttons */
+  B(g,w+.2,.16,d+.2,fur,0,1.14,0);/* fur collar */
+  (o.arms||[]).forEach(p=>{B(p,.23,.44,.28,col,0,-.22,0);B(p,.25,.06,.3,fur,0,-.43,0)});/* sleeves and fur cuffs */
+ }
+ /* a string of Christmas lights worn over the coat: a sash from one shoulder to the opposite hip, a waist loop, a back loop and a neck garland */
+ const WBC=[0xff3b30,0xffc233,0x3b8cff,0x38e07a],WBM=WBC.map(c=>new THREE.MeshBasicMaterial({color:c})),WBW=new THREE.MeshBasicMaterial({color:0x10281a});
+ const WBG=new THREE.BoxGeometry(.09,.09,.09),WLIGHTS=!!window.FW_DEV||new Date().getMonth()===11;/* worn lights are LOCKED UNTIL 1 DECEMBER on the real site, like every other Christmas light; coats are not */
+ function xmasWorn(g,c){
+  const w=.42+(c.body||0)*.5,d=.3+(c.body||0)*.28,z=d/2+.1,zb=-d/2-.1,hx=(w+.2)/2,L=new THREE.Group(),dir=Math.random()<.5?1:-1;
+  const mk=(x,y,zz,i)=>{const m=new THREE.Mesh(WBG,WBM[i&3]);m.position.set(x,y,zz);L.add(m)};
+  const wire=(a,b)=>{const len=Math.hypot(b[0]-a[0],b[1]-a[1]),m=new THREE.Mesh(new THREE.BoxGeometry(len,.02,.02),WBW);
+   m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,a[2]);m.rotation.z=Math.atan2(b[1]-a[1],b[0]-a[0]);L.add(m)};
+  const n=7;let prev=null;
+  for(let i=0;i<=n;i++){const t=i/n,x=-dir*hx*.85+dir*hx*1.7*t,y=1.08-.62*t-Math.sin(t*Math.PI)*.04,pt=[x,y,z];if(prev)wire(prev,pt);mk(x,y-.05,z,i);prev=pt}
+  [[-hx*.9,.5,z],[hx*.9,.5,z],[-hx*.9,.5,zb],[hx*.9,.5,zb],[0,.5,zb],[0,.45,z]].forEach((q,i)=>mk(q[0],q[1],q[2],i+2));
+  for(let i=0;i<5;i++)mk(-hx*.8+hx*1.6*i/4,1.0-.04*Math.sin(i/4*Math.PI),zb,i);
+  [-.22,-.11,0,.11,.22].forEach((x,i)=>mk(x,1.2-Math.abs(x)*.2,z-.02,i+1));
+  L.userData.xmw=1;g.add(L)}
+ /* the bulbs chase and twinkle together: four shared materials whose brightness is driven from the weather tick */
+ function wornTick(t){WBM.forEach((m,i)=>{const w=.5+.5*Math.sin(t*3.4-i*1.9);m.color.setHex(WBC[i]).multiplyScalar(.45+.55*w*w)})}
  /* ---------- NPCs in winter clothes (the player's own look, ch, is never touched) ---------- */
  if(typeof buildChar=='function'){const b0=buildChar;buildChar=function(c){
   if(!c||(typeof ch!='undefined'&&c===ch))return b0.apply(this,arguments);
@@ -150,6 +184,7 @@
     if(r<.18){B(hd,.64,.2,.64,'#c0392b',0,.36,0);B(hd,.66,.1,.66,'#f6f6f6',0,.28,0);B(hd,.4,.2,.4,'#c0392b',.05,.52,-.05);B(hd,.14,.14,.14,'#f6f6f6',.12,.64,-.1)}
     else if(r<.8){B(hd,.64,.16,.64,red,0,.36,0);B(hd,.66,.09,.66,'#f6f6f6',0,.29,0);B(hd,.16,.16,.16,'#f6f6f6',0,.5,0)}
     if(Math.random()<.55){const sc=pk(['#c0392b','#f6f6f6','#2f6fb5','#3f8f5a']);B(g,.62,.14,.5,sc,0,1.15,0);B(g,.14,.4,.1,sc,.18,.95,.27)}}
+   if(!c.xmx&&!g.userData.coat){g.userData.coat=1;xmasCoat(o,cc);if(WLIGHTS&&Math.random()<.7)xmasWorn(g,cc)}
   }catch(e){}
   return o}}
 
@@ -157,7 +192,7 @@
  const W=typeof WTHR=='object'?WTHR:null;
  if(W){
   W.kinds.snow={n:'Snow',dim:.8,amb:.96,grey:.2,rain:0,fog:.16};
-  wxRoll=function(){const r=Math.random();return r<.25?'sun':r<.85?'snow':'fog'};
+  wxRoll=function(){const r=Math.random();return r<.45?'sun':r<.85?'snow':'fog'};
   wxToday=function(){
    if(!S.wx||S.wx.d!==S.day)S.wx={d:S.day,k:S.day<=1?'sun':wxRoll()};
    if(S.wx.k=='rain'||S.wx.k=='storm')S.wx.k='snow';
@@ -231,15 +266,17 @@
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
-  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d'),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
+  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d',{willReadFrequently:true}),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
    if(on){/* solid snow, the same white as the snowy grass everywhere else, with a few slightly cooler flecks */k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.fillStyle='#e6edf5';for(let i=0;i<W2*H2/8;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),1,1)}
    lawn.map.needsUpdate=true}catch(e){}})}
  const lawns=[];
- function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const k=cv.getContext('2d'),gc=k.getImageData(0,0,1,1).data;if(gc[1]>gc[0]*1.12){smoothGrass(m.map);lawns.push({cv,map:m.map,orig:k.getImageData(0,0,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
+ /* read pixels through a scratch canvas made with willReadFrequently: the lawn canvases were created elsewhere without it, so asking again on them is ignored and Chrome warns on every readback */
+ let rdCv=null;function rdPix(cv,w,h){if(!rdCv)rdCv=document.createElement('canvas');rdCv.width=w;rdCv.height=h;const k=rdCv.getContext('2d',{willReadFrequently:true});k.clearRect(0,0,w,h);k.drawImage(cv,0,0,w,h);return k.getImageData(0,0,w,h)}
+ function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const gc=rdPix(cv,1,1).data;if(gc[1]>gc[0]*1.12){smoothGrass(m.map);lawns.push({cv,map:m.map,orig:rdPix(cv,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
 const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
    function smoothGrass(t){if(!t||t.userData&&t.userData.smooth)return;t.userData=t.userData||{};t.userData.smooth=1;
    const c=t.image,k=c.getContext('2d'),W=c.width,H=c.height;let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
-   const d=k.getImageData(0,0,W,H),a=d.data;let r=0,g=0,b=0;for(let i=0;i<a.length;i+=4){r+=a[i];g+=a[i+1];b+=a[i+2]}const n=a.length/4;r/=n;g/=n;b/=n;
+   const d=rdPix(c,W,H),a=d.data;let r=0,g=0,b=0;for(let i=0;i<a.length;i+=4){r+=a[i];g+=a[i+1];b+=a[i+2]}const n=a.length/4;r/=n;g/=n;b/=n;
    for(let i=0;i<a.length;i+=4){const v=1+(rnd()-.5)*.05;a[i]=r*v;a[i+1]=g*v;a[i+2]=b*v}
    k.putImageData(d,0,0);t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;try{t.anisotropy=8}catch(e){}t.needsUpdate=true}
 function sweepWorld(){
@@ -297,14 +334,14 @@ function sweepWorld(){
  let sweepT=0,first=true,sT=0;
  function xmasTick(dt,px,pz){
   sweepT+=dt;if(first||sweepT>2){if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}try{freezePond()}catch(e){}}
-  const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut',inner=(typeof wxInterior=='function')&&wxInterior();
+  const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut'||mode=='menu'||mode=='pause'||mode=='sleep'||mode=='phone'||mode=='fest'||mode=='dshow'||mode=='dcut'||mode=='cutawd',inner=(typeof wxInterior=='function')&&wxInterior();
   /* snow cover follows today's weather */
   const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live)?1:0;
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
   HZU.value=-.7-((typeof WGX=='number'&&WGX)||0);
   SNOWU.value+=(snowTarget-SNOWU.value)*Math.min(1,dt*1.2);if(Math.abs(snowTarget-SNOWU.value)<.01)SNOWU.value=snowTarget;
   grounds.forEach(g=>{if(g.m)g.m.color.copy(g.c0).lerp(SNOW,SNOWU.value)});/* abroad: the flat ground plane under a destination city turns white with the snow */
-  sT+=dt;BU.t.value=sT;
+  sT+=dt;BU.t.value=sT;wornTick(sT);
   /* the pond's water jet is switched off while the pond is frozen */
   try{if(typeof FTX!='undefined'){const b=LK,near=(x,z)=>x>b[0]-16&&x<b[2]+16&&z>b[1]-16&&z<b[3]+16;
    FTX.L.forEach(F=>{if(!near(F.x,F.z))return;F.ps.forEach(q=>{q.pts.visible=false});if(F.foam)F.foam.visible=false});

@@ -65,7 +65,7 @@ function stPrev(i){const was=PRV&&PRV.i==i;stPrevStop();if(was)return;if(!VOL){s
  const a=new Audio(TR[i].src),q={i,a,t:0,hold:MU.hold};const bg=MU.a[MU.cur];if(MU.pl&&bg&&!bg.paused){q.bg=bg;bg.pause();MU.hold=1}if(MENUA&&!MENUA.paused){q.menu=1;MENUA.pause()}
  PRV=q;a.volume=0;a.preload='auto';a.addEventListener('loadedmetadata',()=>{if(PRV!==q)return;try{a.currentTime=(a.duration||0)/2}catch(e){}a.play().then(()=>{q.on=1}).catch(()=>stPrevStop())},{once:true});
  /* fade in over 0.4 s, out over the last 0.6 s of the 5 */
- q.iv=setInterval(()=>{if(!q.on)return;q.t+=.05;const v=Math.min(1,q.t/.4,Math.max(0,(5-q.t)/.6));a.volume=Math.max(0,Math.min(1,v*VOL));if(q.t>=5)stPrevStop()},50);stDraw()}
+ q.iv=setInterval(()=>{if(!q.on)return;q.t+=.05;const v=Math.min(1,q.t/.4,Math.max(0,(5-q.t)/.6));a.volume=Math.max(0,Math.min(1,v*VOL*(window.HF?HF.f:1)));if(q.t>=5)stPrevStop()},50);stDraw()}
 function stBody(){const T=STAB;
  if(T=='sound')return stSl('Music',VOL,"VOL=this.value/100;if(VOL)LAST=VOL;sv()")+stSl('Effects',FX,"FX=this.value/100;sv()","onchange=\"snd('ping')\"")+stSl('Ambience',OPT.amb,"OPT.amb=this.value/100;svOpt()")
   +`<p class=m><small>Music is the soundtrack and menu music. Effects covers clicks and chimes. Ambience is the city outside: traffic, birds and people. Press M to mute music.</small></p>`

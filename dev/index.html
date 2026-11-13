@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta name="robots" content="noindex,nofollow,noarchive"><title>WaveFern Dev</title><link rel="icon" href="/favicon.png"><link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#000;color:#e8f3ec;font:14px ui-monospace,Menlo,Consolas,monospace}
+body{display:flex;align-items:center;justify-content:center}
+main{width:min(340px,86vw)}
+h1{font:700 24px Silkscreen,ui-monospace,monospace;color:#2fe68a;margin:0 0 6px;letter-spacing:1px}
+p{margin:0 0 18px;color:#8aa094;line-height:1.5}
+input{box-sizing:border-box;width:100%;padding:11px 12px;background:#0b0f0d;color:#e8f3ec;border:2px solid #2a352e;font:inherit;outline:none}
+input:focus{border-color:#2fe68a}
+button{margin-top:10px;width:100%;padding:11px;background:#2fe68a;color:#04120a;border:2px solid #000;font:700 13px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+#m{min-height:18px;margin-top:12px;color:#8aa094}
+</style></head><body>
+<main id="g"><h1>WAVEFERN DEV</h1><p>Private test build. Enter the dev password.</p>
+<form id="f" autocomplete="off"><input id="pw" type="password" autocomplete="off" spellcheck="false" aria-label="Password" autofocus><button id="go" type="submit">ENTER</button></form><div id="m" role="status"></div></main>
+<script>
+(function(){
+ const LK='fwdev_lock',MAX=5;
+ const $=id=>document.getElementById(id);
+ const rd=()=>{try{return JSON.parse(localStorage.getItem(LK))||{n:0,until:0,lvl:0}}catch(e){return{n:0,until:0,lvl:0}}};
+ const wr=o=>{try{localStorage.setItem(LK,JSON.stringify(o))}catch(e){}};
+ const hex=b=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
+ const unhex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
+ function msg(t){$('m').textContent=t}
+ function locked(){const s=rd(),left=s.until-Date.now();if(left>0){msg('Too many tries. Wait '+Math.ceil(left/60000)+' min.');return true}return false}
+ async function check(pw){
+  const d=await (await fetch('gate-data.json',{cache:'no-store'})).json();
+  const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);
+  const h=hex(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:unhex(d.salt),iterations:d.iter},k,256));
+  let x=0;for(let i=0;i<h.length;i++)x|=h.charCodeAt(i)^d.hash.charCodeAt(i);
+  return h.length===d.hash.length&&x===0;
+ }
+ async function launch(){
+  /* the script bundle downloads in parallel with the page; if it is missing or out of date the normal script tags are used */
+  const bp=fetch('bundle.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null);
+  let html=await (await fetch('/index-src.html',{cache:'no-store'}).then(r=>r.ok?r:fetch('/index.html',{cache:'no-store'}))).text();
+  const B=await bp;
+  const tags=html.match(/<script src="[^":]+"[^>]*><\/script>/g)||[];
+  const list=tags.map(t=>t.match(/src="([^"]+)"/)[1]);
+  const useB=!!(B&&B.list&&B.list.length===list.length&&B.list.every((x,i)=>x===list[i])&&!/[?&]nobundle/.test(location.search));
+  html=html.replace(/<meta name="robots"[^>]*>/i,'').replace(/<link rel="canonical"[^>]*>/i,'').replace(/<title>[^<]*<\/title>/i,'<title>DEV - WaveFern</title>');
+  html=html.replace(/<head[^>]*>/i,'$&<base href="/"><meta name="robots" content="noindex,nofollow,noarchive"><script src="/dev/dev-shim.js"><\/script>');
+  const extra='<script src="/dev/dev-panel.js"><\/script>';
+  if(useB){
+   window.__FWB=B.files;window.__FWL=list;
+   tags.forEach(t=>{html=html.replace(t,'')});
+   /* runs every game script in order, each as its own classic script (an error in one does not stop the rest), then the dev add-ons */
+   const run='<script>(function(){var F=window.__FWB,i=0;window.__FWB=null;function put(c,n){var e=document.createElement("script");e.text=c+"\\n//# sourceURL=/"+n;document.head.appendChild(e);e.remove()}'+
+    'for(;i<F.length;i++){var n=F[i].s.split("?")[0];put(F[i].c,n)}})();<\/script>';
+   html=html.replace(/<\/body>/i,run+extra+'</body>');
+  }else{
+   html=html.replace(/<\/body>/i,extra+'</body>');
+  }
+  /* every dev script gets a fresh stamp on every load, so a browser can never serve a stale copy */
+  html=html.replace(/(src="\/dev\/[^"?]+\.js)"/g,'$1?t='+Date.now()+'"');
+  document.open();document.write(html);document.close();
+ }
+ $('f').addEventListener('submit',async e=>{
+  e.preventDefault();if(locked())return;
+  const pw=$('pw').value;$('pw').value='';if(!pw)return;
+  $('go').disabled=true;msg('Checking...');
+  let ok=false;try{ok=await check(pw)}catch(err){msg('Could not check. Try again.');$('go').disabled=false;return}
+  if(ok){wr({n:0,until:0,lvl:0});msg('Loading...');try{await launch()}catch(err){msg('Could not load the game.');$('go').disabled=false}return}
+  const s=rd();s.n++;
+  if(s.n>=MAX){s.lvl++;s.until=Date.now()+Math.min(24*60,15*Math.pow(2,s.lvl-1))*60000;s.n=0}
+  wr(s);$('go').disabled=false;
+  if(!locked())msg('Wrong password. '+(MAX-s.n)+' tries left.');
+ });
+ locked();
+})();
+</script></body></html>

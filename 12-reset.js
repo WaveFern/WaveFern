@@ -1,4 +1,8 @@
-/* ---------- v49.71.0: the fresh start ----------
+/* ---------- v49.71.0: the fresh start (V=2 from v49.76.0: second reset, the game was too easy) ----------
+   RS.V=2: every career without S.rv>=2 (that includes careers made after the first reset, rv=1) is moved to Legacy the same way.
+   Money, followers, listeners, apps, songs, houses and the rest of the career are not carried over. The Founder claim is not touched:
+   it lives on the player (Legacy store, cloud founders list, or S.fdr on the old career), and the new career gets it back in rsNewCareer.
+   A career made after the first reset (rv=1) earns no new Founder claim by being archived; only an S.fdr it already has is kept.
    One reset of every career, at one moment: RS.CUT (6 November 2026, 13:30 UTC = 1:30pm in England). Before that moment this file does nothing.
    At and after it:
    - Every career on this device is moved into the Legacy store (fw_legacy) and its slot is emptied: guest slots, every Google
@@ -13,7 +17,7 @@
      old money back; it goes to the Legacy store instead.
    Caveat: this all runs in the browser, so a save can be edited by the person who owns it. The signed saves work is what will
    make S.rv and S.fdr tamper-proof; both are plain fields in the career so they travel inside whatever is signed. */
-const RS={V:1,CUT:Date.UTC(2026,10,6,13,30,0),MIN_DAY:2,K:'fw_legacy'};
+const RS={V:2,CUT:Date.UTC(2026,10,6,13,30,0),MIN_DAY:2,K:'fw_legacy'};
 /* the password-protected /dev/ page (00-dev.js) can move this clock; on the real site it is just Date.now() */
 const rsNow=()=>{try{return window.FW_CLOCK?FW_CLOCK.now():Date.now()}catch(e){return Date.now()}};
 const rsOn=()=>!FW_TRL&&rsNow()>=RS.CUT;
@@ -22,24 +26,24 @@ function rsGet(){try{const raw=localStorage.getItem(RS.K);if(!raw)return{v:1,e:[
 /* never overwrite a Legacy store that cannot be read: keep the unreadable text next to it first */
 function rsPut(v){try{const raw=localStorage.getItem(RS.K);if(raw){let ok=false;try{const o=JSON.parse(raw);ok=!!(o&&Array.isArray(o.e))}catch(e){}if(!ok)localStorage.setItem(RS.K+'_unreadable_'+Date.now(),raw)}
  localStorage.setItem(RS.K,JSON.stringify(v));return true}catch(e){return false}}
-function rsStats(code){try{const s=scDecode(code).S;if(!s||typeof s!='object')return null;return{s,artist:String(s.artist||''),day:+s.day||0,money:+s.money||0,followers:+s.followers||0,songs:Array.isArray(s.songs)?s.songs.length:0,rv:+s.rv||0}}catch(e){return null}}
+function rsStats(code){try{const s=scDecode(code).S;if(!s||typeof s!='object')return null;return{s,artist:String(s.artist||''),day:+s.day||0,money:+s.money||0,followers:+s.followers||0,songs:Array.isArray(s.songs)?s.songs.length:0,rv:/^FW4-/i.test(scClean(code))?(+s.rv||0):0}}catch(e){return null}}
 /* played enough to count as a player who existed before the reset */
-const rsEligible=(st,code)=>{if(st){if(isTrlCareer(code))return false;return st.day>=RS.MIN_DAY||st.songs>=1}
+const rsEligible=(st,code)=>{if(st){if(isTrlCareer(code))return false;if(st.rv>=1)return !!(st.s&&st.s.fdr);return st.day>=RS.MIN_DAY||st.songs>=1}
  const c=scClean(code);return /^FW[1234]-/i.test(c)&&c.length>=1000};
 /* put a career in the Legacy store (once per exact code). Returns true when it is safely there. */
-function rsArchive(code,scope,slot,why){if(typeof code!='string'||!code)return true;
+function rsArchive(code,scope,slot,why,nofd){if(typeof code!='string'||!code)return true;
  const v=rsGet(),id=rsHash(code);if(v.e.some(e=>e.id==id))return true;
  const st=rsStats(code),fd=rsEligible(st,code);
  /* one Founder claim per career: a second snapshot of the same career (another tab, a vault copy) does not add one */
- const dup=st&&v.e.some(e=>e.fd&&e.scope==scope&&e.artist==st.artist&&st.artist);
- v.e.push({id,scope:scope||'guest',slot:slot||0,why:why||'',t:Date.now(),artist:st?st.artist:'',day:st?st.day:0,money:st?st.money:0,followers:st?st.followers:0,songs:st?st.songs:0,bad:st?0:1,fd:fd&&!dup?1:0,used:0,code});
+ const dup=st&&(st.rv>=1?v.e.some(e=>e.fd&&e.scope==scope):v.e.some(e=>e.fd&&e.scope==scope&&e.artist==st.artist&&st.artist));
+ v.e.push({id,scope:scope||'guest',slot:slot||0,why:why||'',t:Date.now(),artist:st?st.artist:'',day:st?st.day:0,money:st?st.money:0,followers:st?st.followers:0,songs:st?st.songs:0,bad:st?0:1,fd:fd&&!dup&&!nofd?1:0,used:0,code});
  return rsPut(v)}
 /* merge a Legacy store from an exported file. Eligibility is worked out again from the code, never trusted from the file. */
 function rsMerge(inc){if(!inc||!Array.isArray(inc.e))return 0;let n=0;const v=rsGet();
  for(const x of inc.e){if(!x||typeof x.code!='string'||!x.code)continue;const id=rsHash(x.code),have=v.e.find(e=>e.id==id);
   if(have){if(x.used&&!have.used)have.used=x.used;continue}
-  const st=rsStats(x.code),fd=rsEligible(st,x.code),dup=st&&v.e.some(e=>e.fd&&e.scope==(x.scope||'guest')&&e.artist==st.artist&&st.artist);
-  v.e.push({id,scope:String(x.scope||'guest').slice(0,40),slot:+x.slot||0,why:String(x.why||'Imported').slice(0,80),t:+x.t||Date.now(),artist:st?st.artist:'',day:st?st.day:0,money:st?st.money:0,followers:st?st.followers:0,songs:st?st.songs:0,bad:st?0:1,fd:fd&&!dup?1:0,used:x.used||0,code:x.code});n++}
+  const st=rsStats(x.code),fd=rsEligible(st,x.code),dup=st&&(st.rv>=1?v.e.some(e=>e.fd&&e.scope==(x.scope||'guest')):v.e.some(e=>e.fd&&e.scope==(x.scope||'guest')&&e.artist==st.artist&&st.artist));
+  v.e.push({id,scope:String(x.scope||'guest').slice(0,40),slot:+x.slot||0,why:String(x.why||'Imported').slice(0,80),t:+x.t||Date.now(),artist:st?st.artist:'',day:st?st.day:0,money:st?st.money:0,followers:st?st.followers:0,songs:st?st.songs:0,bad:st?0:1,fd:fd&&!dup&&/^FW4-/i.test(scClean(x.code))?1:0,used:x.used||0,code:x.code});n++}
  if(n||inc.e.length)rsPut(v);return n}
 const rsIsOld=code=>{const st=rsStats(code);return!!st&&!(st.rv>=RS.V)};
 /* the pass over everything stored in this browser. Returns how many careers it moved. */
@@ -56,7 +60,7 @@ function rsRun(){if(!rsOn())return 0;let n=0;
     for(const f of ['code','prev']){const c=e[f];if(!c||typeof c!='string')continue;const st=rsStats(c);if(st&&st.rv>=RS.V)continue;if(!rsArchive(c,sc,m?+m[3]:0,'Vault copy before the fresh start'))continue;
      if(f=='code'){delete v.e[k]}else{delete e.prev;delete e.prevT}ch=1}}
     if(ch)localStorage.setItem('fw_vault',JSON.stringify(v))}}catch(e){console.warn('reset vault',e)}
-  if(n){try{sessionStorage.setItem('fw_msg','Fresh start: everyone began again today. Your old career is kept as a Legacy career in Settings > Save.')}catch(e){}}
+  if(n){try{sessionStorage.setItem('fw_msg','Fresh start: the game was too easy, so everyone began again. Your old career is kept as a Legacy career in Settings > Save, and your Founder badge stays.')}catch(e){}}
  }catch(e){console.warn('reset pass',e)}
  return n}
 if(!FW_TRL)rsRun();
@@ -85,8 +89,8 @@ function rsNewCareer(){if(FW_TRL||!rsOn()||!S||S.rv>=RS.V)return;
 
 /* nothing old can come back in: a code, an import, a backup or the cloud copy is moved to Legacy instead of being loaded */
 function rsGuardCode(c){if(!rsOn())return false;try{const s=scClean(c);if(!/^FW[1234]-/i.test(s))return false;if(!rsIsOld(s))return false;
-  rsArchive(s,FW_ACCT||'guest',0,'Old career that was loaded after the fresh start');return true}catch(e){return false}}
-{const l0=loadCode;loadCode=function(c){if(rsGuardCode(c)){try{say('That career is from before the fresh start. It is kept as a Legacy career in Settings > Save.')}catch(e){}return}return l0.apply(this,arguments)}}
+  rsArchive(s,FW_ACCT||'guest',0,'Old career that was loaded after the fresh start',true);return true}catch(e){return false}}
+{const l0=loadCode;loadCode=function(c){if(rsGuardCode(c)){try{say('That save code is from an older version. WaveFern has had a fresh start for the new release, so old saves no longer work. Please start a new career. Your old career is kept as a Legacy career in Settings > Save.')}catch(e){}return}return l0.apply(this,arguments)}}
 {const b0=bakKeep;bakKeep=function(code,why){if(rsOn()&&typeof code=='string'&&rsIsOld(code))return rsArchive(code,FW_ACCT||'guest',0,why||'Old career');return b0.apply(this,arguments)}}
 /* Settings > Save: look at the Legacy careers (read only) */
 function rsFmt(n){return Number(n||0).toLocaleString('en-US')}

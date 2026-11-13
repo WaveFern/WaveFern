@@ -73,7 +73,10 @@ function boxGeo(L){const cc=new THREE.Color(),N=L.length,Pp=new Float32Array(N*3
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(Pp,3));g.setAttribute('normal',new THREE.BufferAttribute(Nr,3));g.setAttribute('color',new THREE.BufferAttribute(Cl,3));g.setIndex(new THREE.BufferAttribute(I,1));g.computeBoundingSphere();return g}
 /* tall towers between the camera and you were sliced diagonally by the camera's near plane (-20): push it back */
 cam.near=-80;cam.updateProjectionMatrix();
-{const f0=fadeT;fadeT=function(dt){f0(dt);CT.forEach(c=>{if(c.dm){c.dm.opacity=c.mat.opacity;c.dm.depthWrite=c.mat.depthWrite}})}}
+/* v51.4.0: smooth see-through fade without the glitches. Fading towers go properly transparent (like the walls of your house), but nothing about how they are drawn ever changes while they fade: the materials are see-through from the start (so no shader rebuild hitch when a fade begins), the box is always drawn first of the see-through things and its details right after (fixed render order, so no sorting by centre that flips as the camera moves), and the box only stops writing depth while it is actually faded. */
+{const f0=fadeT;let rdOk=0;fadeT=function(dt){f0(dt);
+ if(rdOk!==CT.length){rdOk=CT.length;const mp=new Map(CT.map(c=>[c.mat,c]));scene.traverse(o=>{if(!o.isMesh)return;const c=mp.get(o.material);if(c){o.renderOrder=-10;c.mat.polygonOffset=true;c.mat.polygonOffsetFactor=1;c.mat.polygonOffsetUnits=1}})}
+ CT.forEach(c=>{const m=c.mat;if(!m.transparent){m.transparent=true;m.needsUpdate=true}if(c.dm){c.dm.opacity=m.opacity;c.dm.depthWrite=m.depthWrite;if(!c.dm.transparent){c.dm.transparent=true;c.dm.needsUpdate=true}}})}}
 /* tower details are one mesh per tower whose material follows the tower's see-through fade (19-v6...js fadeT),
    so a faded tower does not leave its ledges, roof and shop front hanging in front of you */
 function cdTower(c){const T=[],tb=(...a)=>T.push(a),w=c.x1-c.x0,d=c.z1-c.z0,h=c.h,cx=(c.x0+c.x1)/2,fz=c.z1,col='#'+c.mat.color.getHexString(),dc=dk(col,.72);
@@ -95,7 +98,7 @@ function cdTower(c){const T=[],tb=(...a)=>T.push(a),w=c.x1-c.x0,d=c.z1-c.z0,h=c.
  sgnQuad(nm,'z',cx,2.3,fz+.125,.42);
  /* the tower's own front door box fades with it too */
  for(const k in SBC){const L=SBC[k];for(let j=L.length-1;j>=0;j--){const e=L[j];if(e[3]=='#2a1f1a'&&Math.abs(e[4]-cx)<.15&&Math.abs(e[6]-fz-.05)<.2){T.push(e.slice(0,7));L.splice(j,1)}}}
- c.dm=new THREE.MeshLambertMaterial({vertexColors:true,transparent:true});scene.add(new THREE.Mesh(boxGeo(T),c.dm))}
+ c.dm=new THREE.MeshLambertMaterial({vertexColors:true,transparent:true});{const dmm=new THREE.Mesh(boxGeo(T),c.dm);dmm.renderOrder=-9;scene.add(dmm)}}
 
 function cdShop(s){const X=WX(s.cx),z=11.03,aw=dk(s.k,.55);[-2.6,2.6].forEach(x=>{SB(2.2,.06,.9,aw,X+x,2.35,z+.45);for(let i=0;i<4;i++)SB(.55,.2,.04,i%2?'#f4f1ea':aw,X+x-.825+i*.55,2.24,z+.9);SB(2,.1,.12,'#fff',X+x,.85,z+.03)});
  SB(1.5,1.9,.05,'#f0ece4',X,.95,z-.01);[-3.6,3.6].forEach(x=>{SB(.55,.45,.55,'#8a8f96',X+x,.22,z+.4);SB(.45,.35,.45,pick(GRN),X+x,.6,z+.4);SB(.15,.15,.15,pick(FLW),X+x+.1,.8,z+.45)});
@@ -193,7 +196,7 @@ function mapPaint(x,sx,sz,kx,kz,mini){const W=x.canvas.width,H=x.canvas.height,v
  CTD.hfp.forEach(f=>{rect(f,f[4]);roof(f);if(ol){x.strokeStyle='#0005';x.lineWidth=1;x.strokeRect(sx(f[0]),sz(f[1]),(f[2]-f[0])*kx,(f[3]-f[1])*kz)}});
  BLD.forEach(b=>{rect(b,'#8fa6b8');roof(b);if(ol){x.strokeStyle='#4d6070';x.lineWidth=1;x.strokeRect(sx(b[0]),sz(b[1]),(b[2]-b[0])*kx,(b[3]-b[1])*kz)}});
  /* road names */
- if(ROAD_W*kx<7)return;const fs=mini?8:Math.min(13,Math.max(9,Math.round(ROAD_W*kx*.75)));x.font='bold '+fs+'px monospace';x.textAlign='center';x.textBaseline='middle';x.lineWidth=3;x.strokeStyle='#000b';x.fillStyle='#fff';
+ if(ROAD_W*kx<7)return;const fs=mini?8:Math.min(20,Math.max(9,Math.round(ROAD_W*kx*.75)));x.font=fs+'px Silkscreen,monospace';x.textAlign='center';x.textBaseline='middle';x.lineWidth=3;x.strokeStyle='#000b';x.fillStyle='#fff';
  const say=(t,X,Z,rot)=>{x.save();x.translate(X,Z);if(rot)x.rotate(-Math.PI/2);x.strokeText(t,0,0);x.fillText(t,0,0);x.restore()};
  const along=(t,p0,p1,q,v)=>{const tw=x.measureText(t).width+30;if(Math.abs(p1-p0)<tw)return;const lo=Math.max(p0+tw/2,-tw),hi=Math.min(p1-tw/2,(v?H:W)+tw);if(lo>hi)return;
   if(mini){const m=Math.min(hi,Math.max(lo,(v?H:W)/2+(v?-30:30)));say(t,v?q:m,v?m:q,v);return}

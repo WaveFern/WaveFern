@@ -1,5 +1,5 @@
 /* WaveFern dev performance helpers. Only loaded on /dev/.
-   1. Loading watchdog: if the loading screen is still up after 15 s (a stuck script, a failed library, a blocked tab), it says so
+   1. Loading watchdog: if the loading screen is still up after 40 s (a stuck script, a failed library, a blocked tab), it says so
       and offers a reload instead of sitting at 92% forever.
    2. Auto quality (OFF unless the address has ?auto): steps the graphics level down when fps stays under ~40. Never runs by default. */
 (function(){
@@ -8,12 +8,12 @@
  const t0=performance.now();let wd=setInterval(()=>{
   const ld=document.getElementById('load');
   if(!ld){clearInterval(wd);return}
-  if(document.hidden||performance.now()-t0<15000)return;
+  if(document.hidden||performance.now()-t0<40000)return;
   clearInterval(wd);
   const lt=document.getElementById('lt');
   if(lt){lt.textContent='Loading is taking too long'+(typeof THREE=='undefined'?' (3D library did not load)':'')+'. ';
    const a=document.createElement('a');a.href='#';a.textContent='Reload';a.style.color='inherit';a.onclick=e=>{e.preventDefault();location.reload()};lt.appendChild(a)}
-  console.warn('dev: loading stuck >15s',errs.slice(0,5));
+  console.warn('dev: loading stuck >40s',errs.slice(0,5));
  },1000);
  if(!/[?&]auto/.test(location.search))return; /* opt-in only: visuals are never lowered unless asked for */
  const ORDER=['max','balanced','off'];

@@ -5,7 +5,7 @@
    with the same listener count, so they open at the same point in a career. Test mode (the cheat) lands on Level 350. At the max the fame bar shows 100%. */
 const FAME_MAX=350;
 {const OLD=[0,1];const oldStart=n=>{while(OLD.length<=n){const k=OLD.length;OLD.push(OLD[k-1]+Math.round(10*Math.pow(1.1,k-2)))}return OLD[n]};
- const K=40,TOP=4e9,SK=Math.round(1.12*oldStart(K)),G=Math.pow(TOP/SK,1/(FAME_MAX-K)),NEW=[];
+ const K=40,TOP=8e9,SK=Math.round(1.12*oldStart(K)),G=Math.pow(TOP/SK,1/(FAME_MAX-K)),NEW=[];
  fameStart=function(n){n=Math.max(0,Math.floor(n));
   /* past the max there is no next level: 351 always sits just above you, so the fame bar reads Level 350 · 100% */
   if(n==FAME_MAX+1){const a=fameStart(FAME_MAX);let v=0;try{v=fameVal()}catch(e){}return a+Math.max(1,(v-a)/.996)}
@@ -16,4 +16,4 @@ const FAME_MAX=350;
  const moved=v=>v>K?fameLevel(oldStart(v)):v;
  try{AW.need=moved(AW.need)}catch(e){}
  try{FSTG.forEach(s=>s.req=moved(s.req))}catch(e){}
- const ch=cheat;cheat=function(){ch.apply(this,arguments);try{const need=Math.ceil(fameStart(FAME_MAX)/(1+.08*(S.bling||0)));if(S.listeners<need)S.listeners=need;FLC=[-1,0];refresh()}catch(e){}}}
+}

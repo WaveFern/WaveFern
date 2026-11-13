@@ -386,6 +386,8 @@ function go(d){const r=ME.rd;for(const k in MB)MB[k].rd=null;ME.rd=null;if(!r||r
 /* v49.45.0: pausing only stops time when the whole band is paused. While you are paused and anyone else is still playing, your
    clock keeps running (the host's clock keeps coming in and corrects it). It stops below the end of the day, so the night itself
    starts when you come back. */
+/* v52.2.0: 229-pause-freeze.js reads this: freeze nothing while someone else in the band is still playing */
+window.fwMpRuns=()=>{try{return !!(MPS&&S&&list().some(m=>m.id!==ME.id&&!m.pz))}catch(e){return false}};
 function pausedTime(now){const dt=Math.min(1,(now-(NET.pzT||now))/1000);NET.pzT=now;
  if(!S||typeof PAUSED=='undefined'||!PAUSED||mode!='pause')return;
  if(!list().some(m=>m.id!==ME.id&&!m.pz))return;
@@ -531,10 +533,10 @@ if(MPS){const k=MPS.inst,T={gt:{hype:'Shred a solo!',call:'Play the riff back!',
    same for the whole band. Rewards: goal $150 each, all three +$400 and 200 followers; streak days 3/7/14/30 pay $300/$800/$2000/$5000 with followers. ---- */
 const GPOOL={take:'Finish a band take',rel:'Release a band song',bed:'Go to bed as a band',chat:'Send the band a message',emo:'Use an emote with the band',col:'Record a collab together'};
 const dayKey=()=>new Date().toISOString().slice(0,10);
-const STRK={3:[300,50],7:[800,150],14:[2000,400],30:[5000,1000]};
+const STRK={3:[300,12],7:[800,38],14:[2000,100],30:[5000,250]};
 function goalsGet(){if(!S||!S.mp)return null;const d=dayKey();let g=S.mp.g;if(!g||g.d!==d){let h=0;(d+MPS.code).split('').forEach(c=>h=(h*31+c.charCodeAt(0))>>>0);const ks=Object.keys(GPOOL),k=[];while(k.length<3){h=(h*1664525+1013904223)>>>0;const x=ks[h%ks.length];if(!k.includes(x))k.push(x)}g=S.mp.g={d,k,done:{}}}return g}
 function gp(k){try{if(!MPS||MPTR||!S||!S.mp||!band())return;const g=goalsGet();if(!g||!g.k.includes(k)||g.done[k])return;g.done[k]=1;S.money=+((+S.money||0)+150).toFixed(2);snd('chime');say('Band goal done: '+GPOOL[k]+'. +$150');
- if(g.k.every(x=>g.done[x])){S.money=+((+S.money||0)+400).toFixed(2);S.followers=(S.followers||0)+200;say('All of today\'s band goals done! +$400 and 200 followers.')}}catch(e){console.error('band goal',e)}}
+ if(g.k.every(x=>g.done[x])){S.money=+((+S.money||0)+400).toFixed(2);S.followers=(S.followers||0)+50;say('All of today\'s band goals done! +$400 and 50 followers.')}}catch(e){console.error('band goal',e)}}
 /* v49.68.0: streak rewards you can show off: band-only studio pieces that land in Storage (never sold in a shop) */
 const BRW=[[3,'bnd_poster','Band poster stand',[[.06,1.5,.06,'#222',-.45,.75,0],[.06,1.5,.06,'#222',.45,.75,0],[1,1.1,.06,'#0b0f0d',0,1.05,.04],[.86,.18,.07,'#2fe68a',0,1.42,.05],[.86,.6,.07,'#14301a',0,.98,.05],[.5,.08,.08,'#2fe68a',0,.75,.06]]],
  [7,'bnd_neon','Neon band sign',[[1.4,.9,.1,'#0b0f0d',0,1.2,0],[1.1,.08,.12,'#2fe68a',0,1.45,.03],[.08,.5,.12,'#2fe68a',-.5,1.2,.03],[.08,.5,.12,'#2fe68a',.5,1.2,.03],[1.1,.08,.12,'#2fe68a',0,.95,.03],[.5,.08,.12,'#7dffb8',0,1.2,.03],[.1,.75,.1,'#222',0,.38,0],[.6,.06,.4,'#222',0,.03,0]]],
@@ -754,31 +756,61 @@ const FR={on:0,me:'',h:'',L:{},P:{},Q:{},I:{},B:{},pu:{},open:0,seen:{},sent:{},
 const frNm=()=>{let d='';try{d=typeof fwDisplayName=='function'?fwDisplayName():''}catch(e){}return d||(typeof fwNameSafe=='function'?fwNameSafe(S&&S.artist):String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24))};
 const okId=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
 function frErr(e){console.warn('[friends]',e);FR.err=/permission/i.test(String(e&&(e.code||e.message)||e))?'Friends is not switched on yet. The database rules need publishing.':'Could not reach Friends. Check your connection.';frDraw()}
+/* first read with a fallback: if the websocket never connects (blocked by a network, proxy or extension) the Realtime Database client waits silently,
+   so after 10 seconds switch it to long-polling (plain HTTPS) and ask again, then give up after another 15 */
+function fbGet(R,db,path){const to=ms=>new Promise((_,j)=>setTimeout(()=>j(new Error('The database did not answer')),ms));
+ return Promise.race([R.get(R.ref(db,path)),to(10000)]).catch(e=>{if(!/did not answer/.test(String(e&&e.message)))throw e;console.warn('[friends] no answer over websocket, switching to long-polling');
+  try{R.forceLongPolling();R.goOffline(db);R.goOnline(db)}catch(e2){console.warn('[friends] long-polling switch failed',e2)}
+  return Promise.race([R.get(R.ref(db,path)),to(15000)])})}
+/* v49.93.15: live RTDB rules only accept f/p/UID/nm when it equals the stored value OR f/u/UID/d is stamped in the same write (name stamp, once a week). Writes without the stamp were denied. Send the stamp with a new name, and if that is refused (stamp used this week) retry without nm so presence and username still save. */
+/* v49.94.8: owned = the username already belongs to this player (f/n/HANDLE is theirs). The rules refuse any write to f/n/HANDLE that
+   rewrites an existing entry, and they refuse the 30-day username stamp f/u/UID/t while it is still cooling down, so an owned name must not send either,
+   or the whole update (presence included) is denied. The display-name stamp is sent only when the name really changed, so an unchanged name does not use up the weekly stamp. */
+/* v50.1.3: when the rules refuse the display-name stamp, the retry without it works but Firebase still prints a permission_denied warning for the first try. Remember the refusal for a day so later page loads go straight to the version that works. */
+const frNmDenied=()=>{try{return Date.now()-(+localStorage.getItem('fw_frnm_no')||0)<864e5}catch(e){return false}};
+const frNmMark=()=>{try{localStorage.setItem('fw_frnm_no',String(Date.now()))}catch(e){}};
+function frUpd(R,db,uid,h,rm,extra,owned){const base=Object.assign(owned?{}:{['f/n/'+h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp()},extra||{}),nm=frNm(),mk=(withNm)=>{const o={h,o:1,rm:rm||'',t:R.serverTimestamp()};if(withNm&&nm)o.nm=nm;return o};
+ if(frNmDenied())return R.update(R.ref(db),Object.assign({},base,{['f/p/'+uid]:mk(0)}));
+ const a=Object.assign({},base,{['f/p/'+uid]:mk(1)});if(nm&&nm!==FR.snm)a['f/u/'+uid+'/d']=R.serverTimestamp();
+ return R.update(R.ref(db),a).then(r=>{FR.snm=nm;return r}).catch(e=>{if(!nm||!/PERMISSION/i.test(String(e&&(e.code||e.message))))throw e;frNmMark();return R.update(R.ref(db),Object.assign({},base,{['f/p/'+uid]:mk(0)}))})}
+function frEnsureN(R,db,uid){if(!FR.h)return Promise.resolve();return R.get(R.ref(db,'f/n/'+FR.h)).then(n=>{if(!n.exists())return R.update(R.ref(db),{['f/n/'+FR.h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp()}).catch(e=>console.warn('[friends] name copy failed',e&&e.code))}).catch(()=>{})}
+function frLookup(R,db,h){return R.get(R.ref(db,'f/n/'+h)).then(s=>{const f=s.val();if(f&&okId(f))return f;
+ try{if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD)return null;return FBF.getDoc(FBF.doc(FBD,'usernames',h)).then(d=>{const u=d.exists()&&d.data()&&d.data().uid;return u&&okId(u)?u:null}).catch(()=>null)}catch(e){return null}})}
+function frFromProfile(R,db,uid){try{if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD)return Promise.resolve();
+ return FBF.getDoc(FBF.doc(FBD,'profiles',uid)).then(d=>{const h=d.exists()&&d.data()&&d.data().h;if(typeof h!='string'||!/^[a-z0-9_]{3,16}$/.test(h))return;
+  return R.get(R.ref(db,'f/n/'+h)).then(n=>{if(n.exists()&&n.val()!==uid)return;FR.h=h;
+   return frUpd(R,db,uid,h,'',null,n.exists()).catch(e=>console.warn('[friends] username copy failed',e&&e.code))})}).catch(e=>console.warn('[friends] profile read failed',e&&e.code))}catch(e){return Promise.resolve()}}
 function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;FR.on=1;FR.err='';
- rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;
-  R.get(R.ref(db,'f/p/'+uid+'/h')).then(s=>{FR.h=s.val()||'';FR.ok=1;frPresence();frDraw()}).catch(frErr);
-  R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.od=0;frPresence()}});
+ rtdb().then(r=>{const{R,db,uid}=r;FR.r=r;FR.me=uid;console.info('[friends] connected to',RTDB_URL,'as',uid);
+  fbGet(R,db,'f/p/'+uid).then(s=>{const pv=s.val()||{};FR.snm=pv.nm||'';FR.h=pv.h||'';if(FR.h)return;/* v49.92.1: username lives in Firestore profiles/{uid}.h; copy it to Friends if missing here */return frFromProfile(R,db,uid)}).then(()=>frEnsureN(R,db,uid)).then(()=>{FR.ok=1;FR.rerr='';frPresence();frDraw()}).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);frErr(e)});
+  R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.pbo=0;FR.od=0;frPresence()}});
   R.onValue(R.ref(db,'f/l/'+uid),s=>{const v=s.val()||{};for(const f in FR.pu)if(!v[f]){try{FR.pu[f]()}catch(e){}delete FR.pu[f];delete FR.P[f]}FR.L=v;
    for(const f in v)if(!FR.pu[f]&&okId(f))FR.pu[f]=R.onValue(R.ref(db,'f/p/'+f),x=>{const o=FR.P[f],n=x.val();FR.P[f]=n;if(o&&!o.o&&n&&n.o&&n.h)say('@'+n.h+' is online.');frDraw()},()=>{});frDraw()},frErr);
   R.onValue(R.ref(db,'f/q/'+uid),s=>{const v=s.val()||{},nw=Object.keys(v).filter(k=>!FR.Q[k]&&v[k]&&v[k].h);if(FR.qd&&nw.length){snd('ping');say('Friend request from @'+v[nw[0]].h+'. Open Friends to answer.')}FR.qd=1;FR.Q=v;frDraw()},frErr);
   R.onValue(R.ref(db,'f/i/'+uid),s=>{FR.I=s.val()||{};frInvite()},()=>{});
   R.onValue(R.ref(db,'f/b/'+uid),s=>{FR.B=s.val()||{};frDraw()},()=>{});
- }).catch(e=>{FR.on=0;frErr(e)})}
+ }).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);console.warn('[friends] start failed:',e);frErr(e)})}
 function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
- if(k===FR.pk)return;FR.pk=k;const ref=R.ref(db,'f/p/'+uid);R.set(ref,Object.assign({t:R.serverTimestamp()},o)).then(()=>{if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{FR.pk='';console.warn('[friends] presence',e)})}
+ if(k===FR.pk||Date.now()<(FR.pbo||0))return;FR.pk=k;
+ /* send the name stamp with a changed name; if the stamp or nm is refused, retry once without nm */
+ const nmChanged=o.nm&&o.nm!==FR.snm&&!frNmDenied(),go=(withNm)=>{const v=Object.assign({},o);if(!withNm||frNmDenied())delete v.nm;const u={['f/p/'+uid]:Object.assign({t:R.serverTimestamp()},v)};if(withNm&&nmChanged)u['f/u/'+uid+'/d']=R.serverTimestamp();return R.update(R.ref(db),u).then(()=>{if(withNm)FR.snm=o.nm})};
+ go(1).catch(e=>{if(!/PERMISSION/i.test(String(e&&(e.code||e.message)))||!nmChanged)throw e;frNmMark();return go(0)}).then(()=>{FR.pbf=0;if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{
+  /* back off instead of retrying every 4 seconds: 30s, 60s, 2min ... up to 10min, and keep the failed key so it is not re-sent until then */
+  FR.pbf=Math.min((FR.pbf||0)+1,6);FR.pbo=Date.now()+Math.min(600000,15000*Math.pow(2,FR.pbf));FR.pk='';
+  if(!FR.pw){FR.pw=1;console.warn('[friends] presence blocked, backing off',e&&(e.code||e.message))}})}
 setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);
 const frN=()=>Object.keys(FR.Q||{}).length;
-const frName=f=>{const p=FR.P[f];return p&&p.h?'@'+p.h:'Friend'};
+const frName=f=>{const p=FR.P[f],q=FR.PF&&FR.PF[f],h=p&&p.h||q&&q.h;return h?'@'+h:'Friend'};
 /* pick a username (once) */
-window.FRX={FR,frStart:()=>frStart(),frPresence:()=>frPresence(),trailer:MPTR};
+window.FRX={FR,frStart:()=>frStart(),frPresence:()=>frPresence(),rtdb:()=>rtdb(),trailer:MPTR};
 window.frClaim=()=>{const i=$('frh'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='A username has 3 to 16 letters, numbers or _.';snd('err');return frDraw(1)}
  const{R,db,uid}=FR.r;FR.msg='Checking…';frDraw(1);R.get(R.ref(db,'f/n/'+h)).then(s=>{if(s.exists()&&s.val()!==uid){FR.msg='@'+h+' is taken. Try another.';snd('err');return frDraw(1)}
-  return R.update(R.ref(db),{['f/n/'+h]:uid,['f/p/'+uid]:{h,nm:frNm(),o:1,rm:MPS&&!MPTR?MPS.code:'',t:R.serverTimestamp()}}).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
+  return frUpd(R,db,uid,h,MPS&&!MPTR?MPS.code:'',null,s.exists()).then(()=>{FR.h=h;FR.pk='';FR.od=0;FR.msg='';snd('pop');say('Your username is @'+h+'.');frPresence();frDraw(1)})})
  .catch(e=>{FR.msg='Could not save that username.';frErr(e)})};
 /* send a request by username */
 window.frAdd=()=>{const i=$('fra'),h=String(i&&i.value||'').trim().replace(/^@/,'').toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(h)){FR.msg='Type your friend\'s username (3 to 16 letters, numbers or _).';snd('err');return frDraw(1)}
  if(h===FR.h){FR.msg='That is you.';return frDraw(1)}const{R,db,uid}=FR.r;FR.msg='Looking for @'+h+'…';frDraw(1);
- R.get(R.ref(db,'f/n/'+h)).then(s=>{const f=s.val();if(!f||!okId(f)){FR.msg='No player is called @'+h+'.';snd('err');return frDraw(1)}
+ frEnsureN(R,db,uid).then(()=>frLookup(R,db,h)).then(f=>{if(!f){FR.msg='No player is called @'+h+'.';snd('err');return frDraw(1)}
   if(FR.L[f]){FR.msg='@'+h+' is already your friend.';return frDraw(1)}if(FR.Q[f])return frAcc(f);if(FR.B[f]){FR.msg='You blocked @'+h+'. Unblock them first.';return frDraw(1)}
   const ts=R.serverTimestamp();return R.update(R.ref(db),{['f/q/'+f+'/'+uid]:{h:FR.h,nm:frNm(),t:ts},['f/s/'+uid]:ts}).then(()=>{FR.sent[f]=h;FR.msg='Request sent to @'+h+'.';if(i)i.value='';snd('pop');frDraw(1)})})
  .catch(()=>{FR.msg='Could not send it. Wait 10 seconds between requests, or you may already have one waiting with @'+h+'.';snd('err');frDraw(1)})};
@@ -792,7 +824,7 @@ window.frUnblock=f=>{if(!okId(f))return;const{R,db,uid}=FR.r;snd('click');R.remo
 window.frInv=f=>{if(!okId(f)||!MPS||MPTR)return;const{R,db,uid}=FR.r,n=frName(f);
  R.set(R.ref(db,'f/i/'+f+'/'+uid),{c:MPS.code,b:String(MPS.band||'Band').replace(/[<>"]/g,'').slice(0,24),nm:'@'+FR.h,t:R.serverTimestamp()}).then(()=>{snd('pop');say('Invited '+n+' to '+(MPS.band||'the band')+'.')})
  .catch(()=>{snd('err');say('Wait a few seconds before inviting '+n+' again.')})};
-function frGo(c){if(!/^[A-Z0-9]{5}$/.test(c))return;if(MPS&&MPS.code===c)return say('You are already in that room.');try{if(S&&mode!='title')autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.href=location.pathname+'?join='+c}
+window.frGo=function frGo(c){if(!/^[A-Z0-9]{5}$/.test(c))return;if(MPS&&MPS.code===c)return say('You are already in that room.');try{if(S&&mode!='title')autoSave()}catch(e){}wiping=true;try{sessionStorage.removeItem(SK);sessionStorage.removeItem('fw_go')}catch(e){}location.href=location.pathname+'?join='+c}
 window.frJoin=f=>{const p=FR.P[f];if(!p||!p.rm)return;snd('click');const go=()=>frGo(p.rm);if(S&&mode!='title'&&!(MPS&&MPS.code===p.rm))mpAsk('Join '+frName(f)+'\'s band room?','Your game is saved first. You pick your instrument on the next screen.','Join',go);else go()};
 function frInvite(){const{R,db,uid}=FR.r||{};if(!R)return;const now=Date.now();let best=null,bk='';
  for(const k in FR.I){const v=FR.I[k];if(!v||!okId(k))continue;if(now-(+v.t||0)>600000||(MPS&&MPS.code===v.c)){R.remove(R.ref(db,'f/i/'+uid+'/'+k)).catch(()=>{});continue}const sk=k+v.t;if(FR.seen[sk])continue;if(!best||v.t>best.t){best=v;bk=k}}
@@ -809,13 +841,13 @@ function frDraw(force){document.querySelectorAll('.frbadge').forEach(b=>b.textCo
  if(FR.err&&!FR.ok)h+=`<p class=m>${esc(FR.err)}</p>`;
  else if(!FR.ok)h+='<p class=m>Connecting…</p>';
  else if(!FR.h)h+=`<p>Pick a username so your friends can find you. It is the only thing other players see, so keep your real name out of it.</p><div class=ng><input id=frh maxlength=16 placeholder="username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frClaim()"><button class=go onclick="frClaim()">Save</button></div>`;
- else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button> <button onclick="fwNameBox()" style="padding:3px 8px;font-size:12px">Change name</button></p>
+ else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button> <button onclick="fwNameBox()" style="padding:3px 8px;font-size:12px">Change name</button> <button onclick="fwProfileOpen('${esc(FR.h)}')" style="padding:3px 8px;font-size:12px">My profile</button></p>
   <div class=ng><input id=fra maxlength=17 placeholder="Friend's username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frAdd()"><button class=go onclick="frAdd()">Add friend</button></div>`;
   const Q=Object.keys(FR.Q).filter(okId);if(Q.length)h+='<h3>Requests</h3>'+Q.map(f=>{const q=FR.Q[f]||{};return`<div class=frr><div><b>@${esc(q.h||'?')}</b><small>${q.nm?'Plays as '+esc(q.nm):'Wants to be friends'}</small></div><button class=go onclick="frAcc('${f}')">Accept</button><button onclick="frDec('${f}')">Decline</button><button onclick="frBlock('${f}')">Block</button></div>`}).join('');
   const L=Object.keys(FR.L).filter(okId).sort((a,b)=>((FR.P[b]||{}).o?1:0)-((FR.P[a]||{}).o?1:0)||frName(a).localeCompare(frName(b)));
   h+=`<h3>Friends${L.length?' ('+L.filter(f=>(FR.P[f]||{}).o).length+' online)':''}</h3>`;
   h+=L.length?L.map(f=>{const p=FR.P[f]||{},on=!!p.o,inMine=MPS&&p.rm===MPS.code,st=!on?'Offline':p.rm?(inMine?'In your band room':'In a band room'):'Online, playing solo';
-   const bt=(on&&MPS&&!MPTR&&!inMine?`<button class=go onclick="frInv('${f}')">Invite</button>`:'')+(on&&p.rm&&!inMine?`<button onclick="frJoin('${f}')">Join</button>`:'')+`<button onclick="frDel('${f}')" title="Remove friend">Remove</button>`;
+   const bt=(on&&MPS&&!MPTR&&!inMine?`<button class=go onclick="frInv('${f}')">Invite</button>`:'')+(on&&p.rm&&!inMine?`<button onclick="frJoin('${f}')">Join</button>`:'')+(p.h?`<button onclick="fwProfileOpen('${esc(p.h)}')">Profile</button>`:'')+`<button onclick="frDel('${f}')" title="Remove friend">Remove</button>`;
    return`<div class=frr><div><b><i class="mpd ${on?'on':'off'}"></i>${esc(frName(f))}</b><small>${st}${p.nm?' · '+esc(p.nm):''}</small></div>${bt}</div>`}).join(''):'<p class=m>No friends yet. Add one by their username, or send them yours.</p>';
   if(!MPS)h+='<p class=m><small>Create or join a band room to invite friends into it.</small></p>';
   const B=Object.keys(FR.B).filter(okId);if(B.length)h+=`<details><summary class=m>Blocked (${B.length})</summary>${B.map(f=>`<div class=frr><div><b>${esc(String(FR.B[f]))}</b></div><button onclick="frUnblock('${f}')">Unblock</button></div>`).join('')}</details>`}

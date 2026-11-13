@@ -18,7 +18,7 @@
  const live=()=>safe(()=>S&&S.artist&&!(typeof TRL!='undefined'&&TRL.on),'live');
  const fm=n=>n>=1e9?+(n/1e9).toFixed(1)+'B':n>=1e6?+(n/1e6).toFixed(1)+'M':n>=1e4?+(n/1e3).toFixed(n>=1e5?0:1)+'K':Math.round(n).toLocaleString();
  const card=(k,t,s)=>safe(()=>glCard(k,t,s),'card');
- const cash=n=>{S.money=+((+S.money||0)+n).toFixed(0)};
+ const cash=n=>{S.money=+((+S.money||0)+n*.25).toFixed(0)};
 
  /* 1 + 3: stream shaping inside planOf */
  {const po=planOf;planOf=function(s){const fresh=s&&s.pd!==S.day,v=po.apply(this,arguments);if(!fresh||!s||!live())return v;
@@ -49,9 +49,11 @@
 
  /* 2: surprise drops during the first 15 minutes of play */
  let nextAt=0;
+ /* v49.93.26: no fans, no fan surprises. Needs at least 1 monthly listener (so fame level 1+). Waits instead of skipping the window. */
+ const fanOk=()=>(+S.listeners||0)>=1;
  function drop(){const h=hk();h.drops++;const r=Math.random();let t,s;
   if(r<.5){const n=Math.round(R(15,45)*(1+h.drops*.15));cash(n);t='Fan tip';s='A fan slipped you $'+n+'.'}
-  else if(r<.85){const n=Math.round(R(6,20)*(1+h.drops*.2));S.followers=(S.followers||0)+n;t='New fans';s='+'+n+' followers just found you.'}
+  else if(r<.85){const n=Math.round(R(6,20)*(1+h.drops*.2));S.followers=(S.followers||0)+FOLN(n);t='New fans';s='+'+FOLN(n)+' followers just found you.'}
   else{const sg=(S.songs||[]).slice().sort((a,b)=>b.day-a.day)[0];if(sg){const n=Math.round(R(40,120));safe(()=>addSt(sg,n),'drop');t='Stream burst';s='"'+sg.title+'" got +'+n+' streams.'}else{cash(60);t='Jackpot';s='A surprise $60!'}}
   card('SURPRISE',t,s);try{snd('ping')}catch(e){}}
  /* 6: daily streak */
@@ -66,9 +68,10 @@
  setInterval(()=>safe(()=>{if(!live()||typeof mode=='undefined')return;if(typeof PAUSED!='undefined'&&PAUSED)return;if(mode!='play'&&mode!='drive'&&mode!='rec'&&mode!='pc')return;
   const h=hk();h.play++;
   if(h.play==3)daily();
-  if(h.play<=H.dropWindow){if(!nextAt)nextAt=h.play+R(20,40);if(h.play>=nextAt){nextAt=h.play+R(H.dropMin,H.dropMax);drop()}}
+  if(h.play<=H.dropWindow){if(!nextAt)nextAt=h.play+R(20,40);if(h.play>=nextAt){nextAt=h.play+R(H.dropMin,H.dropMax);if(fanOk())drop()}}
   if(h.play%5==0){ladder();bar()}},'tick'),1000);
  /* 7: comeback */
- document.addEventListener('visibilitychange',()=>safe(()=>{const h=hk();if(document.hidden){h.seen=now();return}
-  const gone=(now()-h.seen)/6e4;if(live()&&gone>=10&&(S.songs||[]).length){const n=Math.min(500,Math.round(gone*R(1.5,3)*(1+Math.sqrt(S.listeners||0)/10)));S.followers=(S.followers||0)+n;card('WELCOME BACK','+'+n+' new followers','Your music kept working while you were away.')}},'vis'));
+ document.addEventListener('visibilitychange',()=>safe(()=>{const h=hk();if(document.hidden){h.seen=now();h.pzd=(typeof PAUSED!='undefined'&&PAUSED&&mode=='pause')?1:0;return}
+  if(h.pzd){h.pzd=0;h.seen=now();return}/* v52.2.0: time spent paused earns nothing */
+  const gone=(now()-h.seen)/6e4;if(live()&&gone>=10&&(S.songs||[]).length){const n=Math.min(500,Math.round(gone*R(1.5,3)*(1+Math.sqrt(S.listeners||0)/10)));S.followers=(S.followers||0)+FOLN(n);card('WELCOME BACK','+'+FOLN(n)+' new followers','Your music kept working while you were away.')}},'vis'));
 })();

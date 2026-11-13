@@ -9,7 +9,7 @@
  if(!window.FW_FEAT)return;
  if(/[?&]nomodels/.test(location.search))return;
  const KEY='fw_dmodels';
- let on=true;try{if(localStorage.getItem(KEY)==='0')on=false}catch(e){}
+ let on=true;/* live site: always on, ignores any old saved choice */
  const SKN=['#fddcc0','#f2c09a','#d99a6c','#b57248','#8a5230','#5b3420'];
  const dkc=(c,f)=>{try{return dk(c,f)}catch(e){return c}};
 
@@ -46,7 +46,7 @@
   if(c.hair>=2&&c.hair!=9&&!(c.ht>=0)){const m=B(h,.34,.02,.3,dkc(hc,1.3),.05,.375,.05);m.userData.hair=1}
  }
  try{
-  /* player models are back to the original look (James: the extra detail did not look good); set to true to bring it back */
+  /* player models are the ORIGINAL look (James: the extra character detail did not look good). To bring it back, remove the `false&&` below. */
   if(false&&typeof buildChar=='function'&&typeof B=='function'){
    const b0=buildChar;
    buildChar=function(c){
@@ -68,7 +68,7 @@
   [[0,3,'#7a6a8a'],[4.9,8,'#7a6a8a'],[8,16,'#5a4a6a']].forEach(a=>{const l=a[1]-a[0],cx=(a[0]+a[1])/2;B(g,l,.8,.03,dkc(a[2],.82),cx,.6,.025);B(g,l,.06,.06,tr2,cx,1.03,.03)});
   B(g,.03,.8,6,dkc('#7a6a8a',.82),.025,.6,3);B(g,.06,.06,6,tr2,.03,1.03,3);
   B(g,.03,.8,6,dkc('#8a7f6a',.82),.025,.6,9);B(g,.06,.06,6,tr2,.03,1.03,9);
-  /* the only windows: two on the left wall (bedroom and living room). The back-wall windows are taken out by dev-windows-v1.js */
+  /* plus two more on the left wall (bedroom and living room) */
   const lwin=(z,cur)=>{
    B(g,.03,1.2,1.6,'*8fd0ff',.03,1.8,z);
    B(g,.07,.1,1.8,tr,.05,2.45,z);B(g,.07,.1,1.8,tr,.05,1.15,z);B(g,.07,1.3,.1,tr,.05,1.8,z-.85);B(g,.07,1.3,.1,tr,.05,1.8,z+.85);
@@ -117,5 +117,5 @@
   }
   apply();
  }catch(e){console.warn('dev models failed',e)}}
- let tries=0;const iv=setInterval(()=>{tries++;if(!document.getElementById('load')&&document.getElementById('fwdvb')){clearInterval(iv);boot()}else if(tries>240)clearInterval(iv)},250);
+ let tries=0;const iv=setInterval(()=>{tries++;if(!document.getElementById('load')){clearInterval(iv);boot()}else if(tries>1200)clearInterval(iv)},250);
 })();

@@ -54,7 +54,7 @@
  X.reward=function(c){
   const money=Math.round(Math.max(15000,(S.earn||0)*.02)*c.w),fol=Math.round(Math.max(5000,(S.followers||0)*.03)*c.w);
   const so=c.songs||[c.song];let str=0;so.forEach(s=>{if(!s)return;const add=Math.round((s.streams||0)*.08*c.w+2000*c.w);s.streams=(s.streams||0)+add;s.today=(s.today||0)+add;str+=add});
-  S.money=+((S.money||0)+money).toFixed(2);S.earn=(S.earn||0)+money;S.followers=(S.followers||0)+fol;S.streams=(S.streams||0)+str;S.interest=Math.min(1,(S.interest||0)+.1*c.w/3);
+  S.money=+((S.money||0)+money).toFixed(2);S.earn=(S.earn||0)+money;S.followers=(S.followers||0)+FOLN(fol);S.streams=(S.streams||0)+str;S.interest=Math.min(1,(S.interest||0)+.1*c.w/3);
   S.inv=S.inv||{};S.inv.trophy=(S.inv.trophy||0)+1;const A=awS();A.wins=(A.wins||0)+1;(A.cab=A.cab||[]).push({c:c.name,day:S.day,t:c.t,no:X.no()});
   return{money,fol,str}};
 
@@ -161,6 +161,5 @@
   add('Awards: 7 days before ceremony',()=>{S.day=X.next()-7;S.t=0;say2('Day '+S.day+': notice comes in a second')});
   add('Awards: 1 day before ceremony',()=>{S.day=X.next()-1;S.t=0;say2('Day '+S.day)});
   add('Awards: jump to ceremony day',()=>{S.day=X.next();S.t=0;awS().att=0;say2('Day '+S.day+': the hall is open tonight')});
-  add('Awards: unlock fame, songs, album',()=>{cheat();say2('Test career applied')});
   add('Awards: start the ceremony now',()=>{const n=X.noms();if(!n.list)return say2('Release a song first.');closeUI&&closeUI();mode='menu';awPlay(n);say2('Ceremony started')})})(0);
 })();

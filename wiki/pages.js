@@ -2,7 +2,7 @@
    Each page's body() builds its HTML when it is opened, so tables always use the current WIKI_DATA. */
 cat('start','Getting started','','The basics: your first day, the controls, saving, and how a day works.');
 cat('music','Music','','Recording songs, what decides their quality, genres, extras like 808s and hi hats, and how streams and listeners are worked out.');
-cat('career','Career','','Money, gear, fame, mentors, collabs, record labels, promotions, quests, awards, rivals and radio.');
+cat('career','Career','','Money, gear, fame, collabs, record labels, promotions, quests, awards, rivals and radio.');
 cat('live','Live and touring','','The weekly festival, booking your own slots, flights, and the World Tour.');
 cat('life','City life','','Getting around, homes, furniture, clothes, pets, food, the phone, the computer and the people of the city.');
 cat('band','Multiplayer','','Band rooms: playing with up to three friends.');
@@ -55,7 +55,7 @@ ${H2('Gameplay')}<ol>
 ${H2('The tutorial')}<p>Big Vee, your manager, walks you through the basics: walk, pick your artist name, record a song and release it. A glowing line on the ground leads you to each place, and on the laptop his box shows over the screen and the button to click is outlined. After the basics he only drops in now and then, when you find something new (your first DM, the street, a car, a shop, the airport...), with at least 45 seconds between tips.</p>
 ${N('Press <b>Tips off</b> on his box, or use the pause menu, and he stays quiet (so do the small helper tips). Turn them back on from the pause menu. You get the $150 starting gift either way.','tip','Tips off')}
 <p>Your first release is added to WaveFern's ${L('streams/fresh-finds','Fresh Finds')} playlist, so your first songs get real plays from day one.</p>
-${H2('Early goals')}${ul([`Record a few songs in one ${L('genres','genre family')}: the ${L('genres','genre focus')} bonus rewards a steady sound.`,`Buy a better ${L('gear','microphone')} first: it gives the most quality per level.`,`Install ${L('instagrime','Instagrime')} and post once a day for followers.`,`Reach 10 monthly listeners to unlock your first ${L('mentors','mentor')}.`])}`});
+${H2('Early goals')}${ul([`Record a few songs in one ${L('genres','genre family')}: the ${L('genres','genre focus')} bonus rewards a steady sound.`,`Buy a better ${L('gear','microphone')} first: it gives the most quality per level.`,`Install ${L('instagrime','Instagrime')} and post once a day for followers.`])}`});
 
 page('controls','Controls','start',{e:'',sum:'Keyboard, mouse and touch controls.',src:['07-input-loop.js','154-touch-controls.js'],kw:'keys keyboard wasd shift sprint',body:()=>`
 <p class=lead>WaveFern plays with a keyboard and mouse, or with touch controls on phones and tablets.</p>
@@ -70,7 +70,7 @@ ${H2('The clock')}<p>The first half of the day runs from 06:00 to 20:00; the sec
 ${H2('Energy')}${ul(['You wake with 100 energy after sleeping in your bed.','Recording a song costs 15 energy (1 less per level of chair; 7.5 for your part in a collab). A festival set costs 15 and a tour show 25.','Energy slowly comes back by itself during the day, about 36 over a full day.',`Food tops it up: the corner shop, City Cafe, ${L('food','Goober Eats')} and festival stalls.`])}
 ${H2('Sleeping')}<p>You can only go to bed at night (after 20:00), or earlier if your energy is under 15. Sleeping ends the day: yesterday's streams are paid, your ${L('listeners','monthly listeners')} are updated, every genre's hype is rerolled and new messages arrive.</p>
 ${N('If you are still awake at 06:00 you pass out where you stand and wake with only 70 energy.','warn','Passing out')}
-${H2('What happens overnight')}${ul(['Streams for the day are completed and paid at the stream rate (after any label cut).','Interest decays by 10% and gains 6% for each song you released that day.','Monthly listeners and followers update (followers grow by 5% of the day\'s streams).','Genre hype rerolls between ×0.8 and ×1.3.','A new mentor may unlock, artists may DM you, labels may make offers, and new quests roll.'])}`});
+${H2('What happens overnight')}${ul(['Streams for the day are completed and paid at the stream rate (after any label cut).','Interest decays by 10% and gains 6% for each song you released that day.','Monthly listeners and followers update (followers grow by 5% of the day\'s streams).','Genre hype rerolls between ×0.8 and ×1.3.','Artists may DM you, labels may make offers, and new quests roll.'])}`});
 
 page('saves','Saves and careers','meta',{e:'',sum:'Two career slots, autosave, cloud saves, save codes and backups.',src:['12-save-load.js','86-google-signin.js'],kw:'save load code cloud google backup slot',body:()=>`
 <p class=lead>The main menu has two career slots. Each career saves on its own, so nothing leaks between them.</p>
@@ -102,12 +102,11 @@ ${H2('The formula')}${FX(`quality = max(3, round( <b>experience</b> × (
   + 16 × <b>session</b>            (average of Lyrics and Mix, 0-1)
   + <b>gear points</b>             (see below)
   + 3 if you own a home      + 1 per pet you own
-  + 2 per unlocked mentor
   + max(0, 8 − misses)       (Beat step)
 )))`)}
 ${H2('Experience','experience')}<p>New artists don't get full value from their gear. Experience starts at 0.3 and climbs towards 1:</p>
 ${FX(`experience = 0.3 + 0.7 × (1 − e^(−xp / 200))
-xp = songs made + 8 per mentor + 6 per fame level`)}
+xp = songs made + 6 per fame level`)}
 <p>${T(['xp','Experience'],[0,25,50,100,200,400,800].map(x=>[x,(.3+.7*(1-Math.exp(-x/200))).toFixed(2)]))}</p>
 ${H2('Gear points','gear-points')}<p>Each level of a piece of gear adds a fixed number of points (level 0 = the starting item):</p>
 ${T(['Gear',['Points per level','n'],['Max level','n'],['At max','n']],g.filter(x=>x.q).map(x=>[L('gear',x.n),x.q,x.lv.length-1,x.q*(x.lv.length-1)]))}

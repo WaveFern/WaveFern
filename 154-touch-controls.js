@@ -7,10 +7,14 @@
    Nothing is saved: no state fields added. Wrapped in an IIFE so no top-level names are shared. */
 (function(){
 const J=window.TCHJ={on:0,x:0,y:0};
-let act=0,ui=null,base=null,knob=null,jid=null,jc=[0,0],jk={},runOn=0,held={};
+let act=0,ui=null,base=null,knob=null,jid=null,jc=[0,0],jk={},runOn=0,held={},lastSig='';
 /* Shared device check (also used by the computer screen, placement and messages): true for phones and tablets, false for laptops
    and desktops even when they have a touch screen. iPads and iPadOS Safari (which reports as a Mac) always count as touch. */
+/* v49.73.8: the last input wins. A real finger touch switches to touch (WF_LAST='touch'), a real key press switches back (WF_LAST='kbd'), both ways, any time. */
+window.WF_LAST='';
 window.WF_TOUCH=function(){try{const n=navigator,ua=n.userAgent||'';
+ if(window.WF_LAST=='touch')return true;
+ if(window.WF_LAST=='kbd')return false;
  if(/iPad|iPhone|iPod|Android/i.test(ua))return true;
  if(/Mac/i.test(n.platform||'')&&n.maxTouchPoints>1)return true;
  const mm=q=>matchMedia(q).matches;
@@ -98,13 +102,15 @@ function jMove(e){const R=base.querySelector('.tjb').getBoundingClientRect().wid
 function jRel(){if(jid==null&&!J.on)return;try{if(jid!=null)base.releasePointerCapture(jid)}catch(_){}jid=null;J.on=0;J.x=J.y=0;['w','a','s','d'].forEach(k=>setK(k,0));if(base){base.classList.remove('on');knob.style.transform=''}}
 function relAll(){jRel();for(const id in held){kd(held[id],'keyup');delete held[id]}if(ui)ui.querySelectorAll('#tchb .dn').forEach(b=>b.classList.remove('dn'))}
 
-function enable(){if(act)return;act=1;build();document.body.classList.add('tch')}
+function enable(){if(act)return;act=1;build();document.body.classList.add('tch');lastSig=''}
+function disable(){if(!act)return;act=0;relAll();if(ui)ui.classList.add('off');document.body.classList.remove('tch','tdrv');if(typeof keys!='undefined'&&runOn){runOn=0;delete keys.shift;const r=ui&&ui.querySelector('.tr2');if(r)r.classList.remove('on')}}
+function setLast(v){if(window.WF_LAST==v)return;window.WF_LAST=v;if(v=='touch')enable();else disable()}
 if(coarse())(document.body?enable():addEventListener('DOMContentLoaded',enable));
-addEventListener('pointerdown',e=>{if(e.pointerType=='touch'&&window.WF_TOUCH())enable()},true);
+addEventListener('pointerdown',e=>{if(e.pointerType=='touch')setLast('touch')},true);
+addEventListener('keydown',e=>{if(e.isTrusted)setLast('kbd')},true);
 
 /* show the controls only while walking, driving or walking at the awards; keep Run held while it is on */
-const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function'&&!(typeof S!='undefined'&&S&&S.noPhone),st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};
-let lastSig='';
+const W={map:m=>m=='play',ph:m=>m=='play'&&typeof openPhone=='function',st:m=>m=='play'&&typeof canFurn=='function'&&canFurn(),pz:m=>m=='play'||m=='drive'};
 /* v49.37.0: on stage (a festival set or a tour show) only the joystick shows, for walking around the stage, and it hides while a crowd game is up */
 const onStage=m=>{try{if(m=='fest')return typeof FEST!='undefined'&&FEST.view&&FEST.set&&!FEST.set.end&&!FEST.set.mg;if(m=='dshow'){const H=DCITY.show&&DCITY.show();return!!(H&&!H.mg&&!H.end)}}catch(_){}return false};
 setInterval(()=>{if(!act||!ui)return;const m=M(),stg=onStage(m),ok=(m=='play'||m=='drive'||m=='cutawd'||stg)&&typeof S!='undefined'&&S&&!document.getElementById('load');

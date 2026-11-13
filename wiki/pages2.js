@@ -28,10 +28,6 @@ ${T([['Tier','n'],['Listeners','n'],['Fame level','n']],ft.map((v,i)=>[i+1,[fmt(
 ${H2('Every level','all')}${T([['Level','n'],['Listeners from','n']],step.map(l=>[l,[big(s[l-1]),s[l-1]]]).concat([]),{})}
 <details><summary class=btn>Show all ${s.length-1} levels</summary>${T([['Level','n'],['Listeners from','n']],s.slice(0,350).map((v,i)=>[i+1,[big(v),v]]),{filter:1,tall:1})}</details>`}});
 
-page('mentors','Mentors','career',{e:'',sum:'Legends who unlock as you grow and add song quality.',src:['02-data.js','06-computer.js'],kw:'mentor legends',body:()=>`
-<p class=lead>There are ${(D.mentors||[]).length} mentors, each inspired by a music legend. One unlocks each time you reach the next monthly listener milestone, and every mentor adds +2 quality to every song (and 8 experience). Meet them on the laptop under Legends.</p>
-${T(['Mentor',['Monthly listeners','n'],'Their advice'],(D.mentors||[]).map((m,i)=>['Mentor '+(i+1),m[0],'<i>'+esc(m[2])+'</i>']))}`});
-
 page('labels','Record labels','career',{e:'',sum:'Label offers, advances, cuts and leaving.',src:['101-economy-labels.js','106-label-hq-soon.js'],kw:'label record deal sign advance cut contract',body:()=>`
 ${IB('Labels','',[['First offer','Day 5'],['Offer chance','20% a day'],['Same label again','After 20 days'],['Leave fee','30% of advance'],['After leaving','No offers for 14 days']])}
 <p class=lead>Labels message you with an offer when your monthly listeners, total streams and reputation all reach their thresholds. Signing pays an advance up front; from then on the label keeps a cut of your streaming income every night.</p>
@@ -52,7 +48,7 @@ page('awards','Gramophone Awards','career',{e:'',sum:'Submit a song, beat the st
  return `${IB('Gramophone Awards','',[['Needs','Fame Level '+a.need],['Cooldown',a.cool+' days'],['Category','Song of the Year'],['Prize','Gramophone Trophy']])}
 <p class=lead>The awards hall stands at the end of your street. From Fame Level ${a.need} you can check in (once every ${a.cool} days), submit one song, and watch the ceremony.</p>
 ${H2('How to win')}<p>You're up against four of ${a.pool||16} big stars, and only the single best song wins. The judges look mostly at how good your song is, with a small bonus for how many streams it has.</p>
-${H2('Tips')}${ul(['Submit your best song, not your newest one.','Quality matters far more than streams here. A great song with few plays beats an average song with millions.','The stars you face are very good. If you lose, keep improving your gear and come back in 15 days.','Mentors, a home and pets all add quality, so they help here too.'])}
+${H2('Tips')}${ul(['Submit your best song, not your newest one.','Quality matters far more than streams here. A great song with few plays beats an average song with millions.','The stars you face are very good. If you lose, keep improving your gear and come back in 15 days.','A home and pets add quality, so they help here too.'])}
 <p>A win puts a Gramophone Trophy in your Storage: furniture that isn't sold anywhere.</p>`}});
 
 page('reputation','Reputation','career',{e:'',sum:'What raises and lowers your reputation, and what it does.',src:['75-collab-fees-dms.js','71-festival-booking.js','21-v7-albums-rivals-instagrime-profiles-sit.js'],kw:'rep reputation',body:()=>`
@@ -71,7 +67,7 @@ page('billboards','Billboards','career',{e:'',sum:'When your name goes up beside
 <p class=lead>Billboards beside the main roads rotate every 10 seconds through roster artists with 5,000+ monthly listeners. Once you reach 10,000 monthly listeners, your own name joins the rotation.</p>`});
 
 /* ===================== Live ===================== */
-page('festival','Park Fields Festival','live',{e:'',sum:'The weekly festival: stages, crowds, pay and crowd minigames.',src:['70-festival.js','71-festival-booking.js'],kw:'festival stage crowd tent pit riverside main stage set',body:()=>`
+page('festival','Park Fields Festival','live',{e:'',sum:'The weekly festival: stages, crowds, pay and crowd minigames.',src:['70a-festival-core.js','70b-festival-crowds.js','70c-festival-set.js','71-festival-booking.js'],kw:'festival stage crowd tent pit riverside main stage set',body:()=>`
 ${IB('Park Fields Festival','',[['When','Every 7th day'],['Where','The field east of Park Avenue'],['Book','FestivalApp, 2+ days ahead'],['Set','Up to 4 hours'],['Energy','15 per set'],['Pay per song','$0.08 × stage × crowd']])}
 <p class=lead>A festival opens on every day that is a multiple of 7 (day 7, 14, 21...). The day before, a crew builds it; the day after, they take it down.</p>
 ${H2('Stages')}${T(['Stage',['Fame level','n'],['Pay','n'],['Base crowd','n'],['Max crowd','n']],(D.stages||[]).map(s=>[s.n,s.req,mul(s.mult),big(s.base),big(s.cap)]))}

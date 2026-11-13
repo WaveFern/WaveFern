@@ -95,7 +95,7 @@ const prog=t=>{t=Math.max(0,Math.min(600,t));return t<300?t/900:(300+2*(t-300))/
 /* how much each fame tier multiplies a song's streams (was 2.2, which snowballed: tier 5 by day 30) */
 const FAME_MULT=1.22;
 /* v26.79: quality, collab, hit and viral (knobs in PERF, 02-data.js) */
-const expXp=()=>Math.max(S.made||0,(S.songs||[]).length+(S.drafts||[]).length)+mentors()*PERF.expMentor+fameLv()*PERF.expFame;
+const expXp=()=>Math.max(S.made||0,(S.songs||[]).length+(S.drafts||[]).length)+fameLv()*PERF.expFame;
 const expF=()=>PERF.expMin+(1-PERF.expMin)*(1-Math.exp(-expXp()/PERF.expScale));
 const qualF=s=>Math.max(PERF.qMin,Math.min(PERF.qMax,Math.pow(Math.max(1,s.q||1)/PERF.qRef,PERF.qPow)));
 const collabF=s=>s.ft?Math.pow(s.fm||1.4,PERF.collabPow)*(1+PERF.collabQ*Math.min(1.5,(s.q||0)/100)):1;
@@ -118,6 +118,8 @@ const songCap=s=>s.q*s.q*25*Math.pow(FAME_MULT,fameLv())*(s.lk=='h'?s.hm||1:1)-(
 const artLis=s=>{if(!s||!s.ft)return 0;const a=ART.find(x=>x[0]===s.ft);return a?Math.max(0,a[2]||0):0};
 /* v49.60.1: a featured artist's fans stream the way a real catalogue song goes: biggest on day one, falling fast over the first weeks, then a long steady tail (about 12% of day one, fading slowly). No release-day bonus. */
 const featCurve=a=>.12*Math.pow(.995,a)+.88*Math.pow(.88,a);
+/* v49.93.19: interest shows its real percentage. 100% only appears once interest is clamped at its maximum (nothing more can raise it), so it is rounded down otherwise. Display only. */
+function intPct(){const i=Math.max(0,Math.min(1,+S.interest||0));return i>=1?100:Math.min(99,Math.floor(i*100))}
 function planOf(s){if(s.pd===S.day)return s.pv;rollLuck(s);const age=S.day-s.day,mI=.3+.7*(S.interest||0),mL=Math.pow(FAME_MULT,fameLv())*(1+Math.min(1,Math.sqrt(S.listeners)/PACE.lisBonus));
  let v=s.q*PACE.base*R(.75,1.25)*(S.hype[s.g]||1)*(Math.pow(.86,s.rv!==undefined?Math.max(0,S.day-s.rv):age)+PACE.floor)*mL*mI*(1+S.gear.promo*.3+(S.gear.decks||0)*.2+(S.home||0)*.1)*qualF(s)*collabF(s)*(age==0?1.5:1);if(s.boost>0){v*=1.5;s.boost--}if(Math.random()<PACE.viralP&&age<8)v*=R(PACE.viralMin,PACE.viralMax);if(s.lk=='h')v*=s.hm||1;
  v=Math.max(0,Math.min(Math.round(v||0),songCap(s)));
@@ -129,22 +131,21 @@ function planOf(s){if(s.pd===S.day)return s.pv;rollLuck(s);const age=S.day-s.day
    Energy refill (energyTick), the stream trickle (prog(S.t)) and the clock (clk) all run on S.t, so they stay the same per day. */
 const DAYK=600/720;
 const curMonth=()=>Math.floor((S.day-1)/30);
-function mlInit(){if(!Array.isArray(S.mlHist))S.mlHist=[];if(S.mlMonth==null||!S.mlDiv){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);const m0=S.mlMonth*30+1;S.monthStreams=(S.hist||[]).filter(h=>h.d>=m0&&h.d<S.day).reduce((a,h)=>a+(h.st||0),0)+S.songs.reduce((a,x)=>a+(x.pd===S.day?x.today||0:0),0)}
- if(S.mlMonth!==curMonth()){S.mlMonth=curMonth();S.mlDiv=2+Math.floor(Math.random()*4);S.monthStreams=0}}
+function mlInit(){if(!Array.isArray(S.mlHist))S.mlHist=[];if(S.mlMonth==null||!S.mlDiv){S.mlMonth=curMonth();S.mlDiv=4+Math.floor(Math.random()*6);const m0=S.mlMonth*30+1;S.monthStreams=(S.hist||[]).filter(h=>h.d>=m0&&h.d<S.day).reduce((a,h)=>a+(h.st||0),0)+S.songs.reduce((a,x)=>a+(x.pd===S.day?x.today||0:0),0)}
+ if(S.mlMonth!==curMonth()){S.mlMonth=curMonth();S.mlDiv=4+Math.floor(Math.random()*6);S.monthStreams=0}}
 function addSt(s,k){if(k<=0)return;mlInit();S.monthStreams=(S.monthStreams||0)+k;s.acc+=k;s.streams+=k;s.today=(s.today||0)+k;S.streams+=k}
 let stkT=0;function streamTick(){if(mode=='sleep'||mode=='load'||mode=='creator')return;const nw=performance.now();if(nw-stkT<120)return;stkT=nw;S.songs.forEach(s=>{const pv=planOf(s),f=s.p0>=.999?0:Math.max(0,Math.min(1,(prog(S.t)-s.p0)/(1-s.p0)));addSt(s,Math.floor(pv*f)-s.acc)})}
 function sleepNow(auto){snd('whoosh');mode='sleep';$('ui').innerHTML='<div class=fade></div>';setTimeout(()=>{try{wakeUp(auto)}catch(e){console.error('wake failed',e);if(mode=='sleep'){$('ui').innerHTML='';mode='play'}}},950)}
 /* the wake / new-day step; each side effect is guarded so one error never leaves the screen black */
 function wakeSafe(f,n){try{f()}catch(e){console.error('new-day step failed: '+n,e)}}
 function wakeUp(auto){
- mlInit();const before=mentors(),ph=S.mlHist.filter(h=>h.day<S.day).pop(),old=ph?ph.ml:S.listeners;S.songs.forEach(s=>addSt(s,planOf(s)-s.acc));
+ mlInit();const ph=S.mlHist.filter(h=>h.day<S.day).pop(),old=ph?ph.ml:S.listeners;S.songs.forEach(s=>addSt(s,planOf(s)-s.acc));
  let tot=0;S.songs.forEach(s=>{if(s.pd===S.day)tot+=s.today||0});tot=isFinite(tot)?tot:0;let e=0;
  if(S.paidDay!==S.day){S.paidDay=S.day;e=+(tot*PAY_RATE).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn+=e;S.hist.push({d:S.day,st:tot,e})}
  const rel=S.songs.filter(x=>x.day==S.day).length;S.interest=Math.min(1,(S.interest||0)*.9+rel*PACE.interest);
- {const l30=S.hist.slice(-30).reduce((a,h)=>a+(h.st||0),0),nl=Math.max(0,Math.floor(Math.max(S.monthStreams||0,l30)/S.mlDiv));S.listeners=tot>0?Math.max(nl,Math.floor((old||0)+tot/((S.mlDiv||3)*30)+(old||0)*.01*rel*(S.interest||0))):nl}if(S.cheat)S.listeners=Math.max(S.listeners,1e9);S.mlHist=S.mlHist.filter(h=>h.day!==S.day);S.mlHist.push({day:S.day,ml:S.listeners});if(S.mlHist.length>400)S.mlHist=S.mlHist.slice(-400);if(!isFinite(S.money))S.money=0;S.followers+=Math.round(tot*.05);wakeSafe(genMsgs,'messages');
+ {const l30=S.hist.slice(-30).reduce((a,h)=>a+(h.st||0),0),nl=Math.max(0,Math.floor(Math.max(S.monthStreams||0,l30)/S.mlDiv));S.listeners=tot>0?Math.max(nl,Math.floor((old||0)+tot/((S.mlDiv||3)*30)+(old||0)*.01*rel*(S.interest||0))):nl}if(S.cheat)S.listeners=Math.max(S.listeners,1e9);S.mlHist=S.mlHist.filter(h=>h.day!==S.day);S.mlHist.push({day:S.day,ml:S.listeners});if(S.mlHist.length>400)S.mlHist=S.mlHist.slice(-400);if(!isFinite(S.money))S.money=0;S.followers+=FOLN(tot*.05);wakeSafe(genMsgs,'messages');
  S.day++;S.t=0;S.energy=auto?70:100;S.eacc=0;wakeSafe(mlInit,'month');GEN.forEach(g=>S.hype[g]=+R(.8,1.3).toFixed(2));wakeSafe(updateVersion,'version');
- const nm=mentors()>before?MEN[mentors()-1][1]:null;
- $('ui').innerHTML=`<div class="box modal" style="background:#0b0f0d"><h2>Day ${S.day}</h2>${auto?'<p class=m>You passed out (energy only 70%).</p>':''}<p>Yesterday's results, paid now:</p><div class=cards><div class=card>Streams<b>+${tot.toLocaleString()}</b></div><div class=card>Earned<b>${$$(e)}</b></div><div class=card>Monthly listeners<b>${old.toLocaleString()} → ${S.listeners.toLocaleString()}</b><small>${S.listeners>old?'+'+(S.listeners-old).toLocaleString():S.listeners<old?'-'+(old-S.listeners).toLocaleString():'no change'}</small></div><div class=card>Interest<b>${Math.round(S.interest*100)}%</b></div></div><p class=m><small>${rel?rel+' new release(s) boosted interest.':'No new releases: interest fades and old songs keep decaying.'} Streams build up through the day and faster at night.</small></p>${nm?`<p>New fictional mentor unlocked: <b>${nm}</b> (see Legends)</p>`:''}${!S.songs.length?'<p class=m>Upload a song to start earning!</p>':''}<button class=go onclick="closeUI()">Start the day</button></div>`}
+ $('ui').innerHTML=`<div class="box modal" style="background:#0b0f0d"><h2>Day ${S.day}</h2>${auto?'<p class=m>You passed out (energy only 70%).</p>':''}<p>Yesterday's results, paid now:</p><div class=cards><div class=card>Streams<b>+${tot.toLocaleString()}</b></div><div class=card>Earned<b>${$$(e)}</b></div><div class=card>Monthly listeners<b>${old.toLocaleString()} → ${S.listeners.toLocaleString()}</b><small>${S.listeners>old?'+'+(S.listeners-old).toLocaleString():S.listeners<old?'-'+(old-S.listeners).toLocaleString():'no change'}</small></div><div class=card>Interest<b>${intPct()}%</b></div></div><p class=m><small>${rel?rel+' new release(s) boosted interest.':'No new releases: interest fades and old songs keep decaying.'} Streams build up through the day and faster at night.</small></p>${!S.songs.length?'<p class=m>Upload a song to start earning!</p>':''}<button class=go onclick="closeUI()">Start the day</button></div>`}
 /* the clock keeps running while the computer is open; the taskbar clock follows it */
 {const u2=update;update=function(dt){if(mode=='pc'&&!PAUSED){S.t+=dt*DAYK;if(S.t>=600){sleepNow(1);return}const tb=document.querySelector('#pc .tb>span:last-child'),tx='Day '+S.day+' · '+clk();if(tb&&tb.textContent!=tx)tb.textContent=tx}u2(dt);streamTick()}}
 
@@ -211,7 +212,7 @@ const VPED=[];
 function morePeople(){const cfg=()=>({skin:RI(0,5),eyes:RI(0,4),mouth:RI(0,3),hair:RI(0,11),hc:RI(0,11),top:RI(0,4),tc:RI(0,9),pc:RI(0,7),body:Math.random()});
  RH.forEach(h=>[h[0]-3.1,h[0]+4.8].forEach(z=>{const n=Math.round((h[2]-h[1])/26);for(let i=0;i<n;i++)addNPC(z,R(h[1]+2,h[2]-2),h[1]+1,h[2]-1,R(.8,1.7),Math.random()<.1)}));
  RVV.forEach(v=>[v[0]-3.1,v[0]+4.8].forEach(x=>{const n=Math.round((v[2]-v[1])/26);for(let i=0;i<n;i++){const o=buildChar(cfg());o.g.visible=false;scene.add(o.g);VPED.push({m:o.g,legs:o.legs,arms:o.arms,x,x0:x,z:R(v[1]+2,v[2]-2),mn:v[1]+1,mx:v[2]-1,dir:Math.random()<.5?1:-1,sp:R(.8,1.7),t:R(0,6)})}}))}
-function pedTick(dt){VPED.forEach(n=>{const dd=Math.hypot(P.x-n.x,P.z-n.z);if(dd>60||HIN||IN){n.m.visible=false;return}n.m.visible=true;n.t+=dt*8;n.z+=n.dir*n.sp*dt;if(n.z>n.mx)n.dir=-1;if(n.z<n.mn)n.dir=1;n.x+=(n.x0-n.x)*Math.min(1,dt*2);n.m.rotation.y=n.dir>0?0:Math.PI;n.m.position.set(n.x,0,n.z);const s=Math.sin(n.t)*.6;n.legs[0].rotation.x=s;n.legs[1].rotation.x=-s;n.arms[0].rotation.x=-s;n.arms[1].rotation.x=s})}
+function pedTick(dt){VPED.forEach(n=>{const dd=Math.hypot(P.x-n.x,P.z-n.z);if(dd>60||HIN||IN){n.m.visible=false;return}n.m.visible=true;n.t+=dt*8;{const pz=n.z;n.z+=n.dir*n.sp*dt;if(typeof npcOnRoad=='function'&&!npcOnRoad(n.x,pz)&&npcOnRoad(n.x,n.z)){n.z=pz;n.dir=-n.dir}}if(n.z>n.mx)n.dir=-1;if(n.z<n.mn)n.dir=1;n.x+=(n.x0-n.x)*Math.min(1,dt*2);n.m.rotation.y=n.dir>0?0:Math.PI;n.m.position.set(n.x,0,n.z);const s=Math.sin(n.t)*.6;n.legs[0].rotation.x=s;n.legs[1].rotation.x=-s;n.arms[0].rotation.x=-s;n.arms[1].rotation.x=s})}
 /* solid people and cars: a move is refused only if it goes further into someone, so you can always step away */
 function dynB(x0,z0,x,z){if(IN||HIN)return false;const R0=.62,ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
  if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;

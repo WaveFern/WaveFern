@@ -208,8 +208,9 @@
    <div class=gl>${CARS.map((c,i)=>{if(c.xm)return'';const o=own.includes(i),cu=cust(i),img=o?thumb(i):'';return`<div class="gc ${o?'':'lk'}">${o?`<span class=tag>BAY ${i+1}</span>`:''}
      ${img?`<img src="${img}" alt="${c.n}">`:`<div class=gi>${o?'':'NOT OWNED'}</div>`}
      <h3>${c.n}</h3><p><span class=dot style="background:${o&&cu&&okHex(cu.c)?cu.c:c.c}"></span>${o?(cu&&patOk(cu.p)&&cu.p?PATS[cu.p]:cu?'Custom paint':'Stock paint'):'Not owned'}</p>
-     <button class=go ${o?'':'disabled'} onclick="gcOpen(${i})">${o?'Customise':'Locked'}</button>${o?`<button style="margin-top:6px" onclick="gcDrive(${i})">Drive</button>`:''}</div>`}).join('')}</div>
-   <div class=gf><button onclick="closeUI()">Leave garage</button></div></div>`}
+     <button class=go ${o?'':'disabled'} onclick="gcOpen(${i})">${o?'Customise':'Locked'}</button>${o?`<button style="margin-top:6px" ${window.pcIsOut&&pcIsOut(own.indexOf(i))?'disabled':''} onclick="gcDrive(${i})">${window.pcIsOut&&pcIsOut(own.indexOf(i))?'Parked outside':'Drive'}</button>`:''}</div>`}).join('')}</div>
+   <div class=gf>${mechBtn()}<button onclick="closeUI()">Leave garage</button></div></div>`}
+ function mechBtn(){try{const m=window.mechanicInfo&&mechanicInfo();return m&&m.n?`<button class=go ${S.money<m.fee?'disabled':''} onclick="mechanicPay()">Mechanic: bring ${m.n>1?'all '+m.n+' cars':'car'} home · ${mny(m.fee)}</button>`:''}catch(e){return''}}
  function carUI(i){css();if(!DR||DR.i!=i)DR=Object.assign({i:i},savedLook(i));const cu=DR,cn=n=>(COLS.concat(PCOLS).find(x=>x[1]==n)||[n,n])[0],pn=patOk(cu.p)?cu.p:0;
   const tot=cost(i,cu),can=S.money>=tot,sv=savedLook(i),dirty=!same(cu,sv);
   $('ui').innerHTML=`<div class="box modal gar" id="gar">${head}
@@ -225,17 +226,15 @@
   pvShow(i,cu)}
  window.gcOpen=i=>{if(!(S.cars||[]).includes(i)||CARS[i].xm)return snd('err');DR=null;snd('ping');carUI(i)};
  window.gcList=()=>{snd('ping');listUI()};
- /* Drive: leave the garage and spawn in this car where the parked cars used to stand, then drive. The car goes away again when you get out. */
- window.gcDrive=i=>{if(!(S.cars||[]).includes(i)||CARS[i].xm)return snd('err');snd('ping');pvStop();DR=null;closeUI();
+ /* Drive: take the car out of the garage onto the street and drive. When you get out it stays where you left it. */
+ window.gcDrive=i=>{if(!(S.cars||[]).includes(i)||CARS[i].xm)return snd('err');const j=(S.cars||[]).indexOf(i);if(window.pcIsOut&&pcIsOut(j)){snd('err');return say('That car is parked outside. Find it on the map, or pay the mechanic to bring your cars home.')}
+  snd('ping');pvStop();DR=null;closeUI();
   const go=()=>{try{IN=null}catch(e){}if(typeof exitDrive=='function'&&mode=='drive'&&dr)try{exitDrive()}catch(e){}
-   const j=Math.max(0,(S.cars||[]).indexOf(i)),x=18.6+j*2.1,z=10,m=mkS(carb(i));m.scale.setScalar(1.5);m.position.set(x,0,z);scene.add(m);
-   const c={i,m,x,z,h:0,v:0,tmp:1};PK.push(c);dr=c;P.x=x;P.z=z;P.rot=0;camT.x=x;camT.z=z;if(P.mesh)P.mesh.visible=false;mode='drive'};
+   const c=window.pcSpawn&&pcSpawn(j);if(!c)return;
+   dr=c;P.x=c.x;P.z=c.z;P.rot=0;camT.x=c.x;camT.z=c.z;if(P.mesh)P.mesh.visible=false;mode='drive'};
   if(typeof fade=='function')fade(go,'');else go()};
- /* no cars stand outside any more (only a car you are driving, and the sleigh); the sleigh is never in the garage room */
- {const pc=parkCars;parkCars=function(){const keep=(typeof PK!='undefined'?PK:[]).filter(c=>c.tmp&&c===dr);const r=pc.apply(this,arguments);
-   PK.slice().forEach(c=>{if(!(CARS[c.i]&&CARS[c.i].xm)){try{scene.remove(c.m)}catch(e){}PK.splice(PK.indexOf(c),1)}});keep.forEach(c=>{if(!PK.includes(c))PK.push(c)});return r}
-  const fg=fillGarage;fillGarage=function(){const r=fg.apply(this,arguments);try{GCM=GCM.filter((m,j)=>{const c=CARS[(S.cars||[])[j]];if(c&&c.xm){IG[6].remove(m);return false}return true})}catch(e){}return r}
-  const ed=exitDrive;exitDrive=function(){const c=dr,r=ed.apply(this,arguments);try{if(c&&c.tmp){scene.remove(c.m);const k=PK.indexOf(c);if(k>=0)PK.splice(k,1)}}catch(e){}return r}}
+ /* cars stand outside only when you have left them there (218-parked-cars.js); the sleigh stands by the house until it is moved */
+  {const fg=fillGarage;fillGarage=function(){const r=fg.apply(this,arguments);try{GCM=GCM.filter((m,j)=>{const c=CARS[(S.cars||[])[j]];if(c&&c.xm){IG[6].remove(m);return false}return true})}catch(e){}return r}}
  /* choosing only changes the preview: nothing is saved or paid until Pay and apply */
  window.gcSet=(i,k,v)=>{if(!(S.cars||[]).includes(i)||!DR||DR.i!=i)return;if((k=='c'||k=='c2')&&!okHex(v))return;if(k=='p'&&(!patOk(v)||!wrapOwned(v)))return;DR[k]=v;snd('ping');carUI(i)};
  window.gcReset=i=>{if(!DR||DR.i!=i)return;Object.assign(DR,stockLook(i));snd('ping');carUI(i)};

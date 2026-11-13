@@ -115,7 +115,7 @@ D.landmark=function(C,bk){const f=LM[C.id];if(!f)return false;const G=D.mkG(),Gw
  D.addInt(b.mx,bk.z1-2.4,2.4,'Take a selfie at the '+name.replace(/^the /,''),()=>selfie(C,name));return true}finally{D.building=prev}};
 function selfie(C,name){S.dcity=S.dcity||{};const k=C.id+'|'+S.day,done=(S.dcity.selfie||[]).includes(k);snd('pop');try{chime()}catch(e){}
  if(done)return say('Another photo at the '+name.replace(/^the /,'')+'. Your fans already saw today\'s.');
- S.dcity.selfie=(S.dcity.selfie||[]).filter(x=>(x.split('|')[1]|0)>=S.day-30).concat(k);const f=Math.round(30+Math.sqrt(S.listeners||0)*.25);S.followers=(S.followers||0)+f;
+ S.dcity.selfie=(S.dcity.selfie||[]).filter(x=>(x.split('|')[1]|0)>=S.day-30).concat(k);const f=Math.round(30+Math.sqrt(S.listeners||0)*.25);S.followers=(S.followers||0)+FOLN(f);
  say('Selfie at the '+name.replace(/^the /,'')+' · +'+f.toLocaleString()+' followers')}
 
 /* ---------- rooms ---------- */
@@ -270,12 +270,29 @@ D.cityHooks=D.cityHooks||[];D.cityHooks.push(C=>{['food','cafe','conv','souv','r
 /* test mode: a Teleport app on the phone jumps straight to any tour city (or home) */
 try{IC.tp=mkIc(['..........','...PPPP...','..PWWWWP..','.PWPPPPWP.','.PWPWWPWP.','.PWPWWPWP.','.PWPPPPWP.','..PWWWWP..','...PPPP...','..........'].map(r=>r.replace(/\./g,'K')),{K:'#2a1050',P:'#b05aff',W:'#e8d0ff'})}catch(e){IC.tp=IC.store}
 if(typeof GP_TITLE!='undefined')GP_TITLE.tp='Teleport';
-D.tp=function(id){if(!S.cheat)return;const T=window.TRAVEL;if(!T)return;if(typeof window.apWhere=='function'&&window.apWhere()=='cabin'){snd('err');return say('Land first, then teleport.')}
+const tpOk=()=>!!S.cheat||(typeof isAdmin=='function'&&isAdmin());
+D.tp=function(id){if(!tpOk())return;const T=window.TRAVEL;if(!T)return;if(typeof window.apWhere=='function'&&window.apWhere()=='cabin'){snd('err');return say('Land first, then teleport.')}
  try{closePhone()}catch(e){}if(id==T.loc()&&(id=='home'||D.on)){return say('You are already here.')}IN=null;D.room=null;
  D.fade(()=>{if(D.on)D.leave(id=='home');T.arrive(id);if(id=='home'){P.x=8;P.z=14;P.rot=0;camT.x=P.x;camT.z=P.z;mode='play'}},()=>{if(id=='home')say('Teleported home.')},150)};
-{const b0=phBody;phBody=function(){if(PH.app!='tp')return b0.apply(this,arguments);if(!S.cheat){PH.app='home';return b0.apply(this,arguments)}
+/* v53.5.0: admin only. Starts a festival set right now: the festival is put on for today whatever the day is, the clock moves into a slot,
+   a one-off booking is made on the first stage with your best songs, and you go through the normal stage flow (backstage gate, set, autographs). */
+D.festNow=function(){if(!(typeof isAdmin=='function'&&isAdmin()))return;
+ if(typeof window.apWhere=='function'&&window.apWhere()=='cabin'){snd('err');return say('Land first, then start the festival.')}
+ if(window.TRAVEL&&TRAVEL.loc()!='home'){snd('err');return say('Teleport home first, then start the festival.')}
+ if(!S.songs||!S.songs.length){snd('err');return say('Record a song first: a festival set needs at least one.')}
+ try{closePhone()}catch(e){}
+ try{IN=null;D.room=null;if(mode=='drive'&&typeof exitDrive=='function')exitDrive();
+  FEST.adm=S.day;const s=fStage(1);let bk=fBk().find(b=>b.day==S.day&&b.n==s.n&&!b.st);
+  let k=bk?bk.slot:festSlotAt();if(k<0)k=festMins()<FSLOT[0][0]?0:FSLOT.length-1;
+  const m=festMins(),sl=FSLOT[k];if(m<sl[0]||m>=sl[1]-30)S.t=m<sl[0]||sl[0]<1200?Math.ceil((sl[0]-360)/2.8)+1:300+Math.ceil((sl[0]-1200)/2)+1;
+  S.energy=Math.max(S.energy,100);festSync();
+  if(!bk){bk={id:S.nid++,day:S.day,n:s.n,slot:k,songs:S.songs.slice().sort((a,b)=>(b.streams||0)-(a.streams||0)).slice(0,4).map(x=>x.id),st:0,bd:S.day};fBk().push(bk)}
+  mode='play';P.x=s.ix;P.z=s.iz+1.2;P.rot=0;camT.x=P.x;camT.z=P.z;
+  festStageUse(s.n)}catch(e){console.error(e);say('That did not work.')}};
+{const b0=phBody;phBody=function(){if(PH.app!='tp')return b0.apply(this,arguments);if(!tpOk()){PH.app='home';return b0.apply(this,arguments)}
  const here=window.TRAVEL?TRAVEL.loc():'home',by={};WT_DEST.forEach(d=>{(by[d.cont]=by[d.cont]||[]).push(d)});
  const btn=(id,t)=>`<button style="display:block;width:100%;text-align:left;margin:3px 0;${id==here?'opacity:.5':''}" onclick="DCITY.tp('${id}')">${esc(t)}${id==here?' · you are here':''}</button>`;
- return`<div style="padding:10px"><p class=m style="margin:0 0 6px">Test mode: tap a city to jump there.</p>${btn('home','Home')}${Object.keys(by).map(k=>`<h3 style="margin:10px 0 2px">${esc((typeof WT_CONT!='undefined'&&WT_CONT[k]&&WT_CONT[k].n)||k)}</h3>`+by[k].map(d=>btn(d.id,wtPlace(d))).join('')).join('')}</div>`}}
-{const r0=phR;phR=function(){try{const i=GP_APPS.findIndex(a=>a[0]=='tp');if(S.cheat&&i<0)GP_APPS.push(['tp','Teleport',()=>IC.tp,'#7a2ad0']);if(!S.cheat&&i>=0)GP_APPS.splice(i,1)}catch(e){}return r0.apply(this,arguments)}}
+ const adm=typeof isAdmin=='function'&&isAdmin(),fb=adm?`<button style="display:block;width:100%;text-align:left;margin:3px 0 8px;background:#ff6ad5;color:#2b1240;font-weight:bold" onclick="DCITY.festNow()">Start festival now (admin)</button>`:'';
+ return`<div style="padding:10px"><p class=m style="margin:0 0 6px">Test mode: tap a city to jump there.</p>${fb}${btn('home','Home')}${Object.keys(by).map(k=>`<h3 style="margin:10px 0 2px">${esc((typeof WT_CONT!='undefined'&&WT_CONT[k]&&WT_CONT[k].n)||k)}</h3>`+by[k].map(d=>btn(d.id,wtPlace(d))).join('')).join('')}</div>`}}
+{const r0=phR;phR=function(){try{const i=GP_APPS.findIndex(a=>a[0]=='tp');if(tpOk()&&i<0)GP_APPS.push(['tp','Teleport',()=>IC.tp,'#7a2ad0']);if(!tpOk()&&i>=0)GP_APPS.splice(i,1)}catch(e){}return r0.apply(this,arguments)}}
 })();
