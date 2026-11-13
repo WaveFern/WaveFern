@@ -77,7 +77,7 @@ const DRAW={
 /* ---- scoring: a signature that stays in its spot, has a real size and is not just a scribble ---- */
 function score(st,z){let len=0,inn=0,pts=0,x0=9,x1=-9,y0=9,y1=-9;
  st.forEach(s=>s.forEach((p,i)=>{pts++;if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1];if(i){const d=Math.hypot((p[0]-s[i-1][0])*z.w*W,(p[1]-s[i-1][1])*z.h*H);len+=d;if(p[0]>=-.08&&p[0]<=1.08&&p[1]>=-.12&&p[1]<=1.12)inn+=d}}));
- const zw=z.w*W,ok=len>=zw*.7&&pts>6;if(!ok)return{ok:0,q:0};
+ const zw=z.w*W,stay0=len>0?inn/len:0,ok=len>=zw*.35&&pts>6&&stay0>=.4;if(!ok)return{ok:0,q:0,why:len>0&&stay0<.4?'out':'short'};
  const stay=inn/len,size=Math.min(1,(x1-x0)*.5+.35+(y1-y0)*.4),scr=len>zw*10?Math.max(.45,1-(len-zw*10)/(zw*14)):1,strk=st.length>1?1:.92;
  return{ok:1,q:Math.max(.12,Math.min(1,Math.pow(stay,1.6)*size*scr*strk*1.05))}}
 const LINES=[[.85,'Amazing! Thank you so much!'],[.6,'Thank you! That looks great.'],[.35,'Um... thanks! I think.'],[0,'Is that... a squiggle? Thanks anyway.']];
@@ -103,7 +103,7 @@ window.signGame=function(o){o=o||{};return new Promise(res=>{
  function done(cancel){if(!SIGN.cur)return;SIGN.cur=null;removeEventListener('keydown',kd,true);ov.remove();R.cancelled=!!cancel;const s=R.items.filter(x=>x.signed);R.signed=s.length;R.skipped=items.length-s.length;R.avg=s.length?s.reduce((a,x)=>a+x.q,0)/s.length:0;if(o.onDone)try{o.onDone(R)}catch(e){console.error(e)}res(R)}
  function next(rec){R.items.push(rec);lock=1;if(i>=items.length-1)return setTimeout(()=>done(0),rec.signed?650:150);setTimeout(()=>show(i+1),rec.signed?850:120)}
  function ok(){if(lock)return;const it=items[i],sc=score(strokes,it.zone);
-  if(!sc.ok){const m=$q('sgm');m.textContent='Sign inside the red box first, or skip this one.';m.className='sgw';try{snd('err')}catch(e){}return}
+  if(!sc.ok){const m=$q('sgm');m.textContent=sc.why=='short'?'Sign a little bigger and longer in the red box, or skip this one.':'Sign inside the red box first, or skip this one.';m.className='sgw';try{snd('err')}catch(e){}return}
   lock=1;const q=sc.q,l=LINES.find(a=>q>=a[0])[1];$q('sgr').textContent=l;$q('sgr').className=q>=.6?'sgg':'';try{snd('pop')}catch(e){}
   next({kind:it.kind,who:it.who,signed:1,q,strokes:strokes.map(s=>s.map(p=>[+p[0].toFixed(3),+p[1].toFixed(3)]))})}
  function skip(){if(lock)return;next({kind:items[i].kind,who:items[i].who,signed:0,q:0,strokes:[]})}
