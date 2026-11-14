@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.7.0';
+const GAME_VERSION='v53.7.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.7.1',n:'Security hardening. A friend\'s username is now checked (letters, numbers and underscore only) before it is used on the Friends and Profile buttons, so a made-up name can no longer run code in your game. Band room codes and guest ids are also made with secure random numbers, so they are harder to guess.'},
  {v:'v53.7.0',n:'Brand HQ insides look far more real. Fixed the dark, bare floors (the floor textures were hidden under the plinth). All six rooms and all 14 showrooms now have proper furniture: swivel chairs with arms, desks with drawers and accessories, monitors with stands, cushioned sofas, potted trees and flowering planters, plus soft contact shadows under furniture, warm light pools under lamps, framed art, bookshelves, a directory kiosk, floor lamps, a water cooler, a pastry case and a set boardroom table. Monitors now face the people sitting at them. Shadows and light pools are drawn as their own layers so nothing flickers.'},
  {v:'v53.6.2',n:'Fixed the glitchy, flickering carpets in the brand HQs. Rugs, mats and tracks no longer fight each other or the floor: every one now sits at its own height with its own draw order, the two lobby rugs no longer overlap, and the glowing floor lines sit above them.'},
  {v:'v53.6.1',n:'Brand HQ insides fixed up. New proper doors (dark frame, two glass leaves with push bars, lit sign, wall lamps and a floor mat), removed the black ceiling bars that cut across the view, a dark floor under every HQ so no grass shows past the low walls, plus skirting, chair rail, crown moulding, warm cove lighting, floor inlay lines, planters and floor lamps in all six rooms.'},
