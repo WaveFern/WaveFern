@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.6.1';
+const GAME_VERSION='v53.6.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.6.2',n:'Fixed the glitchy, flickering carpets in the brand HQs. Rugs, mats and tracks no longer fight each other or the floor: every one now sits at its own height with its own draw order, the two lobby rugs no longer overlap, and the glowing floor lines sit above them.'},
  {v:'v53.6.1',n:'Brand HQ insides fixed up. New proper doors (dark frame, two glass leaves with push bars, lit sign, wall lamps and a floor mat), removed the black ceiling bars that cut across the view, a dark floor under every HQ so no grass shows past the low walls, plus skirting, chair rail, crown moulding, warm cove lighting, floor inlay lines, planters and floor lamps in all six rooms.'},
  {v:'v53.6.0',n:'Big brand upgrade. The brand photoshoot is now a real 3D fashion studio seen from a low front angle, with a big black umbrella softbox, stands and a seamless backdrop. You wear or hold the brand\'s product (sneakers, sunglasses, headphones, hoodie, jeans, tracksuit, can, bottle, phone, laptop or handbag). A side panel changes the pose (14), face expression (8), lighting (4 looks, softbox side and height, strength, rim colour), backdrop, props and camera (drag to orbit, scroll to zoom). Your best frame is posted on Instagrime. Every brand HQ is now six rooms joined by doors: lobby with a giant logo wall and logo sculpture, open office, a different signature showroom for each of the 14 brands, cafe, boardroom and the photo studio. The outside of each HQ also gets a logo monument and banners. Normal play is unchanged.'},
  {v:'v53.5.0',n:'Admin accounts only: the Teleport app on the Gphone now has a "Start festival now" button. It puts the festival on for today, moves the clock into a slot, teleports you to the first stage and starts your set straight away (with the backstage gate and autographs as usual). The Teleport app also shows for admin accounts without Cheat mode. Normal players are unchanged.'},

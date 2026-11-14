@@ -64,7 +64,11 @@ function Kit(C,k,o){const[x0,w,d]=RD[k],z0=RZ,h=H7;
   const g=new THREE.PlaneGeometry(Math.abs(b-a),y1-y0),m=new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}),me=new THREE.Mesh(g,m);g.userData.dsOwn=1;m.userData.dsOwn=1;me.userData.dsOwn=1;(C.hqTex=C.hqTex||[]).push(tx);
   if(face=='z')me.position.set((a+b)/2,(y0+y1)/2,c);else{me.rotation.y=Math.PI/2;me.position.set(c,(y0+y1)/2,(a+b)/2)}rm.g.add(me);return me};
  R.fl=(x,z,w2,d2,fn,pw,rx,rz,y)=>{const cv=document.createElement('canvas');cv.width=cv.height=pw||256;fn(cv.getContext('2d'),cv.width,cv.height);const tx=new THREE.CanvasTexture(cv);tx.wrapS=tx.wrapT=THREE.RepeatWrapping;tx.repeat.set(rx||1,rz||1);tx.anisotropy=4;
-  const g=new THREE.PlaneGeometry(w2,d2),m=new THREE.MeshBasicMaterial({map:tx}),me=new THREE.Mesh(g,m);g.userData.dsOwn=1;m.userData.dsOwn=1;me.userData.dsOwn=1;(C.hqTex=C.hqTex||[]).push(tx);me.rotation.x=-Math.PI/2;me.position.set(x+w2/2,y||.04,z+d2/2);rm.g.add(me);return me};
+  const g=new THREE.PlaneGeometry(w2,d2),m=new THREE.MeshBasicMaterial({map:tx}),me=new THREE.Mesh(g,m);g.userData.dsOwn=1;m.userData.dsOwn=1;me.userData.dsOwn=1;(C.hqTex=C.hqTex||[]).push(tx);me.rotation.x=-Math.PI/2;
+  /* v53.6.2: layered floor. The base floor sits at .03; every rug/mat/track gets its own height step, draw order and depth bias so overlapping ones never z-fight */
+  if(y===.03){m.polygonOffset=true;m.polygonOffsetFactor=2;m.polygonOffsetUnits=2;me.renderOrder=0;y=.03}
+  else{const n=R.dn=(R.dn||0)+1;y=.05+.015*n;m.depthWrite=false;m.polygonOffset=true;m.polygonOffsetFactor=-n;m.polygonOffsetUnits=-n;me.renderOrder=n}
+  me.position.set(x+w2/2,y,z+d2/2);rm.g.add(me);return me};
  R.floor=(kind,col,col2)=>{const f=FT[kind]||FT.concrete,tw=kind=='checker'?6:kind=='marble'?8:5;R.fl(x0,z0,w,d,(x,W,H)=>f(x,W,H,col,col2),256,w/tw,d/tw,.03)};
  R.txt=(face,c,a,b,y0,y1,t,fg,bg)=>R.pl(face,c,a,b,y0,y1,512,Math.round(512*(y1-y0)/Math.abs(b-a))||64,txtCanvas(t,fg||'#fff',bg||'#111'));
  R.logoPanel=(face,c,a,b,y0,y1,kind)=>{const asp=Math.abs(b-a)/(y1-y0),pw=768;R.pl(face,c,a,b,y0,y1,pw,Math.round(pw/asp),logoCanvas(R.id,R.b,kind))};
@@ -122,7 +126,7 @@ function Kit(C,k,o){const[x0,w,d]=RD[k],z0=RZ,h=H7;
   bx(.1,.32,d-.2,lo,x0+.05,.16,R.cz);bx(.07,.07,d-.2,mid,x0+.04,1.12,R.cz);bx(.16,.24,d-.2,hi,x0+.08,h-.12,R.cz);bx(.1,.05,d-.2,mix(R.hd.ac,'#000',.2),x0+.05,h-.3,R.cz)};
  R.trim();
  R.finish=()=>{const ac=R.hd.ac,warm='#ffe2a8',x1=R.x1,z1=R.z1;gl(w-.6,.05,.1,warm,R.cx,h-.34,z0+.14);gl(.1,.05,d-.6,warm,x0+.14,h-.34,R.cz);
-  gl(w-2.4,.03,.12,ac,R.cx,.04,z0+1.1);gl(.12,.03,d-2.4,ac,x0+1.1,.04,R.cz);gl(w-2.4,.03,.12,ac,R.cx,.04,z1-1.1);gl(.12,.03,d-2.4,ac,x1-1.1,.04,R.cz);
+  {const iy=.05+.015*((R.dn||0)+1)+.02;gl(w-2.4,.02,.12,ac,R.cx,iy,z0+1.1);gl(.12,.02,d-2.4,ac,x0+1.1,iy,R.cz);gl(w-2.4,.02,.12,ac,R.cx,iy,z1-1.1);gl(.12,.02,d-2.4,ac,x1-1.1,iy,R.cz)}
   const n=Math.max(2,Math.floor((w-6)/8));for(let i=0;i<n;i++){const x=x0+4+(w-8)*(i+.5)/n;bx(1.1,.55,.9,'#2a2c32',x,.28,z1-.65);R.bush(x,z1-.65,1)}
   for(const [px,pz] of [[x1-.7,z0+.8],[x1-.7,z1-.7]]){bx(.35,.1,.35,'#2a2c32',px,.05,pz);bx(.06,1.7,.06,'#333',px,.9,pz);bx(.5,.38,.5,warm,px,1.9,pz)}};
  return R}
@@ -155,7 +159,7 @@ function lobby(R){const{x0,z0,w,d,cx,x1,z1,hd,b,id,pcol}=R,bx=R.bx,gl=R.gl,ac=hd
  /* product plinths along the right side */
  for(let i=0;i<4;i++)R.ped(x1-3.2,z0+7+i*4.2,id,1.7,'#eceef2');
  /* lounge front-left */
- R.rug(x0+7,z0+19,10,7,mix(hd.wl,hd.ac2,.35),hd.ac);R.sofa(x0+12,z0+25,5,hd.ch,1);R.sofa(x0+8,z0+22,3.2,mix(hd.ch,'#000',.2),2);R.sofa(x0+16.2,z0+22,3.2,mix(hd.ch,'#000',.2),3);R.table(x0+12,z0+22,2.4,1.4,'#dcdcdc',.45);R.tree(x0+6,z0+26,1.3);R.tree(x0+18,z0+26,1.3);
+ R.rug(x0+7,z0+21.5,10,5.5,mix(hd.wl,hd.ac2,.35),hd.ac);R.sofa(x0+12,z0+25,5,hd.ch,1);R.sofa(x0+8,z0+22,3.2,mix(hd.ch,'#000',.2),2);R.sofa(x0+16.2,z0+22,3.2,mix(hd.ch,'#000',.2),3);R.table(x0+12,z0+22,2.4,1.4,'#dcdcdc',.45);R.tree(x0+6,z0+26,1.3);R.tree(x0+18,z0+26,1.3);
  R.npc(x0+10.5,z0+24.2,Math.PI,1);R.npc(x0+13.5,z0+24.2,Math.PI,1);
  /* right waiting area */
  R.sofa(x1-3.4,z0+21,4,mix(hd.ch,hd.ac2,.4),3);R.sofa(x1-3.4,z0+25,3,mix(hd.ch,hd.ac2,.4),3);R.table(x1-6,z0+23,1.2,2,'#d6d6da',.45);
