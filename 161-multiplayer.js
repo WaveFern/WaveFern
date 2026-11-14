@@ -50,7 +50,9 @@ const IK=Object.keys(INS),iName=k=>INS[k]?INS[k].n:'?';
 const SPOT={vo:[12.2,2.3,Math.PI],gt:[14.3,2.3,Math.PI],bs:[14.9,3.6,Math.PI/2],dr:[10.8,3.1,Math.PI],ky:[10.2,4.2,0]};
 const STOFF={vo:[0,0],gt:[-1.5,.2],bs:[1.5,.2],dr:[0,-1.3],ky:[2.8,.1]};
 const pid=c=>'wavefern-rm-'+String(c).toLowerCase();
-const newCode=()=>{const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.random()*a.length|0];return s};
+/* v53.6.4: room codes and guest ids come from crypto randomness where the browser has it (Math.random is predictable) */
+const rndInt=n=>{try{const b=new Uint32Array(1);crypto.getRandomValues(b);return b[0]%n}catch(e){return Math.random()*n|0}};
+const newCode=()=>{const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[rndInt(a.length)];return s};
 const lsGet=()=>{if(MPTR)return[];try{const l=JSON.parse(localStorage.getItem(LK)||'[]');return Array.isArray(l)?l:[]}catch(e){return[]}};
 function lsAdd(o){const l=lsGet().filter(x=>!(x.code==o.code&&x.inst==o.inst));l.unshift(Object.assign({t:Date.now()},o));try{localStorage.setItem(LK,JSON.stringify(l.slice(0,8)))}catch(e){}}
 const lastNm=()=>{try{return localStorage.getItem(SAVE_PRE+'mpnm')||''}catch(e){return''}};
@@ -347,7 +349,7 @@ function handle(d,id,self){
  else if(d.t=='gr')gearRecv(d,m)
  else if(d.t=='cm')cmRecv(d,m)
  else if(d.t=='fx'&&m.ad&&window.WFUN_RECV)window.WFUN_RECV(id,d)}
-const myUid=()=>{if(FW_ACCT)return FW_ACCT.slice(0,16);try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Math.random().toString(36).slice(2,12);localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
+const myUid=()=>{if(FW_ACCT)return FW_ACCT.slice(0,16);try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Array.from({length:10},()=>'abcdefghijklmnopqrstuvwxyz0123456789'[rndInt(36)]).join('');localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
 const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
 
