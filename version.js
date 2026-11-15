@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.9.0';
+const GAME_VERSION='v53.9.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.9.1',n:'Beach Club and Lighthouse rebuilt much bigger and better. The Sunset Beach Club is now a proper tiki venue right on the sand: thatched bar with stools and bottle shelves, a big stage with drums, speakers and lights, striped umbrellas and loungers, a fire pit, volleyball net, surfboard rack, palms, torches, string lights and people. The Lighthouse is far taller and stands on the tip of the north coast.'},
  {v:'v53.9.0',n:'Two new places on the island. The Sunset Beach Club on the south-east beach emails you sunset gig offers (accept in Messages, then play at the stage between 18:00 and 21:00: pick up to three songs, earn a fee, followers and streams) and sells a daily smoothie. The Lighthouse on the north-east headland turns its light at night and gives +20 energy once a day when you climb it for the view. Both are on the world map.'},
  {v:'v53.8.1',n:'Island coast is smoother and less jagged. Only long, gentle bays and headlands now, no small spiky bumps. Everything on the island still sits inside the shore.'},
  {v:'v53.8.0',n:'The island coast looks natural. The shore was one rounded rectangle with a regular zig-zag; now it has uneven bays, coves and headlands of different sizes, so no two stretches look alike. The city, park, airport and runway all stay inside, and walking and driving still stop at the new shoreline.'},
