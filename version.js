@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v54.4.1';
+const GAME_VERSION='v54.5.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v54.5.0',n:'Beach Club props rebuilt to the same detail as your studio gear. The stage now has the house-style instruments (mic and stand, guitars on stands, amps, keyboard, drum kit, speaker stacks), the campfire has proper logs, glowing coals and flame, and the volleyball net has posts, tapes and a full mesh. There is also a codeword for maximum quality: type ultra while walking around (or open the game with ?ultra on the end of the address) to switch the stage gear, fire and net to a much more detailed version with a full drum kit with stands and cymbals, detailed guitars, a two-octave keyboard, 4x12 amps, flickering flame tongues with rising sparks, a log cabin fire, a full mesh net with antennas and a referee stand. Type it again to go back. It is remembered. Dev only.'},
  {v:'v54.4.1',n:'Menu buttons now grow clearly when you hover over them (7%, from the centre) on the main menu and pause menu. It was too small to notice before.'},
  {v:'v54.4.0',n:'Main menu redesign in the pixel Silkscreen font. The title, tagline, buttons and footer all use it now, the title is bigger, and the menu buttons grow slightly when you hover over them. The pause menu matches: same font and hover grow.'},
  {v:'v54.3.0',n:'Climb the Lighthouse in first person. Pressing E at the door opens a plain dialog (Climb up / Not now) instead of the old pixel pop-up. Climbing puts you on the lookout gallery at the top (now a wider walkway all the way round the lamp) in first person: WASD or the joystick to walk, mouse (click to capture), touch drag or arrow keys to look, Shift to run. The view reaches across the whole island with small labels and distances for the nearest places on the map. E or the Climb down button takes you back. The +20 energy still comes once a day, when you reach the top. Dev only.'},
