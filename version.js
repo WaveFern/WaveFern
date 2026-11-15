@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v54.8.0';
+const GAME_VERSION='v54.8.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v54.8.1',n:'The Golf Club looks better on the world map and minimap: each course has its own named place label, a speckled grass plot with a tree line and soft shadow, mown fairway stripes, cart paths between holes, shadows under greens, bunkers and ponds, and a detailed clubhouse with roofs, porch, flag, cart bay, car park and Golf Drive.'},
  {v:'v54.8.0',n:'Golf Drive: a road now runs north from Fern Road (on the way to the airport) to the Golf Club, ending in a car park with marked bays in front of the clubhouse. It has kerbs, a centre line, street lamps and a Golf Club sign at the junction, and it shows on the big map and the minimap as Golf Drive.'},
  {v:'v54.7.0',n:'Golf is now physically real: the ball has real mass and size, air drag that depends on speed, backspin that lifts it and fades through the flight, sidespin that curves it, wind that gets stronger with height, and real bounces and rolls (friction can take spin off or spin the ball back, greens are about Stimp 10, rough and sand grab). Ball speeds, launch angles and spin are set per club (Driver 59 m/s, Iron 43.5, Wedge 29.7). The golf course maps are redrawn as crisp, clean course maps: outlined fairways, fringed greens, bunkers, ponds, tee boxes, trees, flags and hole numbers.'},
  {v:'v54.6.1',n:'Golf polish: the ball is round, spins and rolls further along the ground, the club now swings in the right plane (through the ball along your aim), you no longer sink into the ground between shots, and the course ground has smoother lighting and calmer mowing stripes. The golf screen is redesigned: hole number and par panel with a progress strip, big distance to the pin with your lie, wind with headwind/tailwind/crosswind, a power bar with a percentage, club chips with their ranges, key hints, hole and result banners, a clearer scorecard (circles for birdies, squares for bogeys) and a cleaner pause screen.'},

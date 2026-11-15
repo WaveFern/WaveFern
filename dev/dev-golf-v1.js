@@ -510,25 +510,50 @@ try{if(!POIS.some(q=>q[2]=='Golf Club'))POIS.push([CLUB.x,CLUB.z,'Golf Club','#7
    with outlines, fringes and tee boxes, so it reads like a course map at any zoom. Hole numbers, flags and the clubhouse go on top. */
 const shade=(h,k)=>{const c=colr(h);return'rgb('+Math.round(clamp(c.r*255*k,0,255))+','+Math.round(clamp(c.g*255*k,0,255))+','+Math.round(clamp(c.b*255*k,0,255))+')'};
 const sup=(cx,cz,a,b,n)=>{const p=[];for(let k=0;k<n;k++){const t=k/n*6.283,c=Math.cos(t),s2=Math.sin(t);p.push([cx+a*Math.sign(c)*Math.pow(Math.abs(c),.77),cz+b*Math.sign(s2)*Math.pow(Math.abs(s2),.77)])}return p};
+/* a fine grass speckle for the rough, one small tile per course, and a tree line round every course (both fixed, worked out once) */
+const PAT=[],EDGE=[];
+function mapPat(x,ci){if(PAT[ci]!==undefined)return PAT[ci];let p=null;try{const cv=document.createElement('canvas');cv.width=cv.height=48;const c=cv.getContext('2d'),k=CRS[ci].col.rough;c.fillStyle=shade(k,1.12);c.fillRect(0,0,48,48);let sd=ci*77+5;const r=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  for(let n=0;n<90;n++){c.fillStyle=r()<.5?shade(k,.95):shade(k,1.28);c.fillRect(Math.floor(r()*48),Math.floor(r()*48),2,2)}p=x.createPattern(cv,'repeat')}catch(e){}return PAT[ci]=p}
+function mapEdge(ci){if(EDGE[ci])return EDGE[ci];const C=CRS[ci],bx0=C.x0-2,bx1=C.x1+2,bz0=C.bz0+6,bz1=C.bz1-6,out=[];seed(ci*313+9);
+ const add=(x,z)=>out.push([x+(R()-.5)*3,z+(R()-.5)*3,2.1+R()*1.3,R()]);
+ for(let x=bx0+4;x<bx1-3;x+=6.5){add(x,bz0+2);add(x,bz1-2)}for(let z=bz0+8;z<bz1-6;z+=6.5){add(bx0+2,z);add(bx1-2,z)}return EDGE[ci]=out}
 {const m0=mapPaint;mapPaint=function(x,sx,sz,kx,kz,mini){const r=m0.apply(this,arguments);try{x.save();x.lineJoin='round';x.lineCap='round';
   const poly=(P,fill,stroke,lw)=>{x.beginPath();P.forEach((p,i)=>i?x.lineTo(sx(p[0]),sz(p[1])):x.moveTo(sx(p[0]),sz(p[1])));x.closePath();if(fill){x.fillStyle=fill;x.fill()}if(stroke){x.strokeStyle=stroke;x.lineWidth=lw;x.stroke()}};
-  const lw=Math.max(.8,kx*.5);
-  CRS.forEach((C,ci)=>{const cc=C.col,bx0=C.x0-2,bx1=C.x1+2,bz0=C.bz0+6,bz1=C.bz1-6;
-   /* the course: a rounded plot in the rough colour with a darker edge */
-   x.beginPath();x.roundRect?x.roundRect(sx(bx0),sz(bz0),(bx1-bx0)*kx,(bz1-bz0)*kx,10*kx):x.rect(sx(bx0),sz(bz0),(bx1-bx0)*kx,(bz1-bz0)*kx);x.fillStyle=shade(cc.rough,1.12);x.fill();x.strokeStyle=shade(cc.rough,.7);x.lineWidth=Math.max(1,kx*.8);x.stroke();
+  const lw=Math.max(.8,kx*.5),sh='rgba(0,0,0,.2)',off=Math.max(.6,kx*.7);
+  const blob=(P,col,rim)=>{poly(P.map(p=>[p[0]+.9,p[1]+.9]),sh);poly(P,col,rim,lw*.8)};
+  CRS.forEach((C,ci)=>{const cc=C.col,bx0=C.x0-2,bx1=C.x1+2,bz0=C.bz0+6,bz1=C.bz1-6,W=(bx1-bx0)*kx,Hh=(bz1-bz0)*kx;
+   /* the course: a rounded plot of speckled rough with a soft shadow and a tree line round the edge */
+   x.beginPath();x.roundRect?x.roundRect(sx(bx0)+off,sz(bz0)+off,W,Hh,10*kx):x.rect(sx(bx0)+off,sz(bz0)+off,W,Hh);x.fillStyle='rgba(0,0,0,.22)';x.fill();
+   x.beginPath();x.roundRect?x.roundRect(sx(bx0),sz(bz0),W,Hh,10*kx):x.rect(sx(bx0),sz(bz0),W,Hh);x.fillStyle=(!mini&&mapPat(x,ci))||shade(cc.rough,1.12);x.fill();x.strokeStyle=shade(cc.rough,.62);x.lineWidth=Math.max(1,kx*.7);x.stroke();
+   if(kx>.2)mapEdge(ci).forEach(t=>{const px=sx(t[0]),pz=sz(t[1]),rr=Math.max(1,t[2]*kx);x.fillStyle='rgba(0,0,0,.25)';x.beginPath();x.arc(px+rr*.3,pz+rr*.35,rr,0,6.283);x.fill();x.fillStyle=shade(cc.leaf[Math.floor(t[3]*9)%3],.95);x.beginPath();x.arc(px,pz,rr,0,6.283);x.fill()});
+   /* cart paths from each green to the next tee */
+   if(!mini&&kx>.3){x.strokeStyle='#d8cca4';x.lineWidth=Math.max(1,1.5*kx);x.beginPath();C.holes.forEach((o,j)=>{const n=C.holes[j+1];if(!n)return;x.moveTo(sx(o.pin[0]),sz(o.pin[1]));x.lineTo(sx(o.pin[0]+(n.tee[0]-o.pin[0])*.5),sz(o.pin[1]+8*(j%2?-1:1)));x.lineTo(sx(n.tee[0]),sz(n.tee[1]))});x.stroke()}
    C.holes.forEach(o=>{
+    x.beginPath();o.path.forEach((p,i)=>i?x.lineTo(sx(p[0]+.8),sz(p[1]+.8)):x.moveTo(sx(p[0]+.8),sz(p[1]+.8)));x.strokeStyle='rgba(0,0,0,.2)';x.lineWidth=Math.max(1.6,(o.hw*2+1.6)*kx);x.stroke();
     x.beginPath();o.path.forEach((p,i)=>i?x.lineTo(sx(p[0]),sz(p[1])):x.moveTo(sx(p[0]),sz(p[1])));x.strokeStyle=shade(cc.fw,.78);x.lineWidth=Math.max(1.6,(o.hw*2+1.6)*kx);x.stroke();
     x.strokeStyle=shade(cc.fw,1.04);x.lineWidth=Math.max(1,o.hw*2*kx);x.stroke();
-    x.strokeStyle=shade(cc.fw,1.14);x.lineWidth=Math.max(.6,o.hw*kx);x.setLineDash([5*kx,5*kx]);x.stroke();x.setLineDash([])});
-   C.holes.forEach(o=>{poly(sup(o.pin[0],o.pin[1],o.gr+2.2,o.gr*.85+2.2,36),shade(cc.fr,1.05),shade(cc.fr,.75),lw*.7);poly(sup(o.pin[0],o.pin[1],o.gr,o.gr*.85,36),shade(cc.gr,1.04),shade(cc.gr,.72),lw);
-    const tx=o.tee[0],tz=o.tee[1];poly([[tx-5,tz-3.2],[tx+5,tz-3.2],[tx+5,tz+3.2],[tx-5,tz+3.2]],shade(cc.tee,1.05),shade(cc.tee,.72),lw*.7);
-    o.bk.forEach(b=>{poly(sup(b[0],b[1],b[2],b[2],20),shade(cc.sand,1.04),shade(cc.sand,.72),lw*.8)});
-    o.wt.forEach(w=>{poly(sup(w[0],w[1],w[2],w[3],28).map(p=>p),'#3b94dc','#8fd0ff',lw)})});
-   if(!mini||kx>.35)C.trees.forEach(t=>{const px=sx(t[0]),pz=sz(t[1]),rr=Math.max(.8,(1.9+t[3]*.8)*kx);x.fillStyle='rgba(0,0,0,.2)';x.beginPath();x.arc(px+rr*.3,pz+rr*.35,rr,0,6.283);x.fill();x.fillStyle=shade(cc.leaf[Math.floor(t[3]*9)%3],1);x.beginPath();x.arc(px,pz,rr,0,6.283);x.fill()});
+    if(!mini&&kx>.25){x.lineCap='butt';x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=Math.max(1,o.hw*2*kx*.98);x.setLineDash([4*kx,4*kx]);x.stroke();x.setLineDash([]);x.lineCap='round'}});
+   C.holes.forEach(o=>{blob(sup(o.pin[0],o.pin[1],o.gr+2.2,o.gr*.85+2.2,36),shade(cc.fr,1.05),shade(cc.fr,.75));poly(sup(o.pin[0],o.pin[1],o.gr,o.gr*.85,36),shade(cc.gr,1.04),shade(cc.gr,.72),lw);
+    const tx=o.tee[0],tz=o.tee[1];blob([[tx-5,tz-3.2],[tx+5,tz-3.2],[tx+5,tz+3.2],[tx-5,tz+3.2]],shade(cc.tee,1.05),shade(cc.tee,.72));
+    o.bk.forEach(b=>{blob(sup(b[0],b[1],b[2],b[2],20),shade(cc.sand,1.04),shade(cc.sand,.72))});
+    o.wt.forEach(w=>{const P=sup(w[0],w[1],w[2],w[3],28);blob(P,'#3b94dc','#a6dcff');poly(sup(w[0]-w[2]*.18,w[1]-w[3]*.2,w[2]*.55,w[3]*.45,20),'rgba(255,255,255,.14)')})});
+   if(!mini||kx>.35)C.trees.forEach(t=>{const px=sx(t[0]),pz=sz(t[1]),rr=Math.max(.8,(1.9+t[3]*.8)*kx);x.fillStyle='rgba(0,0,0,.22)';x.beginPath();x.arc(px+rr*.35,pz+rr*.4,rr,0,6.283);x.fill();x.fillStyle=shade(cc.leaf[Math.floor(t[3]*9)%3],1);x.beginPath();x.arc(px,pz,rr,0,6.283);x.fill();x.fillStyle='rgba(255,255,255,.16)';x.beginPath();x.arc(px-rr*.28,pz-rr*.3,rr*.5,0,6.283);x.fill()});
    if(!mini&&kx>.45)C.holes.forEach((o,j)=>{const px=sx(o.pin[0]),pz=sz(o.pin[1]),fh=Math.max(6,kx*5);x.strokeStyle='#fff';x.lineWidth=Math.max(1,kx*.14);x.beginPath();x.moveTo(px,pz);x.lineTo(px,pz-fh);x.stroke();x.fillStyle=cc.flag;x.fillRect(px,pz-fh,Math.max(3.5,kx*2.8),Math.max(2.4,kx*1.8));
      const tx=sx(o.tee[0]-o.d*7),tz=sz(o.tee[1]),rr=Math.max(5.5,kx*3.8);x.fillStyle='rgba(8,18,12,.88)';x.beginPath();x.arc(tx,tz,rr,0,6.283);x.fill();x.strokeStyle='#fff';x.lineWidth=1;x.stroke();x.fillStyle='#fff';x.font='bold '+Math.round(rr*1.2)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(j+1,tx,tz+.5)})});
-  /* the clubhouse: roof, cart bay and path */
-  const cx0=CLUB.x,cz0=CLUB.z;x.fillStyle='#a9a392';x.fillRect(sx(cx0+14.8),sz(cz0+4.2),10.4*kx,3.6*kx);x.fillStyle='#d8d2c0';x.fillRect(sx(cx0-12),sz(cz0-7.5),24*kx,15*kx);x.fillStyle='#2f6a3a';x.fillRect(sx(cx0-10.8),sz(cz0-6.8),21.6*kx,11.6*kx);x.fillStyle='#3a7d46';x.fillRect(sx(cx0-8),sz(cz0-5),16*kx,8*kx);
-  x.strokeStyle='#1d4f2a';x.lineWidth=1;x.strokeRect(sx(cx0-12),sz(cz0-7.5),24*kx,15*kx);x.restore()}catch(e){try{x.restore()}catch(e2){}if(!window.__gfMapErr){window.__gfMapErr=1;console.error('golf map',e)}}return r}}
+  /* Golf Drive, the car park and the clubhouse (walls, two roofs with a ridge, porch, flag, carts in the bay) */
+  const X=CLUB.x,Z=CLUB.z,cz=-45;
+  x.fillStyle='#4a4d55';x.fillRect(sx(X-4.6),sz(-38),9.2*kx,(19.9+38)*kx);x.fillStyle='#4a4d55';x.fillRect(sx(X-20.6),sz(cz-8),41.2*kx,16*kx);
+  x.strokeStyle='#c9c4b8';x.lineWidth=Math.max(1,1.2*kx);[[X-4.6,-38,X-4.6,19.9],[X+4.6,-38,X+4.6,19.9]].forEach(q=>{x.beginPath();x.moveTo(sx(q[0]),sz(q[1]));x.lineTo(sx(q[2]),sz(q[3]));x.stroke()});
+  if(kx>.3){x.strokeStyle='#e9e4d8';x.lineWidth=Math.max(.6,.18*kx);x.beginPath();for(let k=-8;k<=8;k++){x.moveTo(sx(X+k*2.3),sz(cz-6.7));x.lineTo(sx(X+k*2.3),sz(cz-1.7))}x.stroke()}
+  x.fillStyle='rgba(0,0,0,.25)';x.fillRect(sx(X-12)+off,sz(Z-7.5)+off,24*kx,15*kx);
+  x.fillStyle='#d8d2c0';x.fillRect(sx(X-12),sz(Z-7.5),24*kx,15*kx);x.fillStyle='#f3efe3';x.fillRect(sx(X-10),sz(Z-6),20*kx,10*kx);
+  x.fillStyle='#2f6a3a';x.fillRect(sx(X-10.8),sz(Z-6.8),21.6*kx,11.6*kx);x.fillStyle='#3a7d46';x.fillRect(sx(X-8),sz(Z-5),16*kx,8*kx);x.fillStyle='#4a9150';x.fillRect(sx(X-5),sz(Z-3.5),10*kx,5*kx);
+  x.strokeStyle='#1d4f2a';x.lineWidth=Math.max(1,kx*.4);x.strokeRect(sx(X-10.8),sz(Z-6.8),21.6*kx,11.6*kx);x.beginPath();x.moveTo(sx(X-8),sz(Z-1));x.lineTo(sx(X+8),sz(Z-1));x.stroke();
+  x.fillStyle='#c9b790';x.fillRect(sx(X-10.5),sz(Z+4.4),21*kx,2.2*kx);
+  [0,1,2,3].forEach(k=>{x.fillStyle=['#e8e8e8','#ffd23f','#58b8f0','#ff6f61'][k];x.fillRect(sx(X+15.4+k*2.5),sz(Z+5.1),1.4*kx,2.2*kx)});
+  x.fillStyle='#ff4d4d';x.fillRect(sx(X+12.5),sz(Z-5),1.6*kx,1*kx);x.fillStyle='#e8e8e8';x.fillRect(sx(X+12.5),sz(Z-5),.25*kx,4*kx);
+  x.restore()}catch(e){try{x.restore()}catch(e2){}if(!window.__gfMapErr){window.__gfMapErr=1;console.error('golf map',e)}}return r}}
+/* each course has its own named place on the map (same label style as the other places) */
+try{CRS.forEach(C=>{if(!POIS.some(q=>q[2]==C.n))POIS.push([(C.x0+C.x1)/2,C.z0-6,C.n,'#7bd85a'])})}catch(e){}
 window.GOLF={ui:{hole:()=>G&&holeOut(),end:()=>G&&endRound(),G:()=>G},CRS,H,surf,sim,shoot:(p,a)=>G&&shoot(p,a==null?G.aim:a),start:startRound,state:()=>G,club:CLUB};
 })();
