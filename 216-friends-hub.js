@@ -17,7 +17,7 @@ function pf(f){const F=X();if(!okU(f))return null;if(f in PRF)return PRF[f]||nul
  try{if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD){delete PRF[f];return null}
   FBF.getDoc(FBF.doc(FBD,'profiles',f)).then(d=>{const v=d.exists()?d.data():null;PRF[f]=v||0;if(F)F.PF=PRF;draw()}).catch(e=>{console.warn('[friends] profile read failed',e&&e.code);setTimeout(()=>{delete PRF[f]},30000)})}catch(e){delete PRF[f]}
  return null}
-const hOf=f=>{const F=X(),p=F&&F.P[f],q=PRF[f];return p&&p.h?p.h:q&&q.h?q.h:''};
+const hOf=f=>{const F=X(),p=F&&F.P[f],q=PRF[f],h=p&&p.h?p.h:q&&q.h?q.h:'';return /^[a-z0-9_]{1,16}$/.test(String(h))?String(h):''}; /* v53.6.3: only a real handle (used inside onclick strings) */
 const nm=f=>hOf(f)||'friend';
 const picOf=f=>{const q=PRF[f];if(!q)return'';if(/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(q.pd||''))return q.pd;return/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(q.p||'')?q.p:''};
 const cdKey=f=>'fw_nudge_'+((X()||{}).me||'')+'_'+f;

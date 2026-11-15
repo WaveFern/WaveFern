@@ -50,7 +50,9 @@ const IK=Object.keys(INS),iName=k=>INS[k]?INS[k].n:'?';
 const SPOT={vo:[12.2,2.3,Math.PI],gt:[14.3,2.3,Math.PI],bs:[14.9,3.6,Math.PI/2],dr:[10.8,3.1,Math.PI],ky:[10.2,4.2,0]};
 const STOFF={vo:[0,0],gt:[-1.5,.2],bs:[1.5,.2],dr:[0,-1.3],ky:[2.8,.1]};
 const pid=c=>'wavefern-rm-'+String(c).toLowerCase();
-const newCode=()=>{const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.random()*a.length|0];return s};
+/* v53.6.4: room codes and guest ids come from crypto randomness where the browser has it (Math.random is predictable) */
+const rndInt=n=>{try{const b=new Uint32Array(1);crypto.getRandomValues(b);return b[0]%n}catch(e){return Math.random()*n|0}};
+const newCode=()=>{const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[rndInt(a.length)];return s};
 const lsGet=()=>{if(MPTR)return[];try{const l=JSON.parse(localStorage.getItem(LK)||'[]');return Array.isArray(l)?l:[]}catch(e){return[]}};
 function lsAdd(o){const l=lsGet().filter(x=>!(x.code==o.code&&x.inst==o.inst));l.unshift(Object.assign({t:Date.now()},o));try{localStorage.setItem(LK,JSON.stringify(l.slice(0,8)))}catch(e){}}
 const lastNm=()=>{try{return localStorage.getItem(SAVE_PRE+'mpnm')||''}catch(e){return''}};
@@ -122,7 +124,7 @@ window.mpHostAgain=(c,i)=>{snd('click');const x=lsGet().find(q=>q.code==c&&q.ins
 window.mpJoinUI=()=>{if(needLogin())return;snd('click');TT.sel=1;const rec=lsGet().filter(x=>!x.host);
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Join a room</h2><p class=m>Type the room code your friend sees on their screen.</p>
   <div class=ng><input id=mpcd placeholder="CODE" autocomplete=off autocapitalize=characters spellcheck=false style="text-transform:uppercase;letter-spacing:3px" oninput="this.value=mpCC(this.value)" onkeydown="if(event.key=='Enter')mpFind()"><button class=go onclick="mpFind()">Find room</button></div>
-  ${rec.length?`<p class=m style="margin:8px 0 0"><small>Rooms you joined: ${rec.map(x=>`<button onclick="$('mpcd').value='${esc(x.code)}';mpFind()">${esc(x.code)}</button>`).join(' ')}</small></p>`:''}
+  ${rec.length?`<p class=m style="margin:8px 0 0"><small>Rooms you joined: ${rec.filter(x=>/^[A-Z0-9]{5}$/.test(String(x.code))).map(x=>`<button onclick="$('mpcd').value='${esc(x.code)}';mpFind()">${esc(x.code)}</button>`).join(' ')}</small></p>`:''}
   <div id=mpjr></div><button onclick="mpRooms()">Back</button></div></div>`;setTimeout(()=>{const i=$('mpcd');i&&i.focus()},50)};
 window.mpFind=()=>{if(needLogin())return;const c=mpCC($('mpcd').value),out=$('mpjr');if(!/^[A-Z0-9]{5}$/.test(c)){snd('err');out.innerHTML='<p class=m>A room code has 5 letters or numbers. Ask the host for the code on their band panel.</p>';return}
  snd('click');out.innerHTML='<p class=m>Looking for room '+esc(c)+'… this can take a few seconds.</p>';if(U.qp)try{U.qp.destroy()}catch(e){}
@@ -347,7 +349,7 @@ function handle(d,id,self){
  else if(d.t=='gr')gearRecv(d,m)
  else if(d.t=='cm')cmRecv(d,m)
  else if(d.t=='fx'&&m.ad&&window.WFUN_RECV)window.WFUN_RECV(id,d)}
-const myUid=()=>{if(FW_ACCT)return FW_ACCT.slice(0,16);try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Math.random().toString(36).slice(2,12);localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
+const myUid=()=>{if(FW_ACCT)return FW_ACCT.slice(0,16);try{let u=localStorage.getItem(SAVE_PRE+'mpuid');if(!u){u=Array.from({length:10},()=>'abcdefghijklmnopqrstuvwxyz0123456789'[rndInt(36)]).join('');localStorage.setItem(SAVE_PRE+'mpuid',u)}return u}catch(e){return''}};
 const myName=()=>String(MPS.nm||(INS[MPS.inst]?INS[MPS.inst].n:'Band')+' player').slice(0,24);
 const myLook=()=>{try{return JSON.parse(JSON.stringify(ch))}catch(e){return null}};
 
@@ -755,6 +757,8 @@ const FR={on:0,me:'',h:'',L:{},P:{},Q:{},I:{},B:{},pu:{},open:0,seen:{},sent:{},
 /* v49.73.0: the name friends and bandmates see: the display name chosen at first sign-in (208-onboarding.js), else the artist name */
 const frNm=()=>{let d='';try{d=typeof fwDisplayName=='function'?fwDisplayName():''}catch(e){}return d||(typeof fwNameSafe=='function'?fwNameSafe(S&&S.artist):String((S&&S.artist)||'').replace(/[<>"]/g,'').slice(0,24))};
 const okId=u=>/^[A-Za-z0-9_-]{6,128}$/.test(String(u||''));
+/* v53.6.3: a friend's username comes from the shared database, so only a real handle may go inside an onclick string */
+const hSafe=h=>/^[a-z0-9_]{1,16}$/.test(String(h||''))?String(h):'';
 function frErr(e){console.warn('[friends]',e);FR.err=/permission/i.test(String(e&&(e.code||e.message)||e))?'Friends is not switched on yet. The database rules need publishing.':'Could not reach Friends. Check your connection.';frDraw()}
 /* first read with a fallback: if the websocket never connects (blocked by a network, proxy or extension) the Realtime Database client waits silently,
    so after 10 seconds switch it to long-polling (plain HTTPS) and ask again, then give up after another 15 */
@@ -847,7 +851,7 @@ function frDraw(force){document.querySelectorAll('.frbadge').forEach(b=>b.textCo
   const L=Object.keys(FR.L).filter(okId).sort((a,b)=>((FR.P[b]||{}).o?1:0)-((FR.P[a]||{}).o?1:0)||frName(a).localeCompare(frName(b)));
   h+=`<h3>Friends${L.length?' ('+L.filter(f=>(FR.P[f]||{}).o).length+' online)':''}</h3>`;
   h+=L.length?L.map(f=>{const p=FR.P[f]||{},on=!!p.o,inMine=MPS&&p.rm===MPS.code,st=!on?'Offline':p.rm?(inMine?'In your band room':'In a band room'):'Online, playing solo';
-   const bt=(on&&MPS&&!MPTR&&!inMine?`<button class=go onclick="frInv('${f}')">Invite</button>`:'')+(on&&p.rm&&!inMine?`<button onclick="frJoin('${f}')">Join</button>`:'')+(p.h?`<button onclick="fwProfileOpen('${esc(p.h)}')">Profile</button>`:'')+`<button onclick="frDel('${f}')" title="Remove friend">Remove</button>`;
+   const bt=(on&&MPS&&!MPTR&&!inMine?`<button class=go onclick="frInv('${f}')">Invite</button>`:'')+(on&&p.rm&&!inMine?`<button onclick="frJoin('${f}')">Join</button>`:'')+(hSafe(p.h)?`<button onclick="fwProfileOpen('${hSafe(p.h)}')">Profile</button>`:'')+`<button onclick="frDel('${f}')" title="Remove friend">Remove</button>`;
    return`<div class=frr><div><b><i class="mpd ${on?'on':'off'}"></i>${esc(frName(f))}</b><small>${st}${p.nm?' · '+esc(p.nm):''}</small></div>${bt}</div>`}).join(''):'<p class=m>No friends yet. Add one by their username, or send them yours.</p>';
   if(!MPS)h+='<p class=m><small>Create or join a band room to invite friends into it.</small></p>';
   const B=Object.keys(FR.B).filter(okId);if(B.length)h+=`<details><summary class=m>Blocked (${B.length})</summary>${B.map(f=>`<div class=frr><div><b>${esc(String(FR.B[f]))}</b></div><button onclick="frUnblock('${f}')">Unblock</button></div>`).join('')}</details>`}
