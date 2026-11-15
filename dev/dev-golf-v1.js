@@ -315,6 +315,7 @@ function shoot(p,psi,sideAng){const ci=G.ci,b=G.ball,cl=CL[G.club],sf=surf(ci,b.
 function afterShot(){const r=G.shot,o=G.hole;
  if(r.end=='holed'){G.ball={x:o.pin[0],y:H(G.ci,o.pin[0],o.pin[1])-.1,z:o.pin[1]};holeOut();return}
  if(r.end=='water'||r.end=='ob'){G.strokes++;toast(r.end=='water'?'SPLASH! +1 stroke':'OUT OF BOUNDS! +1 stroke',1800);sn('err');
+  if(G.strokes>=o.par+6){clearBeacon();toast('PICK UP: max strokes',1600);return holeOut(true)}
   clearBeacon();fade(()=>{G.ball={x:G.lastHit.x,y:H(G.ci,G.lastHit.x,G.lastHit.z),z:G.lastHit.z};G.st='ready';G.dirty=1;pickClub(true)});G.st='fade';return}
  G.ball={x:r.rest[0],y:H(G.ci,r.rest[0],r.rest[1]),z:r.rest[1]};G.last={x:G.ball.x,z:G.ball.z};setBeacon(G.ball.x,G.ball.z,'#43e6ff');
  if(G.strokes>=o.par+6){toast('PICK UP: max strokes',1600);return holeOut(true)}
