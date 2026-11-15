@@ -54,7 +54,7 @@
  const G=off(L,-BW),WK=off(L,-2.6);/* G: where the grass ends, WK: the furthest you can walk or drive */
  const inPoly=(P,x,z)=>{let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])c=!c}return c};
  let bx0=1e9,bx1=-1e9,bz0=1e9,bz1=-1e9;WK.forEach(p=>{bx0=Math.min(bx0,p[0]);bx1=Math.max(bx1,p[0]);bz0=Math.min(bz0,p[1]);bz1=Math.max(bz1,p[1])});
- window.FW_ISLAND={coast:L,grass:G,walk:WK,inside:(x,z)=>inPoly(WK,x,z)};
+ window.FW_ISLAND={coast:L,grass:G,walk:WK,inside:(x,z)=>inPoly(WK,x,z),mapExtra:[]};
 
  /* ---------- walking and driving stop at the shore ---------- */
  const homeMap=(x,z)=>x>-900&&x<1000&&z>-420&&z<330;
@@ -78,7 +78,7 @@
    safe(()=>{x.save();x.fillStyle='#2b7fc0';x.fillRect(-9999,-9999,19999,19999);
     ring(x,SM,sx,sz);x.fillStyle='#58c0d6';x.fill();
     ring(x,LM,sx,sz);x.fillStyle='#e3d3a0';x.fill();x.strokeStyle='#ffffffb0';x.lineWidth=Math.max(1,kx*.8);x.stroke();
-    ring(x,GM,sx,sz);let gp=null;if(!mini){try{gp=mapGrass(x)}catch(e){}}x.fillStyle=gp||'#3f7a45';x.fill();x.restore()},'mapsea');
+    ring(x,GM,sx,sz);let gp=null;if(!mini){try{gp=mapGrass(x)}catch(e){}}x.fillStyle=gp||'#3f7a45';x.fill();(FW_ISLAND.mapExtra||[]).forEach(f=>safe(()=>f(x,sx,sz,kx,kz,mini),'mapextra'));x.restore()},'mapsea');
    return m0.apply(this,arguments)}}
  /* the big map can pan out to the coast on every side, and zoom out far enough to show the whole island */
  const EN=250,ES=90,EE=72,WEST=577;
