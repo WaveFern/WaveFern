@@ -284,3 +284,26 @@ body.gfx-noblur #pzo{backdrop-filter:none!important;background:rgba(0,0,0,.72)}
 #ui>.box.modal:has(#tin) .cards{margin:16px 0}
 #ui>.box.modal:has(#tin) .row2{margin-top:16px}
 @media(max-width:480px){#ui>.box.modal:has(#tin){padding:16px 18px;min-width:0;width:calc(100vw - 32px)}}
+
+/* v53.8.0 unslop: main menu and pause menu. One filled button (the main action), menu column set against the left edge so the
+   stadium shows, plain sentence-case labels in the text face, hover is a surface step (no scale, no blinking arrow, no bob). */
+#ttl:has(.ttm){justify-content:flex-start;padding-left:clamp(20px,9vw,140px)}
+#ttl .ttm{align-items:flex-start;text-align:left;width:min(300px,90vw)}
+#ttl .ttm h1{font-size:clamp(30px,4.6vw,46px);letter-spacing:0;text-shadow:3px 3px 0 #000;animation:none}
+#ttl .ttm>.px{background:none;box-shadow:none;padding:0;margin:8px 0 20px;letter-spacing:0;font-size:13px;color:#9aa79e;font-family:ui-monospace,Menlo,Consolas,monospace}
+#ttl .ttbx{background:none;border:0;box-shadow:none;padding:0;gap:6px}
+#ttl .ttbx p{margin:2px 0 0;max-width:30ch}
+#ttl button,#pzm button{box-shadow:none;border:2px solid #2e2e2e;transition:background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
+#ttl .ttbx>button,#ttl .ttw>button,#ttl .ttw .row2 button,#ttl .ttnc button,#pzm button{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;letter-spacing:0;padding:11px 14px;text-align:left}
+#ttl .ttw>button,#ttl .ttw .row2 button,#pzm button{text-align:center}
+#ttl button:not(:disabled):hover,#pzm button:not(:disabled):hover{transform:none;box-shadow:none;border-color:var(--ga)}
+#ttl button:not(:disabled):active,#pzm button:not(:disabled):active{transform:translateY(1px);box-shadow:none}
+#ttl .ttbx>button::after,#ttl .ttw>button::after,#pzm button::after{content:none}
+#ttl button.go:not(:disabled):hover,#pzm button.go:not(:disabled):hover{background:var(--ga);filter:brightness(1.12)}
+#ttl button:not(.go):not(:disabled),#pzm button:not(.go):not(:disabled){background:#161616}
+#ttl button:not(.go):not(:disabled):hover,#pzm button:not(.go):not(:disabled):hover{background:#262626}
+#ttl .ttw,#ttl .ttsl{box-shadow:none;border-color:#2e2e2e}
+#ttl .ttw h2,.pzm h2{text-shadow:none;font-size:22px}
+.pzm{box-shadow:none;border-width:2px;animation:pzin .18s cubic-bezier(.22,1,.36,1) both}
+#ttl .ttft{text-align:left;left:clamp(20px,9vw,140px)}
+@media(max-width:700px){#ttl:has(.ttm){justify-content:center;padding-left:16px}#ttl .ttm{align-items:center;text-align:center}#ttl .ttft{text-align:center;left:0}}
