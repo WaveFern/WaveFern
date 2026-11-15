@@ -130,7 +130,7 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Messages: logo as the profile picture, Accept / Decline buttons ---------- */
 {const pm=PA.msg;PA.msg=function(){let h=pm.apply(this,arguments);if(typeof h!='string')return h;
  try{const L=S.msgs.filter(m=>m.bd!=null);
-  L.forEach(m=>{const o=job(m.bd);if(!o)return;const ag=BRD.agent(o);let lg=BRD.logo(o.b,64);try{if(ag.cfg)lg=pfp(ag.cfg)}catch(e){}
+  L.forEach(m=>{const o=job(m.bd);if(!o)return;const ag=BRD.agent(o);const lg=BRD.logo(o.b,64);
    h=h.replace(new RegExp('(onclick="openChat\\('+m.id+'\\)">)<img src="[^"]*"'),'$1<img src="'+lg+'" style="border-radius:50%"');
    if(S.chat==m.id){h=h.replace(/(<div class=cvh>(?:<button[^>]*>[^<]*<\/button>)?)<img src="[^"]*"/,'$1<img src="'+lg+'" style="border-radius:50%"');
     const b=BRD.by(o.b),sub=ag.n+' · agent for '+b.n;h=h.replace(/(<div class=cvh>[\s\S]*?<br><small[^>]*>)[^<]*/,'$1'+sub);
