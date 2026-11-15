@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.8.0';
+const GAME_VERSION='v53.9.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.9.0',n:'Brand photoshoots are now clear for new players. A blue objective box at the top of the screen always says your next step (accept the offer, go to the airport and board, walk to the HQ, take the photo studio door, start the shoot, fly home), and a blue light beam and line lead you to the airport, the HQ front door, the studio door and the camera. Your first shoot also has step-by-step pop-ups (offer, flight, HQ, lobby, studio and the 3D shoot with a ? button), and the offer text and Brand Deals page now explain the four steps. A How a photoshoot works button on Brand Deals brings the guide back any time.'},
  {v:'v53.8.0',n:'The brands now post on Instagrime too. Every brand has an official account with its logo as the profile picture and posts product ads in your feed: a rotating ad each day, and a NEW DROP post near the top for 4 days whenever the brand launches its next product (about every 10 days, 3 products per brand). Tap a brand to see its profile with current and past products.'},
  {v:'v53.7.2',n:'Brand accounts in Messages now use the brand logo as their profile picture instead of the agent face.'},
  {v:'v53.7.1',n:'Security hardening. A friend\'s username is now checked (letters, numbers and underscore only) before it is used on the Friends and Profile buttons, so a made-up name can no longer run code in your game. Band room codes and guest ids are also made with secure random numbers, so they are harder to guess.'},
