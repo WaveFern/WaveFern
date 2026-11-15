@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.0.0';
+const GAME_VERSION='v55.0.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.0.1',n:'Golf trees look better (fuller, lumpier crowns with lighter tops, and pine trees on Highland Fling) and the golf camera cuts the flickering black streaks far away.'},
  {v:'v55.0.0',n:'Golf: six clubs (Driver, Wood, 5 Iron, 9 Iron, Wedge, Putter) that really shoot differently, and the best club is picked for you from the distance and your lie (X returns to auto, 1-6 or the wheel overrides for one shot). The power bar shows a green ideal-power band. Putts show a curved line that follows the slope. After a shot you now walk (W/S, A/D, Shift) or drive the buggy to a beacon on your ball, and it goes out when you arrive. Downhill rolls no longer run away. Clubs look different in the golfer hands. The three courses are also spaced out more and each hole bends differently.'},
  {v:'v54.9.0',n:'Golf is more like Wii Golf and easier: hold the mouse and pull back (the power bar fills with how far you pull), then push forward to swing; push diagonally to send the ball left or right. The flag of the hole you are playing has a tall red marker. Less scatter, weaker wind, kinder rough and sand, and a roomier cup.'},
  {v:'v54.8.1',n:'The Golf Club looks better on the world map and minimap: each course has its own named place label, a speckled grass plot with a tree line and soft shadow, mown fairway stripes, cart paths between holes, shadows under greens, bunkers and ponds, and a detailed clubhouse with roofs, porch, flag, cart bay, car park and Golf Drive.'},
