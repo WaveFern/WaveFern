@@ -181,6 +181,19 @@ function buildClubhouse(){if(clubBuilt)return;clubBuilt=1;const b=Batch(),X=CLUB
  for(let k=0;k<4;k++){const c=cartMesh(['#e8e8e8','#ffd23f','#58b8f0','#ff6f61'][k]);c.position.set(X+16+k*2.5,.2,Z+6);c.rotation.y=Math.PI;root.add(c)}
  cols.push([X-10.2,Z-6.8,X+10.2,Z+3.4])}
 
+/* Golf Drive: a road north from Fern Road (the stretch that runs on to the airport) to a car park in front of the clubhouse */
+let roadBuilt=0;
+function buildRoad(){if(roadBuilt)return;roadBuilt=1;const b=Batch(),X=CLUB.x,Z0=-38,Z1=19.9,M=(Z0+Z1)/2,L=Z1-Z0,CZ=-45;
+ b.box(X,-.03,M,8,.04,L,'#3a3d44');[-1,1].forEach(a=>b.box(X+a*4.6,-.02,M,1.2,.06,L,'#b9b5ab'));
+ for(let z=Z0+4;z<Z1-8;z+=8)b.box(X,-.005,z,.3,.02,3.4,'#e8d9a0');
+ b.box(X,-.03,CZ,40,.04,15,'#3a3d44');b.box(X,-.02,CZ-8.1,41,.06,1.2,'#b9b5ab');[-1,1].forEach(a=>b.box(X+a*20.6,-.02,CZ,1.2,.06,16.2,'#b9b5ab'));
+ for(let k=-8;k<=8;k++){b.box(X+k*2.3,-.005,CZ-4.2,.12,.02,5,'#e9e4d8')}/* bays along the back */
+ b.box(X,-.005,CZ+1.5,.3,.02,10,'#e8d9a0');
+ for(let z=Z0+14;z<Z1-10;z+=26)[-5.6,5.6].forEach(a=>{b.box(X+a,2.1,z,.18,4.2,.18,'#4a4f57');b.box(X+a*.8,4.2,z,1.2,.16,.24,'#4a4f57');b.box(X+a*.8,4.1,z,.5,.12,.3,'#fff5c8')});
+ root.add(b.mesh());
+ label(root,'GOLF CLUB',3.6,.9,X+6.8,2.6,12,'#1d4f2a','#ffffff',-Math.PI/2);b2(root,X+6.9,1.3,12);
+ try{ROADS.push([X-4,Z0,X+4,Z1],[X-20,CZ-7.5,X+20,CZ+7.5]);RNAME.v.push([X,'Golf Drive'])}catch(e){console.warn('golf road',e)}}
+function b2(g,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(.14,2.6,.14),new THREE.MeshLambertMaterial({color:0x4a4f57}));m.position.set(x,y,z);g.add(m)}
 /* ---------- the pieces that move: ball, aim line, target, beacon, club, cart ---------- */
 const BR=.11;
 const ballTex=(()=>{const c=document.createElement('canvas');c.width=64;c.height=32;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,64,32);x.fillStyle='#c4c8cf';for(let i=0;i<46;i++)x.fillRect((i*29)%64,(i*13)%30+1,3,3);const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;return t})();
@@ -478,7 +491,7 @@ function hudTick(){const q=G,o=q.hole,cl=CL[q.club],b=q.ball,sf=surf(q.ci,b.x,b.
 let near=null;
 {const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{
  if(mode=='title')return r;const off=away();root.visible=!off;if(off)return r;dt=dt||.016;
- if(!clubBuilt)buildClubhouse();
+ if(!clubBuilt)buildClubhouse();if(!roadBuilt)buildRoad();
  CRS.forEach((C,ci)=>{const d=Math.max(0,Math.max(C.x0-P.x,P.x-C.x1,C.bz0-P.z,P.z-C.bz1)),vis=d<460||(G&&G.on&&G.ci==ci);if(vis&&!built[ci])buildCourse(ci);if(groups[ci])groups[ci].visible=vis});
  if(G&&G.on){gTick(dt)}
  else{INT.forEach(i=>{if(i.gf)i.l='Wavefern Golf Club: play a round / rent a cart'});
