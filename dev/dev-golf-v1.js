@@ -160,9 +160,14 @@ function buildCourse(ci){if(built[ci])return;built[ci]=1;const C=CRS[ci],g=new T
   pos.push(x,a,z,x,cx,z+cs,x+cs,b,z,x+cs,b,z,x,cx,z+cs,x+cs,d,z+cs);for(let q=0;q<6;q++)col.push(cr,cg,cb);
   [[i,j],[i,j+1],[i+1,j],[i+1,j],[i,j+1],[i+1,j+1]].forEach(v=>{const n=nm(v[0],v[1]);nor.push(n[0],n[1],n[2])})}
  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
- const terr=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true}));terr.frustumCulled=false;g.add(terr);
+ const terr=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:2}));terr.frustumCulled=false;g.add(terr);
  const b=Batch();
- C.trees.forEach(t=>{const gy=t[2],s=1+t[3]*.5,lf=cc.leaf[Math.floor(t[3]*9)%3];b.box(t[0],gy+1.3,t[1],.55,2.6,.55,'#6b4a2b');b.box(t[0],gy+3.7*s,t[1],3.4*s,2.4*s,3.4*s,lf,t[3]*3);b.box(t[0],gy+5.6*s,t[1],2.3*s,2*s,2.3*s,lf,t[3]*3+.8)});
+ const sh=(h,k)=>'#'+colr(h).clone().multiplyScalar(k).getHexString();
+ C.trees.forEach(t=>{const gy=t[2],s=1+t[3]*.55,lf=cc.leaf[Math.floor(t[3]*9)%3],ry=t[3]*6,pine=ci==2&&t[3]>.3,tr=sh('#6b4a2b',.8+t[3]*.4);
+  if(pine){b.box(t[0],gy+1.1,t[1],.5,2.2,.5,tr);for(let k=0;k<4;k++){const w=(3.8-k*.85)*s;b.box(t[0],gy+(2.1+k*1.35)*s,t[1],w,1.5*s,w,sh(lf,.82+k*.09),ry+k*.5)}b.box(t[0],gy+7.5*s,t[1],.5,.9*s,.5,sh(lf,1.15),ry)}
+  else{b.box(t[0],gy+1.4,t[1],.62,2.8,.62,tr);b.box(t[0],gy+.35,t[1],.95,.7,.95,tr,ry);
+   b.box(t[0],gy+3.5*s,t[1],4*s,1.9*s,4*s,sh(lf,.8),ry);b.box(t[0]+.7*s,gy+4.1*s,t[1]-.5*s,2.8*s,2*s,3*s,sh(lf,.92),ry+.7);b.box(t[0]-.8*s,gy+4.6*s,t[1]+.6*s,2.6*s,1.9*s,2.4*s,lf,ry+1.3);
+   b.box(t[0],gy+5.7*s,t[1],2.3*s,1.5*s,2.3*s,sh(lf,1.1),ry+2);b.box(t[0]+.2*s,gy+6.6*s,t[1],1.2*s,.8*s,1.2*s,sh(lf,1.2),ry+2.5)}});
  C.holes.forEach((o,j)=>{const[px,pz]=o.pin,py=H(ci,px,pz);
   b.box(px,py+.01,pz,.24,.02,.24,'#101010');b.box(px,py+1.3,pz,.05,2.6,.05,'#f2f2f2');b.box(px+.35,py+2.3,pz,.7,.42,.04,cc.flag);
   const tx=o.tee[0],tz=o.tee[1],ty=H(ci,tx,tz);b.box(tx+o.d*1.2,ty+.1,tz-2.3,.18,.18,.18,'#f2f2f2');b.box(tx+o.d*1.2,ty+.1,tz+2.3,.18,.18,.18,'#f2f2f2');
@@ -214,7 +219,7 @@ const clubG=new THREE.Group(),clubS=new THREE.Group();clubG.add(clubS);{const sh
 /* look of each club: head size x/y/z, head colour, shaft length */
 const CLV=[[1.7,1.6,1.9,'#23262b',1.14],[1.45,1.25,1.5,'#6b4a2b',1.08],[1,.9,.85,'#c9ccd2',1],[1,.9,.8,'#d9dce2',.95],[.95,1,.7,'#eef0f4',.92],[.8,.8,2.3,'#d08a4a',.78]];
 const cartG=cartMesh('#e8e8e8');cartG.visible=false;root.add(cartG);
-const cam3=new THREE.PerspectiveCamera(62,1,.1,1800);
+const cam3=new THREE.PerspectiveCamera(62,1,.45,1800);
 
 /* ---------- the round ---------- */
 let G=null;/* the round in progress */
