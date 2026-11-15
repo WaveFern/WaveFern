@@ -291,14 +291,15 @@ const dirOf=a=>[Math.sin(a),Math.cos(a)];
 const pinD=()=>{const o=G.hole;return Math.hypot(o.pin[0]-G.ball.x,o.pin[1]-G.ball.z)};
 const parName=d=>d==-4?'CONDOR':d==-3?'ALBATROSS':d==-2?'EAGLE':d==-1?'BIRDIE':d==0?'PAR':d==1?'BOGEY':d==2?'DOUBLE BOGEY':d==3?'TRIPLE BOGEY':'+'+d;
 
+const TOUR=[[0,0],[1,1],[2,0],[0,3],[1,2],[2,2],[0,4],[1,5],[2,5]];/* Grand Tour: nine holes, three from each course */
 const dayNo=()=>Math.floor(Date.now()/864e5);
 function startRound(ci,cart,opt){opt=opt||{};if(away())return;const fee=cart?25:0;if((S.money||0)<fee){sn('err');return say2('A golf cart is $25.')}
  S.money=+((S.money||0)-fee).toFixed(2);
- G={on:1,ci,C:CRS[ci],hi:0,sc:[],cart,cx:0,cz:0,ch:0,cv:0,cy:0,view:'3p',st:'ready',aim:0,club:0,ball:{x:0,y:0,z:0},last:{x:0,z:0},practice:opt.practice?1:0,daily:opt.daily||0,paused:0,card:0,tab:0,back:0,swT:0,gz:0,fdir:[0,1],shown:0,keyHold:0,keyP:0,pb:null,beat:0};
+ G={on:1,ci,C:CRS[ci],hi:0,sc:[],cart,cx:0,cz:0,ch:0,cv:0,cy:0,view:'3p',st:'ready',aim:0,club:0,ball:{x:0,y:0,z:0},last:{x:0,z:0},practice:opt.practice?1:0,tour:opt.tour?1:0,daily:opt.daily||0,paused:0,card:0,tab:0,back:0,swT:0,gz:0,fdir:[0,1],shown:0,keyHold:0,keyP:0,pb:null,beat:0};G.hs=opt.tour?TOUR.map(t=>CRS[t[0]].holes[t[1]]):CRS[ci].holes;G.cis=opt.tour?TOUR.map(t=>t[0]):G.hs.map(()=>ci);
  closeUIsafe();mode='golf';try{$('hud').style.display='none'}catch(e){}hud.style.display='block';document.body.classList.add('fston');
- try{P.mesh.visible=true}catch(e){}buildCourse(ci);sn('chime');beginHole(0,true)}
+ try{P.mesh.visible=true}catch(e){}if(opt.tour)CRS.forEach((c,k)=>buildCourse(k));else buildCourse(ci);sn('chime');beginHole(0,true)}
 function closeUIsafe(){try{$('ui').innerHTML=''}catch(e){}}
-function beginHole(hi,first){const C=G.C,o=C.holes[hi];if(G.daily)R2seed=G.daily*97+hi*31+G.ci*7+5;G.hi=hi;G.hole=o;G.strokes=0;G.wind={s:Math.max(0,C.wind*.6*(.2+R2()*1.4)),a:R2()*6.283};
+function beginHole(hi,first){G.ci=G.cis[hi];G.C=CRS[G.ci];const C=G.C,o=G.hs[hi];if(G.daily)R2seed=G.daily*97+hi*31+G.ci*7+5;G.hi=hi;G.hole=o;G.strokes=0;G.wind={s:Math.max(0,C.wind*.6*(.2+R2()*1.4)),a:R2()*6.283};
  const go=()=>{const tx=o.tee[0],tz=o.tee[1];G.ball={x:tx,y:H(G.ci,tx,tz),z:tz};G.last={x:tx,z:tz};G.aim=Math.atan2(o.pin[0]-tx,o.pin[1]-tz);G.card=0;$g('gf_card').style.display='none';
   G.manual=0;pickClub();
   if(G.cart){G.cx=tx-o.d*4;G.cz=tz+7;G.ch=G.aim;G.cy=H(G.ci,G.cx,G.cz)}
@@ -364,7 +365,7 @@ function holeOut(pick){G.st='holeend';G.sc[G.hi]=G.strokes;const d=G.strokes-G.h
  if(pay){S.money=+((S.money||0)+pay).toFixed(2);S.earn=(S.earn||0)+pay}
  try{S.t=Math.min(596,(S.t||0)+4)}catch(e){}
  G.holeName=name;G.holePay=pay;sn(pick?'pop':d<0?'cash':'chime');banner(name,G.strokes+' stroke'+(G.strokes==1?'':'s')+' · par '+G.hole.par+(pay?' · +$'+pay:''),scCol(G.strokes,G.hole.par),2600);setTimeout(()=>{if(G&&G.st=='holeend')showHoleCard()},1700)}
-function sumHtml(){const C=G.C;let tot=0,par=0,done=0;
+function sumHtml(){const C={holes:G.hs};let tot=0,par=0,done=0;
  const cell=(s,p)=>{if(s==null)return'<td>-</td>';const d=s-p,sh=s==1||d<=-1?'border:2px solid;border-radius:50%':d>=1?'border:2px solid;border-radius:0':'';return'<td><i style="color:'+scCol(s,p)+';'+sh+'">'+s+'</i></td>'};
  C.holes.forEach((o,i)=>{const s=G.sc[i];if(s!=null){tot+=s;par+=o.par;done++}});
  const h='<table class=gfsc><tr><th></th>'+C.holes.map((o,i)=>'<td'+(i==G.hi&&G.st!='done'?' style="color:#5fe06a"':'')+'>'+(i+1)+'</td>').join('')+'<th class=tot style="text-align:center">TOT</th></tr>'
@@ -372,21 +373,21 @@ function sumHtml(){const C=G.C;let tot=0,par=0,done=0;
   +'<tr><th>PAR</th>'+C.holes.map(o=>'<td>'+o.par+'</td>').join('')+'<td class=tot>'+C.holes.reduce((a,o)=>a+o.par,0)+'</td></tr>'
   +'<tr><th>YOU</th>'+C.holes.map((o,i)=>cell(G.sc[i],o.par)).join('')+'<td class=tot><b>'+(done?tot+' <small>('+toPar(tot-par)+')</small>':'-')+'</b></td></tr></table>';
  return{h,tot,par,done}}
-function showHoleCard(){const last=G.hi>=5,s=sumHtml(),c=$g('gf_card'),d=G.strokes-G.hole.par;G.card=1;
+function showHoleCard(){const last=G.hi>=G.hs.length-1,s=sumHtml(),c=$g('gf_card'),d=G.strokes-G.hole.par;G.card=1;
  c.innerHTML='<h2 style="color:'+scCol(G.strokes,G.hole.par)+'">'+G.holeName+(G.holePay?' <span style="color:#5fe06a;font-size:16px">+$'+G.holePay+'</span>':'')+'</h2><p>Hole '+(G.hi+1)+' · '+G.strokes+' stroke'+(G.strokes==1?'':'s')+' on a par '+G.hole.par+(G.hole.len?' ('+G.hole.len+' m)':'')+'. Round so far: '+toPar(s.tot-s.par)+'.</p>'+s.h+'<div class=row><button class="gfbtn go" onclick="golfNext()">'+(last?'FINISH ROUND':'NEXT HOLE')+' <small style="opacity:.6">SPACE</small></button></div>';c.style.display='block'}
-window.golfNext=function(){if(!G||!G.card)return;sn('pop');if(G.hi>=5)endRound();else{G.card=0;$g('gf_card').style.display='none';beginHole(G.hi+1)}};
-function endRound(){const s=sumHtml(),g=st(),ci=G.ci,tot=s.tot,d=tot-s.par;let best='',pay=0,extra='';
+window.golfNext=function(){if(!G||!G.card)return;sn('pop');if(G.hi>=G.hs.length-1)endRound();else{G.card=0;$g('gf_card').style.display='none';beginHole(G.hi+1)}};
+function endRound(){const s=sumHtml(),g=st(),ci=G.tour?3:G.ci,tot=s.tot,d=tot-s.par;let best='',pay=0,extra='';
  if(G.practice)extra='Practice round: no score or prize saved';
- else{g.rounds++;if(g.best[ci]==null||tot<g.best[ci]){best=g.best[ci]==null?'First round on this course!':'New best score!';g.best[ci]=tot}pay=20;
+ else{g.rounds++;if(g.best[ci]==null||tot<g.best[ci]){best=g.best[ci]==null?'First round on this course!':'New best score!';g.best[ci]=tot}pay=G.tour?35:20;
   if(G.daily){const dl=g.daily&&g.daily.d==G.daily?g.daily:(g.daily={d:G.daily,best:null,paid:0});if(dl.best==null||tot<dl.best){dl.best=tot;best=(best?best+' ':'')+'New daily best!'}if(!dl.paid&&d<=0){dl.paid=1;pay+=40;extra='Daily challenge cleared: +$40'}else extra='Daily best: '+dl.best}}
  {S.money=+((S.money||0)+pay).toFixed(2);S.earn=(S.earn||0)+pay}sv();G.st='done';G.card=2;sn('cash');
- const c=$g('gf_card');c.innerHTML='<small>'+(G.practice?'PRACTICE ROUND':G.daily?'DAILY CHALLENGE':'ROUND COMPLETE')+'</small><h2>'+E(G.C.n)+'</h2><div style="display:flex;align-items:baseline;gap:14px;margin:6px 0 12px"><span style="font-size:54px;color:'+(d<0?'#5fe06a':d>0?'#ffa14a':'#fff')+'">'+tot+'</span><span style="font-size:22px">'+toPar(d)+'</span><span style="font-size:12px;opacity:.8;margin-left:auto;text-align:right;line-height:1.7">'+(pay?'+$'+pay+' prize<br>':'')+'Best here: '+g.best[ci]+'<br>'+(extra?extra+'<br>':'')+'Rounds played: '+g.rounds+'</span></div>'+(best?'<p style="color:#ffd23f;margin-bottom:10px">'+best+'</p>':'')+s.h+'<div class=row><button class="gfbtn go" onclick="golfLeave()">BACK TO THE CLUBHOUSE</button></div>';c.style.display='block'}
+ const c=$g('gf_card');c.innerHTML='<small>'+(G.practice?'PRACTICE ROUND':G.daily?'DAILY CHALLENGE':'ROUND COMPLETE')+'</small><h2>'+E(G.tour?'Grand Tour':G.C.n)+'</h2><div style="display:flex;align-items:baseline;gap:14px;margin:6px 0 12px"><span style="font-size:54px;color:'+(d<0?'#5fe06a':d>0?'#ffa14a':'#fff')+'">'+tot+'</span><span style="font-size:22px">'+toPar(d)+'</span><span style="font-size:12px;opacity:.8;margin-left:auto;text-align:right;line-height:1.7">'+(pay?'+$'+pay+' prize<br>':'')+'Best here: '+g.best[ci]+'<br>'+(extra?extra+'<br>':'')+'Rounds played: '+g.rounds+'</span></div>'+(best?'<p style="color:#ffd23f;margin-bottom:10px">'+best+'</p>':'')+s.h+'<div class=row><button class="gfbtn go" onclick="golfLeave()">BACK TO THE CLUBHOUSE</button></div>';c.style.display='block'}
 window.golfLeave=function(){if(!G)return;sn('pop');fade(()=>exitGolf())};
 function exitGolf(){const was=G;G=null;SW.on=0;mode='play';try{$('hud').style.display=''}catch(e){}hud.style.display='none';document.body.classList.remove('fston');
  ball.visible=shadow.visible=peg.visible=clubG.visible=target.visible=cartG.visible=false;dots.forEach(d=>d.visible=false);clearBeacon();
  P.x=CLUB.x;P.z=CLUB.z+8.5;P.rot=Math.PI;try{P.mesh.visible=true;P.mesh.rotation.x=0}catch(e){}SY=0;GY=0;$g('gf_card').style.display='none';$g('gf_fade').style.opacity=0;sv()}
 function pauseCard(){if(!G||G.card==1||G.card==2)return;G.paused=!G.paused;const c=$g('gf_card');
- if(G.paused){c.innerHTML='<h2>Paused</h2><p>'+E(G.C.n)+' · hole '+(G.hi+1)+' of 6 · '+(G.cart?'cart rented':'on foot')+'</p><div class=gfkeys><span><kbd>HOLD LMB</kbd></span><span>then <b style="color:#5fe06a;font-weight:normal">pull back, push forward</b>: pull = power, push direction = shot</span><span><kbd>A</kbd><kbd>D</kbd></span><span>Aim (hold <kbd>SHIFT</kbd> for fine aim)</span><span><kbd>WHEEL</kbd><kbd>1-4</kbd></span><span>Pick a club</span><span><kbd>V</kbd></span><span>First / third person</span><span><kbd>TAB</kbd></span><span>Scorecard</span><span><kbd>SPACE</kbd></span><span>Keyboard swing: hold, then let go</span><span><kbd>E</kbd></span><span>Get out of the cart at your ball</span></div><div class=row><button class=gfbtn onclick="golfQuit()">QUIT ROUND</button><button class="gfbtn go" onclick="golfResume()">RESUME</button></div>';c.style.display='block'}else c.style.display='none'}
+ if(G.paused){c.innerHTML='<h2>Paused</h2><p>'+E(G.tour?'Grand Tour':G.C.n)+' · hole '+(G.hi+1)+' of '+G.hs.length+' · '+(G.cart?'cart rented':'on foot')+'</p><div class=gfkeys><span><kbd>HOLD LMB</kbd></span><span>then <b style="color:#5fe06a;font-weight:normal">pull back, push forward</b>: pull = power, push direction = shot</span><span><kbd>A</kbd><kbd>D</kbd></span><span>Aim (hold <kbd>SHIFT</kbd> for fine aim)</span><span><kbd>WHEEL</kbd><kbd>1-4</kbd></span><span>Pick a club</span><span><kbd>V</kbd></span><span>First / third person</span><span><kbd>TAB</kbd></span><span>Scorecard</span><span><kbd>SPACE</kbd></span><span>Keyboard swing: hold, then let go</span><span><kbd>E</kbd></span><span>Get out of the cart at your ball</span></div><div class=row><button class=gfbtn onclick="golfQuit()">QUIT ROUND</button><button class="gfbtn go" onclick="golfResume()">RESUME</button></div>';c.style.display='block'}else c.style.display='none'}
 window.golfResume=function(){if(G&&G.paused)pauseCard()};
 window.golfQuit=function(){if(!G)return;fade(()=>exitGolf())};
 function seatDriver(){const q=G;q.cx=q.ball.x-Math.sin(q.aim)*3.2+Math.cos(q.aim)*2.4;q.cz=q.ball.z-Math.cos(q.aim)*3.2-Math.sin(q.aim)*2.4;if(G.cartKeep){q.cx=G.cartKeep[0];q.cz=G.cartKeep[1]}q.ch=q.aim;q.cv=0}
@@ -397,9 +398,10 @@ function openMenu(){if(mode!='play'||away())return;mode='menu';const g=st();
  $('ui').innerHTML=`<div class="box modal pe" style="width:min(580px,94vw)"><div class=pehd><span class=pek>Wavefern Golf Club</span><h2>Pick a course</h2></div><div class=pebd>
  <p class=pebl>Six holes each, with a daily challenge and a practice mode. Hold the left mouse button, pull the mouse back (the bar fills), then push it forward: how far you pull is the power, the way you push is where the ball goes. Free to play. A cart is $25.</p>
  <div class=pelist>${CRS.map((c,i)=>`<button class=pesong onclick="golfPlay(${i})"><b>${E(c.n)}</b><small>${E(c.sub)} · Par ${c.H.reduce((a,h)=>a+h[0],0)}${g.best[i]!=null?' · Your best: '+g.best[i]:''}</small></button>`).join('')}</div>
- <div class=pelist><button class=pesong onclick="golfDaily()"><b>Daily challenge: ${E(CRS[dayNo()%3].n)}</b><small>Same wind for everyone today. Par or better pays $40 once.${g.daily&&g.daily.d==dayNo()&&g.daily.best!=null?' · Today: '+g.daily.best:''}</small></button></div>\n <div class=row2><button id=gfcart onclick="golfCart()">Golf cart: ${pickCart?'YES ($25)':'no'}</button><button id=gfprac onclick="golfPrac()">Practice: ${pickPrac?'YES':'no'}</button><button onclick="closeUI()">Not now</button></div></div></div>`}
+ <div class=pelist><button class=pesong onclick="golfTour()"><b>Grand Tour: 9 holes</b><small>Three holes from each course, one big round. Par ${TOUR.reduce((a,t)=>a+CRS[t[0]].holes[t[1]].par,0)}${g.best[3]!=null?' · Your best: '+g.best[3]:''}</small></button><button class=pesong onclick="golfDaily()"><b>Daily challenge: ${E(CRS[dayNo()%3].n)}</b><small>Same wind for everyone today. Par or better pays $40 once.${g.daily&&g.daily.d==dayNo()&&g.daily.best!=null?' · Today: '+g.daily.best:''}</small></button></div>\n <div class=row2><button id=gfcart onclick="golfCart()">Golf cart: ${pickCart?'YES ($25)':'no'}</button><button id=gfprac onclick="golfPrac()">Practice: ${pickPrac?'YES':'no'}</button><button onclick="closeUI()">Not now</button></div></div></div>`}
 window.golfCart=function(){pickCart=pickCart?0:1;const b=document.getElementById('gfcart');if(b)b.textContent='Golf cart: '+(pickCart?'YES ($25)':'no');sn('pop')};
 window.golfPlay=function(i){if(mode!='menu')return;startRound(i,pickCart,{practice:pickPrac})};
+window.golfTour=function(){if(mode!='menu')return;startRound(0,pickCart,{tour:1,practice:pickPrac})};
 window.golfDaily=function(){if(mode!='menu')return;startRound(dayNo()%3,pickCart,{daily:dayNo()})};
 window.golfPrac=function(){pickPrac=pickPrac?0:1;const b=document.getElementById('gfprac');if(b)b.textContent='Practice: '+(pickPrac?'YES':'no');sn('pop')};
 
@@ -444,10 +446,10 @@ function driveTick(dt){const q=G,ci=q.ci,f=(GK.w||GK.arrowup?1:0)-(GK.s||GK.arro
 function arrive(){clearBeacon();G.aim=Math.atan2(G.hole.pin[0]-G.ball.x,G.hole.pin[1]-G.ball.z);G.manual=0;pickClub();G.cartKeep=null;G.st='ready';G.snap=1;G.dirty=1;sn('pop')}
 /* on foot: W/S walk, A/D turn, Shift to hurry. The beacon on the ball goes out when you get there. */
 function walkTick(dt){const q=G,f=(GK.w||GK.arrowup?1:0)-(GK.s||GK.arrowdown?1:0),t=(GK.a||GK.arrowleft?1:0)-(GK.d||GK.arrowright?1:0);
- q.wh+=t*2.2*dt;const sp=f>0?(GK.shift?13:7.5):f<0?2.5:0,nx=q.wx+Math.sin(q.wh)*f*sp*dt,nz=q.wz+Math.cos(q.wh)*f*sp*dt,sf=surf(q.ci,nx,nz);
+ q.wh+=t*2.2*dt;const sp=f>0?(GK.shift?6.5:3.3):f<0?2:0,nx=q.wx+Math.sin(q.wh)*f*sp*dt,nz=q.wz+Math.cos(q.wh)*f*sp*dt,sf=surf(q.ci,nx,nz);
  if(sf!=6&&sf!=7&&!treeAt(q.ci,nx,nz,.9)){q.wx=nx;q.wz=nz}else if(f)toast(sf==6?'No swimming!':'Blocked',700);
  q.wv=lerp(q.wv||0,f?1:0,Math.min(1,dt*8));P.x=q.wx;P.z=q.wz;P.rot=q.wh;SY=gyOf(P.x,P.z);P.mesh.visible=true;
- try{const w=Math.sin(performance.now()/110)*.7*q.wv;P.legs[0].rotation.x=w;P.legs[1].rotation.x=-w;P.arms[0].rotation.x=-w*.8;P.arms[1].rotation.x=w*.8}catch(e){}
+ P.t+=dt*(q.wv>.5?(GK.shift?8:6):0);
  if(Math.hypot(q.wx-q.ball.x,q.wz-q.ball.z)<2.4)arrive()}
 function placeGolfer(){const b=G.ball,dir=dirOf(G.aim),pvx=b.x-dir[0]*.35,pvz=b.z-dir[1]*.35,rg=[Math.cos(G.aim),-Math.sin(G.aim)];
  P.x=pvx+rg[0]*.75;P.z=pvz+rg[1]*.75;P.rot=Math.atan2(-rg[0],-rg[1]);return{px:pvx,pz:pvz}}
@@ -506,10 +508,10 @@ function gTick(dt){const q=G,b=q.ball;
  camTick(dt);hudTick()}
 const SFC=['#3d8a36','#6dc24b','#58b84c','#4fdc5c','#7ad257','#efe0a8','#3b94dc','#888'];
 function hudTick(){const q=G,o=q.hole,cl=CL[q.club],b=q.ball,sf=surf(q.ci,b.x,b.z),showing=!q.card&&!q.paused;
- setT('gf_num',q.hi+1);setT('gf_course',E(q.C.n).toUpperCase()+' · HOLE '+(q.hi+1)+' OF 6');setT('gf_par','PAR '+o.par+'<small>'+o.len+' M</small>');
- setT('gf_dots',q.C.holes.map((h,i)=>'<i'+(i==q.hi?' class=cur':'')+(q.sc[i]!=null?' style="background:'+scCol(q.sc[i],h.par)+'"':'')+'></i>').join(''));
+ setT('gf_num',q.hi+1);setT('gf_course',E(q.tour?'Grand Tour':q.C.n).toUpperCase()+' · HOLE '+(q.hi+1)+' OF '+q.hs.length);setT('gf_par','PAR '+o.par+'<small>'+o.len+' M</small>');
+ setT('gf_dots',q.hs.map((h,i)=>'<i'+(i==q.hi?' class=cur':'')+(q.sc[i]!=null?' style="background:'+scCol(q.sc[i],h.par)+'"':'')+'></i>').join(''));
  const sk=q.strokes+(q.st=='fly'||q.st=='holeend'||q.st=='done'?0:1);
- setT('gf_dist','<b>'+Math.round(pinD())+'</b><small> M TO PIN</small><div><small>STROKE '+sk+' · TOTAL '+toPar(q.sc.reduce((a,v,i)=>a+(v!=null?v-q.C.holes[i].par:0),0))+'</small></div><div style="margin-top:5px"><small><i style="display:inline-block;width:9px;height:9px;margin-right:6px;background:'+SFC[sf]+'"></i>LIE: '+SFN[sf].toUpperCase()+'</small></div>');
+ setT('gf_dist','<b>'+Math.round(pinD())+'</b><small> M TO PIN</small><div><small>STROKE '+sk+' · TOTAL '+toPar(q.sc.reduce((a,v,i)=>a+(v!=null?v-q.hs[i].par:0),0))+'</small></div><div style="margin-top:5px"><small><i style="display:inline-block;width:9px;height:9px;margin-right:6px;background:'+SFC[sf]+'"></i>LIE: '+SFN[sf].toUpperCase()+'</small></div>');
  const w=wnd(q.wind),a=dirOf(q.aim),al=w[0]*a[0]+w[1]*a[1],sd2=w[0]*a[1]-w[1]*a[0],ws=q.wind.s,lab=ws<.6?'CALM':Math.abs(al)>Math.abs(sd2)*1.4?(al>0?'TAILWIND':'HEADWIND'):'CROSSWIND';
  $g('gf_arr').style.transform='rotate('+Math.round(Math.atan2(-sd2,al)*180/Math.PI)+'deg)';setT('gf_wt',ws.toFixed(1)+' <small>M/S</small><div><small>'+lab+'</small></div>');
  const live=q.st=='fly'||q.st=='hold'||q.st=='swing'||q.keyHold>0||(SW.live||0)>.02,bar=$g('gf_bar');bar.style.display=(q.st=='ready'||live)&&q.st!='walk'&&showing?'block':'none';
@@ -524,7 +526,7 @@ function hudTick(){const q=G,o=q.hole,cl=CL[q.club],b=q.ball,sf=surf(q.ci,b.x,b.
  if(showing&&q.st=='ready'&&q.hi==0&&q.strokes==0)tip='<b>1</b> HOLD LEFT MOUSE AND PULL BACK &nbsp; <b>2</b> PUSH FORWARD TO SWING<br><small>PULL BACK = POWER BAR · PUSH DIAGONALLY TO SEND THE BALL LEFT OR RIGHT</small>';
  if(showing&&q.st=='hold')tip='<b style="font-size:20px">'+((SW.pull||0)>.06?'NOW PUSH FORWARD':'PULL BACK')+'</b>';
  setT('gf_hint',h);$g('gf_hint').style.display=h?'block':'none';setT('gf_tip',tip);$g('gf_tip').style.display=tip?'block':'none';
- if(q.tab&&!q.card&&!q.paused){const c=$g('gf_card');c.innerHTML='<small>SCORECARD</small><h2>'+E(q.C.n)+'</h2>'+sumHtml().h;c.style.display='block';q.tabOn=1}else if(q.tabOn){q.tabOn=0;if(!q.card&&!q.paused)$g('gf_card').style.display='none'}}
+ if(q.tab&&!q.card&&!q.paused){const c=$g('gf_card');c.innerHTML='<small>SCORECARD</small><h2>'+E(q.tour?'Grand Tour':q.C.n)+'</h2>'+sumHtml().h;c.style.display='block';q.tabOn=1}else if(q.tabOn){q.tabOn=0;if(!q.card&&!q.paused)$g('gf_card').style.display='none'}}
 
 /* the walker stands on the hills when you stroll over the course */
 let near=null;
@@ -543,6 +545,7 @@ try{if(!POIS.some(q=>q[2]=='Golf Club'))POIS.push([CLUB.x,CLUB.z,'Golf Club','#7
 /* the golfer lifts his club in the render hook (the game poses the arms before the frame is drawn) and the third person camera takes over */
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(G&&G.on&&c===cam){cam3.aspect=innerWidth/innerHeight;cam3.updateProjectionMatrix();
   try{const q=G;if(P.arms&&P.legs){if(q.st=='drive'){P.legs[0].rotation.x=P.legs[1].rotation.x=-1.5;P.arms[0].rotation.x=P.arms[1].rotation.x=-1.1}
+   else if(q.st=='walk'){const w=Math.sin(P.t)*(GK.shift?.9:.7)*(q.wv||0);P.legs[0].rotation.x=w;P.legs[1].rotation.x=-w;P.arms[0].rotation.x=-w;P.arms[1].rotation.x=w}
    else if(clubG.visible){const ph=q.ph||18;const a=-1.15+Math.max(0,(18.4-ph))/130*-1.4+Math.max(0,ph-18.4)/115*-.4;P.arms[0].rotation.x=P.arms[1].rotation.x=a;P.legs[0].rotation.x=P.legs[1].rotation.x=0}}}catch(e){}
   return r0(sc,cam3)}return r0(sc,c)}}
 /* the maps: every course is drawn as crisp vector shapes straight from the course data (the same fairway lines, greens, bunkers and ponds the game uses),

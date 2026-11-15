@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.1.0';
+const GAME_VERSION='v55.2.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.2.0',n:'Golf: the Grand Tour, a nine-hole round with three holes from each of the three courses (Meadow Links, Dune Run, Highland Fling). Its own best score and a $35 prize. Walking to your ball now uses the normal walk and sprint speeds and the normal walking animation.'},
  {v:'v55.1.0',n:'Golf: a daily challenge (one course a day with the same wind for everyone, par or better pays $40 once, your best today is kept) and a practice mode with no score and no prizes.'},
  {v:'v55.0.1',n:'Golf trees look better (fuller, lumpier crowns with lighter tops, and pine trees on Highland Fling) and the golf camera cuts the flickering black streaks far away.'},
  {v:'v55.0.0',n:'Golf: six clubs (Driver, Wood, 5 Iron, 9 Iron, Wedge, Putter) that really shoot differently, and the best club is picked for you from the distance and your lie (X returns to auto, 1-6 or the wheel overrides for one shot). The power bar shows a green ideal-power band. Putts show a curved line that follows the slope. After a shot you now walk (W/S, A/D, Shift) or drive the buggy to a beacon on your ball, and it goes out when you arrive. Downhill rolls no longer run away. Clubs look different in the golfer hands. The three courses are also spaced out more and each hole bends differently.'},
