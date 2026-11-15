@@ -23,7 +23,7 @@ const GR=9.8,KD=.0035,KL=.0042;
 /* surface classes: 0 rough, 1 fairway, 2 fringe, 3 green, 4 tee, 5 sand, 6 water, 7 out of bounds */
 const SFN=['Rough','Fairway','Fringe','Green','Tee box','Bunker','Water','Out of bounds'];
 /* bounce (restitution, tangential keep), roll friction (m/s2), shot power and spread for the lie */
-const BOUNCE=[[.18,.3],[.3,.5],[.3,.5],[.32,.6],[.3,.5],[0,.08],[0,0],[0,0]],MU=[6,1.7,2.1,.8,1.7,14,99,99],LIE=[[.78,.06],[1,0],[1,0],[1,0],[1,0],[.6,.08]];
+const BOUNCE=[[.2,.4],[.4,.66],[.38,.62],[.36,.72],[.4,.66],[0,.08],[0,0],[0,0]],MU=[5,1.15,1.5,.7,1.15,14,99,99],LIE=[[.78,.06],[1,0],[1,0],[1,0],[1,0],[.6,.08]];
 const CL=[{n:'Driver',v:52.3,loft:12,sp:.02,r:200},{n:'Iron',v:39.15,loft:24,sp:.012,r:135},{n:'Wedge',v:26.9,loft:46,sp:.01,r:70},{n:'Putter',v:8,loft:0,sp:.004,r:40,putt:1}];
 const LANE=19,PH=3;
 
@@ -144,18 +144,20 @@ function cartMesh(color){const b=Batch();
 function buildCourse(ci){if(built[ci])return;built[ci]=1;const C=CRS[ci],g=new THREE.Group();g.name='golf'+ci;root.add(g);groups[ci]=g;
  const cs=2,x0=C.x0-4,z0=C.bz0,nx=Math.ceil((C.x1+4-x0)/cs),nz=Math.ceil((C.bz1-z0)/cs),hh=[];
  for(let j=0;j<=nz;j++){const row=new Float32Array(nx+1);for(let i=0;i<=nx;i++)row[i]=H(ci,x0+i*cs,z0+j*cs);hh.push(row)}
+ const nrm={},nm=(i,j)=>{const k=i+'_'+j;if(nrm[k])return nrm[k];const gx=(hh[j][Math.min(nx,i+1)]-hh[j][Math.max(0,i-1)])/(cs*(Math.min(nx,i+1)-Math.max(0,i-1))),gz=(hh[Math.min(nz,j+1)][i]-hh[Math.max(0,j-1)][i])/(cs*(Math.min(nz,j+1)-Math.max(0,j-1))),l=Math.hypot(gx,1,gz);return nrm[k]=[-gx/l,1/l,-gz/l]},nor=[];
  const cc=C.col,cl=[cc.rough,cc.fw,cc.fr,cc.gr,cc.tee,cc.sand,'#3b94dc'].map(h=>colr(h)),pos=[],col=[];
  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=x0+i*cs,z=z0+j*cs,sf=surf(ci,x+1,z+1);if(sf==7)continue;
-  const k=((Math.floor((x+1)/4)+Math.floor((z+1)/4))&1)?1.035:.97,nz2=1+(((i*7+j*13)%5)-2)*.012,c=cl[sf],cr=c.r*k*nz2,cg=c.g*k*nz2,cb=c.b*k*nz2;
+  const k=(Math.floor((x+1)/8)&1)?1.03:.985,nz2=1+(((i*7+j*13)%5)-2)*.004,c=cl[sf],cr=c.r*k*nz2,cg=c.g*k*nz2,cb=c.b*k*nz2;
   const a=hh[j][i],b=hh[j][i+1],cx=hh[j+1][i],d=hh[j+1][i+1];
-  pos.push(x,a,z,x,cx,z+cs,x+cs,b,z,x+cs,b,z,x,cx,z+cs,x+cs,d,z+cs);for(let q=0;q<6;q++)col.push(cr,cg,cb)}
- const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));geo.computeVertexNormals();
+  pos.push(x,a,z,x,cx,z+cs,x+cs,b,z,x+cs,b,z,x,cx,z+cs,x+cs,d,z+cs);for(let q=0;q<6;q++)col.push(cr,cg,cb);
+  [[i,j],[i,j+1],[i+1,j],[i+1,j],[i,j+1],[i+1,j+1]].forEach(v=>{const n=nm(v[0],v[1]);nor.push(n[0],n[1],n[2])})}
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
  const terr=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true}));terr.frustumCulled=false;g.add(terr);
  const b=Batch();
  C.trees.forEach(t=>{const gy=t[2],s=1+t[3]*.5,lf=cc.leaf[Math.floor(t[3]*9)%3];b.box(t[0],gy+1.3,t[1],.55,2.6,.55,'#6b4a2b');b.box(t[0],gy+3.7*s,t[1],3.4*s,2.4*s,3.4*s,lf,t[3]*3);b.box(t[0],gy+5.6*s,t[1],2.3*s,2*s,2.3*s,lf,t[3]*3+.8)});
  C.holes.forEach((o,j)=>{const[px,pz]=o.pin,py=H(ci,px,pz);
   b.box(px,py+.01,pz,.24,.02,.24,'#101010');b.box(px,py+1.3,pz,.05,2.6,.05,'#f2f2f2');b.box(px+.35,py+2.3,pz,.7,.42,.04,cc.flag);
-  const tx=o.tee[0],tz=o.tee[1],ty=H(ci,tx,tz);b.box(tx+o.d*1.2,ty+.18,tz-2.3,.3,.3,.3,'#f2f2f2');b.box(tx+o.d*1.2,ty+.18,tz+2.3,.3,.3,.3,'#f2f2f2');
+  const tx=o.tee[0],tz=o.tee[1],ty=H(ci,tx,tz);b.box(tx+o.d*1.2,ty+.1,tz-2.3,.18,.18,.18,'#f2f2f2');b.box(tx+o.d*1.2,ty+.1,tz+2.3,.18,.18,.18,'#f2f2f2');
   label(g,(j+1)+' · PAR '+o.par+' · '+o.len+' m',3.2,.8,tx-o.d*3.5,ty+1.7,tz+3.2,'#1d4f2a','#ffffff',0);
   b.box(tx-o.d*3.5,ty+.85,tz+3.2,.12,1.7,.12,'#5a3a22')});
  g.add(b.mesh())}
@@ -172,15 +174,17 @@ function buildClubhouse(){if(clubBuilt)return;clubBuilt=1;const b=Batch(),X=CLUB
  cols.push([X-10.2,Z-6.8,X+10.2,Z+3.4])}
 
 /* ---------- the pieces that move: ball, aim line, target, beacon, club, cart ---------- */
-const ball=new THREE.Mesh(new THREE.BoxGeometry(.17,.17,.17),new THREE.MeshLambertMaterial({color:0xffffff,emissive:0x555555}));ball.visible=false;root.add(ball);
+const BR=.11;
+const ballTex=(()=>{const c=document.createElement('canvas');c.width=64;c.height=32;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,64,32);x.fillStyle='#c4c8cf';for(let i=0;i<46;i++)x.fillRect((i*29)%64,(i*13)%30+1,3,3);const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;return t})();
+const ball=new THREE.Mesh(new THREE.SphereGeometry(BR,14,10),new THREE.MeshLambertMaterial({map:ballTex,emissive:0x444444}));ball.visible=false;root.add(ball);
 const shadow=new THREE.Mesh(new THREE.BoxGeometry(.3,.01,.3),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.35,depthWrite:false}));shadow.visible=false;root.add(shadow);
 const peg=new THREE.Mesh(new THREE.BoxGeometry(.04,.1,.04),new THREE.MeshBasicMaterial({color:0xffffff}));peg.visible=false;root.add(peg);
 const dots=[];for(let i=0;i<26;i++){const m=new THREE.Mesh(new THREE.BoxGeometry(.2,.04,.8),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75,depthWrite:false}));m.visible=false;root.add(m);dots.push(m)}
 const target=new THREE.Group();[[-1,0,3.2,.35],[1,0,3.2,.35],[0,-1,.35,3.2],[0,1,.35,3.2]].forEach(a=>{const m=new THREE.Mesh(new THREE.BoxGeometry(a[2],.05,a[3]),new THREE.MeshBasicMaterial({color:0xffe85a,transparent:true,opacity:.85,depthWrite:false}));m.position.set(a[0]*1.6,0,a[1]*1.6);target.add(m)});target.visible=false;root.add(target);
 const beMat=new THREE.MeshBasicMaterial({color:0xff9a2a,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending});
 const beacon=new THREE.Group();{const p=new THREE.Mesh(new THREE.BoxGeometry(.8,90,.8),beMat);p.position.y=45;beacon.add(p);const r=new THREE.Mesh(new THREE.BoxGeometry(4,.12,4),beMat);r.position.y=.1;beacon.add(r);beacon.userData.ring=r}beacon.visible=false;root.add(beacon);
-const clubG=new THREE.Group();{const sh=new THREE.Mesh(new THREE.BoxGeometry(.035,1.1,.035),new THREE.MeshLambertMaterial({color:0x2b2b2e}));sh.position.y=-.55;clubG.add(sh);
- const hd=new THREE.Mesh(new THREE.BoxGeometry(.1,.07,.22),new THREE.MeshLambertMaterial({color:0xc9ccd2}));hd.position.set(0,-1.1,.06);clubG.add(hd);clubG.userData.head=hd}clubG.visible=false;root.add(clubG);
+const clubG=new THREE.Group(),clubS=new THREE.Group();clubG.add(clubS);{const sh=new THREE.Mesh(new THREE.BoxGeometry(.035,1.1,.035),new THREE.MeshLambertMaterial({color:0x2b2b2e}));sh.position.y=-.55;clubS.add(sh);
+ const hd=new THREE.Mesh(new THREE.BoxGeometry(.1,.07,.22),new THREE.MeshLambertMaterial({color:0xc9ccd2}));hd.position.set(0,-1.1,.06);clubS.add(hd);clubG.userData.head=hd}clubG.visible=false;root.add(clubG);
 const cartG=cartMesh('#e8e8e8');cartG.visible=false;root.add(cartG);
 const cam3=new THREE.PerspectiveCamera(62,1,.1,1800);
 
@@ -248,7 +252,7 @@ function shoot(p,psi){const ci=G.ci,b=G.ball,cl=CL[G.club],sf=surf(ci,b.x,b.z),l
  psi+=(R2()-.5)*2*(cl.sp+lie[1]+(p>.96?.025:0));let r;const w=wnd(G.wind),pw=p*(cl.putt?(sf==5?.7:1):lie[0]);
  if(cl.putt){const v=pw*cl.v;r=sim(ci,b.x,b.y,b.z,Math.sin(psi)*v,0,Math.cos(psi)*v,true,G.hole.pin,w)}
  else{const v=pw*cl.v,lf=(cl.loft+(sf==5?8:0))*Math.PI/180,h=Math.cos(lf)*v;r=sim(ci,b.x,b.y+.04,b.z,Math.sin(psi)*h,Math.sin(lf)*v,Math.cos(psi)*h,false,G.hole.pin,w)}
- G.strokes++;G.shot=r;G.pb={t:0,i:0,r,done:0,hold:0};G.st='fly';G.fdir=dirOf(psi);G.lastHit={x:b.x,z:b.z};G.sw2=0;
+ G.strokes++;G.shot=r;G.pb={t:0,i:0,r,done:0,hold:0};G.bx=b.x;G.bz=b.z;G.st='fly';G.fdir=dirOf(psi);G.lastHit={x:b.x,z:b.z};G.sw2=0;
  if(!cl.putt)setBeacon(r.land[0],r.land[1],'#ff9a2a');G.after=0;sn('pop');peg.visible=false}
 function afterShot(){const r=G.shot,o=G.hole;
  if(r.end=='holed'){G.ball={x:o.pin[0],y:H(G.ci,o.pin[0],o.pin[1])-.1,z:o.pin[1]};holeOut();return}
@@ -355,20 +359,21 @@ function gTick(dt){const q=G,b=q.ball;
  keyCharge(dt);if(q.st=='ready'&&!GK[' ']&&q.keyHold==0&&!SW.on)SW.live=lerp(SW.live||0,0,Math.min(1,dt*3));
  /* ball in flight */
  if(q.st=='fly'&&q.pb){const pb=q.pb,r=pb.r;pb.t+=dt*(pb.skip?8:1);const T=r.T,i=Math.min(r.pts.length-1,Math.floor(pb.t*60)),a=r.pts[i],c=r.pts[Math.min(r.pts.length-1,i+1)],f=pb.t*60-Math.floor(pb.t*60);
-  const x=lerp(a[1],c[1],f),y=lerp(a[2],c[2],f),z=lerp(a[3],c[3],f);ball.position.set(x,y+.085,z);shadow.position.set(x,gyOf(x,z)+.06,z);ball.visible=shadow.visible=true;
+  const x=lerp(a[1],c[1],f),y=lerp(a[2],c[2],f),z=lerp(a[3],c[3],f);ball.position.set(x,y+BR,z);shadow.position.set(x,gyOf(x,z)+.06,z);{const dx=x-(q.bx||x),dz=z-(q.bz||z),d=Math.hypot(dx,dz);if(d>1e-4&&d<5){const ax=new THREE.Vector3(dz,0,-dx).normalize();ball.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(ax,d/BR))}q.bx=x;q.bz=z}ball.visible=shadow.visible=true;
   if(pb.t>=T){if(!pb.done){pb.done=1;pb.hold=0}pb.hold+=dt;const fast=pb.skip?.05:r.end=='holed'?1.1:.9;if(pb.hold>fast){q.pb=null;afterShot()}}}
- else if(b&&(q.st=='ready'||q.st=='hold'||q.st=='swing'||q.st=='drive'||q.st=='holeend'||q.st=='fade')){ball.position.set(b.x,b.y+.085,b.z);ball.visible=q.st!='holeend'&&!q.card;shadow.position.set(b.x,b.y+.06,b.z);shadow.visible=ball.visible}
+ else if(b&&(q.st=='ready'||q.st=='hold'||q.st=='swing'||q.st=='drive'||q.st=='holeend'||q.st=='fade')){ball.position.set(b.x,b.y+BR,b.z);ball.visible=q.st!='holeend'&&!q.card;shadow.position.set(b.x,b.y+.06,b.z);shadow.visible=ball.visible}
  /* the player, the club, the cart */
  clubG.visible=false;peg.visible=false;
+ if(q.st!='drive'){placeGolfer();SY=gyOf(P.x,P.z)}
  if(q.st=='ready'||q.st=='hold'||q.st=='swing'||(q.st=='fly'&&q.pb&&q.pb.t<1.2)){const g=placeGolfer(),dir=dirOf(q.aim),gy=b.y,putt=CL[q.club].putt;
-  SY=gyOf(P.x,P.z);const sf=surf(q.ci,b.x,b.z);if(sf==4&&!putt&&q.st!='fly'){peg.visible=true;peg.position.set(b.x,gy+.03,b.z);ball.position.y=gy+.13}
+  SY=gyOf(P.x,P.z);const sf=surf(q.ci,b.x,b.z);if(sf==4&&!putt&&q.st!='fly'){peg.visible=true;peg.position.set(b.x,gy+.03,b.z);ball.position.y=gy+.15}
   clubG.visible=true;clubG.position.set(g.px,gy+1.05,g.pz);clubG.rotation.y=q.aim;clubG.userData.head.scale.set(CL[q.club].n=='Driver'?1.6:1,CL[q.club].n=='Driver'?1.5:1,CL[q.club].n=='Driver'?1.8:1);
   let ph=18.4;if(q.st=='ready')ph=18.4-(q.back||0);
   if(q.st=='hold'){SW.pull=Math.max(0,SW.pull-dt*.3);q.back=lerp(q.back||0,SW.pull*(putt?30:125),Math.min(1,dt*14));ph=18.4-q.back}
   if(q.st=='swing'){q.sw2=(performance.now()-SW.tS)/140;ph=lerp(18.4-(q.back||0),18.4,sm(q.sw2))}
   if(q.st=='fly'){q.sw2+=dt/.4;ph=18.4+sm(q.sw2)*(putt?25:115);q.back=0}
   if(q.st=='ready'&&q.sw2>0){q.sw2=0}
-  q.ph=ph;clubG.rotation.x=-ph*Math.PI/180;P.mesh.visible=q.view!='1p'}
+  q.ph=ph;clubS.rotation.x=-ph*Math.PI/180;P.mesh.visible=q.view!='1p'}
  else if(q.st=='drive'||q.st=='fade'){P.mesh.visible=true}
  if(q.cart&&(q.st=='drive'||q.st=='ready'||q.st=='hold'||q.st=='swing'||q.st=='fly'||q.st=='fade')){if(q.st=='drive')driveTick(dt);cartG.visible=true;cartG.position.set(q.cx,q.cy,q.cz);cartG.rotation.set(q.cp||0,q.ch,0,'YXZ')
   if(q.st=='drive'){SY=q.cy+.55;P.mesh.visible=true}}
