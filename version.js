@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.3.0';
+const GAME_VERSION='v55.3.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.3.1',n:'Golf animation cleaned up: a wider golf stance, the shoulders turn back and through with the swing, and you carry the club in one hand with a relaxed walk. The ready camera now sits to one side so you can see the golfer's stance and the club.'},
  {v:'v55.3.0',n:'Golf: the golfer now really holds the club. Both hands grip it and it follows the arms through the backswing, the downswing and the follow-through (the club shape and length change per club). On the walk to your ball the club rests over your shoulder. New effects: grass and sand burst when you hit, a white ring on a hard hit, a club swoosh trail, a ball trail, landing puffs, a big water splash, and confetti when you hole out (more for a hole in one).'},
  {v:'v55.2.0',n:'Golf: the Grand Tour, a nine-hole round with three holes from each of the three courses (Meadow Links, Dune Run, Highland Fling). Its own best score and a $35 prize. Walking to your ball now uses the normal walk and sprint speeds and the normal walking animation.'},
  {v:'v55.1.0',n:'Golf: a daily challenge (one course a day with the same wind for everyone, par or better pays $40 once, your best today is kept) and a practice mode with no score and no prizes.'},
