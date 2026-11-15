@@ -26,6 +26,26 @@
  /* a little wobble so the shore is not a perfect curve */
  L=L.map((p,i)=>{const w=Math.sin(i*.37)*1.6+Math.sin(i*.113+1)*3.2+Math.sin(i*.9)*.6,a=L[(i+1)%NP],b=L[(i+NP-1)%NP],tx=a[0]-b[0],tz=a[1]-b[1],n=Math.hypot(tx,tz)||1;return[p[0]+tz/n*w,p[1]-tx/n*w]});
  L=smooth(smooth(L));
+ /* natural coast (v53.8.0): the first coast was one rounded rectangle with a regular zig-zag. Here every point is pushed in or out along a ray from the island centre
+    by uneven noise of three sizes plus a few named bays, coves and headlands, so no two stretches of shore look alike. Everything on the island stays inside:
+    a keep-in zone (the city, park, runway and roads plus a margin) is a floor under the radius, so the coast can never cut into it. */
+ {const C=[60,0],IN=[[-645,-145,790,180],[-645,-145,-170,232],[-200,-145,10,226]];/* x0,z0,x1,z1 of the zone the coast must stay outside of */
+  const inZ=(x,z)=>IN.some(r=>x>=r[0]&&x<=r[2]&&z>=r[1]&&z<=r[3]);
+  const rmin=th=>{const c=Math.cos(th),s=Math.sin(th);let r=0;while(r<900&&inZ(C[0]+c*(r+1),C[1]+s*(r+1)))r++;return r};
+  let sd=53;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  const wv=[];for(let k=0;k<12;k++){const f=k<3?k+2:k<8?k+3:k+4;wv.push([f,rnd()*6.283,(k<3?30:k<8?13:5)/Math.sqrt(1+k*.15)*(.6+rnd()*.8)])}/* only long, gentle swells: nothing finer than about 300 m, so no jagged edges */
+  /* named features as [angle degrees (0 east, 90 south), width in degrees, metres out (+) or in (-)] */
+  const FT=[[-80,14,-62],[-125,10,38],[-45,9,44],[-10,12,-26],[35,10,-34],[70,11,26],[112,9,-48],[150,10,32],[-165,9,-30],[178,8,24],[-100,5,-30]];
+  const pol=L.map(p=>{const dx=p[0]-C[0],dz=p[1]-C[1];return[Math.atan2(dz,dx),Math.hypot(dx,dz)]});
+  const rr=pol.map(([th,r])=>{let d=0;wv.forEach(w=>d+=Math.sin(th*w[0]+w[1])*w[2]);
+   FT.forEach(f=>{let a=th*57.2958-f[0];a=((a+540)%360)-180;d+=f[2]*Math.exp(-a*a/(2*f[1]*f[1]))});
+   const south=Math.sin(th)>.2;if(south)d=Math.max(d,-4);/* the south keeps its old distance, the runway and a road stub sit close to it */
+   const lo=rmin(th)+22;return Math.max(lo,Math.min(r+d,r+62))});
+  let R2=rr.map((r,i)=>[C[0]+Math.cos(pol[i][0])*r,C[1]+Math.sin(pol[i][0])*r]);
+  /* even out the spacing along the curve again (the noise stretches it) and soften sharp kinks */
+  R2=smooth(R2);const cum=[0];for(let i=1;i<=R2.length;i++){const a=R2[i-1],b=R2[i%R2.length];cum.push(cum[i-1]+Math.hypot(b[0]-a[0],b[1]-a[1]))}
+  const tot=cum[R2.length],out=[];let j=0;for(let i=0;i<NP;i++){const t=tot*i/NP;while(cum[j+1]<t)j++;const a=R2[j],b=R2[(j+1)%R2.length],u=(t-cum[j])/((cum[j+1]-cum[j])||1);out.push([a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u])}
+  L=out;for(let k=0;k<14;k++)L=smooth(L)}
  const area=P=>{let s=0;for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];s+=a[0]*b[1]-b[0]*a[1]}return s/2};
  const ccw=area(L)>0;
  /* move every point d metres outward (negative: inward) */
@@ -37,7 +57,7 @@
  window.FW_ISLAND={coast:L,grass:G,walk:WK,inside:(x,z)=>inPoly(WK,x,z)};
 
  /* ---------- walking and driving stop at the shore ---------- */
- const homeMap=(x,z)=>x>-900&&x<1000&&z>-420&&z<258;
+ const homeMap=(x,z)=>x>-900&&x<1000&&z>-420&&z<330;
  {const h1=hit;hit=function(x,z,r){
    try{if(!IN&&!(typeof D!='undefined'&&D&&D.on)&&homeMap(x,z)){
      WB[0]=Math.min(WB[0],bx0);WB[1]=Math.max(WB[1],bx1);WB[2]=Math.min(WB[2],bz0);WB[3]=Math.max(WB[3],bz1);/* the old rectangle no longer cuts the island */
@@ -61,7 +81,7 @@
     ring(x,GM,sx,sz);let gp=null;if(!mini){try{gp=mapGrass(x)}catch(e){}}x.fillStyle=gp||'#3f7a45';x.fill();x.restore()},'mapsea');
    return m0.apply(this,arguments)}}
  /* the big map can pan out to the coast on every side, and zoom out far enough to show the whole island */
- const EN=106,ES=90,EE=72,WEST=577;
+ const EN=250,ES=90,EE=72,WEST=577;
  mapClamp=function(){const M=MAPZ,w=(M.W+M.L*.86+EE)*M.z,h=(M.H+EN+ES)*M.z;
   M.ox=w<=M.W?(M.W-w)/2:Math.min(0,Math.max(M.W-w,M.ox));
   M.oy=h<=M.H?(M.H-h)/2+EN*M.z:Math.min(EN*M.z,Math.max(M.H-(M.H+ES)*M.z,M.oy))};
