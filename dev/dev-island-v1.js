@@ -81,7 +81,7 @@
     ring(x,GM,sx,sz);let gp=null;if(!mini){try{gp=mapGrass(x)}catch(e){}}x.fillStyle=gp||'#3f7a45';x.fill();x.restore()},'mapsea');
    return m0.apply(this,arguments)}}
  /* the big map can pan out to the coast on every side, and zoom out far enough to show the whole island */
- const EN=106,ES=90,EE=72,WEST=577;
+ const EN=250,ES=90,EE=72,WEST=577;
  mapClamp=function(){const M=MAPZ,w=(M.W+M.L*.86+EE)*M.z,h=(M.H+EN+ES)*M.z;
   M.ox=w<=M.W?(M.W-w)/2:Math.min(0,Math.max(M.W-w,M.ox));
   M.oy=h<=M.H?(M.H-h)/2+EN*M.z:Math.min(EN*M.z,Math.max(M.H-(M.H+ES)*M.z,M.oy))};

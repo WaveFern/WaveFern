@@ -28,10 +28,11 @@ const mins=()=>{try{return festMins()}catch(e){const t=S.t||0;return t<300?360+t
 /* ---------- where they go: scan to the grass edge, then stand back from the beach ---------- */
 function edge(x,z0,dz){let z=z0;while(inPoly(G,x,z+dz)&&Math.abs(z-z0)<900)z+=dz;return z}
 /* the club goes where the south shore is flattest between the city and the east end, the lighthouse on the northernmost tip of the north-east coast */
-let CLUB_X=600,flat=1e9;for(let x=470;x<=720;x+=10){const a=edge(x-45,120,3),b=edge(x+45,120,3),c=edge(x,120,3);const v=Math.abs(a-c)+Math.abs(b-c);if(v<flat){flat=v;CLUB_X=x}}
-const CLUB_Z=edge(CLUB_X,120,3)-5*1.6;/* local z 0 is the front of the deck, the sand starts a little south of it */
+let CLUB_X=600,flat=1e9;for(let x=470;x<=690;x+=10){const a=edge(x-45,120,3),b=edge(x+45,120,3),c=edge(x,120,3);const v=Math.abs(a-c)+Math.abs(b-c);if(v<flat){flat=v;CLUB_X=x}}
+const KC=2.4;/* the club is built in ordinary metres and then scaled up so it reads as a proper venue */
+const CLUB_Z=edge(CLUB_X,120,3)-9*KC;/* local z 0 is the front of the deck, the sand starts a little south of it */
 let LH_X=690,tip=1e9;for(let x=560;x<=780;x+=10){const z=edge(x,-60,-3);if(z<tip){tip=z;LH_X=x}}
-const KL=1.9,LH_Z=tip+10*KL;
+const KL=1.9,LH_Z=tip-100,ISLET=17,PIER_Z0=tip-8;/* the lighthouse stands on a rock islet 100 m out to sea, joined to the north shore by a pier */
 const NAV=[[CLUB_X,CLUB_Z,'Beach Club','#ff7ab8'],[LH_X,LH_Z,'Lighthouse','#ffe27a']];
 NAV.forEach(p=>{try{if(!POIS.some(q=>q[2]==p[2]))POIS.push(p)}catch(e){}});
 
@@ -46,13 +47,15 @@ function parasol(g,x,z,c){cyl(g,.05,.05,2.4,'#ddd',x,1.2,z,5);const k=new THREE.
 const solids=[];
 function solid(x0,z0,x1,z1){const q=[x0,z0,x1,z1];solids.push(q);cols.push(q)}
 
-const KC=1.6;/* the club is built in ordinary metres and then scaled up so it reads as a proper venue */
 const PAL={sand:'#f1dfb0',teak:'#9a6a3c',plank:'#c99a5c',dark:'#5a3a22',bamboo:'#d1b062',thatch:'#bf9548',thatch2:'#a47c3a',teal:'#2aa7a1',coral:'#ff6f61',cream:'#fff3d9',ink:'#17171c'};
 function stripedCone(g,r,h,x,y,z,c1,c2){const geo2=new THREE.ConeGeometry(r,h,10,1,true).toNonIndexed(),n=geo2.attributes.position.count,col2=new Float32Array(n*3),a=new THREE.Color(c1),b=new THREE.Color(c2);
  for(let i=0;i<n;i++){const c=(Math.floor(i/3)%2)?a:b;col2[i*3]=c.r;col2[i*3+1]=c.g;col2[i*3+2]=c.b}
  geo2.setAttribute('color',new THREE.BufferAttribute(col2,3));const m=new THREE.Mesh(geo2,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));m.position.set(x,y,z);g.add(m);return m}
 /* a thatched roof: stepped layers, a ragged fringe round the eaves and a ridge */
-function thatch(g,cx,cy,cz,w,d){for(let i=0;i<5;i++){const s=1-i*.19;B(g,w*s,.42,d*s,i%2?PAL.thatch2:PAL.thatch,cx,cy+i*.36,cz)}
+const RM=[PAL.thatch,PAL.thatch2].map(c=>new THREE.MeshLambertMaterial({color:c,transparent:true}));
+let ROOFG=null;
+function RB(g,w,h,d,c,x,y,z){const m=new THREE.Mesh(geo(w,h,d),RM[c==PAL.thatch2?1:0]);m.position.set(x,y,z);g.add(m);return m}
+function thatch(g0,cx,cy,cz,w,d){const g=new THREE.Group();g0.add(g);ROOFG.push(g);const B=RB;for(let i=0;i<5;i++){const s=1-i*.19;B(g,w*s,.42,d*s,i%2?PAL.thatch2:PAL.thatch,cx,cy+i*.36,cz)}
  B(g,w*.2,.5,d*.9,PAL.thatch2,cx,cy+5*.36+.1,cz);
  for(let i=0;i<Math.round(w/.7);i++){const x=cx-w/2+.35+i*.7,l=.5+((i*7)%3)*.18;B(g,.5,l,.14,i%2?PAL.thatch:PAL.thatch2,x,cy-l/2+.1,cz+d/2);B(g,.5,l,.14,i%2?PAL.thatch2:PAL.thatch,x,cy-l/2+.1,cz-d/2)}
  for(let i=0;i<Math.round(d/.7);i++){const z=cz-d/2+.35+i*.7,l=.5+((i*5)%3)*.18;B(g,.14,l,.5,i%2?PAL.thatch:PAL.thatch2,cx-w/2,cy-l/2+.1,z);B(g,.14,l,.5,i%2?PAL.thatch2:PAL.thatch,cx+w/2,cy-l/2+.1,z)}}
@@ -62,7 +65,7 @@ function palmC(g,x,z,s,lean){s=s||1;lean=lean||.18;let px=x,py=0;for(let i=0;i<5
  [[.3,0],[-.3,.2],[0,-.3]].forEach(([dx,dz])=>{const c=new THREE.Mesh(new THREE.SphereGeometry(.22*s,6,5),M('#6b4a28'));c.position.set(px+dx*s,py-.45*s,z+dz*s);g.add(c)})}
 function person(g,x,z,shirt,pants,ry,seated){const h=new THREE.Group();h.position.set(x,seated?-.32:0,z);h.rotation.y=ry||0;
  B(h,.22,.7,.22,pants,-.13,.4,0);B(h,.22,.7,.22,pants,.13,.4,0);B(h,.52,.62,.3,shirt,0,1.04,0);B(h,.16,.6,.18,shirt,-.36,1.02,0);B(h,.16,.6,.18,shirt,.36,1.02,0);B(h,.32,.32,.32,['#f1c9a0','#d9a577','#a8743f','#7a4e2b'][Math.floor(Math.abs(x*7+z*3))%4],0,1.52,0);B(h,.34,.14,.34,['#2b1d12','#6b4a28','#d9b36a','#1a1a1a'][Math.floor(Math.abs(x*3+z*5))%4],0,1.7,0);g.add(h)}
-function buildClub(){const g=new THREE.Group();g.position.set(CLUB_X,0,CLUB_Z);g.scale.setScalar(KC);root.add(g);
+function buildClub(){ROOFG=[];const g=new THREE.Group();g.position.set(CLUB_X,0,CLUB_Z);g.scale.setScalar(KC);root.add(g);
  /* boardwalk deck with planks, steps down to the sand */
  B(g,34,.28,11,PAL.teak,1,.14,0);for(let i=-16;i<=17;i+=1.4)B(g,.05,.03,11,PAL.dark,i,.29,0);B(g,34.4,.14,.2,PAL.dark,1,.3,5.55);B(g,34.4,.14,.2,PAL.dark,1,.3,-5.55);
  [-8,2,12].forEach(x=>{B(g,4,.14,1.2,PAL.plank,x,.07,6.2);B(g,4,.14,1.2,PAL.plank,x,.03,7.4)});
@@ -77,7 +80,7 @@ function buildClub(){const g=new THREE.Group();g.position.set(CLUB_X,0,CLUB_Z);g
  for(let i=0;i<6;i++){const x=-12+i*2,c=[PAL.coral,PAL.teal][i%2];cyl(g,.1,.1,1.5,'#333',x,.75,2.9,5);cyl(g,.44,.44,.22,c,x,1.6,2.9,10)}
  for(let i=0;i<4;i++)B(g,.28,.28,.28,'*#ffd27a',-11+i*3.6,3.9,2.3).scale.set(1,1.4,1);
  /* the sign, on its own two posts so it reads from far away */
- bam(g,-12,3.8,6.4,.2);bam(g,-2,3.8,6.4,.2);B(g,11.6,3,.35,'#12333a',-7,7.9,3.8);label(g,'SUNSET BEACH CLUB',11,2.4,-7,7.9,4.0,'#e8452c','#fff3d9');B(g,11.6,.25,.5,PAL.thatch2,-7,9.5,3.8);
+ bam(g,-12.4,-4.7,9.2,.2);bam(g,-1.6,-4.7,9.2,.2);B(g,12.4,3.2,.35,'#12333a',-7,8.9,-4.5);label(g,'SUNSET BEACH CLUB',11.6,2.6,-7,8.9,-4.3,'#e8452c','#fff3d9');B(g,12.6,.25,.6,PAL.thatch2,-7,10.6,-4.5);
  /* stage */
  B(g,13,1.1,8,PAL.teak,11.5,.8,.3);B(g,13,.12,8,'#d9b070',11.5,1.4,.3);for(let i=0;i<8;i++)B(g,.05,.02,8,PAL.dark,6.6+i*1.5,1.47,.3);
  B(g,5,.28,.9,PAL.plank,11.5,.14,4.9);B(g,5,.28,.9,PAL.plank,11.5,.42,4.55);
@@ -105,7 +108,7 @@ function buildClub(){const g=new THREE.Group();g.position.set(CLUB_X,0,CLUB_Z);g
  for(let s=0;s<2;s++){const a=pole[s],b=pole[s+1];for(let i=0;i<=14;i++){const t=i/14,x=a[0]+(b[0]-a[0])*t,y=a[1]+(b[1]-a[1])*t-Math.sin(t*Math.PI)*.8;B(g,.16,.16,.16,'*'+['#ffd27a','#ff9ac0','#8ad8ff'][i%3],x,y,6.2)}}
  /* solid: the bar counter and the stage; the deck, steps and sand stay open */
  const W=(x,z)=>[CLUB_X+x*KC,CLUB_Z+z*KC];let a=W(-13,-4.8),b=W(-.8,1.6);solid(a[0],a[1],b[0],b[1]);a=W(5,-3.8);b=W(18,4.2);solid(a[0],a[1],b[0],b[1]);
- const mk=new THREE.Group();B(mk,.9,.9,.9,'*#ff7ab8',0,0,0);mk.rotation.set(Math.PI/4,0,Math.PI/4);mk.position.set(11.5,11,.3);g.add(mk);g.userData.mk=mk;g.userData.mky=11;
+ const mk=new THREE.Group();B(mk,.9,.9,.9,'*#ff7ab8',0,0,0);mk.rotation.set(Math.PI/4,0,Math.PI/4);mk.position.set(11.5,11,.3);g.add(mk);g.userData.mk=mk;g.userData.mky=11;g.userData.roofs=ROOFG;
  /* people: a few at the bar, a crowd on the sand, a few round the fire (full size, so outside the scaled group) */
  const pp=new THREE.Group();root.add(pp);const tops=['#e8452c','#2aa7a1','#ffd23d','#8d5fd3','#fff3d9','#ff7ab8','#3a7bd5'],bots=['#2b3a55','#6b4a28','#e8e1d0','#1a1a1a'];let n=0;
  const add=(lx,lz,ry,seat)=>{const q=W(lx,lz);person(pp,q[0],q[1],tops[n%7],bots[n%4],ry,seat);n++};
@@ -114,7 +117,7 @@ function buildClub(){const g=new THREE.Group();g.position.set(CLUB_X,0,CLUB_Z);g
  return g}
 
 function buildLight(){const g=new THREE.Group();g.position.set(LH_X,0,LH_Z);g.scale.setScalar(KL);root.add(g);
- cyl(g,4.6,5.2,1.2,'#8d9096',0,.6,0,16);/* rock base */
+ cyl(g,4.6,5.2,1.4,'#7c8087',0,.7,0,16);/* foundation */
  const bands=[['#f4f1ea',3.3,2.8],['#d6402f',2.9,2.55],['#f4f1ea',2.55,2.3],['#d6402f',2.3,2.05],['#f4f1ea',2.05,1.85]];let y=1.2;
  bands.forEach(([c,rb,rt],i)=>{const h=4.2;cyl(g,rt,rb,h,c,0,y+h/2,0,16);y+=h});
  cyl(g,2.5,2.5,.35,'#2a2a2e',0,y+.17,0,16);/* gallery floor */
@@ -129,13 +132,27 @@ function buildLight(){const g=new THREE.Group();g.position.set(LH_X,0,LH_Z);g.sc
  [1,-1].forEach(a=>{const w=new THREE.Mesh(new THREE.PlaneGeometry(60,5),bm);w.position.set(a*30,0,0);w.rotation.x=-Math.PI/2;beam.add(w)});
  g.userData.beam=beam;g.userData.beamMat=bm;g.userData.top=y+1.4;
  solid(LH_X-3.6*KL,LH_Z-3.6*KL,LH_X+3.6*KL,LH_Z+3.6*KL);
+ /* the islet: grey rock with a pale shallow ring and a thin line of foam, rocks round the edge */
+ const sh=new THREE.Mesh(new THREE.CircleGeometry(ISLET+15,40),new THREE.MeshBasicMaterial({color:0x8ee6e0,transparent:true,opacity:.55,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.position.set(LH_X,-.41,LH_Z);root.add(sh);
+ cyl(root,ISLET,ISLET+3,2.4,'#7c8087',LH_X,-.1,LH_Z,28);cyl(root,ISLET-2.5,ISLET-1,.5,'#6a9a52',LH_X,1.1,LH_Z,28);cyl(root,ISLET-6,ISLET-5,.3,'#e3d3a0',LH_X,.98,LH_Z,28).visible=false;
+ const fo=new THREE.Mesh(new THREE.RingGeometry(ISLET+2.6,ISLET+4.4,40),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide}));fo.rotation.x=-Math.PI/2;fo.position.set(LH_X,-.36,LH_Z);root.add(fo);g.userData.foam=fo;
+ for(let i=0;i<14;i++){const a=i/14*6.283+Math.sin(i*3.1)*.2,r=ISLET+1+(i%3)*1.4,w=1.6+(i%4)*.7;B(root,w,1+(i%3)*.5,w*.9,['#8d9096','#7c8087','#6f7378','#9a9a94'][i%4],LH_X+Math.cos(a)*r,.2,LH_Z+Math.sin(a)*r).rotation.y=i}
+ /* the pier: planks, posts both sides, a rail and warm lamps */
+ const pz0=LH_Z+ISLET-2,pz1=PIER_Z0,len=pz1-pz0,pm=(pz0+pz1)/2;
+ B(root,5.2,.34,len,'#9a6a3c',LH_X,.22,pm);for(let z=pz0+1;z<pz1;z+=1.3)B(root,5.3,.03,.08,'#5a3a22',LH_X,.4,z);
+ for(let z=pz0+2;z<pz1;z+=6){[-1,1].forEach(a=>{cyl(root,.16,.16,2.2,'#5a3a22',LH_X+a*2.7,.7,z,6);cyl(root,.2,.2,2.4,'#5a3a22',LH_X+a*2.7,-.9,z,6)});if(((z-pz0)/6|0)%2==0)[-1,1].forEach(a=>B(root,.34,.4,.34,'*#ffd27a',LH_X+a*2.7,1.95,z))}
+ [-1,1].forEach(a=>{B(root,.1,.1,len,'#5a3a22',LH_X+a*2.7,1.45,pm)});
+ PIER={x0:LH_X-2.5,x1:LH_X+2.5,z0:LH_Z+ISLET-8,z1:pz1+4};
  return g}
+let PIER=null;
+/* the pier and the islet are walkable out in the sea: the island's shore check is skipped there and only solid things (the tower) stop you */
+{const h0=hit;hit=function(x,z,r){try{if(PIER&&!IN&&mode!='drive'&&((x>PIER.x0&&x<PIER.x1&&z>PIER.z0&&z<PIER.z1)||Math.hypot(x-LH_X,z-LH_Z)<ISLET-1.5)){r=r||.4;return cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])?1:0}}catch(e){}return h0.apply(this,arguments)}}
 let club=null,light=null,built=false;
 function build(){if(built)return;built=true;try{club=buildClub()}catch(e){console.error('beach club',e)}try{light=buildLight()}catch(e){console.error('lighthouse',e)}
  /* prompts */
  INT.push({x:CLUB_X+11.5*KC,z:CLUB_Z+8*KC,r:6,l:'Sunset Beach Club stage',a:()=>stageUse(),bc:'stage'});
  INT.push({x:CLUB_X-7*KC,z:CLUB_Z+3.4*KC,r:4,l:'Beach bar: smoothie $8',a:()=>bar(),bc:'bar'});
- INT.push({x:LH_X,z:LH_Z+4.6*KL,r:4.5,l:'Climb the Lighthouse',a:()=>climb(),lh:1})}
+ INT.push({x:LH_X,z:LH_Z+5.2*KL,r:4.5,l:'Climb the Lighthouse',a:()=>climb(),lh:1})}
 
 /* ---------- state ---------- */
 function st(){if(!S.bcg||typeof S.bcg!='object')S.bcg={last:-999,list:[]};if(!Array.isArray(S.bcg.list))S.bcg.list=[];return S.bcg}
@@ -218,6 +235,7 @@ let spin=0;
  INT.forEach(i=>{if(i.bc=='stage')i.l=open?'Play your Beach Club set':o?(S.day<o.day?'Beach Club gig on Day '+o.day:m<SLOT[0]?'Beach Club gig at '+hm(SLOT[0]):'Beach Club gig (over)'):'Sunset Beach Club stage';
   if(i.bc=='bar')i.l=S.bcBar===S.day?'Beach bar (smoothie taken today)':'Beach bar: smoothie $8';
   if(i.lh)i.l=S.lhDay===S.day?'Lighthouse (visited today)':'Climb the Lighthouse'});
+ if(club){const inside=Math.abs(P.x-(CLUB_X+5*KC))<24*KC&&P.z>CLUB_Z-8*KC&&P.z<CLUB_Z+9*KC;RM.forEach(m=>{m.opacity+=((inside?.1:1)-m.opacity)*.18;m.depthWrite=m.opacity>.6});}
  if(club&&club.userData.mk){const k=club.userData.mk;k.visible=!!open;k.rotation.y=spin*1.6;k.position.y=club.userData.mky+Math.sin(spin*2.2)*.3}
  if(club&&club.userData.fire){const f=club.userData.fire;f.visible=true;f.scale.set(1,.8+Math.sin(spin*9)*.25+Math.sin(spin*13)*.15,1)}
  if(light){const u=light.userData;u.beam.rotation.y=spin*.9;u.beam.visible=night;u.lant.material.color.set(night?0xfff2b0:0xcfd8c0)}
