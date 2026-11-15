@@ -33,7 +33,7 @@
   const inZ=(x,z)=>IN.some(r=>x>=r[0]&&x<=r[2]&&z>=r[1]&&z<=r[3]);
   const rmin=th=>{const c=Math.cos(th),s=Math.sin(th);let r=0;while(r<900&&inZ(C[0]+c*(r+1),C[1]+s*(r+1)))r++;return r};
   let sd=53;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
-  const wv=[];for(let k=0;k<26;k++){const f=k<3?k+2:k<9?k+4:k+8;wv.push([f,rnd()*6.283,(k<3?30:k<9?14:5)/Math.sqrt(1+k*.15)*(.6+rnd()*.8)])}
+  const wv=[];for(let k=0;k<12;k++){const f=k<3?k+2:k<8?k+3:k+4;wv.push([f,rnd()*6.283,(k<3?30:k<8?13:5)/Math.sqrt(1+k*.15)*(.6+rnd()*.8)])}/* only long, gentle swells: nothing finer than about 300 m, so no jagged edges */
   /* named features as [angle degrees (0 east, 90 south), width in degrees, metres out (+) or in (-)] */
   const FT=[[-80,14,-62],[-125,10,38],[-45,9,44],[-10,12,-26],[35,10,-34],[70,11,26],[112,9,-48],[150,10,32],[-165,9,-30],[178,8,24],[-100,5,-30]];
   const pol=L.map(p=>{const dx=p[0]-C[0],dz=p[1]-C[1];return[Math.atan2(dz,dx),Math.hypot(dx,dz)]});
@@ -45,7 +45,7 @@
   /* even out the spacing along the curve again (the noise stretches it) and soften sharp kinks */
   R2=smooth(R2);const cum=[0];for(let i=1;i<=R2.length;i++){const a=R2[i-1],b=R2[i%R2.length];cum.push(cum[i-1]+Math.hypot(b[0]-a[0],b[1]-a[1]))}
   const tot=cum[R2.length],out=[];let j=0;for(let i=0;i<NP;i++){const t=tot*i/NP;while(cum[j+1]<t)j++;const a=R2[j],b=R2[(j+1)%R2.length],u=(t-cum[j])/((cum[j+1]-cum[j])||1);out.push([a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u])}
-  L=smooth(smooth(smooth(out)))}
+  L=out;for(let k=0;k<14;k++)L=smooth(L)}
  const area=P=>{let s=0;for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];s+=a[0]*b[1]-b[0]*a[1]}return s/2};
  const ccw=area(L)>0;
  /* move every point d metres outward (negative: inward) */
