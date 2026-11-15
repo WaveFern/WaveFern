@@ -85,7 +85,7 @@ function mk(bid){const s=st(),b=bid?BRD.by(bid):pickBrand();if(!b)return;const d
  const pl=BRD.place(o),open=(S.artist||'there');
  const ag=BRD.agent(o),A=['Hi '+open+', it is '+ag.n.split(' ')[0]+', the partnerships agent at '+b.n+'. ','Hello '+open+'. '+ag.n+' here, I handle sponsorships for '+b.n+'. '];
  let t=pick(A)+'We at '+b.n+' have watched you rise to Fame Level '+fl()+' and we want you as the face of our next '+CAMP[b.cat]+' campaign. It is one photoshoot day at our own headquarters in '+pl+', in our studio. Fee: '+fm(o.pay)+', paid when the shoot wraps, and the photos go on your Instagrime tagged as a partnership. ';
- t+='We pay for everything: your Swiftwing flight out (booked and checked in the moment you accept), a company car in the city, and your flight home. ';
+ t+='We pay for everything: your Swiftwing flight out (booked and checked in the moment you accept), a company car in the city, and your flight home. ';t+='What happens next: tap Accept, go to the airport and board the flight, then walk to our HQ for the photoshoot. ';
  t+='Our brief: a '+o.brief.mood.toLowerCase()+' mood with '+o.brief.light.toLowerCase()+' lighting. This offer stands for '+EXPIRE+' days.';
  S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:t});
  S.hqLink=1;
@@ -130,7 +130,7 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Messages: logo as the profile picture, Accept / Decline buttons ---------- */
 {const pm=PA.msg;PA.msg=function(){let h=pm.apply(this,arguments);if(typeof h!='string')return h;
  try{const L=S.msgs.filter(m=>m.bd!=null);
-  L.forEach(m=>{const o=job(m.bd);if(!o)return;const ag=BRD.agent(o);let lg=BRD.logo(o.b,64);try{if(ag.cfg)lg=pfp(ag.cfg)}catch(e){}
+  L.forEach(m=>{const o=job(m.bd);if(!o)return;const ag=BRD.agent(o);const lg=BRD.logo(o.b,64);
    h=h.replace(new RegExp('(onclick="openChat\\('+m.id+'\\)">)<img src="[^"]*"'),'$1<img src="'+lg+'" style="border-radius:50%"');
    if(S.chat==m.id){h=h.replace(/(<div class=cvh>(?:<button[^>]*>[^<]*<\/button>)?)<img src="[^"]*"/,'$1<img src="'+lg+'" style="border-radius:50%"');
     const b=BRD.by(o.b),sub=ag.n+' · agent for '+b.n;h=h.replace(/(<div class=cvh>[\s\S]*?<br><small[^>]*>)[^<]*/,'$1'+sub);
@@ -189,7 +189,7 @@ const pastList=()=>st().list.filter(o=>o.st>=2).slice().reverse();
 const early=()=>fl()<FAME[0];
 /* Brand Deals: heading, the four figures, the booked shoot and offers in brief, the Fame Level note and the brand directory */
 function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),open=BR.filter(b=>FAME[b.t]<=L).length;
- let h=phead('','Brand Deals','Brands book you for one photoshoot day at their own headquarters abroad. Every trip is paid for by the brand, and the fee is set by your recent income.');
+ let h=phead('','Brand Deals','Brands book you for one photoshoot day at their own headquarters abroad. How it works: 1 Accept an offer. 2 Fly out (the brand books and pays the flight). 3 Walk to their HQ. 4 Shoot the photos and get paid. Your next step always shows at the top of the screen. <button class=lh-lk onclick="BRD.guide()">How a photoshoot works</button>');
  h+=`<div class=lh-kpis>${kpi('Completed shoots',s.done)}${kpi('Earned from brands',fm(s.earned))}${kpi('Open offers',offs.length)}${kpi('Fame Level',L)}</div>`;
  h+=`<section class=lh-par aria-label="Our partnered brands"><div class=lh-parh><h2 class=lh-h4>Our partnered brands</h2></div><div class=lh-mq><div class=lh-mt>${[0,1].map(n=>`<ul${n?' aria-hidden=true':''}>${BR.map(b=>`<li><button class=lh-pn${n?' tabindex=-1':''} onclick="bdBrand('${b.id}')">${esc(b.n)}</button></li>`).join('')}</ul>`).join('')}</div></div></section>`;
  const ab=act?(()=>{const b=BRD.by(act.b);return`<div class=lh-sum><p class=lh-big>${esc(b.n)}</p><p class=lh-mut>${esc(cap(b.cat))} campaign in ${esc(BRD.place(act))}. Fee ${fm(act.pay)}.</p>${lk('View the booking',"bdTab('active')")}</div>`})()
