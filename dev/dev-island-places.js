@@ -5,7 +5,7 @@
      message. On the day, walk to the stage during the slot and press the prompt: pick up to 3 of your songs and play. The crowd
      reacts to the song quality: fee (70% to 130% of the offer), followers, streams for the songs you played. It costs 20 energy and
      about 2 hours of game time. Miss the slot and the offer lapses (nothing lost). The bar also sells a cheap smoothie.
-   - Lighthouse: a striped tower on the north-east headland with a light that turns at night. Climb it once a day for the view:
+   - Lighthouse: a striped tower on the north-east headland with a light that turns at night. Press E to climb it: a plain dialog, then first person on the gallery (WASD, mouse or arrow keys, labels for places on the map). The first climb each day gives
      +20 energy. It is also a map place, so you can set a guide marker on it.
    State (saved, old saves start empty): S.bcg={last,list:[{id,pay,exp,day,st}]} (st 0 offer, 1 booked, 2 declined, 3 played, 4 expired, 5 missed),
    S.lhDay (the day you last climbed the lighthouse), S.bcBar (the day of your last smoothie). */
@@ -185,8 +185,8 @@ function buildLight(){const g=new THREE.Group();g.position.set(LH_X,0,LH_Z);root
  let y=1.3;const win=[];
  for(let i=0;i<5;i++){const w=6.2-i*.55,h=4;B(g,w,h,w,i%2?'#d6402f':'#f4f1ea',0,y+h/2,0);B(g,w+.35,.22,w+.35,'#3a3a40',0,y+h,0);if(i)B(g,.5,.8,.1,'#1b2a3a',0,y+2.2,w/2+.03);y+=h}
  B(g,1.2,2.2,.15,'#3a2a22',0,2.4,3.15);
- B(g,5.6,.3,5.6,'#2a2a2e',0,y+.15,0);
- [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dz])=>{const L=5.6;B(g,dx?.08:L,.08,dx?L:.08,'#2a2a2e',dx*2.76,y+1.1,dz*2.76);for(let k=-2;k<=2;k++)B(g,.1,.9,.1,'#2a2a2e',dx?dx*2.76:k*1.35,y+.7,dx?k*1.35:dz*2.76)});
+ B(g,8,.3,8,'#2a2a2e',0,y+.15,0);g.userData.floor=y+.3;
+ [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dz])=>{const L=8;B(g,dx?.08:L,.08,dx?L:.08,'#2a2a2e',dx*3.9,y+1.1,dz*3.9);for(let k=-2;k<=2;k++)B(g,.1,.9,.1,'#2a2a2e',dx?dx*3.9:k*1.95,y+.7,dx?k*1.95:dz*3.9)});
  const lant=new THREE.Mesh(geo(2.6,2,2.6),new THREE.MeshBasicMaterial({color:'#ffe9a8',transparent:true,opacity:.85}));lant.position.set(0,y+1.3,0);g.add(lant);g.userData.lant=lant;
  [[-1.3,-1.3],[1.3,-1.3],[-1.3,1.3],[1.3,1.3]].forEach(([a,b])=>B(g,.18,2.2,.18,'#2a2a2e',a,y+1.4,b));
  [[3.4,.4],[2.6,.4],[1.8,.4]].forEach(([w,h],i)=>B(g,w,h,w,'#d6402f',0,y+2.6+i*.4,0));B(g,.9,.6,.9,'#d6402f',0,y+3.9,0);B(g,.12,.9,.12,'#2a2a2e',0,y+4.6,0);
@@ -279,7 +279,7 @@ window.bcPlay=function(){const o=booked();if(!o||!PICK.length)return;const L=PIC
 
 /* ---------- the gig: the camera goes behind you on stage and looks out over the crowd ---------- */
 let BCV=null,bcCam=null;
-{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(BCV&&bcCam&&c===cam){bcCam.aspect=innerWidth/innerHeight;bcCam.updateProjectionMatrix();return r0(sc,bcCam)}return r0(sc,c)}}
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(BCV&&bcCam&&c===cam){bcCam.aspect=innerWidth/innerHeight;bcCam.updateProjectionMatrix();return r0(sc,bcCam)}if(LHV&&lhCam&&c===cam)return r0(sc,lhCam);return r0(sc,c)}}
 function showGig(L,fin){if(!club||away()||mode=='title'){fin();return}
  try{if(!bcCam)bcCam=new THREE.PerspectiveCamera(60,1,.1,600);
   const perf=buildChar(ch);perf.g.position.set(CLUB_X+14,1.3,CLUB_Z-15.6);root.add(perf.g);
@@ -295,15 +295,46 @@ function bar(){if(mode!='play'||away())return;if(S.bcBar===S.day){sn('err');retu
  if((S.money||0)<8){sn('err');return say('A smoothie is $8.')}if((S.energy||0)>=100){sn('err');return say('You are already full of energy.')}
  S.money=+(S.money-8).toFixed(2);S.energy=Math.min(100,(S.energy||0)+12);S.bcBar=S.day;sv();sn('eat');say('Mango smoothie. +12 energy.')}
 
-/* ---------- the lighthouse ---------- */
-function climb(){if(mode!='play'||away())return;
- if(S.lhDay===S.day){sn('err');return say('You already took in the view today. Come back tomorrow.')}
- mode='menu';const night=(S.t||0)>=300;
- $('ui').innerHTML=`<div class="box modal pe" style="width:min(520px,94vw)"><div class=pehd><span class=pek>Island Lighthouse</span><h2>The lookout</h2></div><div class=pebd>
- <div style="height:130px;border:2px solid #000;margin-bottom:10px;background:linear-gradient(${night?'#0b1230 0%,#1d2f6b 55%,#0e3a66 55%,#0a2347 100%':'#7cc4ee 0%,#cfeaf8 52%,#2b87c8 52%,#1d5f9c 100%'})"></div>
- <p class=pebl>${night?'The beam sweeps over black water and the city lights glow behind you.':'Gulls wheel below. You can see the whole island from up here: the park, the runway, the beach club.'}</p>
- <div class=row2><button class=go onclick="lhBreathe()">Breathe in the sea air (+20 energy)</button><button onclick="closeUI()">Back down</button></div></div></div>`}
-window.lhBreathe=function(){if(S.lhDay===S.day)return closeUI();S.lhDay=S.day;S.energy=Math.min(100,(S.energy||0)+20);sv();sn('chime');closeUI();say('Fresh sea air. +20 energy.')};
+/* ---------- the lighthouse: climb to the gallery and walk round the top in first person ---------- */
+let LHV=null,lhCam=null;
+const LHBOX='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;background:rgba(18,22,30,.94);color:#fff;font:15px/1.45 system-ui,sans-serif;border-radius:14px;padding:20px 22px;width:min(360px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.45)';
+const LHBTN='padding:10px 16px;border:0;border-radius:8px;font:600 15px system-ui,sans-serif;cursor:pointer;color:#fff;';
+function climb(){if(mode!='play'||away())return;mode='menu';const fresh=S.lhDay!==S.day;
+ $('ui').innerHTML=`<div style="${LHBOX}"><div style="font-size:18px;font-weight:600;margin-bottom:6px">Lighthouse</div><div style="opacity:.8;margin-bottom:16px">Climb to the lookout and look out over the whole island.${fresh?' The sea air gives you +20 energy (once a day).':''}</div><div style="display:flex;gap:8px"><button onclick="lhGo()" style="${LHBTN}flex:1;background:#2f7bf5">Climb up</button><button onclick="closeUI()" style="${LHBTN}background:rgba(255,255,255,.14)">Not now</button></div></div>`}
+let lhH=null;
+window.lhGo=function(){if(!light||LHV||mode!='menu')return;$('ui').innerHTML='';
+ if(S.lhDay!==S.day){S.lhDay=S.day;S.energy=Math.min(100,(S.energy||0)+20);sv();sn('chime');say('Fresh sea air at the top. +20 energy.')}
+ if(!lhCam){lhCam=new THREE.PerspectiveCamera(72,1,.1,4000);lhCam.rotation.order='YXZ'}
+ LHV={x:0,z:2.8,yaw:Math.PI,pit:-.08,f:light.userData.floor,fog:scene.fog&&scene.fog.near!=null?[scene.fog.near,scene.fog.far]:null,drag:0,lab:[]};
+ if(LHV.fog){scene.fog.near=500;scene.fog.far=3200}
+ try{P.mesh.visible=false}catch(e){}document.body.classList.add('fston');
+ const d=document.createElement('div');d.id='lhv';d.style.cssText='position:fixed;inset:0;z-index:55;pointer-events:none;font:12px system-ui,sans-serif;color:#fff;overflow:hidden';
+ d.innerHTML='<div id=lhl></div><div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(18,22,30,.82);padding:8px 14px;border-radius:10px;display:flex;gap:14px;align-items:center;pointer-events:auto;font:14px system-ui,sans-serif"><span style="opacity:.85">WASD walk · mouse or arrows look · Shift run</span><button onclick="lhDown()" style="'+LHBTN+'background:#2f7bf5;padding:7px 14px">Climb down</button></div>';
+ document.body.appendChild(d);const box=d.firstChild;
+ /* a small label for each place on the map: name and distance */
+ POIS.forEach(q=>{if(q[2]=='Lighthouse')return;const e=document.createElement('div');e.style.cssText='position:absolute;left:0;top:0;white-space:nowrap;background:rgba(18,22,30,.72);padding:2px 7px;border-radius:9px;border-left:3px solid '+(q[3]||'#fff')+';display:none';box.appendChild(e);LHV.lab.push({q,e})});
+ const cv=renderer.domElement,mm=e=>{if(!LHV)return;if(document.pointerLockElement===cv||LHV.drag){LHV.yaw-=(e.movementX||0)*.0025;LHV.pit=Math.max(-1.2,Math.min(1.2,LHV.pit-(e.movementY||0)*.0025))}},
+  md=e=>{if(!LHV||e.target!==cv)return;LHV.drag=1;try{cv.requestPointerLock&&cv.requestPointerLock()}catch(x){}},mu=()=>{if(LHV)LHV.drag=0},
+  kd=e=>{if(!LHV)return;const k=(e.key||'').toLowerCase();if(k=='e'||k=='escape'){e.preventDefault();e.stopPropagation();lhDown()}else if(k.startsWith('arrow')||k==' ')e.preventDefault()},
+  ts=e=>{if(!LHV||e.target!==cv)return;LHV.tx=e.touches[0].clientX;LHV.ty=e.touches[0].clientY},
+  tm=e=>{if(!LHV||LHV.tx==null||e.target!==cv)return;const t=e.touches[0];LHV.yaw-=(t.clientX-LHV.tx)*.005;LHV.pit=Math.max(-1.2,Math.min(1.2,LHV.pit-(t.clientY-LHV.ty)*.005));LHV.tx=t.clientX;LHV.ty=t.clientY};
+ window.addEventListener('mousemove',mm);window.addEventListener('mousedown',md);window.addEventListener('mouseup',mu);window.addEventListener('keydown',kd,true);window.addEventListener('touchstart',ts,{passive:true});window.addEventListener('touchmove',tm,{passive:true});
+ lhH=()=>{window.removeEventListener('mousemove',mm);window.removeEventListener('mousedown',md);window.removeEventListener('mouseup',mu);window.removeEventListener('keydown',kd,true);window.removeEventListener('touchstart',ts);window.removeEventListener('touchmove',tm)}};
+window.lhDown=function(){const v=LHV;if(!v)return;LHV=null;if(lhH){lhH();lhH=null}try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}
+ if(v.fog){scene.fog.near=v.fog[0];scene.fog.far=v.fog[1]}const d=document.getElementById('lhv');if(d)d.remove();try{P.mesh.visible=true}catch(e){}document.body.classList.remove('fston');mode='play';sn('pop')};
+const lhV3=new THREE.Vector3();
+function lhFrame(dt){const v=LHV,d=Math.min(dt||.016,.1);
+ v.yaw+=((keys.arrowleft?1:0)-(keys.arrowright?1:0))*1.8*d;v.pit=Math.max(-1.2,Math.min(1.2,v.pit+((keys.arrowup?1:0)-(keys.arrowdown?1:0))*1.2*d));
+ let fx=(keys.w?1:0)-(keys.s?1:0),sx=(keys.d?1:0)-(keys.a?1:0);if(window.TCHJ&&TCHJ.on){fx=-TCHJ.y;sx=TCHJ.x}
+ const sp=(keys.shift?4:2.2)*d,sn_=Math.sin(v.yaw),cs=Math.cos(v.yaw);v.x+=(-sn_*fx+cs*sx)*sp;v.z+=(-cs*fx-sn_*sx)*sp;
+ const O=3.55,I=1.75;v.x=Math.max(-O,Math.min(O,v.x));v.z=Math.max(-O,Math.min(O,v.z));
+ if(Math.abs(v.x)<I&&Math.abs(v.z)<I){if(I-Math.abs(v.x)<I-Math.abs(v.z))v.x=(v.x<0?-1:1)*I;else v.z=(v.z<0?-1:1)*I}
+ lhCam.position.set(LH_X+v.x,v.f+1.65,LH_Z+v.z);lhCam.rotation.set(v.pit,v.yaw,0);lhCam.aspect=innerWidth/innerHeight;lhCam.updateProjectionMatrix();lhCam.updateMatrixWorld(true);
+ /* labels: the nearest places in view, skipping any that would sit on top of one already shown */
+ const W=innerWidth,H=innerHeight,c=[];v.lab.forEach(l=>{l.e.style.display='none';const dx=l.q[0]-lhCam.position.x,dz=l.q[1]-lhCam.position.z,dist=Math.hypot(dx,dz);lhV3.set(l.q[0],2,l.q[1]).project(lhCam);
+  if(lhV3.z>1||lhV3.z<0||Math.abs(lhV3.x)>.98||Math.abs(lhV3.y)>.95||dist>1700)return;c.push({l,dist,x:(lhV3.x+1)/2*W,y:(1-lhV3.y)/2*H})});
+ c.sort((a,b)=>a.dist-b.dist);const shown=[];
+ c.forEach(o=>{if(shown.length>=9||shown.some(p=>Math.abs(p.x-o.x)<150&&Math.abs(p.y-o.y)<26))return;shown.push(o);const e=o.l.e;e.style.display='block';e.style.transform='translate('+Math.round(o.x)+'px,'+Math.round(o.y)+'px) translate(-50%,-120%)';const t=o.l.q[2]+' \u00b7 '+Math.round(o.dist/10)*10+' m';if(e.textContent!==t)e.textContent=t})}
 
 /* ---------- every frame ---------- */
 let spin=0,HY=0;/* the height the walker is lifted to (other files reset SY every frame, so it is smoothed here and then written to SY) */
@@ -315,6 +346,7 @@ function hy(h,dt){HY+=(h-HY)*Math.min(1,(dt||.016)*14);if(Math.abs(HY-h)<.01)HY=
  INT.forEach(i=>{if(i.bc=='stage')i.l=open?'Play your Beach Club set':o?(S.day<o.day?'Beach Club gig on Day '+o.day:m<SLOT[0]?'Beach Club gig at '+hm(SLOT[0]):'Beach Club gig (over)'):'Sunset Beach Club stage';
   if(i.bc=='bar')i.l=S.bcBar===S.day?'Beach bar (smoothie taken today)':'Beach bar: smoothie $8';
   if(i.lh)i.l=S.lhDay===S.day?'Lighthouse (visited today)':'Climb the Lighthouse'});
+ if(LHV)lhFrame(dt);
  if(BCV){const v=BCV,t=v.t+=dt||0,k=Math.min(v.L.length-1,Math.floor(t/7)),e=$('bcnow');if(e&&v.k!==k){v.k=k;e.textContent='\u266a '+v.L[k].title}
   bcCam.position.set(CLUB_X+12.4+Math.sin(t*.37)*.35,4.7,CLUB_Z-19.6+Math.min(t,10)*.04);bcCam.lookAt(CLUB_X+14.6+Math.sin(t*.37)*.2,1.7,CLUB_Z+12);
   v.perf.g.position.y=1.3+Math.abs(Math.sin(t*4))*.05;v.perf.arms[0].rotation.x=-.3+Math.sin(t*3)*.25;v.perf.arms[1].rotation.x=-1.1;
