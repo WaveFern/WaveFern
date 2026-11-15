@@ -37,6 +37,21 @@ NAV.forEach(p=>{try{if(!POIS.some(q=>q[2]==p[2]))POIS.push(p)}catch(e){}});
 
 /* ---------- 3D ---------- */
 const root=new THREE.Group();root.name='islandPlaces';WORLD.add(root);
+/* soft sand apron: the grass wedge between the club's sand and the beach is sand now, and the sand fades out into the grass at the sides and the back instead of ending in a hard edge */
+function buildApron(){const cx=CLUB_X,x0=cx-80,x1=cx+80,z0=CLUB_Z-12,z1=CLUB_Z+60,N=2,nx=(x1-x0)/N,nz=Math.ceil((z1-z0)/N);
+ const fade=(x,z)=>{const dx=Math.abs(x-cx),a=Math.min(1,Math.max(0,(80-dx)/42)),b=Math.min(1,Math.max(0,(z-z0)/24));const f=Math.min(a,b);return f*f*(3-2*f)};
+ const pos=[],uv=[],idx=[],ok=[],cv=document.createElement('canvas');cv.width=160;cv.height=nz;const c2=cv.getContext('2d'),im=c2.createImageData(160,nz);
+ for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++){pos.push(x0+i*N,0,z0+j*N);uv.push(i/nx,1-j/nz)}
+ for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=x0+(i+.5)*N,z=z0+(j+.5)*N;if(![[0,0],[-1,-1],[1,-1],[-1,1],[1,1]].some(([u,v])=>inPoly(G,x+u*N/2,z+v*N/2)))continue;const a=i+j*(nx+1),b=a+1,c=a+nx+1,d=c+1;idx.push(a,c,b,b,c,d)}
+ for(let j=0;j<nz;j++)for(let i=0;i<160;i++){const x=x0+(i+.5)*(x1-x0)/160,z=z0+(j+.5)*N,k=(j*160+i)*4,r=Math.sin(i*12.9898+j*78.233)*43758.5453,n=r-Math.floor(r),f=fade(x,z);const t=n<.12?-9:n>.9?7:0;im.data[k]=231+t;im.data[k+1]=217+t;im.data[k+2]=168+t;im.data[k+3]=Math.round(255*f)}
+ c2.putImageData(im,0,0);const tx=new THREE.CanvasTexture(cv);tx.minFilter=tx.magFilter=THREE.LinearFilter;
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
+ const nm=g.attributes.normal;for(let i=0;i<nm.count;i++)nm.setXYZ(i,0,1,0);
+ const m=new THREE.MeshLambertMaterial({map:tx,transparent:true,depthWrite:false});m.userData.xms=1;
+ const ap=new THREE.Mesh(g,m);ap.position.y=-.2;ap.renderOrder=-1;root.add(ap);
+ /* the maps get the same patch, with the same soft edges */
+ FI.mapExtra.push((x,sx,sz)=>{const gr=x.createRadialGradient(sx(cx),sz(CLUB_Z+20),0,sx(cx),sz(CLUB_Z+20),Math.abs(sx(cx+70)-sx(cx)));gr.addColorStop(0,'#e7d9a8ff');gr.addColorStop(.55,'#e7d9a8ee');gr.addColorStop(1,'#e7d9a800');x.save();x.beginPath();FI.grass.forEach((p,i)=>i?x.lineTo(sx(p[0]),sz(p[1])):x.moveTo(sx(p[0]),sz(p[1])));x.closePath();x.clip();x.fillStyle=gr;x.fillRect(sx(x0),sz(z0),sx(x1)-sx(x0),sz(z1)-sz(z0));x.restore()})}
+try{buildApron()}catch(e){console.warn('sand apron',e)}
 function label(g,text,w,h,x,y,z,bg,fg,ry){const cv=document.createElement('canvas');cv.width=w*128;cv.height=h*128;const c=cv.getContext('2d');c.fillStyle=bg;c.fillRect(0,0,cv.width,cv.height);
  c.strokeStyle=fg;c.lineWidth=6;c.strokeRect(6,6,cv.width-12,cv.height-12);c.fillStyle=fg;c.font='bold '+Math.round(cv.height*.46)+'px monospace';c.textAlign='center';c.textBaseline='middle';c.fillText(text,cv.width/2,cv.height/2+3);
  const t=new THREE.CanvasTexture(cv);t.magFilter=THREE.NearestFilter;const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t}));m.position.set(x,y,z);m.rotation.y=ry||0;g.add(m);return m}
