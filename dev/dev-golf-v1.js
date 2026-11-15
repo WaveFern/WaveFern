@@ -291,13 +291,14 @@ const dirOf=a=>[Math.sin(a),Math.cos(a)];
 const pinD=()=>{const o=G.hole;return Math.hypot(o.pin[0]-G.ball.x,o.pin[1]-G.ball.z)};
 const parName=d=>d==-4?'CONDOR':d==-3?'ALBATROSS':d==-2?'EAGLE':d==-1?'BIRDIE':d==0?'PAR':d==1?'BOGEY':d==2?'DOUBLE BOGEY':d==3?'TRIPLE BOGEY':'+'+d;
 
-function startRound(ci,cart){if(away())return;const fee=cart?25:0;if((S.money||0)<fee){sn('err');return say2('A golf cart is $25.')}
+const dayNo=()=>Math.floor(Date.now()/864e5);
+function startRound(ci,cart,opt){opt=opt||{};if(away())return;const fee=cart?25:0;if((S.money||0)<fee){sn('err');return say2('A golf cart is $25.')}
  S.money=+((S.money||0)-fee).toFixed(2);
- G={on:1,ci,C:CRS[ci],hi:0,sc:[],cart,cx:0,cz:0,ch:0,cv:0,cy:0,view:'3p',st:'ready',aim:0,club:0,ball:{x:0,y:0,z:0},last:{x:0,z:0},paused:0,card:0,tab:0,back:0,swT:0,gz:0,fdir:[0,1],shown:0,keyHold:0,keyP:0,pb:null,beat:0};
+ G={on:1,ci,C:CRS[ci],hi:0,sc:[],cart,cx:0,cz:0,ch:0,cv:0,cy:0,view:'3p',st:'ready',aim:0,club:0,ball:{x:0,y:0,z:0},last:{x:0,z:0},practice:opt.practice?1:0,daily:opt.daily||0,paused:0,card:0,tab:0,back:0,swT:0,gz:0,fdir:[0,1],shown:0,keyHold:0,keyP:0,pb:null,beat:0};
  closeUIsafe();mode='golf';try{$('hud').style.display='none'}catch(e){}hud.style.display='block';document.body.classList.add('fston');
  try{P.mesh.visible=true}catch(e){}buildCourse(ci);sn('chime');beginHole(0,true)}
 function closeUIsafe(){try{$('ui').innerHTML=''}catch(e){}}
-function beginHole(hi,first){const C=G.C,o=C.holes[hi];G.hi=hi;G.hole=o;G.strokes=0;G.wind={s:Math.max(0,C.wind*.6*(.2+R2()*1.4)),a:R2()*6.283};
+function beginHole(hi,first){const C=G.C,o=C.holes[hi];if(G.daily)R2seed=G.daily*97+hi*31+G.ci*7+5;G.hi=hi;G.hole=o;G.strokes=0;G.wind={s:Math.max(0,C.wind*.6*(.2+R2()*1.4)),a:R2()*6.283};
  const go=()=>{const tx=o.tee[0],tz=o.tee[1];G.ball={x:tx,y:H(G.ci,tx,tz),z:tz};G.last={x:tx,z:tz};G.aim=Math.atan2(o.pin[0]-tx,o.pin[1]-tz);G.card=0;$g('gf_card').style.display='none';
   G.manual=0;pickClub();
   if(G.cart){G.cx=tx-o.d*4;G.cz=tz+7;G.ch=G.aim;G.cy=H(G.ci,G.cx,G.cz)}
@@ -359,7 +360,7 @@ function pickClub(){if(G.manual)return;const b=G.ball,d=pinD(),sf=surf(G.ci,b.x,
   if(sf==2&&d<45)c=4}
  G.club=c;G.dirty=1}
 function holeOut(pick){G.st='holeend';G.sc[G.hi]=G.strokes;const d=G.strokes-G.hole.par;let name=G.strokes==1?'HOLE IN ONE!':parName(d),pay=0;
- if(!pick){if(G.strokes==1){pay=250;st().aces++}else if(d<=-2)pay=40;else if(d==-1)pay=10}else name='PICKED UP';
+ if(!pick){if(G.strokes==1){if(!G.practice){pay=250;st().aces++}}else if(G.practice){}else if(d<=-2)pay=40;else if(d==-1)pay=10}else name='PICKED UP';
  if(pay){S.money=+((S.money||0)+pay).toFixed(2);S.earn=(S.earn||0)+pay}
  try{S.t=Math.min(596,(S.t||0)+4)}catch(e){}
  G.holeName=name;G.holePay=pay;sn(pick?'pop':d<0?'cash':'chime');banner(name,G.strokes+' stroke'+(G.strokes==1?'':'s')+' · par '+G.hole.par+(pay?' · +$'+pay:''),scCol(G.strokes,G.hole.par),2600);setTimeout(()=>{if(G&&G.st=='holeend')showHoleCard()},1700)}
@@ -374,9 +375,12 @@ function sumHtml(){const C=G.C;let tot=0,par=0,done=0;
 function showHoleCard(){const last=G.hi>=5,s=sumHtml(),c=$g('gf_card'),d=G.strokes-G.hole.par;G.card=1;
  c.innerHTML='<h2 style="color:'+scCol(G.strokes,G.hole.par)+'">'+G.holeName+(G.holePay?' <span style="color:#5fe06a;font-size:16px">+$'+G.holePay+'</span>':'')+'</h2><p>Hole '+(G.hi+1)+' · '+G.strokes+' stroke'+(G.strokes==1?'':'s')+' on a par '+G.hole.par+(G.hole.len?' ('+G.hole.len+' m)':'')+'. Round so far: '+toPar(s.tot-s.par)+'.</p>'+s.h+'<div class=row><button class="gfbtn go" onclick="golfNext()">'+(last?'FINISH ROUND':'NEXT HOLE')+' <small style="opacity:.6">SPACE</small></button></div>';c.style.display='block'}
 window.golfNext=function(){if(!G||!G.card)return;sn('pop');if(G.hi>=5)endRound();else{G.card=0;$g('gf_card').style.display='none';beginHole(G.hi+1)}};
-function endRound(){const s=sumHtml(),g=st(),ci=G.ci,tot=s.tot,d=tot-s.par;g.rounds++;let best='';if(g.best[ci]==null||tot<g.best[ci]){best=g.best[ci]==null?'First round on this course!':'New best score!';g.best[ci]=tot}
- const pay=20;S.money=+((S.money||0)+pay).toFixed(2);S.earn=(S.earn||0)+pay;sv();G.st='done';G.card=2;sn('cash');
- const c=$g('gf_card');c.innerHTML='<small>ROUND COMPLETE</small><h2>'+E(G.C.n)+'</h2><div style="display:flex;align-items:baseline;gap:14px;margin:6px 0 12px"><span style="font-size:54px;color:'+(d<0?'#5fe06a':d>0?'#ffa14a':'#fff')+'">'+tot+'</span><span style="font-size:22px">'+toPar(d)+'</span><span style="font-size:12px;opacity:.8;margin-left:auto;text-align:right;line-height:1.7">+$'+pay+' prize<br>Best here: '+g.best[ci]+'<br>Rounds played: '+g.rounds+'</span></div>'+(best?'<p style="color:#ffd23f;margin-bottom:10px">'+best+'</p>':'')+s.h+'<div class=row><button class="gfbtn go" onclick="golfLeave()">BACK TO THE CLUBHOUSE</button></div>';c.style.display='block'}
+function endRound(){const s=sumHtml(),g=st(),ci=G.ci,tot=s.tot,d=tot-s.par;let best='',pay=0,extra='';
+ if(G.practice)extra='Practice round: no score or prize saved';
+ else{g.rounds++;if(g.best[ci]==null||tot<g.best[ci]){best=g.best[ci]==null?'First round on this course!':'New best score!';g.best[ci]=tot}pay=20;
+  if(G.daily){const dl=g.daily&&g.daily.d==G.daily?g.daily:(g.daily={d:G.daily,best:null,paid:0});if(dl.best==null||tot<dl.best){dl.best=tot;best=(best?best+' ':'')+'New daily best!'}if(!dl.paid&&d<=0){dl.paid=1;pay+=40;extra='Daily challenge cleared: +$40'}else extra='Daily best: '+dl.best}}
+ {S.money=+((S.money||0)+pay).toFixed(2);S.earn=(S.earn||0)+pay}sv();G.st='done';G.card=2;sn('cash');
+ const c=$g('gf_card');c.innerHTML='<small>'+(G.practice?'PRACTICE ROUND':G.daily?'DAILY CHALLENGE':'ROUND COMPLETE')+'</small><h2>'+E(G.C.n)+'</h2><div style="display:flex;align-items:baseline;gap:14px;margin:6px 0 12px"><span style="font-size:54px;color:'+(d<0?'#5fe06a':d>0?'#ffa14a':'#fff')+'">'+tot+'</span><span style="font-size:22px">'+toPar(d)+'</span><span style="font-size:12px;opacity:.8;margin-left:auto;text-align:right;line-height:1.7">'+(pay?'+$'+pay+' prize<br>':'')+'Best here: '+g.best[ci]+'<br>'+(extra?extra+'<br>':'')+'Rounds played: '+g.rounds+'</span></div>'+(best?'<p style="color:#ffd23f;margin-bottom:10px">'+best+'</p>':'')+s.h+'<div class=row><button class="gfbtn go" onclick="golfLeave()">BACK TO THE CLUBHOUSE</button></div>';c.style.display='block'}
 window.golfLeave=function(){if(!G)return;sn('pop');fade(()=>exitGolf())};
 function exitGolf(){const was=G;G=null;SW.on=0;mode='play';try{$('hud').style.display=''}catch(e){}hud.style.display='none';document.body.classList.remove('fston');
  ball.visible=shadow.visible=peg.visible=clubG.visible=target.visible=cartG.visible=false;dots.forEach(d=>d.visible=false);clearBeacon();
@@ -388,14 +392,16 @@ window.golfQuit=function(){if(!G)return;fade(()=>exitGolf())};
 function seatDriver(){const q=G;q.cx=q.ball.x-Math.sin(q.aim)*3.2+Math.cos(q.aim)*2.4;q.cz=q.ball.z-Math.cos(q.aim)*3.2-Math.sin(q.aim)*2.4;if(G.cartKeep){q.cx=G.cartKeep[0];q.cz=G.cartKeep[1]}q.ch=q.aim;q.cv=0}
 
 /* ---------- the clubhouse menu ---------- */
-let pickCart=0;
+let pickCart=0,pickPrac=0;
 function openMenu(){if(mode!='play'||away())return;mode='menu';const g=st();
  $('ui').innerHTML=`<div class="box modal pe" style="width:min(580px,94vw)"><div class=pehd><span class=pek>Wavefern Golf Club</span><h2>Pick a course</h2></div><div class=pebd>
- <p class=pebl>Six holes each. Hold the left mouse button, pull the mouse back (the bar fills), then push it forward: how far you pull is the power, the way you push is where the ball goes. Free to play. A cart is $25.</p>
+ <p class=pebl>Six holes each, with a daily challenge and a practice mode. Hold the left mouse button, pull the mouse back (the bar fills), then push it forward: how far you pull is the power, the way you push is where the ball goes. Free to play. A cart is $25.</p>
  <div class=pelist>${CRS.map((c,i)=>`<button class=pesong onclick="golfPlay(${i})"><b>${E(c.n)}</b><small>${E(c.sub)} · Par ${c.H.reduce((a,h)=>a+h[0],0)}${g.best[i]!=null?' · Your best: '+g.best[i]:''}</small></button>`).join('')}</div>
- <div class=row2><button id=gfcart onclick="golfCart()">Golf cart: ${pickCart?'YES ($25)':'no'}</button><button onclick="closeUI()">Not now</button></div></div></div>`}
+ <div class=pelist><button class=pesong onclick="golfDaily()"><b>Daily challenge: ${E(CRS[dayNo()%3].n)}</b><small>Same wind for everyone today. Par or better pays $40 once.${g.daily&&g.daily.d==dayNo()&&g.daily.best!=null?' · Today: '+g.daily.best:''}</small></button></div>\n <div class=row2><button id=gfcart onclick="golfCart()">Golf cart: ${pickCart?'YES ($25)':'no'}</button><button id=gfprac onclick="golfPrac()">Practice: ${pickPrac?'YES':'no'}</button><button onclick="closeUI()">Not now</button></div></div></div>`}
 window.golfCart=function(){pickCart=pickCart?0:1;const b=document.getElementById('gfcart');if(b)b.textContent='Golf cart: '+(pickCart?'YES ($25)':'no');sn('pop')};
-window.golfPlay=function(i){if(mode!='menu')return;startRound(i,pickCart)};
+window.golfPlay=function(i){if(mode!='menu')return;startRound(i,pickCart,{practice:pickPrac})};
+window.golfDaily=function(){if(mode!='menu')return;startRound(dayNo()%3,pickCart,{daily:dayNo()})};
+window.golfPrac=function(){pickPrac=pickPrac?0:1;const b=document.getElementById('gfprac');if(b)b.textContent='Practice: '+(pickPrac?'YES':'no');sn('pop')};
 
 /* ---------- input ---------- */
 const guard=e=>G&&G.on;
