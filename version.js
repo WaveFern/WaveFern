@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v53.7.2';
+const GAME_VERSION='v53.8.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v53.8.0',n:'The brands now post on Instagrime too. Every brand has an official account with its logo as the profile picture and posts product ads in your feed: a rotating ad each day, and a NEW DROP post near the top for 4 days whenever the brand launches its next product (about every 10 days, 3 products per brand). Tap a brand to see its profile with current and past products.'},
  {v:'v53.7.2',n:'Brand accounts in Messages now use the brand logo as their profile picture instead of the agent face.'},
  {v:'v53.7.1',n:'Security hardening. A friend\'s username is now checked (letters, numbers and underscore only) before it is used on the Friends and Profile buttons, so a made-up name can no longer run code in your game. Band room codes and guest ids are also made with secure random numbers, so they are harder to guess.'},
  {v:'v53.7.0',n:'Brand HQ insides look far more real. Fixed the dark, bare floors (the floor textures were hidden under the plinth). All six rooms and all 14 showrooms now have proper furniture: swivel chairs with arms, desks with drawers and accessories, monitors with stands, cushioned sofas, potted trees and flowering planters, plus soft contact shadows under furniture, warm light pools under lamps, framed art, bookshelves, a directory kiosk, floor lamps, a water cooler, a pastry case and a set boardroom table. Monitors now face the people sitting at them. Shadows and light pools are drawn as their own layers so nothing flickers.'},
