@@ -398,7 +398,7 @@ function endRound(){const s=sumHtml(),g=st(),ci=G.tour?3:G.ci,tot=s.tot,d=tot-s.
 window.golfLeave=function(){if(!G)return;sn('pop');fade(()=>exitGolf())};
 function exitGolf(){const was=G;G=null;SW.on=0;mode='play';try{$('hud').style.display=''}catch(e){}hud.style.display='none';document.body.classList.remove('fston');
  ball.visible=shadow.visible=peg.visible=clubG.visible=target.visible=cartG.visible=false;dots.forEach(d=>d.visible=false);clearBeacon();
- try{P.arms[0].rotation.set(0,0,0);P.arms[1].rotation.set(0,0,0)}catch(e){}P.x=CLUB.x;P.z=CLUB.z+8.5;P.rot=Math.PI;try{P.mesh.visible=true;P.mesh.rotation.x=0}catch(e){}SY=0;GY=0;$g('gf_card').style.display='none';$g('gf_fade').style.opacity=0;sv()}
+ try{P.arms[0].rotation.set(0,0,0);P.arms[1].rotation.set(0,0,0);P.legs[0].rotation.set(0,0,0);P.legs[1].rotation.set(0,0,0)}catch(e){}P.x=CLUB.x;P.z=CLUB.z+8.5;P.rot=Math.PI;try{P.mesh.visible=true;P.mesh.rotation.x=0}catch(e){}SY=0;GY=0;$g('gf_card').style.display='none';$g('gf_fade').style.opacity=0;sv()}
 function pauseCard(){if(!G||G.card==1||G.card==2)return;G.paused=!G.paused;const c=$g('gf_card');
  if(G.paused){c.innerHTML='<h2>Paused</h2><p>'+E(G.tour?'Grand Tour':G.C.n)+' · hole '+(G.hi+1)+' of '+G.hs.length+' · '+(G.cart?'cart rented':'on foot')+'</p><div class=gfkeys><span><kbd>HOLD LMB</kbd></span><span>then <b style="color:#5fe06a;font-weight:normal">pull back, push forward</b>: pull = power, push direction = shot</span><span><kbd>A</kbd><kbd>D</kbd></span><span>Aim (hold <kbd>SHIFT</kbd> for fine aim)</span><span><kbd>WHEEL</kbd><kbd>1-4</kbd></span><span>Pick a club</span><span><kbd>V</kbd></span><span>First / third person</span><span><kbd>TAB</kbd></span><span>Scorecard</span><span><kbd>SPACE</kbd></span><span>Keyboard swing: hold, then let go</span><span><kbd>E</kbd></span><span>Get out of the cart at your ball</span></div><div class=row><button class=gfbtn onclick="golfQuit()">QUIT ROUND</button><button class="gfbtn go" onclick="golfResume()">RESUME</button></div>';c.style.display='block'}else c.style.display='none'}
 window.golfResume=function(){if(G&&G.paused)pauseCard()};
@@ -473,7 +473,8 @@ function handsLocal(ph){const A=P.arms,cl=CL[G.club],k=CLV[G.club][4],L=1.1*k*.8
 function placeGolfer(){const b=G.ball,dir=dirOf(G.aim),pvx=b.x-dir[0]*.35,pvz=b.z-dir[1]*.35,rg=[Math.cos(G.aim),-Math.sin(G.aim)];let mx=.16,mz=.36;
  try{const h=handsLocal(18.4);mx=h.mid[0];mz=h.mid[2]}catch(e){}
  P.x=pvx-dir[0]*mx+rg[0]*mz;P.z=pvz-dir[1]*mx+rg[1]*mz;P.rot=Math.atan2(-rg[0],-rg[1]);return{px:pvx,pz:pvz}}
-function golfPose(q){P.legs[0].rotation.set(0,0,0);P.legs[1].rotation.set(0,0,0);const h=handsLocal(q.ph||18.4);P.arms[0].quaternion.copy(h.ql);P.arms[1].quaternion.copy(h.qr);const y=P.mesh.rotation.y,c=Math.cos(y),sn2=Math.sin(y),m=h.mid;
+function golfPose(q){const ph0=q.ph||18.4,sp=.2+Math.min(.08,Math.abs(ph0-18.4)/1500);P.legs[0].rotation.set(0,0,-sp);P.legs[1].rotation.set(0,0,sp);
+ P.mesh.rotation.y=P.rot+(ph0<18.4?-(18.4-ph0)/125*.6:Math.min(1,(ph0-18.4)/115)*.9);const h=handsLocal(ph0);P.arms[0].quaternion.copy(h.ql);P.arms[1].quaternion.copy(h.qr);const y=P.mesh.rotation.y,c=Math.cos(y),sn2=Math.sin(y),m=h.mid;
  clubG.position.set(P.mesh.position.x+m[0]*c+m[2]*sn2,P.mesh.position.y+m[1],P.mesh.position.z-m[0]*sn2+m[2]*c)}
 function clubLook(){const v=CLV[G.club],hd=clubG.userData.head,sh=clubG.userData.shaft;hd.scale.set(v[0],v[1],v[2]);hd.material.color.set(v[3]);sh.scale.y=v[4];sh.position.y=-.55*v[4];hd.position.y=-1.1*v[4]}
 const gyOf=(x,z)=>H(G.ci,x,z);
@@ -487,7 +488,7 @@ function camTick(dt){const q=G,b=q.ball,k=Math.min(1,dt*7);let tx,ty,tz,lx,ly,lz
  else if(q.st=='drive'||q.st=='fade'&&q.cart&&false){const fx=Math.sin(q.ch),fz=Math.cos(q.ch);tx=q.cx-fx*8.5;tz=q.cz-fz*8.5;ty=q.cy+3.8;cam3.position.x+=(tx-cam3.position.x)*k;cam3.position.y+=(ty-cam3.position.y)*k;cam3.position.z+=(tz-cam3.position.z)*k;cam3.lookAt(q.cx+fx*6,q.cy+.8,q.cz+fz*6)}
  else{const dir=dirOf(q.aim),gy=b.y;
   if(q.view=='1p'){const eye=[b.x-dir[0]*1.35,gy+1.62,b.z-dir[1]*1.35];tx=eye[0];ty=eye[1];tz=eye[2];lx=eye[0]+dir[0]*30;lz=eye[2]+dir[1]*30;ly=eye[1]-7;fov=84}
-  else{tx=b.x-dir[0]*5.4+dir[1]*.7;tz=b.z-dir[1]*5.4-dir[0]*.7;ty=Math.max(gy+2.1,gyOf(tx,tz)+1.6);lx=b.x+dir[0]*22;lz=b.z+dir[1]*22;ly=gy+.5}
+  else{{const rg0=Math.cos(q.aim),rg1=-Math.sin(q.aim);tx=b.x-dir[0]*4.6-rg0*2.3;tz=b.z-dir[1]*4.6-rg1*2.3}ty=Math.max(gy+2.1,gyOf(tx,tz)+1.6);lx=b.x+dir[0]*22-Math.cos(q.aim)*(-2.3);lz=b.z+dir[1]*22-(-Math.sin(q.aim))*(-2.3);ly=gy+.5}
   const kk=q.snap?1:Math.min(1,dt*9);q.snap=0;cam3.position.x+=(tx-cam3.position.x)*kk;cam3.position.y+=(ty-cam3.position.y)*kk;cam3.position.z+=(tz-cam3.position.z)*kk;cam3.lookAt(lx,ly,lz)}
  if(Math.abs(cam3.fov-fov)>.01){cam3.fov=lerp(cam3.fov,fov,Math.min(1,dt*5))}}
 let GY=0;
@@ -569,8 +570,8 @@ INT.push({x:CLUB.x,z:CLUB.z+6.6,r:6,l:'Wavefern Golf Club: play a round / rent a
 try{if(!POIS.some(q=>q[2]=='Golf Club'))POIS.push([CLUB.x,CLUB.z,'Golf Club','#7bd85a'])}catch(e){}
 /* the golfer lifts his club in the render hook (the game poses the arms before the frame is drawn) and the third person camera takes over */
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(G&&G.on&&c===cam){cam3.aspect=innerWidth/innerHeight;cam3.updateProjectionMatrix();
-  try{const q=G;if(P.arms&&P.legs){if(q.st=='drive'){P.legs[0].rotation.x=P.legs[1].rotation.x=-1.5;P.arms[0].rotation.x=P.arms[1].rotation.x=-1.1}
-   else if(q.st=='walk'){const w=Math.sin(P.t)*(GK.shift?.9:.7)*(q.wv||0);P.legs[0].rotation.x=w;P.legs[1].rotation.x=-w;P.arms[0].rotation.set(-w,0,0);P.arms[1].rotation.set(w-.35,0,0);P.mesh.updateMatrixWorld(true);clubLook();clubG.visible=true;clubG.position.copy(P.arms[1].localToWorld(new THREE.Vector3(0,-.5,0)));clubG.rotation.y=P.mesh.rotation.y;clubS.rotation.x=2.6}
+  try{const q=G;if(P.arms&&P.legs){if(q.st=='drive'){P.legs[0].rotation.set(-1.5,0,0);P.legs[1].rotation.set(-1.5,0,0);P.arms[0].rotation.set(-1.1,0,0);P.arms[1].rotation.set(-1.1,0,0)}
+   else if(q.st=='walk'){const w=Math.sin(P.t)*(GK.shift?.9:.7)*(q.wv||0);P.legs[0].rotation.x=w;P.legs[1].rotation.x=-w;P.legs[0].rotation.set(w,0,0);P.legs[1].rotation.set(-w,0,0);P.arms[0].rotation.set(-w,0,0);P.arms[1].rotation.set(w*.3-.15,0,-.08);P.mesh.updateMatrixWorld(true);clubLook();clubG.visible=true;clubG.position.copy(P.arms[1].localToWorld(new THREE.Vector3(0,-.5,0)));clubG.rotation.y=P.mesh.rotation.y;clubS.rotation.x=1.05+w*.35}
    else if(clubG.visible&&q.st!='walk'){golfPose(q);try{const hdw=clubG.userData.head;clubG.updateMatrixWorld(true);if(q.st=='swing'||(q.st=='fly'&&q.sw2<.6)){const v=new THREE.Vector3();hdw.getWorldPosition(v);fx(v.x,v.y,v.z,1,'#ffffff',.2,0,.14,.22,0,.45)}}catch(e){}}
    else if(false){const ph=q.ph||18;const a=-1.15+Math.max(0,(18.4-ph))/130*-1.4+Math.max(0,ph-18.4)/115*-.4;P.arms[0].rotation.x=P.arms[1].rotation.x=a;P.legs[0].rotation.x=P.legs[1].rotation.x=0}}}catch(e){}
   return r0(sc,cam3)}return r0(sc,c)}}
