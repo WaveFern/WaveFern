@@ -313,13 +313,13 @@ body.gfx-noblur #pzo{backdrop-filter:none!important;background:rgba(0,0,0,.72)}
 #ttl .ttm h1{font-family:Silkscreen,ui-monospace,monospace;font-weight:700;font-size:clamp(34px,5.4vw,60px);line-height:1;letter-spacing:2px;text-shadow:4px 4px 0 #000}
 #ttl .ttm>.px{font-family:Silkscreen,ui-monospace,monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin:12px 0 24px}
 #ttl .ttbx{gap:8px}
-#ttl .ttbx>button{font-family:Silkscreen,ui-monospace,monospace;font-weight:400;font-size:16px;letter-spacing:1.5px;text-transform:uppercase;padding:13px 16px;transform-origin:left center;transition:transform .18s cubic-bezier(.22,1,.36,1),background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
-#ttl .ttbx>button:not(:disabled):hover{transform:scale(1.045)}
-#ttl .ttbx>button:not(:disabled):active{transform:scale(1.02)}
+#ttl .ttbx>button{font-family:Silkscreen,ui-monospace,monospace;font-weight:400;font-size:16px;letter-spacing:1.5px;text-transform:uppercase;padding:13px 16px;transform-origin:center;transition:transform .2s cubic-bezier(.22,1,.36,1),background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
+#ttl .ttbx>button:not(:disabled):hover{transform:scale(1.07)}
+#ttl .ttbx>button:not(:disabled):active{transform:scale(1.03)}
 #ttl .ttft{font-family:Silkscreen,ui-monospace,monospace;font-size:10px;letter-spacing:.5px}
 @media(prefers-reduced-motion:reduce){#ttl .ttbx>button{transition:background .15s,border-color .15s}#ttl .ttbx>button:not(:disabled):hover,#ttl .ttbx>button:not(:disabled):active{transform:none}}
-#pzm button{font-family:Silkscreen,ui-monospace,monospace;font-weight:400;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;padding:12px 14px;transition:transform .18s cubic-bezier(.22,1,.36,1),background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
-#pzm button:not(:disabled):hover{transform:scale(1.045)}
-#pzm button:not(:disabled):active{transform:scale(1.02)}
+#pzm button{font-family:Silkscreen,ui-monospace,monospace;font-weight:400;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;padding:12px 14px;transition:transform .2s cubic-bezier(.22,1,.36,1),background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
+#pzm button:not(:disabled):hover{transform:scale(1.07)}
+#pzm button:not(:disabled):active{transform:scale(1.03)}
 #pzm h2,.pzm h2{font-family:Silkscreen,ui-monospace,monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
 @media(prefers-reduced-motion:reduce){#pzm button:not(:disabled):hover,#pzm button:not(:disabled):active{transform:none}}
