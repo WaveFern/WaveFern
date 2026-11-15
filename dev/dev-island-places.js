@@ -104,9 +104,9 @@ function buildPeople(g){if(ppG)return;ppG=new THREE.Group();g.add(ppG);const P0=
  P0(24,16,0,{talk:1,top:'#e8452c',pants:'#e8452c'});/* lifeguard */
  /* the crowd that gathers in front of the stage while a gig is on */
  for(let i=0;i<22;i++){const t=r1(),x=4.5+t*20+(r1()-.5)*1.5,z=-9.5+r1()*14;P0(x,z,Math.PI+(r1()-.5)*.5,{y:z<-6.2?.25:.05,k:'crowd'})}}
-/* ---- stage gear, fire and volleyball net, each built at two levels: q1 is house-level detail, q2 is maximum detail (type "ultra" in the game, or add ?ultra to the address) ---- */
+/* ---- stage gear, fire and volleyball net, each built at two levels: q1 is house-level detail, q2 is maximum detail (max is the default; type "ultra" in the game or add ?lite to the address for the lighter one) ---- */
 const sub=g=>{const h=new THREE.Group();g.add(h);return h};
-let QMAX=false;try{QMAX=/[?&]ultra/.test(location.search)||localStorage.getItem('fwBcQ')=='1'}catch(e){}
+let QMAX=true;try{if(/[?&]lite/.test(location.search)||localStorage.getItem('fwBcQ')=='0')QMAX=false}catch(e){}
 function guitarM(h,x,y,z,c,ry,q){const s=sub(h);s.position.set(x,y,z);s.rotation.y=ry||0;B(s,.06,.9,.06,'#222',0,.45,0);
  if(q>1)[0,1.05,2.1].forEach(a=>{B(s,.46,.04,.05,'#333',0,.03,0).rotation.y=a});
  const gt=sub(s);gt.position.set(0,.7,.1);gt.rotation.z=.2;
@@ -279,8 +279,8 @@ let PIER=null;
 {const h0=hit;hit=function(x,z,r){try{if(PIER&&!IN&&mode!='drive'&&((x>PIER.x0&&x<PIER.x1&&z>PIER.z0&&z<PIER.z1)||Math.max(Math.abs(x-LH_X),Math.abs(z-LH_Z))<ISLET-1.5)){r=r||.4;return cols.some(c=>x+r>c[0]&&x-r<c[2]&&z+r>c[1]&&z-r<c[3])?1:0}}catch(e){}return h0.apply(this,arguments)}}
 let club=null,light=null,built=false;
 function applyQ(){if(!club)return;const u=club.userData;u.q1.forEach(v=>v.visible=!QMAX);u.q2.forEach(v=>v.visible=QMAX)}
-/* the codeword: type "ultra" while walking about (or open the game with ?ultra) to switch the club's fire, net and stage gear to maximum detail */
-function setQ(v){QMAX=!!v;applyQ();try{localStorage.setItem('fwBcQ',QMAX?'1':'0')}catch(e){}try{say('Beach Club props: '+(QMAX?'MAX quality on.':'normal quality.'));sn('chime')}catch(e){}}
+/* max detail is the default. Type "ultra" while walking about (or open the game with ?lite) to switch the club's fire, net and stage gear to the lighter house-level version, and again to come back */
+function setQ(v){QMAX=!!v;applyQ();try{localStorage.setItem('fwBcQ',QMAX?'1':'0')}catch(e){}try{say('Beach Club props: '+(QMAX?'max detail on.':'lighter detail.'));sn('chime')}catch(e){}}
 {let buf='';window.addEventListener('keydown',e=>{if(mode!='play'||!e.key||e.key.length!=1)return;const t=e.target&&e.target.tagName;if(t=='INPUT'||t=='TEXTAREA')return;buf=(buf+e.key.toLowerCase()).slice(-5);if(buf=='ultra'){buf='';setQ(!QMAX)}})}
 function build(){if(built)return;built=true;try{club=buildClub();applyQ()}catch(e){console.error('beach club',e)}try{light=buildLight()}catch(e){console.error('lighthouse',e)}
  /* prompts */
