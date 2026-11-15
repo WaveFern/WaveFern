@@ -220,6 +220,6 @@ setInterval(()=>{try{const o=BRD.active();if(!o||o.k!='trip'||BRD.shootOn)return
  if(typeof P!='undefined'&&Math.hypot(P.x-OX-D.C.hq.x,P.z-OZ-D.C.hq.z)<14)return;
  const b=BRD.by(o.b);o.nx=Date.now()+180000;snd('ping');
  modal(`<div class="box modal bsx"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} car <small>${esc(BRD.place(o))}</small></h2><img class=bsfac src="${BRD.facade(o.b,BRD.place(o))}">
- <p class=m>Welcome to ${esc(BRD.place(o))}. A company car from ${esc(b.n)} is waiting outside the airport and will take you to their HQ. It is all on the brand.</p>
+ <p class=m>Welcome to ${esc(BRD.place(o))}. A company car from ${esc(b.n)} is waiting outside the airport and will take you to their HQ. It is all on the brand. Next: walk through the HQ front door (a blue light beam shows where), then the photo studio door on the left of the lobby.</p>
  <div class=row2><button class=go onclick="bdCar()">Take the company car</button><button onclick="bdWalk()">I will walk</button></div></div>`)}catch(e){console.error('brand car',e)}},1500);
 })();
