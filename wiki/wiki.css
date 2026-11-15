@@ -188,3 +188,25 @@ figure.thumb{float:right;clear:right;width:320px;margin:4px 0 14px 18px;padding:
 #lb img{max-height:85vh;width:auto;max-width:100%;margin:0 auto;border:2px solid var(--line)}
 #lb figcaption{text-align:center;color:var(--t);font-size:13px}
 @media(max-width:860px){figure.thumb{float:none;width:auto;margin:0 0 14px}}
+
+/* v53.8.0 unslop: the pixel face stays on the logo and the page title only. Section heads, box heads and sidebar labels are
+   sentence case in the text face; rules under headings go (spacing groups them); the main-page boxes lose their frames. */
+article h2,.mpb h2,#side h3,.ib .ibt,.w1{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+article h2{font-size:18px;border-bottom:0;padding-bottom:0;margin:32px 0 8px}
+article h1{border-bottom:0;padding-bottom:0}
+.from{margin:6px 0 16px}
+#side h3{font-size:12px;letter-spacing:0;border-bottom:0;margin:20px 0 6px}
+#side a{padding:2px 0}
+#side a.on{font-weight:600;color:var(--g)}
+.tabs{border-bottom:0}.tabs a.on{border-color:transparent;background:none;border-bottom:2px solid var(--g);margin-bottom:0}
+.welcome{border-bottom:0;text-align:left;padding:0 0 8px;margin-bottom:12px}
+.w1{font-size:26px;color:var(--t);line-height:1.2}
+.mpb{border:0;background:none;margin-bottom:24px}
+.mpb h2{background:none;padding:0;margin:0 0 6px;font-size:15px;color:var(--m)}
+.mpb>p,.mpb>ul{margin:6px 0}
+.ib .ibt{font-size:14px;background:#141a16}
+.btn,button{box-shadow:none;border-color:var(--line)}
+.btn:hover,button:hover{border-color:var(--g)}
+.btn:active,button:active{transform:none}
+.btn.go{border-color:var(--g)}
+@media(max-width:860px){.welcome{text-align:left}}
