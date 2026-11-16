@@ -2,6 +2,8 @@
    Players see every entry newer than the last one they closed, once, as a pop-up (243-whats-new.js). Nothing else to edit.
    id: whole number, always increasing. v: game version. t: title. d: date. tag: small label. items: short lines (HTML ok, keep it plain). */
 const WF_NEWS=[
+ {id:8,v:'v55.16.0',d:'2026-11-16',tag:'NEW',t:'Pier Fishing',
+  items:['A relaxing <b>fishing pier</b> with a bait and tackle hut, benches, lanterns, cats and seagulls.','Cast, wait for a real bite, hook it and win the reel-in tension game. No timer.','About 20 fish by time, weather, tide and bait, plus junk and treasure; a journal tracks every species.','Rods and baits unlock deeper water and bigger fish. Fishing feeds Music Mastery.']},
  {id:7,v:'v55.15.0',d:'2026-11-16',tag:'UPDATE',t:'Music Mastery v2',
   items:['Music Mastery is now built from <b>activity masteries</b> (Golf, Surfing, Songs, Gigs, Fishing and more), each with its own percent and rank.','Much harder to max: 100% needs every activity near complete.']},
  {id:6,v:'v55.14.0',d:'2026-11-16',tag:'NEW',t:'Surf Break',
