@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.8.0';
+const GAME_VERSION='v55.9.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.9.0',n:'Rivals, rolling events and viral posts. Seven AI rival artists share a chart with you (CHARTS button, bottom left): pass one for cash and followers, get passed and lose a few followers, and brand deals pay more the higher you rank (and a rival can steal an offer if you are near the bottom). A new event every 3-6 days: award nights, scandals, bidding wars, diss tracks, playlist features, festival season, algorithm dips, so no two weeks are the same. Going viral on Instagrime is now possible but very rare: almost never early, a decent chance late in a long career, and some players will never get it.'},
  {v:'v55.8.0',n:'Late-game money: the new $ WEALTH button (from 10M monthly listeners) opens the Wealth Office. Buy businesses (club, records label, merch, studios) that pay every morning, spend on luxury (mansion, yacht, private jet, art, charity gala) for Prestige that boosts business income, or put cash in the risky Fern Fund. Also a What\'s new pop-up that shows each big update once, driven by news-data.js.'},
  {v:'v55.7.0',n:'Label HQ brands: the partnered-brands strip now scrolls sideways on its own (it pauses while you hover or touch it, and still works if your device asks for reduced motion). Brands you have not unlocked yet show blurred with a pixel-art lock and their fame level, in the strip and in the brand directory, so you no longer see every brand name up front.'},
  {v:'v55.6.0',n:'Founder gear is optional. Nothing Founder is worn or placed for you: the Founder Bomber and Cap are only ever added to the wardrobe (never put on, and you can take them off), and the plaque and Day One light only go to Storage. New careers no longer get the Founder pieces automatically; Settings > Game has an Add them button. New setting Founder mark: Shown or Hidden hides the Founder badge everywhere (menus, chat, band, profile, leaderboard, other players).'},
