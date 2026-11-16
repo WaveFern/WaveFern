@@ -323,3 +323,11 @@ body.gfx-noblur #pzo{backdrop-filter:none!important;background:rgba(0,0,0,.72)}
 #pzm button:not(:disabled):active{transform:scale(1.03)}
 #pzm h2,.pzm h2{font-family:Silkscreen,ui-monospace,monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
 @media(prefers-reduced-motion:reduce){#pzm button:not(:disabled):hover,#pzm button:not(:disabled):active{transform:none}}
+
+/* v55.3.2: waking-up card on phones. The result cards were one per row (about 800px tall in landscape) so "Start the day" sat far below the
+   screen. On touch devices they now sit several to a row, tighter, and the button stays pinned to the bottom of the card. */
+body.tch #ui>.box.modal .cards{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))!important;gap:6px;margin:6px 0}
+body.tch #ui>.box.modal .cards .card{padding:8px}
+body.tch #ui>.box.modal .cards .card b{font-size:15px}
+body.tch #ui>.box.modal .cards~button.go{position:sticky;bottom:0;z-index:2;width:100%;box-shadow:0 10px 0 #0b0f0d,0 -10px 8px -2px #0b0f0d}
+@media(max-height:560px){body.tch #ui>.box.modal .cards{grid-template-columns:repeat(4,1fr)!important}}
