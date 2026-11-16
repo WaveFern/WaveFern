@@ -65,7 +65,7 @@ function hilite(i){const b=new THREE.Box3().setFromObject(PL[i].m),sz=b.getSize(
  if(!HOVO){HOVO=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1)),new THREE.LineBasicMaterial({color:DEV()?0xe6d8a8:0xffee55,depthTest:false}));HOVO.renderOrder=999;scene.add(HOVO)}
  HOVO.position.copy(ct);HOVO.scale.set(sz.x+.06,sz.y+.06,sz.z+.06);HOVO.visible=true}
 {const b0=buildTick;buildTick=function(){const r=b0.apply(this,arguments);
-  document.body.classList.toggle('pbuild',mode=='build');
+  document.body.classList.toggle('pbuild',mode=='build');document.body.classList.toggle('pbhold',mode=='build'&&!!hold);
   if(mode!='build'){sel=-1;moving=null;if(SET.length)settleTick(true);return r}
   if(SET.length)settleTick();
   if(sel>=PL.length)sel=-1;
@@ -123,6 +123,13 @@ addEventListener('keydown',e=>{if(mode!='build'||/INPUT|TEXTAREA/.test(e.target.
 const css=document.createElement('style');css.textContent=`
 body.pbuild canvas{touch-action:none}
 body.pbuild #tch{display:none!important}
+#hud{transition:opacity .25s ease,transform .25s ease}
+body.pbhold #hud{opacity:0;transform:translateY(-14px);pointer-events:none}
+.pb.act>.pbr:first-child>button:not(.go),.pb.act .pbf,.pb.act .pbl,.pb.act .pbs,.pb.act .pbh{display:none}
+.pb.act{overflow:hidden}
+@keyframes pbin{from{opacity:.4;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.pb.pbanim{animation:pbin .22s ease-out}
+@media(prefers-reduced-motion:reduce){.pb.pbanim{animation:none}#hud{transition:none}}
 .pb{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 16px));max-height:52vh;overflow:auto;box-sizing:border-box;padding:10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .pb h3{margin:0;font-size:14px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pb button{min-height:40px;padding:6px 12px;font:inherit}
@@ -182,7 +189,7 @@ window.PBcat=c=>{SCAT=c;snd('click');buildUI()};
 window.PBq=v=>{SSQ=v;const g=document.getElementById('pbgrid');if(g)g.innerHTML=listHTML();const x=document.getElementById('pbclr');if(x)x.style.display=v?'':'none'};
 window.PBclr=()=>{SSQ='';buildUI();const i=document.getElementById('pbq');if(i)i.focus()};
 
-buildUI=function(){const s=PS();S.fd=S.fd||{};const oldp=document.querySelector('#ui .pb'),sl=oldp?oldp.scrollTop:0,ol=document.querySelector('#ui .pbl'),sl2=ol?ol.scrollLeft:0,wasQ=document.activeElement&&document.activeElement.id=='pbq';
+buildUI=function(){const s=PS();const wasAct=!!document.querySelector('#ui .pb.act'),oldH=(document.querySelector('#ui .pb')||{}).offsetHeight;S.fd=S.fd||{};const oldp=document.querySelector('#ui .pb'),sl=oldp?oldp.scrollTop:0,ol=document.querySelector('#ui .pbl'),sl2=ol?ol.scrollLeft:0,wasQ=document.activeElement&&document.activeElement.id=='pbq';
  const k=stored(),fd=Object.keys(S.fd).filter(i=>S.fd[i]>0&&FOOD[i]);
  const tab=(t,n)=>`<button class="${SGT==t?'on':''}" onclick="SGT='${t}';buildUI()">${n}</button>`;
  const tg=(key,val,n)=>`<button class="${s[key]==val?'on':''}" onclick="PBset('${key}',${val})">${n}</button>`;
@@ -195,7 +202,8 @@ buildUI=function(){const s=PS();S.fd=S.fd||{};const oldp=document.querySelector(
  const sets=setOpen?`<div class=pbs><b>Snap to walls and furniture</b>${tg('snap',1,'On')}${tg('snap',0,'Off')}<b>Turn back to the wall</b>${tg('turn',1,'On')}${tg('turn',0,'Off')}<b>Grid size</b>${tg('grid',.25,'¼')}${tg('grid',.5,'½')}${tg('grid',1,'1')}${tg('grid',0,'Free')}</div>`:'';
  const hint=SGT!='f'?'Tap food to eat it and restore energy.':touch()?(act?'Drag in the room to move it. Green means it fits.':'Tap an item below to place it, or tap a placed item to move it.'+(DEV()?' Search or pick a category to find things faster.':'')):(act?'Click to place · R or right-click: turn · E: store · Enter: place':'Pick an item below, or click a placed item. Drag to move it.');
  $('ui').innerHTML=`<div class="box pb ${act?'act':''}"><div class=pbr><h3>Storage${name?' · '+name:''}</h3>${tab('f','Furniture ('+k.reduce((a,t)=>a+S.inv[t],0)+')')}${tab('d','Food ('+fdN()+')')}<button class="${setOpen?'on':''}" onclick="PBgear()" aria-label="Placement settings">${pxIcon('gear')}</button><button class=go onclick="exitBuild()">Done</button></div>${actRow}${sets}${body}<small class="m pbh">${hint}${hasBed()?'':' · The room needs a bed'}</small></div>`;
- const n=document.querySelector('#ui .pb');if(n)n.scrollTop=sl;const n2=document.querySelector('#ui .pbl');if(n2&&!DEV())n2.scrollLeft=sl2;if(wasQ){const i=document.getElementById('pbq');if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}}};
+ const n=document.querySelector('#ui .pb');if(n&&oldH&&wasAct!=act&&n.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches){/* panel slides out to a slim bar while you hold an item, and back when you let go */const nh=n.offsetHeight;if(nh!=oldH){try{n.animate([{height:oldH+'px'},{height:nh+'px'}],{duration:240,easing:'ease'})}catch(e){}}n.classList.add('pbanim');setTimeout(()=>n.classList.remove('pbanim'),260)}
+ if(n)n.scrollTop=sl;const n2=document.querySelector('#ui .pbl');if(n2&&!DEV())n2.scrollLeft=sl2;if(wasQ){const i=document.getElementById('pbq');if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}}};
 window.PBdo=a=>{if(mode!='build')return;if(a=='place')place();else if(a=='rl'){rot(-1);buildUI()}else if(a=='rr'){rot(1);buildUI()}else if(a=='store')store();else if(a=='cancel')cancel();else if(a=='move'&&sel>=0)pickUp(sel)};
 window.PBset=(k,v)=>{PS()[k]=v;snd('click');buildUI()};
 window.PBgear=()=>{setOpen=!setOpen;snd('click');buildUI()};
