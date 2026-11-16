@@ -2,6 +2,8 @@
    Players see every entry newer than the last one they closed, once, as a pop-up (243-whats-new.js). Nothing else to edit.
    id: whole number, always increasing. v: game version. t: title. d: date. tag: small label. items: short lines (HTML ok, keep it plain). */
 const WF_NEWS=[
+ {id:5,v:'v55.13.0',d:'2026-11-16',tag:'NEW',t:'Music Mastery',
+  items:['Press <b>Tab</b> to open your <b>Music Mastery</b>: a long-term 0 to 100% score from songs, gigs, festivals, golf, brand work, fame and more.','Hit milestones for cash, followers, titles, studio perks and cosmetics.','Higher mastery makes every new song a little better (up to +15% quality).']},
  {id:4,v:'v55.12.0',d:'2026-11-16',tag:'NEW',t:'Move everything at home',
   items:['Your <b>studio gear</b> (instruments, mic, speakers, decks) and the <b>bedroom</b> (wardrobe, pictures, clock, lights, plants) can now be moved and stored. Press <b>F</b> at home.','Only the desk stays fixed. Place your mic before you leave Storage.']},
  {id:3,v:'v55.9.0',d:'2026-11-16',tag:'NEW',t:'Rivals and rolling events',
