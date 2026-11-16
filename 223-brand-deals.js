@@ -73,7 +73,7 @@ function pickBrand(){const L=fl(),last=(st().list.slice(-1)[0]||{}).b,pool=[];BR
 function pickDest(){try{if(typeof WT_DEST=='undefined'||!Array.isArray(WT_DEST)||!WT_DEST.length)return null;return WT_DEST[Math.floor(Math.random()*WT_DEST.length)]}catch(e){return null}}
 const placeOf=id=>{try{return id&&id!='home'?wtPlace(wtDest(id)):'your home city'}catch(e){return'abroad'}};
 BRD.place=o=>placeOf(o.d);
-const CAMP={sneaker:'sneaker',drink:'summer drinks',eyewear:'eyewear',streetwear:'streetwear drop',denim:'denim',audio:'headphone',sportswear:'sportswear',tech:'tech',luxury:'luxury'};
+const CAMP={sneaker:'sneaker',drink:'summer drinks',eyewear:'eyewear',streetwear:'streetwear drop',denim:'denim',audio:'headphone',sportswear:'sportswear',tech:'tech',luxury:'luxury',fastfood:'fast food',snack:'snack',coffee:'coffee',cosmetics:'beauty',streaming:'streaming',gaming:'gaming',outdoor:'outdoor wear',athleisure:'athleisure',car:'car'};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 /* each brand writes through a named agent with a face of their own */
 const AGN=['Dana Reyes','Marcus Hale','Priya Nair','Jonas Weber','Chloe Martin','Theo Bianchi','Aiko Tanaka','Sam Okafor','Lena Novak','Rafael Costa'];
