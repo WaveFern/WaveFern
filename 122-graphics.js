@@ -9,7 +9,7 @@
    Stored per device in localStorage 'fw_gfx' (missing = Auto), so saves are untouched. ===== */
 /* bg: when the tab/window is in the background: 0 full, 1 reduced (10 fps), 2 rendering paused. blur: blurred backdrop behind the pause menu.
    bat (Battery Saver) cuts frame rate, crowds, rain and draw distance first and keeps the normal pixel size and every visual feature. */
-const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,cg:1},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,cg:1},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:2,shd:1,cg:1},low:{px:4,fps:30,crowd:1,wx:0,far:0,bg:0,blur:1,sh:1,shd:0,cg:0},bat:{px:3,fps:30,crowd:2,wx:1,far:0,bg:1,blur:0,sh:2,shd:0,cg:1}};
+const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,cg:1},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,cg:1},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:2,shd:1,cg:1},low:{px:4,fps:0,crowd:1,wx:0,far:0,bg:0,blur:0,sh:0,shd:0,cg:0},bat:{px:3,fps:60,crowd:2,wx:1,far:0,bg:1,blur:0,sh:2,shd:0,cg:1}};
 const GFX_LV=['high','med','low'];
 const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,cg:1};let GFX=Object.assign({},GFX_DEF);
 try{const g=JSON.parse(localStorage.getItem('fw_gfx')||'null');if(g&&typeof g=='object')Object.assign(GFX,g)}catch(e){}

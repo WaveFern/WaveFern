@@ -572,7 +572,9 @@ let near=null;
 {const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{
  if(mode=='title')return r;const off=away();root.visible=!off;if(off)return r;dt=dt||.016;
  if(!clubBuilt)buildClubhouse();if(!roadBuilt)buildRoad();
- CRS.forEach((C,ci)=>{const d=Math.max(0,Math.max(C.x0-P.x,P.x-C.x1,C.bz0-P.z,P.z-C.bz1)),vis=d<460||(G&&G.on&&G.ci==ci);if(vis&&!built[ci])buildCourse(ci);if(groups[ci])groups[ci].visible=vis});
+ /* v55.11: the 3 courses are about 150,000 triangles that are never frustum-culled, so a course is only drawn while the view is near it */
+ const VR=Math.max(40,viewH*Math.max(1.8,innerWidth/Math.max(1,innerHeight))*1.3+30);
+ CRS.forEach((C,ci)=>{const d=Math.max(0,Math.max(C.x0-P.x,P.x-C.x1,C.bz0-P.z,P.z-C.bz1)),near=d<460,vd=Math.max(0,Math.max(C.x0-camT.x,camT.x-C.x1,C.bz0-camT.z,camT.z-C.bz1)),vis=!!(near&&(vd<VR||(G&&G.on&&G.ci==ci)));if(near&&!built[ci])buildCourse(ci);if(groups[ci])groups[ci].visible=vis});
  if(G&&G.on){gTick(dt)}
  else{INT.forEach(i=>{if(i.gf)i.l='Wavefern Golf Club: play a round / rent a cart'});
   if(mode=='play'&&!IN&&P.mesh){let ci=-1;CRS.forEach((C,i)=>{if(P.x>C.x0-6&&P.x<C.x1+6&&P.z>C.bz0&&P.z<C.bz1)ci=i});
