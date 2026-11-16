@@ -108,6 +108,17 @@ spFollow(INT[2],'hm_mic',0,.7);spFollow(INT[3],'hm_gtr',-.55,.75);spFollow(INT[4
 /* you record at the mic: it has to be placed before you leave Storage */
 {const e0=exitBuild;exitBuild=function(){if(mode=='build'&&!PL.some(q=>q.t=='hm_mic')){snd('err');if(typeof SGT!='undefined')SGT='f';buildUI();return say('Place your studio mic before you leave Storage. You record at it.')}
   return e0.apply(this,arguments)}}
+/* v55.12.4: the bed can never be lost. If no bed is placed, stored or in your hands (an old save that lost it while you were
+   moving it), it comes back: from Storage if there is one, otherwise a new bed. It goes to its old spot, or stays in Storage if that spot is taken. */
+let bedMsg=0;
+function ensureBed(){if(busy||typeof PL=='undefined'||!scene||!S||!S.sp||mode=='load'||mode=='creator'||mode=='build'||hold||IN)return;
+ try{if(hasBed())return;S.inv=S.inv||{};let t=Object.keys(S.inv).find(k=>isBed(k)&&S.inv[k]>0)||'bed';
+  const[x,z,r]=STRD.bed,have=S.inv[t]>0;
+  if(overlapFree(t,x,z,r)){if(have)S.inv[t]--;if(S.inv[t]<=0)delete S.inv[t];addPiece(t,x,z,r)}else if(!have)S.inv[t]=1;
+  if(!bedMsg){bedMsg=1;say(PL.some(q=>isBed(q.t))?'Your bed was missing, so it is back in the bedroom.':'Your bed is back in Storage. Press F at home to place it.')}}
+ catch(e){console.warn('bed repair',e)}}
+{const w0=wakeUp;wakeUp=function(){const r=w0.apply(this,arguments);try{ensureBed()}catch(e){}return r}}
+{const b0=buildTick;let n=0;buildTick=function(){if(++n%30==0)ensureBed();return b0.apply(this,arguments)}}
 window.FW_HOUSE={ALL,DEF,BED,sync,cnt};
 if(typeof studio!='undefined'&&studio&&S&&S.gear)try{buildStudio()}catch(e){}
 })();
