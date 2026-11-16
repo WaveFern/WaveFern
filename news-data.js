@@ -2,6 +2,8 @@
    Players see every entry newer than the last one they closed, once, as a pop-up (243-whats-new.js). Nothing else to edit.
    id: whole number, always increasing. v: game version. t: title. d: date. tag: small label. items: short lines (HTML ok, keep it plain). */
 const WF_NEWS=[
+ {id:7,v:'v55.15.0',d:'2026-11-16',tag:'UPDATE',t:'Music Mastery v2',
+  items:['Music Mastery is now built from <b>activity masteries</b> (Golf, Surfing, Songs, Gigs, Fishing and more), each with its own percent and rank.','Much harder to max: 100% needs every activity near complete.']},
  {id:6,v:'v55.14.0',d:'2026-11-16',tag:'NEW',t:'Surf Break',
   items:['A new <b>surf spot</b> on the island coast. Rent a board at the hut and <b>paddle out</b> (or press <b>E</b> at the stand).','Catch sets of waves, <b>pop up</b>, carve, <b>ride the barrel</b> and launch off the lip. Judges score each ride out of 10.','Beat your best to unlock <b>bigger breaks</b>. Surfing counts towards your Music Mastery.']},
  {id:5,v:'v55.13.0',d:'2026-11-16',tag:'NEW',t:'Music Mastery',
