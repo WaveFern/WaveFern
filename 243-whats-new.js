@@ -1,4 +1,4 @@
-/* WaveFern WHAT'S NEW pop-up (v55.7.0). Data lives in news-data.js (WF_NEWS, newest first). Every entry the player has not closed yet
+/* WaveFern WHAT'S NEW pop-up (v55.8.0). Data lives in news-data.js (WF_NEWS, newest first). Every entry the player has not closed yet
    is shown once as a pixel style card (newest first, max 3 at a time). "Got it" remembers the newest id on this device (and per Google
    account). Brand new careers (day 1-2) skip old news. Never shows over the title screen, while paused, or on top of the must-read
    notice (205-announcement.js). Reopen any time: FW_NEWS.open(). ?nonews turns it off. */

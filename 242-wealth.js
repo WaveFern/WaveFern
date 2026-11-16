@@ -1,4 +1,4 @@
-/* WaveFern WEALTH OFFICE (v55.7.0): late-game money. Unlocks at 10M monthly listeners (about day 200), when plain streaming
+/* WaveFern WEALTH OFFICE (v55.8.0): late-game money. Unlocks at 10M monthly listeners (about day 200), when plain streaming
    cash stops being a challenge. Everything is priced in "days of earnings" (the 7-day average, same idea as 212-endgame.js), so it
    scales with any economy. State is S.wl (saved with the career, lazy, old saves start empty). ?nowealth skips this file.
    1 Businesses (earners): Club, Records label, Merch, Studios. 5 levels each, cost grows 1.9x a level, pays ~2.6% of what you put in per day

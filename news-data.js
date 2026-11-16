@@ -1,8 +1,8 @@
-/* WaveFern "What's new" data (v55.7.0). To announce a big update: add ONE entry at the TOP of WF_NEWS with the next id.
+/* WaveFern "What's new" data (v55.8.0). To announce a big update: add ONE entry at the TOP of WF_NEWS with the next id.
    Players see every entry newer than the last one they closed, once, as a pop-up (243-whats-new.js). Nothing else to edit.
    id: whole number, always increasing. v: game version. t: title. d: date. tag: small label. items: short lines (HTML ok, keep it plain). */
 const WF_NEWS=[
- {id:2,v:'v55.7.0',d:'2026-11-16',tag:'LATE GAME',t:'The Wealth Office',
+ {id:2,v:'v55.8.0',d:'2026-11-16',tag:'LATE GAME',t:'The Wealth Office',
   items:['New <b>$ WEALTH</b> button once you pass <b>10M monthly listeners</b>.',
    'Buy <b>businesses</b> (club, records label, merch, studios) that pay you every morning.',
    'Spend on <b>luxury</b>: mansion, yacht, private jet, art. Prestige makes your businesses earn more.',
