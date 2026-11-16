@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.7.0';
+const GAME_VERSION='v55.8.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.8.0',n:'Your bedroom looks real now: the bed has a carved frame, headboard, pillows, a striped blanket and a teddy; the bedside table has drawers, a lamp, an alarm clock and books; the desk has drawers, a monitor with a screen, keyboard, desk lamp, speaker and a swivel chair; the rug has a patterned border. The room also gets a window with curtains, framed pictures, a clock, fairy lights, a book shelf, a wardrobe and two plants. Sleeping and the furniture work the same.'},
  {v:'v55.7.0',n:'Label HQ brands: the partnered-brands strip now scrolls sideways on its own (it pauses while you hover or touch it, and still works if your device asks for reduced motion). Brands you have not unlocked yet show blurred with a pixel-art lock and their fame level, in the strip and in the brand directory, so you no longer see every brand name up front.'},
  {v:'v55.6.0',n:'Founder gear is optional. Nothing Founder is worn or placed for you: the Founder Bomber and Cap are only ever added to the wardrobe (never put on, and you can take them off), and the plaque and Day One light only go to Storage. New careers no longer get the Founder pieces automatically; Settings > Game has an Add them button. New setting Founder mark: Shown or Hidden hides the Founder badge everywhere (menus, chat, band, profile, leaderboard, other players).'},
  {v:'v55.5.1',n:'Pause now stops everything in the background: every running timer and animation loop (quests, flights, stats, economy, brand deals, tutorial, mini-games, spinners and more) holds still while the game is paused and carries on when you resume. Saving, audio fades, online play and the pause menu keep running.'},
