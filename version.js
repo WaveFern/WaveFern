@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.4.1';
+const GAME_VERSION='v55.5.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.5.0',n:'The Beach Club and the Lighthouse now show on the world map and minimap as they really look from above: the club has its teak deck, tiki bar and stage thatch roofs, fence and gate, umbrellas, sunbeds, fire pit, volleyball court, lifeguard tower and palms; the Lighthouse has its rock islet, grassy top, pier with lamps, and the striped tower with red cap and lamp.'},
  {v:'v55.4.1',n:'Golf: the ball rolls far less. More grip on landing and heavier friction on the fairway, rough, fringe and bunkers, so shots stop close to where they land. Greens roll as before.'},
  {v:'v55.4.0',n:'Golf: the hole is much bigger and easier to get into (a larger cup with a white rim, and a ball that rolls in at a higher speed), the greens are completely flat, tap-ins under 0.8 m on the green are given (GIMME, counts one stroke), your bodyguards and pets stay out of the way while you play, and walking to your ball uses the exact same walking animation as the normal game. The wind is weaker, your aim always starts on the hole (A and D nudge it off the line for that shot), a beige panel fence closes in each course so you cannot wander the whole map, fairways have a first-cut rough edge, and yardage markers (50, 100, 150 m) sit on the fairways.'},
  {v:'v55.3.2',n:'Sleeping on a phone: the waking-up results card is compact on touch screens (several cards per row) and Start the day stays on screen, so you are no longer stuck below the fold. Also fixed a typo in the v55.3.1 note that broke version.js.'},
