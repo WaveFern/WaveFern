@@ -126,3 +126,6 @@ The real order is the order of tags in `index.html`, not file numbers. Known non
 - `node tools/load-test.js [url]`: headless boot, new career, open phone apps, save; prints page errors. Serve with `python3 -m http.server 8099`.
 - `node tools/wiki-data.js` refreshes `wiki/data.js` from the live game (also runs in deploy).
 - Manual: new career, make and release a song, save, reload and load the save, sign-in and cloud save if touched.
+
+## Newsletter
+`newsletter/index.html` (served at wavefern.com/newsletter/) renders `newsletter/articles.js`; screenshots in `newsletter/img/`. Not part of the game, no version bump. How to add an article and the Monday roundup: `docs/newsletter.md`.
