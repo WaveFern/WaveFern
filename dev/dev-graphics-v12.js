@@ -33,7 +33,7 @@
  sun.shadow.bias=-.0004;sun.shadow.normalBias=.03;
  let applied='',frame=0,shRange=0,shOn=false,cgOn=true,shK='',shForce=true,lastSh=0,maxTex=2048;try{maxTex=renderer.capabilities.maxTextureSize||2048}catch(e){}
  /* Settings > Graphics (122-graphics.js) sets shadow quality, distance and the colour grade: sh 0 off, 1-4 = 512/1024/2048/4096; shd 0/1/2 = near/normal/far; cg 1/0 */
- const gcfg=()=>{try{const c=gfxCur();return{sh:c.sh==null?3:+c.sh,shd:c.shd==null?1:+c.shd,cg:c.cg==null?1:+c.cg}}catch(e){return{sh:3,shd:1,cg:1}}};
+ const gcfg=()=>{try{const c=gfxCur();return{sh:c.sh==null?3:+c.sh,shd:c.shd==null?1:+c.shd,shi:c.shi==null?14:+c.shi,cg:c.cg==null?1:+c.cg}}catch(e){return{sh:3,shd:1,cg:1}}};
  function apply(){
   const g=gcfg(),on=lv!='off',mx=lv=='max',wasSh=shOn;
   shOn=on&&g.sh>0;cgOn=!!g.cg;shK=g.sh+'|'+g.cg;shForce=true;
@@ -88,7 +88,7 @@
    amb.intensity=a0*(.84-.09*d)*BR[bri];sun.intensity=s0*(1.32-.42*d)*BR[bri];
    const T=TONES[tone];AW.setHex(T.aw);SW.setHex(T.sw);amb.color.lerp(AW,T.a*d);sun.color.lerp(SW,T.s*d)}}
   /* the shadow map is redrawn at most about 60 times a second (fast screens do not need more) and not at all while the game is paused */
-  if(dp&&shOn){const n=performance.now();if(shForce||(n-lastSh>=14&&!(typeof PAUSED!='undefined'&&PAUSED))){renderer.shadowMap.needsUpdate=true;lastSh=n;shForce=false}}
+  if(dp&&shOn){const n=performance.now();if(shForce||(n-lastSh>=gcfg().shi&&!(typeof PAUSED!='undefined'&&PAUSED))){renderer.shadowMap.needsUpdate=true;lastSh=n;shForce=false}}
   let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0;amb.color.copy(ac0);sun.color.copy(sc0)}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
   if(GLOW&&lv=='max'&&c===cam&&!(frame&1))try{bx.drawImage(cv,0,0,bc.width,bc.height)}catch(e){}
