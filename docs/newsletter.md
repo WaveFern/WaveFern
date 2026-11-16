@@ -1,6 +1,6 @@
 # Newsletter (wavefern.com/newsletter/)
 
-Static page: `newsletter/index.html` renders `newsletter/articles.js` (newest first). Screenshots live in `newsletter/img/` (960px wide .webp).
+Static page: `newsletter/index.html` renders `newsletter/articles.js` (newest first) as a masthead, latest-issue feature, 2-column card feed with infinite scroll (chunks of 6 cards), tag filter and month archive sidebar, and a full article view at `#id`. Skeleton cards show while the first and every later Firestore chunk (12 per REST request, `orderBy=d desc`) load. To test infinite scroll, intercept the `firestore.googleapis.com/.../newsletter` request in Playwright and serve fake paged docs. Screenshots live in `newsletter/img/` (960px wide .webp).
 
 ## Add an article
 1. Take a real screenshot of the feature in the game (headless Playwright, see `tools/wiki-shots.js` for setup). No real-artist names on screen.
