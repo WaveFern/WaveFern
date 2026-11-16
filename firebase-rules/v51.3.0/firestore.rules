@@ -1,5 +1,5 @@
 rules_version = '2';
-// WaveFern Firestore rules v51.3.0, 12 Nov 2026. Second admin uid added (admin() now accepts a list). Previous v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
+// WaveFern Firestore rules v51.3.0, 12 Nov 2026 (16 Nov 2026: added newsletter/{id}, public read, admin write; republish to let the admin publish newsletter articles). Second admin uid added (admin() now accepts a list). Previous v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
 // ADMIN UID: the Google account has a NEW uid in the waveferndata project. Replace wE6oPZIH... below with your uid from Authentication > Users.
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
 // Only what the game uses is allowed; everything else is refused. No get()/exists() lookups, so rules never cost extra reads.
@@ -125,6 +125,17 @@ service cloud.firestore {
         return code.matches('[A-Z0-9]{5}') && fields(['code', 'band', 'n', 'uid', 't'])
           && d.code == code && d.uid == me() && str(d.band, 1, 24) && d.n is int && d.n >= 1 && d.n <= 4 && stamp(d.t);
       }
+    }
+
+    // newsletter/{id}: wavefern.com/newsletter. Anyone reads; only the admin writes. t title, g tag, v version, d date YYYY-MM-DD, b body (paragraphs split by blank lines), i screenshot as a data URL, c created (ms).
+    match /newsletter/{id} {
+      allow read: if true;
+      allow create, update: if admin() && id.matches('[a-z0-9-]{3,70}')
+        && request.resource.data.keys().hasAll(['t', 'd', 'b', 'c']) && request.resource.data.keys().hasOnly(['t', 'g', 'v', 'd', 'b', 'i', 'c'])
+        && str(request.resource.data.t, 1, 120) && str(request.resource.data.d, 10, 10) && str(request.resource.data.b, 1, 6000) && stamp(request.resource.data.c)
+        && (!('g' in request.resource.data) || str(request.resource.data.g, 0, 20)) && (!('v' in request.resource.data) || str(request.resource.data.v, 0, 12))
+        && (!('i' in request.resource.data) || str(request.resource.data.i, 0, 700000));
+      allow delete: if admin();
     }
 
     match /{document=**} { allow read, write: if false; }

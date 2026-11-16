@@ -11,3 +11,8 @@ Static page: `newsletter/index.html` renders `newsletter/articles.js` (newest fi
 
 ## Weekly roundup (every Monday)
 Read `VERSION_HISTORY` in `version.js` and `git log --since="7 days ago"`. Write one article (tag `Weekly`, title like "Week of 9 Nov: ...") covering what shipped the previous week, with one screenshot of the biggest thing. Skip the week if nothing big shipped. PR it and merge to main once checks pass.
+
+## Publishing from the page (admin)
+Sign in with the admin Google account on wavefern.com/newsletter/ (the account name sits in the top right of the page). The account's Publish button opens a form: title, tag, version, date, text, optional screenshot. It saves to Firestore `newsletter/{id}` and shows up for everyone, merged with `articles.js`, newest date first. Admin also sees a Delete link on those articles.
+One-off setup: publish `firebase-rules/v51.3.0/firestore.rules` (it now has a `newsletter` block, public read, admin write) in Firebase console > Firestore Database > Rules. Until then, publishing shows "permission-denied".
+Admin uids live in `88-admin.js` (ADMIN_UIDS), in the rules `admin()` and in the page script. Add a new admin in all three.

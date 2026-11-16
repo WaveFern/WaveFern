@@ -13,8 +13,8 @@ body{margin:0;background:var(--bg);color:var(--t);font:15px/1.7 ui-monospace,Men
 a{color:var(--g);text-decoration:none}a:hover{text-decoration:underline}
 h1,h2,.px{font-family:'Silkscreen',ui-monospace,monospace;font-weight:400;margin:0}
 ::selection{background:var(--g);color:#04120a}
-#top{display:flex;align-items:center;gap:16px;padding:10px 18px;background:#070a08;border-bottom:3px solid #000}
-#top .px{color:var(--g);font-size:19px}#top nav{margin-left:auto;display:flex;gap:16px;font-size:13px}
+#top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;padding:10px 18px;background:#070a08;border-bottom:3px solid #000}
+#top .px{color:var(--g);font-size:19px}#top nav{margin-left:auto;display:flex;gap:16px;font-size:13px;align-items:center}#acct{display:flex;gap:10px;align-items:center;padding-left:16px;border-left:1px solid var(--line)}#acct:empty{display:none}#acct b{font-weight:400;color:var(--t)}.lk{background:none;border:0;padding:0;font:inherit;color:var(--g);cursor:pointer}.lk:hover{text-decoration:underline}
 .btn{display:inline-block;font-family:'Silkscreen',monospace;background:var(--g);color:#04120a;border:3px solid #000;box-shadow:inset 0 -4px #0003,4px 4px 0 #000;padding:8px 16px;font-size:14px}
 .btn:hover{text-decoration:none;transform:translate(1px,1px);box-shadow:inset 0 -4px #0003,3px 3px 0 #000}
 main{max-width:1000px;margin:0 auto;padding:0 18px 80px}
@@ -23,7 +23,7 @@ header.mast h1{font-size:clamp(34px,7vw,64px);line-height:1.05}
 header.mast h1 b{color:var(--g);font-weight:400}
 header.mast p{max-width:34em;color:var(--m);margin:14px 0 0}
 article{display:grid;grid-template-columns:150px minmax(0,1fr);gap:28px;padding:44px 0;border-bottom:1px solid var(--line)}
-.rail{align-self:start;position:sticky;top:16px}
+.rail{align-self:start;position:sticky;top:72px}
 .rail .v{font-family:'Silkscreen',monospace;font-size:34px;line-height:1;color:var(--g)}
 .rail .d{color:var(--m);font-size:13px;margin-top:8px}
 .rail .tag{display:inline-block;margin-top:10px;font-size:12px;color:var(--amb)}
@@ -34,31 +34,96 @@ figure img{display:block;width:100%;height:auto;border:3px solid #000;box-shadow
 .body p{margin:0 0 12px;max-width:42em}
 footer{padding:36px 0 0;color:var(--m);font-size:13px}
 @media(max-width:700px){article{grid-template-columns:1fr;gap:12px}.rail{position:static;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}.rail .v{font-size:24px}.rail .d,.rail .tag{margin:0}.pair{grid-template-columns:1fr}}
+
+#ed{display:none;margin:28px 0 0;padding:20px;background:var(--p);border:3px solid #000;box-shadow:6px 6px 0 #000}
+#ed.on{display:block}#ed h2{font-size:18px;margin-bottom:14px}
+#ed label{display:block;margin:10px 0 4px;color:var(--m);font-size:12px}
+#ed input,#ed textarea{width:100%;background:#000;color:var(--t);border:2px solid var(--line);padding:8px;font:inherit}
+#ed textarea{min-height:150px;resize:vertical}#ed .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+#ed .go{margin-top:14px;cursor:pointer}#ed #st{margin-left:12px;color:var(--m);font-size:13px}
+.del{margin-top:8px;font-size:12px;color:#e06c6c}
+@media(max-width:700px){#ed .row{grid-template-columns:1fr}#acct{padding-left:0;border:0}#top nav a:not(.btn){display:none}}
 </style></head><body>
-<div id="top"><a class="px" href="/">WaveFern</a><nav><a href="/wiki/">Wiki</a><a href="/versions.html">All versions</a><a class="btn" href="/">Play</a></nav></div>
+<div id="top"><a class="px" href="/">WaveFern</a><nav><a href="/wiki/">Wiki</a><a href="/versions.html">All versions</a><a class="btn" href="/">Play</a><span id="acct"></span></nav></div>
 <main>
-<header class="mast"><h1>The Wave<b>Fern</b> newsletter</h1><p>Big updates, a few lines each, with a screenshot from the game. A roundup of the previous week goes up every Monday.</p></header>
+<header class="mast"><h1>The Wave<b>Fern</b> newsletter</h1><p>Big updates in plain words, each with a screenshot from the game. On Mondays we write up the week before.</p></header>
+<section id="ed"><h2>Publish an article</h2>
+<label>Title</label><input id="et" maxlength="120">
+<div class="row"><div><label>Tag</label><input id="eg" maxlength="20" value="Update"></div><div><label>Version (optional)</label><input id="ev" maxlength="12" placeholder="v55.9"></div><div><label>Date</label><input id="ed2" type="date"></div></div>
+<label>Text (blank line between paragraphs)</label><textarea id="eb"></textarea>
+<label>Screenshot (optional)</label><input id="ei" type="file" accept="image/*">
+<button class="btn go" id="epub" type="button">Publish</button><span id="st"></span></section>
 <div id="list"></div>
 <noscript><p>This page needs JavaScript to list the articles. Full list of changes: <a href="/versions.html">versions</a>.</p></noscript>
-<footer>Small fixes are not covered here, they are all on the <a href="/versions.html">versions page</a>.</footer>
+<footer>Small fixes are not covered here. They are all on the <a href="/versions.html">versions page</a>.</footer>
 </main>
 <script src="articles.js"></script>
 <script>
 (function(){
  var L=document.getElementById('list'),M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+ var ADMINS=['wE6oPZIHYifrqBFxzpPse6ripGY2','T79oEtO29fUBYv4P9qq0vBDzZZt2'],CFG={apiKey:'AIzaSyBK_7wiX2SEtEhacUsFrgt8URcG1DyHdmA',authDomain:'waveferndata.firebaseapp.com',projectId:'waveferndata',appId:'1:729312399087:web:09d5d134ce654e223ed51a'};
+ var FB='https://www.gstatic.com/firebasejs/10.12.2/firebase-',user=null,A=null,AM=null,DB=null,FS=null,cloud=[];
  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
  function fig(s,a){var f=el('figure'),i=el('img');i.src=s;i.alt=a||'';i.loading='lazy';f.appendChild(i);return f}
- NEWSLETTER.forEach(function(a){
-  var ar=el('article');ar.id=a.id;
-  var r=el('div','rail'),d=a.date.split('-');
-  r.appendChild(el('div','v',a.v));r.appendChild(el('div','d',+d[2]+' '+M[+d[1]-1]+' '+d[0]));r.appendChild(el('div','tag',a.tag));
-  var c=el('div');c.appendChild(el('h2','',a.title));
-  if(a.img2){var p=el('div','pair');p.appendChild(fig(a.img,a.alt));p.appendChild(fig(a.img2,a.alt2));c.appendChild(p)}
-  else if(a.img)c.appendChild(fig(a.img,a.alt));
-  var b=el('div','body');a.body.forEach(function(t){b.appendChild(el('p','',t))});c.appendChild(b);
-  ar.appendChild(r);ar.appendChild(c);L.appendChild(ar);
- });
- if(location.hash){var t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}
+ function isAdmin(){return !!(user&&ADMINS.indexOf(user.uid)>=0)}
+ function render(){
+  L.textContent='';
+  var all=NEWSLETTER.map(function(a){return a}).concat(cloud);
+  all.sort(function(x,y){return x.date<y.date?1:x.date>y.date?-1:(y.c||0)-(x.c||0)});
+  all.forEach(function(a){
+   var ar=el('article');ar.id=a.id;
+   var r=el('div','rail'),d=a.date.split('-');
+   r.appendChild(el('div','v',a.v||'News'));r.appendChild(el('div','d',+d[2]+' '+M[+d[1]-1]+' '+d[0]));if(a.tag)r.appendChild(el('div','tag',a.tag));
+   var c=el('div');c.appendChild(el('h2','',a.title));
+   if(a.img)c.appendChild(fig(a.img,a.alt));
+   var b=el('div','body');a.body.forEach(function(t){b.appendChild(el('p','',t))});c.appendChild(b);
+   if(a.cloud&&isAdmin()){var x=el('button','lk del','Delete this article');x.onclick=function(){if(x.dataset.s!='1'){x.dataset.s='1';x.textContent='Click again to delete';return}del(a.id)};c.appendChild(x)}
+   ar.appendChild(r);ar.appendChild(c);L.appendChild(ar);
+  });
+  if(location.hash){var t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}
+ }
+ /* articles published from the page are read with the plain REST API, so readers never load the Firebase SDK for them */
+ function loadCloud(){
+  return fetch('https://firestore.googleapis.com/v1/projects/'+CFG.projectId+'/databases/(default)/documents/newsletter?pageSize=100&key='+CFG.apiKey).then(function(r){return r.ok?r.json():{}}).then(function(j){
+   cloud=(j.documents||[]).map(function(d){var f=d.fields||{},g=function(k){return f[k]&&f[k].stringValue||''};
+    return {id:d.name.split('/').pop(),cloud:1,v:g('v'),date:g('d'),tag:g('g'),title:g('t'),img:g('i'),alt:g('t'),body:g('b').split(/\n\s*\n/).map(function(s){return s.trim()}).filter(Boolean),c:f.c&&+f.c.integerValue||0}}).filter(function(a){return a.title&&a.date.length==10});
+  }).catch(function(){cloud=[]});
+ }
+ function acct(){
+  var a=document.getElementById('acct'),ed=document.getElementById('ed');a.textContent='';
+  if(!A){return}
+  if(!user){var b=el('button','lk','Sign in');b.onclick=signIn;a.appendChild(b);ed.classList.remove('on');return}
+  a.appendChild(el('b','',String(user.displayName||user.email||'Signed in').split(' ')[0].slice(0,16)));
+  if(isAdmin()){var p=el('button','lk','Publish');p.onclick=function(){ed.classList.toggle('on');if(ed.classList.contains('on'))ed.scrollIntoView({behavior:'smooth'})};a.appendChild(p)}else ed.classList.remove('on');
+  var o=el('button','lk','Sign out');o.onclick=function(){AM.signOut(A)};a.appendChild(o);
+ }
+ function signIn(){AM.signInWithPopup(A,new AM.GoogleAuthProvider()).catch(function(e){document.getElementById('st').textContent='Sign-in failed: '+((e&&e.code)||e)})}
+ function initAuth(){
+  Promise.all([import(FB+'app.js'),import(FB+'auth.js')]).then(function(m){
+   var app=m[0].initializeApp(CFG);AM=m[1];A=AM.getAuth(app);
+   AM.onAuthStateChanged(A,function(u){user=u;acct();render()});
+  }).catch(function(){})
+ }
+ function fs(){return FS?Promise.resolve():import(FB+'firestore.js').then(function(f){FS=f;DB=f.getFirestore(A.app)})}
+ function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50)}
+ function shrink(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){var w=Math.min(960,i.width),c=document.createElement('canvas');c.width=w;c.height=Math.round(i.height*w/i.width);c.getContext('2d').drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/webp',.8))};i.onerror=function(){rej('Could not read that image')};i.src=u})}
+ function say(t){document.getElementById('st').textContent=t}
+ function publish(){
+  var v=function(id){return document.getElementById(id).value.trim()},t=v('et'),b=v('eb'),d=v('ed2')||new Date().toISOString().slice(0,10);
+  if(!t||!b){return say('Title and text are needed')}
+  say('Publishing');
+  var f=document.getElementById('ei').files[0];
+  (f?shrink(f):Promise.resolve('')).then(function(img){
+   if(img.length>650000)throw 'Image too big, use a smaller one';
+   return fs().then(function(){
+    var o={t:t,g:v('eg'),v:v('ev'),d:d,b:b,c:Date.now()};if(img)o.i=img;
+    return FS.setDoc(FS.doc(DB,'newsletter',slug(t)+'-'+d),o)});
+  }).then(function(){say('Published');['et','eb','ev'].forEach(function(k){document.getElementById(k).value=''});document.getElementById('ei').value='';return loadCloud().then(render)})
+  .catch(function(e){say('Failed: '+((e&&e.code)||e)+((e&&e.code=='permission-denied')?' (the Firestore rules need publishing, see docs/newsletter.md)':''))});
+ }
+ function del(id){fs().then(function(){return FS.deleteDoc(FS.doc(DB,'newsletter',id))}).then(loadCloud).then(render).catch(function(e){say('Failed: '+((e&&e.code)||e))})}
+ document.getElementById('epub').onclick=publish;
+ render();loadCloud().then(render);initAuth();
 })();
 </script>
 </body></html>
