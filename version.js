@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.10.0';
+const GAME_VERSION='v55.10.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.10.1',n:'Bedroom fix: only one wardrobe now (the detailed one, still opens your wardrobe) and the wall shelf covering the window is gone.'},
  {v:'v55.10.0',n:'Your bedroom looks real now: the bed has a carved frame, headboard, pillows, a striped blanket and a teddy; the bedside table has drawers, a lamp, an alarm clock and books; the desk has drawers, a monitor with a screen, keyboard, desk lamp, speaker and a swivel chair; the rug has a patterned border. The room also gets a window with curtains, framed pictures, a clock, fairy lights, a book shelf, a wardrobe and two plants. Sleeping and the furniture work the same.'},
  {v:'v55.9.0',n:'Rivals, rolling events and viral posts. Seven AI rival artists share a chart with you (CHARTS button, bottom left): pass one for cash and followers, get passed and lose a few followers, and brand deals pay more the higher you rank (and a rival can steal an offer if you are near the bottom). A new event every 3-6 days: award nights, scandals, bidding wars, diss tracks, playlist features, festival season, algorithm dips, so no two weeks are the same. Going viral on Instagrime is now possible but very rare: almost never early, a decent chance late in a long career, and some players will never get it.'},
  {v:'v55.8.0',n:'Late-game money: the new $ WEALTH button (from 10M monthly listeners) opens the Wealth Office. Buy businesses (club, records label, merch, studios) that pay every morning, spend on luxury (mansion, yacht, private jet, art, charity gala) for Prestige that boosts business income, or put cash in the risky Fern Fund. Also a What\'s new pop-up that shows each big update once, driven by news-data.js.'},
