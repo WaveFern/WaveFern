@@ -1,40 +1,54 @@
-/* ---------- v55.13.0: Music Mastery (dev build) ----------
+/* ---------- v55.14.0: Music Mastery v2 (dev build) ----------
    A long-term progress number, 0 to 100 %, that rises the better you get at things and the more you do them.
    Press Tab while walking about (or tap the small "Tab Mastery" pill at the bottom left) for the full-screen Mastery panel: a slow
-   turntable 3D model of your player with the big % gauge and rank, a reward track, the ledger of every category (click or arrow keys
-   + Enter for the breakdown) and the last 20 contributions. Tab or Esc closes it. The panel is mode 'menu' like the other menus, so
-   time stands still and movement is off while it is open; if the game pauses (focus lost, pause menu) the panel hides until you resume.
+   turntable 3D model of your player with the big % gauge, rank and a compact "What got you here" strip (the top contributing
+   activities, ranked, with mini bars), a reward track, the ledger of every category (each shows a big "N% complete" of its OWN cap
+   and its share of the total; click or arrow keys + Enter for the breakdown) and the last 20 contributions. Tab or Esc closes it.
+   The panel is mode 'menu' like the other menus, so time stands still and movement is off while it is open; if the game pauses
+   (focus lost, pause menu) the panel hides until you resume.
 
    PUBLIC API (other features feed it):  FW_MASTERY = { add(categoryId, points, reason), get(), cats, qualityBonus(q), open(), close() }
      add(cat, points, reason)  skill-weighted points go IN (you decide how many from how well the player did; 0..60 per call).
                                Returns the points that were really applied after the daily rules below.
-     get()                     {pct, rank, next, cats:[{id,name,raw,cap,frac,pct,weight,today,dayCap,...}], rewards, qBonus ...}
+     get()                     {pct, base, factor, weakest, rank, next, cats:[{id,name,raw,cap,frac,done,pct,weight,today,dayCap,...}], rewards, qBonus ...}
+                               done = completion of that category's own cap, 0..100 (what the panel shows as "N% complete")
      cats                      the category table (id -> {name, w, cap, day, exp, how, state})
-   Category ids: songs, qual, gigs, fest, golf, surf, mgolf, skate, brand, collab, fame, days.
-   surf / mgolf / skate have no activity in the game yet: call FW_MASTERY.add('surf', pts, 'Wave ridden') from the new feature.
+   Category ids: songs, qual, gigs, fest, golf, surf, mgolf, skate, fish, brand, collab, fame, days.
+   surf / mgolf / skate / fish have no activity in the game yet: call FW_MASTERY.add('surf', pts, 'Wave ridden') from the new feature.
 
    HOW THE NUMBER IS BUILT (tuning table; change the numbers here)
-     Every category has a weight W (its share of the 100 %; the twelve add up to 100), a points cap R, a daily cap D and a curve exponent X.
-     category score  c = min(1, raw / R) ^ X          (X < 1: early points count most, the last ones are very slow)
-     Music Mastery % = sum of W * c
+     Every category has a weight W (its share of the 100 %; the thirteen add up to 100), a points cap R, a daily cap D and a curve exponent X.
+     category completion  c = min(1, raw / R) ^ X       (0..1, shown as "N% complete"; X < 1 only softens the very start a little)
+     base = sum of W * c                               (each category's share of the total)
+     Music Mastery % = base * (1 - .08 * worst)        worst = max over categories of max(0, .95 - c) / .95
+     The balance penalty is gentle but real: a category left at 0 % caps the total at 92 % of what the rest earned, so skipping one
+     activity lands around 82-88 % (its own share is missing too), and the penalty only disappears once EVERY category is above 95 %.
+     So 100 % needs all thirteen near complete; maxing only 8 of 13 reaches about 70 %.
      id      W    R(cap)  D(per day)  X     what feeds it
-     songs   10   2400    8           .6    each released song: 1.2 + 5 * (quality/100)^2
-     qual    14   2400    8           .6    each released song over quality 45: 9 * ((q-45)/55)^1.6, +3 at 90+
-     gigs     6    600   12           .6    Beach Club gig: 3 + 15 * crowd skill^2
-     fest    12   1200   20           .6    festival set: 3 + 22 * avg score^2, +1.5 per full song (x0.3 if you quit early)
-     golf     9    900   14           .6    round: 8 - 1.6 * (strokes under/over par), +1.5 per stroke under par on a hole, ace +20
-     surf     5    600    8           .6    API only
-     mgolf    4    400    6           .6    API only
-     skate    4    400    6           .6    API only
-     brand    8    600   12           .6    brand deal finished: 10 + 20 * photoshoot quality
-     collab   6    600    6           .6    released song with a feature artist: 4 + 4 * quality/100
-     fame    14     12    -           1     (state) fame tier 0..12 with the progress to the next one
-     days     8   1200    -           .6    (state) 0.5 * days survived + 0.5 * days you earned anything
+     songs    9   4000    8           .75   each released song: 1.2 + 5 * (quality/100)^2
+     qual    12   4000    8           .75   each released song over quality 45: 9 * ((q-45)/55)^1.6, +3 at 90+
+     gigs     6   6000    12          .75   Beach Club gig: 3 + 15 * crowd skill^2
+     fest    10   9000    20          .75   festival set: 3 + 22 * avg score^2, +1.5 per full song (x0.3 if you quit early)
+     golf     8   7000    14          .75   round: 8 - 1.6 * (strokes under/over par), +1.5 per stroke under par on a hole, ace +20
+     surf     5   3600    8           .75   API only
+     mgolf    4   3000    6           .75   API only
+     skate    4   3000    6           .75   API only
+     fish     6   3600    8           .75   API only (Fishing)
+     brand    7   5400    12          .75   brand deal finished: 10 + 20 * photoshoot quality
+     collab   5   3000    6           .75   released song with a feature artist: 4 + 4 * quality/100
+     fame    14     10    -           1     (state) fame tier 0..10 with the progress to the next one
+     days    10    900    -           .75   (state) 0.5 * days survived + 0.5 * days you earned anything
      Anti-farming: each category stops at its daily cap D per game day; the n-th contribution of a day in a category is worth 0.88^n;
      repeating the same reason (same song, course, stage...) in one day is worth 0.6^repeats. Event points cannot pass R.
-     Playing 10 hours (about 50 game days of 12 minutes) lands near 20-25 %: a few songs a day of quality 55-65, a festival set a
-     week, some golf and a brand deal. Filling every cap takes R/D game days at the very least (300 days for songs = 60 hours of perfect
-     play), and the 0.6 exponent means the last 10 % of every bar costs about 15 % of its points: 100 % needs hundreds of hours.
+     PACING (headless simulation through FW_MASTERY.add, one game day per step; fame modelled as listeners growing 4 % a day):
+       normal long session (50 game days at 40 % of every daily cap): 10.6 %  (30 days 7.4, 100 days 17.7, 365 days 49.7)
+       heavy varied play (every category at its daily cap, every day): 30 days 11.6 %, 50 days 16.8, 100 days 28.5, 200 days 49.6,
+         365 days 77.9; 50 % takes about 200 maxed-out days (many weeks, realistically a lot longer). Consistency alone needs 900 days,
+         so 100 % cannot come before day 900 and needs every other category near its cap too.
+       all categories at 95 % -> 95 %, at 90 % -> 89.6 %, at 80 % -> 79 %; one missing small category (mini golf) -> 88 %, surfing 87 %.
+   ACTIVITY MASTERIES: every category is the player's own mastery of one activity (titled 'Golf Mastery' etc.) with a percent complete
+     and a rank name that changes at 0/15/35/60/85 % complete (golf: Range Rookie, Weekend Swinger, Club Regular, Scratch Player,
+     Tour Pro). Music Mastery is derived from them; a neglected activity holds the total back (balance penalty above).
    RANKS: Newcomer 0, Local Act 5, Rising 15, Headliner 30, Icon 55, Legend 80.
    REWARDS (RW below): milestones from 5 % to 100 % pay out automatically once: cash, followers, titles, studio perks (+1 song
      quality each at 15 / 40 / 90 %) and panel cosmetics (halo 20 %, gold stage 50 %, aurora 80 %, crown 100 %).
@@ -51,19 +65,22 @@ if(window.FW_MASTERY)return;
 try{if(/[?&]trailer/.test(location.search))return}catch(e){}
 
 const CATS=[
- {id:'songs',name:'Songs made',w:10,cap:2400,day:8,exp:.6,how:'Release songs. A great song is worth many rough ones.'},
- {id:'qual',name:'Release quality',w:14,cap:2400,day:8,exp:.6,how:'Release songs above quality 45. Quality 90+ is a perfect song.'},
- {id:'gigs',name:'Live gigs',w:6,cap:600,day:12,exp:.6,how:'Play Beach Club gigs with your best songs for a wild crowd.'},
- {id:'fest',name:'Festival sets',w:12,cap:1200,day:20,exp:.6,how:'Book festival sets and keep the crowd hyped to the last song.'},
- {id:'golf',name:'Golf',w:9,cap:900,day:14,exp:.6,how:'Finish rounds under par. Birdies, eagles and holes in one pay best.'},
- {id:'surf',name:'Surfing',w:5,cap:600,day:8,exp:.6,how:'Ride waves (coming soon: counts as soon as surfing is in the game).'},
- {id:'mgolf',name:'Mini Golf',w:4,cap:400,day:6,exp:.6,how:'Low scores on the mini golf course (coming soon).'},
- {id:'skate',name:'Skating',w:4,cap:400,day:6,exp:.6,how:'Land tricks and long runs on the skate park (coming soon).'},
- {id:'brand',name:'Brand work',w:8,cap:600,day:12,exp:.6,how:'Finish brand shoots; a better photoshoot earns more.'},
- {id:'collab',name:'Collabs',w:6,cap:600,day:6,exp:.6,how:'Release songs with a feature artist.'},
- {id:'fame',name:'Fame',w:14,cap:12,day:0,exp:1,state:1,how:'Grow your listeners to climb the fame tiers.'},
- {id:'days',name:'Consistency',w:8,cap:1200,day:0,exp:.6,state:1,how:'Stay in the game: days survived, and days you actually earned something.'}];
+ {id:'songs',name:'Songs',w:9,rk:'Doodler,Songwriter,Hitmaker,Chart Smith,Song Legend'.split(','),cap:4000,day:8,exp:.75,how:'Release songs. A great song is worth many rough ones.'},
+ {id:'qual',name:'Song quality',w:12,rk:'Rough Cut,Clean Mix,Polished,Studio Ace,Perfectionist'.split(','),cap:4000,day:8,exp:.75,how:'Release songs above quality 45. Quality 90+ is a perfect song.'},
+ {id:'gigs',name:'Gigs',w:6,rk:'Open Mic,Regular Act,Crowd Pleaser,Headline Act,Stage Legend'.split(','),cap:6000,day:12,exp:.75,how:'Play Beach Club gigs with your best songs for a wild crowd.'},
+ {id:'fest',name:'Festivals',w:10,rk:'Opening Slot,Side Stage,Main Stage,Festival Star,Festival Legend'.split(','),cap:9000,day:20,exp:.75,how:'Book festival sets and keep the crowd hyped to the last song.'},
+ {id:'golf',name:'Golf',w:8,rk:'Range Rookie,Weekend Swinger,Club Regular,Scratch Player,Tour Pro'.split(','),cap:7000,day:14,exp:.75,how:'Finish rounds under par. Birdies, eagles and holes in one pay best.'},
+ {id:'surf',name:'Surfing',w:5,rk:'Beach Walker,Wave Paddler,Board Rider,Barrel Chaser,Big Wave Legend'.split(','),cap:3600,day:8,exp:.75,how:'Ride waves (coming soon: counts as soon as surfing is in the game).'},
+ {id:'mgolf',name:'Mini Golf',w:4,rk:'Putt Rookie,Windmill Dodger,Clown Slayer,Hole-in-One Hunter,Putt Master'.split(','),cap:3000,day:6,exp:.75,how:'Low scores on the mini golf course (coming soon).'},
+ {id:'skate',name:'Skating',w:4,rk:'Board Wobbler,Ollie Kid,Park Regular,Rail Grinder,Skate Legend'.split(','),cap:3000,day:6,exp:.75,how:'Land tricks and long runs on the skate park (coming soon).'},
+ {id:'fish',name:'Fishing',w:6,rk:'Bait Fumbler,Pier Angler,Reel Regular,Boat Captain,Fish Whisperer'.split(','),cap:3600,day:8,exp:.75,how:'Catch fish, rare ones pay best (coming soon: counts as soon as fishing is in the game).'},
+ {id:'brand',name:'Brand work',w:7,rk:'Fresh Face,Gig Model,Campaign Face,Brand Ambassador,Household Name'.split(','),cap:5400,day:12,exp:.75,how:'Finish brand shoots; a better photoshoot earns more.'},
+ {id:'collab',name:'Collabs',w:5,rk:'Solo Act,Feature Guest,Duo Partner,Collab King,Supergroup'.split(','),cap:3000,day:6,exp:.75,how:'Release songs with a feature artist.'},
+ {id:'fame',name:'Fame',w:14,rk:'Unknown,Local Buzz,Rising Name,Star,Icon'.split(','),cap:10,day:0,exp:1,state:1,how:'Grow your listeners to climb the fame tiers.'},
+ {id:'days',name:'Consistency',w:10,rk:'Newcomer,Regular,Veteran,Lifer,Island Legend'.split(','),cap:900,day:0,exp:.75,state:1,how:'Stay in the game: days survived, and days you actually earned something.'}];
+const PEN=.08,PFREE=.95;/* balance penalty: max share lost, and the completion above which a category costs nothing */
 const BY={};CATS.forEach(c=>BY[c.id]=c);
+const TIERS=[0,15,35,60,85];/* an activity's rank changes at these completions (%) of its own cap */
 const RANKS=[[0,'Newcomer'],[5,'Local Act'],[15,'Rising'],[30,'Headliner'],[55,'Icon'],[80,'Legend']];
 /* milestone rewards: cash ($), fol (followers), q (flat song quality), badge (title), fx (panel cosmetic) */
 const RW=[
@@ -141,22 +158,24 @@ function rawOf(c,m){
  if(c.id=='fame')return fameRaw();
  if(c.id=='days')return .5*num(S.day)+.5*num(m.ad);
  return num(m.raw[c.id])}
+function tierOf(d){let t=0;TIERS.forEach((a,i)=>{if(d>=a)t=i});return t}
 function rankOf(p){let r=RANKS[0],nx=null;for(let i=0;i<RANKS.length;i++){if(p>=RANKS[i][0]){r=RANKS[i];nx=RANKS[i+1]||null}}return{name:r[1],at:r[0],next:nx?{name:nx[1],at:nx[0]}:null}}
 function perkQ(m){let q=0;RW.forEach(r=>{if(r.q&&m.rw.includes(r.at))q+=r.q});return q}
 function get(){
  const m=ens();
- if(!m)return{pct:0,rank:'Newcomer',next:{name:'Local Act',at:5},cats:[],rewards:[],qBonus:0,qFlat:0,log:[],title:''};
- let tot=0;
+ if(!m)return{pct:0,base:0,factor:1,weakest:'',rank:'Newcomer',next:{name:'Local Act',at:5},cats:[],rewards:[],qBonus:0,qFlat:0,log:[],title:''};
+ let tot=0,worst=0,wc=null;
  const cats=CATS.map(c=>{
   const raw=Math.min(c.cap,rawOf(c,m)),frac=Math.pow(cl(raw/c.cap,0,1),c.exp),pct=c.w*frac;tot+=pct;
-  return{id:c.id,name:c.name,how:c.how,state:!!c.state,weight:c.w,raw:+raw.toFixed(1),cap:c.cap,frac,pct:+pct.toFixed(2),
+  const d=Math.max(0,PFREE-frac)/PFREE;if(d>worst){worst=d;wc=c.name}
+  return{id:c.id,name:c.name,mname:c.name+' Mastery',rank:c.rk[tierOf(frac*100)],tier:tierOf(frac*100),how:c.how,state:!!c.state,weight:c.w,raw:+raw.toFixed(1),cap:c.cap,frac,done:+(frac*100).toFixed(1),pct:+pct.toFixed(2),
    today:+(m.dy.u[c.id]||0).toFixed(1),dayCap:c.day,count:m.dy.n[c.id]||0,mult:c.day?+Math.pow(.88,m.dy.n[c.id]||0).toFixed(2):1,
    reasons:Object.entries(m.rs[c.id]||{}).sort((a,b)=>b[1]-a[1]).slice(0,5)}});
- const pct=Math.min(100,+tot.toFixed(2)),rk=rankOf(pct);
+ const factor=1-PEN*worst,pct=Math.min(100,+(tot*factor).toFixed(2)),rk=rankOf(pct);
  const rewards=RW.map(r=>({at:r.at,k:r.k,n:r.n,d:r.d,fx:r.fx||'',got:m.rw.includes(r.at)}));
  const flat=perkQ(m),qBonus=QCAP*pct/100;
  let title='';RW.forEach(r=>{if(r.badge&&m.rw.includes(r.at))title=r.badge});
- return{pct,rank:rk.name,next:rk.next,cats,rewards,qBonus,qFlat:flat,log:m.log.slice(-20).reverse(),title,ad:num(m.ad),claimed:m.rw.length}}
+ return{pct,base:+tot.toFixed(2),factor,weakest:worst>0?wc:'',rank:rk.name,next:rk.next,cats,rewards,qBonus,qFlat:flat,log:m.log.slice(-20).reverse(),title,ad:num(m.ad),claimed:m.rw.length}}
 
 /* the extra quality a new recording of quality q gets (a share of q plus the perk points); used by the mgFinish wrapper */
 function qualityBonus(q){try{const g=get();let b=Math.round(num(q)*g.qBonus)+g.qFlat;if(b<=0)return 0;const room=Math.max(0,100-num(q));return q>=100?0:Math.min(b,Math.max(room,0))}catch(e){return 0}}
@@ -288,10 +307,15 @@ const CSS=`
 #mst .bar2 i{display:block;height:100%;background:var(--g,#2fe68a)}
 #mst .lg{background:#0b0f0dd9;border:3px solid #000;box-shadow:inset 0 0 0 2px #1d2621;margin-bottom:6px;cursor:pointer;padding:8px 10px}
 #mst .lg:hover,#mst .lg.sel{box-shadow:inset 0 0 0 2px var(--g,#2fe68a)}
-#mst .lg .t{display:flex;gap:10px;align-items:baseline}
-#mst .lg .t b{flex:1}
+#mst .lg .t{display:flex;gap:10px;align-items:center}
+#mst .lg .nm{flex:1;min-width:0}#mst .lg .nm b{display:block;font-size:15px}#mst .lg .nm span{display:block;margin-top:2px}#mst .lg .nm u{text-decoration:none;color:#ffd23f}#mst .lg .pc{text-align:right;min-width:92px}#mst .lg .pc b{display:block;font:800 32px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:-1px;color:var(--g,#2fe68a);text-shadow:2px 2px 0 #000}#mst .lg .pc small{color:var(--m,#8aa094);font-size:11px}#mst .lg .sh{font-size:12px;margin-top:4px}#mst .lg .sh b{color:var(--g,#2fe68a)}#mst .intro{color:var(--m,#8aa094);font-size:12px;margin:-2px 0 8px}
+#mst .mL canvas{left:0;right:auto;width:calc(100% - 226px)}
+#mst .mSm{position:absolute;right:10px;top:52px;width:206px;padding:8px 10px;background:#000c;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e;pointer-events:none}
+#mst .mSm h4{margin:0 0 6px;font:10px/1.3 'Silkscreen',ui-monospace,monospace;color:var(--m,#8aa094);letter-spacing:.5px;text-transform:uppercase}
+#mst .sr{display:flex;flex-wrap:wrap;gap:0 8px;align-items:baseline;margin-bottom:5px}#mst .sr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mst .sr b{font-size:15px;color:var(--g,#2fe68a)}#mst .sr i{flex:0 0 100%;height:6px;background:#000;display:block;margin-top:2px}#mst .sr s{display:block;height:100%;background:var(--g,#2fe68a)}#mst.gold .sr s{background:#ffd23f}#mst.gold .sr b{color:#ffd23f}
+#mst .sn,#mst .sp{font-size:11px;color:var(--m,#8aa094)}#mst .sp{margin-top:4px;color:#ffd23f}
 #mst .lg .t span{color:var(--m,#8aa094);font-size:12px}
-#mst .lg .t em{font-style:normal;color:var(--g,#2fe68a);min-width:92px;text-align:right}
+
 #mst .lg .h{color:var(--m,#8aa094);font-size:12px;margin-top:3px}
 #mst .lg .dt{display:none;margin-top:8px;padding-top:8px;border-top:2px dashed #26302a;font-size:12px}
 #mst .lg.open .dt{display:block}
@@ -308,7 +332,7 @@ const CSS=`
 #mstpill{position:fixed;left:10px;bottom:10px;z-index:3;display:none;padding:4px 9px;font:11px 'Silkscreen',ui-monospace,monospace;color:#8aa094;background:#000a;border:2px solid #000;box-shadow:inset 0 0 0 1px #2a352e;cursor:pointer;opacity:.75}
 #mstpill:hover{opacity:1;color:#e8f3ec}
 #mstpill b{color:#2fe68a}
-@media(max-width:820px){#mst.on{grid-template-columns:1fr;grid-template-rows:minmax(190px,36vh) 1fr}#mst .mL{border-right:0;border-bottom:3px solid #000}#mst .mG{width:110px;height:110px;left:10px;top:8px}#mst .mGt b{font-size:22px}#mst .mGt small{display:none}#mst .mRk{left:10px;right:10px;bottom:8px;padding:6px 8px;left:auto;max-width:55%}#mst .mRk .px{font-size:16px}#mst .mR{padding:12px 12px 24px}}
+@media(max-width:820px){#mst.on{grid-template-columns:1fr;grid-template-rows:minmax(190px,36vh) 1fr}#mst .mL{border-right:0;border-bottom:3px solid #000}#mst .mG{width:110px;height:110px;left:10px;top:8px}#mst .mGt b{font-size:22px}#mst .mGt small{display:none}#mst .mL canvas{width:100%}#mst .mSm{top:auto;bottom:8px;right:10px;width:min(190px,44%);padding:5px 7px}#mst .mSm h4,#mst .mSm .sp{display:none}#mst .mSm .sr:nth-child(n+5){display:none}#mst .mSm .sr{margin-bottom:3px}#mst .mSm .sr b{font-size:13px}#mst .mRk{bottom:8px;padding:6px 8px;right:auto;left:10px;max-width:50%}#mst .mRk .px{font-size:16px}#mst .mR{padding:12px 12px 24px}}
 `;
 let ST=null,CV=null,RD=null,SC=null,CA=null,PIV=null,MD=null,RAF=0,T0=0,SELI=0,OPEN=0,RUN=0,FX={},EXP={};
 function css(){if(document.getElementById('mstcss'))return;const s=document.createElement('style');s.id='mstcss';s.textContent=CSS;document.head.appendChild(s)}
@@ -337,6 +361,7 @@ function render(first){
  const qb=g.qBonus*100;
  R.querySelector('.mC').innerHTML=
   `<div class=chip><b>+${qb.toFixed(1)}%${g.qFlat?' +'+g.qFlat:''}</b><small>song quality bonus from mastery${g.qFlat?' and studio perks':''}</small></div>`+
+  `<div class=chip><b>${g.base.toFixed(1)}%</b><small>from your activity masteries${g.weakest?' (-'+((1-g.factor)*100).toFixed(1)+'% balance: '+E(g.weakest)+' holds it back)':', no balance penalty'}</small></div>`+
   `<div class=chip><b>${g.claimed}/${RW.length}</b><small>rewards unlocked</small></div>`+
   `<div class=chip><b>${g.ad}</b><small>days you earned mastery (day ${num(S.day)})</small></div>`;
  R.querySelector('.mRw').innerHTML=g.rewards.map(r=>{const st=r.got?'got':r===nx?'nx':'';return`<div class="rw ${st}" title="${E(r.d)}"><i>${r.got?'UNLOCKED':r===nx?'NEXT':'LOCKED'}</i><div class=at>${r.at}%</div><b>${E(r.n)}</b><small>${E(KIND[r.k])} · ${E(r.d)}</small></div>`}).join('');
@@ -345,10 +370,15 @@ function render(first){
   const sub=c.state?(c.id=='fame'?'Fame tier '+c.raw.toFixed(1)+' of '+c.cap:'Day '+num(S.day)+' · '+g.ad+' active days'):c.raw.toFixed(0)+' / '+c.cap+' pts';
   const rs=c.reasons.length?c.reasons.map(q=>'<div>'+E(q[0])+' <span class=m>+'+q[1].toFixed(1)+' pts</span></div>').join(''):'<div class=m>Nothing yet.</div>';
   const day=c.dayCap?`<div><span class=m>Today:</span> ${c.today.toFixed(1)} / ${c.dayCap} pts${c.today>=c.dayCap-.05?' (daily cap reached)':''} · next contribution worth x${c.mult}</div>`:'<div class=m>No daily cap: this one follows your progress.</div>';
-  return`<div class="lg${EXP[c.id]?' open':''}${i==SELI?' sel':''}" data-i=${i} data-id=${c.id} title="${E(c.name)}: ${c.raw.toFixed(0)} of ${c.cap} points, worth ${c.pct.toFixed(1)} of ${c.weight}%">
-  <div class=t><b>${E(c.name)}</b><span>${sub}</span><em>${c.pct.toFixed(1)} / ${c.weight}%</em></div>
-  <div class=bar2><i style="width:${(c.frac*100).toFixed(1)}%"></i></div><div class=h>${E(c.how)}</div>
-  <div class=dt><div><span class=m>Points:</span> ${c.raw.toFixed(1)} of ${c.cap} (${(c.raw/c.cap*100).toFixed(1)}% of the way; the bar fills faster at the start)</div>${day}<div class=m>Best sources:</div>${rs}</div></div>`}).join('');
+  return`<div class="lg${EXP[c.id]?' open':''}${i==SELI?' sel':''}" data-i=${i} data-id=${c.id} title="${E(c.mname)} ${c.done.toFixed(0)}% complete: ${c.raw.toFixed(0)} of ${c.cap} points, worth ${c.pct.toFixed(1)} of ${c.weight}% of Music Mastery">
+  <div class=t><div class=nm><b>${E(c.mname)}</b><span>Rank: <u>${E(c.rank)}</u> · ${sub}</span></div><div class=pc><b>${c.done.toFixed(0)}%</b><small>complete</small></div></div>
+  <div class=bar2><i style="width:${c.done.toFixed(1)}%"></i></div>
+  <div class=sh>Adds <b>${c.pct.toFixed(1)}</b> of its <b>${c.weight}</b> points to your Music Mastery (${c.weight}% weight)</div>
+  <div class=h>Raises it: ${E(c.how)}</div>
+  <div class=dt><div><span class=m>Points:</span> ${c.raw.toFixed(1)} of ${c.cap} (${c.done.toFixed(1)}% complete)</div>${day}<div class=m>Best sources:</div>${rs}</div></div>`}).join('');
+ /* the compact strip beside the player: top contributors, ranked */
+ const top=g.cats.filter(c=>c.pct>=.05).sort((a,b)=>b.pct-a.pct).slice(0,6);
+ L.querySelector('.mSm').innerHTML='<h4>Your activity masteries (% complete)</h4>'+(top.length?top.map(c=>`<div class=sr><span>${E(c.name)}</span><b>${c.done.toFixed(0)}%</b><i><s style="width:${c.done.toFixed(1)}%"></s></i></div>`).join(''):'<div class=sn>Nothing yet. Play, perform, golf, shoot...</div>')+(g.weakest?`<div class=sp>Held back ${((1-g.factor)*100).toFixed(1)}% by ${E(g.weakest)}</div>`:'');
  R.querySelector('.lo').innerHTML=g.log.length?g.log.map(e=>{const c=BY[e.c];return e.c=='reward'?`<div><span>Reward: ${E(e.r)}</span><em>unlocked</em><small>Day ${e.d} ${E(e.t)} · ${ago(e.d)}</small></div>`:`<div><span>${E(c?c.name:e.c)}: ${E(e.r)}</span><em>+${(+e.p).toFixed(1)}</em><small>Day ${e.d} ${E(e.t)} · ${ago(e.d)}</small></div>`}).join(''):'<div class=none>Nothing yet. Release a song, play a set or finish a round.</div>';
  DIRTY=0}
 function prevAt(a){let p=0;RW.forEach(r=>{if(r.at<a)p=r.at});return p}
@@ -356,10 +386,10 @@ function prevAt(a){let p=0;RW.forEach(r=>{if(r.at<a)p=r.at});return p}
 function build(){
  if(ST)return;css();
  ST=document.createElement('div');ST.id='mst';
- ST.innerHTML=`<div class=mL><canvas id=mstc></canvas><div class=mG></div><div class=mTi></div><div class=mRk></div></div>
+ ST.innerHTML=`<div class=mL><canvas id=mstc></canvas><div class=mG></div><div class=mTi></div><div class=mSm></div><div class=mRk></div></div>
  <div class=mR><div class=mH><h2 class=px>Music Mastery</h2><button id=mstx>Close (Tab)</button></div>
- <div class=mC></div><h3>Reward track</h3><div class=mRw></div><div class=mNx></div><h3>Ledger</h3><div class=mLg></div><h3>Recent activity</h3><div class=lo></div>
- <div class=ft>Click a row or use Up / Down and Enter for its breakdown. Points are skill-weighted, capped per day and worth less when repeated, so this takes hundreds of hours. Tab or Esc closes.</div></div>`;
+ <div class=mC></div><h3>Reward track</h3><div class=mRw></div><div class=mNx></div><h3>Activity masteries</h3><div class=intro>Music Mastery is built from your activity masteries. Each activity has its own mastery (0 to 100% of its own goal) that you raise by playing it well and often; the total is the sum of their shares. An activity you leave untouched holds the total back: 100% needs every activity above 95%.</div><div class=mLg></div><h3>Recent activity</h3><div class=lo></div>
+ <div class=ft>Click a row or use Up / Down and Enter for its breakdown. Points are skill-weighted, capped per day and worth less when repeated, so this takes a very long time. Tab or Esc closes.</div></div>`;
  document.body.appendChild(ST);
  ST.querySelector('#mstx').onclick=close;
  ST.querySelector('.mLg').addEventListener('click',e=>{const r=e.target.closest('.lg');if(!r)return;SELI=+r.dataset.i;EXP[r.dataset.id]=!EXP[r.dataset.id];render()});
