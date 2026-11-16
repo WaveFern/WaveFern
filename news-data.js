@@ -5,7 +5,7 @@ const WF_NEWS=[
  {id:4,v:'v55.12.0',d:'2026-11-16',tag:'NEW',t:'Move everything at home',
   items:['Your <b>studio gear</b> (instruments, mic, speakers, decks) and the <b>bedroom</b> (wardrobe, pictures, clock, lights, plants) can now be moved and stored. Press <b>F</b> at home.','Only the desk stays fixed. Place your mic before you leave Storage.']},
  {id:3,v:'v55.9.0',d:'2026-11-16',tag:'NEW',t:'Rivals and rolling events',
-  items:['New <b>CHARTS</b> button: seven rival artists chase you. Pass them for cash and followers.','Brand deals pay more the higher you rank.','A new event every few days: awards, scandals, bidding wars, diss tracks.','Going <b>viral on Instagrime</b> is possible, but very rare.']},
+  items:['Seven rival artists chase you. Pass them for cash and followers.','Brand deals pay more the higher you rank.','A new event every few days: awards, scandals, bidding wars, diss tracks.','Going <b>viral on Instagrime</b> is possible, but very rare.']},
  {id:1,v:'v55.6.0',d:'2026-11-12',tag:'UPDATE',t:'Golf, Beach Club and more',
   items:['Wavefern Golf Club: three courses, six clubs, daily challenge and the Grand Tour.','The Beach Club and Lighthouse are on the world map.','Founder gear is now optional.']}
 ];
