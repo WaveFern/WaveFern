@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.3.2';
+const GAME_VERSION='v55.4.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.4.0',n:'Golf: the hole is much bigger and easier to get into (a larger cup with a white rim, and a ball that rolls in at a higher speed), the greens are completely flat, tap-ins under 0.8 m on the green are given (GIMME, counts one stroke), your bodyguards and pets stay out of the way while you play, and walking to your ball uses the exact same walking animation as the normal game. The wind is weaker, your aim always starts on the hole (A and D nudge it off the line for that shot), a beige panel fence closes in each course so you cannot wander the whole map, fairways have a first-cut rough edge, and yardage markers (50, 100, 150 m) sit on the fairways.'},
  {v:'v55.3.2',n:'Sleeping on a phone: the waking-up results card is compact on touch screens (several cards per row) and Start the day stays on screen, so you are no longer stuck below the fold. Also fixed a typo in the v55.3.1 note that broke version.js.'},
  {v:'v55.3.1',n:'Golf animation cleaned up: a wider golf stance, the shoulders turn back and through with the swing, and you carry the club in one hand with a relaxed walk. The ready camera now sits to one side so you can see the golfer\'s stance and the club.'},
  {v:'v55.3.0',n:'Golf: the golfer now really holds the club. Both hands grip it and it follows the arms through the backswing, the downswing and the follow-through (the club shape and length change per club). On the walk to your ball the club rests over your shoulder. New effects: grass and sand burst when you hit, a white ring on a hard hit, a club swoosh trail, a ball trail, landing puffs, a big water splash, and confetti when you hole out (more for a hole in one).'},

@@ -47,7 +47,7 @@ function hill(C,x,z){return C.amp*(Math.sin(x*.037*C.fq+C.p1)*Math.cos(z*.051*C.
 const edgeW=(C,x,z)=>sm(Math.min(x-C.x0+10,C.x1+10-x,z-C.bz0,C.bz1-z)/16);
 CRS.forEach((C,ci)=>{seed(ci*131+7);C.p1=R()*6.28;C.p2=R()*6.28;C.p3=R()*6.28;C.bz0=C.z0-16;C.bz1=C.z0+C.lane*5+16;C.trees=[];
  C.holes=C.H.map(([par,len,bnd],j)=>{const zc=C.z0+j*C.lane,d=j%2?-1:1,tx=d>0?C.x0+10:C.x1-10,px=tx+d*len,pz=zc+(R()-.5)*4,bend=bnd+(R()-.5)*2;
-  const o={par,len,d,zc,tee:[tx,zc],pin:[px,pz],hw:C.hw-(par==3?1.5:0),gr:par==3?9:10,bk:[],wt:[],sx:(R()-.5)*.05,sz:(R()-.5)*.05,i:j};
+  const o={par,len,d,zc,tee:[tx,zc],pin:[px,pz],hw:C.hw-(par==3?1.5:0),gr:par==3?9:10,bk:[],wt:[],sx:0,sz:0,i:j};
   o.path=[[tx,zc],[tx+d*len*.5,zc+bend],[px,pz]];o.ty=hill(C,tx,zc)*edgeW(C,tx,zc);o.gy=hill(C,px,pz)*edgeW(C,px,pz);
   const nb=par==4?C.nb:Math.max(0,C.nb-2);
   for(let k=0;k<nb;k++){const u=.5+.32*R(),p=pa(o,u),s=R()<.5?-1:1,r=3+R()*2.4;o.bk.push([p[0],p[1]+s*(o.hw*.5+r*.55),r])}
@@ -103,7 +103,7 @@ function sim(ci,x,y,z,vx,vy,vz,putt,hole,wind,spin,stopLand){
    if(y<=gy&&vy<0){y=gy;const sf=surf(ci,x,z);if(!land)land=[x,z,sf,t];
     if(stopLand){end='land';pts.push([t,x,y,z]);break}
     if(sf==6||sf==7){end=sf==6?'water':'ob';pts.push([t,x,y,z]);break}
-    if(hole&&Math.hypot(x-hole[0],z-hole[1])<.11&&Math.hypot(vx,vz)<9){x=hole[0];z=hole[1];end='holed';pts.push([t,x,gy-.1,z]);break}
+    if(hole&&Math.hypot(x-hole[0],z-hole[1])<.2&&Math.hypot(vx,vz)<9){x=hole[0];z=hole[1];end='holed';pts.push([t,x,gy-.1,z]);break}
     /* touchdown: split the speed along and across the ground; friction on the contact point can take backspin out or spin the ball back */
     const g=grad(ci,x,z),nl=Math.hypot(g[0],1,g[1]),nx=-g[0]/nl,ny=1/nl,nz=-g[1]/nl,vn=vx*nx+vy*ny+vz*nz;
     let tx=vx-vn*nx,ty=vy-vn*ny,tz=vz-vn*nz;const tm=Math.hypot(tx,ty,tz),e=REST[sf],J=FRIC[sf]*(1+e)*(-vn);let nt=tm;
@@ -117,7 +117,7 @@ function sim(ci,x,y,z,vx,vy,vz,putt,hole,wind,spin,stopLand){
    let sp=Math.hypot(vx,vz);const dec=(MU[sf]+.035*sp*sp)*dt;
    if(sp<=dec){if(Math.hypot(ax,az)<MU[sf]*.9){vx=vz=0;still++}}else{vx-=vx/sp*dec;vz-=vz/sp*dec;still=0}
    x+=vx*dt;z+=vz*dt;y=H(ci,x,z);sp=Math.hypot(vx,vz);
-   if(hole){const d=Math.hypot(x-hole[0],z-hole[1]);if(d<.075&&sp<2.4*(1-d/.075*.5)){x=hole[0];z=hole[1];end='holed';pts.push([t,x,y-.1,z]);break}}
+   if(hole){const d=Math.hypot(x-hole[0],z-hole[1]);if(d<.2&&sp<3.4*(1-d/.2*.45)){x=hole[0];z=hole[1];end='holed';pts.push([t,x,y-.1,z]);break}}
    if(!land&&putt)land=[x,z,sf,t];
    if(still>20)break}
   if(ac>=4){ac-=4;pts.push([t,x,y,z])}}
@@ -155,12 +155,22 @@ function buildCourse(ci){if(built[ci])return;built[ci]=1;const C=CRS[ci],g=new T
  const nrm={},nm=(i,j)=>{const k=i+'_'+j;if(nrm[k])return nrm[k];const gx=(hh[j][Math.min(nx,i+1)]-hh[j][Math.max(0,i-1)])/(cs*(Math.min(nx,i+1)-Math.max(0,i-1))),gz=(hh[Math.min(nz,j+1)][i]-hh[Math.max(0,j-1)][i])/(cs*(Math.min(nz,j+1)-Math.max(0,j-1))),l=Math.hypot(gx,1,gz);return nrm[k]=[-gx/l,1/l,-gz/l]},nor=[];
  const cc=C.col,cl=[cc.rough,cc.fw,cc.fr,cc.gr,cc.tee,cc.sand,'#3b94dc'].map(h=>colr(h)),pos=[],col=[];
  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=x0+i*cs,z=z0+j*cs,sf=surf(ci,x+1,z+1);if(sf==7)continue;
-  const k=(Math.floor((x+1)/8)&1)?1.03:.985,nz2=1+(((i*7+j*13)%5)-2)*.004,c=cl[sf],cr=c.r*k*nz2,cg=c.g*k*nz2,cb=c.b*k*nz2;
+  const fc=sf==0&&C.holes.some(o=>Math.abs(z-o.zc)<30&&pdist(o,x+1,z+1)<o.hw+3.2),k=(Math.floor((x+1)/8)&1)?1.03:.985,nz2=1+(((i*7+j*13)%5)-2)*.004,c=cl[sf],fm=fc?.5:0,cr=lerp(c.r,cl[1].r,fm)*k*nz2,cg=lerp(c.g,cl[1].g,fm)*k*nz2,cb=lerp(c.b,cl[1].b,fm)*k*nz2;
   const a=hh[j][i],b=hh[j][i+1],cx=hh[j+1][i],d=hh[j+1][i+1];
   pos.push(x,a,z,x,cx,z+cs,x+cs,b,z,x+cs,b,z,x,cx,z+cs,x+cs,d,z+cs);for(let q=0;q<6;q++)col.push(cr,cg,cb);
   [[i,j],[i,j+1],[i+1,j],[i+1,j],[i,j+1],[i+1,j+1]].forEach(v=>{const n=nm(v[0],v[1]);nor.push(n[0],n[1],n[2])})}
  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
  const terr=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:2}));terr.frustumCulled=false;g.add(terr);
+/* a beige panel fence all round the course (like a vinyl privacy fence): panels between posts, a rail along the bottom, caps on the posts, stepping with the ground */
+ {const fb=Batch(),PW=2.4,FH=2.3,gap=.12,fx0=C.x0-3.6,fx1=C.x1+3.6,fz0=C.bz0+.5,fz1=C.bz1-.5;
+  const seg=(x,z,alongX)=>{const gy=H(ci,x,z),h=FH+.3,w=alongX?PW-gap*2:.14,d=alongX?.14:PW-gap*2;
+   fb.box(x,gy-.3+h/2,z,w,h,d,'#d8cfb4');fb.box(x,gy+.16,z,alongX?w:.17,.32,alongX?.17:d,'#bdb394');fb.box(x,gy+FH-.05,z,alongX?w:.17,.1,alongX?.17:d,'#e6dfc9');
+   if(((x*.7+z*.3)|0)%2==0)fb.box(x,gy+FH*.55,z,alongX?w-.2:.15,FH*.5,alongX?.15:d-.2,'#d1c8ab')};
+  const post=(x,z)=>{const gy=H(ci,x,z);fb.box(x,gy-.3+1.45,z,.26,2.9,.26,'#c4b99b');fb.box(x,gy+2.5,z,.36,.1,.36,'#e9e2cd');fb.box(x,gy+2.58,z,.22,.08,.22,'#d8cfb4')};
+  const nx=Math.ceil((fx1-fx0)/PW),nz=Math.ceil((fz1-fz0)/PW),sx=(fx1-fx0)/nx,sz=(fz1-fz0)/nz;
+  for(let i=0;i<nx;i++){const x=fx0+sx*(i+.5);seg(x,fz0,1);seg(x,fz1,1);post(fx0+sx*i,fz0);post(fx0+sx*i,fz1)}
+  for(let j=0;j<nz;j++){const z=fz0+sz*(j+.5);seg(fx0,z,0);seg(fx1,z,0);post(fx0,fz0+sz*j);post(fx1,fz0+sz*j)}
+  post(fx1,fz1);post(fx0,fz1);g.add(fb.mesh())}
  const b=Batch();
  const sh=(h,k)=>'#'+colr(h).clone().multiplyScalar(k).getHexString();
  C.trees.forEach(t=>{const gy=t[2],s=1+t[3]*.55,lf=cc.leaf[Math.floor(t[3]*9)%3],ry=t[3]*6,pine=ci==2&&t[3]>.3,tr=sh('#6b4a2b',.8+t[3]*.4);
@@ -169,7 +179,8 @@ function buildCourse(ci){if(built[ci])return;built[ci]=1;const C=CRS[ci],g=new T
    b.box(t[0],gy+3.5*s,t[1],4*s,1.9*s,4*s,sh(lf,.8),ry);b.box(t[0]+.7*s,gy+4.1*s,t[1]-.5*s,2.8*s,2*s,3*s,sh(lf,.92),ry+.7);b.box(t[0]-.8*s,gy+4.6*s,t[1]+.6*s,2.6*s,1.9*s,2.4*s,lf,ry+1.3);
    b.box(t[0],gy+5.7*s,t[1],2.3*s,1.5*s,2.3*s,sh(lf,1.1),ry+2);b.box(t[0]+.2*s,gy+6.6*s,t[1],1.2*s,.8*s,1.2*s,sh(lf,1.2),ry+2.5)}});
  C.holes.forEach((o,j)=>{const[px,pz]=o.pin,py=H(ci,px,pz);
-  b.box(px,py+.01,pz,.24,.02,.24,'#101010');b.box(px,py+1.3,pz,.05,2.6,.05,'#f2f2f2');b.box(px+.35,py+2.3,pz,.7,.42,.04,cc.flag);
+  b.box(px,py+.008,pz,.66,.016,.66,'#d9d5c6');b.box(px,py+.014,pz,.46,.02,.46,'#0c0c0c');b.box(px,py+1.3,pz,.05,2.6,.05,'#f2f2f2');b.box(px+.35,py+2.3,pz,.7,.42,.04,cc.flag);
+  if(o.len>115)[[50,'#ffffff'],[100,'#2f7bff'],[150,'#ff4a3a']].forEach(([m,col])=>{if(m>=o.len-15)return;for(let u=1;u>=0;u-=.01){const q=pa(o,u);if(Math.hypot(q[0]-px,q[1]-pz)>=m){const gy2=H(ci,q[0],q[1]);b.box(q[0],gy2+.03,q[1],.7,.05,.7,col);b.box(q[0],gy2+.03,q[1],.3,.06,.3,'#fff');b.box(q[0]+(o.hw+1.3)*0,gy2+.5,q[1]-o.hw-1.4,.12,1,.12,col);break}}});
   const tx=o.tee[0],tz=o.tee[1],ty=H(ci,tx,tz);b.box(tx+o.d*1.2,ty+.1,tz-2.3,.18,.18,.18,'#f2f2f2');b.box(tx+o.d*1.2,ty+.1,tz+2.3,.18,.18,.18,'#f2f2f2');
   label(g,(j+1)+' · PAR '+o.par+' · '+o.len+' m',3.2,.8,tx-o.d*3.5,ty+1.7,tz+3.2,'#1d4f2a','#ffffff',0);
   b.box(tx-o.d*3.5,ty+.85,tz+3.2,.12,1.7,.12,'#5a3a22')});
@@ -312,7 +323,7 @@ function startRound(ci,cart,opt){opt=opt||{};if(away())return;const fee=cart?25:
  closeUIsafe();mode='golf';try{$('hud').style.display='none'}catch(e){}hud.style.display='block';document.body.classList.add('fston');
  try{P.mesh.visible=true}catch(e){}if(opt.tour)CRS.forEach((c,k)=>buildCourse(k));else buildCourse(ci);sn('chime');beginHole(0,true)}
 function closeUIsafe(){try{$('ui').innerHTML=''}catch(e){}}
-function beginHole(hi,first){G.ci=G.cis[hi];G.C=CRS[G.ci];const C=G.C,o=G.hs[hi];if(G.daily)R2seed=G.daily*97+hi*31+G.ci*7+5;G.hi=hi;G.hole=o;G.strokes=0;G.wind={s:Math.max(0,C.wind*.6*(.2+R2()*1.4)),a:R2()*6.283};
+function beginHole(hi,first){G.ci=G.cis[hi];G.C=CRS[G.ci];const C=G.C,o=G.hs[hi];if(G.daily)R2seed=G.daily*97+hi*31+G.ci*7+5;G.hi=hi;G.hole=o;G.strokes=0;G.wind={s:Math.max(0,C.wind*.3*(.2+R2()*1.4)),a:R2()*6.283};
  const go=()=>{const tx=o.tee[0],tz=o.tee[1];G.ball={x:tx,y:H(G.ci,tx,tz),z:tz};G.last={x:tx,z:tz};G.aim=Math.atan2(o.pin[0]-tx,o.pin[1]-tz);G.card=0;$g('gf_card').style.display='none';
   G.manual=0;pickClub();
   if(G.cart){G.cx=tx-o.d*4;G.cz=tz+7;G.ch=G.aim;G.cy=H(G.ci,G.cx,G.cz)}
@@ -348,7 +359,7 @@ function impact(){if(!SW.on)return;SW.on=0;
 /* keyboard fallback: hold Space to charge the bar, let go to hit straight */
 function keyCharge(dt){if(G.st=='ready'&&GK[' ']&&!G.busy&&!G.card&&!G.paused){G.keyHold=Math.min(1.2,G.keyHold+dt);SW.live=G.keyHold/1.2}else if(G.keyHold>0&&!GK[' ']){const p=G.keyHold/1.2;G.keyHold=0;if(p>.04&&G.st=='ready')shoot(p,G.aim);SW.live=p}}
 const LIEPW=sf=>(LIE[sf]||LIE[0]);
-function shoot(p,psi,sideAng){G.manual=0;try{const bb=G.ball;fxImpact(p,bb.x,bb.y,bb.z,surf(G.ci,bb.x,bb.z))}catch(e){}const ci=G.ci,b=G.ball,cl=CL[G.club],sf=surf(ci,b.x,b.z),lie=LIEPW(sf);sideAng=sideAng||0;
+function shoot(p,psi,sideAng){G.manual=0;G.off=0;try{const bb=G.ball;fxImpact(p,bb.x,bb.y,bb.z,surf(G.ci,bb.x,bb.z))}catch(e){}const ci=G.ci,b=G.ball,cl=CL[G.club],sf=surf(ci,b.x,b.z),lie=LIEPW(sf);sideAng=sideAng||0;
  psi+=(R2()-.5)*2*(cl.sp*.5+lie[1]+(p>.96?.01:0));let r;const w=wnd(G.wind),pw=p*(cl.putt?(sf==5?.7:1):lie[0]);
  if(cl.putt){const v=pw*cl.v;r=sim(ci,b.x,b.y,b.z,Math.sin(psi)*v,0,Math.cos(psi)*v,true,G.hole.pin,w)}
  else{const v=pw*cl.v,lf=(cl.loft+(sf==5?6:0)-(sf==0?2:0))*Math.PI/180,h=Math.cos(lf)*v,back=cl.sb*(.55+.45*p)*(sf==0?.5:sf==5?.6:1),side=(R2()-.5)*220+(p>.96?(R2()-.5)*900:0)+sideAng*1500;
@@ -360,7 +371,9 @@ function afterShot(){const r=G.shot,o=G.hole;
  if(r.end=='water'||r.end=='ob'){G.strokes++;toast(r.end=='water'?'SPLASH! +1 stroke':'OUT OF BOUNDS! +1 stroke',1800);sn('err');
   if(G.strokes>=o.par+6){clearBeacon();toast('PICK UP: max strokes',1600);return holeOut(true)}
   clearBeacon();fade(()=>{G.ball={x:G.lastHit.x,y:H(G.ci,G.lastHit.x,G.lastHit.z),z:G.lastHit.z};G.st='ready';G.dirty=1;pickClub(true)});G.st='fade';return}
- G.ball={x:r.rest[0],y:H(G.ci,r.rest[0],r.rest[1]),z:r.rest[1]};G.last={x:G.ball.x,z:G.ball.z};setBeacon(G.ball.x,G.ball.z,'#43e6ff');
+G.ball={x:r.rest[0],y:H(G.ci,r.rest[0],r.rest[1]),z:r.rest[1]};G.last={x:G.ball.x,z:G.ball.z};
+ if(surf(G.ci,G.ball.x,G.ball.z)==3&&pinD()<.8){G.strokes++;G.ball={x:o.pin[0],y:H(G.ci,o.pin[0],o.pin[1])-.1,z:o.pin[1]};toast('GIMME! Tap-in counts one stroke',1500);return holeOut()}
+ setBeacon(G.ball.x,G.ball.z,'#43e6ff');
  if(G.strokes>=o.par+6){toast('PICK UP: max strokes',1600);return holeOut(true)}
  pickClub(true);G.aim=Math.atan2(o.pin[0]-G.ball.x,o.pin[1]-G.ball.z);G.dirty=1;
  if(G.cart){G.st='drive';G.dv=0;seatDriver();toast('Drive to your ball',1500)}
@@ -398,7 +411,7 @@ function endRound(){const s=sumHtml(),g=st(),ci=G.tour?3:G.ci,tot=s.tot,d=tot-s.
 window.golfLeave=function(){if(!G)return;sn('pop');fade(()=>exitGolf())};
 function exitGolf(){const was=G;G=null;SW.on=0;mode='play';try{$('hud').style.display=''}catch(e){}hud.style.display='none';document.body.classList.remove('fston');
  ball.visible=shadow.visible=peg.visible=clubG.visible=target.visible=cartG.visible=false;dots.forEach(d=>d.visible=false);clearBeacon();
- try{P.arms[0].rotation.set(0,0,0);P.arms[1].rotation.set(0,0,0);P.legs[0].rotation.set(0,0,0);P.legs[1].rotation.set(0,0,0)}catch(e){}P.x=CLUB.x;P.z=CLUB.z+8.5;P.rot=Math.PI;try{P.mesh.visible=true;P.mesh.rotation.x=0}catch(e){}SY=0;GY=0;$g('gf_card').style.display='none';$g('gf_fade').style.opacity=0;sv()}
+ try{FOL.forEach(f=>{f.m.visible=true})}catch(e){}try{P.arms[0].rotation.set(0,0,0);P.arms[1].rotation.set(0,0,0);P.legs[0].rotation.set(0,0,0);P.legs[1].rotation.set(0,0,0)}catch(e){}P.x=CLUB.x;P.z=CLUB.z+8.5;P.rot=Math.PI;try{P.mesh.visible=true;P.mesh.rotation.x=0}catch(e){}SY=0;GY=0;$g('gf_card').style.display='none';$g('gf_fade').style.opacity=0;sv()}
 function pauseCard(){if(!G||G.card==1||G.card==2)return;G.paused=!G.paused;const c=$g('gf_card');
  if(G.paused){c.innerHTML='<h2>Paused</h2><p>'+E(G.tour?'Grand Tour':G.C.n)+' · hole '+(G.hi+1)+' of '+G.hs.length+' · '+(G.cart?'cart rented':'on foot')+'</p><div class=gfkeys><span><kbd>HOLD LMB</kbd></span><span>then <b style="color:#5fe06a;font-weight:normal">pull back, push forward</b>: pull = power, push direction = shot</span><span><kbd>A</kbd><kbd>D</kbd></span><span>Aim (hold <kbd>SHIFT</kbd> for fine aim)</span><span><kbd>WHEEL</kbd><kbd>1-4</kbd></span><span>Pick a club</span><span><kbd>V</kbd></span><span>First / third person</span><span><kbd>TAB</kbd></span><span>Scorecard</span><span><kbd>SPACE</kbd></span><span>Keyboard swing: hold, then let go</span><span><kbd>E</kbd></span><span>Get out of the cart at your ball</span></div><div class=row><button class=gfbtn onclick="golfQuit()">QUIT ROUND</button><button class="gfbtn go" onclick="golfResume()">RESUME</button></div>';c.style.display='block'}else c.style.display='none'}
 window.golfResume=function(){if(G&&G.paused)pauseCard()};
@@ -456,13 +469,13 @@ function driveTick(dt){const q=G,ci=q.ci,f=(GK.w||GK.arrowup?1:0)-(GK.s||GK.arro
  const gy=H(ci,q.cx,q.cz),g=grad(ci,q.cx,q.cz),pitch=Math.atan(-(g[0]*Math.sin(q.ch)+g[1]*Math.cos(q.ch))*1);q.cy=gy;q.cp=lerp(q.cp||0,pitch,Math.min(1,dt*8));
  P.x=q.cx;P.z=q.cz;P.rot=q.ch;
  const d=Math.hypot(q.cx-q.ball.x,q.cz-q.ball.z);G.near=d<14;if(d<5){q.cartKeep=[q.cx,q.cz];arrive()}}
-function arrive(){clearBeacon();G.aim=Math.atan2(G.hole.pin[0]-G.ball.x,G.hole.pin[1]-G.ball.z);G.manual=0;pickClub();G.cartKeep=null;G.st='ready';G.snap=1;G.dirty=1;sn('pop')}
+function arrive(){G.off=0;clearBeacon();G.aim=Math.atan2(G.hole.pin[0]-G.ball.x,G.hole.pin[1]-G.ball.z);G.manual=0;pickClub();G.cartKeep=null;G.st='ready';G.snap=1;G.dirty=1;sn('pop')}
 /* on foot: W/S walk, A/D turn, Shift to hurry. The beacon on the ball goes out when you get there. */
 function walkTick(dt){const q=G,f=(GK.w||GK.arrowup?1:0)-(GK.s||GK.arrowdown?1:0),t=(GK.a||GK.arrowleft?1:0)-(GK.d||GK.arrowright?1:0);
  q.wh+=t*2.2*dt;const sp=f>0?(GK.shift?6.5:3.3):f<0?2:0,nx=q.wx+Math.sin(q.wh)*f*sp*dt,nz=q.wz+Math.cos(q.wh)*f*sp*dt,sf=surf(q.ci,nx,nz);
  if(sf!=6&&sf!=7&&!treeAt(q.ci,nx,nz,.9)){q.wx=nx;q.wz=nz}else if(f)toast(sf==6?'No swimming!':'Blocked',700);
  q.wv=lerp(q.wv||0,f?1:0,Math.min(1,dt*8));P.x=q.wx;P.z=q.wz;P.rot=q.wh;SY=gyOf(P.x,P.z);P.mesh.visible=true;
- P.t+=dt*(q.wv>.5?(GK.shift?8:6):0);
+ P.t+=dt*(q.wv>.5?8:0);
  if(Math.hypot(q.wx-q.ball.x,q.wz-q.ball.z)<2.4)arrive()}
 /* the two hands on the club: both arms point at one grip point that follows the swing angle, so the golfer really holds it */
 const HQ=new THREE.Quaternion(),HD=new THREE.Vector3(),HDN=new THREE.Vector3(0,-1,0);
@@ -494,7 +507,7 @@ function camTick(dt){const q=G,b=q.ball,k=Math.min(1,dt*7);let tx,ty,tz,lx,ly,lz
 let GY=0;
 function gTick(dt){const q=G,b=q.ball;fxTick(dt);
  /* aim */
- if(q.st=='ready'&&!q.busy&&!q.card&&!q.paused){const rate=(GK.shift?.35:1.1)*dt,a=(GK.a||GK.arrowleft?1:0)-(GK.d||GK.arrowright?1:0);if(a){q.aim+=a*rate;q.dirty=1}}
+ if(q.st=='ready'&&!q.busy&&!q.card&&!q.paused){const rate=(GK.shift?.35:1.1)*dt,a=(GK.a||GK.arrowleft?1:0)-(GK.d||GK.arrowright?1:0);if(a)q.off=(q.off||0)+a*rate;const na=Math.atan2(q.hole.pin[0]-b.x,q.hole.pin[1]-b.z)+(q.off||0);if(Math.abs(na-q.aim)>1e-4){q.aim=na;q.dirty=1}}
  if(q.st=='swing'||q.st=='hold')swEval(performance.now());
   keyCharge(dt);if(q.st=='ready'&&!GK[' ']&&q.keyHold==0&&!SW.on)SW.live=lerp(SW.live||0,0,Math.min(1,dt*3));
  /* ball in flight */
@@ -569,9 +582,9 @@ INT.push({x:CLUB.x,z:CLUB.z+6.6,r:6,l:'Wavefern Golf Club: play a round / rent a
 /* map place */
 try{if(!POIS.some(q=>q[2]=='Golf Club'))POIS.push([CLUB.x,CLUB.z,'Golf Club','#7bd85a'])}catch(e){}
 /* the golfer lifts his club in the render hook (the game poses the arms before the frame is drawn) and the third person camera takes over */
-{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(G&&G.on&&c===cam){cam3.aspect=innerWidth/innerHeight;cam3.updateProjectionMatrix();
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(G&&G.on&&c===cam){try{FOL.forEach(f=>{f.m.visible=false})}catch(e){}cam3.aspect=innerWidth/innerHeight;cam3.updateProjectionMatrix();
   try{const q=G;if(P.arms&&P.legs){if(q.st=='drive'){P.legs[0].rotation.set(-1.5,0,0);P.legs[1].rotation.set(-1.5,0,0);P.arms[0].rotation.set(-1.1,0,0);P.arms[1].rotation.set(-1.1,0,0)}
-   else if(q.st=='walk'){const w=Math.sin(P.t)*(GK.shift?.9:.7)*(q.wv||0);P.legs[0].rotation.x=w;P.legs[1].rotation.x=-w;P.legs[0].rotation.set(w,0,0);P.legs[1].rotation.set(-w,0,0);P.arms[0].rotation.set(-w,0,0);P.arms[1].rotation.set(w*.3-.15,0,-.08);P.mesh.updateMatrixWorld(true);clubLook();clubG.visible=true;clubG.position.copy(P.arms[1].localToWorld(new THREE.Vector3(0,-.5,0)));clubG.rotation.y=P.mesh.rotation.y;clubS.rotation.x=1.05+w*.35}
+   else if(q.st=='walk'){const w=Math.sin(P.t)*.7*(q.wv||0);P.legs[0].rotation.set(w,0,0);P.legs[1].rotation.set(-w,0,0);P.arms[0].rotation.set(-w,0,0);P.arms[1].rotation.set(w,0,0);P.mesh.position.y+=Math.abs(Math.sin(P.t))*.06*(q.wv||0);P.mesh.updateMatrixWorld(true);clubLook();clubG.visible=true;clubG.position.copy(P.arms[1].localToWorld(new THREE.Vector3(0,-.5,0)));clubG.rotation.y=P.mesh.rotation.y;clubS.rotation.x=1.0+w*.25}
    else if(clubG.visible&&q.st!='walk'){golfPose(q);try{const hdw=clubG.userData.head;clubG.updateMatrixWorld(true);if(q.st=='swing'||(q.st=='fly'&&q.sw2<.6)){const v=new THREE.Vector3();hdw.getWorldPosition(v);fx(v.x,v.y,v.z,1,'#ffffff',.2,0,.14,.22,0,.45)}}catch(e){}}
    else if(false){const ph=q.ph||18;const a=-1.15+Math.max(0,(18.4-ph))/130*-1.4+Math.max(0,ph-18.4)/115*-.4;P.arms[0].rotation.x=P.arms[1].rotation.x=a;P.legs[0].rotation.x=P.legs[1].rotation.x=0}}}catch(e){}
   return r0(sc,cam3)}return r0(sc,c)}}
