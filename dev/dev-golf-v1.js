@@ -24,7 +24,7 @@ const G9=9.81,RHO=1.225,BRAD=.02135,AREA=Math.PI*BRAD*BRAD,MASS=.04593,KA=.5*RHO
 const SFN=['Rough','Fairway','Fringe','Green','Tee box','Bunker','Water','Out of bounds'];
 /* bounce (restitution, tangential keep), roll friction (m/s2), shot power and spread for the lie */
 /* the ground: normal restitution, friction while sliding, rolling deceleration (m/s2, a green is about Stimp 10), power and spread of the lie */
-const REST=[.15,.38,.36,.35,.38,0],FRIC=[.55,.32,.34,.28,.32,.9],MU=[4.5,1.3,1,.55,1.3,9,99,99],LIE=[[.88,.03],[1,0],[1,0],[1,0],[1,0],[.75,.04]];
+const REST=[.12,.28,.26,.26,.28,0],FRIC=[.6,.4,.4,.34,.4,.9],MU=[6,3.2,2.4,.55,3.2,10,99,99],LIE=[[.88,.03],[1,0],[1,0],[1,0],[1,0],[.75,.04]];
 /* ball speed (m/s), launch angle, backspin (rpm): worked out so a full swing on flat ground without wind carries 200 / 135 / 70 m */
 const CL=[{n:'Driver',v:59,loft:11.5,sb:2600,sp:.022,r:200},{n:'Wood',v:51.5,loft:14,sb:3200,sp:.017,r:172},{n:'5 Iron',v:43.5,loft:17,sb:6500,sp:.012,r:135},{n:'9 Iron',v:37,loft:23,sb:7500,sp:.009,r:100},{n:'Wedge',v:29.7,loft:28,sb:8500,sp:.007,r:70},{n:'Putter',v:7,loft:0,sb:0,sp:.004,r:40,putt:1}],PUT=5;
 const PH=3;
