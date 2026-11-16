@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.12.4';
+const GAME_VERSION='v55.13.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.13.0',n:'Music Mastery. Press Tab while walking (or tap the Tab Mastery pill at the bottom left) to open a full-screen panel with a turntable 3D model of your player, a big mastery gauge from 0 to 100% and a rank (Newcomer, Local Act, Rising, Headliner, Icon, Legend). The ledger lists every category that feeds it (songs, release quality, Beach Club gigs, festival sets, golf, brand work, collabs, fame, days played, with surfing, mini golf and skating ready for when they arrive) with progress bars, a breakdown on click and your last 20 contributions. Points are skill-weighted with daily caps and a repeat penalty, so it takes hundreds of hours. Milestone rewards from 5% to 100% pay cash, followers, titles, studio perks and panel cosmetics, and mastery adds up to +15% quality to every new song. Saves still load.'},
  {v:'v55.12.4',n:'Fixed the bed going missing. If the game saved while you were moving a piece of furniture (for example switching apps on your phone), that piece was lost for good. Now it is kept in Storage when saved. If a save already lost its bed, the bed comes back when you wake up: in the bedroom if the spot is free, otherwise in Storage.'},
  {v:'v55.12.3',n:'Removed the CHARTS button and chart screen. Rivals still exist behind the scenes and still change brand deal pay, and the rolling events still happen, but events now settle themselves with the safe choice and show a result card. Saves still load.'},
  {v:'v55.12.2',n:'Moving furniture now clears the screen. While you hold an item to place it, the Storage panel slides down to a slim bar (Place, turn, Store, Cancel) and the top HUD fades away, so you can put things anywhere in the house. Both slide back when you let go. Works on phone too.'},
