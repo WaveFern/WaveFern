@@ -303,6 +303,51 @@ function build(){if(built)return;built=true;try{club=buildClub();applyQ()}catch(
  INT.push({x:CLUB_X-18,z:CLUB_Z-12.4,r:4.5,l:'Beach bar: smoothie $8',a:()=>bar(),bc:'bar'});
  INT.push({x:LH_X,z:LH_Z+5.6,r:4.5,l:'Climb the Lighthouse',a:()=>climb(),lh:1})}
 
+/* ---------- maps: the Beach Club and the Lighthouse drawn from above, same shapes and colours as the 3D builds (v55.5.0) ---------- */
+{const m0=mapPaint;mapPaint=function(x,sx,sz,kx,kz,mini){const r=m0.apply(this,arguments);try{x.save();x.lineJoin='round';x.lineCap='round';
+  const R=(cx,cz,w,d,col,ox,oz)=>{x.fillStyle=col;x.fillRect(sx(cx-w/2+(ox||0)),sz(cz-d/2+(oz||0)),w*kx,d*kx)};
+  const Q=(cx,cz,w,d,col)=>{R(cx,cz,w,d,'rgba(0,0,0,.22)',.8,.8);R(cx,cz,w,d,col)};
+  const C=(cx,cz,rad,col)=>{x.fillStyle=col;x.beginPath();x.arc(sx(cx),sz(cz),Math.max(.8,rad*kx),0,6.283);x.fill()};
+  const D=(cx,cz,h,col)=>{x.fillStyle=col;x.beginPath();x.moveTo(sx(cx),sz(cz-h));x.lineTo(sx(cx+h),sz(cz));x.lineTo(sx(cx),sz(cz+h));x.lineTo(sx(cx-h),sz(cz));x.closePath();x.fill()};
+  const L=(a,b,c,d,col,w)=>{x.strokeStyle=col;x.lineWidth=Math.max(.7,w*kx);x.beginPath();x.moveTo(sx(a),sz(b));x.lineTo(sx(c),sz(d));x.stroke()};
+  const fine=kx>.3;
+  /* ---- Sunset Beach Club ---- */
+  {const X=CLUB_X,Z=CLUB_Z;
+   R(X,Z-28.5,3.6,13,PAL.teak);/* the boardwalk in from the grass */
+   R(X,Z+5,54,22,PAL.sand);/* the sand */
+   Q(X,Z-14,54,16,PAL.teak);if(fine)for(let a=-26;a<=26;a+=1.5)L(X+a,Z-22,X+a,Z-6,PAL.dark,.05);/* the deck with its planks */
+   R(X,Z-5.7,6,.6,PAL.plank);R(X,Z-5.1,6,.6,PAL.plank);/* steps to the sand */
+   L(X-27,Z-22,X-2.9,Z-22,PAL.dark,.5);L(X+2.9,Z-22,X+27,Z-22,PAL.dark,.5);L(X-27,Z-22,X-27,Z-2,PAL.dark,.5);L(X+27,Z-22,X+27,Z-2,PAL.dark,.5);/* the fence and the gate */
+   R(X,Z-22,6.8,.6,'#e8452c');
+   Q(X-18,Z-17.7,14.4,8.2,PAL.thatch);if(fine){R(X-18,Z-17.7,12,6,PAL.thatch2);L(X-18,Z-21.8,X-18,Z-13.6,PAL.thatch,.35)}/* the tiki bar roof */
+   Q(X+14,Z-16.5,18,10.8,PAL.thatch);R(X+14,Z-16.5,15.6,8.4,PAL.thatch2);if(fine)L(X+14,Z-21.9,X+14,Z-11.1,PAL.thatch,.5);/* the stage roof */
+   D(X+14,Z-16.5,1.4,'#ff7ab8');/* the pink marker over the stage */
+   [-23,-17,-11].forEach((a,i)=>{C(X+a,Z-9,1.7,i?PAL.teal:PAL.coral);C(X+a,Z-9,.35,PAL.dark)});/* deck umbrellas */
+   [[-17,2.5,PAL.coral],[-11,2.5,PAL.teal],[-5,2.5,'#ffd23d'],[-17,8.5,PAL.teal],[-11,8.5,'#ffd23d'],[-5,8.5,PAL.coral]].forEach(([a,b,c])=>{C(X+a,Z+b,2,c);C(X+a,Z+b,.3,PAL.dark);if(fine)[-.95,.95].forEach((o,j)=>R(X+a+o,Z+b+1.9,.7,1.8,j?PAL.coral:PAL.teal))});/* beach umbrellas and sunbeds */
+   Q(X-24.5,Z+8,5.2,5.2,'#7a5230');R(X-24.5,Z+8,1.8,1.8,'#ff9a2e');C(X-24.5,Z+8,.7,'#ffd23d');/* the fire pit */
+   R(X+16,Z+10.5,9,11,'#f6ecc8');R(X+16,Z+10.5,8.6,10.6,PAL.sand);L(X+11.5,Z+10.5,X+20.5,Z+10.5,'#fff',.35);R(X+16,Z+5,9,.2,'#fff');R(X+16,Z+16,9,.2,'#fff');/* the volleyball court and net */
+   Q(X+24,Z+14,2.7,2.7,'#fff3d9');R(X+24,Z+14,2.2,2.2,'#e8452c');/* the lifeguard tower */
+   if(fine)['#ff6f61','#2aa7a1','#ffd23d','#8ad8ff','#e8e1d0'].forEach((c,i)=>R(X+2.4+i*.5,Z+13,.45,.1,c));/* surfboard rack */
+   [[-26,-19],[26,-19],[-26,-4],[26,-4],[-26,14],[26,10]].forEach(([a,b])=>{C(X+a,Z+b,2.4,'#2f8a3a');C(X+a,Z+b,1,'#5cc05a')});/* palms */
+  }
+  /* ---- the Lighthouse: islet, pier, tower ---- */
+  {const X=LH_X,Z=LH_Z,I=ISLET,h=.7071;
+   R(X,Z,I*2+26,I*2+26,'rgba(142,230,224,.55)');/* the pale shallows */
+   const pz0=Z+I-2,pz1=PIER_Z0,len=pz1-pz0;
+   R(X,Z,I*2+6.8,I*2+6.8,'rgba(255,255,255,.45)');/* foam */
+   R(X,Z,I*2,I*2,'#7c8087');D(X,Z,I*1.7*h,'#72767c');/* rock: a square and a turned square */
+   R(X,Z,I*1.6,I*1.6,'#6a9a52');D(X,Z,I*1.35*h,'#6a9a52');/* grassy top */
+   for(let i=0;i<14;i++){const a=i/14*6.283+Math.sin(i*3.1)*.2,rr=I*1.2+(i%3)*1.4,w=1.6+(i%4)*.7;R(X+Math.cos(a)*rr,Z+Math.sin(a)*rr,w,w*.9,['#8d9096','#7c8087','#6f7378','#9a9a94'][i%4])}/* rocks round the edge */
+   Q(X,pz0+len/2,5.2,len,'#9a6a3c');if(fine)for(let z=pz0+1;z<pz1;z+=1.3)L(X-2.6,z,X+2.6,z,'#5a3a22',.08);/* the pier */
+   [-1,1].forEach(a=>{L(X+a*2.7,pz0,X+a*2.7,pz1,'#5a3a22',.2);for(let z=pz0+2;z<pz1;z+=6)C(X+a*2.7,z,.25,'#ffd27a')});
+   Q(X,Z,10,10,'#7c8087');/* the base */
+   R(X,Z,8.4,8.4,'#6a6e74');R(X,Z,8,8,'#2a2a2e');/* the gallery floor */
+   L(X-3.9,Z-3.9,X+3.9,Z-3.9,'#e8e8e8',.2);L(X-3.9,Z+3.9,X+3.9,Z+3.9,'#e8e8e8',.2);L(X-3.9,Z-3.9,X-3.9,Z+3.9,'#e8e8e8',.2);L(X+3.9,Z-3.9,X+3.9,Z+3.9,'#e8e8e8',.2);/* the rail */
+   R(X,Z,5.6,5.6,'#f4f1ea');if(fine){R(X,Z,4.4,4.4,'#d6402f');R(X,Z,3.2,3.2,'#f4f1ea')}/* the striped tower seen from above */
+   R(X,Z,3.4,3.4,'#d6402f');R(X,Z,2.6,2.6,'#e5503d');R(X,Z,1.8,1.8,'#ffe9a8');R(X,Z,.9,.9,'#ffffff');/* the red cap and the lamp */
+  }
+  x.restore()}catch(e){try{x.restore()}catch(e2){}if(!window.__ipMapErr){window.__ipMapErr=1;console.error('island map',e)}}return r}}
+
 /* ---------- state ---------- */
 function st(){if(!S.bcg||typeof S.bcg!='object')S.bcg={last:-999,list:[]};if(!Array.isArray(S.bcg.list))S.bcg.list=[];return S.bcg}
 const find=id=>st().list.find(o=>o.id===id);
