@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.10.1';
+const GAME_VERSION='v55.10.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.10.2',n:'Faster on slow computers: the golf courses are only drawn when you are near them (they were about 150,000 triangles drawn all the time), the town is split into smaller tiles so off-screen streets are skipped, and the Low preset no longer caps the frame rate, has no shadows and no pause blur. Battery Saver now caps at 60. Nothing looks different on Medium, High or Best.'},
  {v:'v55.10.1',n:'Bedroom fix: only one wardrobe now (the detailed one, still opens your wardrobe) and the wall shelf covering the window is gone.'},
  {v:'v55.10.0',n:'Your bedroom looks real now: the bed has a carved frame, headboard, pillows, a striped blanket and a teddy; the bedside table has drawers, a lamp, an alarm clock and books; the desk has drawers, a monitor with a screen, keyboard, desk lamp, speaker and a swivel chair; the rug has a patterned border. The room also gets a window with curtains, framed pictures, a clock, fairy lights, a book shelf, a wardrobe and two plants. Sleeping and the furniture work the same.'},
  {v:'v55.9.0',n:'Rivals, rolling events and viral posts. Seven AI rival artists share a chart with you (CHARTS button, bottom left): pass one for cash and followers, get passed and lose a few followers, and brand deals pay more the higher you rank (and a rival can steal an offer if you are near the bottom). A new event every 3-6 days: award nights, scandals, bidding wars, diss tracks, playlist features, festival season, algorithm dips, so no two weeks are the same. Going viral on Instagrime is now possible but very rare: almost never early, a decent chance late in a long career, and some players will never get it.'},
