@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.11.0';
+const GAME_VERSION='v55.11.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.11.1',n:'Lower graphics presets are now really faster. Every step is cheaper than the one above (Best, High, Medium, Low, Battery): smaller pictures on Low and Battery, shadows that redraw less often on High and Medium, shorter shadow distance on Medium, no shadows or colour grade on Low and Battery, and Low and Battery also skip tiny props (bins, pots and bits) so far fewer things are drawn. New Small props option in Settings > Graphics. The town is also drawn in smaller chunks, so less of it is drawn off screen. Battery Saver now also uses the lightest look. Saves still load.'},
  {v:'v55.11.0',n:'22 new brands in Brand Deals, all parodies with their own pixel-art logos: Rad Bull, Microsoff, Vanz, Envidia, Tezla, Ferrali, Rolix, Sonny, Nintenda, Netflux, Starbux Coffee, Tacko Bell, Doritoz and more. Each has its own HQ in a world city, a studio, Instagrime ads, and shows up in the partner strip and the brand directory (locked and blurred until you reach its Fame Level).'},
  {v:'v55.10.3',n:'Removed the $ WEALTH late-game feature (businesses, luxury, Prestige, Fern Fund). Old saves load fine and the leftover wealth data is ignored.'},
  {v:'v55.10.2',n:'Faster on slow computers: the golf courses are only drawn when you are near them (they were about 150,000 triangles drawn all the time), the town is split into smaller tiles so off-screen streets are skipped, and the Low preset no longer caps the frame rate, has no shadows and no pause blur. Battery Saver now caps at 60. Nothing looks different on Medium, High or Best.'},
