@@ -46,7 +46,7 @@
   const songs=((D&&D.songs)||[]).slice().sort((a,b)=>(b.streams||0)-(a.streams||0)).slice(0,5).map(s=>[s.title,s.streams||0,(s.streams||0)>=1e6?1:((s.today||0)>5e4?2:0)]);
   const sk=(D&&D.mp&&D.mp.sk&&D.mp.sk.n)||0;
   const st=load();
-  return{id:'me',me:1,sample:!has,artist:g(()=>window.fwDisplayName&&window.fwDisplayName())||(has?D.artist:'Your Artist Name'),user:g(()=>window.fwUsername&&window.fwUsername())||st.user,seed:3,founder:g(()=>!!(S&&S.fdr)||(window.isFounder&&isFounder()))?1:0,
+  return{id:'me',me:1,sample:!has,artist:g(()=>window.fwDisplayName&&window.fwDisplayName())||(has?D.artist:'Your Artist Name'),user:g(()=>window.fwUsername&&window.fwUsername())||st.user,seed:3,founder:g(()=>(!!(S&&S.fdr)||(window.isFounder&&isFounder()))&&!(S&&S.fdh))?1:0,
    fame:has?fameOf(D):7,listeners:has?(D.listeners||0):18400,joined:realJoin(st),
    bio:st.bio,songs:songs.length?songs:[['Sample Song One',120400,2],['Sample Song Two',8800,0]],
    band:ch&&ch.k==='cur'&&g(()=>MPS&&MPS.band)?{name:MPS.band,inst:g(()=>iName(MPS.inst))||'Band',members:g(()=>list().length)||1,streak:sk}:(has?null:{name:'The Ferns',inst:'Vocals',members:3,streak:4}),
