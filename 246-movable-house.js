@@ -1,4 +1,4 @@
-/* ===== v55.11.0: everything in the house can be moved and stored (except the desk) =====
+/* ===== v55.12.0: everything in the house can be moved and stored (except the desk) =====
    The bedroom dressing (wardrobe, wall poster, pictures, wall clock, fairy lights, plants) and the studio gear (chair, mic,
    speakers, guitar and amp, keys, drums, decks, table with its gear, pedals, bass, vocal booth, synth, ring light, posters and
    foam panels) used to be built into the house. They are now ordinary placed furniture, like the bed: hover outline, E to

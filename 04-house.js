@@ -20,7 +20,7 @@ function buildHouse(){
   /* window over the desk */
   P(1.8,1.3,.06,Wt,6,1.95,.03);P(1.55,1.05,.04,'*a9d8f2',6,1.95,.06);P(1.55,.3,.045,'*dff1fb',6,2.28,.065);P(.05,1.05,.06,Wt,6,1.95,.08);P(1.55,.05,.06,Wt,6,1.95,.08);
   P(2.5,.04,.04,'#333',6,2.7,.08);P(.34,1.45,.08,'#c8506a',5.1,1.95,.07);P(.34,1.45,.08,'#c8506a',6.9,1.95,.07);P(.12,1.45,.09,'#a63e56',5.25,1.95,.075);P(.12,1.45,.09,'#a63e56',6.75,1.95,.075);
-  /* v55.11.0: pictures, wall clock, fairy lights, wardrobe and plants are now movable items (245-movable-house.js) */
+  /* v55.12.0: pictures, wall clock, fairy lights, wardrobe and plants are now movable items (246-movable-house.js) */
  }
  buildStudio();return g}
 function buildStudio(){
