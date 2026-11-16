@@ -8,16 +8,29 @@
 (()=>{
 if(/[?&]noeco/.test(location.search))return;
 /* income per stream is scaled by how many listeners you have, so cash in hand follows: ~$300 at 1K, $3K at 10K, $200K at 1M, $25M at 1B, $100M at 8B */
+/* v55.13.0: the first days pay more (EARLY below), so the opening loop is not starved of cash */
 const MFP=[[1e3,.12],[1e4,.46],[1e5,.42],[1e6,.4],[1e7,.17],[1e8,.08],[1e9,.024],[4e9,.011],[8e9,.0095]];
 const MF=L=>{if(L<=MFP[0][0])return MFP[0][1]*Math.max(.5,Math.min(1,L/1e3+.3));for(let i=1;i<MFP.length;i++)if(L<MFP[i][0]){const a=MFP[i-1],b=MFP[i],t=Math.log(L/a[0])/Math.log(b[0]/a[0]);return Math.exp(Math.log(a[1])+t*(Math.log(b[1])-Math.log(a[1])))}return MFP[MFP.length-1][1]};
-window.__ecoMF=MF;
-const PAY=.04,ADD=40,IDLE=.3,CAPX=1.15,FIX=1.065;
-const PATH=[[100,1],[1e3,6],[2e3,12],[1e4,36],[1e5,90],[1e6,144],[1e7,204],[1e8,270],[1e9,336],[4e9,420],[8e9,480]];
+/* EARLY: money per stream is multiplied by up to x5 for a brand-new artist, fading out (log scale) to x1 at 30K listeners.
+   It only touches the first days: at 10 days a player earned about $14 in total, now about $150 (a first gear upgrade is within reach). */
+const EARLY=L=>1+4*Math.max(0,Math.min(1,1-Math.log10(Math.max(L,1e3)/1e3)/1.48));
+/* LATE: from day 30 the industry pushes back. P ramps 0 -> 1 between day 30 and day 210. It slows growth, adds an upkeep cut
+   on streaming income (management, touring and label costs, up to 45%), kills idle growth and makes a player who stops releasing
+   lose listeners every night. Past 10M monthly listeners growth also slows with each x10 (audience saturation). */
+const LATE0=30,LATE1=210;
+const press=d=>Math.max(0,Math.min(1,((+d||0)-LATE0)/(LATE1-LATE0)));
+const upkeep=d=>1-.45*press(d);
+const sat=L=>L>1e7?1/(1+.5*Math.log10(L/1e7)):1;
+window.__ecoPress=press;window.__ecoMF=MF;
+const PAY=.04,ADD=60,IDLE=.3,CAPX=1.15,FIX=1.065;
+const PATH=[[100,1],[1e3,5],[2e3,9],[1e4,30],[1e5,90],[1e6,144],[1e7,204],[1e8,270],[1e9,336],[4e9,420],[8e9,480]];
 const RT=PATH.slice(1).map((p,i)=>[PATH[i][0],p[0],Math.log(p[0]/PATH[i][0])/(p[1]-PATH[i][1])]);
 const rate=L=>{for(const s of RT)if(L<s[1])return s[2];return RT[RT.length-1][2]*.5};
 const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=Math.random();return (u-3)/Math.sqrt(.5)};
-function step(L0,rel,st){let m;if(st.slow>0){st.slow--;m=.2;if(!st.slow)st.catch=2}else if(Math.random()<.06){st.slow=1+Math.floor(Math.random()*4);m=.2}else{m=Math.max(.5,Math.min(1.6,Math.exp(gauss()*.2)));if(st.catch>0){st.catch--;m*=1.4}}
- const g=rate(L0)*m*(st.p||1),tgt=Math.floor(L0*Math.exp(g*FIX*(rel?1:IDLE))+ADD*(rel?1:.2)),cap=Math.floor(L0*Math.exp(g*FIX*CAPX)+ADD*1.5);return{tgt,cap}}
+function step(L0,rel,st,day){const P=press(day);let m;if(st.slow>0){st.slow--;m=.2;if(!st.slow)st.catch=2}else if(Math.random()<.06){st.slow=1+Math.floor(Math.random()*4);m=.2}else{m=Math.max(.5,Math.min(1.6,Math.exp(gauss()*.2)));if(st.catch>0){st.catch--;m*=1.4}}
+ const g=rate(L0)*m*(st.p||1)*(1-.4*P)*sat(L0),idle=rel?1:IDLE*(1-P);let tgt=Math.floor(L0*Math.exp(g*FIX*idle)+ADD*(rel?1:.2)*(1-P));
+ if(!rel&&P>0&&L0>1e3){tgt=Math.min(tgt,Math.floor(L0*(1-.012*P*(.5+Math.random()))));st.dec=1}else st.dec=0;
+ const cap=Math.floor(L0*Math.exp(g*FIX*CAPX)+ADD*1.5);return{tgt,cap}}
 window.__ecoStep=step;
 /* the official listener count only changes at night: catalogue boosts, gifts and stream bursts during the day cannot inflate it */
 setInterval(()=>{try{if(typeof S=='object'&&S&&S.eco&&S.eco.L!=null&&!S.cheat){const m=Math.floor(S.eco.L*1.02+30);if(S.listeners>m)S.listeners=m}}catch(e){}},1000);
@@ -26,15 +39,15 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
  try{if(S.cheat)return r0;
   S.eco=S.eco||{slow:0,catch:0};if(!S.eco.p)S.eco.p=.9+Math.random()*.2;
   if(!(S.mlDiv>=4)){S.mlDiv=4+Math.floor(Math.random()*6)}
-  const rel=(S.songs||[]).some(s=>s.day==S.day-1),T=step(L0,rel,S.eco);let tgt=T.tgt,cap=T.cap;
+  const rel=(S.songs||[]).some(s=>s.day==S.day-1),T=step(L0,rel,S.eco,S.day);let tgt=T.tgt,cap=T.cap;
   if(L0<1){tgt=cap=54+Math.floor(Math.random()*14)}
-  const Ln=+S.listeners||0,Lf=Math.min(cap,Math.max(Ln,tgt)),h=S.hist&&S.hist[S.hist.length-1],md=S.mlDiv;
+  const Ln=+S.listeners||0,Lf=S.eco.dec?Math.max(1,Math.min(cap,tgt)):Math.min(cap,Math.max(Ln,tgt)),h=S.hist&&S.hist[S.hist.length-1],md=S.mlDiv;
   /* streams of the last 31 days must add up to listeners x divisor: set last night's streams to fill the gap */
   if(h&&h.d===S.day-1&&!h.cp){h.cp=1;
    const prev=S.hist.slice(-31,-1).reduce((a,x)=>a+(x.st||0),0),want=Math.max(Lf*md-prev,Lf*md/62),tot=Math.round(want);
    const songs=(S.songs||[]).filter(s=>s.pd===S.day-1&&s.today>0),nat=songs.reduce((a,s)=>a+s.today,0);
    if(nat>0){const k=tot/nat;songs.forEach(s=>{const dl=Math.round(s.today*(k-1));s.today+=dl;s.streams=(s.streams||0)+dl;const e=(s.dh||[]).find(x=>x[0]===S.day-1);if(e)e[1]=Math.round(s.today)})}
-   const dS=tot-(h.st||0),e1=+(tot*PAY*MF(Lf)).toFixed(2),dE=e1-(+h.e||0);
+   const dS=tot-(h.st||0),e1=+(tot*PAY*MF(Lf)*EARLY(Lf)*upkeep(S.day)).toFixed(2),dE=e1-(+h.e||0);
    S.streams=(S.streams||0)+dS;h.st=tot;h.e=e1;
    S.money=+Math.max(0,S.money+dE).toFixed(2);S.earn=+((S.earn||0)+dE).toFixed(2)}
   S.listeners=Lf;S.eco.L=Lf;S.monthStreams=Lf*md;
