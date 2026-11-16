@@ -23,9 +23,9 @@
   r.arm(+ms||0);r.pub=r.cur;F.tm.set(r.pub,r);return r.pub};
  window.clearTimeout=function(id){const r=F.tm.get(id);if(r){F.tm.delete(id);ct0(r.cur);return}return ct0.apply(window,arguments)};
  /* ---- freeze / thaw ---- */
- function freeze(){F.fz=pn();F.dt0=Date.now();F.tm.forEach(r=>{ct0(r.cur);r.left=Math.max(0,r.due-F.fz)});
+ function freeze(){try{window.FWPX&&FWPX.freeze()}catch(e){}F.fz=pn();F.dt0=Date.now();F.tm.forEach(r=>{ct0(r.cur);r.left=Math.max(0,r.due-F.fz)});
   try{document.body.classList.add('fwpz')}catch(e){}}
- function thaw(){const d=pn()-F.fz,dd=Math.max(0,Date.now()-F.dt0);F.tot+=d;F.fz=0;F.tm.forEach(r=>r.arm(r.left));
+ function thaw(){try{window.FWPX&&FWPX.thaw()}catch(e){}const d=pn()-F.fz,dd=Math.max(0,Date.now()-F.dt0);F.tot+=d;F.fz=0;F.tm.forEach(r=>r.arm(r.left));
   try{document.body.classList.remove('fwpz')}catch(e){}
   F.subs.forEach(f=>{try{f(dd,d)}catch(e){console.error('pause shift',e)}})}
  function sync(){const f=frozen();if(f&&!F.fz)freeze();else if(!f&&F.fz)thaw()}
