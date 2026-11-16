@@ -22,6 +22,7 @@ const PR={
  gucci:[['Guchi Marmont Bag','Gold hardware, quiet flex'],['Guchi Horsebit Loafer','Walk into the room'],['Guchi Green Stripe Belt','The detail that matters']],
  apple:[['Appel Phone 20 Pro','Our best camera, ever'],['Appel Pods Max','Spatial audio for your mix'],['Appel Book Air','Thin, light, runs all day']],
  lv:[['Lewis Vitton Speedy 30','The icon, in new colours'],['Lewis Vitton Trunk','Travel like a legend'],['Lewis Vitton Sneaker','Luxury you can run in']]};
+BRD.postProducts=PR; /* v55.11.0: 245-more-brands.js adds its brands' products here */
 const P=10,WIN=4; /* launch every P days (shifted per brand), new for WIN days */
 const hdl=b=>b.n.toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'')+'.official';
 const prods=b=>PR[b.id]||[[b.n+' Classic','Now in stores'],[b.n+' Limited','Limited drop'],[b.n+' Essentials','Everyday favourites']];
