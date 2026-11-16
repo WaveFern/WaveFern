@@ -207,4 +207,6 @@ buildUI=function(){const s=PS();const wasAct=!!document.querySelector('#ui .pb.a
 window.PBdo=a=>{if(mode!='build')return;if(a=='place')place();else if(a=='rl'){rot(-1);buildUI()}else if(a=='rr'){rot(1);buildUI()}else if(a=='store')store();else if(a=='cancel')cancel();else if(a=='move'&&sel>=0)pickUp(sel)};
 window.PBset=(k,v)=>{PS()[k]=v;snd('click');buildUI()};
 window.PBgear=()=>{setOpen=!setOpen;snd('click');buildUI()};
+/* v55.12.4: an item you are moving is out of the room and out of Storage. Saving then (switching apps on a phone fires an autosave) used to lose it for good, bed included. The save now counts it as stored. */
+{const s0=saveCode;saveCode=function(){const t=mode=='build'&&moving&&hold?hold:null;if(t)S.inv[t]=(S.inv[t]||0)+1;try{return s0.apply(this,arguments)}finally{if(t){S.inv[t]--;if(S.inv[t]<=0)delete S.inv[t]}}}}
 })();
