@@ -82,7 +82,7 @@ function rsClaim(scope){const v=rsGet();let e=v.e.find(x=>x.fd&&x.scope==scope);
  return e?{a:e.artist||'',d:e.day||0}:null}
 function rsNewCareer(){if(FW_TRL||!rsOn()||!S||S.rv>=RS.V)return;
  S.rv=RS.V;S.rvt=Date.now();
- const c=rsClaim(FW_ACCT||'guest');if(c)S.fdr={v:1,a:String(c.a).slice(0,24),d:Math.min(9999,c.d|0),g:{}};
+ const c=rsClaim(FW_ACCT||'guest');if(c)S.fdr={v:1,a:String(c.a).slice(0,24),d:Math.min(9999,c.d|0),g:{},opt:1};
  try{if(typeof founderSync=='function')founderSync(true)}catch(e){console.warn('founder',e)}
  try{autoSave()}catch(e){}}
 {const c0=confirmChar;confirmChar=function(){const r=c0.apply(this,arguments);try{rsNewCareer()}catch(e){console.warn('new career',e)}return r}}

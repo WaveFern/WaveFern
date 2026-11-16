@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.5.1';
+const GAME_VERSION='v55.6.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.6.0',n:'Founder gear is optional. Nothing Founder is worn or placed for you: the Founder Bomber and Cap are only ever added to the wardrobe (never put on, and you can take them off), and the plaque and Day One light only go to Storage. New careers no longer get the Founder pieces automatically; Settings > Game has an Add them button. New setting Founder mark: Shown or Hidden hides the Founder badge everywhere (menus, chat, band, profile, leaderboard, other players).'},
  {v:'v55.5.1',n:'Pause now stops everything in the background: every running timer and animation loop (quests, flights, stats, economy, brand deals, tutorial, mini-games, spinners and more) holds still while the game is paused and carries on when you resume. Saving, audio fades, online play and the pause menu keep running.'},
  {v:'v55.5.0',n:'The Beach Club and the Lighthouse now show on the world map and minimap as they really look from above: the club has its teak deck, tiki bar and stage thatch roofs, fence and gate, umbrellas, sunbeds, fire pit, volleyball court, lifeguard tower and palms; the Lighthouse has its rock islet, grassy top, pier with lamps, and the striped tower with red cap and lamp.'},
  {v:'v55.4.1',n:'Golf: the ball rolls far less. More grip on landing and heavier friction on the fairway, rough, fringe and bunkers, so shots stop close to where they land. Greens roll as before.'},
