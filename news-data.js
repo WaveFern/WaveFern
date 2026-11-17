@@ -2,6 +2,8 @@
    Players see every entry newer than the last one they closed, once, as a pop-up (243-whats-new.js). Nothing else to edit.
    id: whole number, always increasing. v: game version. t: title. d: date. tag: small label. items: short lines (HTML ok, keep it plain). */
 const WF_NEWS=[
+ {id:9,v:'v55.17.0',d:'2026-11-16',tag:'NEW',t:'Skate Park',
+  items:['A full <b>skate park</b> south of town: bowl, half-pipe, rails, stairs, a big gap, murals and floodlights.','Hold and release Space to ollie, add flips, spins, grabs, grinds and manuals, and chain combos.','Free skate, a 2-minute Score Run, S-K-A-T-E against an NPC and unlocking challenges.','Slow-motion replay of your best trick, a coach, a board shop and Skate Mastery points.']},
  {id:8,v:'v55.16.0',d:'2026-11-16',tag:'NEW',t:'Pier Fishing',
   items:['A relaxing <b>fishing pier</b> with a bait and tackle hut, benches, lanterns, cats and seagulls.','Cast, wait for a real bite, hook it and win the reel-in tension game. No timer.','About 20 fish by time, weather, tide and bait, plus junk and treasure; a journal tracks every species.','Rods and baits unlock deeper water and bigger fish. Fishing feeds Music Mastery.']},
  {id:7,v:'v55.15.0',d:'2026-11-16',tag:'UPDATE',t:'Music Mastery v2',
