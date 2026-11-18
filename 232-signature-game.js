@@ -82,6 +82,7 @@ function score(st,z){let len=0,inn=0,pts=0,x0=9,x1=-9,y0=9,y1=-9;
  return{ok:1,q:Math.max(.12,Math.min(1,Math.pow(stay,1.6)*size*scr*strk*1.05))}}
 const LINES=[[.85,'Amazing! Thank you so much!'],[.6,'Thank you! That looks great.'],[.35,'Um... thanks! I think.'],[0,'Is that... a squiggle? Thanks anyway.']];
 
+const SIMLINES=[[.8,'Wow, that is spot on! Thank you!'],[.6,'That looks just like your signature!'],[.4,'Close enough, I guess. Thanks!'],[.2,'Hmm, that does not look like your usual one...'],[0,'That looks nothing like your signature. Is this a fake?']];
 window.signGame=function(o){o=o||{};return new Promise(res=>{
  const items=(o.items&&o.items.length?o.items:SIGN.random(3)).map((it,i)=>{const a=Object.assign({},it);a.who=a.who||NAMES[(Math.random()*NAMES.length)|0];a.ask=a.ask||ASK[a.kind]||'Could you sign this?';
   const nm=(typeof S!='undefined'&&S&&S.artist)||'You';a.art=Object.assign({artist:nm,title:(typeof S!='undefined'&&S&&S.songs&&S.songs.length?S.songs[S.songs.length-1].title:'')||'Live',col:null},a.art||{});
@@ -104,7 +105,9 @@ window.signGame=function(o){o=o||{};return new Promise(res=>{
  function next(rec){R.items.push(rec);lock=1;if(i>=items.length-1)return setTimeout(()=>done(0),rec.signed?650:150);setTimeout(()=>show(i+1),rec.signed?850:120)}
  function ok(){if(lock)return;const it=items[i],sc=score(strokes,it.zone);
   if(!sc.ok){const m=$q('sgm');m.textContent=sc.why=='short'?'Sign a little bigger and longer in the red box, or skip this one.':'Sign inside the red box first, or skip this one.';m.className='sgw';try{snd('err')}catch(e){}return}
-  lock=1;const q=sc.q,l=LINES.find(a=>q>=a[0])[1];$q('sgr').textContent=l;$q('sgr').className=q>=.6?'sgg':'';try{snd('pop')}catch(e){}
+  lock=1;let q=sc.q,l=LINES.find(a=>q>=a[0])[1];
+  /* v55.21: when you have a saved signature (235-my-signature.js), the fan's comment is about how well this one matches it */
+  try{if(window.SIGNME&&S.sig&&!it.noGhost){const m=SIGNME.sim(strokes.map(a=>a.slice()),it.kind,it.zone);q=m;l=SIMLINES.find(a=>m>=a[0])[1]}}catch(e){}$q('sgr').textContent=l;$q('sgr').className=q>=.6?'sgg':'';try{snd('pop')}catch(e){}
   next({kind:it.kind,who:it.who,signed:1,q,strokes:strokes.map(s=>s.map(p=>[+p[0].toFixed(3),+p[1].toFixed(3)]))})}
  function skip(){if(lock)return;next({kind:items[i].kind,who:items[i].who,signed:0,q:0,strokes:[]})}
  const pos=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]};

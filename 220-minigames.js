@@ -60,8 +60,8 @@ function run(names,res){const avg=res.reduce((a,b)=>a+b,0)/res.length,bonus=Math
  rec.sc={l:avg,x:avg};rec.miss=Math.round((1-avg)*8);rec.cdn=0;
  document.body.classList.remove('mgon');const o=$('mg');if(o)o.remove();
  mgFinish();
- try{const d=S.drafts[S.drafts.length-1];if(d&&d.id===n0){d.q+=bonus;const box=document.querySelector('#ui .box.modal');if(box){const cs=box.querySelector('.cards');if(cs){cs.innerHTML=names.map((m,i)=>`<div class=card>${m}<b>${Math.round(res[i]*100)}%</b></div>`).join('')}
-  box.classList.add('nmw');if(avg>=.9&&res.every(v=>v>=.75))box.classList.add('fxperfect');
+ try{const d=S.drafts[S.drafts.length-1];if(d&&d.id===n0){d.q+=bonus;const box=document.querySelector('#ui .box.modal');if(box){const cs=box.querySelector('.cards');if(cs){cs.innerHTML=names.map((m,i)=>`<div class=card>${m}<b>${res[i]>=.999?100:Math.min(99,Math.round(res[i]*100))}%</b></div>`).join('')}
+  box.classList.add('nmr');/* v55.21: gold Perfect only when every game is a true 100% */const pf=res.every(v=>v>=.999);box.classList.toggle('fxperfect',pf);if(!pf){const bn=box.querySelector('.fxpbanner');if(bn)bn.remove()}
   const fq=document.getElementById('fxq');if(fq){const nf=fq.cloneNode();nf.textContent=d.q;fq.replaceWith(nf)}else{const p=box.querySelector('p.m');if(p)p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality '+d.q)}}}}catch(e){console.error('nmg result',e)}}
 {const t0=recTick;recTick=function(dt){if(rec&&rec.nm===undefined){rec.nm=0;if(rec.st===0&&!rec.band&&!rec.ig&&typeof GT!='undefined'&&mode=='rec'){try{const p=plan();rec.q={p,i:0,res:[],cur:p[0],g:null};if(p[0]!='beat')startItem();else rec.q.cur='beat'}catch(e){console.error('nmg',e);rec.q=null}}}
  if(rec&&rec.q&&rec.st==9){nmTick(dt);return}
@@ -77,6 +77,6 @@ function beatVar(dt){const r=rec;if(r.bm===undefined){r.bm=ri(0,3);r.bph=Math.ra
 {const d0=mgDraw;mgDraw=function(){const o=$('mg');if(o&&o.offsetHeight>120)LASTH=o.offsetHeight;if(rec&&rec.q){if(rec.st==9){nmDraw();return}d0.apply(this,arguments);const s=document.querySelector('#mg .mgs');if(s)s.innerHTML=planStrip();return}return d0.apply(this,arguments)}}
 addEventListener('keydown',e=>{if(!rec||!rec.q||rec.st!=9||rec.wait||(e.repeat&&rec.q.cur!='hype')||/INPUT|TEXTAREA/.test(e.target.tagName))return;const n=parseInt(e.key);if(n>=1&&n<=4&&rec.q.cur=='echo')nmIn(n-1);if((e.key==' '||e.key=='Enter'||e.key.toLowerCase()=='e')&&rec.q.cur=='hype')nmIn(0)});
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const u=$('ui');if(u)u.innerHTML=u.innerHTML.replace(/Three steps:[^<]*?Costs 15 energy\./,GT.need()+' quick minigame'+(GT.need()>1?'s':'')+'. Costs 15 energy.')}catch(e){}return r}}
-{const st=document.createElement('style');st.textContent='#ui>.box.modal.fxperfect{position:absolute}#ui>.box.modal.nmw{width:min(380px,92vw);box-sizing:border-box}';document.head.appendChild(st)}
+{const st=document.createElement('style');st.textContent='#ui>.box.modal.fxperfect{position:absolute}#ui>.box.modal.nmr{width:min(380px,92vw);box-sizing:border-box}';document.head.appendChild(st)}
 window.NMG={games:NG,order:ORDER,names:NM};
 })();

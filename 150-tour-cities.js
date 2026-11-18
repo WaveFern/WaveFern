@@ -544,7 +544,7 @@ function dsTaxi(lx,lz,label){const C=D.C;if(!C)return;const dist=Math.hypot(P.x-
  S.money=+(S.money-c).toFixed(2);closeUI();dsFade(()=>{D.room=null;P.x=OX+lx;P.z=OZ+lz;P.rot=0;camT.x=P.x;camT.z=P.z},()=>say('Taxi to '+label+' · $'+c))}
 D.taxi=dsTaxi;
 /* Taxi home from any city abroad, always available */
-D.taxiHome=function(){const c=500;if(S.money<c){snd('err');return say('The taxi home costs $'+c)}S.money=+(S.money-c).toFixed(2);closeUI();
+D.taxiHome=function(){return say('There is no taxi home from abroad. Fly home from the airport.');const c=500;if(S.money<c){snd('err');return say('The taxi home costs $'+c)}S.money=+(S.money-c).toFixed(2);closeUI();
  dsFade(()=>{try{TRAVEL.arrive('home')}catch(e){}if(D.on)dsTear();if(S.dcity)S.dcity.loc=null;IN=null;P.x=8;P.z=14;P.rot=0;camT.x=P.x;camT.z=P.z},()=>say('Taxi home · $'+c))};
 function dsFade(mid,end,hold){dsCutCSS();let f=$('dsfade');if(!f){f=document.createElement('div');f.id='dsfade';document.body.appendChild(f)}f.style.opacity=1;setTimeout(()=>{try{mid&&mid()}catch(e){console.error(e)}setTimeout(()=>{f.style.opacity=0;try{end&&end()}catch(e){}},hold||250)},420)}
 D.fade=dsFade;
@@ -562,7 +562,7 @@ function dsMapPaint(x,sx,sz,k,mini){const C=D.C;if(!C)return;const s=C.s,R0=(a,b
 D.mapPaint=dsMapPaint;
 function dsBigMap(){const C=D.C;mode='menu';const d=C.d;
  $('ui').innerHTML=`<div class="box modal" style="width:min(780px,96vw)"><h2>${esc(wtPlace(d))}</h2><canvas id=dsmap width=760 height=420 style="width:100%;display:block;border:2px solid #000;image-rendering:pixelated"></canvas>
- <p class=m>You are the white arrow. ${D.hint?esc(D.hint()):''}</p><div class=row2><button onclick="DCITY.taxi(${C.spots.air.x},${C.spots.air.z},'the airport')">Taxi to the airport</button><button onclick="DCITY.taxi(${C.st.x},${C.st.z+C.st.b+4},'the stadium')">Taxi to ${esc((d.venue&&d.venue.n)||'the stadium')}</button>${C.spots.club?`<button onclick="DCITY.taxi(${C.spots.club.x},${C.spots.club.z+1},'the club')">Taxi to ${esc((d.club&&d.club.n)||'the club')}</button>`:''}${C.spots.hotel?`<button onclick="DCITY.taxi(${C.spots.hotel.x},${C.spots.hotel.z+1},'the hotel')">Taxi to the hotel</button>`:''}<button onclick="DCITY.taxiHome()">Taxi home ($500)</button><button onclick="closeUI()">Close</button></div></div>`;
+ <p class=m>You are the white arrow. ${D.hint?esc(D.hint()):''}</p><div class=row2><button onclick="DCITY.taxi(${C.spots.air.x},${C.spots.air.z},'the airport')">Taxi to the airport</button><button onclick="DCITY.taxi(${C.st.x},${C.st.z+C.st.b+4},'the stadium')">Taxi to ${esc((d.venue&&d.venue.n)||'the stadium')}</button>${C.spots.club?`<button onclick="DCITY.taxi(${C.spots.club.x},${C.spots.club.z+1},'the club')">Taxi to ${esc((d.club&&d.club.n)||'the club')}</button>`:''}${C.spots.hotel?`<button onclick="DCITY.taxi(${C.spots.hotel.x},${C.spots.hotel.z+1},'the hotel')">Taxi to the hotel</button>`:''}<button onclick="closeUI()">Close</button></div></div>`;
  const c=$('dsmap'),x=c.getContext('2d'),k=Math.min(760/(C.W+150),420/(C.zMax+80)),ox=(760-(C.W+150)*k)/2+120*k,oz=40*k;x.fillStyle='#223';x.fillRect(0,0,760,420);
  dsMapPaint(x,v=>ox+v*k,v=>oz+v*k,k,false);const px=ox+(P.x-OX)*k,pz=oz+(P.z-OZ)*k;x.fillStyle='#fff';x.strokeStyle='#000';x.beginPath();x.arc(px,pz,5,0,7);x.fill();x.stroke()}
 

@@ -85,11 +85,14 @@ function runCard(r){const a=albById(r.alb),F=FM[r.fmt],wait=r.ready-S.day,k=clam
  const stat=wait>0?`Arrives in ${wait} day${wait>1?'s':''}`:`Day ${k} of ${WIN} on sale`;
  return`<article class=lh-oc><div class=lh-oct><h3 class=lh-ocn>${esc(a?a.name:'Album')}</h3><span class=lh-tag>${F.n}</span></div>
  <div class=lh-ocf><div><span>Printed</span><b>${num(r.qty)} at ${fm2(r.price)}</b></div><div><span>Status</span><b>${stat}</b></div><div><span>Sold so far</span><b>${num(r.sold)} copies</b></div><div><span>Revenue so far</span><b>${fm(r.rev)} of ${fm(r.cost)} cost</b></div><div class=lh-wide><span>Sell-through</span><i class=lh-pg><b style="width:${Math.round(100*r.sold/r.qty)}%"></b></i></div><div><span>Signed copies left</span><b>${num(Math.max(0,(r.sg||0)-(r.sgs||0)))}</b></div></div>${canSign(r)?`<div class=lh-ocb><button class="lh-btn pri" onclick="BRD.pressSign(${r.id})">Sign ${F.n=='CD'?'CDs':'vinyls'}</button></div>`:''}</article>`}
-const canSign=r=>r.state==0&&S.day>=r.ready&&typeof signGame=='function'&&(r.qty-r.sold)-Math.max(0,(r.sg||0)-(r.sgs||0))>0;
-BRD.pressSign=function(id){const r=st().runs.find(x=>x.id==id);if(!r||!canSign(r))return say('Nothing left to sign on this pressing.');const a=albById(r.alb),F=FM[r.fmt];
- const items=[];for(let i=0;i<SGN;i++)items.push({kind:r.fmt,art:{title:a?a.name:'Album',artist:S.artist||'Artist'}});
+/* v55.21: only 10% of a pressing can be signed, at most 50 copies */
+const sgCap=r=>Math.min(50,Math.max(1,Math.floor(r.qty*.1)));
+const sgLeft=r=>Math.max(0,Math.min((r.qty-r.sold)-Math.max(0,(r.sg||0)-(r.sgs||0)),sgCap(r)-(r.sg||0)));
+const canSign=r=>r.state==0&&S.day>=r.ready&&typeof signGame=='function'&&sgLeft(r)>0;
+BRD.pressSign=function(id){const r=st().runs.find(x=>x.id==id);if(!r||!canSign(r))return say('Nothing left to sign: only 10% of a pressing (max 50) can be signed.');const a=albById(r.alb),F=FM[r.fmt];
+ const items=[];for(let i=0,m=Math.min(SGN,Math.ceil(sgLeft(r)/SGC));i<m;i++)items.push({kind:r.fmt,art:{title:a?a.name:'Album',artist:S.artist||'Artist'}});
  signGame({items,title:'Sign your '+F.n+' copies of '+(a?a.name:'your album'),onDone:()=>{}}).then(res=>{try{if(!res||res.cancelled)return;
-  const room=(r.qty-r.sold)-Math.max(0,(r.sg||0)-(r.sgs||0));let n=0;(res.items||[]).forEach(it=>{if(it.signed)n+=Math.round(SGC*(.5+.5*(+it.q||0)))});n=Math.min(n,Math.max(0,room));
+  const room=sgLeft(r);let n=0;(res.items||[]).forEach(it=>{if(it.signed)n+=Math.round(SGC*(.5+.5*(it.sim!=null?+it.sim:+it.q||0)))});n=Math.min(n,Math.max(0,room));
   if(n>0){r.sg=(r.sg||0)+n;try{updateVersion()}catch(e){}say('Signed '+num(n)+' '+F.n+' copies. Signed copies sell for more.')}else say('No copies signed.');pcR()}catch(e){console.error('label press sign',e)}})};
 function pastTable(rs){return`<table class=lh-t><thead><tr><th>Album</th><th>Format</th><th class=lh-r>Printed</th><th class=lh-r>Sold</th><th class=lh-r>Price</th><th class=lh-r>Revenue</th><th class=lh-r>Cost</th><th class=lh-r>Result</th></tr></thead><tbody>${rs.map(r=>{const a=albById(r.alb),p=r.res?r.res.profit:r.rev-r.cost;
  return`<tr><td>${esc(a?a.name:'Album')}</td><td>${FM[r.fmt].n}</td><td class=lh-r>${num(r.qty)}</td><td class=lh-r>${num(r.sold)}</td><td class=lh-r>${fm2(r.price)}</td><td class=lh-r>${fm(r.rev)}</td><td class=lh-r>${fm(r.cost)}</td><td class=lh-r><b>${p>=0?'Profit '+fm(p):'Loss '+fm(-p)}</b></td></tr>`}).join('')}</tbody></table>`}
