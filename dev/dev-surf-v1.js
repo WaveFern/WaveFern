@@ -59,17 +59,23 @@ const baseY=u=>(u<=0?-.41:u<13?lerp(-.41,-.43,u/13):u<38?lerp(-.43,-.46,(u-13)/2
 const sandY=z=>z<=0?-.36:z<5?lerp(-.36,-.33,z/5):z<10?lerp(-.33,-.30,(z-5)/5):z<15?lerp(-.30,-.27,(z-10)/5):-.25;
 
 /* ---------- the wave model ----------
-   A wave: crest line  uc(s,t) = ub - c*(t-tb) + (s-sP)*tanb   (u out from the waterline; moves in at c m/s, tilted so the break runs along +s)
-   The peel point  sb(t) = sP + vp*(t-tb) (+ a slow wobble for "sections"), vp = c / tanb.  d = s - sb is the distance AHEAD of the peel point.
-   Face height T (m). Behind the peel (d<0) the wave is whitewater, ahead of it a green face that curls into a barrel just in front of the peel. */
+   v55.23: waves face the beach. A wave is a straight swell line parallel to the shore that rolls in at c m/s until it reaches its break line ub
+   at time tb, then slows to a crawl (C2) while the peel point runs along it: sb(t) = sP + vp*(t-tb) (+ a slow wobble for "sections").
+   d = s - sb is the distance AHEAD of the peel point: ahead of it the green face stands up square to the beach, behind it the whitewater
+   rolls on to the sand at about 0.8*c (so only the broken part fans in). Face height T (m); ahead of the peel a green face that curls
+   into a barrel just in front of the peel. */
 const SG1=.36,SG2=.43,SG3=.45,SG4=.80,TIPA=.95;/* curve parameter breakpoints: back slope | outer lip | tip | inner wall | foot */
 const waves=[];let TT=0,wid=0;
-function mkWave(o){const H=o.H,c=o.c||3.6+.75*H,vp=o.vp||(6.5+1.5*H)*rr(.88,1.15),w={id:++wid,H,c,vp,tanb:c/vp,tb:o.tb,sP:o.sP,ub:o.ub||12+17*H,hol:o.hol==null?rr(.25,.8):o.hol,Lw:o.Lw||rr(95,150),set:o.set||0,k:o.k||0,n:o.n||1,close:!!o.close,sec:rr(0,6.28),caught:0};
- if(w.close){w.vp=w.c/.07;w.tanb=.07;w.hol=.1}return w}
+function mkWave(o){const H=o.H,c=o.c||3.6+.75*H,vp=o.vp||(6.5+1.5*H)*rr(.88,1.15),w={id:++wid,H,c,vp,tb:o.tb,sP:o.sP,ub:o.ub||12+17*H,hol:o.hol==null?rr(.25,.8):o.hol,Lw:o.Lw||rr(95,150),set:o.set||0,k:o.k||0,n:o.n||1,close:!!o.close,sec:rr(0,6.28),caught:0};
+ if(w.close){w.vp=w.c/.07;w.hol=.1}return w}
 const envAt=(w,s)=>{const a=12,r=sm(w.sP-a,w.sP+5,s),t=1-sm(w.sP+w.Lw-38,w.sP+w.Lw,s);return r*t*(1+.16*Math.exp(-Math.pow((s-w.sP-10)/22,2)))};
 const sbAt=(w,t)=>w.sP+w.vp*(t-w.tb)+(w.close?0:3.4*Math.sin((t-w.tb)*.5+w.sec));
-const ucAt=(w,s,t)=>w.ub-w.c*(t-w.tb)+(s-w.sP)*w.tanb;
-const waveDead=(w,t)=>t>w.tb+(w.ub+w.Lw*w.tanb)/w.c+4;
+const C2=.7,TAU0=1.3;/* crawl speed after the break, and how fast the swell slows down to it */
+const travel=(w,tau)=>tau<0?w.c*tau:C2*tau+(w.c-C2)*TAU0*(1-Math.exp(-tau/TAU0));
+const kwOf=w=>Math.max(0,(.8*w.c-C2)/w.vp);
+/* the crest line: straight along the shore ahead of the peel point (a faint bend so it is not a ruler line), fanning shoreward only behind it */
+const ucAt=(w,s,t)=>{const d=s-sbAt(w,t),bh=-d;return w.ub-travel(w,t-w.tb)-kwOf(w)*.5*(bh+Math.sqrt(bh*bh+4)-2)+.9*Math.sin(s*.045+w.sec)};
+const waveDead=(w,t)=>t>w.tb+(w.Lw+16)/w.vp+(w.ub+8)/(kwOf(w)*w.vp+C2)+4;
 /* the two curves a green wave can have, both indexed by one parameter sg in 0..1 that runs from the back of the wave over the crest down the face to the foot:
    sCurve = a plain swell/shoulder (E shoreward distance from the crest, Y height), bCurve = the barrel (lip, tube, wall). A wave is the blend of the two by kappa. */
 const OB=[0,0];
@@ -108,61 +114,79 @@ const NR=U.length,NV=NC*NR;
 const rowOf=u=>u<0?(u+6)/2:u<=132?3+u:136+(u-134)/2;
 const surf={mesh:null,pos:null,nor:null,fo:null,ht:null,al:null,dY:null,dU:null,fN:null,fR:null,wwN:null,mat:null,ready:false};
 function buildSurf(){const g=new THREE.BufferGeometry();
- surf.pos=new Float32Array(NV*3);surf.nor=new Float32Array(NV*3);surf.fo=new Float32Array(NV);surf.ht=new Float32Array(NV);surf.al=new Float32Array(NV);
+ surf.pos=new Float32Array(NV*3);surf.nor=new Float32Array(NV*3);surf.fo=new Float32Array(NV);surf.ht=new Float32Array(NV);surf.al=new Float32Array(NV);surf.rt=new Float32Array(NV);surf.rN=new Float32Array(NV);
  surf.dY=new Float32Array(NV);surf.dU=new Float32Array(NV);surf.fN=new Float32Array(NV);surf.fR=new Float32Array(NV);surf.wwN=new Float32Array(NV);
- const au=new Float32Array(NV),idx=new Uint16Array((NC-1)*(NR-1)*6);let k=0;
- for(let i=0;i<NC;i++)for(let j=0;j<NR;j++){const v=i*NR+j;au[v]=U[j];surf.nor[v*3+1]=1;
+ const au=new Float32Array(NV),as=new Float32Array(NV),idx=new Uint16Array((NC-1)*(NR-1)*6);let k=0;
+ for(let i=0;i<NC;i++)for(let j=0;j<NR;j++){const v=i*NR+j;au[v]=U[j];as[v]=S0+i*DS;surf.nor[v*3+1]=1;
   if(i<NC-1&&j<NR-1){const a=v,b=v+NR,c=v+1,d=v+NR+1;idx[k++]=a;idx[k++]=b;idx[k++]=c;idx[k++]=b;idx[k++]=d;idx[k++]=c}}
  const dyn=THREE.DynamicDrawUsage;
  g.setAttribute('position',new THREE.BufferAttribute(surf.pos,3).setUsage(dyn));g.setAttribute('normal',new THREE.BufferAttribute(surf.nor,3).setUsage(dyn));
  g.setAttribute('aFoam',new THREE.BufferAttribute(surf.fo,1).setUsage(dyn));g.setAttribute('aHt',new THREE.BufferAttribute(surf.ht,1).setUsage(dyn));g.setAttribute('aAlpha',new THREE.BufferAttribute(surf.al,1).setUsage(dyn));
- g.setAttribute('aU',new THREE.BufferAttribute(au,1));g.setIndex(new THREE.BufferAttribute(idx,1));
+ g.setAttribute('aU',new THREE.BufferAttribute(au,1));g.setAttribute('aS',new THREE.BufferAttribute(as,1));g.setAttribute('aR',new THREE.BufferAttribute(surf.rt,1).setUsage(dyn));g.setIndex(new THREE.BufferAttribute(idx,1));
  const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:true,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2,
   uniforms:{uSun:{value:new THREE.Vector3(.4,.8,.45)},uSunCol:{value:new THREE.Color(1,1,1)},uAmb:{value:new THREE.Color(.7,.7,.7)},uSky:{value:new THREE.Color(.6,.8,1)},uFog:{value:new THREE.Color(.6,.8,1)},uFogR:{value:new THREE.Vector2(1e5,2e5)},uTime:{value:0}},
-  vertexShader:`attribute float aFoam;attribute float aHt;attribute float aAlpha;attribute float aU;varying vec3 vN;varying vec3 vW;varying float vF;varying float vH;varying float vA;varying float vU;
-   void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vN=normal;vF=aFoam;vH=aHt;vA=aAlpha;vU=aU;gl_Position=projectionMatrix*viewMatrix*w;}`,
+  vertexShader:`attribute float aFoam;attribute float aHt;attribute float aAlpha;attribute float aU;attribute float aS;attribute float aR;varying vec3 vN;varying vec3 vW;varying float vF;varying float vH;varying float vA;varying float vU;varying float vS;varying float vR;
+   void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vN=normal;vF=aFoam;vH=aHt;vA=aAlpha;vU=aU;vS=aS;vR=aR;gl_Position=projectionMatrix*viewMatrix*w;}`,
+  /* v55.23 water: the flat sea matches the island strips; a wave face darkens to deep teal at its foot and glows translucent green
+     up near the lip (brighter with the sun behind it), with streaks running down the face, a white lip line, sun glints, sky
+     reflection at grazing angles and bubbly foam laid out along the shore so it moves with the waves. Far slivers fade out. */
   fragmentShader:`uniform vec3 uSun;uniform vec3 uSunCol;uniform vec3 uAmb;uniform vec3 uSky;uniform vec3 uFog;uniform vec2 uFogR;uniform float uTime;
-   varying vec3 vN;varying vec3 vW;varying float vF;varying float vH;varying float vA;varying float vU;
+   varying vec3 vN;varying vec3 vW;varying float vF;varying float vH;varying float vA;varying float vU;varying float vS;varying float vR;
    float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
    float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1.,0.)),f.x),mix(h2(i+vec2(0.,1.)),h2(i+vec2(1.,1.)),f.x),f.y);}
    vec3 wc(float u){vec3 a=vec3(.608,.910,.871),b=vec3(.310,.749,.831),c=vec3(.169,.498,.753);return u<13.?mix(a,b,clamp(u/13.,0.,1.)):mix(b,c,clamp((u-13.)/25.,0.,1.));}
-   void main(){vec3 N=normalize(vN);if(!gl_FrontFacing)N=-N;vec3 V=normalize(cameraPosition-vW);
-    float dif=max(dot(N,uSun),0.);vec3 base=wc(vU);
-    float th=smoothstep(.25,2.6,vH);base=mix(base,base*vec3(.85,1.25,1.2)+vec3(.0,.07,.06),th*.6);
+   void main(){vec3 N=normalize(vN);if(!gl_FrontFacing)N=-N;vec3 V=normalize(cameraPosition-vW);float dist=length(cameraPosition-vW);
+    float wv=smoothstep(.04,.5,vH);/* how much of a wave is here at all */
+    vec3 Nl=normalize(mix(vec3(0.,1.,0.),N,wv));/* flat water is lit like the island sea under it */
+    float st=clamp(1.-Nl.y,0.,1.);float face=smoothstep(.04,.45,st)*wv;
+    float r=clamp(vR,0.,1.);
+    vec3 base=wc(vU);
+    vec3 deep=vec3(.05,.36,.46),glass=vec3(.30,.92,.80);
+    vec3 fc=mix(deep,mix(base,glass,.7),smoothstep(.25,.95,r));
+    base=mix(base,fc,face);
+    /* streaks running down the face, moving up as the wave stands up */
+    float sk=vn(vec2(vS*.55,vH*2.2-uTime*.7))*.6+vn(vec2(vS*1.9,vH*5.-uTime*1.3))*.4;base*=1.+face*(sk-.5)*.32;
+    float dif=max(dot(Nl,uSun),0.);
     vec3 col=base*(uAmb+uSunCol*dif);
-    float fr=pow(1.-max(dot(N,V),0.),3.);col=mix(col,uSky,fr*.3);
-    vec3 R=reflect(-uSun,N);col+=uSunCol*pow(max(dot(R,V),0.),36.)*.5;
-    float back=pow(max(dot(-V,uSun),0.),2.)*smoothstep(.4,2.,vH)*.25;col+=vec3(.05,.2,.18)*back*uSunCol;
-    float n=vn(vW.xz*1.3+vec2(uTime*.3,0.))*.6+vn(vW.xz*3.7-vec2(0.,uTime*.5))*.4;
-    float fm=smoothstep(.42,.72,n+vF*.62-.4)*clamp(vF*1.8,0.,1.);
-    vec3 fc=vec3(.93,.985,1.)*(uAmb*.85+uSunCol*(.3+.7*dif));
-    col=mix(col,fc,fm);
+    /* light shining through the thin top of the wave */
+    float thin=smoothstep(.5,.97,r)*wv;float bl=pow(max(dot(-V,uSun),0.),2.)*.7+.3;col+=vec3(.10,.42,.32)*thin*bl*(uSunCol*.6+uAmb*.4)*(.55+face*.6);
+    float fr=pow(1.-max(dot(Nl,V),0.),4.);col=mix(col,uSky*(uAmb+uSunCol*.5),fr*.35*wv);
+    vec3 R=reflect(-uSun,Nl);col+=uSunCol*pow(max(dot(R,V),0.),60.)*.7*wv;
+    /* the lip line */
+    float lip=smoothstep(.9,.99,r)*face;col=mix(col,vec3(.92,.99,1.)*(uAmb*.8+uSunCol*.45),lip*.75);
+    /* foam, laid out in the coast frame (s along the shore, u out to sea) so it travels with the water */
+    vec2 fp=vec2(vS*.42,vU*.9);float n=vn(fp*1.6+vec2(uTime*.25,-uTime*.4))*.55+vn(fp*4.3-vec2(uTime*.5,uTime*.2))*.3+vn(fp*11.+vec2(0.,uTime))*.15;
+    float fm=smoothstep(.42,.66,n+vF*.66-.38)*clamp(vF*1.9,0.,1.);
+    float bub=smoothstep(.55,.7,vn(fp*9.-vec2(uTime*.3,0.)));fm*=.86+.14*bub;
+    vec3 fcol=vec3(.95,.99,1.)*(uAmb*.85+uSunCol*(.35+.65*max(dot(N,uSun),0.)));
+    col=mix(col,fcol,fm);
     float a=clamp(max(vA,fm),0.,1.);
-    float ff=smoothstep(uFogR.x,uFogR.y,length(cameraPosition-vW));col=mix(col,uFog,ff);
-    gl_FragColor=vec4(col,a);}`});
+    a*=mix(1.,smoothstep(.05,.6,vH)+fm,smoothstep(70.,190.,dist));/* far away, thin swell slivers fade into the sea */
+    float ff=smoothstep(uFogR.x,uFogR.y,dist);col=mix(col,uFog,ff);
+    gl_FragColor=vec4(col,clamp(a,0.,1.));}`});
  surf.mat=mat;const m=new THREE.Mesh(g,mat);m.frustumCulled=false;m.renderOrder=3;m.visible=false;m.name='surfmesh';WORLD.add(m);surf.mesh=m;surf.ready=true;
  for(let i=0;i<NC;i++)for(let j=0;j<NR;j++){const v=i*NR+j,p=toWorldFast(i,U[j]);surf.pos[v*3]=p[0];surf.pos[v*3+1]=baseY(U[j]);surf.pos[v*3+2]=p[1]}}
 const _tw=[0,0];function toWorldFast(i,u){_tw[0]=CX[i]+NX[i]*u;_tw[1]=CZ[i]+NZ[i]*u;return _tw}
 let simDt=.016;
-function surfUpdate(dt,pk){const dY=surf.dY,dU=surf.dU,fN=surf.fN,wwN=surf.wwN,fR=surf.fR;dY.fill(0);dU.fill(0);fN.fill(0);wwN.fill(0);
+function surfUpdate(dt,pk){const dY=surf.dY,dU=surf.dU,fN=surf.fN,wwN=surf.wwN,fR=surf.fR,rN=surf.rN;dY.fill(0);rN.fill(0);dU.fill(0);fN.fill(0);wwN.fill(0);
  const o=SCR;
  for(let q=0;q<waves.length;q++){const w=waves[q];if(TT<w.tb-(215-w.ub)/w.c||waveDead(w,TT))continue;
   for(let i=0;i<NC;i++){const s=S0+i*DS,e=envAt(w,s);if(e<.015)continue;const uc=ucAt(w,s,TT);if(uc>192+50)continue;
    const d=s-sbAt(w,TT),T=w.H*e*sm(192,166,uc)*(1-.005*clamp(d,0,60));if(T<.06)continue;
    const Wb=2.6*T+2,Wf=1.6*T+1.2,wide=Math.max(Wb,1.7*T+2.4),jl=Math.max(0,Math.floor(rowOf(Math.max(-6,uc-Wf-1.8)))),jh=Math.min(NR-1,Math.ceil(rowOf(Math.min(192,uc+wide))));
-   for(let j=jl;j<=jh;j++){const xi=U[j]-uc;if(!prof(T,d,w.hol,xi,uc,o))continue;const v=i*NR+j;dY[v]+=o[1];dU[v]+=o[0];if(o[2]>fN[v])fN[v]=o[2];if(o[3]*o[2]>wwN[v])wwN[v]=o[3]*o[2]}}}
+   for(let j=jl;j<=jh;j++){const xi=U[j]-uc;if(!prof(T,d,w.hol,xi,uc,o))continue;const v=i*NR+j;dY[v]+=o[1];dU[v]+=o[0];const rr0=o[1]/T;if(rr0>rN[v])rN[v]=rr0;if(o[2]>fN[v])fN[v]=o[2];if(o[3]*o[2]>wwN[v])wwN[v]=o[3]*o[2]}}}
  const dec=Math.exp(-dt/3.4),pos=surf.pos,al=surf.al,ht=surf.ht,fo=surf.fo;
  for(let i=0;i<NC;i++)for(let j=0;j<NR;j++){const v=i*NR+j,u=U[j],y=dY[v],du=dU[v];
   const r=wwN[v]*.9,f0=fR[v]*dec;fR[v]=r>f0?r:f0;
   const uu=u+du;pos[v*3]=CX[i]+NX[i]*uu;pos[v*3+1]=baseY(u)+y;pos[v*3+2]=CZ[i]+NZ[i]*uu;
-  const F=Math.max(fN[v],fR[v]);fo[v]=F;ht[v]=y;
+  const F=Math.max(fN[v],fR[v]);fo[v]=F;ht[v]=y;surf.rt[v]=rN[v];
   al[v]=Math.min(1,Math.max(sm(.03,.32,y),Math.abs(du)>.05?1:0,F*.9))}
  /* normals from central differences of the displaced grid */
  const nor=surf.nor;
  for(let i=0;i<NC;i++){const i0=i>0?i-1:i,i1=i<NC-1?i+1:i;for(let j=0;j<NR;j++){const j0=j>0?j-1:j,j1=j<NR-1?j+1:j,v=i*NR+j,a=(i1*NR+j)*3,b=(i0*NR+j)*3,c=(i*NR+j1)*3,e=(i*NR+j0)*3;
    const sx=pos[a]-pos[b],sy=pos[a+1]-pos[b+1],sz=pos[a+2]-pos[b+2],ux=pos[c]-pos[e],uy=pos[c+1]-pos[e+1],uz=pos[c+2]-pos[e+2];
    let nx=sy*uz-sz*uy,ny=sz*ux-sx*uz,nz=sx*uy-sy*ux;const l=Math.hypot(nx,ny,nz)||1;nor[v*3]=nx/l;nor[v*3+1]=ny/l;nor[v*3+2]=nz/l}}
- const g=surf.mesh.geometry.attributes;g.position.needsUpdate=g.normal.needsUpdate=g.aFoam.needsUpdate=g.aHt.needsUpdate=g.aAlpha.needsUpdate=true}
+ const g=surf.mesh.geometry.attributes;g.position.needsUpdate=g.normal.needsUpdate=g.aFoam.needsUpdate=g.aHt.needsUpdate=g.aAlpha.needsUpdate=g.aR.needsUpdate=true}
 /* foam left on the water by something small (the surfer's wake) */
 function foamAt(s,u,r,k){const f=colAt(s),i0=Math.max(0,Math.round(f-r/DS)),i1=Math.min(NC-1,Math.round(f+r/DS)),jr=Math.max(1,Math.round(r)),jc=Math.round(rowOf(clamp(u,-6,192)));
  for(let i=i0;i<=i1;i++)for(let j=Math.max(0,jc-jr);j<=Math.min(NR-1,jc+jr);j++){const v=i*NR+j;if(surf.fR[v]<k)surf.fR[v]=k}}
@@ -185,7 +209,7 @@ function spawnSet(lv,tbStart,rp,opt){opt=opt||{};const L=LV[lv],n=3+Math.floor(M
  const sP0=rr(-14,22);
  for(let k=0;k<n;k++){const f=prof[Math.round(k/(Math.max(1,n-1))*4)]*rr(.93,1.07),H=lerp(L.h[0],L.h[1],clamp((f-.8)/.4,0,1)*.8+rr(0,.2))*rp.m;
   const clo=!opt.noClose&&Math.random()<L.clo&&k>0,hol=clamp(rr(L.hol[0],L.hol[1])+rp.hol,.05,1);
-  const w=mkWave({H,tb,sP:sP0+rr(-9,9),hol,close:clo,set:SCH.setN,k:k+1,n});w.vp*=L.vpk;w.tanb=w.c/w.vp;if(clo){w.vp=w.c/.07;w.tanb=.07}
+  const w=mkWave({H,tb,sP:sP0+rr(-9,9),hol,close:clo,set:SCH.setN,k:k+1,n});w.vp*=L.vpk;if(clo){w.vp=w.c/.07}
   waves.push(w);out.push(w);tb+=rr(L.gap[0],L.gap[1])}
  SCH.setN++;return{n,end:tb,waves:out}}
 function resetWaves(){waves.length=0;wid=0}
@@ -426,6 +450,96 @@ function partsTick(dt){if(!PART)return;const im=PART.im,{m4,q,v,sc}=PART;let any
   const k=p.l>0?Math.min(1,p.l/p.m*2.2)*p.s:0;v.set(p.x,p.y,p.z);sc.set(k,k,k);m4.compose(v,q,sc);im.setMatrixAt(i,m4);im.setColorAt(i,p.c);if(p.l>0)any=true}
  im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true}
 
+/* ---------- the sweet spot marker (v55.23) ----------
+   A glowing ring on the water with a soft inner disk, a breathing inner ring and a pulse that rolls outward, a light beam you can see
+   from anywhere in the line-up, a floating arrow, a soft band showing the whole catchable stretch of the wave and a dotted trail from
+   you to the spot. Gold = paddle there, green = in position, white flash = pop up now. A label in the HUD follows it on screen. */
+let MK=null;
+const MKC={far:new THREE.Color('#ffc83a'),in:new THREE.Color('#4dffa0'),now:new THREE.Color('#ffffff')};
+function markerOn(){const grp=new THREE.Group();grp.name='surfSpot';grp.visible=false;
+ const add=(geo,mat,ro)=>{const m=new THREE.Mesh(geo,mat);m.renderOrder=ro||7;m.frustumCulled=false;grp.add(m);return m};
+ const bm=o=>new THREE.MeshBasicMaterial(Object.assign({transparent:true,depthWrite:false,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4},o));
+ const flat=g=>{g.rotateX(-Math.PI/2);return g};
+ const disk=add(flat(new THREE.CircleGeometry(1.62,48)),bm({color:0xffc83a,opacity:.2}));
+ const ring=add(flat(new THREE.RingGeometry(1.6,2.02,64)),bm({color:0xffc83a,opacity:.95}));
+ const rim=add(flat(new THREE.RingGeometry(2.02,2.14,64)),bm({color:0x0a2a33,opacity:.35}));
+ const inner=add(flat(new THREE.RingGeometry(.86,1.0,48)),bm({color:0xffffff,opacity:.75}));
+ const pulse=add(flat(new THREE.RingGeometry(1.94,2.08,64)),bm({color:0xffffff,opacity:.6}));
+ /* four notches on the ring, like a sight */
+ const notchG=new THREE.BufferGeometry();{const v=[];for(let k=0;k<4;k++){const a=k*Math.PI/2,ca=Math.cos(a),sa=Math.sin(a),px=-sa*.12,pz=ca*.12,r0=2.18,r1=2.62;
+   v.push(ca*r0+px,0,sa*r0+pz, ca*r1,0,sa*r1, ca*r0-px,0,sa*r0-pz)}notchG.setAttribute('position',new THREE.Float32BufferAttribute(v,3))}
+ const notch=add(notchG,bm({color:0xffc83a,opacity:.95}));
+ /* the light beam: brightest at the water, fading up, soft at its edges, with slow rising bands */
+ const beamMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
+  uniforms:{uC:{value:new THREE.Color(0xffc83a)},uA:{value:.55},uT:{value:0}},
+  vertexShader:`varying vec2 vUv;varying vec3 vN;varying vec3 vV;void main(){vUv=uv;vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform vec3 uC;uniform float uA;uniform float uT;varying vec2 vUv;varying vec3 vN;varying vec3 vV;
+   void main(){float rim=pow(abs(dot(vN,vV)),1.4);float h=vUv.y;float a=pow(1.-h,1.8)*uA*rim;a*=.8+.2*sin(h*22.-uT*5.);a+=pow(1.-h,10.)*.35*uA;gl_FragColor=vec4(uC*a,a);}`});
+ const beamG=new THREE.CylinderGeometry(.55,1.15,12,24,1,true);beamG.translate(0,6,0);const beam=add(beamG,beamMat,8);
+ /* the floating arrow: a four sided gem pointing down with a white cap */
+ const arw=new THREE.Group();grp.add(arw);
+ const gemM=new THREE.MeshLambertMaterial({color:0xffc83a,emissive:0x5a3d00});
+ const gem=new THREE.Mesh(new THREE.ConeGeometry(.5,.95,4),gemM);gem.rotation.x=Math.PI;arw.add(gem);
+ const cap=new THREE.Mesh(new THREE.ConeGeometry(.5,.28,4),new THREE.MeshLambertMaterial({color:0xffffff,emissive:0x555555}));cap.position.y=.61;arw.add(cap);
+ arw.children.forEach(m=>{m.renderOrder=8;m.frustumCulled=false});
+ /* the catchable stretch: a soft band along the break line */
+ const bandMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3,
+  uniforms:{uC:{value:new THREE.Color(0xffffff)},uA:{value:.0},uT:{value:0}},
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform vec3 uC;uniform float uA;uniform float uT;varying vec2 vUv;void main(){float ex=smoothstep(0.,.18,vUv.x)*smoothstep(1.,.82,vUv.x),ey=smoothstep(0.,.35,vUv.y)*smoothstep(1.,.65,vUv.y);
+   float st=.65+.35*step(.5,fract(vUv.x*9.-uT*.8));gl_FragColor=vec4(uC,uA*ex*ey*st);}`});
+ const band=new THREE.Mesh(flat(new THREE.PlaneGeometry(1,1)),bandMat);band.renderOrder=6;band.frustumCulled=false;scene.add(band);
+ /* the trail of dots from you to the spot */
+ const TN=12,dotM=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4});
+ const dots=new THREE.InstancedMesh(flat(new THREE.CircleGeometry(.2,14)),dotM,TN);dots.renderOrder=7;dots.frustumCulled=false;scene.add(dots);
+ scene.add(grp);
+ MK={grp,disk,ring,rim,inner,pulse,notch,beam,beamMat,arw,gemM,band,bandMat,dots,TN,k:0,col:MKC.far.clone(),flash:0,lx:null,ly:null,m4:new THREE.Matrix4(),v:new THREE.Vector3(),q:new THREE.Quaternion(),sc:new THREE.Vector3()}}
+function markerOff(){if(!MK)return;const dis=o=>{o.traverse(m=>{if(m.geometry)m.geometry.dispose();if(m.material)m.material.dispose()})};
+ scene.remove(MK.grp);scene.remove(MK.band);scene.remove(MK.dots);dis(MK.grp);dis(MK.band);MK.dots.geometry.dispose();MK.dots.material.dispose();MK.dots.dispose();MK=null;
+ const l=$s('sb_spot');if(l)l.style.display='none'}
+function markerFlash(){if(MK)MK.flash=1}
+function markerTick(dt){if(!MK)return;const g=G,M=MK,sp=g.spot,show=g.st=='paddle'&&!!sp&&!g.paused;
+ M.k+=((show?1:0)-M.k)*Math.min(1,dt*(show?4:7));if(!show)spotLabel(null);M.flash=Math.max(0,M.flash-dt*2.2);
+ const vis=M.k>.01;M.grp.visible=M.band.visible=M.dots.visible=vis;
+ if(!vis||!sp){spotLabel(null);return}
+ const p=sp.p,w=toWorld(p.s,p.u),y=water(p.s,p.u)+.07,t=tanAt(p.s),ang=Math.atan2(-t[1],t[0]);
+ M.grp.position.set(w[0],y,w[1]);M.grp.rotation.y=ang;
+ const inPos=g.spotDist!=null&&g.spotDist<2.4,now=!!(g.ring&&Math.abs(g.ring.xi-1.8)<.6),coming=!!g.meter;
+ const tc=now?MKC.now:inPos?MKC.in:MKC.far;M.col.lerp(tc,Math.min(1,dt*8));
+ const fl=M.flash,c=M.col,A=M.k;
+ [M.ring.material,M.disk.material,M.notch.material].forEach(m=>m.color.copy(c));M.gemM.color.copy(c);M.gemM.emissive.copy(c).multiplyScalar(.35);M.beamMat.uniforms.uC.value.copy(c);
+ const T=TT,br=.5+.5*Math.sin(T*(now?14:coming?7:3.2));
+ M.ring.material.opacity=A*(.82+.18*br);M.disk.material.opacity=A*(.14+.12*br+(now?.2:0)+fl*.5);M.rim.material.opacity=A*.3;M.notch.material.opacity=A*.9;
+ M.ring.scale.setScalar(1+fl*.35+(now?.06*br:0));M.notch.rotation.y=T*(inPos?.9:.35);M.notch.scale.setScalar(1+.06*br);
+ M.inner.scale.setScalar(.85+.3*br);M.inner.material.opacity=A*(.45+.4*(1-br));
+ const pp=(T*(coming?1.6:.8))%1;M.pulse.scale.setScalar(1+pp*1.4);M.pulse.material.opacity=A*.65*(1-pp)*(1-pp);
+ /* the beam fades as you get close (it would only be in the way) */
+ const dist=g.spotDist||0,bA=(inPos?.22:clamp(.25+dist/30,.3,.7))*A*(1+fl);M.beamMat.uniforms.uA.value=bA;M.beamMat.uniforms.uT.value=T;M.beam.scale.set(1,inPos?.55:1,1);
+ /* arrow: bobs and turns slowly, drops lower once you are in position */
+ const ay=(inPos?2.6:4.2)+Math.sin(T*2.6)*.22;M.arw.position.y+=(ay-M.arw.position.y)*Math.min(1,dt*4);M.arw.rotation.y=T*1.4;M.arw.scale.setScalar(A*(inPos?.75:1.05)*(1+fl*.4));
+ /* band along the break line (d 3.5 to 16 at the spot time), in the coast frame */
+ {const s0=p.s-4,s1=p.s+8.5,sc=(s0+s1)/2,u0=sp.w.ub-.8,u1=sp.w.ub+3.6,uc=(u0+u1)/2,bw=toWorld(sc,uc),bt=tanAt(sc);M.band.position.set(bw[0],water(sc,uc)+.05,bw[1]);M.band.rotation.y=Math.atan2(-bt[1],bt[0]);M.band.scale.set(s1-s0,1,u1-u0);
+  M.bandMat.uniforms.uA.value=A*(inPos?.1:.17)*(coming?1.4:1);M.bandMat.uniforms.uC.value.copy(c);M.bandMat.uniforms.uT.value=T}
+ /* trail: marching dots from the board to the ring when you are more than a few metres away */
+ const im=M.dots,show2=dist>3.6;let n=0;if(show2){const ds=p.s-g.s,du=p.u-g.u,L=Math.hypot(ds,du),ns=ds/L,nu=du/L,from=1.4,to=L-2.3,step=1.6,off=(T*2.4)%step;
+  for(let x=from+off;x<to&&n<M.TN;x+=step){const s=g.s+ns*x,u=g.u+nu*x,pw=toWorld(s,u),f=Math.min(1,(x-from)/2,(to-x)/2)*A;M.v.set(pw[0],water(s,u)+.06,pw[1]);M.sc.set(f,1,f);M.m4.compose(M.v,M.q,M.sc);im.setMatrixAt(n++,M.m4)}}
+ im.count=n;im.instanceMatrix.needsUpdate=true;im.material.color.copy(c).lerp(MKC.now,.55);
+ if(show)spotLabel({x:w[0],y:y+M.arw.position.y+.9,z:w[1],inPos,now,coming,dist})}
+/* the HUD label that rides above the arrow (clamped to the screen edge with a pointer when the spot is off screen) */
+function spotLabel(o){const e=$s('sb_spot');if(!e)return;if(!o||!MK||MK.k<.05){e.style.display='none';return}
+ const g=G,v=MK.v.set(o.x,o.y,o.z).project(cam3),W=innerWidth,H=innerHeight;let x=(v.x+1)/2*W,y=(1-v.y)/2*H;const behind=v.z>1;
+ if(behind){x=W-x;y=H-60}const m=70,off=behind||x<m||x>W-m||y<m||y>H-m;const cx=clamp(x,m,W-m),cy=clamp(y,m+40,H-m-90);
+ if(MK.lx==null){MK.lx=cx;MK.ly=cy}MK.lx+=(cx-MK.lx)*.35;MK.ly+=(cy-MK.ly)*.35;
+ const paddling=g.sIn<.6;let t,sub,cls;
+ if(o.now){t='POP UP!';sub='SPACE';cls='now'}
+ else if(g.ring){t=paddling?'GET READY':'PADDLE IN';sub=paddling?'pop up in the green':'hold S';cls='go'}
+ else if(o.coming&&o.inPos){t=paddling?'HERE IT COMES':'TURN AND PADDLE IN';sub=paddling?'keep paddling':'hold S';cls='go'}
+ else if(o.inPos){t='IN POSITION';sub='wait for the wave';cls='in'}
+ else{t='SWEET SPOT';sub=Math.round(o.dist)+' m';cls='far'}
+ setH('sb_spot_t',t);setT('sb_spot_s',sub);e.className=cls+(off?' off':'');e.style.display='block';
+ e.style.transform=`translate(${MK.lx.toFixed(1)}px,${MK.ly.toFixed(1)}px) translate(-50%,-100%)`;
+ const a=$s('sb_spot_a');if(a){if(off){const ang=Math.atan2(y-cy,x-cx);a.style.transform=`rotate(${(ang*180/Math.PI).toFixed(0)}deg) translateX(70px)`;a.style.display='block'}else a.style.display='none'}}
+
 /* ---------- the rider and the board ---------- */
 function boardMesh(own){bxs.length=0;const c=own?'#3a7bd5':'#ffd23d',s2=own?'#fff3d9':'#ff6f61';board(null,2.0,.56,c,s2,0,0,0,0,0,0);const m=mergeBoxes();return m}
 const UP=new THREE.Vector3(0,1,0);
@@ -451,8 +565,7 @@ function startSession(lv,own,fee){if(G||away()||mode=='surf')return;const o=st()
  try{if(P.mesh){P.mesh.visible=true;G.sh=P.mesh.children[0]&&P.mesh.children[0].visible;if(P.mesh.children[0])P.mesh.children[0].visible=false}}catch(e){}
  const bm=boardMesh(G.own);G.board=new THREE.Group();G.board.add(bm);G.boardMesh=bm;scene.add(G.board);
  partsOn();
- /* the catch zone marker: a soft cyan strip on the water where the next wave is best caught */
- const zg=new THREE.PlaneGeometry(1,1),zm=new THREE.MeshBasicMaterial({color:0x7ff3ff,transparent:true,opacity:.2,depthWrite:false,side:THREE.DoubleSide});G.zone=new THREE.Mesh(zg,zm);G.zone.rotation.x=-Math.PI/2;G.zone.renderOrder=4;G.zone.visible=false;scene.add(G.zone);
+ markerOn();
  G.stars=new THREE.Group();const sg=new THREE.BoxGeometry(.14,.14,.14),sm2=new THREE.MeshBasicMaterial({color:0xffe45a});for(let i=0;i<4;i++){const m=new THREE.Mesh(sg,sm2);G.stars.add(m)}G.stars.visible=false;scene.add(G.stars);
  hudOn();fadeIn(.7);
  const sf=scene.fog;G.fog=sf&&sf.near!=null?[sf.near,sf.far,sf.color.clone()]:null;if(sf&&sf.near!=null){sf.near=380;sf.far=1500;const bg=scene.background;if(bg&&bg.isColor)sf.color.copy(bg)}
@@ -469,8 +582,8 @@ function exitSession(){const g=G;if(!g)return;G=null;
  mode='play';try{$('hud').style.display=''}catch(e){}document.body.classList.remove('fston');
  try{g.hidden.forEach(a=>{a[0].m.visible=a[1]})}catch(e){}
  try{if(P.mesh){if(P.mesh.children[0])P.mesh.children[0].visible=g.sh!==false;P.mesh.rotation.set(0,0,0);P.mesh.quaternion.identity();P.arms[0].rotation.set(0,0,0);P.arms[1].rotation.set(0,0,0);P.legs[0].rotation.set(0,0,0);P.legs[1].rotation.set(0,0,0)}}catch(e){}
- try{scene.remove(g.board);g.boardMesh.geometry.dispose();g.boardMesh.material.dispose();scene.remove(g.zone);g.zone.geometry.dispose();g.zone.material.dispose();scene.remove(g.stars);g.stars.children[0].geometry.dispose();g.stars.children[0].material.dispose()}catch(e){soft(e,'dispose')}
- partsOff();hudOff();
+ try{scene.remove(g.board);g.boardMesh.geometry.dispose();g.boardMesh.material.dispose();scene.remove(g.stars);g.stars.children[0].geometry.dispose();g.stars.children[0].material.dispose()}catch(e){soft(e,'dispose')}
+ partsOff();markerOff();hudOff();
  try{const sf=scene.fog;if(g.fog&&sf){sf.near=g.fog[0];sf.far=g.fog[1];sf.color.copy(g.fog[2])}}catch(e){}
  const gw=lw(1.5,4.4);P.x=gw[0];P.z=gw[1];P.rot=Math.atan2(-(nrmAt(PS)[0]),-(nrmAt(PS)[1]));SY=0;HY=0;
  SCH.mode='idle';SCH.next=0;resetWaves();gateCool=TT+3;
@@ -499,11 +612,22 @@ function bore(s,u){let p=0;for(let i=0;i<waves.length;i++){const w=waves[i];if(T
   if(prof(T,d,0,u-uc,uc,SCR)&&SCR[3]>.3&&SCR[1]>.12)p=Math.max(p,SCR[1]*SCR[3])}return p}
 const water=(s,u)=>hAt(s,u)+baseY(u);
 
-/* ---------- paddling and catching ---------- */
+/* ---------- paddling and catching ----------
+   v55.23: every wave has one sweet spot: 1.2 m outside its break line and 7.5 m ahead of where the peel will be when the swell gets there.
+   A marker on the water (ring, light beam, floating arrow, a dotted trail from you and a label that follows it) shows it, and a timing
+   meter shows the swell coming up behind you: pop up when the needle is in the green. */
+const SPOT_D=7.5,SPOT_U=1.2;
+function spotOf(w){const t=w.tb-SPOT_U/w.c,s=sbAt(w,t)+SPOT_D;return{s,u:w.ub+SPOT_U,t}}
+/* when does the crest of w reach the line u at s (bisection, the crest only ever moves in) */
+function arrival(w,s,u){let a=TT,b=TT+24;if(ucAt(w,s,a)<=u)return TT;if(ucAt(w,s,b)>u)return null;for(let i=0;i<20;i++){const m=(a+b)/2;if(ucAt(w,s,m)>u)a=m;else b=m}return b}
+const catchable=w=>!w.close&&!waveDead(w,TT)&&TT>w.tb-(200-w.ub)/w.c;
 function ringCandidate(){const s=G.s,u=G.u;let best=null,bd=1e9;
- for(let i=0;i<waves.length;i++){const w=waves[i];if(w.close||waveDead(w,TT)||TT<w.tb-(200-w.ub)/w.c)continue;const e=envAt(w,s);if(e<.5)continue;
-  const uc=ucAt(w,s,TT),xi=u-uc,dArr=(u-w.ub)/w.tanb;if(xi<-.8||xi>14)continue;
-  const ok=dArr>3.2&&dArr<26&&sbAt(w,TT)<s-1;const dd=Math.abs(xi-1.8);if(dd<bd){bd=dd;best={w,xi,dArr,ok}}}return best}
+ for(let i=0;i<waves.length;i++){const w=waves[i];if(!catchable(w))continue;const e=envAt(w,s);if(e<.5)continue;
+  const uc=ucAt(w,s,TT),xi=u-uc;if(xi<-.8||xi>14)continue;
+  const ta=arrival(w,s,u),dArr=ta==null?99:s-sbAt(w,ta),far=u-w.ub>6.5,ok=!far&&dArr>3.2&&dArr<22&&sbAt(w,TT)<s-1;
+  const dd=Math.abs(xi-1.8);if(dd<bd){bd=dd;best={w,xi,dArr,ok,far}}}return best}
+/* the wave the marker shows: the next catchable one whose sweet spot has not been passed yet */
+function nextSpotWave(){let nx=null,sp=null;for(const w of waves){if(!catchable(w)||TT<w.tb-40)continue;const p=spotOf(w);if(p.t<TT-.5)continue;if(!nx||p.t<sp.t){nx=w;sp=p}}return nx?{w:nx,p:sp}:null}
 function paddleTick(dt){const g=G,[ix,iy]=steerIn();
  const inward=iy<0;if(inward)g.sIn=0;else g.sIn+=dt;
  const bw=bore(g.s,g.u),slow=1-clamp(bw*.45,0,.55);
@@ -515,27 +639,33 @@ function paddleTick(dt){const g=G,[ix,iy]=steerIn();
  g.pdl=(g.pdl||0)+dt*(2.2+sp*2.2);
  if(sp>1&&Math.random()<dt*14)fx(g.s-g.hs*.8,g.u-g.hu*.8,water(g.s,g.u)+.05,1,{sp:.8,vy:1.2,size:.12,life:.5,r:.3});
  if(sp>.8)foamAt(g.s,g.u,1.4,.35);
- /* the wave that is about to lift you: ring when it is behind you and you are paddling in */
- const c=ringCandidate();g.ring=null;g.tsT=1;g.hint='';
- if(c&&c.ok&&g.coolPop<=0){const paddling=g.sIn<.6;
-  if(paddling&&c.xi<7.2&&c.xi>-.2){g.ring=c;g.tsT=.5}
-  else if(c.xi>0&&c.xi<24)g.hint=paddling?'':'Paddle in for it: hold S'}
- else if(c&&!c.ok&&c.xi>0&&c.xi<22&&g.coolPop<=0){g.hint=c.dArr<=3.2?'Too far in: it will break on you. Paddle out':'Too far out: it will not break here. Paddle in'}
+ /* the sweet spot of the next wave, and how close you are to it */
+ const ns=nextSpotWave();g.spot=ns;if(ns){const p=ns.p;g.spotDs=p.s-g.s;g.spotDu=p.u-g.u;g.spotDist=Math.hypot(g.spotDs,g.spotDu)}else g.spotDist=null;
+ /* the wave that is about to lift you: the meter runs while it is behind you and it will break around you */
+ const c=ringCandidate();g.ring=null;g.meter=null;g.tsT=1;g.hint='';
+ if(c&&c.ok&&g.coolPop<=0){const paddling=g.sIn<.6;g.meter=c;
+  if(c.xi<7.2&&c.xi>-.2){g.ring=c;g.tsT=paddling?.5:.7}
+  else if(c.xi>0&&c.xi<24&&!paddling)g.hint='Wave coming! Turn for the beach and paddle in: hold S'}
+ else if(c&&!c.ok&&c.xi>0&&c.xi<22&&g.coolPop<=0){g.hint=c.far?'Too far out: it will not break here. Paddle to the marker':c.dArr<=3.2?'Too close to the breaking part: paddle to the marker':'Not this one: paddle to the marker'}
  g.coolPop-=dt;
  if(PRS(' ')){if(g.ring)tryPop(g.ring);else if(g.coolPop<=0&&c&&c.ok&&c.xi>7.2&&c.xi<24){g.coolPop=.7;msg('Too early!',.8,'bad')}}
  if(g.ring&&g.ring.xi<-.3&&!g.popped){g.coolPop=1.4;g.ring=null;msg('Missed it',1,'bad')}}
-function tryPop(c){const g=G,dxi=Math.abs(c.xi-1.8);let q=clamp(1-dxi/2.6,0,1);
+function tryPop(c){const g=G,dxi=Math.abs(c.xi-1.8);
  if(c.xi>5){g.coolPop=.8;g.ring=null;msg('Too early!',.9,'bad');return}
  if(c.xi<-.2){g.coolPop=1.2;g.ring=null;msg('Too late!',.9,'bad');return}
- const lab=dxi<.6?'PERFECT POP UP':dxi<1.4?'Nice pop up':'Pop up';
- g.popQ=q;g.popLab=lab;startRide(c.w,q)}
+ const paddling=g.sIn<.6,sp=spotOf(c.w),pe=Math.hypot((c.dArr-SPOT_D)/6,(g.u-sp.u)/3.5),qT=clamp(1-dxi/2.6,0,1),qP=clamp(1-pe,0,1);
+ let q=qT*.62+qP*.38;if(!paddling)q*=.72;
+ const perfect=dxi<.6&&pe<.55&&paddling;
+ const lab=perfect?'PERFECT POP UP':dxi<1.4&&q>.5?'Nice pop up':'Pop up';
+ g.popQ=q;g.popLab=lab;g.popPerfect=perfect;startRide(c.w,q)}
 
 /* ---------- riding ---------- */
 function newRide(w,q){return{w,q,t:0,dropT:.62,v:w.vp*(.86+.16*q),z:1,zv:-1.2,s0:G.s,len:0,style:0,pocket:0,tube:0,tubeCur:0,tubeN:0,carves:0,tops:0,dir:0,lastExt:1,tricks:[],kinds:{},air:null,pump:0,pumpCd:0,vmax:0,warn:0,Tmax:0,Tsum:0,kap:0,pts:{len:0,style:0,tube:0,trick:0},stuck:0}}
 function startRide(w,q){const g=G;g.R=newRide(w,q);g.st='ride';g.stT=0;g.ring=null;g.tsT=1;g.popped=true;
  const d=g.s-sbAt(w,TT);w.caught++;g.rideN++;
  if(d<2.4){return wipeout('foam',true)}
- msg(g.popLab+'!',1.1,q>.75?'good':'');spl('whoosh');fx(g.s,g.u,water(g.s,g.u)+.2,18,{sp:3,vy:3,size:.2,life:.9});}
+ msg(g.popLab+'!',1.1,q>.75?'good':'');spl('whoosh');markerFlash();fx(g.s,g.u,water(g.s,g.u)+.2,18,{sp:3,vy:3,size:.2,life:.9});
+ if(g.popPerfect){addStyle(10);chainAdd(1);spl('sb_ding');fx(g.s,g.u,water(g.s,g.u)+.6,16,{sp:2.6,vy:3.2,size:.14,life:1,g:3,c:'#ffd23d'})}}
 const curP=[0,0,0,0];
 function rideTick(dt){const g=G,R=g.R,w=R.w;R.t+=dt;g.popped=false;
  const s=g.s,e=envAt(w,s),uc=ucAt(w,s,TT),d=s-sbAt(w,TT);g.d=d;
@@ -633,7 +763,7 @@ function wipeout(cause,quiet){const g=G;if(g.st=='wipe')return;const R=g.R;const
  const t=cause=='foam'?'Caught by the whitewater!':cause=='lip'?'Hit by the lip!':cause=='landing'?'Bad landing!':FUNNY[Math.floor(Math.random()*FUNNY.length)];
  msg(quiet?'Too late, it broke on you!':t,1.4,'bad');spl('sb_splash')}
 function waveBack(){const g=G;let nx=null;for(const w of waves)if(w.tb>TT+3&&!w.close&&(!nx||w.tb<nx.tb))nx=w;
- const L=g.L,ub=nx?nx.ub:(L.h[0]+L.h[1])/2*17+12;g.s=nx?clamp(nx.sP+rr(4,22),-60,60):rr(0,25);g.u=ub+rr(5,10);g.vs=g.vu=0;g.hs=0;g.hu=1;g.idle=0;g.sIn=9;g.coolPop=1.2;g.W=null;g.K=null}
+ const L=g.L,ub=nx?nx.ub:(L.h[0]+L.h[1])/2*17+12;g.s=nx?clamp(spotOf(nx).s+rr(-12,12),-60,150):rr(0,25);g.u=ub+rr(4,8);g.vs=g.vu=0;g.hs=0;g.hu=1;g.idle=0;g.sIn=9;g.coolPop=1.2;g.W=null;g.K=null}
 
 /* ---------- the sim, once per frame ---------- */
 function simTick(dt){const g=G;
@@ -653,13 +783,10 @@ function simTick(dt){const g=G;
   case'recover':if(g.stT>1.4){g.st='back';g.stT=0;g.fadeT=1;if(g.stars)g.stars.visible=false}break;
   case'back':if(g.stT>.5&&!g.moved){g.moved=1;waveBack();msg(timeUp?'Time!':'Paddling back to the line-up',1.4);camSnap()}if(g.stT>.5)g.fadeT=0;if(g.stT>.95){g.moved=0;g.st='paddle';g.stT=0;g.R=null;if(timeUp)sessionDone()}break;
   case'done':break}
- /* the catch zone marker */
  let nw=null;if(g.st=='paddle'||g.st=='wipe'||g.st=='back'){for(const w of waves)if(!w.close&&w.tb>TT-1.5&&TT>w.tb-22&&(!nw||w.tb<nw.tb))nw=w}
- const z=g.zone;if(nw&&g.st=='paddle'&&!g.ring){const sc=nw.sP+22,uu=nw.ub+5.2,p=toWorld(sc,uu),t=tanAt(sc);z.visible=true;z.position.set(p[0],baseY(uu)+.07,p[1]);
-  z.quaternion.setFromEuler(_e.set(-Math.PI/2,Math.atan2(-t[1],t[0]),0,'YXZ'));z.scale.set(56,7,1);z.material.opacity=.13+.08*Math.sin(TT*4)}else z.visible=false;
  g.nw=nw;
  g.ts+=(g.tsT-g.ts)*Math.min(1,dt*9);
- camUpdate(dt);partsTick(dt);hudTick(dt);
+ camUpdate(dt);partsTick(dt);markerTick(dt);hudTick(dt);
  const wy=g.st=='ride'&&g.wy!=null?g.wy:0;void wy;
  GKd={}}
 function wipeTick(dt){const g=G,W=g.W;W.t+=dt;const wl=water(W.s,W.u);
@@ -761,6 +888,22 @@ const CSS=`#surfhud{position:fixed;inset:0;z-index:7;pointer-events:none;display
 #sb_ring .tg{position:absolute;left:-60px;top:-60px;width:120px;height:120px;border:4px solid rgba(141,255,176,.85);border-radius:50%}
 #sb_ring .in{position:absolute;left:-60px;top:-60px;width:120px;height:120px;border:6px solid #fff;border-radius:50%}
 #sb_ring .tx{position:absolute;left:-120px;top:78px;width:240px;text-align:center;font-size:18px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+#sb_spot{position:absolute;left:0;top:0;display:none;pointer-events:none;will-change:transform}
+#sb_spot .pl{background:#ffc83a;color:#241805;padding:5px 13px 6px;text-align:center;border:2px solid #fff6d8;box-shadow:0 3px 0 rgba(0,0,0,.35),0 0 22px rgba(255,200,58,.6);white-space:nowrap;transition:background .2s,box-shadow .2s}
+#sb_spot .pl b{display:block;font-size:15px;letter-spacing:.08em}#sb_spot .pl small{display:block;font-size:10px;opacity:.8;letter-spacing:.06em;margin-top:1px}
+#sb_spot>i{display:block;width:0;height:0;margin:0 auto;border:9px solid transparent;border-top-color:#fff6d8;border-bottom:0}
+#sb_spot.in .pl{background:#4dffa0;box-shadow:0 3px 0 rgba(0,0,0,.35),0 0 22px rgba(77,255,160,.65)}
+#sb_spot.go .pl{background:#8af6ff;box-shadow:0 3px 0 rgba(0,0,0,.35),0 0 22px rgba(138,246,255,.7)}
+#sb_spot.now .pl{background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.35),0 0 30px #fff;animation:sbnow .18s infinite alternate}
+@keyframes sbnow{0%{transform:scale(1)}100%{transform:scale(1.12)}}
+#sb_spot.off>i{display:none}
+#sb_spot_a{position:absolute;left:50%;top:50%;margin:-10px 0 0 -8px;width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:16px solid #fff6d8;transform-origin:8px 10px;display:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+#sb_meter{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:min(440px,86vw);display:none}
+#sb_meter .hd{display:flex;justify-content:space-between;align-items:flex-end;font-size:10px;letter-spacing:.1em;margin-bottom:4px;text-shadow:0 2px 0 rgba(0,0,0,.6)}#sb_meter .hd span{opacity:.7}
+#sb_meter .hd b{font-size:15px;letter-spacing:.08em;color:#fff}#sb_meter.pf .hd b{color:#4dffa0}#sb_meter.wait .hd b{color:#8af6ff}
+#sb_meter .tr{position:relative;height:18px;background:rgba(6,20,28,.82);border:2px solid rgba(255,255,255,.35);box-shadow:0 3px 0 rgba(0,0,0,.35)}
+#sb_meter .tr i{position:absolute;top:0;bottom:0}#sb_meter .ok{background:rgba(255,200,58,.22)}#sb_meter .ni{background:rgba(255,214,80,.55)}#sb_meter .pf{background:#4dffa0;box-shadow:0 0 14px rgba(77,255,160,.8)}
+#sb_mn{position:absolute;top:-7px;bottom:-7px;width:5px;margin-left:-2px;background:#fff;box-shadow:0 0 10px #fff;text-decoration:none;left:0}
 #sb_hint{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);font-size:14px;background:var(--bg);padding:6px 14px;border:2px solid var(--ln);display:none;white-space:nowrap}
 #sb_keys{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);font-size:11px;white-space:nowrap;background:var(--bg);padding:6px 12px;border:2px solid var(--ln)}
 #sb_keys kbd{display:inline-block;min-width:22px;padding:2px 6px;margin:0 3px;background:#e8f4f6;color:#10242a;border-bottom:3px solid #8aa8ad;font:inherit;font-size:10px;text-align:center}
@@ -781,6 +924,8 @@ function hudOn(){if(!sbCSS){sbCSS=document.createElement('style');sbCSS.id='surf
 <div id=sb_sc class=sbp><small>BEST RIDE</small><b id=sb_best>0.0</b><br><span id=sb_s2></span></div>
 <div id=sb_live class=sbp><div class=row><span><small>STYLE</small><b id=sl_st>0</b></span><span><small>TUBE</small><b id=sl_tb>0.0s</b></span><span><small>TRICKS</small><b id=sl_tr>0</b></span><span><small>LENGTH</small><b id=sl_ln>0m</b></span><span><small>SPEED</small><b id=sl_sp>0</b></span></div><div id=sb_combo>COMBO x1</div></div>
 <div id=sb_msg></div><div id=sb_ring><div class=tg></div><div class=in id=sb_ri></div><div class=tx id=sb_rt></div></div>
+<div id=sb_spot><div class=pl><b id=sb_spot_t></b><small id=sb_spot_s></small></div><i></i><span id=sb_spot_a></span></div>
+<div id=sb_meter><div class=hd><span>EARLY</span><b id=sb_mt></b><span>LATE</span></div><div class=tr><i class=ok style="left:41.7%;right:4.2%"></i><i class=ni style="left:60.4%;right:10.4%"></i><i class=pf style="left:68.75%;right:18.75%"></i><u id=sb_mn></u></div></div>
 <div id=sb_hint></div><div id=sb_wave></div><div id=sb_keys></div>
 <div id=sb_card class=sbp></div><div id=sb_modal class=sbp></div><div id=sb_fade></div>`;
  document.body.appendChild(hud);hud.style.display='block';HC={};
@@ -796,10 +941,11 @@ function hudTick(dt,paused){const g=G;if(!hud)return;const o=st();
  const t2=g.top.slice().sort((a,b)=>b-a).slice(0,2);setH('sb_s2','TOP 2 TOTAL <b style="font-size:13px;color:#fff">'+t2.reduce((a,b)=>a+b,0).toFixed(1)+'</b><br>RIDES '+g.rides.length+' / TUBES '+g.tubes);
  const R=g.R,live=$s('sb_live');if(live)live.style.display=(g.st=='ride'||g.st=='kick')&&R?'block':'none';
  if(R&&(g.st=='ride')){setT('sl_st',Math.round(R.style+R.pts.trick+R.tube*13));setT('sl_tb',R.tube.toFixed(1)+'s');setT('sl_tr',String(R.tricks.length));setT('sl_ln',Math.round(R.len)+'m');setT('sl_sp',Math.round(R.v*3.6)+'');setT('sb_combo',g.combo>1?'COMBO x'+g.combo:'COMBO x1')}
- /* ring */
- const ring=$s('sb_ring');if(ring){if(g.ring&&g.st=='paddle'){const x=g.ring.xi;ring.style.display='block';const sc=clamp(1+(x-1.8)/3.4*1.2,.82,2.4);$s('sb_ri').style.transform='scale('+sc.toFixed(3)+')';const near=Math.abs(x-1.8)<.6,ok=Math.abs(x-1.8)<1.4;
-   $s('sb_ri').style.borderColor=near?'#8dffb0':ok?'#ffe45a':x>4?'#ff9a8a':'#fff';setT('sb_rt',near?'NOW!  SPACE':'POP UP  [SPACE]')}else ring.style.display='none'}
- const hint=$s('sb_hint');if(hint){const h=g.st=='paddle'&&!g.ring?g.hint:'';if(h){hint.style.display='block';setT('sb_hint',h)}else hint.style.display='none'}
+ /* the pop-up meter: the swell behind you runs from EARLY to LATE, pop up in the green */
+ const mt=$s('sb_meter');if(mt){const c=g.st=='paddle'?g.meter:null;if(c&&c.xi<12){mt.style.display='block';const f=clamp((9-c.xi)/9.6,0,1);$s('sb_mn').style.left=(f*100).toFixed(1)+'%';
+   const paddling=g.sIn<.6,pf=Math.abs(c.xi-1.8)<.6&&g.ring;setT('sb_mt',pf?'NOW!  SPACE':g.ring?(paddling?'POP UP  [SPACE]':'HOLD S TO PADDLE IN'):(paddling?'SWELL COMING':'HOLD S TO PADDLE IN'));mt.className=pf?'pf':paddling?'':'wait'}else mt.style.display='none'}
+ const ring=$s('sb_ring');if(ring)ring.style.display='none';
+ const hint=$s('sb_hint');if(hint){const h=g.st=='paddle'&&!g.meter?g.hint:'';if(h){hint.style.display='block';setT('sb_hint',h)}else hint.style.display='none'}
  /* wave info */
  let wi='';if(g.nw&&(g.st=='paddle'||g.st=='back')){const w=g.nw,secs=Math.max(0,w.tb-TT);wi='SET '+(w.set+1)+' · WAVE '+w.k+' OF '+w.n+' · '+(w.H).toFixed(1)+' m · '+(w.hol>.6?'hollow':w.hol>.35?'steep':'mellow')+' · breaks in '+Math.ceil(secs)+' s'}
  else if(g.st=='paddle'&&!g.nw)wi='Lull. Next set coming';
