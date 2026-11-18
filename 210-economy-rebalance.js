@@ -14,13 +14,12 @@ const MF=L=>{if(L<=MFP[0][0])return MFP[0][1]*Math.max(.5,Math.min(1,L/1e3+.3));
 /* EARLY: money per stream is multiplied by up to x5 for a brand-new artist, fading out (log scale) to x1 at 30K listeners.
    It only touches the first days: at 10 days a player earned about $14 in total, now about $150 (a first gear upgrade is within reach). */
 const EARLY=L=>1+4*Math.max(0,Math.min(1,1-Math.log10(Math.max(L,1e3)/1e3)/1.48));
-/* LATE: from day 30 the industry pushes back. P ramps 0 -> 1 between day 30 and day 210. It slows growth, adds an upkeep cut
+/* LATE: from day 30 the industry pushes back. P ramps 0 -> 1 between day 30 and day 210. It slows growth by up to 25%, adds an upkeep cut
    on streaming income (management, touring and label costs, up to 45%), kills idle growth and makes a player who stops releasing
-   lose listeners every night. Past 10M monthly listeners growth also slows with each x10 (audience saturation). */
+   lose listeners every night. There is no wall at 50M: progress keeps going, slower than before, so the road to 4B stays the real end game. */
 const LATE0=30,LATE1=210;
 const press=d=>Math.max(0,Math.min(1,((+d||0)-LATE0)/(LATE1-LATE0)));
 const upkeep=d=>1-.45*press(d);
-const sat=L=>L>1e7?1/(1+.5*Math.log10(L/1e7)):1;
 window.__ecoPress=press;window.__ecoMF=MF;
 const PAY=.04,ADD=60,IDLE=.3,CAPX=1.15,FIX=1.065;
 const PATH=[[100,1],[1e3,5],[2e3,9],[1e4,30],[1e5,90],[1e6,144],[1e7,204],[1e8,270],[1e9,336],[4e9,420],[8e9,480]];
@@ -28,7 +27,7 @@ const RT=PATH.slice(1).map((p,i)=>[PATH[i][0],p[0],Math.log(p[0]/PATH[i][0])/(p[
 const rate=L=>{for(const s of RT)if(L<s[1])return s[2];return RT[RT.length-1][2]*.5};
 const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=Math.random();return (u-3)/Math.sqrt(.5)};
 function step(L0,rel,st,day){const P=press(day);let m;if(st.slow>0){st.slow--;m=.2;if(!st.slow)st.catch=2}else if(Math.random()<.06){st.slow=1+Math.floor(Math.random()*4);m=.2}else{m=Math.max(.5,Math.min(1.6,Math.exp(gauss()*.2)));if(st.catch>0){st.catch--;m*=1.4}}
- const g=rate(L0)*m*(st.p||1)*(1-.4*P)*sat(L0),idle=rel?1:IDLE*(1-P);let tgt=Math.floor(L0*Math.exp(g*FIX*idle)+ADD*(rel?1:.2)*(1-P));
+ const g=rate(L0)*m*(st.p||1)*(1-.25*P),idle=rel?1:IDLE*(1-P);let tgt=Math.floor(L0*Math.exp(g*FIX*idle)+ADD*(rel?1:.2)*(1-P));
  if(!rel&&P>0&&L0>1e3){tgt=Math.min(tgt,Math.floor(L0*(1-.012*P*(.5+Math.random()))));st.dec=1}else st.dec=0;
  const cap=Math.floor(L0*Math.exp(g*FIX*CAPX)+ADD*1.5);return{tgt,cap}}
 window.__ecoStep=step;
