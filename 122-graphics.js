@@ -10,9 +10,9 @@
 /* bg: when the tab/window is in the background: 0 full, 1 reduced (10 fps), 2 rendering paused. blur: blurred backdrop behind the pause menu.
    bat (Battery Saver) is the lightest: Low's look plus a 30 fps cap and reduced drawing in the background. */
 /* det = small props hidden: any solid prop whose longest side is under that many world units is not drawn (0 = all drawn). v55.11: every step is cheaper than the one above it. shi = shadow redraw gap in ms (shadows are redrawn at most that often). Battery is the lightest and also draws at 30 fps. */
-const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,shi:14,cg:1,det:0},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,cg:1,det:0},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:1,shd:0,shi:100,cg:1,det:0.15},low:{px:5,fps:0,crowd:1,wx:0,far:0,bg:0,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6},bat:{px:5,fps:30,crowd:1,wx:0,far:0,bg:1,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6}};
+const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,shi:14,cg:1,det:0},high:{px:3,fps:60,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,cg:1,det:0},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:1,shd:0,shi:100,cg:1,det:0.15},low:{px:5,fps:60,crowd:1,wx:0,far:0,bg:0,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6},bat:{px:5,fps:30,crowd:1,wx:0,far:0,bg:1,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6}};
 const GFX_LV=['high','med','low'];
-const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,det:0,cg:1};let GFX=Object.assign({},GFX_DEF);
+const GFX_DEF={p:'auto',al:'high',px:3,fps:60,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,det:0,cg:1};let GFX=Object.assign({},GFX_DEF);
 try{const g=JSON.parse(localStorage.getItem('fw_gfx')||'null');if(g&&typeof g=='object')Object.assign(GFX,g)}catch(e){}
 if(!GFX_PRE[GFX.al])GFX.al='high';
 if(GFX.p!='auto'&&GFX.p!='custom'&&!GFX_PRE[GFX.p])GFX.p='auto';
@@ -36,11 +36,12 @@ const GFA={n:0,sum:0,t0:0,lastDraw:0,due:0};
 {const l0=loop;loop=function(n){const c=gfxCur(),idle=document.hidden||!gfxFocus;let cap=+c.fps||0;
   /* background: pause drawing entirely, or drop to 10 fps; the pause menu (static scene) needs only 20 fps */
   if(idle&&c.bg==2){requestAnimationFrame(loop);return}
-  if(idle&&c.bg==1)cap=cap?Math.min(cap,10):10;else if(PAUSED&&mode=='pause')cap=cap?Math.min(cap,20):20;
+  if(idle&&c.bg==1)cap=cap?Math.min(cap,10):10;else if(PAUSED&&mode=='pause')cap=cap?Math.min(cap,10):10;
   /* v55.19.0 battery: the full-screen Mastery panel hides the world (10 fps), and the computer view is a still desk scene (30 fps; dt stays under the 0.05 s clamp so game time runs at the same speed) */
-  else if(window.FW_MASTERY&&FW_MASTERY.isOpen&&FW_MASTERY.isOpen())cap=cap?Math.min(cap,10):10;else if(mode=='pc')cap=cap?Math.min(cap,30):30;
-  /* scheduled cap: keeps the average on target even when it is not a divisor of the screen's refresh rate (45 on 60 Hz) */
-  const iv=cap?1000/cap:0;
+  else if(window.FW_MASTERY&&FW_MASTERY.isOpen&&FW_MASTERY.isOpen())cap=cap?Math.min(cap,10):10;else if(mode=='pc'||mode=='title')cap=cap?Math.min(cap,30):30;
+  /* scheduled cap: keeps the average on target even when it is not a divisor of the screen's refresh rate (45 on 60 Hz).
+     v55.19.2: only on screens clearly faster than the cap, so a 60 cap never drops a frame on a ~60 Hz screen; pause and main menu stadium capped too */
+  const iv=cap&&!(gfxHz&&gfxHz<=cap*1.1)?1000/cap:0;
   if(iv){if(GFA.due-n>iv)GFA.due=n;if(n<GFA.due-1){requestAnimationFrame(loop);return}GFA.due=n-GFA.due>iv*2?n+iv:GFA.due+iv}else GFA.due=0;
   const gap=GFA.lastDraw?n-GFA.lastDraw:0;GFA.lastDraw=n;gfxAuto(gap,cap);fpsTick(n);return l0(n)}}
 function gfxAuto(gap,cap){if(GFX.p!='auto'||document.hidden||PAUSED||(mode!='play'&&mode!='drive')){GFA.n=GFA.sum=0;return}

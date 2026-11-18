@@ -54,8 +54,9 @@
    if(s.length>=3&&/[a-z]/.test(s)&&badWord(s,true))return true}
   return false}
  window.fwProfane=(t,asName)=>{try{return badText(t,!!asName)}catch(e){return false}};
- function clean(t){
-  t=String(t==null?'':t);if(!t||!/[A-Za-z0-9@$!|+(À-￿]/.test(t)||!badText(t,false))return t;
+ /* v55.19.0: the HUD re-adds the same texts many times a second, so results are remembered */
+ const CLC=new Map();function clean(t){t=String(t==null?'':t);let r=CLC.get(t);if(r===undefined){if(CLC.size>3000)CLC.clear();r=clean0(t);CLC.set(t,r)}return r}
+ function clean0(t){if(!t||!/[A-Za-z0-9@$!|+(À-￿]/.test(t)||!badText(t,false))return t;
   const parts=t.split(/(\s+)/);
   /* single letters in a row */
   for(let i=0;i<parts.length;i+=2){let j=i,s='',n=0;while(j<parts.length&&parts[j].replace(/[^A-Za-z0-9]/g,'').length<=1&&parts[j]!==''&&n<14){s+=parts[j].replace(/[^A-Za-z0-9]/g,'');j+=2;n++}

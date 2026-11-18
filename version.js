@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.19.1';
+const GAME_VERSION='v55.19.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.19.2',n:'Battery and frame rate: shadows are only redrawn when something in them moves (the shadow pass cost more than the frame itself), flat ground pieces no longer cast shadows, the frame cap no longer drops frames on 60 Hz screens, the pause menu and main menu stadium draw fewer frames, the minimap redraws 10 times a second instead of every few frames, and the word filter remembers texts it already checked.'},
  {v:'v55.19.1',n:'Money fix: cash can no longer turn into $0 by itself. The real cause of the "$0 after sleep" bug was a broken cash value during the day (shown as $0) that the new-day screen then saved as $0. Cash now refuses any broken value and keeps what you had, and a drop to $0 while waking up is blocked. Small amounts now show cents (Earned $0.45 instead of $0). The Mastery panel no longer says surfing and fishing are coming soon. Battery: the computer screen draws the room behind it at 30 fps and the Mastery panel pauses the world behind it.'},
  {v:'v55.19.0',n:'Dev version, test mode only: brands now write to you on their own (a new brand deal offer arrives every morning and every 30 seconds whenever none is open), so brand deals and photoshoots are easy to test. Normal play is unchanged and test careers still never post to the leaderboard.'},
  {v:'v55.18.2',n:'Brand photoshoot guide popups fixed. They no longer show while you are in the airport, on a plane or on the flight home, and they wait (instead of covering) if any other panel is open. They and the objective chip now use the normal game panel style: pixel font headings, green accents, same box frame.'},
