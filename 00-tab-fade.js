@@ -14,12 +14,25 @@
    const v0=a.volume,f0=H.f;if(a._hfp)clearInterval(a._hfp);a._hfp=setInterval(()=>{if(!away||H.f<=.002||a.paused){clearInterval(a._hfp);a._hfp=0;a.pause();return}a.volume=Math.max(0,Math.min(1,v0*H.f/f0))},30)},
   cancelEl(a){if(a&&a._hfp){clearInterval(a._hfp);a._hfp=0}}};
  const emit=()=>{subs.forEach(fn=>{try{fn(away)}catch(e){}})};
- function step(){const k=Math.min(1,(performance.now()-t0)/dur);H.f=from+(to-from)*k;if(k>=1){H.f=to;clearInterval(iv);iv=0;emit()}}
+ function step(){const k=Math.min(1,(performance.now()-t0)/dur);H.f=from+(to-from)*k;if(k>=1){H.f=to;clearInterval(iv);iv=0;emit();snooze()}}
+ /* v55.18.0: once the fade-out is done the tab goes fully to sleep: AudioContexts suspended, playing media paused, every interval stopped. back() undoes it exactly. */
+ const ctxs=new Set(),susp=[],media=new Set(),mpaused=[];let asleep=false;
+ if(window.HTMLMediaElement){const pl=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){media.add(this);if(asleep&&H.f<=.002){try{this.pause()}catch(e){}return Promise.resolve()}return pl.apply(this,arguments)}}
+ if(window.AudioContext||window.webkitAudioContext){const P=(window.AudioContext||window.webkitAudioContext).prototype,rs=P.resume;P.resume=function(){if(asleep&&away)return Promise.resolve();return rs.apply(this,arguments)}}
+ function snooze(){if(asleep||!away||H.f>.002)return;asleep=true;
+  masters.forEach(g=>{try{ctxs.add(g.context)}catch(e){}});
+  ctxs.forEach(c=>{try{if(c.state=='running'&&c.suspend){susp.push(c);c.suspend()}}catch(e){}});
+  media.forEach(a=>{try{if(!a.paused&&!a.ended){mpaused.push(a);a.pause()}}catch(e){}});
+  try{window.FWPX&&FWPX.sleep&&FWPX.sleep()}catch(e){}}
+ function wake(){if(!asleep)return;asleep=false;
+  try{window.FWPX&&FWPX.wake&&FWPX.wake()}catch(e){}
+  susp.splice(0).forEach(c=>{try{if(c.state!='closed')c.resume()}catch(e){}});
+  mpaused.splice(0).forEach(a=>{try{if(a.paused&&!a.ended)a.play().catch(()=>{})}catch(e){}})}
  function go(target,ms){from=H.f;to=target;t0=performance.now();dur=Math.max(1,ms*(Math.abs(target-from)||1));if(!iv)iv=setInterval(step,30);
   for(let i=masters.length-1;i>=0;i--){const g=masters[i];try{if(g.context.state=='closed'){masters.splice(i,1);continue}const t=g.context.currentTime;g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(target,t+dur/1000)}catch(e){}}}
- function leave(){if(away)return;away=true;go(0,OUT);emit();/* a hidden tab can run timers late: check again once the fade is over */setTimeout(emit,OUT+80);
+ function leave(){if(away)return;away=true;go(0,OUT);emit();/* a hidden tab can run timers late: check again once the fade is over */setTimeout(()=>{emit();snooze()},OUT+80);
   try{if(typeof mFade=='function'&&typeof MENUA!='undefined'&&MENUA&&!MENUA.paused)mFade(0,OUT)}catch(e){}}
- function back(){if(!away)return;if(document.hidden)return;away=false;go(1,IN);emit();
+ function back(){if(!away)return;if(document.hidden)return;away=false;wake();go(1,IN);emit();
   try{if(typeof mFade=='function'&&typeof MENUA!='undefined'&&MENUA&&!MENUA.paused)mFade(1,IN)}catch(e){}}
  const touch=()=>{try{return matchMedia('(pointer:coarse)').matches||(typeof WF_TOUCH=='function'&&WF_TOUCH())}catch(e){return false}};
  document.addEventListener('visibilitychange',()=>{clearTimeout(blurT);if(document.hidden)leave();else back()});
