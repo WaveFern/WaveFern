@@ -73,23 +73,24 @@ function pickBrand(){const L=fl(),last=(st().list.slice(-1)[0]||{}).b,pool=[];BR
 function pickDest(){try{if(typeof WT_DEST=='undefined'||!Array.isArray(WT_DEST)||!WT_DEST.length)return null;return WT_DEST[Math.floor(Math.random()*WT_DEST.length)]}catch(e){return null}}
 const placeOf=id=>{try{return id&&id!='home'?wtPlace(wtDest(id)):'your home city'}catch(e){return'abroad'}};
 BRD.place=o=>placeOf(o.d);
-const CAMP={sneaker:'sneaker',drink:'summer drinks',eyewear:'eyewear',streetwear:'streetwear drop',denim:'denim',audio:'headphone',sportswear:'sportswear',tech:'tech',luxury:'luxury'};
+const CAMP={sneaker:'sneaker',drink:'summer drinks',eyewear:'eyewear',streetwear:'streetwear drop',denim:'denim',audio:'headphone',sportswear:'sportswear',tech:'tech',luxury:'luxury',fastfood:'fast food',snack:'snack',coffee:'coffee',cosmetics:'beauty',streaming:'streaming',gaming:'gaming',outdoor:'outdoor wear',athleisure:'athleisure',car:'car'};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 /* each brand writes through a named agent with a face of their own */
 const AGN=['Dana Reyes','Marcus Hale','Priya Nair','Jonas Weber','Chloe Martin','Theo Bianchi','Aiko Tanaka','Sam Okafor','Lena Novak','Rafael Costa'];
 BRD.agent=function(o){const b=BRD.by(o.b);if(!o.ag||!o.ag.n){let cfg=null;try{cfg=fCfg()}catch(e){}o.ag={n:pick(AGN),cfg}}o.ag.from=o.ag.n+' · '+b.n;return o.ag};
-function mk(){const s=st(),b=pickBrand();if(!b)return;const d=HQC[b.id];
+function mk(bid){const s=st(),b=bid?BRD.by(bid):pickBrand();if(!b)return;const d=HQC[b.id];
  const pay=Math.max(FLOOR[b.t],Math.round(monthly()*(.8+Math.random()*.8)/100)*100)*1.2,
   o={id:S.nid++,b:b.id,k:'trip',d,pay:Math.round(pay/100)*100,exp:S.day+EXPIRE,st:0,due:0,brief:{mood:pick(BRD.mood),light:pick(BRD.light)}};
  s.list.push(o);s.last=S.day;if(s.list.length>24)s.list=s.list.filter(q=>q.st<2||q.st==3&&q.res).slice(-24);
  const pl=BRD.place(o),open=(S.artist||'there');
  const ag=BRD.agent(o),A=['Hi '+open+', it is '+ag.n.split(' ')[0]+', the partnerships agent at '+b.n+'. ','Hello '+open+'. '+ag.n+' here, I handle sponsorships for '+b.n+'. '];
  let t=pick(A)+'We at '+b.n+' have watched you rise to Fame Level '+fl()+' and we want you as the face of our next '+CAMP[b.cat]+' campaign. It is one photoshoot day at our own headquarters in '+pl+', in our studio. Fee: '+fm(o.pay)+', paid when the shoot wraps, and the photos go on your Instagrime tagged as a partnership. ';
- t+='We pay for everything: your Swiftwing flight out (booked and checked in the moment you accept), a company car in the city, and your flight home. ';
+ t+='We pay for everything: your Swiftwing flight out (booked and checked in the moment you accept), a company car in the city, and your flight home. ';t+='What happens next: tap Accept, go to the airport and board the flight, then walk to our HQ for the photoshoot. ';
  t+='Our brief: a '+o.brief.mood.toLowerCase()+' mood with '+o.brief.light.toLowerCase()+' lighting. This offer stands for '+EXPIRE+' days.';
  S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:t});
  S.hqLink=1;
- try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}}
+ try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}return o}
+BRD.mk=mk;
 
 /* ---------- flights: a free, checked-in ticket on the company ---------- */
 const T=()=>window.TRAVEL;
@@ -129,7 +130,7 @@ setInterval(()=>{try{BRD.failCheck()}catch(e){}},2000);
 /* ---------- Messages: logo as the profile picture, Accept / Decline buttons ---------- */
 {const pm=PA.msg;PA.msg=function(){let h=pm.apply(this,arguments);if(typeof h!='string')return h;
  try{const L=S.msgs.filter(m=>m.bd!=null);
-  L.forEach(m=>{const o=job(m.bd);if(!o)return;const ag=BRD.agent(o);let lg=BRD.logo(o.b,64);try{if(ag.cfg)lg=pfp(ag.cfg)}catch(e){}
+  L.forEach(m=>{const o=job(m.bd);if(!o)return;const ag=BRD.agent(o);const lg=BRD.logo(o.b,64);
    h=h.replace(new RegExp('(onclick="openChat\\('+m.id+'\\)">)<img src="[^"]*"'),'$1<img src="'+lg+'" style="border-radius:50%"');
    if(S.chat==m.id){h=h.replace(/(<div class=cvh>(?:<button[^>]*>[^<]*<\/button>)?)<img src="[^"]*"/,'$1<img src="'+lg+'" style="border-radius:50%"');
     const b=BRD.by(o.b),sub=ag.n+' · agent for '+b.n;h=h.replace(/(<div class=cvh>[\s\S]*?<br><small[^>]*>)[^<]*/,'$1'+sub);
@@ -186,11 +187,27 @@ function pastTable(past){return`<table class=lh-t><thead><tr><th>Brand</th><th>L
  return`<tr class="${o.st==3?'':'lh-dim'}">${td('Brand',`<button class=lh-bnm onclick="bdBrand('${b.id}')">${esc(b.n)}</button>`)}${td('Location',esc(BRD.place(o)))}${td('Offered','Day '+day0(o))}${td('Outcome',STT[o.st]||'')}${td('Fee',o.res?fm(o.res.pay):fm(o.pay),'lh-r lh-num')}</tr>`}).join('')}</tbody></table>`}
 const pastList=()=>st().list.filter(o=>o.st>=2).slice().reverse();
 const early=()=>fl()<FAME[0];
+/* v55.7.0: locked brands show blurred with a pixel-art lock (name hidden); the partner strip scrolls by itself */
+const LOCKSVG='<svg class=lh-lkp viewBox="0 0 9 10" shape-rendering="crispEdges" aria-hidden=true><path fill="currentColor" fill-rule="evenodd" d="M3 0H6V1H7V4H8V10H1V4H2V1H3ZM3 1H6V4H3ZM4 6H5V8H4Z"/></svg>';
+const maskN=n=>'n'.repeat(Math.max(5,String(n).length));
+function mqGo(){document.querySelectorAll('#pc .lh-mq:not([data-on])').forEach(m=>{m.setAttribute('data-on','1');
+ const t=m.firstElementChild;let pos=m.scrollLeft,last=0,hold=0,rel=0;
+ const stop=()=>{hold=1;clearTimeout(rel)},go=()=>{hold=0},later=()=>{clearTimeout(rel);rel=setTimeout(go,1800)};
+ m.addEventListener('mouseenter',stop);m.addEventListener('mouseleave',go);m.addEventListener('focusin',stop);m.addEventListener('focusout',go);
+ m.addEventListener('touchstart',stop,{passive:true});m.addEventListener('touchend',later,{passive:true});m.addEventListener('touchcancel',later,{passive:true});
+ const step=ts=>{if(!m.isConnected)return;
+  const dt=last?Math.min(64,ts-last):0;last=ts;
+  const half=t.firstElementChild?t.firstElementChild.offsetWidth:0;
+  if(Math.abs(m.scrollLeft-pos)>2)pos=m.scrollLeft;
+  if(!hold&&half>0&&dt){pos+=dt*.04;if(pos>=half)pos-=half;m.scrollLeft=pos}
+  requestAnimationFrame(step)};
+ requestAnimationFrame(step)})}
 /* Brand Deals: heading, the four figures, the booked shoot and offers in brief, the Fame Level note and the brand directory */
 function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),open=BR.filter(b=>FAME[b.t]<=L).length;
- let h=phead('','Brand Deals','Brands book you for one photoshoot day at their own headquarters abroad. Every trip is paid for by the brand, and the fee is set by your recent income.');
+ let h=phead('','Brand Deals','Brands book you for one photoshoot day at their own headquarters abroad. How it works: 1 Accept an offer. 2 Fly out (the brand books and pays the flight). 3 Walk to their HQ. 4 Shoot the photos and get paid. Your next step always shows at the top of the screen. <button class=lh-lk onclick="BRD.guide()">How a photoshoot works</button>');
  h+=`<div class=lh-kpis>${kpi('Completed shoots',s.done)}${kpi('Earned from brands',fm(s.earned))}${kpi('Open offers',offs.length)}${kpi('Fame Level',L)}</div>`;
- h+=`<section class=lh-par aria-label="Our partnered brands"><div class=lh-parh><h2 class=lh-h4>Our partnered brands</h2></div><div class=lh-mq><div class=lh-mt>${[0,1].map(n=>`<ul${n?' aria-hidden=true':''}>${BR.map(b=>`<li><button class=lh-pn${n?' tabindex=-1':''} onclick="bdBrand('${b.id}')">${esc(b.n)}</button></li>`).join('')}</ul>`).join('')}</div></div></section>`;
+ h+=`<section class=lh-par aria-label="Our partnered brands"><div class=lh-parh><h2 class=lh-h4>Our partnered brands</h2></div><div class=lh-mq><div class=lh-mt>${[0,1].map(n=>`<ul${n?' aria-hidden=true':''}>${BR.map(b=>FAME[b.t]>L?`<li><span class="lh-pn lk" title="Reach Fame Level ${FAME[b.t]} to unlock">${LOCKSVG}<b>${maskN(b.n)}</b></span></li>`:`<li><button class=lh-pn${n?' tabindex=-1':''} onclick="bdBrand('${b.id}')">${esc(b.n)}</button></li>`).join('')}</ul>`).join('')}</div></div></section>`;
+ setTimeout(mqGo,0);
  const ab=act?(()=>{const b=BRD.by(act.b);return`<div class=lh-sum><p class=lh-big>${esc(b.n)}</p><p class=lh-mut>${esc(cap(b.cat))} campaign in ${esc(BRD.place(act))}. Fee ${fm(act.pay)}.</p>${lk('View the booking',"bdTab('active')")}</div>`})()
   :empty(early()?'Brands start writing at Fame Level '+FAME[0]+'.':'No shoot booked. Brands write now and then as your fame grows. Every deal is at the brand\'s own HQ abroad and the brand pays for the whole trip.');
  const nx=FAME.find(f=>f>L);
@@ -198,6 +215,7 @@ function dealsTab(){const s=st(),L=fl(),act=BRD.active(),offs=BRD.open(),open=BR
  h+=sec('Open Offers',offs.length?offs.length+(offs.length==1?' offer':' offers')+' &nbsp;·&nbsp; '+lk('View offers',"bdTab('active')"):'',offs.length?offerCards(offs):empty(early()?'Brands start writing at Fame Level '+FAME[0]+'.':'No offers right now. New offers arrive in Messages.'));
  h+=`<div class=lh-fame><h2 class=lh-h4>About Fame Level</h2><p>Brands only write to artists they have heard of. The first offers come at Fame Level ${FAME[0]}, and the larger names wait for Fame Level ${FAME.slice(1,-1).join(', ')} or ${FAME[FAME.length-1]}. ${L<FAME[0]?'You are at Fame Level '+L+'.':nx?'You are at Fame Level '+L+', and the next brands open at Fame Level '+nx+'.':'You are at Fame Level '+L+': every brand can write to you.'}</p></div>`;
  h+=`<section class="lh-sec lh-cat"><div class=lh-sh><h2 class=lh-h2>Brand directory</h2><span class=lh-meta>${open} of ${BR.length} open to you</span></div><div class=lh-tabs>${[['all','All brands',BR.length],['open','Open to you',open],['locked','Higher Fame Level',BR.length-open]].map(t=>`<button class="${HQF==t[0]?'on':''}" onclick="bdFilter('${t[0]}')">${t[1]}<em>${t[2]}</em></button>`).join('')}</div><ul class=lh-grid>${BR.filter(b=>HQF=='all'||(HQF=='open')==(FAME[b.t]<=L)).map(b=>{const lkd=FAME[b.t]>L,of=offerFrom(b.id);
+   if(lkd)return`<li class=lk><span class=lh-item title="Reach Fame Level ${FAME[b.t]} to unlock">${LOCKSVG}<span class=lh-in1><b>${maskN(b.n)}</b></span><span class=lh-in2><span>Locked · Fame Level ${FAME[b.t]}</span></span></span></li>`;
    return`<li class="${lkd?'lk':''}"><button class=lh-item onclick="bdBrand('${b.id}')"><span class=lh-in1>${esc(b.n)}</span><span class=lh-in2><span>Fame Level ${FAME[b.t]}${of?' · Offer waiting':''}</span><span class=lh-vo>View offer</span></span></button></li>`}).join('')}</ul></section>`;
  return h}
 /* Active Deals: the booked shoot and every open offer */
@@ -258,9 +276,9 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
  try{hqFont()}catch(e){}
  const th=L&&(HQT=='labels'||HQT=='team')?THM[L.id]:null,sty=th?`--ac:${th.a}`:'';
  const tab=(k,n,b)=>`<button class="${HQT==k?'on':''}" onclick="bdTab('${k}')"${HQT==k?' aria-current="page"':''}>${n}${b?`<em>${b}</em>`:''}</button>`;
- const nav=tab('deals','Brand Deals')+tab('active','Active Deals',BRD.open().length||'')+tab('past','Past Deals');
+ const nav=tab('deals','Brand Deals')+tab('active','Active Deals',BRD.open().length||'')+tab('past','Past Deals')+tab('press','Vinyl & CD');
  const nav2=(labels()?tab('labels','Labels',HQJ?1:''):'')+(L?tab('team','Team'):'');
- let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():HQT=='active'?activeTab():HQT=='past'?pastTab():HQB?brandPage(HQB):joinCard()+dealsTab()}catch(e){console.error('label hq',e);body=empty('Label HQ hit a problem. Close and open it again.')}
+ let body;try{body=HQT=='team'?teamTab():HQT=='labels'?labelsTab():HQT=='active'?activeTab():HQT=='past'?pastTab():HQT=='press'&&BRD.press?BRD.press():HQB?brandPage(HQB):joinCard()+dealsTab()}catch(e){console.error('label hq',e);body=empty('Label HQ hit a problem. Close and open it again.')}
  return`<div class="bdw lhq${th?' lhth':''}" style="${sty}"><header class=lh-top><div class=lh-in><nav class=lh-nav aria-label="Brand Deals">${nav}</nav>${nav2?`<nav class="lh-nav lh-nav2" aria-label="Labels">${nav2}</nav>`:''}</div></header>
  <main class=lh-main><div class=lh-in>${body}</div></main></div>`};
 /* the app fills its window edge to edge */
@@ -307,15 +325,17 @@ PA.hq=function(){const L=labels()&&S.label?lbCur():null;if(!L&&HQT=='team')HQT='
 #pc .lhq .lh-logo{display:block;width:104px;height:104px;margin:0 0 22px}
 #pc .lhq .lh-par{margin:-24px 0 56px}
 #pc .lhq .lh-parh .lh-h4{margin:0 0 10px;color:var(--mu);font-weight:400}
-#pc .lhq .lh-mq{overflow:hidden;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln)}
-#pc .lhq .lh-mt{display:flex;width:max-content;animation:lhmq 70s linear infinite}
-#pc .lhq .lh-mq:hover .lh-mt,#pc .lhq .lh-mq:focus-within .lh-mt{animation-play-state:paused}
+#pc .lhq .lh-mq{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln)}
+#pc .lhq .lh-mq::-webkit-scrollbar{display:none}
+#pc .lhq .lh-mt{display:flex;width:max-content}
 #pc .lhq .lh-mt ul{list-style:none;display:flex;flex:none}
 #pc .lhq .lh-pn{all:unset;cursor:pointer;display:block;padding:20px 28px 20px 0;margin-right:28px;font:600 30px/1.1 var(--serif);white-space:nowrap;color:var(--ink)}
 #pc .lhq .lh-pn:hover{color:var(--mu)}
 #pc .lhq .lh-pn:focus-visible{outline:1px solid var(--ink);outline-offset:-4px}
-@keyframes lhmq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media (prefers-reduced-motion:reduce){#pc .lhq .lh-mq{overflow-x:auto}#pc .lhq .lh-mt{animation:none}}
+#pc .lhq .lh-pn.lk{cursor:default;display:flex;align-items:center;gap:14px;color:var(--mu)}
+#pc .lhq .lh-pn.lk b,#pc .lhq .lh-item .lh-in1 b{font-weight:inherit;filter:blur(6px);opacity:.55;user-select:none;pointer-events:none}
+#pc .lhq .lh-lkp{width:22px;height:25px;flex:none;color:var(--ink);image-rendering:pixelated}
+#pc .lhq .lh-grid li.lk .lh-item{cursor:default;display:flex;align-items:center;gap:12px}
 #pc .lhq .lh-ocs{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:20px;padding-top:20px}
 #pc .lhq .lh-oc{border:1px solid var(--ln);padding:22px 22px 18px;display:flex;flex-direction:column;min-width:0}
 #pc .lhq .lh-oct{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--ln)}

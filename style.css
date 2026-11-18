@@ -284,3 +284,50 @@ body.gfx-noblur #pzo{backdrop-filter:none!important;background:rgba(0,0,0,.72)}
 #ui>.box.modal:has(#tin) .cards{margin:16px 0}
 #ui>.box.modal:has(#tin) .row2{margin-top:16px}
 @media(max-width:480px){#ui>.box.modal:has(#tin){padding:16px 18px;min-width:0;width:calc(100vw - 32px)}}
+
+/* v53.8.0 unslop: main menu and pause menu. One filled button (the main action), menu column set against the left edge so the
+   stadium shows, plain sentence-case labels in the text face, hover is a surface step (no scale, no blinking arrow, no bob). */
+#ttl:has(.ttm){justify-content:flex-start;padding-left:clamp(20px,9vw,140px)}
+#ttl .ttm{align-items:flex-start;text-align:left;width:min(300px,90vw)}
+#ttl .ttm h1{font-size:clamp(30px,4.6vw,46px);letter-spacing:0;text-shadow:3px 3px 0 #000;animation:none}
+#ttl .ttm>.px{background:none;box-shadow:none;padding:0;margin:8px 0 20px;letter-spacing:0;font-size:13px;color:#9aa79e;font-family:ui-monospace,Menlo,Consolas,monospace}
+#ttl .ttbx{background:none;border:0;box-shadow:none;padding:0;gap:6px}
+#ttl .ttbx p{margin:2px 0 0;max-width:30ch}
+#ttl button,#pzm button{box-shadow:none;border:2px solid #2e2e2e;transition:background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
+#ttl .ttbx>button,#ttl .ttw>button,#ttl .ttw .row2 button,#ttl .ttnc button,#pzm button{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;letter-spacing:0;padding:11px 14px;text-align:left}
+#ttl .ttw>button,#ttl .ttw .row2 button,#pzm button{text-align:center}
+#ttl button:not(:disabled):hover,#pzm button:not(:disabled):hover{transform:none;box-shadow:none;border-color:var(--ga)}
+#ttl button:not(:disabled):active,#pzm button:not(:disabled):active{transform:translateY(1px);box-shadow:none}
+#ttl .ttbx>button::after,#ttl .ttw>button::after,#pzm button::after{content:none}
+#ttl button.go:not(:disabled):hover,#pzm button.go:not(:disabled):hover{background:var(--ga);filter:brightness(1.12)}
+#ttl button:not(.go):not(:disabled),#pzm button:not(.go):not(:disabled){background:#161616}
+#ttl button:not(.go):not(:disabled):hover,#pzm button:not(.go):not(:disabled):hover{background:#262626}
+#ttl .ttw,#ttl .ttsl{box-shadow:none;border-color:#2e2e2e}
+#ttl .ttw h2,.pzm h2{text-shadow:none;font-size:22px}
+.pzm{box-shadow:none;border-width:2px;animation:pzin .18s cubic-bezier(.22,1,.36,1) both}
+#ttl .ttft{text-align:left;left:clamp(20px,9vw,140px)}
+@media(max-width:700px){#ttl:has(.ttm){justify-content:center;padding-left:16px}#ttl .ttm{align-items:center;text-align:center}#ttl .ttft{text-align:center;left:0}}
+
+/* v54.3.0 main menu and pause menu in Silkscreen: title, tagline, buttons and footer use the pixel face; buttons are flat rows that grow
+   a little from their left edge on hover (main menu only, the career list and pause menu keep the surface-step hover). */
+#ttl .ttm h1{font-family:Silkscreen,ui-monospace,monospace;font-weight:700;font-size:clamp(34px,5.4vw,60px);line-height:1;letter-spacing:2px;text-shadow:4px 4px 0 #000}
+#ttl .ttm>.px{font-family:Silkscreen,ui-monospace,monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin:12px 0 24px}
+#ttl .ttbx{gap:8px}
+#ttl .ttbx>button{font-family:Silkscreen,ui-monospace,monospace;font-weight:400;font-size:16px;letter-spacing:1.5px;text-transform:uppercase;padding:13px 16px;transform-origin:center;transition:transform .2s cubic-bezier(.22,1,.36,1),background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
+#ttl .ttbx>button:not(:disabled):hover{transform:scale(1.07)}
+#ttl .ttbx>button:not(:disabled):active{transform:scale(1.03)}
+#ttl .ttft{font-family:Silkscreen,ui-monospace,monospace;font-size:10px;letter-spacing:.5px}
+@media(prefers-reduced-motion:reduce){#ttl .ttbx>button{transition:background .15s,border-color .15s}#ttl .ttbx>button:not(:disabled):hover,#ttl .ttbx>button:not(:disabled):active{transform:none}}
+#pzm button{font-family:Silkscreen,ui-monospace,monospace;font-weight:400;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;padding:12px 14px;transition:transform .2s cubic-bezier(.22,1,.36,1),background .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1)}
+#pzm button:not(:disabled):hover{transform:scale(1.07)}
+#pzm button:not(:disabled):active{transform:scale(1.03)}
+#pzm h2,.pzm h2{font-family:Silkscreen,ui-monospace,monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+@media(prefers-reduced-motion:reduce){#pzm button:not(:disabled):hover,#pzm button:not(:disabled):active{transform:none}}
+
+/* v55.3.2: waking-up card on phones. The result cards were one per row (about 800px tall in landscape) so "Start the day" sat far below the
+   screen. On touch devices they now sit several to a row, tighter, and the button stays pinned to the bottom of the card. */
+body.tch #ui>.box.modal .cards{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))!important;gap:6px;margin:6px 0}
+body.tch #ui>.box.modal .cards .card{padding:8px}
+body.tch #ui>.box.modal .cards .card b{font-size:15px}
+body.tch #ui>.box.modal .cards~button.go{position:sticky;bottom:0;z-index:2;width:100%;box-shadow:0 10px 0 #0b0f0d,0 -10px 8px -2px #0b0f0d}
+@media(max-height:560px){body.tch #ui>.box.modal .cards{grid-template-columns:repeat(4,1fr)!important}}

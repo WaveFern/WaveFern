@@ -147,11 +147,13 @@ function festEnd(quit){const set=FEST.set;if(!set||set.end)return;set.end=1;cons
  F.p[s.n]={c,pay:set.pay,sc:Math.round(avg*100),song:set.list[0].title,n:full,d:S.day};
  
  updateVersion();festBoardDraw();chime();
- const lis=Math.round(set.str/(S.mlDiv||3.5)),grade=avg>=.85?'Legendary set':avg>=.65?'Great show':avg>=.45?'Decent set':'Tough crowd',ttl=quit?'You left the stage early':set.fin==2&&full<set.list.length?'Time\'s up! '+grade:grade;mode='menu';
+ const lis=Math.round(set.str/(S.mlDiv||3.5)),grade=avg>=.85?'Legendary set':avg>=.65?'Great show':avg>=.45?'Decent set':'Tough crowd',ttl=quit?'You left the stage early':set.fin==2&&full<set.list.length?'Time\'s up! '+grade:grade;set.ttl=ttl;set.avg=avg;set.full=full;set.gain=gain;set.lis=lis;set.cEnd=c;mode='menu';festSumUI(set)}
+/* the set summary, drawn again after the autographs (233-festival-backstage.js, festSign) */
+function festSumUI(set){const s=set.st,ttl=set.ttl,avg=set.avg,full=set.full,gain=set.gain,lis=set.lis,c=set.cEnd,sg=set.sg;
  $('ui').innerHTML=`<div class="box modal"><h2>${ttl}</h2><p class=m>Stage ${s.n} · ${s.name} · ${full} of ${set.list.length} songs played${set.sc.length?' · '+set.sc.length+' crowd moments, '+Math.round(avg*100)+'% average':''}</p>
-  <div class=cards><div class=card>Crowd<b>${c.toLocaleString()}</b><small>${gain>=0?'+':''}${gain.toLocaleString()} during your set</small></div><div class=card>Paid<b>${$$(set.pay)}</b><small>$${FSONG_PAY.toFixed(2)} x ${s.mult} x crowd, per song</small></div><div class=card>Streams<b>+${set.str.toLocaleString()}</b><small>about +${lis.toLocaleString()} monthly listeners tomorrow</small></div><div class=card>Followers<b>+${set.fol.toLocaleString()}</b></div></div>
+  <div class=cards><div class=card>Crowd<b>${c.toLocaleString()}</b><small>${gain>=0?'+':''}${gain.toLocaleString()} during your set</small></div><div class=card>Paid<b>${$$(set.pay)}</b><small>$${FSONG_PAY.toFixed(2)} x ${s.mult} x crowd, per song</small></div><div class=card>Streams<b>+${set.str.toLocaleString()}</b><small>about +${lis.toLocaleString()} monthly listeners tomorrow</small></div><div class=card>Followers<b>+${set.fol.toLocaleString()}</b></div>${sg?`<div class=card>Autographs<b>${sg.n} signed</b><small>fans ${sg.hap}% happy${sg.fol?' · +'+sg.fol+' followers':''}</small></div>`:''}</div>
   <div style="max-height:22vh;overflow:auto;margin:6px 0">${set.done.map((d,i)=>`<div class=ng><span style="flex:1">${i+1}. "${esc(d.t)}"${d.f<1?' <small class=m>(cut short, '+Math.round(d.f*100)+'%)</small>':''}</span><small class=m>${d.c.toLocaleString()} people · ${$$(d.pay)}</small></div>`).join('')}</div>
-  <div class=row2><button class=go onclick="festLeave()">Leave the stage</button></div></div>`}
+  ${!sg&&set.done.length&&typeof festSign=='function'?`<div class=row2 style="margin-bottom:6px"><button class=go onclick="festSign()">Sign autographs</button><span class=m style="margin-left:8px">Fans are waiting at the barrier. Unpaid.</span></div>`:''}<div class=row2><button class=go onclick="festLeave()">Leave the stage</button></div></div>`}
 function festLeave(){const set=FEST.set;FEST.set=null;festViewOff();festHud();const s=set&&set.st;if(s){P.x=s.ix;P.z=s.iz+1.2;P.rot=0;camT.x=P.x;camT.z=P.z;s.cr.hype=.4;s.cr.C=festAmbient(s);s.cr.shown=-1}closeUI();festScreens()}
 
 /* ---- 10. every frame ---- */
