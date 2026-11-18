@@ -8,6 +8,7 @@ const w0=wakeUp;
 wakeUp=function(){
  let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.eco.L!=null)L0=S.eco.L}catch(e){}
  const r=w0.apply(this,arguments);
+ return r; /* v55.20.1: switched off. The summary now shows the REAL streams that were added to the songs overnight (hits and viral songs included), not a rescaled number. */
  try{if(S.cheat)return r;
   const cs=document.querySelectorAll('#ui .box .cards .card');
   if(cs.length<3||!/Streams/.test(cs[0].textContent)||!/Monthly listeners/.test(cs[2].textContent))return r;

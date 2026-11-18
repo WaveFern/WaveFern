@@ -216,19 +216,17 @@ function buildTerm(){if(AP.grp)return;const G=xgNew(),g=AP.grp=new THREE.Group()
  AP.light=new THREE.HemisphereLight('#ffffff','#8a8a8a',0);g.add(AP.light);
  buildNpc();AP.dirty=1}
 function buildNpc(){const g=AP.grp,u=v=>AX+v,w=v=>AZ+v,SW_T='#1d3d7a',SW_P='#1a1f2e';
- const stand=(a,b,o,ry)=>{const c=mkChar(o);c.g.position.set(u(a),0,w(b));c.g.rotation.y=ry||0;g.add(c.g);AP.npc.push({c,k:'idle',ph:Math.random()*6});return c};
+ const stand=(a,b,o,ry)=>{const c=mkChar(o);g.add(c.g);AP.npc.push(NPCS.idle(c,u(a),w(b),ry));return c};
  [8,13,18,23].forEach(a=>stand(a,43.7,{tc:SW_T,pc:SW_P,top:0}));stand(50,43.7,{tc:'#ff6b4a',pc:SW_P,top:0});stand(62,47,{tc:'#1565d8',pc:SW_P,top:0});
  LANES.forEach(a=>stand(a+1.6,SECV-1.4,{tc:'#2b2b2b',pc:'#1b1b1b',top:0}));
  for(let i=1;i<=6;i++)stand(GU(i)+3.4,3.8,{tc:SW_T,pc:SW_P,top:0});
  stand(67,37.9,{tc:'#6b4a32'});stand(23,16.6,{tc:'#6b4a32'});stand(64,16.6,{tc:'#b33a2a'});stand(5,20.4,{tc:'#c06090'});stand(50,16.4,{tc:'#3a4552'});
  /* walkers with suitcases: landside and airside lanes */
  [[39.5,1],[49.8,1],[52,0],[39.5,0],[12.5,1],[27,0],[12.5,0],[27,1],[14,1],[50.5,0]].forEach(([b,d],i)=>{const c=mkChar();const s=new THREE.Mesh(new THREE.BoxGeometry(.4,.55,.25),pm(['#c0392b','#2d5a8d','#1b1b1b','#e6b422','#7a5ad8'][i%5]));s.position.set(.42,.3,-.25);c.g.add(s);
-  g.add(c.g);AP.npc.push({c,k:'walk',v:b,x:4+Math.random()*64,d:d?1:-1,sp:.9+Math.random()*.6,ph:Math.random()*6})});
+  g.add(c.g);AP.npc.push(NPCS.walker(c,{ax:'x',c:w(b),a:u(3),b:u(69)},u(4+Math.random()*64),d?1:-1,.9+Math.random()*.6,{bob:.04}))});
  /* people waiting at the gates */
  for(let i=0;i<10;i++){const gi=1+rr(6),c=mkChar();c.g.position.set(u(GU(gi)-3+rr(6)),-.3,w(rr(2)?7.6:10));c.legs[0].rotation.x=c.legs[1].rotation.x=-1.5;c.arms[0].rotation.x=c.arms[1].rotation.x=-.6;g.add(c.g)}}
-function npcTick(dt){AP.npc.forEach(n=>{n.ph+=dt*8;const c=n.c;if(n.k=='idle'){c.arms[0].rotation.x=Math.sin(n.ph*.15)*.08;c.arms[1].rotation.x=-Math.sin(n.ph*.13)*.08;return}
- n.x+=n.d*n.sp*dt;if(n.x>69){n.d=-1}if(n.x<3){n.d=1}c.g.position.set(AX+n.x,Math.abs(Math.sin(n.ph))*.04,AZ+n.v);c.g.rotation.y=n.d>0?Math.PI/2:-Math.PI/2;
- const s=Math.sin(n.ph)*.6;c.legs[0].rotation.x=s;c.legs[1].rotation.x=-s;c.arms[0].rotation.x=-s*.6;c.arms[1].rotation.x=0})}
+function npcTick(dt){NPCS.tick(AP.npc,dt,{indoor:1})}
 
 /* departure boards and gate screens */
 function drawBoard(b){const from=here(),L=T.upcoming(from,b.n),n=T.now(),mine=new Set(T.active().map(k=>k.fl+'#'+k.dep));
@@ -321,13 +319,12 @@ function takeOff(){const tk=AP.tk;if(!tk)return;AP.ph='fly';T.emit('depart',tk);
  let d=document.getElementById('apfly');if(d)d.remove();d=document.createElement('div');d.id='apfly';
  const night=k=>{const m=((k%1440)+1440)%1440;return m<360||m>=1200};
  d.style.cssText=`position:fixed;inset:0;z-index:65;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;font:15px ${FONT};background:linear-gradient(180deg,${night(dep)?'#0a1430,#1b2c5a':'#2f7fe0,#9fd2ff'});overflow:hidden`;
- d.innerHTML=`<style>#apfly .cl{position:absolute;background:#fff;border-radius:999px;opacity:.75;filter:blur(1px);animation:apcl linear infinite}@keyframes apcl{from{transform:translateX(110vw)}to{transform:translateX(-40vw)}}#apfly button{all:unset;cursor:pointer;background:#ff6b4a;color:#fff;font-weight:700;padding:8px 18px;border-radius:10px;box-shadow:0 3px 0 #c84528}</style>
- ${[0,1,2,3,4,5].map(i=>`<div class=cl style="top:${10+i*14}%;width:${120+i*40}px;height:${30+i*6}px;animation-duration:${6+i*1.6}s;animation-delay:-${i*1.3}s"></div>`).join('')}
- <div style="position:relative;font:700 28px ${FONT}">${esc(tk.fl)} · ${esc(T.city(tk.from))} → ${esc(T.city(tk.to))}</div>
- <canvas id=apflc width=720 height=300 style="position:relative;width:min(720px,94vw);aspect-ratio:720/300;border-radius:14px;border:3px solid #0b2a5b;background:#7cc2ff"></canvas>
- <div id=apflt style="position:relative;font:700 18px ${FONT}"></div><div style="position:relative;display:flex;gap:10px"><button onclick="apLand()">Skip</button></div>`;
+ d.innerHTML=`<style>#apsky{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}</style><canvas id=apsky></canvas>
+ <div style="position:relative;font:700 28px ${FONT};text-shadow:0 3px 0 #0b2a5b">${esc(tk.fl)} · ${esc(T.city(tk.from))} → ${esc(T.city(tk.to))}</div>
+ <canvas id=apflc width=720 height=300 style="position:relative;width:min(720px,94vw);aspect-ratio:720/300;border-radius:4px;border:4px solid #0b2a5b;box-shadow:4px 4px 0 #0b2a5b99;background:#7cc2ff"></canvas>
+ <div id=apflt style="position:relative;font:700 18px ${FONT};text-shadow:0 2px 0 #0b2a5b"></div>`;
  document.body.appendChild(d);const t0=(window.FWP?FWP.now():performance.now()),DUR=8500,A=T.dest(tk.from)||WT_HOME,B=T.dest(tk.to)||WT_HOME;AP.flv=null;
- const step=()=>{if(!document.getElementById('apfly')||AP.ph!='fly')return;const k=Math.min(1,((window.FWP?FWP.now():performance.now())-t0)/DUR),c=document.getElementById('apflc');if(c&&T.paintWorld){const r=c.getBoundingClientRect(),W0=r.width||720,H0=r.height||300,dpr=Math.min(3,window.devicePixelRatio||1),W=Math.round(W0*dpr),H=Math.round(H0*dpr);
+ const step=()=>{if(!document.getElementById('apfly')||AP.ph!='fly')return;try{apSky(document.getElementById('apsky'),dep+(arr-dep)*Math.min(1,((window.FWP?FWP.now():performance.now())-t0)/DUR),(window.FWP?FWP.now():performance.now())-t0)}catch(e){}const k=Math.min(1,((window.FWP?FWP.now():performance.now())-t0)/DUR),c=document.getElementById('apflc');if(c&&T.paintWorld){const r=c.getBoundingClientRect(),W0=r.width||720,H0=r.height||300,dpr=Math.min(3,window.devicePixelRatio||1),W=Math.round(W0*dpr),H=Math.round(H0*dpr);
   if(c.width!=W||c.height!=H){c.width=W;c.height=H}const x=c.getContext('2d'),pa=T.proj(A.lat,A.lon),pb=T.proj(B.lat,B.lon);
   /* sharp vector map (138-flights.js), framed on the route */
   if(!AP.flv)AP.flv=T.fitView([pa,pb],W0,H0,1.7);const v=AP.flv,s=T.clampView(v,W0,H0),ox=W0/2-v.cx*s,oy=H0/2-v.cy*s;T.paintWorld(x,s*dpr,ox*dpr,oy*dpr,W,H,dpr);x.setTransform(dpr,0,0,dpr,0,0);
@@ -340,6 +337,31 @@ function takeOff(){const tk=AP.tk;if(!tk)return;AP.ph='fly';T.emit('depart',tk);
   x.font='bold 13px '+FONT;x.lineJoin='round';[[T.city(tk.from),ax,ay],[T.city(tk.to),bx2,by]].forEach(q=>{x.strokeStyle='#ffffffd0';x.lineWidth=3;x.strokeText(q[0],q[1]+8,q[2]-8);x.fillStyle='#0b2a5b';x.fillText(q[0],q[1]+8,q[2]-8)})}
   const now=dep+(arr-dep)*k,e=document.getElementById('apflt');if(e)e.textContent=`${T.hm(now)} · ${Math.round((1-k)*tk.hrs*60)} min to go${tk.to!='home'?' · local time there '+T.local(now,tk.to):''}`;
   if(k>=1)apLand();else requestAnimationFrame(step)};requestAnimationFrame(step)}
+/* v55.21.0: pixel-art flight sky. Low-res canvas scaled up: sky colour follows the game clock (night, dawn, day, dusk), stars and a moon at night, a sun by day, blocky clouds drifting past in three layers, a pixel plane. */
+const SKYK=[[0,0],[5,0],[6.5,1],[8,2],[17,2],[18.5,1],[20,0],[24,0]],
+ SKYC=[['#0a1430','#1b2c5a'],['#2b4a8a','#f0905a'],['#2f7fe0','#9fd2ff']];
+const hx=c=>[1,3,5].map(i=>parseInt(c.substr(i,2),16)),mix=(a,b,t)=>{const A=hx(a),B=hx(b);return'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join()+')'};
+function skyAt(h){let i=0;while(i<SKYK.length-2&&h>=SKYK[i+1][0])i++;const k0=SKYK[i],k1=SKYK[i+1],t=Math.max(0,Math.min(1,(h-k0[0])/(k1[0]-k0[0]))),a=SKYC[k0[1]],b=SKYC[k1[1]];return{top:mix(a[0],b[0],t),bot:mix(a[1],b[1],t),night:k0[1]==0&&k1[1]==0?1:k0[1]==0?1-t:k1[1]==0?t:0}}
+const CLP=[[0,1,4],[1,0,6],[2,1,5]];
+function apSky(c,now,ms){if(!c||!c.clientWidth)return;const W=192,H=Math.max(60,Math.round(W*c.clientHeight/c.clientWidth));if(c.width!=W||c.height!=H){c.width=W;c.height=H}
+ const x=c.getContext('2d'),h=(((now%1440)+1440)%1440)/60,sk=skyAt(h),N=sk.night;
+ const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,sk.top);g.addColorStop(1,sk.bot);x.fillStyle=g;x.fillRect(0,0,W,H);
+ /* banded sky: snap to 6 colour steps so it reads as pixel art */
+ x.fillStyle=sk.bot;for(let y=0;y<H;y+=6){x.globalAlpha=.10;x.fillRect(0,y,W,3)}x.globalAlpha=1;
+ if(N>.35){for(let i=0;i<46;i++){const sx=(i*53)%W,sy=(i*37)%Math.floor(H*.7),tw=((i+Math.floor(ms/400))%5)==0;x.fillStyle=tw?'#8aa4d8':'#fff';x.globalAlpha=Math.min(1,N*1.2);x.fillRect(sx,sy,1,1)}x.globalAlpha=1;
+  x.fillStyle='#f4efe2';x.fillRect(150,12,6,6);x.fillRect(149,13,8,4);x.fillStyle=sk.top;x.fillRect(153,12,4,4)}
+ else{x.fillStyle='#ffd84a';x.fillRect(28,14,8,8);x.fillRect(27,15,10,6);x.fillRect(29,13,6,10)}
+ /* clouds: three layers, farther = smaller, slower, paler */
+ const tint=N>.5?['#34457a','#46598f','#566aa3']:h<7.5||h>17.5?['#f2c9b0','#ffe3cf','#fff2e6']:['#cfe6ff','#e8f3ff','#ffffff'];
+ for(let L=0;L<3;L++){const sp=[.006,.012,.022][L],sz=[1,1.4,2][L];x.fillStyle=tint[L];
+  for(let i=0;i<5;i++){const w=Math.round(26*sz),px=Math.floor(((i*(W+60)/5+(L*37))-ms*sp*(W/190)*3)%(W+60)+(W+60))%(W+60)-40,py=Math.floor(H*(.12+.13*((i*7+L*3)%6)));
+   CLP.forEach(r=>x.fillRect(px+Math.round(r[0]*5*sz),py+Math.round(r[1]*3*sz),Math.round(r[2]*5*sz),Math.round(3*sz)));
+   x.fillRect(px+Math.round(5*sz),py+Math.round(3*sz),Math.round(w*.6),Math.round(2*sz))}}
+ /* plane (pixel sprite) bobbing in the middle, with a little wake of cloud puffs */
+ const bob=Math.round(Math.sin(ms/500)*2),px=Math.floor(W/2)-12,py=Math.floor(H*.5)+bob;
+ x.fillStyle='#0b2a5b';x.fillRect(px-1,py+4,26,7);x.fillStyle='#fff';x.fillRect(px,py+3,24,7);x.fillStyle='#ff6b4a';x.fillRect(px+19,py-3,4,7);x.fillStyle='#cfe6ff';x.fillRect(px+4,py+10,14,3);x.fillRect(px+7,py-1,9,4);
+ x.fillStyle='#0b2a5b';x.fillRect(px+20,py+4,3,2);x.fillStyle='#fff';x.globalAlpha=.7;for(let i=0;i<4;i++)x.fillRect(px-6-i*7-((Math.floor(ms/120)+i)%3),py+6+(i%2),4,2);x.globalAlpha=1}
+window.apSky=apSky;
 window.apLand=function(){const tk=AP.tk;if(!tk||AP.ph!='fly')return;const d=document.getElementById('apfly');if(d)d.remove();
  tk.st='flown';tk.bt=0;AP.ph='landed';T.st().loc=tk.to||'home';const arr=AP.arrT||T.now(),end=(S.day+1)*1440+360;
  const s=seatXZ(tk);P.sit=null;P.x=s.ax;P.z=s.az;P.rot=Math.PI;camT.x=P.x;camT.z=P.z;AP.cnpc.forEach(n=>n.c.g.visible=true);if(AP.seatM)AP.seatM.visible=false;

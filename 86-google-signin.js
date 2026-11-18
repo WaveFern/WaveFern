@@ -118,7 +118,7 @@ function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionSt
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
 function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
  const NI='<i class=ttni aria-label="Not signed in"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.6 3.8-7.5 8.5-7.5s8.5 2.9 8.5 7.5z"/></svg></i>';
- const pf=FBU?`<div class=ttpf title="${esc(nm)}">${FBU.photoURL?`<img src="${esc(FBU.photoURL)}" referrerpolicy=no-referrer alt="Your Google profile picture" onerror="this.outerHTML=${esc(JSON.stringify(NI))}">`:NI}</div>`:`<div class=ttpf>${NI}</div>`;
+ const pf=FBU?`<div class=ttpf title="${esc(nm)}">${fwPhoto()?`<img src="${esc(fwPhoto())}" referrerpolicy=no-referrer alt="Your Google profile picture" onerror="this.outerHTML=${esc(JSON.stringify(NI))}">`:NI}</div>`:`<div class=ttpf>${NI}</div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN</h1><div class=px>Music Career Sim</div><div class=ttbx>
   <button class=go onclick="ttWorlds()" ${busy?'disabled':''}>${busy?'Loading your save…':'Play'}</button>
   <button onclick="ttSet()">Settings</button><button onclick="ttWiki()">Wiki</button>${FBU?`<button onclick="fbSignOutAsk()" ${busy?'disabled':''}>Sign out of Google</button>`:''}${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · <a href="privacy/" target="_blank" rel="noopener">Privacy</a> · <a href="terms/" target="_blank" rel="noopener">Terms</a> · <a href="legal/" target="_blank" rel="noopener">Legal</a></div></div>`}
@@ -130,8 +130,8 @@ function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;TT.sel=0
    Cloud save stays one doc per account and follows the active career. */
 function ttWorlds(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.sel=1;const a=curSlot(),rows=[],free=[];
  for(let n=1;n<=SLOTS;n++){const i=n==a?(TT.game?{artist:S.artist||'',day:S.day||0}:null):slotInfo(n);if(!i)free.push(n);
-  rows.push(i?`<div class="ttsl${n==a?' on':''}" data-slot=${n}><div><b>${esc(i.artist||'Unnamed artist')}</b><small>Career ${n} · Day ${i.day||1}${n==a?' · last played':''}</small></div><button class=go onclick="ttSlot(${n})">Play</button><button class=ttdel title="Delete this career" aria-label="Delete career ${n}" onclick="ttDel(${n})">✕</button></div>`
-   :`<div class="ttsl empty" data-slot=${n}><div><b>Empty slot</b><small>Career ${n}</small></div></div>`)}
+  rows.push(i?`<div class="ttsl${n==a?' on':''}" data-slot=${n} draggable=true><div><b>${esc(i.artist||'Unnamed artist')}</b><small>Career ${n} · Day ${i.day||1}${n==a?' · last played':''}</small></div><button class=go onclick="ttSlot(${n})">Play</button><button class=ttdel title="Delete this career" aria-label="Delete career ${n}" onclick="ttDel(${n})">✕</button></div>`
+   :`<div class="ttsl empty" data-slot=${n} draggable=true><div><b>Empty slot</b><small>Career ${n}</small></div></div>`)}
  const rec=[];for(let n=1;n<=BK_MAX;n++){try{const b=localStorage.getItem('fw_bak_'+n);if(b){let nm='';try{nm=scDecode(b).S.artist||''}catch(e){}rec.push(`<div class="ttsl ttbk" draggable=true data-bak=${n}><div><b>${esc(nm||'Recovered career')}</b><small>${esc(localStorage.getItem('fw_bakw_'+n)||'Backup from slot '+n)} · drag onto a career slot</small></div><button onclick="ttRecover(${n})">Recover</button></div>`)}}catch(e){}}
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Choose a career</h2>${rows.join('')}${rec.length?`<details class=ttrb><summary>Recovered backups (${rec.length})</summary>${rec.join('')}</details>`:''}<span class=ttnc title="${free.length?'':'Coming soon'}"><button ${free.length?`class=go onclick="ttSlot(${free[0]})"`:'disabled'}>+ New career</button>${free.length?'':'<em>Coming soon</em>'}</span><button onclick="ttBack()">Back</button></div></div>`}
 function ttRecover(n,t){let b=null;try{b=localStorage.getItem('fw_bak_'+n)}catch(e){}if(!b)return;
@@ -147,10 +147,19 @@ function ttRecAsk(n,t){const i=t==curSlot()&&TT.game?{artist:S.artist}:slotInfo(
  const d=document.createElement('div');d.id='ttrc';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Overwrite career ${t}?</h2><p>Career ${t}${i.artist?' ('+esc(i.artist)+')':''} will be replaced by the recovered backup. The career it replaces is kept under Recovered backups.</p><div class=row2><button class=go id=ttrcy>Overwrite</button><button id=ttrcn>Cancel</button></div></div>`;
  document.body.appendChild(d);$('ttrcy').onclick=()=>{d.remove();ttRecover(n,t)};$('ttrcn').onclick=()=>d.remove()}
-document.addEventListener('dragstart',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttbk');if(r){try{e.dataTransfer.setData('text/plain',r.dataset.bak);e.dataTransfer.effectAllowed='move'}catch(x){}}});
+/* v55.21.0: drag a career onto another slot to swap them (an empty slot just takes the career). Drags carry 'slot:N'; backups carry a bare number. */
+document.addEventListener('dragstart',e=>{const s=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(s){try{e.dataTransfer.setData('text/plain','slot:'+s.dataset.slot);e.dataTransfer.effectAllowed='move'}catch(x){}return}const r=e.target.closest&&e.target.closest('#ttl .ttbk');if(r){try{e.dataTransfer.setData('text/plain',r.dataset.bak);e.dataTransfer.effectAllowed='move'}catch(x){}}});
 document.addEventListener('dragover',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r){e.preventDefault();r.classList.add('drop')}});
 document.addEventListener('dragleave',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r)r.classList.remove('drop')});
-document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(!r)return;e.preventDefault();r.classList.remove('drop');let n=0;try{n=+e.dataTransfer.getData('text/plain')}catch(x){}if(n)ttRecAsk(n,+r.dataset.slot)});
+document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(!r)return;e.preventDefault();r.classList.remove('drop');let v='';try{v=e.dataTransfer.getData('text/plain')}catch(x){}if(/^slot:/.test(v))return ttSwap(+v.slice(5),+r.dataset.slot);const n=+v;if(n)ttRecAsk(n,+r.dataset.slot)});
+/* v55.21.0: swap two career slots. The save keys move with the slot, the active pointer follows its career, then the page reloads like Recover does. */
+function ttSwap(a,b){if(!a||!b||a==b)return;snd('click');if(TT.game)autoSave();wiping=true;
+ try{const ka=slotKey(a),kb=slotKey(b),va=localStorage.getItem(ka),vb=localStorage.getItem(kb);
+  if(vb)localStorage.setItem(ka,vb);else localStorage.removeItem(ka);
+  if(va)localStorage.setItem(kb,va);else localStorage.removeItem(kb);
+  const c=curSlot();if(c==a)localStorage.setItem(SLOT_K,b);else if(c==b)localStorage.setItem(SLOT_K,a);
+  if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){wiping=false;return}
+ location.reload()}
 function ttBack(){snd('click');TT.sel=0;titleUI()}
 function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
  if(TT.game)autoSave();wiping=true;const i=slotInfo(n);
@@ -172,7 +181,7 @@ const NEUTRAL_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="curren
 /* pause menu: Save & quit, plus the Google profile picture */
 {const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(!m)return;const q=document.createElement('button');q.textContent='Save and quit';q.onclick=saveQuit;m.appendChild(q);
  if(!FB_ON||!FBU)return;const h=m.querySelector('h2'),av=document.createElement('div');av.className='pzav';
- if(FBU.photoURL){const im=document.createElement('img');im.src=FBU.photoURL;im.referrerPolicy='no-referrer';im.alt='Your Google profile picture';im.onerror=()=>{av.innerHTML=NEUTRAL_ICON};av.appendChild(im)}else av.innerHTML=NEUTRAL_ICON;
+ if(fwPhoto()){const im=document.createElement('img');im.src=fwPhoto();im.referrerPolicy='no-referrer';im.alt='Your Google profile picture';im.onerror=()=>{av.innerHTML=NEUTRAL_ICON};av.appendChild(im)}else av.innerHTML=NEUTRAL_ICON;
  if(h)h.before(av);};
  const pg=pauseGame;pauseGame=function(){pg();csPush()}}
 /* browsers block sound until the first click, so start the menu music then */
@@ -180,3 +189,42 @@ addEventListener('pointerdown',()=>{if(TT.on&&MENUA&&MENUA.paused)MENUA.play().c
 
 /* v49.64.0: no cloud save reads while the game is paused. Entering the pause does one last sync, then the 90 second timer and tab-hidden syncs stay quiet until you resume. */
 {const c0=csPush;let pz=0;csPush=function(force){if(typeof PAUSED!='undefined'&&PAUSED&&!force){if(pz)return Promise.resolve();pz=1}else pz=0;return c0.apply(this,arguments)}}
+
+/* v52 custom picture: an animated GIF cannot be shown as a profile picture, so when the Google photo is a GIF the player is asked to
+   upload one instead. The picture is cropped to 128x128 and saved as a JPEG data URL on profiles/{uid}.pfp (firebase-rules allow it,
+   24000 characters at most) and cached in localStorage fw_pfp_{uid}. fwPhoto() is the one helper every display path reads.
+   "Later" asks again in the next session. */
+const PFP_MAX=24000,PFP_C={},PFP_ASK={};
+function fwIsGif(u){u=String(u||'');if(!u)return Promise.resolve(false);if(u in PFP_C)return Promise.resolve(PFP_C[u]);
+ const byName=()=>/\.gif([?#]|$)/i.test(u);
+ return fetch(u,{credentials:'omit',referrerPolicy:'no-referrer'}).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})
+  .then(b=>{const s=String.fromCharCode.apply(null,new Uint8Array(b,0,6));return s=='GIF87a'||s=='GIF89a'})
+  .catch(byName).then(g=>(PFP_C[u]=!!g))}
+function fwCustomPfp(){try{const u=FBU&&FBU.uid;const v=u?localStorage.getItem('fw_pfp_'+u):'';return v&&v.indexOf('data:image/jpeg;base64,')==0?v:''}catch(e){return ''}}
+function fwPhoto(){return FBU?(fwCustomPfp()||FBU.photoURL||''):''}
+function fwPfpCache(v){try{if(FBU)localStorage.setItem('fw_pfp_'+FBU.uid,v)}catch(e){}}
+function fwPfpPart(){const v=fwCustomPfp();return v?{pfp:v}:{}}
+function fwPfpSave(v){const uid=FBU&&FBU.uid;if(!uid)return Promise.reject(new Error('Sign in first.'));
+ try{localStorage.setItem('fw_pfp_'+uid,v)}catch(e){return Promise.reject(new Error('No room to save this picture.'))}
+ if(!FBF||!FBD)return Promise.resolve();
+ return FBF.setDoc(FBF.doc(FBD,'profiles',uid),{pfp:v},{merge:true}).catch(()=>{}).then(()=>{if(window.fwProfileSync)fwProfileSync(1)})}
+function fwPfpResize(f){return new Promise((res,rej)=>{const u=URL.createObjectURL(f),im=new Image();
+ const done=(e,v)=>{URL.revokeObjectURL(u);e?rej(e):res(v)};
+ im.onerror=()=>done(new Error('That file is not a picture.'));
+ im.onload=()=>{try{const s=Math.min(im.naturalWidth,im.naturalHeight);if(!s)throw 0;const c=document.createElement('canvas');c.width=c.height=128;
+   const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,128,128);x.drawImage(im,(im.naturalWidth-s)/2,(im.naturalHeight-s)/2,s,s,0,0,128,128);
+   let v='';for(const q of [.8,.7,.6,.5]){v=c.toDataURL('image/jpeg',q);if(v.length<=PFP_MAX)break}
+   v.length<=PFP_MAX?done(0,v):done(new Error('That picture is too detailed. Try a simpler one.'))}catch(e){done(new Error('That picture could not be used.'))}};
+ im.src=u})}
+function fwPfpShow(){const d=document.createElement('div');d.id='pfpq';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
+ d.innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>Pick a profile picture</h2><p>Your Google profile picture is an animated GIF, which WaveFern cannot show. Upload a picture instead. It is cropped to a square and saved to your account.</p><p class=m id=pfpm></p><div class=row2><label class=go style="cursor:pointer">Upload picture<input type=file accept="image/*" id=pfpin style="display:none"></label><button id=pfpl>Later</button></div></div>`;
+ document.body.appendChild(d);
+ d.querySelector('#pfpl').onclick=()=>{try{sessionStorage.setItem('fw_pfp_later','1')}catch(e){}d.remove()};
+ d.querySelector('#pfpin').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const m=d.querySelector('#pfpm');m.textContent='Saving...';
+  fwPfpResize(f).then(v=>fwPfpSave(v)).then(()=>{d.remove();say('Your profile picture is saved');fbRedraw()},err=>{m.textContent=(err&&err.message)||'That picture could not be used.'})}}
+function fwPfpPrompt(){try{if(!FB_ON||!FBU||!TT.on||fwCustomPfp()||!FBU.photoURL)return;const uid=FBU.uid;if(PFP_ASK[uid]||document.getElementById('pfpq'))return;
+ try{if(sessionStorage.getItem('fw_pfp_later'))return}catch(e){}
+ PFP_ASK[uid]=1;const u=FBU.photoURL;
+ fwIsGif(u).then(g=>{if(g&&TT.on&&FBU&&FBU.uid==uid&&!fwCustomPfp())fwPfpShow()},()=>{})}catch(e){}}
+{const pt0=titleUI;titleUI=function(){const r=pt0.apply(this,arguments);try{fwPfpPrompt()}catch(e){}return r}}
+window.FW_PFP_isGif=fwIsGif;
