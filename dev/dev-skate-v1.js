@@ -283,13 +283,19 @@ function buildRails(){RAILS.forEach(r=>{if(r.coping)return;railMesh(r)});
  cp(PX0+POOL.r,PZ0-.15,PX1-POOL.r,PZ0+.15);cp(PX0+POOL.r,PZ1-.15,PX1-POOL.r,PZ1+.15);cp(PX0-.15,PZ0+POOL.r,PX0+.15,PZ1-POOL.r);cp(PX1-.15,PZ0+POOL.r,PX1+.15,PZ1-POOL.r);
  /* rounded corners of the coping: short boxes along the arc */
  [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([sx,sz])=>{const cx=POOL.cx+sx*(POOL.a-POOL.r),cz=POOL.cz+sz*(POOL.b-POOL.r);for(let k=1;k<6;k++){const a=k/6*PI/2,x=cx+sx*Math.cos(a)*POOL.r,z=cz+sz*Math.sin(a)*POOL.r;bx(.35,.1,.35,COL.steel,x,.02,z,-Math.atan2(sz*Math.sin(a),sx*Math.cos(a)))}})}
-/* the island ground lies over the pool pit, so the ground layers under the pool get a clip box (clipIntersection = only inside the box is cut) */
-let CARVED=[];
-function carvePool(){try{renderer.localClippingEnabled=true;const x0=CX+PX0+.01,x1=CX+PX1-.01,z0=CZ+PZ0+.01,z1=CZ+PZ1-.01;
- const pl=[new THREE.Plane(new THREE.Vector3(-1,0,0),x0),new THREE.Plane(new THREE.Vector3(1,0,0),-x1),new THREE.Plane(new THREE.Vector3(0,0,-1),z0),new THREE.Plane(new THREE.Vector3(0,0,1),-z1)];
- const box=new THREE.Box3(new THREE.Vector3(x0,-3,z0),new THREE.Vector3(x1,.1,z1)),bb=new THREE.Box3(),seen=new Set();
- scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.skate)return;for(let a=o.parent;a;a=a.parent)if(a===root)return;bb.setFromObject(o);if(bb.isEmpty()||bb.max.y>.2||!bb.intersectsBox(box))return;
-  (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(!m||seen.has(m))return;seen.add(m);CARVED.push([m,m.clippingPlanes,m.clipIntersection]);m.clippingPlanes=pl;m.clipIntersection=true;m.needsUpdate=true})})}catch(e){soft(e,'carve')}}
+/* the island ground (grass, the snow lawn, the beach layers under it) is cut away under the WHOLE park, not just the pool pit (v55.23.0):
+   a clip box (clipIntersection = only inside the box is cut) on every flat ground mesh that reaches under the slab. Before, only the pool was
+   cut, so the grass only 12 cm under the concrete could show through it from a distance (depth precision, worst on phones and tablets), and
+   the snow-day ground materials (swapped in later by the Christmas file) were never cut at all. carveTick re-checks every 2 s and cuts any
+   material that was swapped onto those meshes since. */
+let CARVED=[],CARVO=[];const CLIP=[];
+function carvePool(){try{renderer.localClippingEnabled=true;const x0=CX-HXM-.42,x1=CX+HXM+.42,z0=CZ-HZM-.42,z1=CZ+HZM+.42;
+ if(!CLIP.length)CLIP.push(new THREE.Plane(new THREE.Vector3(-1,0,0),x0),new THREE.Plane(new THREE.Vector3(1,0,0),-x1),new THREE.Plane(new THREE.Vector3(0,0,-1),z0),new THREE.Plane(new THREE.Vector3(0,0,1),-z1));
+ const box=new THREE.Box3(new THREE.Vector3(x0,-3,z0),new THREE.Vector3(x1,.1,z1)),bb=new THREE.Box3();
+ scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.skate||CARVO.includes(o))return;for(let a=o.parent;a;a=a.parent)if(a===root)return;bb.setFromObject(o);if(bb.isEmpty()||bb.max.y>.2||!bb.intersectsBox(box))return;CARVO.push(o)});
+ carveMats()}catch(e){soft(e,'carve')}}
+function carveMats(){CARVO.forEach(o=>(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(!m||m.clippingPlanes===CLIP)return;CARVED.push([m,m.clippingPlanes,m.clipIntersection]);m.clippingPlanes=CLIP;m.clipIntersection=true;m.needsUpdate=true}))}
+let carveT=0;function carveTick(dt){if(!CLIP.length)return;carveT+=dt;if(carveT<2)return;carveT=0;try{carveMats()}catch(e){soft(e,'carve2')}}
 function buildRamps(){
  const S2=soup(),cT=tcol('#b6bbc1'),cF=tcol('#9ea4aa'),cR=tcol('#8a8f96'),cS=tcol('#7e848b');
  EXT.forEach(e=>{if(e.kind=='hut'||e.kind=='rack'||e.kind=='prop'||e.kind=='box'&&e.id!='plat')return;
@@ -1000,7 +1006,7 @@ let intDone=false,HY2=0,ANT=0;
   p=f(-52,-21.4);INT.push({x:p[0],z:p[1],r:3.6,l:'Board Shop: rent, decks, trucks',a:()=>openMenu('shop'),sk:2});
   p=f(-39,-21.2);INT.push({x:p[0],z:p[1],r:2.6,l:'Talk to Rex the coach',a:()=>openMenu('coach'),sk:3});
   p=f(LBX,LBZ+2.6);INT.push({x:p[0],z:p[1],r:3,l:'Skate park leaderboard and challenges',a:()=>openMenu('chal'),sk:4})}
- if(root.visible){if(!ppBuilt&&dd<260)buildPeople();ANT+=dt;lightsTick();
+ if(root.visible){if(!ppBuilt&&dd<260)buildPeople();ANT+=dt;lightsTick();carveTick(dt);
   if(ppBuilt&&(dd<200||G))npcTick(dt,ANT);
   if(boardKey&&!G){const o=st();if(boardKey!==[o.best,o.runs,o.bestCombo,Object.keys(o.challenges).length,o.wins].join('|'))drawBoard()}}
  if(G&&G.on){if(!(window.FW_SKATE&&FW_SKATE.hold)){P.x=CX+B.x;P.z=CZ+B.z;SY=SLAB;simTick(dt)}hudTick()}
