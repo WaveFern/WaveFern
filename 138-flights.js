@@ -238,7 +238,7 @@ function drawMap(){const c=document.getElementById('swmapc');if(!c)return;const 
  const big=Math.min(1.4,.9+v.z*.08),names=v.z>=2.4,lab=[];x.textBaseline='middle';x.lineJoin='round';
  PINS.forEach(q=>{if(q.x<-20||q.y<-20||q.x>r.width+20||q.y>r.height+20)return;const d=T.dest(q.p),dim=cont&&(cont=='home'?q.p!='home':!d||d.cont!=cont),on=q.p==SW.to||q.p==hov,me=q.p==from;
   x.globalAlpha=dim?.3:1;x.fillStyle=me?'#0b2a5b':d?WT_CONT[d.cont].c:'#2fe68a';x.strokeStyle='#0b2a5b';x.lineWidth=on?2.5:1.4;
-  x.beginPath();x.arc(q.x,q.y,(on?6.5:me?5.5:q.p=='home'?2.2:4.5)*big*(q.p=='home'&&!on&&!me?.8:1),0,7);x.fill();x.stroke();
+  x.beginPath();x.arc(q.x,q.y,(on?6.5:me?5.5:4.5)*big,0,7);x.fill();x.stroke();
   if(names&&!me&&!dim||on&&!me)lab.push({q,on});x.globalAlpha=1});
  /* city names once zoomed in: the picked / hovered one first, then any that do not overlap one already drawn */
  const box=[];if(A)box.push([A.x+6,A.y-8,A.x+150,A.y+8]);lab.sort((a,b)=>b.on-a.on).forEach(l=>{const q=l.q,t=T.city(q.p);x.font=(l.on?'bold ':'')+'12px Trebuchet MS,Arial';
