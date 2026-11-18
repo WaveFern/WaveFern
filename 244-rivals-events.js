@@ -11,7 +11,7 @@
      steal an open brand offer (20%/day). Taking #1 also tempts a brand (a free offer if you have none open).
    2 EVENTS  A new event every 3-6 days (never the same twice in a row): award night, scandal (pay PR / ignore / lean in), bidding war
      (cash now or hold out), rival diss track (reply / laugh it off), playlist feature, festival season, algorithm change.
-     Choice events wait 2 days for you (open the CHARTS button) then take the safe default. Stream boosts are daily multipliers (planOf).
+     Choice events have no screen: they take the safe default at once (an old save's pending event is settled on the next morning). Stream boosts are daily multipliers (planOf).
    3 VIRAL   Going viral on Instagrime. Rolled once per post, the morning after (any posting path). Chance per post:
        base by day  <100: 0.02%   100-250: 0.08% rising to 0.20%   250-400: 0.20% rising to 0.60%   400+: 1.0%   (see VB)
        x fame factor 0.3..1 (log of monthly listeners, full at 100M), x 0.5 for each earlier viral post, 45 day cooldown, max 4 a career.
@@ -109,9 +109,9 @@
   if(!ok.length)return;let t=0;ok.forEach(k=>t+=EV[k].w);let x=Math.random()*t,k=ok[0];for(const q of ok){x-=EV[q].w;if(x<=0){k=q;break}}
   r.lastEv=k;r.next=S.day+RI(3,6);const e=EV[k];
   if(e.auto){if(k=='award')r.lastAward=S.day;e.run();return}
-  r.ev=Object.assign({k,d:S.day,x:S.day+2},e.make());card(e.t,e.h(r.ev),'Open CHARTS to decide.');safe(()=>snd('ping'),'snd')}
+  r.ev=Object.assign({k,d:S.day,x:S.day+2},e.make());safe(()=>snd('ping'),'snd');evExpire(true)}
  function evPick(i){const r=rs(),ev=r.ev;if(!ev)return;const e=EV[ev.k],o=e.o(ev)[i];if(!o||!o[1])return;r.ev=null;o[2]()}
- function evExpire(){const r=rs(),ev=r.ev;if(ev&&S.day>=ev.x){const e=EV[ev.k],o=e.o(ev)[e.def];r.ev=null;if(o)o[2]()}
+ function evExpire(now){const r=rs(),ev=r.ev;if(ev&&(now||S.day>=ev.x)){const e=EV[ev.k],o=e.o(ev)[e.def];r.ev=null;if(o)o[2]()}
   if(r.due&&S.day>=r.due.d){const u=r.due;r.due=null;cash(u.c);card('BRAND ANSWER',u.t,'+'+$$c(u.c));log(u.t+' ('+$$c(u.c)+')')}
   r.fx=r.fx.filter(f=>S.day-f.s<f.len)}
 
@@ -124,31 +124,9 @@
   card('YOU WENT VIRAL','Your post is everywhere','+'+fm(fo)+' Instagrime followers, +'+fm(f2)+' fans, streams +60% fading over a week.');safe(()=>{snd('chime');snd('cash')},'snd');
   safe(()=>{if(typeof BRD!='undefined'&&BRD.mk&&!BRD.open().length&&!BRD.active())BRD.mk()},'viral brand')}
 
- function daily(){if(!live()||!(S.songs||[]).length)return;safe(()=>{rs();evExpire();rivalsInit();rivalsStep();brands();viral();evNew()},'daily');ui()}
+ function daily(){if(!live()||!(S.songs||[]).length)return;safe(()=>{rs();evExpire();rivalsInit();rivalsStep();brands();viral();evNew()},'daily')}
  {const w0=wakeUp;wakeUp=function(){const r=w0.apply(this,arguments);try{daily()}catch(e){console.error('rivals',e)}return r}}
 
- /* ---------- UI ---------- */
- const css='font:11px Silkscreen,ui-monospace,monospace;color:#e8fff0;';let btn=null,pop=null;
- function ui(){const show=live()&&typeof mode!='undefined'&&(mode=='play'||mode=='drive')&&(S.songs||[]).length;
-  if(!btn){btn=document.createElement('button');btn.style.cssText='position:fixed;left:10px;bottom:44px;z-index:30;padding:5px 9px;background:#16241c;border:2px solid #7ad7ff;cursor:pointer;'+css;btn.onclick=open;document.body.appendChild(btn)}
-  const r=safe(rs,'rs');btn.style.display=show?'':'none';if(!show||!r)return;const ev=r.ev;
-  btn.textContent='▲ CHARTS #'+(r.rank||'?')+(ev?' !':'');btn.style.borderColor=ev?'#ffd27a':'#7ad7ff';btn.style.color=ev?'#ffd27a':'#e8fff0'}
- const row=(a,b,hl)=>'<div style="display:flex;justify-content:space-between;padding:4px 6px;'+(hl?'background:#1d3b2a;border:1px solid #2fe68a;':'border-bottom:1px solid #ffffff22;')+'"><span>'+a+'</span><span>'+b+'</span></div>';
- const H=t=>'<h3 style="margin:12px 0 4px;color:#7ad7ff;font-size:12px">'+t+'</h3>';
- const fxName={award:'Award glow',playlist:'Playlist',fest:'Festival season',algo:'Algorithm dip',scandal:'Scandal',lean:'Controversy',reply:'Beef reply',viral:'VIRAL'};
- function html(){const r=rs(),L=L0(),all=r.rv.map(x=>({n:x.n,l:x.l,me:0})).concat([{n:(S.artist||'You')+' (you)',l:L,me:1}]).sort((a,b)=>b.l-a.l);
-  let h='<div style="display:flex;justify-content:space-between"><b style="font-size:14px">WAVEFERN CHARTS</b><span>Rank #'+(r.rank||'?')+' of '+all.length+' · best #'+(r.best||'?')+'</span></div>';
-  h+=H('TOP ARTISTS (monthly listeners)');all.forEach((x,i)=>{h+=row((i+1)+'. '+x.n,fm(x.l),x.me)});
-  h+='<small style="opacity:.7">Pass a rival for cash and followers. Brand offers pay more the higher you sit.</small>';
-  const ev=r.ev;if(ev){const e=EV[ev.k];h+=H(e.t+' · decide by day '+ev.x)+'<div style="margin:4px 0">'+e.h(ev)+'. '+e.p(ev)+'</div>';e.o(ev).forEach((o,i)=>{h+='<button data-a="e'+i+'" '+(o[1]?'':'disabled ')+'style="'+css+'display:block;width:100%;margin:3px 0;padding:6px;background:'+(o[1]?'#2fe68a':'#333')+';color:'+(o[1]?'#04210f':'#888')+';border:2px solid #000;cursor:'+(o[1]?'pointer':'default')+'">'+o[0]+'</button>'})}
-  if(r.fx.length){h+=H('ACTIVE BOOSTS');r.fx.forEach(f=>{const m=1+(f.m-1)*Math.max(0,1-(S.day-f.s)/f.len);h+=row(fxName[f.k]||f.k,(m>=1?'+':'')+Math.round((m-1)*100)+'% streams')})}
-  h+=H('INSTAGRIME')+row('Viral posts',r.vr.n+' (max '+VMAX+')')+'<small style="opacity:.7">Going viral is rare. Keep posting; the further into your career and the bigger you are, the better the odds.</small>';
-  if(r.log.length){h+=H('NEWS');r.log.slice(0,8).forEach(n=>{h+=row('Day '+n.d,n.t)})}return h}
- function open(){if(pop){pop.remove();pop=null;return}pop=document.createElement('div');pop.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;width:min(520px,94vw);max-height:84vh;overflow:auto;padding:12px 14px;background:#0f1a14;border:3px solid #7ad7ff;'+css;
-  const draw=()=>{pop.innerHTML='<div style="text-align:right"><button data-a="x" style="'+css+'background:#333;border:2px solid #000;cursor:pointer">X</button></div>'+html()};draw();
-  pop.onclick=e=>safe(()=>{const a=e.target.dataset&&e.target.dataset.a;if(!a)return;if(a=='x'){open();return}if(a[0]=='e')evPick(+a.slice(1));draw();ui()},'click');document.body.appendChild(pop)}
- setInterval(()=>safe(()=>{if(live())ui()},'tick'),2000);
-
  /* test hooks (tools/viral-sim.js) */
- window.FW_RIVALS={viralP,base,fameF,rs,daily,rivalsStep,EV,evPick,fxM,bmul,VB,open};
+ window.FW_RIVALS={viralP,base,fameF,rs,daily,rivalsStep,EV,evPick,fxM,bmul,VB};
 })();
