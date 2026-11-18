@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.18.2';
+const GAME_VERSION='v55.19.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.19.0',n:'Dev version, test mode only: brands now write to you on their own (a new brand deal offer arrives every morning and every 30 seconds whenever none is open), so brand deals and photoshoots are easy to test. Normal play is unchanged and test careers still never post to the leaderboard.'},
  {v:'v55.18.2',n:'Brand photoshoot guide popups fixed. They no longer show while you are in the airport, on a plane or on the flight home, and they wait (instead of covering) if any other panel is open. They and the objective chip now use the normal game panel style: pixel font headings, green accents, same box frame.'},
  {v:'v55.18.1',n:'Cash safety on sleep. Waking up can no longer leave you with less money than you went to bed with: if anything in the morning chain ever took your cash, it is put back to what you had plus the Earned figure shown on the new-day screen.'},
  {v:'v55.18.0',n:'Battery saver. When you leave the tab and the music has faded out, the game now goes fully to sleep: audio is suspended (not just silent), playing sounds are paused, and every timer stops. It all comes back exactly as it was when you return.'},
