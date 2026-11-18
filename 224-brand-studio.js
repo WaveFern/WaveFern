@@ -158,21 +158,23 @@ window.bsShoot=function(){if(!SH||SH.shots.length>=4)return;const o=SH.o,sc=Math
  const p=$e('bspv');if(p)p.src=u;const n=$e('bsn');if(n)n.textContent='Frame '+SH.shots.length+': '+msg+' ('+sc+'/100)';thumbs()};
 
 /* wrap: pay, followers, the Instagrime post, flight home */
-window.bsWrap=function(){if(!SH||!SH.shots.length)return;const o=SH.o,b=BRD.by(o.b),s=SH.shots,best=s.slice().sort((a,c)=>c.sc-a.sc),pick=s[SH.sel]||best[0],
+window.bsWrap=function(){if(!SH||!SH.shots.length)return;BRD.wrapShoot(SH.o,SH.shots,SH.sel)};
+/* shots: [{sc,u,...,s3?}] (s3 = the 3D shoot setup of 238-brand-shoot3d.js), sel = the picked one */
+BRD.wrapShoot=function(o,s,sel){const b=BRD.by(o.b),best=s.slice().sort((a,c)=>c.sc-a.sc),pick=s[sel]||best[0],
  q=((best[0].sc+(best[1]?best[1].sc:best[0].sc))/2)/100,pay=Math.round(o.pay*(.75+.5*q)/100)*100,fol=FOLN(Math.round((60+(S.followers||0)*.01)*(.6+q)*(1+b.t*.5))),
  fans=(S.followers||0)+(S.igF||0),likes=Math.round(fans*(.12+q*.25))+20+Math.floor(Math.random()*30);
  S.money=+(S.money+pay).toFixed(2);S.earn=(S.earn||0)+pay;S.followers=(S.followers||0)+fol;S.energy=Math.max(0,(S.energy||0)-12);
  const cap='Paid partnership with '+b.n+'. '+['Campaign day at the '+b.n+' HQ.','New campaign, new look.','Lights, camera, '+b.n+'.','Thank you '+b.n+' for having me.'][Math.floor(Math.random()*4)]+' '+BRD.place(o);
- const p={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap,day:S.day,l:likes,brand:o.b,bs:[pick.m,pick.l,pick.bg,pick.seed]};
+ const p={id:S.nid++,mine:1,u:S.artist,cfg:Object.assign({},ch),cap,day:S.day,l:likes,brand:o.b};if(pick.s3)p.s3=pick.s3;else p.bs=[pick.m,pick.l,pick.bg,pick.seed];let pu=pick.u;if(pick.s3&&BRD.render3d)try{pu=BRD.render3d(pick.s3,ch,480,600)}catch(e){console.warn('hi-res shot',e)}
  try{S.igPosts=S.igPosts||[];S.igPosts.push(p);if(S.lastPost!=S.day){S.lastPost=S.day;if(typeof igbOn=='function'&&igbOn())igbNow()}}catch(e){console.error('brand post',e)}
- PICS[p.id]=pick.u;o.st=3;o.res={pay,q:Math.round(q*100),post:p.id,day:S.day};const bd=BRD.st();bd.done++;bd.earned+=pay;
+ PICS[p.id]=pu;o.st=3;o.res={pay,q:Math.round(q*100),post:p.id,day:S.day};const bd=BRD.st();bd.done++;bd.earned+=pay;
  let back='';if(o.k=='trip'&&T()){try{const f=T().upcoming(o.d,80).find(x=>x.to=='home'&&x.dep>=T().now()+120);if(f){const tk=Object.assign({},{id:'T'+(T().st().nid++),fl:f.fl,from:f.from,to:'home',dep:f.dep,arr:f.arr,hrs:f.hrs,gate:f.gate,seat:(3+Math.floor(Math.random()*18))+'ABCDEF'[Math.floor(Math.random()*6)],price:0,st:'booked',bd:S.day,ck:1,bt:0,co:o.b});T().st().tickets.push(tk);back=tk.fl+' home, Gate '+tk.gate+', boarding '+T().hm(tk.dep-120)+', gate closes '+T().hm(tk.dep-10)+' ('+BRD.dayWord(f)+')';try{glCard('FLIGHT HOME · '+tk.fl,T().code(tk.from)+' ✈ '+T().code(tk.to),'Paid by '+b.n+' · Gate '+tk.gate+' · closes '+T().hm(tk.dep-10))}catch(e){}}}catch(e){console.error('return flight',e)}}
  S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:'The campaign photos look great. Your fee of '+fm(pay)+' has been paid and the shot is on your Instagrime. '+(back?'Your flight home is booked and checked in: '+back+'.':'Thank you, we would love to work with you again.')});
  try{snd('cash');updateVersion()}catch(e){}
  const av=(typeof igxPortrait=='function'?igxPortrait(ch,1):pfp(ch));
  SH=null;BRD.shootOn=0;
  modal(`<div class="box modal bsx" style="max-width:560px"><h2><img src="${BRD.logo(o.b,64)}">${esc(b.n)} shoot wrapped <small>quality ${Math.round(q*100)}/100</small></h2>
- <div class=bsig><div class=bshd><img src="${av}"><div><b>${esc(S.artist||'you')}</b><small>Paid partnership with ${esc(b.n)}</small></div></div><img class=bspic src="${pick.u}"><div class=bsft><b>${likes.toLocaleString()} likes</b><br>${esc(cap)}</div></div>
+ <div class=bsig><div class=bshd><img src="${av}"><div><b>${esc(S.artist||'you')}</b><small>Paid partnership with ${esc(b.n)}</small></div></div><img class=bspic src="${pu}"><div class=bsft><b>${likes.toLocaleString()} likes</b><br>${esc(cap)}</div></div>
  <div class=bsr><span>Fee (${fm(o.pay)} base)</span><b>+${fm(pay)}</b></div><div class=bsr><span>New followers</span><b>+${fol.toLocaleString()}</b></div>${back?`<div class=bsr><span>Flight home (${esc(b.n)} pays)</span><b style="font-size:12px">${esc(back)}</b></div>`:''}
  <p class=m>Posted on Instagrime. You are a little tired from the day (-12 energy).</p><div class=row2><button class=go onclick="closeUI()">Done</button></div></div>`);
  try{say('Posted: Paid partnership with '+b.n+'. +'+fm(pay))}catch(e){}};

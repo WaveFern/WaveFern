@@ -11,34 +11,34 @@ cat('meta','About the game','','Settings, graphics, saves and the full version h
 /* ===================== Main Page ===================== */
 /* "Did you know..." facts for the Main Page; numbers come from the game's data */
 const DYK=()=>{const f=D.perf||{},cars=D.cars||[],fast=cars.slice().sort((a,b)=>b.mph-a.mph)[0],lab=(D.labels||[]).slice(-1)[0],s=(D.fame||{}).starts||[];
- return [`... that a song's ${L('genres/genre-focus','genre focus')} can swing its streams from −25% to +40%, depending on your last five releases?`,
- `... that ${L('streams')} build up twice as fast at night as during the day?`,
- `... that a ${L('streams/viral','viral')} song gets at least ${fmt(f.viralMin||5e6)} extra streams?`,
- ...Object.entries(D.dmLock||{}).map(([n,v])=>`... that ${n} won't ${L('collabs','DM you')} until you have ${big(v)} monthly listeners?`),
- `... that if you're still awake at 06:00 you ${L('days','pass out')} and wake with only 70 energy?`,
- fast?`... that the ${fast.n} is the fastest ${L('cars','car')}, at ${fast.mph} mph?`:'',
- s[349]?`... that ${L('fame','Fame Level 350')} needs ${fmt(s[349])} monthly listeners?`:'',
- `... that a fan asking for an autograph might be a thief who grabs ${L('fans','35% of your cash')}?`,
- `... that greeting a ${L('tour-shows','stadium crowd')} in their own language gets them more hyped?`,
- `... that typing a lone "100" while ${L('collabs/haggle','haggling')} means "keep it 100", not an offer?`,
- lab?`... that ${esc(lab.n)} keeps only ${pct(lab.cut)} of your streams, but wants ${fmt(lab.ml)} monthly listeners before it calls?`:'',
- `... that ${L('pets','every pet')} you own adds +1 quality to every song you make?`,
- `... that ${L('band-rooms','band songs')} get +3 quality for each extra band member?`,
- `... that there are ${((D.drums||{}).s808||[]).length} different ${L('extras','808s')} to choose from?`,
- `... that the ${L('festival','Park Fields Festival')} is held on every 7th day?`,
- `... that your ${L('gphone','phone')} model can add up to +22% streams to every song?`].filter(Boolean)};
+ return [`A song's ${L('genres/genre-focus','genre focus')} can swing its streams from −25% to +40%, depending on your last five releases.`,
+ `${L('streams')} build up twice as fast at night as during the day.`,
+ `A ${L('streams/viral','viral')} song gets at least ${fmt(f.viralMin||5e6)} extra streams.`,
+ ...Object.entries(D.dmLock||{}).map(([n,v])=>`${n} won't ${L('collabs','DM you')} until you have ${big(v)} monthly listeners.`),
+ `if you're still awake at 06:00 you ${L('days','pass out')} and wake with only 70 energy.`,
+ fast?`the ${fast.n} is the fastest ${L('cars','car')}, at ${fast.mph} mph.`:'',
+ s[349]?`${L('fame','Fame Level 350')} needs ${fmt(s[349])} monthly listeners.`:'',
+ `A fan asking for an autograph might be a thief who grabs ${L('fans','35% of your cash')}.`,
+ `greeting a ${L('tour-shows','stadium crowd')} in their own language gets them more hyped.`,
+ `typing a lone "100" while ${L('collabs/haggle','haggling')} means "keep it 100", not an offer.`,
+ lab?`${esc(lab.n)} keeps only ${pct(lab.cut)} of your streams, but wants ${fmt(lab.ml)} monthly listeners before it calls.`:'',
+ `${L('pets','every pet')} you own adds +1 quality to every song you make.`,
+ `${L('band-rooms','band songs')} get +3 quality for each extra band member.`,
+ `there are ${((D.drums||{}).s808||[]).length} different ${L('extras','808s')} to choose from.`,
+ `the ${L('festival','Park Fields Festival')} is held on every 7th day.`,
+ `your ${L('gphone','phone')} model can add up to +22% streams to every song.`].filter(Boolean)};
 let DYKS=0;
 window.dykMore=()=>{DYKS++;const el=document.getElementById('dyk');if(el)el.innerHTML=dykList();return false};
-function dykList(){const a=DYK(),n=a.length,o=[];for(let i=0;i<4;i++)o.push(a[(DYKS*4+i+new Date().getDate())%n]);return o.map(x=>'<li>'+x+'</li>').join('')}
+function dykList(){const a=DYK(),n=a.length,o=[];for(let i=0;i<4;i++)o.push(a[(DYKS*4+i+new Date().getDate())%n]);return o.map(x=>'<li>'+x.replace(/^[a-z]/,c=>c.toUpperCase())+'</li>').join('')}
 page('home','Main Page','meta',{hide:1,body:()=>{const n=PAGES.filter(p=>!p.hide).length,ps=PAGES.filter(p=>!p.hide&&p.cat!='meta'),day=Math.floor(Date.now()/864e5),fa=ps[day%ps.length];
  let lead='';try{const m=/class=lead>([\s\S]*?)<\/p>/.exec(fa.body());lead=m?m[1]:''}catch(e){}TID=0;
  const news=typeof VERSION_HISTORY!='undefined'?VERSION_HISTORY.slice(0,4):[];
- return `<div class=welcome><p class=w1>Welcome to WaveFern Wiki</p><p>the guide to <a href="../">WaveFern</a> that explains how the game works, from the first song to a world tour.</p><p class=m>${n} articles, written for game ${esc(D.version||'')}.</p></div>
+ return `<div class=welcome><p class=w1>How WaveFern works</p><p>Every number and rule in <a href="../">WaveFern</a>, from the first song to a world tour.</p><p class=m>${n} articles, current to ${esc(D.version||'')}</p></div>
  <div class=mp><div>
-  <section class=mpb><h2>Today's featured article</h2><p><b>${fa.t}</b>. ${lead} (<a href="#/${fa.id}">Full article</a>)</p></section>
-  <section class=mpb><h2>Did you know</h2><ul id=dyk>${dykList()}</ul><p class=more><a href="#" onclick="return dykMore()">More facts</a></p></section>
+  <section class=mpb><h2>Article of the day</h2><p><b>${fa.t}</b>. ${lead} (<a href="#/${fa.id}">Full article</a>)</p></section>
+  <section class=mpb><h2>Numbers worth knowing</h2><ul id=dyk>${dykList()}</ul><p class=more><a href="#" onclick="return dykMore()">More facts</a></p></section>
  </div><div>
-  <section class=mpb><h2>Recent changes to the game</h2><ul class=news>${news.map(v=>`<li><b>${v.v}</b>: ${esc(v.n.length>160?v.n.slice(0,v.n.lastIndexOf(' ',157))+'...':v.n)}</li>`).join('')}</ul><p class=more>${L('versions','Full version history')}</p></section>
+  <section class=mpb><h2>Recent changes</h2><ul class=news>${news.map(v=>`<li><b>${v.v}</b>: ${esc(v.n.length>160?v.n.slice(0,v.n.lastIndexOf(' ',157))+'...':v.n)}</li>`).join('')}</ul><p class=more>${L('versions','Full version history')}</p></section>
   <section class=mpb><h2>Browse by category</h2><ul class=catl>${CATS.map(c=>{const k=PAGES.filter(p=>p.cat===c.id&&!p.hide).length;return `<li><a href="#/cat-${c.id}">${c.t}</a> <span class=m>(${k})</span></li>`}).join('')}</ul></section>
  </div></div>`}});
 
