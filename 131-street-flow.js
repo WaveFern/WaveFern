@@ -80,3 +80,29 @@ dynB=function(x0,z0,x,z){if(IN||HIN)return false;const R0=.62,ppl=o=>{const a=Ma
  if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;
  return TRAF.some(c=>{if(!c.e||!c.m.visible||Math.abs(c.x-x)>4||Math.abs(c.z-z)>4)return false;const hx=Math.sin(c.h),hz=Math.cos(c.h),cx=c.rx??c.x,cz=c.rz??c.z,dep=(px,pz)=>{const dx=px-cx,dz=pz-cz,al=Math.abs(dx*hx+dz*hz),pp=Math.abs(dx*hz-dz*hx);return Math.min(2.2-al,1.15-pp)};const n=dep(x,z);return n>0&&n>dep(x0,z0)})};
 })();
+
+/* ===== shared NPC pedestrians (airport 139, abroad cities 150) =====
+   One implementation of lane walkers, idle staff, sidestep/slow-down around the player and the player hitbox.
+   n = {o:buildChar result, ax:'x'|'z' lane axis, c:lane coord, a,b:range, p:position along, dir, sp, t, ao}; all world coordinates.
+   NPCS.walker(o,lane,p,dir,sp,opts) / NPCS.idle(o,x,z,ry) make entries; NPCS.tick(list,dt,{vis,avoid}) walks them;
+   NPCS.blocks(x0,z0,x,z) is the hitbox (also wired into dynB below, so it works indoors). */
+const NPCS=(()=>{
+const R=.62,SIDE=1,reg=new Set();
+function walker(o,lane,p,dir,sp,x){x=x||{};return{o,ax:lane.ax,c:lane.c,a:lane.a,b:lane.b,p,dir:dir||1,sp,t:Math.random()*6,ao:0,bob:x.bob||0,x:0,z:0}}
+function idle(o,x,z,ry){o.g.position.set(x,0,z);o.g.rotation.y=ry||0;return{o,idle:1,x,z,t:Math.random()*6}}
+function tick(L,dt,k){k=k||{};reg.add(L);L._at=performance.now();const av=k.avoid!==false&&!(typeof HIN!=='undefined'&&HIN&&!k.indoor);
+ L.forEach(n=>{const o=n.o,g=o.g;
+  if(n.idle){n.t+=dt*8;const vis=!k.vis||k.vis(n.x,n.z);g.visible=vis;if(vis){o.arms[0].rotation.x=Math.sin(n.t*.15)*.08;o.arms[1].rotation.x=-Math.sin(n.t*.13)*.08}return}
+  const X=n.ax=='x',lx=X?n.p:n.c+n.ao,lz=X?n.c+n.ao:n.p,vis=!k.vis||k.vis(lx,lz);g.visible=vis;if(!vis)return;
+  let tgt=0,slow=1,blocked=false;
+  if(av){const al=((X?P.x-n.p:P.z-n.p))*n.dir,pl=(X?P.z:P.x)-n.c,r=mode=='drive'?1.9:1.05;
+   if(al>-1.2&&al<4.5&&Math.abs(pl-n.ao)<r+.6){let sd=n.ao>=pl?1:-1;if(Math.abs(pl+sd*r)>SIDE)sd=-sd;tgt=Math.max(-SIDE,Math.min(SIDE,pl+sd*r));if(al>0&&Math.abs(pl-n.ao)<r)slow=al<1.4?.25:.55}
+   blocked=Math.hypot(lx-P.x,lz-P.z)<R+.28}
+  n.ao+=(tgt-n.ao)*Math.min(1,dt*(tgt?4:1.5));if(Math.abs(n.ao)<.005&&!tgt)n.ao=0;
+  if(!blocked){n.p+=n.dir*n.sp*slow*dt;if(n.p>n.b){n.p=n.b;n.dir=-1}if(n.p<n.a){n.p=n.a;n.dir=1}n.t+=dt*7*Math.max(.3,slow)}
+  n.x=X?n.p:n.c+n.ao;n.z=X?n.c+n.ao:n.p;
+  g.position.set(n.x,n.bob&&!blocked?Math.abs(Math.sin(n.t))*n.bob:0,n.z);g.rotation.y=X?(n.dir>0?Math.PI/2:-Math.PI/2):(n.dir>0?0:Math.PI);
+  const s=blocked?0:Math.sin(n.t)*.6;o.legs[0].rotation.x=s;o.legs[1].rotation.x=-s;o.arms[0].rotation.x=-s*.6;o.arms[1].rotation.x=blocked?0:s*.6})}
+function blocks(x0,z0,x,z){const now=performance.now();for(const L of reg){if(now-L._at>400)continue;for(const n of L){if(!n.o.g.visible||!n.o.g.parent)continue;const a=Math.hypot(n.x-x,n.z-z);if(a<R&&a<Math.hypot(n.x-x0,n.z-z0))return true}}return false}
+return{R,walker,idle,tick,blocks}})();
+{const d0=dynB;dynB=function(x0,z0,x,z){return d0(x0,z0,x,z)||NPCS.blocks(x0,z0,x,z)}}

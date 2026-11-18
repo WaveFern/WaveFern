@@ -95,7 +95,7 @@ function prep(o){o=o||{};if(S.sig&&o.items&&!o.items.some(i=>i.noGhost))o.intro=
 #sgov button:hover{background:#364439}#sgov button:active{box-shadow:inset 3px 3px 0 #00000059,inset -3px -3px 0 #ffffff1a}
 #sgov button.go{background:var(--g,#2fe68a);color:#04120a}#sgov button.go:hover{background:#5df0a6}
 #sgov #sgm{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--m,#8aa094);min-height:16px}#sgov #sgm.sgw{color:#ff9a8a}`;document.head.appendChild(s)}
-/* ---- the "Choose your signature" page: the game's own app look ---- */
+/* ---- the "Choose your signature" page: Label HQ's current site look (v55.21.0) ---- */
 {const h0=PA.hq;PA.hq=function(){if(S.sig)return h0.apply(this,arguments);
- return`<div class=hqx><h1>Label HQ</h1><div class=card style="max-width:460px"><b class=px style="font-size:16px;color:var(--g)">Choose your signature</b><p class=m style="margin:10px 0">Before you use Label HQ, draw the signature you will sign everything with. Whenever you sign something later, from a fan on the street to a pressed vinyl, you are paid by how closely it matches this one.</p><button class=go onclick="SIGNME.setup()">Draw my signature</button></div></div>`}}
+ return`<div class="bdw lhq"><header class=lh-top><div class=lh-in><nav class=lh-nav><button class=on>Label HQ</button></nav></div></header><main class=lh-main><div class=lh-in><header class=lh-ph><h1 class=lh-h1>Choose your signature</h1><p class=lh-lede>Before you use Label HQ, draw the signature you will sign everything with. Whenever you sign something later, from a fan on the street to a pressed vinyl, you are paid by how closely it matches this one.</p></header><button class="lh-btn pri" onclick="SIGNME.setup()">Draw my signature</button></div></main></div>`}}
 })();

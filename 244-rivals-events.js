@@ -72,9 +72,9 @@
  function brands(){const b=S.brands;if(!b||!Array.isArray(b.list))return;const r=rs(),rk=r.rank||1,m=bmul(rk);
   b.list.forEach(o=>{if(o.st!=0||o.rk)return;o.rk=1;
    if(m!=1){const was=o.pay;o.pay=Math.round(o.pay*m/100)*100;
-    safe(()=>{const ms=(S.msgs||[]).find(q=>q.bd===o.id);if(ms)ms.body+=' Update: '+(m>1?'you sit #'+rk+' on the charts, so we raised the fee to '+$$c(o.pay)+'.':'rivals are ahead of you on the charts, so we trimmed the fee to '+$$c(o.pay)+'.')},'brand msg')}});
+    safe(()=>{const ms=(S.msgs||[]).find(q=>q.bd===o.id);if(ms){const u=' Update: '+(m>1?'you sit #'+rk+' on the charts, so we raised the fee to '+$$c(o.pay)+'.':'rivals are ahead of you on the charts, so we trimmed the fee to '+$$c(o.pay)+'.');ms.body+=u;const e=(ms.log||[]).filter(x=>x.bd===o.id).pop();if(e)e.t+=u}},'brand msg')}});
   if(rk>=6)b.list.forEach(o=>{if(o.st==0&&o.rk&&Math.random()<.2){const x=r.rv.filter(q=>q.l>L0());const w=x.length?pick(x).n:'another artist';o.st=4;
-   safe(()=>S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:'We have signed '+w+' for this campaign instead. They are higher on the charts. Climb and we will talk again.'}),'steal');log(w+' took a brand deal from you')}})}
+   safe(()=>BRD.brandPush({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:'We have signed '+w+' for this campaign instead. They are higher on the charts. Climb and we will talk again.'}),'steal');log(w+' took a brand deal from you')}})}
 
  /* ---------- streams boosts ---------- */
  const fxM=()=>{const r=rs();let m=1;r.fx.forEach(f=>{const k=Math.max(0,1-(S.day-f.s)/f.len);m*=1+(f.m-1)*k});return m};

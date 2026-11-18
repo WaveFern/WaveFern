@@ -71,7 +71,14 @@ function sfMute(){S.sfVol=(S.sfVol==null?1:S.sfVol)>0?0:1;sfVol(S.sfVol);pcR()}
 function sfBig(){const c=sfCur();if(c&&sfIsSong(c))return sfToggle();const L=sfOrder();if(!L.length)return;if(SPQ.sh)sfStart(L[Math.floor(Math.random()*L.length)],L.map(x=>x.id));else sfStart(L[0],L.map(x=>x.id))}
 
 /* ---------- artist page ---------- */
-const sfAcc=()=>{let h=0;for(const c of String(S.artist||''))h=(h*31+c.charCodeAt(0))>>>0;return['#5a1414','#14385a','#3a145a','#14503a','#5a3a14','#5a1446'][h%6]};
+const sfAvg={};/* v55.21.0: the page colour is the average colour of your picture (a fully blue picture gives a fully blue page); a name-based colour shows until the picture is read */
+const sfAcc=()=>{let h=0;for(const c of String(S.artist||''))h=(h*31+c.charCodeAt(0))>>>0;const fb=['#5a1414','#14385a','#3a145a','#14503a','#5a3a14','#5a1446'][h%6];let src='';try{src=pfp()}catch(e){}
+ if(!src)return fb;const k=src.length+':'+src.slice(-40);if(sfAvg[k])return sfAvg[k];sfAvg[k]=fb;
+ try{const im=new Image;im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d');x.drawImage(im,0,0,24,24);const d=x.getImageData(0,0,24,24).data;let r=0,g=0,b=0,n=0;for(let q=0;q<d.length;q+=4)if(d[q+3]>128){r+=d[q];g+=d[q+1];b+=d[q+2];n++}
+  if(!n)return;r/=n;g/=n;b/=n;const L=(r*.299+g*.587+b*.114)/255;if(L>.6){const f=.6/L;r*=f;g*=f;b*=f}
+  const col='#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');sfAvg[k]=col;
+  document.querySelectorAll('.sfhd,.sfbd,.gsp').forEach(e=>{if(e.style.getPropertyValue('--acc')===fb)e.style.setProperty('--acc',col)})}catch(e){}};im.src=src}catch(e){}
+ return fb};
 function sfRow(s,i,c){const on=!!(c&&c.src===s),pl=on&&!c.held,f=sfAlbumOf(s.id),lk=typeof luckTag=='function'?luckTag(s):'';
  return`<div class="sfr${on?' on':''}" ondblclick="sfPlayId(${s.id})"><span class=sfn><b>${on?(pl?'<i class=sfeq><i></i><i></i><i></i></i>':i):i}</b><button class=sfnb title="${pl?'Pause':'Play'}" aria-label="${pl?'Pause':'Play'} ${esc(s.title)}" onclick="sfPlayId(${s.id})">${sfIco(pl?'pause':'play')}</button></span>
  <img class=sfrc src="${sfCover(s)}" alt=""><span class=sft><b>${esc(s.title)}${lk}</b><small>${esc(s.g||'')} · +${(s.today||0).toLocaleString()} today</small></span>
@@ -176,3 +183,11 @@ function sfBar(){const c=sfCur(),I=c?sfInfo(c):null,pl=!!(c&&!c.held),d=c?sfLenB
 .sfpbr{display:flex;align-items:center;justify-content:flex-end;gap:8px}.sfpbr .sfvs{width:110px;height:auto;padding:0;margin:0;border:0;background:none;box-shadow:none;accent-color:#a66bff}
 @media (max-width:1100px){.sfnp{display:none}.sfr{grid-template-columns:30px 44px 1fr 100px 50px 32px;gap:10px}}
 @media (max-width:760px){.sfpb{grid-template-columns:1fr auto}.sfpbr{display:none}.sfr{grid-template-columns:26px 40px 1fr 50px 32px}.sfs{display:none}.sfhd{padding:0 18px 18px}.sfbd{padding:18px}}`;document.head.appendChild(st)}
+
+/* v55.21.0: change your Spotify name from the artist page. The name is saved on the career like the first name you pick. */
+let SFRN=0;
+{const h1=PG.home;PG.home=function(){const h=h1.apply(this,arguments);if(typeof h!='string'||!S.artist)return h;
+ if(SFRN)return h.replace(/<h1 class=sfnm>[\s\S]*?<\/h1>/,()=>`<div class=sfrn style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0"><input id=sfrni maxlength=24 value="${esc(S.artist)}" style="min-width:0;flex:1" onkeydown="if(event.key=='Enter')sfRenameSave()"><button class=go onclick="sfRenameSave()">Save</button><button onclick="SFRN=0;pcR()">Cancel</button></div>`);
+ return h.replace(/<h1 class=sfnm>[\s\S]*?<\/h1>/,m=>m+'<button class=sfrnb style="margin-top:4px" onclick="sfRename()">Edit name</button>')}}
+function sfRename(){snd('click');SFRN=1;pcR();setTimeout(()=>{const i=$('sfrni');if(i){i.focus();i.select()}},0)}
+function sfRenameSave(){const v=(($('sfrni')||{}).value||'').trim().slice(0,24);if(v.length<2)return say('Name needs 2+ characters.');S.artist=v;SFRN=0;try{updateVersion()}catch(e){}pcR()}
