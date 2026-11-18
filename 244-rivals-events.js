@@ -52,7 +52,7 @@
   r.rv.forEach((x,i)=>{
    if(S.day>=x.ph){x.f=x.b*RND(.85,1.2);x.ph=S.day+RI(20,40)}
    if(x.hot>0)x.hot--;else if(Math.random()<.04){x.hot=3;news.push(x.n+' dropped a new single.');log(x.n+' dropped a new single')}
-   const tg=Math.max(floorL(S.day,x.b),lag*x.f*(x.hot?1.35:1));
+   const tg=Math.max(floorL(S.day,x.b),lag*x.f*(x.hot?1.35:1))*(1+.5*Math.max(0,Math.min(1,(S.day-30)/180))); /* v55.13.0: rivals get stronger after day 30 */
    x.l=Math.max(1000,x.l+(tg-x.l)*.07+x.l*RND(-.04,.04));
    const ab=x.l>L;
    if(x.ab===null)x.ab=ab;
