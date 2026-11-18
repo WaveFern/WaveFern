@@ -50,8 +50,8 @@ const fd=ts=>ts>0?new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'
 function ppHtml(p,handle,me){
  const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')),ac=+p.ac||0;
  const n=Math.round(+p.fame||0);
- let h='<div class="pp'+(p.founder?' fdo':'')+'"><div class=pt><span>'+(me?'YOUR PROFILE':'PLAYER PROFILE')+'</span><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div>';
- h+='<div class=ph><div class=pa>'+pic(p.p)+'</div><div style="min-width:0;flex:1"><h2 class=pn>'+esc(p.a||'')+'</h2><p class=pu>@'+esc(handle)+'</p><div class=pg>'+(p.founder?'<span class=g>FOUNDER</span>':'')+'<span>FAME LEVEL '+n+'</span></div></div></div>';
+ const dev=window.fwIsDev&&fwIsDev(p._u);let h='<div class="pp'+(dev?' dvo':p.founder?' fdo':'')+'"><div class=pt><span>'+(me?'YOUR PROFILE':'PLAYER PROFILE')+'</span><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div>';
+ h+='<div class=ph><div class=pa>'+pic(p.p)+'</div><div style="min-width:0;flex:1"><h2 class=pn>'+esc(p.a||'')+'</h2><p class=pu>@'+esc(handle)+'</p><div class=pg>'+(dev?'<span class="g dv">DEV</span>':p.founder?'<span class=g>FOUNDER</span>':'')+'<span>FAME LEVEL '+n+'</span></div></div></div>';
  h+=p.bio?'<p class=pb>'+esc(p.bio)+'</p>':'<p class="pb e">No bio.</p>';
  h+='<div class=ps><div><small>FAME LEVEL</small><b>'+n+'</b></div><div><small>MONTHLY LISTENERS</small><b>'+num(p.lis)+'</b></div><div><small>JOINED</small><b>'+fd(+p.j)+'</b></div></div>';
  h+='<div class=pc><h3>TOP SONGS</h3>'+(sg.map((s,i)=>'<div class=pr><span class=i>'+(i+1)+'</span><span class=n>'+esc(s[0])+'</span><span class=v>'+num(s[1])+'</span></div>').join('')||'<span class=pu>No songs yet.</span>')+'</div>';
@@ -68,7 +68,7 @@ window.fwProfileOpen=async function(handle,byUid){
  const box=h=>{o.innerHTML='<div class="box modal" style="width:min(380px,94vw)">'+h+'<div class=row2 style="margin-top:10px"><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div></div>'};
  const full=(p,handle,me,uid)=>{const P=window.FW_PROFILE;if(P&&P.open&&me){o.remove();P.open('me');return}if(P&&P.openData&&!me){o.remove();const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')).map(x=>[x[0],+x[1]||0,0]);
   const ac=+p.ac||0;const pd=/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p.pd||'')?p.pd:'';P.openData({uid:uid||'',artist:p.a||'',user:handle,founder:p.founder?1:0,fame:Math.round(+p.fame||0),listeners:+p.lis||0,joined:+p.j||0,bio:p.bio||'',songs:sg,band:p.bn?{name:p.bn,inst:p.bi||'',members:+p.bm||1}:null,ach:ACH.map((_,i)=>i).filter(i=>ac>>i&1),photo:pd||/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(p.p||'')?p.p:''});return}
-  o.innerHTML=ppHtml(p,handle,me)};
+  o.innerHTML=ppHtml(Object.assign({},p,{_u:me?FBU.uid:uid}),handle,me)};
  box('<p class=m>Loading…</p>');document.body.appendChild(o);
  try{const{R,db}=F.r,uid=byUid||(await R.get(R.ref(db,'f/n/'+handle))).val();
   if(!uid){box('<h2>@'+esc(handle)+'</h2><p class=m>No player has that username.</p>');return}
