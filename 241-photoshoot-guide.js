@@ -21,6 +21,14 @@ const bookedTk=o=>{try{return T().st().tickets.find(q=>q.id===o.tk)||null}catch(
 const homeTk=()=>{try{if(!T()||!T().abroad())return null;return T().st().tickets.find(q=>q.co&&q.to=='home'&&q.st=='booked')||null}catch(e){return null}};
 const findInt=re=>{try{return D.C.ints.find(q=>re.test(q.l||''))||null}catch(e){return null}};
 
+/* v55.18.2: true when the screen is not free for a guide popup: on a plane or in the airport (incl. the flight home), another
+   panel open in #ui, a fade running, or not plain play mode. Popups wait (each is only marked seen once it is shown). */
+const busy=()=>{try{if(mode!='play'||IN||BRD.shootOn)return true;
+ if(typeof window.apWhere=='function'&&window.apWhere())return true;
+ if(document.getElementById('apfly'))return true;
+ const u=$('ui');if(u&&u.children.length)return true;
+ return false}catch(e){return true}};
+
 /* ---------- the objective ---------- */
 BRD.obj=function(){
  try{if(!S||!S.artist||!S.brands||!T())return null;
@@ -51,12 +59,12 @@ BRD.obj=function(){
 
 /* ---------- objective chip ---------- */
 let chip=null,lastT='';
-function mkChip(){const st=document.createElement('style');st.textContent='#bdobj{position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:3;max-width:min(520px,92vw);background:rgba(10,18,32,.86);color:#fff;border:2px solid #5aa8ff;border-radius:10px;padding:7px 12px;font:600 13px/1.35 system-ui,sans-serif;text-align:left;pointer-events:none;display:none}#bdobj b{display:block;font-size:10px;letter-spacing:.8px;color:#9fd0ff;margin-bottom:2px}@media(max-width:700px){#bdobj{top:auto;bottom:112px;font-size:12px}}'+
- '#bgbox{max-width:480px}#bgbox ol{margin:10px 0 10px 18px;padding:0;text-align:left}#bgbox li{margin:6px 0;line-height:1.4}#bgbox .bgk{color:#ffd84a;font-weight:700}'+
- '#b3gd{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:14px}#b3gd>div{background:#14171a;color:#fff;border:2px solid #2ee59d;border-radius:12px;max-width:440px;padding:16px 18px;text-align:left;font:14px/1.45 system-ui,sans-serif}#b3gd h3{margin:0 0 8px;font-size:17px}#b3gd ol{margin:8px 0 12px 18px;padding:0}#b3gd li{margin:6px 0}#b3gd button{width:100%;padding:10px;border:0;border-radius:8px;background:#2ee59d;color:#04120a;font:700 14px system-ui,sans-serif;cursor:pointer}#b3q{margin-left:auto;width:28px;height:28px;border-radius:50%;border:1px solid #333a40;background:#20252a;color:#fff;font-weight:700;cursor:pointer}';
+function mkChip(){const st=document.createElement('style');st.textContent='#bdobj{position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:3;max-width:min(520px,92vw);background:#0b0f0dd9;color:var(--t);border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;padding:7px 12px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;text-align:left;pointer-events:none;display:none}#bdobj b{display:block;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:var(--g);margin-bottom:3px}@media(max-width:700px){#bdobj{top:auto;bottom:112px;font-size:11px}}'+
+ '#bgbox{max-width:480px}#bgbox h2{font-size:16px}#bgbox h2 small{font:11px ui-monospace,Menlo,Consolas,monospace;color:var(--m);letter-spacing:0}#bgbox ol{margin:10px 0 4px 18px;padding:0;text-align:left}#bgbox li{margin:6px 0;line-height:1.4}#bgbox .bgk{color:var(--g);font-weight:700}'+
+ '#b3gd{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:14px}#b3gd>div{background:var(--p);color:var(--t);border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,4px 4px 0 #0008;max-width:440px;padding:14px 16px;text-align:left;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}#b3gd h3{margin:0 0 8px;font-size:16px}#b3gd ol{margin:8px 0 12px 18px;padding:0}#b3gd li{margin:6px 0}#b3gd .bgk{color:var(--g);font-weight:700}#b3gd button{width:100%;padding:8px;background:var(--g);color:#04120a;font-weight:700}#b3q{margin-left:auto;width:28px;height:28px;padding:0;font-weight:700}';
  document.head.appendChild(st);chip=document.createElement('div');chip.id='bdobj';document.body.appendChild(chip)}
 setInterval(()=>{try{if(!chip){if(!document.body)return;mkChip()}
- const q=(mode=='play'||mode=='drive')&&!BRD.shootOn?BRD.obj():null;
+ const u=$('ui'),q=(mode=='play'||mode=='drive')&&!BRD.shootOn&&!(u&&u.children.length)&&!document.getElementById('apfly')?BRD.obj():null;
  if(!q){chip.style.display='none';return}const t=q.t;if(t!==lastT){lastT=t;chip.innerHTML='<b>OBJECTIVE · BRAND PHOTOSHOOT</b>'+esc2(t)}chip.style.display='block'}catch(e){}},500);
 
 /* ---------- popups ---------- */
@@ -74,7 +82,7 @@ const POP=[
  ['lobby',()=>roomIs('hq_lobby')&&act(),()=>card('The HQ lobby','Step 3 of 4',['The <span class=bgk>photo studio</span> is the door on the left. Walk to "Go to Photo studio" (marked with the beam) and press the action button.','Ask reception if you get lost.'])],
  ['studio',()=>roomIs('brand')&&act()&&!BRD.shootOn,()=>card('The photo studio','Step 4 of 4',['Walk to the camera by the lights: the <span class=bgk>"Start the photoshoot"</span> prompt (marked with the beam).','Press the action button on it. A 3D studio opens where you pose, light and shoot the campaign.'])]
 ];
-setInterval(()=>{try{if(!first()||mode!='play'||(typeof IN!='undefined'&&IN)||BRD.shootOn||!S.brands)return;
+setInterval(()=>{try{if(!first()||!S.brands||busy())return;
  const p=POP.find(q=>!seen(q[0])&&q[1]());if(!p)return;mark(p[0]);try{snd('ping')}catch(e){}modal(p[2]())}catch(e){}},1200);
 
 /* ---------- inside the 3D shoot ---------- */
