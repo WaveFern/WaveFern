@@ -3,10 +3,11 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.19.1';
+const GAME_VERSION='v55.19.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.19.1',n:'Dev version: world tour stadium and club shows run much smoother. The crowd of detailed people is now drawn with about a third fewer vertices and far less per-vertex maths, with the same people, outfits, waving arms and jumping.'},
+ {v:'v55.19.2',n:'Dev version: world tour stadium and club shows run much smoother. The crowd of detailed people is now drawn with about a third fewer vertices and far less per-vertex maths, with the same people, outfits, waving arms and jumping.'},
+ {v:'v55.19.1',n:'Money fix: cash can no longer turn into $0 by itself. The real cause of the "$0 after sleep" bug was a broken cash value during the day (shown as $0) that the new-day screen then saved as $0. Cash now refuses any broken value and keeps what you had, and a drop to $0 while waking up is blocked. Small amounts now show cents (Earned $0.45 instead of $0). The Mastery panel no longer says surfing and fishing are coming soon. Battery: the computer screen draws the room behind it at 30 fps and the Mastery panel pauses the world behind it.'},
  {v:'v55.19.0',n:'Dev version, test mode only: brands now write to you on their own (a new brand deal offer arrives every morning and every 30 seconds whenever none is open), so brand deals and photoshoots are easy to test. Normal play is unchanged and test careers still never post to the leaderboard.'},
  {v:'v55.18.2',n:'Brand photoshoot guide popups fixed. They no longer show while you are in the airport, on a plane or on the flight home, and they wait (instead of covering) if any other panel is open. They and the objective chip now use the normal game panel style: pixel font headings, green accents, same box frame.'},
  {v:'v55.18.1',n:'Cash safety on sleep. Waking up can no longer leave you with less money than you went to bed with: if anything in the morning chain ever took your cash, it is put back to what you had plus the Earned figure shown on the new-day screen.'},
