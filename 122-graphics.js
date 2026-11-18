@@ -8,10 +8,11 @@
    Auto starts on High and steps down while the game runs slowly, remembering the level it settled on.
    Stored per device in localStorage 'fw_gfx' (missing = Auto), so saves are untouched. ===== */
 /* bg: when the tab/window is in the background: 0 full, 1 reduced (10 fps), 2 rendering paused. blur: blurred backdrop behind the pause menu.
-   bat (Battery Saver) cuts frame rate, crowds, rain and draw distance first and keeps the normal pixel size and every visual feature. */
-const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,cg:1},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,cg:1},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:2,shd:1,cg:1},low:{px:4,fps:30,crowd:1,wx:0,far:0,bg:0,blur:1,sh:1,shd:0,cg:0},bat:{px:3,fps:30,crowd:2,wx:1,far:0,bg:1,blur:0,sh:2,shd:0,cg:1}};
+   bat (Battery Saver) is the lightest: Low's look plus a 30 fps cap and reduced drawing in the background. */
+/* det = small props hidden: any solid prop whose longest side is under that many world units is not drawn (0 = all drawn). v55.11: every step is cheaper than the one above it. shi = shadow redraw gap in ms (shadows are redrawn at most that often). Battery is the lightest and also draws at 30 fps. */
+const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,shi:14,cg:1,det:0},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,cg:1,det:0},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:1,shd:0,shi:100,cg:1,det:0.15},low:{px:5,fps:0,crowd:1,wx:0,far:0,bg:0,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6},bat:{px:5,fps:30,crowd:1,wx:0,far:0,bg:1,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6}};
 const GFX_LV=['high','med','low'];
-const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,cg:1};let GFX=Object.assign({},GFX_DEF);
+const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,det:0,cg:1};let GFX=Object.assign({},GFX_DEF);
 try{const g=JSON.parse(localStorage.getItem('fw_gfx')||'null');if(g&&typeof g=='object')Object.assign(GFX,g)}catch(e){}
 if(!GFX_PRE[GFX.al])GFX.al='high';
 if(GFX.p!='auto'&&GFX.p!='custom'&&!GFX_PRE[GFX.p])GFX.p='auto';
@@ -54,12 +55,30 @@ function gfxCull(){const c=gfxCur(),a=Math.max(1.8,innerWidth/Math.max(1,innerHe
  TRAF.forEach(t=>{if(t.m&&t.m.visible&&far(t.m,t.x,t.z))t.m.visible=false})}
 {const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{gfxCull()}catch(e){}return r}}
 
+/* small props (v55.11): the game has hundreds of tiny separate meshes (bins, pots, lamp bits), each one a draw call. When det > 0 the small solid ones are moved to camera layer 1, which the camera does not draw
+   (shadows skip them too), and moved back to layer 0 when det drops. Moving things (people, cars, the player) and anything that is not a plain opaque lit mesh are never touched; a mesh seen moving is put back for good. */
+const GFD={t:0,n:0};
+function gfxDetail(force){const thr=+gfxCur().det||0;if(!thr&&!GFD.on)return;
+ const dyn=new Set(),tag=g=>{if(g)dyn.add(g)};NPC.forEach(n=>{tag(n.m);tag(n.pet)});TRAF.forEach(t=>tag(t.m));if(typeof VPED!='undefined')VPED.forEach(n=>tag(n.m));tag(P.mesh);
+ const bx=new THREE.Box3(),sz=new THREE.Vector3(),ps=new THREE.Vector3();let on=0;
+ const walk=(o,skip)=>{if(o.visible===false&&thr)return;if(dyn.has(o))skip=true;
+  if(o.isMesh){const m=o.material;
+   if(!skip&&o.frustumCulled!==false&&m&&!Array.isArray(m)&&m.isMeshLambertMaterial&&!m.transparent&&!m.vertexColors&&!o.isInstancedMesh&&!o.isSkinnedMesh){
+    if(o._gsz==null){const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();bx.copy(g.boundingBox).applyMatrix4(o.matrixWorld);bx.getSize(sz);o._gsz=Math.max(sz.x,sz.y,sz.z);o._gp=ps.setFromMatrixPosition(o.matrixWorld).toArray()}
+    else if(!o._gdyn){ps.setFromMatrixPosition(o.matrixWorld);const q=o._gp;if(Math.abs(ps.x-q[0])+Math.abs(ps.y-q[1])+Math.abs(ps.z-q[2])>.02)o._gdyn=1}
+    const hide=thr&&!o._gdyn&&o._gsz<thr;if(hide){o.layers.set(1);o._ghid=1;on=1}else if(o._ghid){o.layers.set(0);o._ghid=0}}
+   else if(o._ghid){o.layers.set(0);o._ghid=0}}
+  const c=o.children;for(let i=0;i<c.length;i++)walk(c[i],skip)};
+ if(thr||GFD.on){const ch=scene.children;for(let i=0;i<ch.length;i++)walk(ch[i],false)}GFD.on=on&&thr?1:0;
+ if(!thr&&GFD.on===0)scene.traverse(o=>{if(o._ghid){o.layers.set(0);o._ghid=0}})}
+{const w1=worldTick;worldTick=function(dt){const r=w1.apply(this,arguments);if(++GFD.n>=45){GFD.n=0;try{gfxDetail()}catch(e){}}return r}}
+
 /* weather: light = half the rain, off = no rain or fog drawn (the weather itself still happens) */
 if(typeof wxTick=='function'){const x0=wxTick;wxTick=function(dt){const r=x0.apply(this,arguments);try{const w=gfxCur().wx;
   if(w<2&&WTHR.mesh&&WTHR.mesh.visible){if(!w)WTHR.mesh.visible=false;else{const g=WTHR.mesh.geometry,d=g.drawRange;g.setDrawRange(0,Math.floor((d.count||0)/2))}}
   if(!w)WTHR.fogs.forEach(m=>m.visible=false)}catch(e){}return r}}
 
-function gfxApply(){gfxSize();GFA.n=GFA.sum=0;GFA.due=0;document.body.classList.toggle('gfx-noblur',!gfxCur().blur)}
+function gfxApply(){gfxSize();GFD.n=0;try{GFD.on=1;gfxDetail()}catch(e){}GFA.n=GFA.sum=0;GFA.due=0;document.body.classList.toggle('gfx-noblur',!gfxCur().blur)}
 gfxApply();
 
 /* Settings > Graphics */
@@ -82,6 +101,7 @@ const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];if(k=='fps'&&gfxHz)
   +gfxRow('Crowds','crowd',[[4,'All'],[2,'Half'],[1,'Few']])
   +gfxRow('Weather effects','wx',[[2,'Full'],[1,'Light'],[0,'Off']])
   +stTog('FPS counter',GFX.fpsOn,"GFX.fpsOn=GFX.fpsOn?0:1;gfxSv();fpsShow()",'Frames per second, top of the screen')
+  +gfxRow('Small props','det',[[0,'All'],[.15,'Fewer'],[.6,'Few']],'Hides tiny bins, pots and bits, so fewer things are drawn')
   +gfxRow('Draw distance','far',[[1,'Normal'],[0,'Near']],'People and cars near the edge of the screen')
   +gfxH('Battery')
   +gfxRow('When in the background','bg',[[0,'Full'],[1,'Reduced'],[2,'Pause']],'Tab hidden or window not focused: Reduced draws 10 fps, Pause stops drawing')

@@ -123,6 +123,7 @@ window.founderSync=function(first){try{if(typeof S!='object'||!S)return;S.wr=Arr
  if(window.__fdOff&&S.fdr)delete S.fdr; /* v49.93.0: founders/{uid}.f = 0 in Firebase takes Founder away (209-founder-cloud.js) */
  if(!S.fdr){if(S.wr.some(i=>FIDS.includes(i))){S.wr=S.wr.filter(i=>!FIDS.includes(i));if(S.wn)for(const k in S.wn)if(FIDS.includes(S.wn[k]))delete S.wn[k]}
   if(S.inv)PKS.forEach(k=>{if(S.inv[k])delete S.inv[k]});return}
+ if(S.fdr.opt)return; /* v55.6.0: new careers do not get the pieces automatically; Settings > Game has a button to add them */
  const g=S.fdr.g=S.fdr.g||{};let n=0;S.wc=S.wc||{};S.inv=S.inv||{};
  [GJ,GH].forEach(x=>{if(!g[x.id]){g[x.id]=1;n++;if(!S.wr.includes(x.id))S.wr.push(x.id);S.wc[x.id]=x.dc}});
  PIECES.forEach(([k])=>{if(!g[k]){g[k]=1;n++;S.inv[k]=(S.inv[k]||0)+1}});
@@ -138,5 +139,14 @@ if(typeof pauseUI=='function'){const p0=pauseUI;pauseUI=function(){const r=p0.ap
 if(typeof slotInfo=='function'){const s0=slotInfo;slotInfo=function(n){const r=s0.apply(this,arguments);if(r){try{const c=localStorage.getItem(slotKey(n));if(c&&scDecode(c).S.fdr)r.fd=1}catch(e){}}return r}}
 if(typeof ttWorlds=='function'){const w0=ttWorlds;ttWorlds=function(){const r=w0.apply(this,arguments);try{const a=curSlot();document.querySelectorAll('#ttl .ttsl[data-slot]').forEach(el=>{const n=+el.dataset.slot,f=n==a&&typeof TT=='object'&&TT.game?isF():(slotInfo(n)||{}).fd;const b=el.querySelector('b');if(f&&b&&!el.querySelector('.fdm'))b.insertAdjacentHTML('afterend',fdMark(13))})}catch(e){}return r}}
 /* band: shared with bandmates when they join, and shown next to the name in the band panel and in band chat */
-window.fdFlag=()=>isF()?1:0;
+window.fdFlag=()=>isF()&&!S.fdh?1:0;
+/* v55.6.0: the Founder mark can be hidden everywhere (Settings > Game); nothing Founder is worn or placed for you */
+const fdCls=()=>{try{document.body.classList.toggle('fdhide',!!(S&&S.fdh))}catch(e){}};
+setInterval(fdCls,1500);
+{const s0=document.createElement('style');s0.textContent='.fdhide .fdm,.fdhide .fdc{display:none!important}';document.head.appendChild(s0)}
+window.fdToggleHide=()=>{S.fdh=S.fdh?0:1;fdCls();try{autoSave()}catch(e){}if(typeof stDraw=='function')stDraw()};
+window.fdClaim=()=>{if(!S.fdr)return;delete S.fdr.opt;founderSync(1);try{autoSave()}catch(e){}if(typeof stDraw=='function')stDraw()};
+if(typeof stBody=='function'){const b0=stBody;stBody=function(){const h=b0.apply(this,arguments);if(STAB!='game'||!isF())return h;
+ return h+`<h3 style="margin-top:12px">Founder</h3><div class=so><span>Founder mark<small class=m>Badge by your name, in menus, chat and profile</small></span><button class="${S.fdh?'':'go'}" onclick="fdToggleHide()">${S.fdh?'Hidden':'Shown'}</button></div>`
+ +(S.fdr.opt?`<div class=so><span>Founder pieces<small class=m>Bomber, Cap, plaque and light. Never worn for you.</small></span><button onclick="fdClaim()">Add them</button></div>`:'')}}
 })();
