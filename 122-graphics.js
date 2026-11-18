@@ -37,6 +37,8 @@ const GFA={n:0,sum:0,t0:0,lastDraw:0,due:0};
   /* background: pause drawing entirely, or drop to 10 fps; the pause menu (static scene) needs only 20 fps */
   if(idle&&c.bg==2){requestAnimationFrame(loop);return}
   if(idle&&c.bg==1)cap=cap?Math.min(cap,10):10;else if(PAUSED&&mode=='pause')cap=cap?Math.min(cap,20):20;
+  /* v55.19.0 battery: the full-screen Mastery panel hides the world (10 fps), and the computer view is a still desk scene (30 fps; dt stays under the 0.05 s clamp so game time runs at the same speed) */
+  else if(window.FW_MASTERY&&FW_MASTERY.isOpen&&FW_MASTERY.isOpen())cap=cap?Math.min(cap,10):10;else if(mode=='pc')cap=cap?Math.min(cap,30):30;
   /* scheduled cap: keeps the average on target even when it is not a divisor of the screen's refresh rate (45 on 60 Hz) */
   const iv=cap?1000/cap:0;
   if(iv){if(GFA.due-n>iv)GFA.due=n;if(n<GFA.due-1){requestAnimationFrame(loop);return}GFA.due=n-GFA.due>iv*2?n+iv:GFA.due+iv}else GFA.due=0;
