@@ -216,19 +216,17 @@ function buildTerm(){if(AP.grp)return;const G=xgNew(),g=AP.grp=new THREE.Group()
  AP.light=new THREE.HemisphereLight('#ffffff','#8a8a8a',0);g.add(AP.light);
  buildNpc();AP.dirty=1}
 function buildNpc(){const g=AP.grp,u=v=>AX+v,w=v=>AZ+v,SW_T='#1d3d7a',SW_P='#1a1f2e';
- const stand=(a,b,o,ry)=>{const c=mkChar(o);c.g.position.set(u(a),0,w(b));c.g.rotation.y=ry||0;g.add(c.g);AP.npc.push({c,k:'idle',ph:Math.random()*6});return c};
+ const stand=(a,b,o,ry)=>{const c=mkChar(o);g.add(c.g);AP.npc.push(NPCS.idle(c,u(a),w(b),ry));return c};
  [8,13,18,23].forEach(a=>stand(a,43.7,{tc:SW_T,pc:SW_P,top:0}));stand(50,43.7,{tc:'#ff6b4a',pc:SW_P,top:0});stand(62,47,{tc:'#1565d8',pc:SW_P,top:0});
  LANES.forEach(a=>stand(a+1.6,SECV-1.4,{tc:'#2b2b2b',pc:'#1b1b1b',top:0}));
  for(let i=1;i<=6;i++)stand(GU(i)+3.4,3.8,{tc:SW_T,pc:SW_P,top:0});
  stand(67,37.9,{tc:'#6b4a32'});stand(23,16.6,{tc:'#6b4a32'});stand(64,16.6,{tc:'#b33a2a'});stand(5,20.4,{tc:'#c06090'});stand(50,16.4,{tc:'#3a4552'});
  /* walkers with suitcases: landside and airside lanes */
  [[39.5,1],[49.8,1],[52,0],[39.5,0],[12.5,1],[27,0],[12.5,0],[27,1],[14,1],[50.5,0]].forEach(([b,d],i)=>{const c=mkChar();const s=new THREE.Mesh(new THREE.BoxGeometry(.4,.55,.25),pm(['#c0392b','#2d5a8d','#1b1b1b','#e6b422','#7a5ad8'][i%5]));s.position.set(.42,.3,-.25);c.g.add(s);
-  g.add(c.g);AP.npc.push({c,k:'walk',v:b,x:4+Math.random()*64,d:d?1:-1,sp:.9+Math.random()*.6,ph:Math.random()*6})});
+  g.add(c.g);AP.npc.push(NPCS.walker(c,{ax:'x',c:w(b),a:u(3),b:u(69)},u(4+Math.random()*64),d?1:-1,.9+Math.random()*.6,{bob:.04}))});
  /* people waiting at the gates */
  for(let i=0;i<10;i++){const gi=1+rr(6),c=mkChar();c.g.position.set(u(GU(gi)-3+rr(6)),-.3,w(rr(2)?7.6:10));c.legs[0].rotation.x=c.legs[1].rotation.x=-1.5;c.arms[0].rotation.x=c.arms[1].rotation.x=-.6;g.add(c.g)}}
-function npcTick(dt){AP.npc.forEach(n=>{n.ph+=dt*8;const c=n.c;if(n.k=='idle'){c.arms[0].rotation.x=Math.sin(n.ph*.15)*.08;c.arms[1].rotation.x=-Math.sin(n.ph*.13)*.08;return}
- n.x+=n.d*n.sp*dt;if(n.x>69){n.d=-1}if(n.x<3){n.d=1}c.g.position.set(AX+n.x,Math.abs(Math.sin(n.ph))*.04,AZ+n.v);c.g.rotation.y=n.d>0?Math.PI/2:-Math.PI/2;
- const s=Math.sin(n.ph)*.6;c.legs[0].rotation.x=s;c.legs[1].rotation.x=-s;c.arms[0].rotation.x=-s*.6;c.arms[1].rotation.x=0})}
+function npcTick(dt){NPCS.tick(AP.npc,dt,{indoor:1})}
 
 /* departure boards and gate screens */
 function drawBoard(b){const from=here(),L=T.upcoming(from,b.n),n=T.now(),mine=new Set(T.active().map(k=>k.fl+'#'+k.dep));

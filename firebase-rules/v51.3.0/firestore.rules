@@ -77,7 +77,8 @@ service cloud.firestore {
       allow create, update: if google() && me() == uid && profOk(request.resource.data);
       allow delete: if google() && me() == uid || admin();
       function profOk(d) {
-        return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'founder', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd'])
+        return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'founder', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd', 'pfp'])
+          && (!('pfp' in d) || (d.pfp is string && d.pfp.size() <= 24000 && d.pfp.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]*')))
           && str(d.a, 1, 24) && d.a.matches('[^<>"]*') && str(d.h, 0, 16) && d.h.matches('[a-z0-9_]*')
           && str(d.bio, 0, 160) && d.bio.matches('[^<>"]*')
           && d.fame is int && d.fame >= 0 && d.fame <= 1000 && count(d.lis) && stampNear(d.t)

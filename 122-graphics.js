@@ -12,7 +12,7 @@
 /* det = small props hidden: any solid prop whose longest side is under that many world units is not drawn (0 = all drawn). v55.11: every step is cheaper than the one above it. shi = shadow redraw gap in ms (shadows are redrawn at most that often). Battery is the lightest and also draws at 30 fps. */
 const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,shi:14,cg:1,det:0},high:{px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,cg:1,det:0},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:1,shd:0,shi:100,cg:1,det:0.15},low:{px:5,fps:0,crowd:1,wx:0,far:0,bg:0,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6},bat:{px:5,fps:30,crowd:1,wx:0,far:0,bg:1,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6}};
 const GFX_LV=['high','med','low'];
-const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,det:0,cg:1};let GFX=Object.assign({},GFX_DEF);
+const GFX_DEF={p:'auto',al:'high',px:3,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,det:0,cg:1,pp:0};let GFX=Object.assign({},GFX_DEF);
 try{const g=JSON.parse(localStorage.getItem('fw_gfx')||'null');if(g&&typeof g=='object')Object.assign(GFX,g)}catch(e){}
 if(!GFX_PRE[GFX.al])GFX.al='high';
 if(GFX.p!='auto'&&GFX.p!='custom'&&!GFX_PRE[GFX.p])GFX.p='auto';
@@ -33,7 +33,12 @@ addEventListener('resize',gfxSize);gfxSize();
 
 /* frame rate cap, and frame timing for Auto */
 const GFA={n:0,sum:0,t0:0,lastDraw:0,due:0};
+/* v55.x: Draw distance Near also pulls the camera far plane in (cam.far 90 -> 46); "Pause actually pauses" (GFX.pp) stops drawing and ticking once the pause menu has had 3 frames */
+GFA.pz=0;
 {const l0=loop;loop=function(n){const c=gfxCur(),idle=document.hidden||!gfxFocus;let cap=+c.fps||0;
+  {const fr=c.far?90:46;if(cam.far!=fr){cam.far=fr;cam.updateProjectionMatrix()}}
+  if(window.FW_MENUIDLE&&FW_MENUIDLE.sleeping){requestAnimationFrame(loop);return}
+  if(GFX.pp&&PAUSED&&mode=='pause'&&!(window.FWP&&!FWP.frozen())){if(++GFA.pz>3){requestAnimationFrame(loop);return}}else GFA.pz=0;
   /* background: pause drawing entirely, or drop to 10 fps; the pause menu (static scene) needs only 20 fps */
   if(idle&&c.bg==2){requestAnimationFrame(loop);return}
   if(idle&&c.bg==1)cap=cap?Math.min(cap,10):10;else if(PAUSED&&mode=='pause')cap=cap?Math.min(cap,20):20;
@@ -104,7 +109,8 @@ const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];if(k=='fps'&&gfxHz)
   +gfxRow('Weather effects','wx',[[2,'Full'],[1,'Light'],[0,'Off']])
   +stTog('FPS counter',GFX.fpsOn,"GFX.fpsOn=GFX.fpsOn?0:1;gfxSv();fpsShow()",'Frames per second, top of the screen')
   +gfxRow('Small props','det',[[0,'All'],[.15,'Fewer'],[.6,'Few']],'Hides tiny bins, pots and bits, so fewer things are drawn')
-  +gfxRow('Draw distance','far',[[1,'Normal'],[0,'Near']],'People and cars near the edge of the screen')
+  +gfxRow('Draw distance','far',[[1,'Normal'],[0,'Near']],'Near pulls the camera far plane in and hides far people and cars, for more FPS')
+  +stTog('Pause actually pauses',GFX.pp,"GFX.pp=GFX.pp?0:1;gfxSv();stDraw()",'Pausing stops drawing the world and all game ticks, so the GPU and CPU go idle')
   +gfxH('Battery')
   +gfxRow('When in the background','bg',[[0,'Full'],[1,'Reduced'],[2,'Pause']],'Tab hidden or window not focused: Reduced draws 10 fps, Pause stops drawing')
   +gfxRow('Pause menu blur','blur',[[1,'On'],[0,'Off']],'Off saves battery behind the pause menu')
