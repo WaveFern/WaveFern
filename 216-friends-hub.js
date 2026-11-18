@@ -37,12 +37,12 @@ window.fhNudge=f=>{const F=X();if(!F||!F.r||!okU(f))return;const w=wait(f);if(w>
 window.fhClearK=f=>{const F=X();if(!F||!F.r||!okU(f))return;F.r.R.remove(F.r.R.ref(F.r.db,'f/k/'+F.r.uid+'/'+f)).catch(()=>{})};
 /* ---- notifications on your profile ---- */
 function items(){const F=X();if(!F)return[];const a=[];
- for(const f in F.Q)if(okU(f)&&F.Q[f]&&F.Q[f].h)a.push({t:'q',f,n:'@'+F.Q[f].h,s:'sent you a friend request',at:+F.Q[f].t||0});
+ for(const f in F.Q)if(okU(f)&&F.Q[f]&&F.Q[f].h){const dv=window.fwIsDev&&fwIsDev(f);a.push({t:'q',f,n:'@'+F.Q[f].h,s:dv?'A WaveFern dev wants to be your friend':'sent you a friend request',dev:dv?1:0,at:dv?Date.now()+1e9:+F.Q[f].t||0})}
  for(const f in F.I){const v=F.I[f];if(okU(f)&&v&&Date.now()-(+v.t||0)<600000)a.push({t:'i',f,n:v.nm||'A friend',s:'invited you to the band '+(v.b||''),c:v.c,at:+v.t||0})}
  for(const f in FH.K){const v=FH.K[f];if(okU(f)&&v)a.push({t:'k',f,n:v.nm||'A friend',s:'nudged you to play together',at:+v.t||0})}
  return a.sort((x,y)=>y.at-x.at)}
 function nHtml(){const a=items();
- return'<h3>NOTIFICATIONS'+(a.length?' ('+a.length+')':'')+'</h3>'+(a.length?a.map(i=>`<div class=fhrow><div><b>${E(i.n)}</b><small>${E(i.s)}</small></div>`+
+ return'<h3>NOTIFICATIONS'+(a.length?' ('+a.length+')':'')+'</h3>'+(a.length?a.map(i=>`<div class="fhrow${i.dev?' fhdev':''}"><div><b>${E(i.n)}${i.dev?fwDevTag():''}</b><small>${E(i.s)}</small></div>`+
   (i.t=='q'?`<button class=go onclick="fhAct('qa','${i.f}')">Accept</button><button onclick="fhAct('qd','${i.f}')">Deny</button>`:i.t=='i'?`<button class=go onclick="fhAct('ia','${i.f}')">Accept</button><button onclick="fhAct('id','${i.f}')">Deny</button>`:`<button onclick="fhAct('kd','${i.f}')">Dismiss</button>`)+'</div>').join(''):'<p class=fhe>Nothing new. Friend requests, band invites and nudges show up here.</p>')}
 window.fhAct=(k,f)=>{const F=X();if(!F||!F.r||!okU(f))return;const{R,db,uid}=F.r;
  if(k=='qa')frAcc(f);else if(k=='qd')frDec(f);else if(k=='kd')fhClearK(f);
@@ -70,7 +70,7 @@ function draw(){if(!FH.open)return;const F=X();let h='<h2>Friends</h2>';
   const Q=items().filter(i=>i.t=='q');
   h+=`<div class=fhtabs><button class="fht${FH.tab=='f'?' act':''}" onclick="fhTab('f')">Friends (${L.length})</button><button class="fht${FH.tab=='r'?' act':''}" onclick="fhTab('r')">Requests${Q.length?' <span class=fhn2>'+Q.length+'</span>':''}</button></div>`;
   if(FH.tab=='r'){
-   h+=Q.length?Q.map(i=>`<div class=fhrow><i class=fhav>${E((i.n.replace('@','')[0]||'?')).toUpperCase()}</i><div><b>${E(i.n)}</b><small>${E(i.s)}</small></div><button class=go onclick="fhAct('qa','${i.f}')">Accept</button><button onclick="fhAct('qd','${i.f}')">Deny</button></div>`).join(''):'<p class=fhe>No pending friend requests.</p>'}
+   h+=Q.length?Q.map(i=>`<div class="fhrow${i.dev?' fhdev':''}"><i class=fhav>${E((i.n.replace('@','')[0]||'?')).toUpperCase()}</i><div><b>${E(i.n)}${i.dev?fwDevTag():''}</b><small>${E(i.s)}</small></div><button class=go onclick="fhAct('qa','${i.f}')">Accept</button><button onclick="fhAct('qd','${i.f}')">Deny</button></div>`).join(''):'<p class=fhe>No pending friend requests.</p>'}
   else{
    const sec=(k,t,arr,em)=>`<div class=fhsh onclick="fhCl('${k}')"><span class=fhar>${FH.cl[k]?'▶':'▼'}</span> ${t} (${arr.length})</div>`+(FH.cl[k]?'':(arr.map(row).join('')||`<p class=fhe>${em}</p>`));
    h+=sec('on','ONLINE',on,'Nobody online right now.')+sec('off','OFFLINE',off,'No offline friends.');
