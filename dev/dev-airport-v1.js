@@ -129,7 +129,7 @@
   [[28.5,40.4],[44,40.4],[28,16.2],[46,16.2],[2,17]].forEach(([x,z])=>{bx(.55,.9,.55,'#566270',x,.45,z);bx(.65,.12,.65,'#2b3440',x,.95,z)});
   flush(G,g);
   /* staff at the new kiosks */
-  [[12,20.9,'#c2457c'],[55,20.9,'#16408a']].forEach(([x,z,tc])=>{const c=buildChar({skin:Math.floor(Math.random()*6),eyes:1,mouth:1,hair:Math.floor(Math.random()*12),hc:Math.floor(Math.random()*12),top:0,tc_custom:tc,tc:0,pc:3,body:.5});c.g.position.set(u(x),0,w(z));g.add(c.g);APT.npc.push({c,k:'idle',ph:Math.random()*6})})}
+  [[12,20.9,'#c2457c'],[55,20.9,'#16408a']].forEach(([x,z,tc])=>{const c=buildChar({skin:Math.floor(Math.random()*6),eyes:1,mouth:1,hair:Math.floor(Math.random()*12),hc:Math.floor(Math.random()*12),top:0,tc_custom:tc,tc:0,pc:3,body:.5});g.add(c.g);APT.npc.push(NPCS.idle(c,u(x),w(z),0))})}
 
  setInterval(()=>safe(()=>{
   if(typeof APT!='object'||!APT)return;

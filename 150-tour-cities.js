@@ -488,7 +488,7 @@ function dsTraffic(C){const s=C.s,r=C.r,n=s.big?30:16,lanes=[];const lft=s.left?
 function dsPeople(C){const s=C.s,r=C.r,n=s.big?44:28,e=C.hr+2,paths=[];
  C.rz.forEach(z=>{if(z===C.canalZ)return;for(let i=0;i<C.rx.length-1;i++){paths.push({ax:'x',c:z+e,a:C.rx[i]+e,b:C.rx[i+1]-e},{ax:'x',c:z-e,a:C.rx[i]+e,b:C.rx[i+1]-e})}});
  C.rx.forEach(x=>{for(let j=0;j<C.rz.length-1;j++)paths.push({ax:'z',c:x+e,a:C.rz[j]+e,b:C.rz[j+1]-e},{ax:'z',c:x-e,a:C.rz[j]+e,b:C.rz[j+1]-e})});
- for(let i=0;i<n;i++){const P0=paths[(r()*paths.length)|0];let o;try{o=buildChar(fCfg())}catch(e){continue}scene.add(o.g);C.extra.push(o.g);C.peds.push({o,P:P0,p:P0.a+r()*(P0.b-P0.a),dir:r()<.5?1:-1,sp:R(1.1,1.7),t:r()*6})}
+ for(let i=0;i<n;i++){const P0=paths[(r()*paths.length)|0];let o;try{o=buildChar(fCfg())}catch(e){continue}scene.add(o.g);C.extra.push(o.g);{const X=P0.ax=='x';C.peds.push(NPCS.walker(o,{ax:P0.ax,c:P0.c+(X?OZ:OX),a:P0.a+(X?OX:OZ),b:P0.b+(X?OX:OZ)},P0.a+r()*(P0.b-P0.a)+(X?OX:OZ),r()<.5?1:-1,R(1.1,1.7)))}}
  /* fans waiting on the stadium plaza */
  for(let i=0;i<(s.big?26:14);i++){let o;try{o=buildChar(fCfg())}catch(e){continue}const a=-Math.PI*.15-r()*Math.PI*.7,rr=1.15+r()*.35;o.g.position.set(OX+C.st.x+Math.cos(a)*C.st.a*rr*.95,0,OZ+C.st.z-Math.sin(a)*C.st.b*rr);o.g.rotation.y=Math.atan2(C.st.x-(o.g.position.x-OX),C.st.z-(o.g.position.z-OZ));
   scene.add(o.g);C.extra.push(o.g);C.fans.push({o,t:r()*6,k:r()})}}
@@ -645,9 +645,7 @@ function dsTick(dt){const C=D.C;if(!C)return;const t=performance.now()/1000,px=P
   if(want>0&&yieldAt(C,L,v))want=0;
   v.v+=(want-v.v)*Math.min(1,dt*(want<v.v?4:1.2));v.p+=v.v*L.dir*dt;if(v.p>L.hi)v.p=L.lo;if(v.p<L.lo)v.p=L.hi;v.x=L.ax=='x'?v.p:L.c;v.z=L.ax=='x'?L.c:v.p;
   const vis=cut||near(lx,lz,80);v.m.visible=vis;if(vis){v.m.position.set(OX+lx,0,OZ+lz);v.m.rotation.y=L.ax=='x'?(L.dir>0?Math.PI/2:-Math.PI/2):(L.dir>0?0:Math.PI)}}});
- C.peds.forEach(p=>{const lx=p.P.ax=='x'?p.p:p.P.c,lz=p.P.ax=='x'?p.P.c:p.p,vis=cut||near(lx,lz,48);p.o.g.visible=vis;if(!vis)return;
-  const blocked=!D.room&&Math.hypot(lx-px,lz-pz)<.9;if(!blocked){p.p+=p.dir*p.sp*dt;if(p.p>p.P.b){p.p=p.P.b;p.dir=-1}if(p.p<p.P.a){p.p=p.P.a;p.dir=1}p.t+=dt*7}
-  p.o.g.position.set(OX+(p.P.ax=='x'?p.p:p.P.c),0,OZ+(p.P.ax=='x'?p.P.c:p.p));p.o.g.rotation.y=p.P.ax=='x'?(p.dir>0?Math.PI/2:-Math.PI/2):(p.dir>0?0:Math.PI);const sw=blocked?0:Math.sin(p.t)*.6;p.o.legs[0].rotation.x=sw;p.o.legs[1].rotation.x=-sw;p.o.arms[0].rotation.x=-sw;p.o.arms[1].rotation.x=sw});
+ NPCS.tick(C.peds,dt,{avoid:!D.room,vis:(x,z)=>cut||near(x-OX,z-OZ,48)});
  C.fans.forEach(fn=>{const vis=cut||near(fn.o.g.position.x-OX,fn.o.g.position.z-OZ,50);fn.o.g.visible=vis;if(!vis)return;const k=t*3+fn.t;fn.o.arms[0].rotation.x=fn.k<.5?-2.6+Math.sin(k)*.4:-.2;fn.o.arms[1].rotation.x=-2.6+Math.sin(k+1)*.4;fn.o.g.position.y=Math.max(0,Math.sin(k*1.6))*.12});
  C.tugs.forEach(g=>{g.p+=dt;g.m.position.z=g.z0+Math.sin(g.p*.3)*14;g.m.rotation.y=Math.cos(g.p*.3)>0?0:Math.PI});
  if(C.fly){const F=C.fly;F.t+=dt;const T=F.t%46;let z,y=2.1,pitch=0;if(T<6){z=F.z0}else if(T<26){const u=(T-6)/20;z=F.z0+(F.z1-F.z0)*u*u*.9;if(u>.62){const k=(u-.62)/.38;y=2.1+k*k*40;pitch=k*.25}}else{z=F.z1-(T-26)*60;y=40+(T-26)*14;pitch=.25}
