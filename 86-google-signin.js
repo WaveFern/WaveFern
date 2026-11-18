@@ -130,8 +130,8 @@ function ttPlay(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.on=0;TT.sel=0
    Cloud save stays one doc per account and follows the active career. */
 function ttWorlds(){if(FBU&&!CLD.ok&&!CLD.err)return;snd('click');TT.sel=1;const a=curSlot(),rows=[],free=[];
  for(let n=1;n<=SLOTS;n++){const i=n==a?(TT.game?{artist:S.artist||'',day:S.day||0}:null):slotInfo(n);if(!i)free.push(n);
-  rows.push(i?`<div class="ttsl${n==a?' on':''}" data-slot=${n}><div><b>${esc(i.artist||'Unnamed artist')}</b><small>Career ${n} · Day ${i.day||1}${n==a?' · last played':''}</small></div><button class=go onclick="ttSlot(${n})">Play</button><button class=ttdel title="Delete this career" aria-label="Delete career ${n}" onclick="ttDel(${n})">✕</button></div>`
-   :`<div class="ttsl empty" data-slot=${n}><div><b>Empty slot</b><small>Career ${n}</small></div></div>`)}
+  rows.push(i?`<div class="ttsl${n==a?' on':''}" data-slot=${n} draggable=true><div><b>${esc(i.artist||'Unnamed artist')}</b><small>Career ${n} · Day ${i.day||1}${n==a?' · last played':''}</small></div><button class=go onclick="ttSlot(${n})">Play</button><button class=ttdel title="Delete this career" aria-label="Delete career ${n}" onclick="ttDel(${n})">✕</button></div>`
+   :`<div class="ttsl empty" data-slot=${n} draggable=true><div><b>Empty slot</b><small>Career ${n}</small></div></div>`)}
  const rec=[];for(let n=1;n<=BK_MAX;n++){try{const b=localStorage.getItem('fw_bak_'+n);if(b){let nm='';try{nm=scDecode(b).S.artist||''}catch(e){}rec.push(`<div class="ttsl ttbk" draggable=true data-bak=${n}><div><b>${esc(nm||'Recovered career')}</b><small>${esc(localStorage.getItem('fw_bakw_'+n)||'Backup from slot '+n)} · drag onto a career slot</small></div><button onclick="ttRecover(${n})">Recover</button></div>`)}}catch(e){}}
  $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Choose a career</h2>${rows.join('')}${rec.length?`<details class=ttrb><summary>Recovered backups (${rec.length})</summary>${rec.join('')}</details>`:''}<span class=ttnc title="${free.length?'':'Coming soon'}"><button ${free.length?`class=go onclick="ttSlot(${free[0]})"`:'disabled'}>+ New career</button>${free.length?'':'<em>Coming soon</em>'}</span><button onclick="ttBack()">Back</button></div></div>`}
 function ttRecover(n,t){let b=null;try{b=localStorage.getItem('fw_bak_'+n)}catch(e){}if(!b)return;
@@ -147,10 +147,19 @@ function ttRecAsk(n,t){const i=t==curSlot()&&TT.game?{artist:S.artist}:slotInfo(
  const d=document.createElement('div');d.id='ttrc';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
  d.innerHTML=`<div class="box modal" style="width:min(380px,92vw)"><h2>Overwrite career ${t}?</h2><p>Career ${t}${i.artist?' ('+esc(i.artist)+')':''} will be replaced by the recovered backup. The career it replaces is kept under Recovered backups.</p><div class=row2><button class=go id=ttrcy>Overwrite</button><button id=ttrcn>Cancel</button></div></div>`;
  document.body.appendChild(d);$('ttrcy').onclick=()=>{d.remove();ttRecover(n,t)};$('ttrcn').onclick=()=>d.remove()}
-document.addEventListener('dragstart',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttbk');if(r){try{e.dataTransfer.setData('text/plain',r.dataset.bak);e.dataTransfer.effectAllowed='move'}catch(x){}}});
+/* v55.21.0: drag a career onto another slot to swap them (an empty slot just takes the career). Drags carry 'slot:N'; backups carry a bare number. */
+document.addEventListener('dragstart',e=>{const s=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(s){try{e.dataTransfer.setData('text/plain','slot:'+s.dataset.slot);e.dataTransfer.effectAllowed='move'}catch(x){}return}const r=e.target.closest&&e.target.closest('#ttl .ttbk');if(r){try{e.dataTransfer.setData('text/plain',r.dataset.bak);e.dataTransfer.effectAllowed='move'}catch(x){}}});
 document.addEventListener('dragover',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r){e.preventDefault();r.classList.add('drop')}});
 document.addEventListener('dragleave',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r)r.classList.remove('drop')});
-document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(!r)return;e.preventDefault();r.classList.remove('drop');let n=0;try{n=+e.dataTransfer.getData('text/plain')}catch(x){}if(n)ttRecAsk(n,+r.dataset.slot)});
+document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(!r)return;e.preventDefault();r.classList.remove('drop');let v='';try{v=e.dataTransfer.getData('text/plain')}catch(x){}if(/^slot:/.test(v))return ttSwap(+v.slice(5),+r.dataset.slot);const n=+v;if(n)ttRecAsk(n,+r.dataset.slot)});
+/* v55.21.0: swap two career slots. The save keys move with the slot, the active pointer follows its career, then the page reloads like Recover does. */
+function ttSwap(a,b){if(!a||!b||a==b)return;snd('click');if(TT.game)autoSave();wiping=true;
+ try{const ka=slotKey(a),kb=slotKey(b),va=localStorage.getItem(ka),vb=localStorage.getItem(kb);
+  if(vb)localStorage.setItem(ka,vb);else localStorage.removeItem(ka);
+  if(va)localStorage.setItem(kb,va);else localStorage.removeItem(kb);
+  const c=curSlot();if(c==a)localStorage.setItem(SLOT_K,b);else if(c==b)localStorage.setItem(SLOT_K,a);
+  if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){wiping=false;return}
+ location.reload()}
 function ttBack(){snd('click');TT.sel=0;titleUI()}
 function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
  if(TT.game)autoSave();wiping=true;const i=slotInfo(n);
