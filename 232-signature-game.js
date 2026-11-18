@@ -83,7 +83,7 @@ function score(st,z){let len=0,inn=0,pts=0,x0=9,x1=-9,y0=9,y1=-9;
 const LINES=[[.85,'Amazing! Thank you so much!'],[.6,'Thank you! That looks great.'],[.35,'Um... thanks! I think.'],[0,'Is that... a squiggle? Thanks anyway.']];
 
 window.signGame=function(o){o=o||{};return new Promise(res=>{
- const items=(o.items&&o.items.length?o.items:SIGN.random(3)).map((it,i)=>{const a=Object.assign({},it);a.who=a.who||NAMES[(Math.random()*NAMES.length)|0];a.ask=a.ask||ASK[a.kind]||'Could you sign this?';
+ const items=(o.items&&o.items.length?o.items:SIGN.random(3)).map((it,i)=>{const a=Object.assign({},it);a.who=a.who||NAMES[(Math.random()*NAMES.length)|0];a.ask=a.ask===false?'':(a.ask||ASK[a.kind]||'Could you sign this?');
   const nm=(typeof S!='undefined'&&S&&S.artist)||'You';a.art=Object.assign({artist:nm,title:(typeof S!='undefined'&&S&&S.songs&&S.songs.length?S.songs[S.songs.length-1].title:'')||'Live',col:null},a.art||{});
   a.zone=a.zone||ZONE[a.kind]||ZONE.paper;a.ink=a.ink||INK[a.kind]||'#111';return a});
  if(SIGN.cur){const r={signed:0,skipped:0,total:items.length,cancelled:true,avg:0,items:[]};if(o.onDone)try{o.onDone(r)}catch(e){console.error(e)}return res(r)}
@@ -98,7 +98,7 @@ window.signGame=function(o){o=o||{};return new Promise(res=>{
   strokes.forEach(s=>{if(!s.length)return;ink.lineWidth=lw+1.2;ink.beginPath();s.forEach((p,k)=>{const x=z.x+p[0]*z.w,y=z.y+p[1]*z.h;k?ink.lineTo(x,y):ink.moveTo(x,y)});if(s.length==1)ink.lineTo(z.x+s[0][0]*z.w+.1,z.y+s[0][1]*z.h);ink.stroke()})}
  function hint(){const it=items[i],z=zr();bg.save();bg.setLineDash([8,7]);bg.strokeStyle='#e03a3acc';bg.lineWidth=2;rr(bg,z.x,z.y,z.w,z.h,8);bg.stroke();bg.setLineDash([]);bg.fillStyle='#e03a3acc';bg.font='bold 22px sans-serif';bg.textAlign='left';bg.textBaseline='middle';bg.fillText('×',z.x+8,z.y+z.h*.78);bg.restore()}
  function show(n){i=n;strokes=[];cur=null;lock=0;const it=items[i];bg.clearRect(0,0,W,H);(it.draw||DRAW[it.kind]||DRAW.paper)(bg,it);hint();ink.clearRect(0,0,W,H);
-  $q('sgt').textContent=(o.title||'Autographs');$q('sgp').textContent='Item '+(i+1)+' of '+items.length;$q('sgq').innerHTML='<b>'+esc(it.who)+':</b> “'+esc(it.ask)+'”';$q('sgm').textContent='';$q('sgr').textContent='';$q('sgok').textContent=i==items.length-1?'Finish':'Next';
+  $q('sgt').textContent=(o.title||'Autographs');$q('sgp').textContent='Item '+(i+1)+' of '+items.length;$q('sgq').innerHTML=it.ask?'<b>'+esc(it.who)+':</b> “'+esc(it.ask)+'”':'';$q('sgm').textContent='';$q('sgr').textContent='';$q('sgok').textContent=i==items.length-1?'Finish':'Next';
   $q('sgm').className='';}
  function done(cancel){if(!SIGN.cur)return;SIGN.cur=null;removeEventListener('keydown',kd,true);ov.remove();R.cancelled=!!cancel;const s=R.items.filter(x=>x.signed);R.signed=s.length;R.skipped=items.length-s.length;R.avg=s.length?s.reduce((a,x)=>a+x.q,0)/s.length:0;if(o.onDone)try{o.onDone(R)}catch(e){console.error(e)}res(R)}
  function next(rec){R.items.push(rec);lock=1;if(i>=items.length-1)return setTimeout(()=>done(0),rec.signed?650:150);setTimeout(()=>show(i+1),rec.signed?850:120)}

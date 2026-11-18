@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.20.0';
+const GAME_VERSION='v55.21.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.21.0',n:'Economy and daily fixes. Signed vinyl and CD copies sell for more (signed copies earn 120% extra instead of 60%), and signing in Label HQ no longer shows the fan\'s line. The morning summary Earned figure now includes your vinyl and CD sales, and tapping Earned opens a breakdown (streams pay, vinyl and CD sales, streams by song). Waking up shows at most two notifications plus a count of the rest. Storage has a Paint tab for paint tins. Amazoom no longer sells phones (Gphones are on the Gphone Store site). Goober Eats has no pick-up option and shows whole-number energy.'},
  {v:'v55.20.0',n:'WaveFern dev badge. The two WaveFern developer accounts now show a gold DEV tag on the leaderboard and on their public profile, in place of the Founder tag, and their friend requests arrive as "A WaveFern dev wants to be your friend" on a glowing gold card. The tag is tied to the account itself, so it cannot be faked.'},
  {v:'v55.19.1',n:'Money fix: cash can no longer turn into $0 by itself. The real cause of the "$0 after sleep" bug was a broken cash value during the day (shown as $0) that the new-day screen then saved as $0. Cash now refuses any broken value and keeps what you had, and a drop to $0 while waking up is blocked. Small amounts now show cents (Earned $0.45 instead of $0). The Mastery panel no longer says surfing and fishing are coming soon. Battery: the computer screen draws the room behind it at 30 fps and the Mastery panel pauses the world behind it.'},
  {v:'v55.19.0',n:'Dev version, test mode only: brands now write to you on their own (a new brand deal offer arrives every morning and every 30 seconds whenever none is open), so brand deals and photoshoots are easy to test. Normal play is unchanged and test careers still never post to the leaderboard.'},
