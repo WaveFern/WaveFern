@@ -5,7 +5,7 @@
 (()=>{
 const PS=()=>{const p=S.pset=S.pset||{};if(p.snap===undefined)p.snap=1;if(p.turn===undefined)p.turn=1;if(p.grid===undefined)p.grid=.5;return p};
 const dims=(t,r)=>{const f=F[t];return r%2?[f.d,f.w]:[f.w,f.d]};
-let sel=-1,moving=null,drag=null,pType='mouse',setOpen=false,PX=0,PY=0,man=false;
+const TW={w:-1,n:0,t:null};let sel=-1,moving=null,drag=null,pType='mouse',setOpen=false,PX=0,PY=0,man=false;
 
 /* v47.2.0: the room you are placing in. Downstairs is the house (x 0-16, z -WGX-12); upstairs is the annex floor at x 900, z 320,
    whose walls and stairwell are in ANX.cw */
@@ -14,9 +14,9 @@ const room=()=>upst()?[900,320,900+ANX.W,320+ANX.D]:[0,-WGX,16,12];
 const walls=()=>upst()?cols.concat(ANX.cw||[]):cols;
 /* does an item of type t fit at x,z facing r? (skip = index in PL to ignore) */
 function valid(t,x,z,r,skip){const f=F[t],c=fb(t,x,z,r),R=room();let ok=c[0]>=R[0]-1e-6&&c[1]>=R[1]-1e-6&&c[2]<=R[2]+1e-6&&c[3]<=R[3]+1e-6;
- if(ok&&!f.f){const o=q=>c[0]<q[2]&&c[2]>q[0]&&c[1]<q[3]&&c[3]>q[1];
+ if(ok&&!f.f){const E=.004,o=q=>c[0]<q[2]-E&&c[2]>q[0]+E&&c[1]<q[3]-E&&c[3]>q[1]+E;/* v55.20.1: tolerance, so flush against a wall or another piece is never 'overlapping' by a rounding error */
   /* wall items hang above furniture, so they only bump into walls and other wall items */
-  ok=!(walls().some(o)||!f.wall&&dyn.some(o)||PL.some((q,i)=>i!=skip&&!F[q.t].f&&!F[q.t].wall==!f.wall&&o(fb(q.t,q.x,q.z,q.r)))||!f.wall&&o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
+  ok=!(walls().some(o)||!f.wall&&dyn.some(o)||PL.some((q,i)=>i!=skip&&!F[q.t].f&&!F[q.t].wall==!f.wall&&o(fb(q.t,q.x,q.z,q.r)))||!f.wall&&mode!='build'&&o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
  if(ok&&f.wall)ok=backOn(t,x,z,r);
  return ok}
 /* v49.42.0: wall items (plaques) only fit with their back flat against a room wall or a low wall */
@@ -44,7 +44,9 @@ function fit(t,px,pz,r,skip){const s=PS(),f=F[t],R=room();let wall=null;
   return[x,z]};
  let[x,z]=run();
  /* back to the wall: furniture backs sit at -z when r=0, -x when r=1, +z when r=2, +x when r=3 */
- if(s.turn&&!man&&!f.f&&wall){const want=wall[1]==-1?0:wall[1]==1?2:wall[0]==-1?1:wall[0]==1?3:null;if(want!=null&&want!=r){r=want;[x,z]=run()}}
+ if(s.turn&&!man&&!f.f&&wall){const want=wall[1]==-1?0:wall[1]==1?2:wall[0]==-1?1:wall[0]==1?3:null;
+  /* v55.20.1: turning to a wall needs the same wall for 4 frames in a row, so the item stops flipping back and forth near corners */
+  if(want!=null&&want!=r){if(TW.w===want&&TW.t===hold)TW.n++;else{TW.w=want;TW.n=1;TW.t=hold}if(TW.n>=4||skip>=0){r=want;[x,z]=run()}}else TW.n=0}
  /* a wall item turns its back to whichever wall it is up against */
  if(f.wall&&!backOn(t,x,z,r))for(const r2 of[r,(r+1)%4,(r+2)%4,(r+3)%4].slice(1)){const r0=r;r=r2;const[x2,z2]=run();if(backOn(t,x2,z2,r2)){x=x2;z=z2;break}r=r0}
  return{x,z,r}}
@@ -81,7 +83,7 @@ function settleTick(done){const now=performance.now();for(let i=SET.length-1;i>=
   if(!a.m.parent){SET.splice(i,1);continue}
   const e=u*u*(3-2*u);a.m.position.y=a.y0*(1-e);const sq=u<1?1-.035*Math.sin(u*Math.PI):1;a.m.scale.set(1+(1-sq)*.5,sq,1+(1-sq)*.5);
   if(u>=1){a.m.position.y=0;a.m.scale.set(1,1,1);SET.splice(i,1)}}}
-function place(){if(!hold)return;if(!gp.ok){snd('err');return say(F[hold].wall?'Hang it on a wall: move it right up against one, back to the wall.':'It does not fit there. Move it or turn it.')}
+function place(){if(!hold)return;if(gp.ok&&!valid(hold,gp.x,gp.z,gp.r,-1))gp.ok=0;/* v55.20.1: re-check right at the click: never outside the room */if(!gp.ok){snd('err');return say(F[hold].wall?'Hang it on a wall: move it right up against one, back to the wall.':'It does not fit there. Move it or turn it.')}
  const t=hold,m=mkF(t);m.position.set(gp.x,DEV()&&ghost?ghost.position.y:0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t,x:gp.x,z:gp.z,r:gp.r,m});if(DEV())settle(m);snd('thunk');
  moving=null;if(S.inv[t]>0){S.inv[t]--;man=false}else{hold=null;clrGhost();sel=PL.length-1}buildUI()}
 function pickUp(i){const q=PL[i];if(!q||hold)return;if(q.t=='desk'){snd('err');return say('Your desk is part of the house. Upgrade it in the Gear shop.')}

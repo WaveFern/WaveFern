@@ -794,7 +794,7 @@ function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;
   R.onValue(R.ref(db,'f/i/'+uid),s=>{FR.I=s.val()||{};frInvite()},()=>{});
   R.onValue(R.ref(db,'f/b/'+uid),s=>{FR.B=s.val()||{};frDraw()},()=>{});
  }).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);console.warn('[friends] start failed:',e);frErr(e)})}
-function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
+function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:Date.now()-LAST>600000?0:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
  if(k===FR.pk||Date.now()<(FR.pbo||0))return;FR.pk=k;
  /* send the name stamp with a changed name; if the stamp or nm is refused, retry once without nm */
  const nmChanged=o.nm&&o.nm!==FR.snm&&!frNmDenied(),go=(withNm)=>{const v=Object.assign({},o);if(!withNm||frNmDenied())delete v.nm;const u={['f/p/'+uid]:Object.assign({t:R.serverTimestamp()},v)};if(withNm&&nmChanged)u['f/u/'+uid+'/d']=R.serverTimestamp();return R.update(R.ref(db),u).then(()=>{if(withNm)FR.snm=o.nm})};

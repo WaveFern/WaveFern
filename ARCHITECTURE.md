@@ -7,7 +7,7 @@ Keep it accurate: update it in the same commit as any structural change (new fil
 
 WaveFern is a static browser game (GitHub Pages; the repo has no build step, but the deploy workflow bundles and minifies the scripts into `fw-bundle.js`, see §4). Everything is **classic `<script>` files sharing one global scope**, loaded by `index.html` in the order the tags appear. There are no ES modules and no imports: a file uses a function or variable simply because an earlier file declared it.
 
-- 254 game scripts in the repo root + 67 files in `dev/` = **321 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
+- 255 game scripts in the repo root + 67 files in `dev/` = **322 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
 - Three.js r128 (CDN, with a cdnjs fallback) renders the 3D world. The "computer", phone and menus are plain DOM (`style.css`, see `docs/THEMES.md`).
 - Firebase (Auth, Firestore, Analytics) is optional: the game runs fully offline as a guest. Rules are in `firebase-rules/`.
 - Version and changelog live in `version.js` (`GAME_VERSION`, `VERSION_HISTORY`). Bump both in the same commit as every change.
@@ -56,6 +56,7 @@ Numbers are file prefixes (`NN-*.js`). "Newest wins" files are listed last in ea
 | **Audio** | `08-music`, `67-beats` (procedural beat engine; one closure, read whole by `tools/music-test.js` and `tools/mix-*.js`, so do not split), `73-ambience`, `107-my-songs-music`, `132-808-hats`, `200-sfx-polish`, `00-tab-fade`, `156` | Music, sfx, ambience |
 | **Graphics & rendering** | `04-house`, `23`/`24` (previews), `56-name-tags`, `84-pixel-pictures`, `190-pfp-styles`, `122-graphics`, `116-perf` | Meshes, canvas textures, profile pictures |
 | **Multiplayer & leaderboards** | `248-dev-tag` (DEV badge by fixed UID list: `fwIsDev`, `fwDevTag`), `161-multiplayer` (band rooms, PeerJS, leaderboard), `216-friends-hub` | Band rooms, friends, presence | Leaderboard row/profile writes are blocked for tainted careers (`S.tainted`, `window.fwTainted`, `dev/dev-leaderboard-v1.js`); `fdClearLeaderboardRow` is in `209-founder-cloud.js`.
+| **Fix pack** | `249-fix-pack.js` (last tag in `index.html`, after the `dev/` scripts so it wraps their versions): small wrappers from v55.20.1 (sleep keeps the play zoom via `VIEWX`, phone app error fallback in `phR`, album cover face button, recovered backups delete + 30 day expiry via `fw_bakt_N`). Put small later-wins patches here | |
 | **Input** | `07-input-loop`, `154-touch-controls`, `168-gamepad`, `155`/`158z` (responsive) | Keyboard, touch, controller |
 | **Trailers** | `175-trailer`, `183-band-trailer`, `201`, `202` | `?trailer` modes, recording |
 | **Tutorial** | `72-tutorial` (Big Vee), `78-big-vee-smarter`, `214-guide-markers`, `205-announcement` (one must-read notice), `news-data.js` (`WF_NEWS`, newest first: add one entry per big update) + `243-whats-new.js` (shows unseen entries once as a pop-up; `FW_NEWS.open()`) | Tips, guide line, announcements |
