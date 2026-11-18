@@ -63,7 +63,11 @@ function daily(){const p=st();p.runs.forEach(r=>{if(r.state!=0)return;const k=cl
   if(d>0){const un=r.qty-r.sold,sa=Math.max(0,(r.sg||0)-(r.sgs||0)),ds=un>0?Math.min(d,sa,Math.round(d*sa/un)):0;r.sgs=(r.sgs||0)+ds;const e=+((d+ds*SGP)*r.price).toFixed(2);r.sold=sold;r.rev=+(r.rev+e).toFixed(2);S.money=+(S.money+e).toFixed(2);S.earn=+((S.earn||0)+e).toFixed(2);p.rev+=e;p.units+=d;p.sold[key(r.alb,r.fmt)]=(p.sold[key(r.alb,r.fmt)]||0)+d}
   if(k>=WIN){r.state=1;r.res={sold:r.sold,left:r.qty-r.sold,rev:r.rev,cost:r.cost,profit:+(r.rev-r.cost).toFixed(2)};
    mail('Pressing result for "'+nm+'" on '+F.n+': sold '+num(r.sold)+' of '+num(r.qty)+' copies at '+fm2(r.price)+'. Revenue '+fm(r.rev)+', cost '+fm(r.cost)+', '+(r.res.profit>=0?'profit '+fm(r.res.profit):'loss '+fm(-r.res.profit))+'.'+(r.res.left>0?' '+num(r.res.left)+' unsold copies were written off.':' Sold out.'))}})}
-{const w0=wakeUp;wakeUp=function(){const r=w0.apply(this,arguments);try{daily()}catch(e){console.error('label press',e)}return r}}
+{const w0=wakeUp;wakeUp=function(){const r=w0.apply(this,arguments);const e1=+S.earn||0;try{daily()}catch(e){console.error('label press',e)}
+ /* v55.20.1: vinyl and CD money counts as money earned: it goes into the day's "Earned" figure and the summary card */
+ try{const v=+((+S.earn||0)-e1).toFixed(2);if(v>0){const h=(S.hist||[])[S.hist.length-1];if(h&&h.d===S.day-1)h.e=+((+h.e||0)+v).toFixed(2);
+  const c=[...document.querySelectorAll('#ui .box .cards .card')].find(x=>/^Earned/.test(x.textContent)),b=c&&c.querySelector('b');if(b&&h)b.innerHTML=fm2(h.e)+'<small style="display:block;font-size:11px;opacity:.75">incl. '+fm2(v)+' vinyl and CD</small>'}}catch(e){console.error('vinyl earned',e)}
+ return r}}
 /* ---------- the page ---------- */
 const sec=(t,meta,body)=>`<section class=lh-sec><div class=lh-sh><h2 class=lh-h2>${t}</h2>${meta?`<span class=lh-meta>${meta}</span>`:''}</div>${body}</section>`;
 const kpi=(k,v,s)=>`<div class=lh-kpi><span>${k}</span><b>${v}</b>${s?`<small>${s}</small>`:''}</div>`;
