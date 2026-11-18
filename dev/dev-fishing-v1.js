@@ -988,7 +988,7 @@ function lightsTick(){const k=nightK(),wx=wxNow();if(ANIM.glMat)ANIM.glMat.color
   SPOTS.forEach((s,i)=>INT.push({x:s.wx,z:s.wz,r:s.s=='sand'?2.3:1.7,l:'Fish here: '+s.n,a:()=>startSession(i),fi:3}));
   const mp=lw(-1.2,-21),pp=lw(-5.3,-41.2);INT.push({x:mp[0],z:mp[1],r:2.4,l:'Talk to Old Mara',a:()=>openMara(),fi:4});INT.push({x:pp[0],z:pp[1],r:2.2,l:'Talk to Pete',a:()=>talkPete(),fi:5})}
  if(root.visible){if(!ppBuilt&&dd<220)buildPeople();ANT+=dt;lightsTick();
-  if((dd<320&&(!window.FW_ZONE||FW_ZONE.seen(root,25)))||G){/* v55.21.0: animated only while the pier is on screen */ANIM.buoys.forEach(b=>{b.g.position.y=b.y+Math.sin(ANT*1.3+b.ph)*.05;b.g.rotation.z=Math.sin(ANT*.9+b.ph)*.1;b.g.rotation.x=Math.sin(ANT*1.1+b.ph*2)*.08});
+  if((dd<320&&(!window.FW_ZONE||FW_ZONE.seen(root,25)))||G){/* v55.22.0: animated only while the pier is on screen */ANIM.buoys.forEach(b=>{b.g.position.y=b.y+Math.sin(ANT*1.3+b.ph)*.05;b.g.rotation.z=Math.sin(ANT*.9+b.ph)*.1;b.g.rotation.x=Math.sin(ANT*1.1+b.ph*2)*.08});
    if(ppBuilt){npcTick(dt,ANT);bubbleTick()}
    if(!ANIM.animals&&ppBuilt){ANIM.animals=1;mkCat('#d98a3a','#fff3d9',-3.2,-41.85,DECK+.5,Math.PI);mkCat('#3a3a42','#e8e8ee',1.3,-31.5,DECK+.5,Math.PI/2);
     mkGull(-2.05,DECK+3.15,-33,.8);mkGull(9.3,DECK+.95,-43,2.4);mkGull(-15.75,5.55,4.6,1.2);mkGull(12.5,.45,-5.5,-.6);ANIM.gulls[0].home[1]=DECK+3.15;ANIM.gulls[1].home[1]=DECK+1.0}
