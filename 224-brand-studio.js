@@ -194,16 +194,9 @@ function tier(){const L=fl();return L>=250?4:L>=150?3:L>=60?2:L>=15?1:0}
 BRD.tier=tier;
 function fill(t,C){const song=((S.songs||[]).slice().sort((a,b)=>(b.streams||0)-(a.streams||0))[0]||{}).title||'your new single',hi=(window.DCITY&&DCITY.words?DCITY.words(C.s&&C.s.lang).hi:'Hello');
  return t.replace(/\{A\}/g,S.artist||'you').replace(/\{C\}/g,(C.d&&(C.d.city||C.d.country))||'town').replace(/\{S\}/g,song).replace(/\{H\}/g,hi.replace(/[!¡]/g,''))}
-let BUB=null,lastT=0;
-function bubble(g,txt){if(BUB)BUB.el.remove();const el=document.createElement('div');el.className='bsbub';el.textContent=txt;document.body.appendChild(el);const v=new THREE.Vector3(),B={el,g,t0:performance.now()};BUB=B;
- const upd=()=>{if(BUB!==B)return;const t=performance.now()-B.t0;if(t>3600||!g.visible||typeof mode=='undefined'||mode!='play'){el.remove();BUB=null;return}
-  v.set(g.position.x,2.4,g.position.z).project(cam);el.style.left=((v.x*.5+.5)*innerWidth)+'px';el.style.top=((-v.y*.5+.5)*innerHeight)+'px';el.style.opacity=t<250?t/250:t>3200?(3600-t)/400:1;requestAnimationFrame(upd)};upd()}
-{const s=document.createElement('style');s.textContent='.bsbub{position:fixed;z-index:60;transform:translate(-50%,-100%);max-width:210px;background:#f4f1ea;color:#15171a;border:2px solid #000;border-radius:6px;padding:6px 9px;font:12px/1.3 ui-monospace,Menlo,Consolas,monospace;box-shadow:2px 3px 0 #000a;pointer-events:none;text-align:center}.bsbub:after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-5px;border:5px solid transparent;border-top-color:#000;border-bottom:0}';document.head.appendChild(s)}
-function fanPhoto(){const d=S.brands=S.brands||{};d.fan=d.fan&&d.fan.d==S.day?d.fan:{d:S.day,n:0};if(d.fan.n>=3)return;d.fan.n++;const f=Math.max(1,FOLN(Math.round(6+Math.sqrt(S.followers||0)*.15*tier())));S.followers=(S.followers||0)+f;setTimeout(()=>{try{say('A fan took a photo with you. +'+f+' followers')}catch(e){}},900)}
+let lastT=0;
 setInterval(()=>{try{const D=window.DCITY;if(!(D&&D.on&&D.C&&typeof mode!='undefined'&&mode=='play'&&!D.room&&!D.view&&S.artist&&typeof P!='undefined'))return;
  if(typeof window.apWhere=='function'&&window.apWhere())return;const C=D.C,tr=tier();
  if(!C.recMsg){C.recMsg=1;const m=TXT.find(q=>fl()>=q[0]);setTimeout(()=>{try{say(m?fill(m[2],C):'Nobody here knows you yet. Keep growing your fame.')}catch(e){}},600);return}
- if(!tr||Date.now()-lastT<CD[tr])return;
- let best=null,bd=7;(C.peds||[]).forEach(p=>{const g=p.o&&p.o.g;if(!g||!g.visible)return;const d=Math.hypot(g.position.x-P.x,g.position.z-P.z);if(d<bd&&!(p.rec&&Date.now()-p.rec<60000)){bd=d;best=p}});
- if(!best)return;best.rec=Date.now();lastT=Date.now();const L=LINES[tr];bubble(best.o.g,fill(L[Math.floor(Math.random()*L.length)],C));if(tr>=2&&Math.random()<.3)fanPhoto()}catch(e){console.error('recognition',e)}},900);
+ }catch(e){console.error('recognition',e)}},900);
 })();

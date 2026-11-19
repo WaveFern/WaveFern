@@ -9,11 +9,17 @@
 /* ---------- 1. pedestrians step around you ---------- */
 const SIDE=1.0;/* how far either side of their line people may step (pavement is about 2.4 wide) */
 function avoidPrep(L,vert){L.forEach(n=>{if(n._ao){if(vert)n.x-=n._ao;else n.z-=n._ao}if(n._sp0!==undefined)n.sp=n._sp0})}
-function avoidApply(L,vert,dt){const out=HIN||IN,r=mode=='drive'?1.9:1.05;L.forEach(n=>{
+function avoidApply(L,vert,dt){const out0=HIN||IN,r=mode=='drive'?1.9:1.05;L.forEach(n=>{const out=!n.ext&&out0;/* n.ext: people placed in the airport or a city abroad stay active indoors */
   if(n._sp0===undefined)n._sp0=n.sp;
-  const o=n._ao||0;let al=0,pl=0;
-  if(!out&&n.m.visible&&n.st!=1){const lane=vert?n.x0:n.z0;al=(vert?P.z-n.z:P.x-n.x)*n.dir;pl=(vert?P.x:P.z)-lane}
-  const ss=NPCS.sidestep(o,pl,al,dt,!out&&n.m.visible&&n.st!=1);n._ao=ss[0];n.sp=n._sp0*ss[1];
+  let tgt=0,slow=1;const o=n._ao||0;
+  if(!out&&n.m.visible&&n.st!=1){
+   const lane=vert?n.x0:n.z0,al=(vert?P.z-n.z:P.x-n.x)*n.dir,pl=(vert?P.x:P.z)-lane;
+   if(al>-1.2&&al<4.5&&Math.abs(pl-o)<r+.6){
+    /* step to the side away from you, or the other side if you are near that edge */
+    let sd=o>=pl?1:-1;if(Math.abs(pl+sd*r)>SIDE)sd=-sd;
+    tgt=Math.max(-SIDE,Math.min(SIDE,pl+sd*r));
+    if(al>0&&Math.abs(pl-o)<r)slow=al<1.4?.25:.55}}
+  const no=o+(tgt-o)*Math.min(1,dt*(tgt?4:1.5));n._ao=Math.abs(no)<.005&&!tgt?0:no;n.sp=n._sp0*slow;
   if(vert)n.x+=n._ao;else n.z+=n._ao;
   if(!n.m.visible)return;
   n.m.position.x=n.x;n.m.position.z=n.z;if(n.pet&&!vert)n.pet.position.z+=n._ao;
@@ -21,7 +27,7 @@ function avoidApply(L,vert,dt){const out=HIN||IN,r=mode=='drive'?1.9:1.05;L.forE
 /* two-way pavements: each direction of travel keeps to its own side (right-hand lane) so people passing head-on never meet.
    The base walk code eases people toward z0/x0 every frame, so moving that target by direction is all it takes; at the end
    of a pavement the target flips and they glide across to the other lane. */
-const LANE=.42;/* also NPCS.LANE */
+const LANE=.42;
 function lanes(L,vert){L.forEach(n=>{if(n._lb===undefined)n._lb=vert?n.x0:n.z0;const o=(vert?-1:1)*n.dir*LANE;if(vert)n.x0=n._lb+o;else n.z0=n._lb+o})}
 /* the old shove runs after the sidestep, on people's real positions */
 const push0=pushPeople;pushPeople=function(){};
@@ -70,39 +76,16 @@ trafTick=function(dt){const pl=mode=='play'||mode=='drive';TRAF.forEach(c=>{if(!
   const m=c.m;if(c.f||!m.visible){c.rx=c.x;c.rz=c.z;c.h=th;c.f=0}else if(q1){c.rx=c.x;c.rz=c.z}else{c.rx+=(c.x-c.rx)*Math.min(1,dt*8);c.rz+=(c.z-c.rz)*Math.min(1,dt*8)}
   m.position.set(c.rx,0,c.rz);m.rotation.y=c.h;m.visible=Math.abs(c.x-P.x)<50&&Math.abs(c.z-P.z)<50&&!HIN&&!IN})};
 /* on foot, a traffic car is a box along its real heading (also mid-turn) */
-dynB=function(x0,z0,x,z){if(IN||HIN)return false;const R0=.62,ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
- if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;
+dynB=function(x0,z0,x,z){const ind=IN||HIN,R0=.62,ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
+ if(NPC.some(n=>n.m.visible&&(!ind||n.ext)&&ppl(n))||VPED.some(n=>n.m.visible&&(!ind||n.ext)&&ppl(n))||(!ind&&ART_M.some(o=>ppl(o))))return true;if(ind)return false;
  return TRAF.some(c=>{if(!c.e||!c.m.visible||Math.abs(c.x-x)>4||Math.abs(c.z-z)>4)return false;const hx=Math.sin(c.h),hz=Math.cos(c.h),cx=c.rx??c.x,cz=c.rz??c.z,dep=(px,pz)=>{const dx=px-cx,dz=pz-cz,al=Math.abs(dx*hx+dz*hz),pp=Math.abs(dx*hz-dz*hx);return Math.min(2.2-al,1.15-pp)};const n=dep(x,z);return n>0&&n>dep(x0,z0)})};
 })();
 
-/* ===== shared NPC pedestrians (airport 139, abroad cities 150) =====
-   One implementation of lane walkers, idle staff, sidestep/slow-down around the player and the player hitbox.
-   n = {o:buildChar result, ax:'x'|'z' lane axis, c:lane coord, a,b:range, p:position along, dir, sp, t, ao}; all world coordinates.
-   NPCS.walker(o,lane,p,dir,sp,opts) / NPCS.idle(o,x,z,ry) make entries; NPCS.tick(list,dt,{vis,avoid}) walks them;
-   NPCS.blocks(x0,z0,x,z) is the hitbox (also wired into dynB below, so it works indoors). */
-const NPCS=(()=>{
-const R=.62,SIDE=1,LANE=.42,reg=new Set();
-/* the one sidestep rule for every pedestrian (home city NPC/VPED in the street-flow part above, airport, abroad):
-   ao = current sideways offset, pl = player's lane position relative to the lane, al = player's distance ahead along the walking direction;
-   returns [new offset, speed factor] */
-function sidestep(ao,pl,al,dt,on){let tgt=0,slow=1;const r=mode=='drive'?1.9:1.05;
- if(on&&al>-1.2&&al<4.5&&Math.abs(pl-ao)<r+.6){let sd=ao>=pl?1:-1;if(Math.abs(pl+sd*r)>SIDE)sd=-sd;tgt=Math.max(-SIDE,Math.min(SIDE,pl+sd*r));if(al>0&&Math.abs(pl-ao)<r)slow=al<1.4?.25:.55}
- const no=ao+(tgt-ao)*Math.min(1,dt*(tgt?4:1.5));return[Math.abs(no)<.005&&!tgt?0:no,slow]}
-function walker(o,lane,p,dir,sp,x){x=x||{};return{o,ax:lane.ax,c:lane.c,a:lane.a,b:lane.b,p,dir:dir||1,sp,t:Math.random()*6,ao:0,lo:0,bob:x.bob||0,x:0,z:0}}
-function idle(o,x,z,ry){o.g.position.set(x,0,z);o.g.rotation.y=ry||0;return{o,idle:1,x,z,t:Math.random()*6}}
-function tick(L,dt,k){k=k||{};reg.add(L);L._at=performance.now();const av=k.avoid!==false&&!(typeof HIN!=='undefined'&&HIN&&!k.indoor);
- L.forEach(n=>{const o=n.o,g=o.g;
-  if(n.idle){n.t+=dt*8;const vis=!k.vis||k.vis(n.x,n.z);g.visible=vis;if(vis){o.arms[0].rotation.x=Math.sin(n.t*.15)*.08;o.arms[1].rotation.x=-Math.sin(n.t*.13)*.08}return}
-  const X=n.ax=='x';/* right-hand lane per direction, same as the home-city pavements */
-  n.lo+=((X?1:-1)*n.dir*LANE-n.lo)*Math.min(1,dt*3);const lc=n.c+n.lo,lx=X?n.p:lc+n.ao,lz=X?lc+n.ao:n.p,vis=!k.vis||k.vis(lx,lz);g.visible=vis;if(!vis)return;
-  let slow=1,blocked=false;
-  if(av){const ss=sidestep(n.ao,(X?P.z:P.x)-lc,((X?P.x-n.p:P.z-n.p))*n.dir,dt,true);n.ao=ss[0];slow=ss[1];
-   blocked=Math.hypot(lx-P.x,lz-P.z)<R+.28}
-  else n.ao=0;
-  if(!blocked){n.p+=n.dir*n.sp*slow*dt;if(n.p>n.b){n.p=n.b;n.dir=-1}if(n.p<n.a){n.p=n.a;n.dir=1}n.t+=dt*7*Math.max(.3,slow)}
-  n.x=X?n.p:n.c+n.lo+n.ao;n.z=X?n.c+n.lo+n.ao:n.p;
-  g.position.set(n.x,n.bob&&!blocked?Math.abs(Math.sin(n.t))*n.bob:0,n.z);g.rotation.y=X?(n.dir>0?Math.PI/2:-Math.PI/2):(n.dir>0?0:Math.PI);
-  const s=blocked?0:Math.sin(n.t)*.6;o.legs[0].rotation.x=s;o.legs[1].rotation.x=-s;o.arms[0].rotation.x=-s*.6;o.arms[1].rotation.x=blocked?0:s*.6})}
-function blocks(x0,z0,x,z){const now=performance.now();for(const L of reg){if(now-L._at>400)continue;for(const n of L){if(!n.o.g.visible||!n.o.g.parent)continue;const a=Math.hypot(n.x-x,n.z-z);if(a<R&&a<Math.hypot(n.x-x0,n.z-z0))return true}}return false}
-return{R,LANE,walker,idle,tick,blocks,sidestep}})();
-{const d0=dynB;dynB=function(x0,z0,x,z){return d0(x0,z0,x,z)||NPCS.blocks(x0,z0,x,z)}}
+/* ===== people in the airport and abroad are the same NPC / VPED people as in the home city =====
+   npcAdd puts an existing buildChar result into the home-city lists, so worldTick (walking, fans who walk up and ask for an
+   autograph), the lanes and sidestep above, pedTick, pushPeople and dynB all treat them exactly like home pedestrians.
+   n.ext (a function) says when they are active; it replaces the "outdoors in the home city" check. All world coordinates.
+   ax 'x': walks along x on lane z=c (NPC list); ax 'z': walks along z on lane x=c (VPED list). */
+function npcAdd(o,ax,c,a,b,p,dir,sp,ext){const base={m:o.g,legs:o.legs,arms:o.arms,dir:dir||1,sp,t:R(0,6),ext};
+ if(ax=='x'){const n=Object.assign(base,{x:p,z:c,z0:c,mn:a,mx:b,k:Math.random(),st:0,cool:0,fan:false});NPC.push(n);return n}
+ const n=Object.assign(base,{x:c,x0:c,z:p,mn:a,mx:b});VPED.push(n);return n}
