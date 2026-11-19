@@ -9,7 +9,7 @@
      bounding box, then compared both ways by nearest-point distance (chamfer); a big difference in ink length lowers it too. */
 (function(){
 const ZONE={paper:[.74,.26],poster:[.6,.15],ticket:[.8,.3],cap:[.4,.28],album:[.8,.17],shirt:[.4,.22],vinyl:[.32,.32],cd:[.4,.4]};
-const W=720,H=440,TOL=.04;
+const W=720,H=440,TOL=.1;
 const fm=n=>'$'+Math.round(n).toLocaleString('en-US');
 const zsize=(kind,z)=>z?[z.w*W,z.h*H]:[(ZONE[kind]||ZONE.paper)[0]*W,(ZONE[kind]||ZONE.paper)[1]*H];
 function cloud(strokes,zw,zh){const P=[];let len=0;(strokes||[]).forEach(s=>{if(!s||!s.length)return;
@@ -25,7 +25,7 @@ const SIGNME=window.SIGNME={};
 SIGNME.sim=function(strokes,kind,zone){const me=S.sig;if(!me||!me.s||!strokes||!strokes.length)return 0;
  const [zw,zh]=zsize(kind,zone),a=cloud(strokes,zw,zh),b=cloud(me.s,me.a[0],me.a[1]);if(!a.P.length||!b.P.length)return 0;
  const A=thin(a.P,260),B=thin(b.P,260),d=(mean(A,B)+mean(B,A))/2,lr=Math.min(a.len,b.len)/Math.max(a.len,b.len,1e-6);
- const s=Math.max(0,1-d/TOL)*(.4+.6*lr);return +Math.max(0,Math.min(1,s)).toFixed(3)};
+ const s=Math.pow(Math.max(0,1-d/TOL),.6)*(.7+.3*lr);/* v55.x: TOL .04 + a harsh ink-length factor rated nearly every redraw as 0 */return +Math.max(0,Math.min(1,s)).toFixed(3)};
 SIGNME.fee=()=>{let L=0;try{L=fameLv()||0}catch(e){}return 10*(1+.35*L)};
 SIGNME.setup=function(){if(typeof signGame!='function')return say('The signature game is not available.');
  signGame({title:'Your signature',noPay:true,skippable:false,intro:'Sign the way you will sign everything from now on. Enter = done, Backspace = clear.',
@@ -38,7 +38,7 @@ SIGNME.setup=function(){if(typeof signGame!='function')return say('The signature
   (r.items||[]).forEach((it,i)=>{if(!it.signed)return;const src=items&&items[i]||{};it.sim=SIGNME.sim(it.strokes,it.kind,src.zone);n++;tot+=it.sim});
   r.sim=n?+(tot/n).toFixed(3):0;let pay=0;(r.items||[]).forEach(it=>{if(it.signed)pay+=SIGNME.fee()*it.sim});pay=+pay.toFixed(2);r.paid=pay;
   if(pay>0){S.money=+(S.money+pay).toFixed(2);S.earn=+((S.earn||0)+pay).toFixed(2);try{snd('cash')}catch(e){}}
-  if(n)setTimeout(()=>say(pay>0?'Signatures paid '+fm(pay)+' ('+Math.round(r.sim*100)+'% like yours)':'Those did not look like your signature, so nothing was paid.'),700)}catch(e){console.error('signature pay',e)}return r})}}
+  if(n)setTimeout(()=>say(pay>0?'Signatures paid '+fm(pay)+' ('+Math.round(r.sim*100)+'% like yours)':'Thanks for signing! Take a bit more care to match your saved one and you will be paid.'),700)}catch(e){console.error('signature pay',e)}return r})}}
 /* Label HQ: you have to set your signature first */
 {const h0=PA.hq;PA.hq=function(){if(S.sig)return h0.apply(this,arguments);
  return`<div class="bdw lhq"><header class=lh-top><div class=lh-in><nav class=lh-nav><button class=on>Label HQ</button></nav></div></header><main class=lh-main><div class=lh-in><header class=lh-ph><h1 class=lh-h1>Choose your signature</h1><p class=lh-lede>Before you use Label HQ, draw the signature you will sign everything with. Whenever you sign something later, from a fan on the street to a pressed vinyl, you are paid by how closely it matches this one.</p></header><button class="lh-btn pri" onclick="SIGNME.setup()">Draw my signature</button></div></main></div>`}}
