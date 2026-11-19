@@ -99,8 +99,13 @@ service cloud.firestore {
     // A player can create a name only if it is free (create is refused when the document exists), release only their own, and nobody edits one.
     match /usernames/{name} {
       allow get: if google();
+      // v55.28.2 anti-squatting: a name can only be created together with the same-batch profile write that sets profiles/{me}.h to it, and only if the profile's previous
+      // name is the same or is released (deleted) in that batch. So one account holds one name, instead of a script reserving thousands.
       allow create: if google() && name.matches('[a-z0-9_]{3,16}') && name.matches('.*[a-z].*') && fields(['uid', 't'])
-        && request.resource.data.uid == me() && stampNear(request.resource.data.t);
+        && request.resource.data.uid == me() && stampNear(request.resource.data.t)
+        && getAfter(/databases/$(database)/documents/profiles/$(me())).data.h == name
+        && (!exists(/databases/$(database)/documents/profiles/$(me())) || get(/databases/$(database)/documents/profiles/$(me())).data.get('h', '') in ['', name]
+            || !existsAfter(/databases/$(database)/documents/usernames/$(get(/databases/$(database)/documents/profiles/$(me())).data.h)));
       allow delete: if google() && resource.data.uid == me() || admin();
     }
 

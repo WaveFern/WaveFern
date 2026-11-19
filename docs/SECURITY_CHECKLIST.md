@@ -6,6 +6,7 @@ Threat model: WaveFern is a static page. **Everything in the browser is attacker
 ## 1. Rules (the real security boundary)
 - [ ] Rules live in `firebase-rules/<version>/` (`firestore.rules`, `database.rules.json`). Change them there, bump the folder name to the game version, fix every path mention (`grep -rn "firebase-rules/"`).
 - [ ] Every Firestore/RTDB write is limited to the writer's own uid, bounded in size and shape (`hasOnly`, length and number limits, regexes with no `<>"`), and `auth != null` alone is **not** enough: use `google()` (Firestore) or `auth.token.firebase.sign_in_provider === 'google.com'` (RTDB) so free anonymous accounts cannot be used for spam.
+- [ ] Anything a player can create in bulk (usernames, rooms, profiles) needs a one-per-account rule or an accepted, documented limit. Usernames: created only in the same batch as `profiles/{me}.h` and only when the old name is released.
 - [ ] Anything that grants a privilege (admin, Founder, DEV, gifts, usernames) is decided by the rules or by a fixed uid list, never by a field the player writes.
 - [ ] Wildcard children in RTDB rules (`$other`) also match children you have not listed: list every legitimate key first, then `$other: false`. (The first v55.28.2 draft broke room creation this way; the emulator test caught it.)
 - [ ] Run `tools/rules-test.js` in the emulators (command in the file header). All lines must pass. Add a test for every new rule.
