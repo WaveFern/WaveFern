@@ -301,8 +301,21 @@ function carvePool(){try{renderer.localClippingEnabled=true;const x0=CX-HXM-.42,
    ground built or rebuilt after the park (each mesh is only measured once) */
 const CARVSEEN=new WeakSet();const _cbx=new THREE.Box3(),_cbb=new THREE.Box3();
 function carveScan(){_cbx.min.set(CX-HXM-.42,-3,CZ-HZM-.42);_cbx.max.set(CX+HXM+.42,.1,CZ+HZM+.42);
- scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.skate||CARVSEEN.has(o))return;for(let a=o.parent;a;a=a.parent)if(a===root)return;CARVSEEN.add(o);
-  o.updateWorldMatrix(true,false);_cbb.setFromObject(o);if(_cbb.isEmpty()||_cbb.max.y>.2||!_cbb.intersectsBox(_cbx)||Math.max(_cbb.max.x-_cbb.min.x,_cbb.max.z-_cbb.min.z)<4)return;if(!CARVO.includes(o))CARVO.push(o)})}
+ scene.traverse(o=>{if(!o.isMesh||o.userData.skate||CARVSEEN.has(o))return;for(let a=o.parent;a;a=a.parent)if(a===root)return;CARVSEEN.add(o);if(o.isInstancedMesh)return;
+  /* the mesh's own geometry only (setFromObject also counted its children, so a ground plane carrying trees or props looked tall and was skipped) */
+  const g=o.geometry;if(!g||!g.attributes||!g.attributes.position)return;if(!g.boundingBox)g.computeBoundingBox();o.updateWorldMatrix(true,false);_cbb.copy(g.boundingBox).applyMatrix4(o.matrixWorld);
+  if(_cbb.isEmpty()||_cbb.max.y>.2||!_cbb.intersectsBox(_cbx)||Math.max(_cbb.max.x-_cbb.min.x,_cbb.max.z-_cbb.min.z)<4)return;if(!CARVO.includes(o))CARVO.push(o)});
+ carveRays()}
+/* v55.30.8: and whatever is really under the park: rays straight down through the pool and the slab; any surface they hit below the
+   concrete top that is not the park's own (instanced ground too) gets the cut */
+const _crc=new THREE.Raycaster(),_cdn=new THREE.Vector3(0,-1,0),_cor=new THREE.Vector3(),_chits=[];
+function carveRays(){let n=0;scene.updateMatrixWorld();_crc.camera=cam;_crc.near=0;_crc.far=8;
+ const own=o=>{for(let a=o;a;a=a.parent){if(a===root||a.userData.skate)return true;if(G&&(a===G.boardG||(RG&&a===RG.g)))return true}return false};
+ const pts=[];for(let i=0;i<=6;i++)for(let j=0;j<=4;j++)pts.push([PX0+.3+(PX1-PX0-.6)*i/6,PZ0+.3+(PZ1-PZ0-.6)*j/4]);for(let i=0;i<=8;i++)for(let j=0;j<=4;j++)pts.push([-HXM+2+(2*HXM-4)*i/8,-HZM+2+(2*HZM-4)*j/4]);
+ const cand=[],sp=new THREE.Sphere();scene.children.forEach(c=>c.traverse(o=>{if(!o.isMesh||o.visible===false||CARVO.includes(o)||own(o))return;const g=o.geometry;if(!g||!g.attributes||!g.attributes.position)return;
+  if(o.isInstancedMesh){if(o.count<=3000)cand.push(o);return}if(!g.boundingSphere)g.computeBoundingSphere();sp.copy(g.boundingSphere).applyMatrix4(o.matrixWorld);if(sp.intersectsBox(_cbx))cand.push(o)}));
+ for(const [x,z] of pts){_cor.set(CX+x,SLAB+3,CZ+z);_crc.set(_cor,_cdn);for(const o of cand){_chits.length=0;try{o.raycast(_crc,_chits)}catch(e){continue}
+  for(const h of _chits)if(h.point.y<SLAB-.005&&!CARVO.includes(o)){CARVO.push(o);n++;try{console.log('skate park: cut ground',o.name||o.type,h.point.y.toFixed(3))}catch(e){}break}}}return n}
 function carveMats(){CARVO.forEach(o=>(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(!m||m.clippingPlanes===CLIP)return;CARVED.push([m,m.clippingPlanes,m.clipIntersection]);m.clippingPlanes=CLIP;m.clipIntersection=true;m.needsUpdate=true}))}
 let carveT=0;function carveTick(dt){if(!CLIP.length)return;carveT+=dt;if(carveT<2)return;carveT=0;try{renderer.localClippingEnabled=true;carveScan();carveMats()}catch(e){soft(e,'carve2')}}
 function buildRamps(){
