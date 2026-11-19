@@ -168,7 +168,7 @@ function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
   if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.pOn){try{p.destroy()}catch(x){}if(!NET.on)say('Could not reach the room service. Trying again…');setTimeout(hostOpen,6000)}})}
 /* v45.7.0: public room list for the admin. The host writes rooms/CODE (using a separate anonymous Firebase login, so Google sign-in is not needed) (band name, player count, heartbeat);
    the admin panel lists fresh entries. Best effort: hosts who are not signed in, or offline, just do not appear. */
-function regAuth(){/* v55.30.2: the rooms rules now need a Google account, so the heartbeat uses the signed-in Google user (the anonymous login below is only the old fallback) */
+function regAuth(){/* v55.30.3: the rooms rules now need a Google account, so the heartbeat uses the signed-in Google user (the anonymous login below is only the old fallback) */
  if(typeof FBU!='undefined'&&FBU&&!FBU.isAnonymous&&FBD&&FBF)return Promise.resolve({uid:FBU.uid,F:FBF,D:FBD});
  if(NET.ra)return NET.ra;if(typeof FB_ON=='undefined'||!FB_ON)return Promise.reject('off');const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
  return NET.ra=Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js'),import(u+'app-check.js').catch(()=>null)]).then(([a,m,f,ac])=>{const app=a.initializeApp(FB_CFG,'rooms');fbAppCheck(ac,app);const au=m.getAuth(app);
@@ -247,7 +247,7 @@ function rtdb(){if(FBRP)return FBRP;if(typeof FB_ON=='undefined'||!FB_ON)return 
  return FBRP=waitA().then(()=>FBA.authStateReady()).then(()=>import(u+'database.js')).then(R=>{const usr=FBA.currentUser;if(!usr||usr.isAnonymous)throw new Error('Google sign-in needed');
   return FB.r={R,db:R.getDatabase(FBA.app,RTDB_URL),uid:usr.uid}}).catch(e=>{FBRP=null;throw e})}
 /* everything from other players is cleaned before the game uses it: no HTML characters, bounded sizes */
-/* v55.30.2: ids that other players send end up as object keys (MB[id], BQ[bl]) and inside onclick='...' text. A value of __proto__ would write into Object.prototype, and a ' would break out of the quotes. */
+/* v55.30.3: ids that other players send end up as object keys (MB[id], BQ[bl]) and inside onclick='...' text. A value of __proto__ would write into Object.prototype, and a ' would break out of the quotes. */
 const idOk=s=>typeof s=='string'&&/^[A-Za-z0-9_-]{1,128}$/.test(s)&&s!='__proto__'&&s!='constructor'&&s!='prototype';
 const idc=(s,n)=>{s=String(s==null?'':s).replace(/[^A-Za-z0-9_-]/g,'').slice(0,n||128);return s=='__proto__'||s=='constructor'||s=='prototype'?'_':s};
 function cln(v,dp){dp=dp||0;if(typeof v=='string'){if(v=='__proto__'||v=='constructor'||v=='prototype')return'_';return v.slice(0,4000).replace(/[<>"]/g,c=>c=='<'?'‹':c=='>'?'›':'”')}
@@ -328,7 +328,7 @@ function guestVC(r,base,uid){const{R,db}=r,up=k=>R.ref(db,base+'/u/'+uid+'/'+k),
  return vc}
 /* messages from members (relayed by the host) */
 function handle(d,id,self){
-  /* v55.30.2: band-song id and member ids are plain id text (they are put inside onclick handlers and used as object keys) */
+  /* v55.30.3: band-song id and member ids are plain id text (they are put inside onclick handlers and used as object keys) */
   for(const k of['bl','w','to','id'])if(k in d)d[k]=typeof d[k]=='string'?idc(d[k],k=='bl'?60:128):'';
   /* v49.70.0: numbers that other players (or a host) send are bounded before the game uses them, so a modified client can not push crazy values into your career */
   if(!self){const nb=(v,lo,hi,df)=>{v=+v;return isFinite(v)?Math.min(hi,Math.max(lo,v)):df};
