@@ -1,4 +1,4 @@
-/* ===== v55.22.0: zone culling (draw only what is near you) =====
+/* ===== v55.23.0: zone culling (draw only what is near you) =====
    The world is one big scene of about 32,000 objects. Three.js already skips drawing a single mesh that is off screen, but it
    still walks every visible group each frame, recomputes its matrices and tests each mesh against the view, and the sun's
    shadow pass draws anything inside its own (larger) box. So from home the skate park, the island, the golf club, the beach
