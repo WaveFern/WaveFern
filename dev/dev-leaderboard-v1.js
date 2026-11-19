@@ -31,12 +31,13 @@
  /* only a career made after the full progress reset counts, never a trailer career or an old one */
  const eligible=()=>{try{return live()&&!window.fwTainted()&&typeof S=='object'&&S&&!FW_TRL&&typeof RS!='undefined'&&rsOn()&&S.rv>=RS.V&&mode!='creator'&&mode!='load'&&!(typeof TT!='undefined'&&TT.on&&!TT.game)&&!wiping&&!!boardName()}catch(e){return false}};
  const vals=()=>({a:boardName(),day:cl(S.day,1e5),lis:cl(S.listeners,1e12),str:cl(S.streams,1e12),mon:cl(S.money,1e12),fame:cl((()=>{try{return fameLevel()}catch(e){return 0}})(),1000),sg:cl((S.songs||[]).length,1e5),fol:cl(S.followers,1e12)});
- let lastSig='',lastAt=0,noFUntil=0,wbusy=0;
- LB.push=function(force){if(wbusy||!eligible())return Promise.resolve(0);
+ let lastSig='',lastAt=0,noFUntil=0,wbusy=0,wAt=0;
+ /* v55.30.10: a write that never settles (offline, dropped connection) no longer blocks every later write for the whole session; after 30 s the lock is released so the row keeps updating and the player does not sink down the board on stale numbers */
+ LB.push=function(force){if(wbusy&&Date.now()-wAt>30000)wbusy=0;if(wbusy||!eligible())return Promise.resolve(0);
   const v=vals(),sig=JSON.stringify(v)+((S.fdr&&!S.fdh)?1:0)+FBU.uid,n=Date.now();if(!force&&sig==lastSig&&n-lastAt<600000)return Promise.resolve(0);
   /* v49.91.0: the profile is written from the same moment, so the board and the profile never disagree */
   try{if(typeof fwProfileSync=='function')fwProfileSync(1)}catch(e){}
-  const d=Object.assign({},v,{t:n});if(Date.now()>=noFUntil)d.f=(S.fdr&&!S.fdh)?1:0;const uid=FBU.uid;wbusy=1;
+  const d=Object.assign({},v,{t:n});if(Date.now()>=noFUntil)d.f=(S.fdr&&!S.fdh)?1:0;const uid=FBU.uid;wbusy=1;wAt=Date.now();
   const put=x=>FBF.setDoc(FBF.doc(FBD,'leaderboard',uid),x);
   /* v49.95.2: a refused founder flag is not kept off for the whole session: the row is written without it, and the flag is tried again after 10 minutes (so a rules update takes effect without a reload) */
   return put(d).catch(e=>{if(e&&e.code=='permission-denied'&&d.f!==undefined){noFUntil=Date.now()+600000;delete d.f;return put(d)}throw e}).then(()=>{lastSig=sig;lastAt=n;LBS.werr='';return 1},e=>{LBS.werr=(e&&e.code)||'error';console.warn('leaderboard write',LBS.werr);return 0}).finally(()=>{wbusy=0})};
@@ -45,8 +46,8 @@
   const F=FBF,uid=FBU.uid;LBS.st='load';LBS.err='';
   return F.getDocs(F.query(F.collection(FBD,'leaderboard'),F.orderBy(k,'desc'),F.limit(CAP))).then(async sn=>{
    const rows=[];sn.forEach(d=>{const x=d.data();if(x&&typeof x.a=='string'&&!junk(x))rows.push({id:d.id,name:x.a,v:+x[k]||0,me:d.id==uid,fdr:!!x.f})});
-   if(!rows.some(r=>r.me)&&rows.length>=CAP){try{const m=await F.getDoc(F.doc(FBD,'leaderboard',uid));if(m.exists()){const x=m.data();rows.push({id:uid,name:x.a,v:+x[k]||0,me:true,fdr:!!x.f,rk:CAP+'+'})}}catch(e){}}
-   cache[k]={at:Date.now(),rows};LBS.st='ok'},e=>{LBS.st='err';LBS.err=(e&&e.code)||'error';cache[k]={at:Date.now()-TTL+8000,rows:[]};console.warn('leaderboard read',LBS.err)}).then(()=>{if(document.getElementById('lbd')&&CATS[cur].k==k)draw()})};
+   if(!rows.some(r=>r.me)&&sn.size>=CAP){try{const m=await F.getDoc(F.doc(FBD,'leaderboard',uid));if(m.exists()){const x=m.data();rows.push({id:uid,name:x.a,v:+x[k]||0,me:true,fdr:!!x.f,rk:CAP+'+'})}}catch(e){}}
+   cache[k]={at:Date.now(),rows};LBS.st='ok'},e=>{LBS.st='err';LBS.err=(e&&e.code)||'error';cache[k]={at:Date.now()-TTL+8000,rows:c?c.rows:[]};console.warn('leaderboard read',LBS.err)}).then(()=>{if(document.getElementById('lbd')&&CATS[cur].k==k)draw()})};
  /* returns [{name,v,me,fdr}] sorted high to low */
  LB.board=function(k){const c=cache[k];if(!c||Date.now()-c.at>=TTL)LB.load(k);return c?c.rows:[]};
  const emptyMsg=()=>!live()?'Sign in with Google to see the leaderboard and join it.':LBS.st=='err'?(LBS.err=='permission-denied'?'The leaderboard is not switched on yet.':'Could not load the leaderboard. Try again soon.'):LBS.st=='load'||LBS.st=='idle'?'Loading...':!eligible()&&0?'':'No ranked players yet.';
