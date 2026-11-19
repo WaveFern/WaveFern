@@ -18,6 +18,10 @@
            would go negative (a lip, an edge) and lands again by the same function. Cliffs (steps, walls) are detected against the predicted slope.
    STATE   S.skate={best,runs,tricks:{id:count},challenges:{id:done},deck,...} (lazy defaults in st(), saved like S.surf).
    HOOKS   FW_MASTERY.add('skate',..) per banked combo and at the end of a run (guarded). Test hook: window.FW_SKATE (bottom of the file).
+   RIDER v55.28.0  The skater is a jointed rig (skRig/applyFrame): hip, torso and head plus two-bone IK legs and arms (thigh/shin, upper arm/forearm). Feet are
+           planted on the deck (or the ground while pushing) by IK with knees bending forward, hands reach for the real grab spots on the board, a crouch
+           spring absorbs landings and pops, the back foot pushes in a cycle, flips flick the feet, carves lean the body, and everything is eased from the
+           same 24 number frames, so replays, Dex, Mika, Juno and Kai use it too. The old rig stays as applyFrame0 for any record without a hip.
    Mode is 'skate' while a session runs (capture-phase keys, own camera through a renderer.render wrapper, HUD #skhud). */
 (function(){
 if(!window.FW_ISLAND||/[?&]noskate/.test(location.search))return;
@@ -283,13 +287,19 @@ function buildRails(){RAILS.forEach(r=>{if(r.coping)return;railMesh(r)});
  cp(PX0+POOL.r,PZ0-.15,PX1-POOL.r,PZ0+.15);cp(PX0+POOL.r,PZ1-.15,PX1-POOL.r,PZ1+.15);cp(PX0-.15,PZ0+POOL.r,PX0+.15,PZ1-POOL.r);cp(PX1-.15,PZ0+POOL.r,PX1+.15,PZ1-POOL.r);
  /* rounded corners of the coping: short boxes along the arc */
  [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([sx,sz])=>{const cx=POOL.cx+sx*(POOL.a-POOL.r),cz=POOL.cz+sz*(POOL.b-POOL.r);for(let k=1;k<6;k++){const a=k/6*PI/2,x=cx+sx*Math.cos(a)*POOL.r,z=cz+sz*Math.sin(a)*POOL.r;bx(.35,.1,.35,COL.steel,x,.02,z,-Math.atan2(sz*Math.sin(a),sx*Math.cos(a)))}})}
-/* the island ground lies over the pool pit, so the ground layers under the pool get a clip box (clipIntersection = only inside the box is cut) */
-let CARVED=[];
-function carvePool(){try{renderer.localClippingEnabled=true;const x0=CX+PX0+.01,x1=CX+PX1-.01,z0=CZ+PZ0+.01,z1=CZ+PZ1-.01;
- const pl=[new THREE.Plane(new THREE.Vector3(-1,0,0),x0),new THREE.Plane(new THREE.Vector3(1,0,0),-x1),new THREE.Plane(new THREE.Vector3(0,0,-1),z0),new THREE.Plane(new THREE.Vector3(0,0,1),-z1)];
- const box=new THREE.Box3(new THREE.Vector3(x0,-3,z0),new THREE.Vector3(x1,.1,z1)),bb=new THREE.Box3(),seen=new Set();
- scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.skate)return;for(let a=o.parent;a;a=a.parent)if(a===root)return;bb.setFromObject(o);if(bb.isEmpty()||bb.max.y>.2||!bb.intersectsBox(box))return;
-  (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(!m||seen.has(m))return;seen.add(m);CARVED.push([m,m.clippingPlanes,m.clipIntersection]);m.clippingPlanes=pl;m.clipIntersection=true;m.needsUpdate=true})})}catch(e){soft(e,'carve')}}
+/* the island ground (grass, the snow lawn, the beach layers under it) is cut away under the WHOLE park, not just the pool pit (v55.28.0):
+   a clip box (clipIntersection = only inside the box is cut) on every flat ground mesh that reaches under the slab. Before, only the pool was
+   cut, so the grass only 12 cm under the concrete could show through it from a distance (depth precision, worst on phones and tablets), and
+   the snow-day ground materials (swapped in later by the Christmas file) were never cut at all. carveTick re-checks every 2 s and cuts any
+   material that was swapped onto those meshes since. */
+let CARVED=[],CARVO=[];const CLIP=[];
+function carvePool(){try{renderer.localClippingEnabled=true;const x0=CX-HXM-.42,x1=CX+HXM+.42,z0=CZ-HZM-.42,z1=CZ+HZM+.42;
+ if(!CLIP.length)CLIP.push(new THREE.Plane(new THREE.Vector3(-1,0,0),x0),new THREE.Plane(new THREE.Vector3(1,0,0),-x1),new THREE.Plane(new THREE.Vector3(0,0,-1),z0),new THREE.Plane(new THREE.Vector3(0,0,1),-z1));
+ const box=new THREE.Box3(new THREE.Vector3(x0,-3,z0),new THREE.Vector3(x1,.1,z1)),bb=new THREE.Box3();
+ scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.skate||CARVO.includes(o))return;for(let a=o.parent;a;a=a.parent)if(a===root)return;bb.setFromObject(o);if(bb.isEmpty()||bb.max.y>.2||!bb.intersectsBox(box))return;CARVO.push(o)});
+ carveMats()}catch(e){soft(e,'carve')}}
+function carveMats(){CARVO.forEach(o=>(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(!m||m.clippingPlanes===CLIP)return;CARVED.push([m,m.clippingPlanes,m.clipIntersection]);m.clippingPlanes=CLIP;m.clipIntersection=true;m.needsUpdate=true}))}
+let carveT=0;function carveTick(dt){if(!CLIP.length)return;carveT+=dt;if(carveT<2)return;carveT=0;try{carveMats()}catch(e){soft(e,'carve2')}}
 function buildRamps(){
  const S2=soup(),cT=tcol('#b6bbc1'),cF=tcol('#9ea4aa'),cR=tcol('#8a8f96'),cS=tcol('#7e848b');
  EXT.forEach(e=>{if(e.kind=='hut'||e.kind=='rack'||e.kind=='prop'||e.kind=='box'&&e.id!='plat')return;
@@ -697,7 +707,7 @@ function frameOf(){const b=B,mo=b.st=='g'?(b.man?M_M:M_G):b.st=='a'?M_A:b.st=='r
 const GRAB_IDX={indy:1,nose:2,tail:3,melon:4,stale:5};
 /* apply a frame to a character record R={g,arms,legs,board} */
 const ref=new THREE.Object3D();
-function applyFrame(R,f,off){const bd=R.board,b0=ref,tt=f[13];
+function applyFrame0(R,f,off){const bd=R.board,b0=ref,tt=f[13];
  bd.position.set(f[0],f[1]+.18*f[10],f[2]);bd.rotation.set(f[4],f[3]+f[7],f[5]+f[6],'YXZ');
  const mo=f[11],A=R.arms,L=R.legs,m=R.g;
  if(mo==M_B&&f[20]!=null&&(f[14]||f[15])){/* tumbling: the whole body is a flailing lump */
@@ -716,6 +726,114 @@ function applyFrame(R,f,off){const bd=R.board,b0=ref,tt=f[13];
  else{const push=f[21];A[0].rotation.set(-.2*cr,0,-.55-w-.3*cr);A[1].rotation.set(-.2*cr,0,.55+w+.3*cr)}
  m.scale.setScalar(1)}
 
+/* ---------- RIDER v55.28.0: a jointed skater (thigh/shin/foot, upper arm/forearm/hand, hip, torso, head) ---------- */
+const DECK=.214,LT=.22,LS=.19,ANK=.09,LUA=.25,LFA=.22,UPY=new THREE.Vector3(0,1,0);
+const _ia=new THREE.Vector3(),_ib=new THREE.Vector3(),_ic=new THREE.Vector3(),_id=new THREE.Vector3(),_ie=new THREE.Vector3(),_if=new THREE.Vector3(),_iM=new THREE.Matrix4(),_iQ=new THREE.Quaternion();
+const _qd=new THREE.Quaternion(),_qb=new THREE.Quaternion(),_qa=new THREE.Quaternion(),_qc=new THREE.Quaternion(),_m1=new THREE.Matrix4(),_m2=new THREE.Matrix4(),_pa=new THREE.Vector3(),_pb=new THREE.Vector3(),_pc=new THREE.Vector3(),_pd=new THREE.Vector3(),_pe=new THREE.Vector3();
+const _pk=[new THREE.Vector3(-.25,-.1,1),new THREE.Vector3(.45,-.1,1)],_pkA=[new THREE.Vector3(-.5,-.2,-1),new THREE.Vector3(.5,-.2,-1)];
+const _cc=new THREE.Vector3(0,.11,0);
+function bq(q,y,pole){_ic.copy(pole).addScaledVector(y,-pole.dot(y));if(_ic.lengthSq()<1e-6){_ic.set(0,0,1).addScaledVector(y,-y.z);if(_ic.lengthSq()<1e-6)_ic.set(1,0,0)}_ic.normalize();_id.crossVectors(y,_ic);_iM.makeBasis(_id,y,_ic);q.setFromRotationMatrix(_iM)}
+/* two-bone IK in the pivot's parent space: root, target, bone lengths, knee/elbow pole, upper pivot, lower pivot */
+function ik2(root,tg,L1,L2,pole,up,lo){const d=_ia.subVectors(tg,root);let D=d.length();if(D<1e-5){d.set(0,-1,0);D=1}d.divideScalar(D);
+ const Dc=clamp(D,Math.abs(L1-L2)+.02,L1+L2-.003),a=(L1*L1-L2*L2+Dc*Dc)/(2*Dc),h=Math.sqrt(Math.max(0,L1*L1-a*a));
+ _ib.copy(pole).addScaledVector(d,-pole.dot(d));if(_ib.lengthSq()<1e-6)_ib.set(0,0,1).addScaledVector(d,-d.z);_ib.normalize();
+ _ie.copy(d).multiplyScalar(a).addScaledVector(_ib,h).divideScalar(-L1);bq(up.quaternion,_ie,pole);
+ _if.copy(d).multiplyScalar(Dc-a).addScaledVector(_ib,-h).divideScalar(-L2);bq(_iQ,_if,pole);
+ lo.quaternion.copy(up.quaternion).invert().multiply(_iQ)}
+function rbox(p,w,h,d,mat,x,y,z){const m=new THREE.Mesh(geo(w,h,d),mat);m.position.set(x,y,z);p.add(m);return m}
+function skRig(f,board){const g=f.g,u=g.userData;if(u.skr){u.skr.board=board;return u.skr}
+ const sc=g.scale.y||1;g.scale.setScalar(sc);
+ const li=f.legs.map(l=>{const c=l.children,p=(c[0].geometry&&c[0].geometry.parameters)||{};return{x:l.position.x,pm:c[0].material,sm:c.length>=4?c[1].material:c[0].material,fm:c[c.length-1].material,w:p.width||.2,d:p.depth||.25}});
+ const ai=f.arms.map(a=>{const c=a.children;return{p:a.position.clone().sub(new THREE.Vector3(0,.5,0)),sl:c.length>1?c[0].geometry.parameters.height:0,m1:c.length>1?c[0].material:null,sk:c[c.length-1].material}});
+ const hip=new THREE.Group(),tor=new THREE.Group();tor.rotation.order='YXZ';hip.position.y=.5;g.add(hip);hip.add(tor);let head=null;
+ g.children.slice().forEach(c=>{if(c===hip)return;if(f.legs.indexOf(c)>=0){c.visible=false;return}
+  if(c.geometry&&c.geometry.type=='CircleGeometry'){c.visible=false;return}
+  tor.add(c);c.position.y-=.5;if(f.arms.indexOf(c)>=0)c.visible=false;else if(!c.isMesh&&Math.abs(c.position.y-.9)<.06)head=c});
+ if(!head)head=new THREE.Group();head.rotation.order='YXZ';
+ const legs=li.map(q=>{const th=new THREE.Group();th.position.set(q.x,0,0);hip.add(th);rbox(th,q.w,LT+.01,q.d*.9,q.pm,0,-LT/2,0);
+  const sh=new THREE.Group();sh.position.y=-LT;th.add(sh);rbox(sh,q.w*.86,LS+.01,q.d*.8,q.sm,0,-LS/2,0);
+  const ft=new THREE.Group();ft.position.y=-LS;sh.add(ft);rbox(ft,q.w*.95,ANK-.02,.27,q.fm,0,-ANK/2+.01,.04);rbox(ft,q.w,.03,.29,'#f4f4f4'&&M('#f4f4f4'),0,-ANK+.015,.04);
+  return{th,sh,ft}});
+ const arms=ai.map(q=>{const up=new THREE.Group();up.position.copy(q.p);tor.add(up);
+  rbox(up,.14,LUA+.01,.16,q.sl>.05&&q.m1?q.m1:q.sk,0,-LUA/2,0);const lo=new THREE.Group();lo.position.y=-LUA;up.add(lo);
+  rbox(lo,.12,LFA+.01,.14,q.sl>.4&&q.m1?q.m1:q.sk,0,-LFA/2,0);rbox(lo,.1,.09,.12,q.sk,0,-LFA-.02,0);return{up,lo,p:q.p}});
+ const V=()=>new THREE.Vector3(),s={t:0,fresh:1,c:.14,cv:0,pm:f.legs?0:0,py:0,pt:-9,avy:0,cr:0,rp:0,rr:0,pa:0,p:0,pw:0,tp:0,tw:0,tz:0,hx:0,hz:0,hd:0,bail:0,bt:0,bp:V(),bq:new THREE.Quaternion(),f:[V(),V()],fy:[0,0],h:[V(),V()],sh:null};
+ return u.skr={g,arms:f.arms,legs:f.legs,board,hip,tor,head,rl:legs,ra:arms,s,sh:null}}
+function skShadow(R,f){let sh=R.sh;if(!sh){sh=R.sh=new THREE.Mesh(new THREE.CircleGeometry(.5,14),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.28,depthWrite:false}));sh.rotation.x=-PI/2;sh.renderOrder=1;(R.g.parent||scene).add(sh)}
+ const x=f[0],z=f[2],gy=R.own?SLAB+hH(clamp(x-CX,-HXM,HXM),clamp(z-CZ,-HZM,HZM)):hH(clamp(x,-HXM,HXM),clamp(z,-HZM,HZM)),h=Math.max(0,f[1]-gy),k=1/(1+h*.9);
+ sh.position.set(x,gy+.04,z);sh.scale.set(1.5*k,1.5*k,1);sh.material.opacity=.3*k;sh.visible=R.g.visible}
+function applyFrame(R,f){if(!R.hip)return applyFrame0(R,f);
+ const s=R.s,g=R.g,hip=R.hip,tor=R.tor,bd=R.board,fr=s.fresh,now=performance.now(),dt=fr?0:clamp((now-s.t)/1000,0,.1);s.t=now;
+ const kk=r=>fr?1:1-Math.exp(-r*dt),mo=f[11],air=mo==M_A,gnd=mo==M_G,tt=f[13];
+ skShadow(R,f);
+ /* board: spins about its own centre */
+ s.cr+=((gnd?f[9]:0)-s.cr)*kk(10);const cz=s.cr*.16;
+ _e.set(f[4],f[3],f[5]-cz,'YXZ');_qd.setFromEuler(_e);_e.set(f[4],f[3]+f[7],f[5]-cz+f[6],'YXZ');_qb.setFromEuler(_e);
+ const lift=.18*f[10]+.12*Math.max(Math.abs(Math.sin(f[6]/2)),.7*Math.abs(Math.sin(f[7])));
+ _pa.set(f[0],f[1]+lift,f[2]);_pb.copy(_cc).applyQuaternion(_qd);_pc.copy(_cc).applyQuaternion(_qb);bd.position.copy(_pa).add(_pb).sub(_pc);bd.quaternion.copy(_qb);
+ const fl=Math.abs(Math.sin(f[6]/2)),sv=Math.abs(Math.sin(f[7])),R0=R.rl,A0=R.ra;
+ if(mo==M_B&&(f[14]||f[15])){/* tumbling */
+  const k=1-(f[20]||0);g.position.set(f[14],f[15]-.42,f[16]);_e.set(f[17]*k,f[18],f[19]*k,'XYZ');g.quaternion.setFromEuler(_e);
+  hip.position.set(0,.47,0);hip.rotation.set(0,0,0);tor.rotation.set(0,0,0);R.head.rotation.set(0,0,0);
+  for(let i=0;i<2;i++){const sn=Math.sin(tt*14+i*2),sg=i?1:-1;R0[i].th.rotation.set(-(.5+.5*sn)*k,0,0);R0[i].sh.rotation.set((.8+.4*sn)*k,0,0);R0[i].ft.rotation.set(0,0,0);
+   A0[i].up.rotation.set(Math.sin(tt*14+i*2.6)*2*k,0,sg*(.8+.6*sn)*k);A0[i].lo.rotation.set(-.6*k,0,0)}
+  s.bail=1;s.bp.copy(g.position);s.bq.copy(g.quaternion);s.pm=mo;s.fresh=0;return}
+ if(s.bail){s.bail=0;s.bt=.35}
+ /* crouch spring, landing absorb and pop */
+ const ground=mo==M_G||mo==M_R||mo==M_M,pm=fr?mo:s.pm,ft=f[13]-s.pt;
+ if(air){if(ft>1e-4&&ft<.2){s.avy+=((f[1]-s.py)/ft-s.avy)*Math.min(1,dt*10)}}else s.avy=0;
+ if(ft>1e-4||fr){s.py=f[1];s.pt=f[13]}
+ if(pm==M_A&&ground)s.cv+=clamp(-s.avy*.7,1.2,5);else if((pm==M_G||pm==M_M)&&air)s.cv-=1.6;
+ /* push phase */
+ const pushing=gnd&&!f[10]&&f[21]>.15;
+ if(pushing){s.pa=1;s.p+=dt*1.3}else if(s.pa){const b=Math.floor(s.p);s.p+=dt*2.8;if(Math.floor(s.p)>b){s.pa=0;s.p=0}}
+ s.pw+=((s.pa?1:0)-s.pw)*kk(8);const ph=s.p-Math.floor(s.p),pw=s.pw,pl=pw*sm(.2,.26,ph)*(1-sm(.68,.74,ph));
+ const ct=f[8]+(gnd?.08:0)+.5*pl,n=Math.ceil(dt/.016),h=n?dt/n:0;if(fr)s.c=ct;
+ for(let i=0;i<n;i++){s.cv+=(-160*(s.c-ct)-13.9*s.cv)*h;s.c+=s.cv*h}
+ const c=clamp(s.c,-.3,1.1),hipY=.5*(.94-.44*c);
+ /* rider root */
+ const manX=mo==M_M?f[12]*.55+.18:0,kr=kk(air?5:14),rpT=(f[4]-manX)*(air?.35:1),rrT=f[5]*(mo==M_W?.7:1);
+ if(fr){s.rp=rpT;s.rr=rrT}else{s.rp+=(rpT-s.rp)*kr;s.rr+=(rrT-s.rr)*kr}
+ _e.set(s.rp,f[3],s.rr,'YXZ');g.quaternion.setFromEuler(_e).multiply(_yq);
+ _pb.set(0,DECK,0).applyQuaternion(_qd);g.position.set(f[0]+_pb.x,f[1]+_pb.y,f[2]+_pb.z);
+ if(s.bt>0){s.bt-=dt;const u=ease(1-clamp(s.bt/.35,0,1));g.position.lerpVectors(s.bp,g.position,u);_qa.copy(s.bq).slerp(g.quaternion,u);g.quaternion.copy(_qa)}
+ /* hip and torso */
+ const gid=f[22],gb=(gid>=1&&gid<=3?.25:.15)*f[10],kt=kk(10),man=mo==M_M,rail=mo==M_R;
+ s.hx+=((pw*.05)-(man?.12+f[12]*.08:0)-s.hx)*kt;s.hz+=(-s.cr*.1-s.hz)*kt;hip.position.set(s.hx,hipY,s.hz);hip.rotation.set(0,0,0);
+ s.tp+=(.12+.32*c+.15*pw+gb-s.tp)*kt;s.tw+=(.8*pw-s.tw)*kt;s.tz+=((man?.25-f[12]*.15:rail?-f[12]*.25:0)-s.tz)*kt;
+ tor.rotation.set(s.tp-s.cr*.2,s.tw,s.tz);
+ s.hd+=((rail?.7:.6)-s.tw-s.hd)*kt;R.head.rotation.set(.08-.8*Math.max(0,s.tp-.3),s.hd,0);
+ g.updateMatrix();hip.updateMatrix();_m1.multiplyMatrices(g.matrix,hip.matrix);_m2.copy(_m1).invert();
+ /* feet */
+ const pf=ph<.22?0:ph<.72?1:2;
+ for(let i=0;i<2;i++){const fv=s.f[i],front=i==1;let x=front?-.02:0,y=DECK+ANK,z=front?.2:-.27,yw=front?.35:.1;
+  if(front){x=lerp(x,0,pw);z=lerp(z,.16,pw);yw=lerp(yw,1.1,pw)}
+  else if(pw>.001){let px,py,pz;
+   if(pf==0){const u=ease(ph/.22);px=lerp(0,-.26,u);pz=lerp(-.27,.12,u);py=lerp(DECK+ANK,ANK+.04,u)+.12*arc(u)}
+   else if(pf==1){const u=(ph-.22)/.5;px=-.26;pz=lerp(.12,-.5,u);py=ANK+.04}
+   else{const u=ease((ph-.72)/.28);px=lerp(-.26,0,u);pz=lerp(-.5,-.27,u);py=lerp(ANK+.04,DECK+ANK,u)+.15*arc(u)}
+   x=lerp(x,px,pw);y=lerp(y,py,pw);z=lerp(z,pz,pw);yw=lerp(yw,.1,pw)}
+  y+=.26*fl;if(front){z+=.06*fl;x+=(f[6]>0?-.12:.12)*fl}else y+=.2*sv;
+  _pd.set(x,y,z);fv.lerp(_pd,kk(20));s.fy[i]+=(yw-s.fy[i])*kk(20);
+  _pe.copy(fv).applyQuaternion(_qd).add(_pa).applyMatrix4(_m2);const L=R0[i];
+  ik2(L.th.position,_pe,LT,LS,_pk[i],L.th,L.sh);
+  _qa.setFromAxisAngle(UPY,s.fy[i]);_qc.copy(_qd).multiply(_yq).multiply(_qa);
+  _qb.copy(g.quaternion).multiply(hip.quaternion).multiply(L.th.quaternion).multiply(L.sh.quaternion);L.ft.quaternion.copy(_qb.invert()).multiply(_qc)}
+ /* hands */
+ tor.updateMatrix();_m1.multiplyMatrices(_m1,tor.matrix);_m2.copy(_m1).invert();
+ const flipping=air&&(Math.abs(f[6])>.15||Math.abs(f[7])>.15),gi=gid==2||gid==4?1:0,sw=Math.sin(Math.PI*2*ph)*pw;
+ for(let i=0;i<2;i++){const sg=i?1:-1,A=R.ra[i],hv=s.h[i];let x=sg*.16,y=-.38,z=.08+.12*c+Math.sin(tt*2.2+i*3.1)*.03;
+  if(pw>.001){z+=(i?-1:1)*.22*sw;y+=.04*pw}
+  if(air||mo==M_B){x=sg*.32;y=-.22;z=.05;if(flipping){x=sg*.38;y=-.1;z=0}}
+  else if(rail){x=sg*.45;y=-.12+f[12]*sg*.18;z=.04}else if(man){x=sg*.3;y=-.18;z=.2}else if(mo==M_W){x=sg*.35;y=-.15;z=0}
+  _pd.set(x,y,z);hv.lerp(_pd,kk(12));_pe.copy(A.p).add(hv);
+  if(f[10]>.01&&gid){const gr=f[10];if(i==gi||(gid==1||gid==3||gid==5)&&i==0){/* grabbing hand */
+    const q=gid==1?[-.105,DECK+.04,-.05]:gid==2?[0,DECK+.06,.4]:gid==3?[0,DECK+.06,-.4]:gid==4?[.105,DECK+.04,.03]:[.105,DECK+.04,-.12];
+    _pa.set(q[0],q[1],q[2]).applyQuaternion(bd.quaternion).add(bd.position);_pa.applyMatrix4(_m2);_pe.lerp(_pa,gr)}
+   else{_pd.set(A.p.x+sg*.42,A.p.y-.05,-.05);_pe.lerp(_pd,gr)}}
+  ik2(A.p,_pe,LUA,LFA,_pkA[i],A.up,A.lo)}
+ s.pm=mo;s.fresh=0}
+
 /* =====================================================================================================================
    start / stop, input, the sim tick, camera, replay
    ===================================================================================================================== */
@@ -729,6 +847,7 @@ function startSession(modeId,opt){opt=opt||{};if(G||away()||(mode!='play'&&mode!
  try{FOL.forEach(f=>{G.hidden.push([f,f.m.visible]);f.m.visible=false})}catch(e){}
  try{if(P.mesh){P.mesh.visible=true;G.sh=P.mesh.children[0]&&P.mesh.children[0].visible;if(P.mesh.children[0])P.mesh.children[0].visible=false}}catch(e){}
  const gg=gear(),bm=boardMesh(gg.d,2),bg=new THREE.Group();bg.add(bm);scene.add(bg);G.boardG=bg;G.boardM=bm;RG={g:P.mesh,arms:P.arms,legs:P.legs,board:bg};
+ try{const rc=buildChar(ch);scene.add(rc.g);RG=skRig(rc,bg);RG.own=1;RG.rc=rc;if(P.mesh)P.mesh.visible=false}catch(e){soft(e,'rider')}
  partsOn();audioOn();hudOn();
  const sf=scene.fog;G.fog=sf&&sf.near!=null?[sf.near,sf.far,sf.color.clone()]:null;if(sf&&sf.near!=null){sf.near=140;sf.far=620;const bgc=scene.background;if(bgc&&bgc.isColor)sf.color.copy(bgc)}
  P.x=CX+B.x;P.z=CZ+B.z;SY=SLAB;
@@ -743,6 +862,7 @@ function endSession(quit){if(!G||G.ended)return;G.ended=true;const o=st();bankCo
 function exitSession(){const g=G;if(!g)return;G=null;mode='play';try{$('hud').style.display=''}catch(e){}document.body.classList.remove('fston');
  try{g.hidden.forEach(a=>{a[0].m.visible=a[1]})}catch(e){}
  try{if(P.mesh){if(P.mesh.children[0])P.mesh.children[0].visible=g.sh!==false;P.mesh.rotation.set(0,0,0);P.mesh.quaternion.identity();P.mesh.scale.setScalar(1);[P.arms[0],P.arms[1],P.legs[0],P.legs[1]].forEach(x=>x.rotation.set(0,0,0))}}catch(e){}
+ try{if(RG&&RG.own){if(RG.g.parent)RG.g.parent.remove(RG.g);if(RG.sh){if(RG.sh.parent)RG.sh.parent.remove(RG.sh);RG.sh.geometry.dispose();RG.sh.material.dispose()}if(P.mesh)P.mesh.visible=true}}catch(e){soft(e,'rider2')}
  try{scene.remove(g.boardG);g.boardM.geometry.dispose();g.boardM.material.dispose()}catch(e){soft(e,'dispose')}
  partsOff();audioOff();hudOff();
  try{const sf=scene.fog;if(g.fog&&sf){sf.near=g.fog[0];sf.far=g.fog[1];sf.color.copy(g.fog[2])}}catch(e){}
@@ -805,7 +925,7 @@ function camUpdate(dt){const c=G.cam,b=B,sp=Math.hypot(b.vx,b.vz);let tx=b.x,ty=
  const fv=60+Math.min(20,sp*1.7);c.fov+=(fv-c.fov)*Math.min(1,dt*3);if(c.shake>0)c.shake=Math.max(0,c.shake-dt*3)}
 const _cp=new THREE.Vector3();
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(c===cam&&G&&G.on){cam3.aspect=innerWidth/innerHeight;if(Math.abs(cam3.fov-G.cam.fov)>.01)cam3.fov=G.cam.fov;cam3.updateProjectionMatrix();try{poseFrame()}catch(e){soft(e,'pose')}const sc0=sun.castShadow;sun.castShadow=false;try{return r0(sc,cam3)}finally{sun.castShadow=sc0}}return r0(sc,c)}}
-function poseFrame(){if(!G||!B||!RG)return;let f;const c=G.cam;
+function poseFrame(){if(!G||!B||!RG)return;let f;const c=G.cam;if(RG.own&&P.mesh)P.mesh.visible=false;
  if(G.phase=='replay'&&G.rp){f=G.rp.cur;if(!f)return;applyFrame(RG,f);const r=G.rp,a=r.ang,fx=f[0],fz=f[2],y=f[1];const px=fx+Math.cos(a)*6.2,pz=fz+Math.sin(a)*6.2;cam3.position.set(px,Math.max(y+1.4,SLAB+1.3),pz);cam3.lookAt(fx,y+.9,fz);cam3.fov=48;return}
  f=frameOf();applyFrame(RG,f);G.curF=f;
  const sh=c.shake*.06;cam3.position.set(CX+c.x+(sh?rr(-sh,sh):0),SLAB+c.y+(sh?rr(-sh,sh):0),CZ+c.z);cam3.lookAt(CX+c.lx,SLAB+c.ly,CZ+c.lz);if(G.camOv){const o=G.camOv;cam3.position.set(CX+o[0],SLAB+o[1],CZ+o[2]);cam3.lookAt(CX+o[3],SLAB+o[4],CZ+o[5])}}
@@ -935,7 +1055,7 @@ function person(x,z,ry,o){const i=NPC.length,r=n=>{let h=Math.sin((i+1)*61.7+n*1
  const c={skin:Math.floor(r(1)*(typeof SKIN!='undefined'?SKIN.length:6)),eyes:o.eyes!=null?o.eyes:Math.floor(r(2)*4),mouth:Math.floor(r(3)*4),hair:o.hair!=null?o.hair:Math.floor(r(4)*12),hc:Math.floor(r(5)*(typeof HAIRC!='undefined'?HAIRC.length:12)),top:o.topT!=null?o.topT:0,tc:0,pc:0,tc_custom:o.top||'#ffd23d',pc_custom:o.pants||'#2b3a55',body:o.body!=null?o.body:r(6),bt:o.bt!=null?o.bt:2,hgt:o.hgt!=null?o.hgt:.5};
  if(o.hcc)c.hc_custom=o.hcc;const f=buildChar(c);f.g.position.set(x,o.y||0,z);f.g.rotation.y=ry;root.add(f.g);if(o.seat)f.legs.forEach(l=>l.rotation.x=-1.5);
  const p={f,k:o.k,x,z,ry,ph:i*1.7,nm:o.nm,t0:rr(0,20)};NPC.push(p);return p}
-function skater(o){const p=person(0,0,0,o);const d=DECKS[o.deck%DECKS.length],bm=boardMesh(d,0),bg=new THREE.Group();bg.add(bm);root.add(bg);p.rig={g:p.f.g,arms:p.f.arms,legs:p.f.legs,board:bg};p.bm=bm;return p}
+function skater(o){const p=person(0,0,0,o);const d=DECKS[o.deck%DECKS.length],bm=boardMesh(d,0),bg=new THREE.Group();bg.add(bm);root.add(bg);p.rig=skRig(p.f,bg);p.bm=bm;return p}
 function buildPeople(){if(ppBuilt)return;ppBuilt=true;
  const tina=person(-52,-24.55,0,{k:'clerk',top:'#f3efe2',pants:'#22405e',y:.3,hair:5,bt:3,nm:'Tina',hcc:'#6a3a2a',topT:5});tina.f.arms[1].rotation.x=-.5;
  const rex=person(-39,-22.6,.6,{k:'coach',top:'#d9483b',pants:'#2b3a55',hair:1,bt:2,nm:'Rex',hcc:'#9a9a9a',topT:6,body:.7});rex.f.arms[1].rotation.set(-.6,0,.2);rex.f.arms[0].rotation.set(-.2,0,-.2);
@@ -944,9 +1064,10 @@ function buildPeople(){if(ppBuilt)return;ppBuilt=true;
  const s2=person(0,-28.75,PI,{k:'sit',top:'#ff6ad5',pants:'#2b2b3a',y:.55,hair:6,bt:1,nm:'Lou',seat:1,topT:3});s2.f.g.position.y=.12;
  NPC.skaters=[skater({k:'dex',top:'#3a7bd5',pants:'#22223a',hair:3,nm:'Dex',deck:3,topT:0}),skater({k:'mika',top:'#ff6ad5',pants:'#2a2a40',hair:7,nm:'Mika',deck:1,topT:6,bt:1}),skater({k:'juno',top:'#ffd23d',pants:'#3a3a4a',hair:11,nm:'Juno',deck:2,topT:5}),skater({k:'kai',top:'#9dffb6',pants:'#2a3a4a',hair:1,nm:'Kai',deck:4,topT:3})];
  root.updateMatrixWorld(true)}
-const mkF=(x,y,z,yaw,o)=>{o=o||{};return[x,y,z,yaw,o.pitch||0,o.roll||0,o.flip||0,o.shove||0,o.crouch==null?.2:o.crouch,o.lean||0,o.grab||0,o.mode||0,o.bal||0,o.t||0,0,0,0,0,0,0,0,0,o.gid||0,o.sp||4]};
+const mkF=(x,y,z,yaw,o)=>{o=o||{};return[x,y,z,yaw,o.pitch||0,o.roll||0,o.flip||0,o.shove||0,o.crouch==null?.2:o.crouch,o.lean||0,o.grab||0,o.mode||0,o.bal||0,o.t||0,0,0,0,0,0,0,0,o.push||0,o.gid||0,o.sp||4]};
 const ease=p=>p*p*(3-2*p),arc=p=>4*p*(1-p);
 function dexLoop(t){const cx=-16,cz=-17,r=7.5,sp=5.2,th=sp/r*t,x=cx+r*Math.cos(th),z=cz+r*Math.sin(th),yaw=Math.atan2(-Math.sin(th),Math.cos(th)),ph=t%3,idx=Math.floor(t/3)%3;let air=0,o={crouch:.2,t};
+ if(t%3>1.3&&t%3<2.6)o.push=1;
  if(ph<.8){const a=ph/.8;air=.7*arc(a);o.crouch=.5;if(idx==0)o.flip=TAU*ease(a);else if(idx==1)o.shove=PI*ease(a);else{o.grab=sm(.15,.4,a)*(1-sm(.7,.9,a));o.gid=1}}
  return mkF(x,hH(x,z)+air,z,yaw,o)}
 function mikaPipe(t){const cx=-53,cz=18,w=1.15,s=Math.sin(w*t),c=Math.cos(w*t),L=3.04+1.9,x=cx+L*s,z=cz+Math.sin(t*.37)*1.4,y=hH(x,z);const ex=Math.abs(s)>.93?arc(clamp((1-Math.abs(s))/.07,0,1)*.5+.0)*0+(1-clamp((1-Math.abs(s))/.07,0,1)):0;
@@ -954,10 +1075,10 @@ function mikaPipe(t){const cx=-53,cz=18,w=1.15,s=Math.sin(w*t),c=Math.cos(w*t),L
  return mkF(x,y+ex*.9,z,yaw,{crouch:.25+.5*ex,grab:ex>.3?1:0,gid:4,pitch:c>=0?pitch:-pitch,t,flip:0})}
 function junoBowl(t){const rx=3.6+1.9*Math.sin(.45*t),rz=2.2+1.1*Math.sin(.45*t+1),th=t*.95,x=POOL.cx+rx*Math.cos(th),z=POOL.cz+rz*Math.sin(th),dx=-rx*Math.sin(th),dz=rz*Math.cos(th),yaw=Math.atan2(dx,dz);return mkF(x,hH(x,z),z,yaw,{crouch:.35,lean:.7,roll:0,t,pitch:0})}
 function kaiRail(t){const T=[1.7,.55,3.3,.55,1.3,3.6,1.3],tot=T.reduce((a,b)=>a+b,0);let u=t%tot,i=0;while(u>T[i]){u-=T[i];i++}const p=u/T[i];let x,z,y=0,o={crouch:.2,t},yaw=PI/2;
- switch(i){case 0:x=lerp(-37,-31.8,p);z=-6;break;case 1:x=lerp(-31.8,-29.8,p);z=-6;y=.55*ease(p)+.5*arc(p);o.crouch=.5;break;
+ switch(i){case 0:x=lerp(-37,-31.8,p);z=-6;o.push=1;break;case 1:x=lerp(-31.8,-29.8,p);z=-6;y=.55*ease(p)+.5*arc(p);o.crouch=.5;break;
   case 2:x=lerp(-29.8,-18.2,p);z=-6;y=.55;o.mode=M_R;o.bal=Math.sin(t*3.1)*.5;o.crouch=.3;break;case 3:x=lerp(-18.2,-16,p);z=-6;y=.55*(1-ease(p))+.45*arc(p);o.crouch=.5;o.flip=p>.4?TAU*ease((p-.4)/.6):0;break;
   case 4:{const a=ease(p);x=lerp(-16,-12,a);z=lerp(-6,-10,a);yaw=PI/2+(1-p)*0-.9*Math.sin(p*PI);break}
-  case 5:x=lerp(-12,-37,p);z=-10;yaw=-PI/2;break;default:{const a=ease(p);x=lerp(-37,-37,a);z=lerp(-10,-6,a);yaw=-PI/2+PI*a;break}}
+  case 5:x=lerp(-12,-37,p);z=-10;yaw=-PI/2;o.push=1;break;default:{const a=ease(p);x=lerp(-37,-37,a);z=lerp(-10,-6,a);yaw=-PI/2+PI*a;break}}
  if(i==1||i==3)o.flip=o.flip||0;return mkF(x,y+hH(x,z)*0,z,yaw,o)}
 /* Dex doing a trick for S-K-A-T-E, on a clear stretch of plaza (or the long rail for grinds) */
 function dexDemo(id,ok){const n=NPC.skaters&&NPC.skaters[0];if(!n)return;n.demo={id,ok,t:0}}
@@ -1000,7 +1121,7 @@ let intDone=false,HY2=0,ANT=0;
   p=f(-52,-21.4);INT.push({x:p[0],z:p[1],r:3.6,l:'Board Shop: rent, decks, trucks',a:()=>openMenu('shop'),sk:2});
   p=f(-39,-21.2);INT.push({x:p[0],z:p[1],r:2.6,l:'Talk to Rex the coach',a:()=>openMenu('coach'),sk:3});
   p=f(LBX,LBZ+2.6);INT.push({x:p[0],z:p[1],r:3,l:'Skate park leaderboard and challenges',a:()=>openMenu('chal'),sk:4})}
- if(root.visible){if(!ppBuilt&&dd<260)buildPeople();ANT+=dt;lightsTick();
+ if(root.visible){if(!ppBuilt&&dd<260)buildPeople();ANT+=dt;lightsTick();carveTick(dt);
   if(ppBuilt&&(dd<200||G))npcTick(dt,ANT);
   if(boardKey&&!G){const o=st();if(boardKey!==[o.best,o.runs,o.bestCombo,Object.keys(o.challenges).length,o.wins].join('|'))drawBoard()}}
  if(G&&G.on){if(!(window.FW_SKATE&&FW_SKATE.hold)){P.x=CX+B.x;P.z=CZ+B.z;SY=SLAB;simTick(dt)}hudTick()}
