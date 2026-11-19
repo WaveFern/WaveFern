@@ -1086,25 +1086,25 @@ const CSS=`#fishhud{position:fixed;inset:0;z-index:7;pointer-events:none;display
 #fh_bite .in{position:absolute;left:-50px;top:-50px;width:100px;height:100px;border:6px solid #fff;border-radius:50%}
 #fh_bite .ex{position:absolute;left:-50px;top:-34px;width:100px;text-align:center;font-size:58px;color:#ffd27a;text-shadow:0 4px 0 rgba(0,0,0,.55)}
 #fh_bite .tx{position:absolute;left:-120px;top:64px;width:240px;text-align:center;font-size:18px;text-shadow:0 2px 0 rgba(0,0,0,.6)}
-#fh_reel{position:absolute;right:3vw;top:50%;transform:translateY(-50%);display:none;width:150px}
+#fh_reel{position:absolute;right:3vw;top:calc(50% + 34px);transform:translateY(-50%);display:none;width:auto;background:var(--bg);border:3px solid #0a1a22;box-shadow:inset 0 0 0 2px var(--ln),0 4px 0 rgba(0,0,0,.4);padding:10px 10px 12px;image-rendering:pixelated}
 #fh_rw{display:flex;flex-direction:column;align-items:center;gap:8px}#fh_rw.shk{animation:fhshk .1s linear infinite}
 @keyframes fhshk{0%{transform:translate(0,0)}25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}75%{transform:translate(2px,3px)}100%{transform:translate(0,0)}}
-#fh_rl{font-size:12px;letter-spacing:.06em;text-align:center;text-shadow:0 2px 0 rgba(0,0,0,.6);background:var(--bg);border:2px solid var(--ln);padding:5px 8px;max-width:190px}
+#fh_rl{font-size:11px;letter-spacing:.08em;text-align:center;text-shadow:2px 2px 0 #000;background:#0a1a22;border:2px solid var(--ln);padding:5px 8px;max-width:170px;text-transform:uppercase}
 #fh_rl.big{color:#ffd27a}
 #fh_rr{display:flex;gap:8px;align-items:stretch}
-#fh_col{position:relative;width:74px;height:min(360px,52vh)}
-#fh_col .wt{position:absolute;inset:0;border-radius:14px;overflow:hidden;border:3px solid rgba(255,255,255,.35);background:linear-gradient(180deg,#58c9e8 0%,#2a8fc0 35%,#14587f 75%,#0b3552 100%);box-shadow:0 4px 0 rgba(0,0,0,.35),inset 0 0 18px rgba(0,20,40,.5)}
-#fh_col .sand{position:absolute;left:0;right:0;bottom:0;height:9%;background:linear-gradient(180deg,#d8c08a,#a88a54)}
-#fh_col .bb{position:absolute;bottom:-8px;width:7px;height:7px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);animation:fhbub 4s linear infinite}
+#fh_col{position:relative;width:72px;height:min(352px,52vh)}
+#fh_col .wt{position:absolute;inset:0;overflow:hidden;border:3px solid #0a1a22;box-shadow:inset 0 0 0 2px rgba(255,255,255,.28);background:linear-gradient(180deg,#5fd0ec 0 18%,#3aaad6 18% 38%,#1f7fb0 38% 60%,#155c86 60% 80%,#0c3a58 80% 100%)}
+#fh_col .sand{position:absolute;left:0;right:0;bottom:0;height:8%;background:#d8c08a;border-top:4px solid #a88a54;box-shadow:inset 0 -6px 0 #b89a64}
+#fh_col .bb{position:absolute;bottom:-8px;width:6px;height:6px;border:2px solid rgba(255,255,255,.8);animation:fhbub 4s steps(24) infinite}
 @keyframes fhbub{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.9}100%{transform:translateY(-380px) scale(1.2);opacity:0}}
-#fh_zone{position:absolute;left:0;right:0;bottom:0;height:20%;background:rgba(120,255,160,.28);border-top:3px solid #9dffb6;border-bottom:3px solid #9dffb6;border-radius:6px;transition:background .12s,box-shadow .12s}
-#fh_zone.in{background:rgba(120,255,160,.5);box-shadow:0 0 16px 3px rgba(157,255,182,.85)}
-#fh_fc{position:absolute;left:50%;bottom:0;width:100px;height:60px;margin-left:-50px;transform:translateY(50%);will-change:transform;pointer-events:none}
-#fh_mt{position:relative;width:16px;border-radius:8px;background:rgba(8,26,34,.85);border:3px solid rgba(255,255,255,.35);overflow:hidden}
-#fh_mu{position:absolute;left:0;right:0;bottom:0;height:100%;transform-origin:50% 100%;transform:scaleY(.3);background:#9dffb6}
-#fh_crank{position:relative;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#5a606c 0,#3a404c 70%);border:3px solid #c9ced6;box-shadow:0 3px 0 rgba(0,0,0,.4)}
-#fh_crank i{position:absolute;left:50%;top:50%;width:4px;height:22px;margin:-22px 0 0 -2px;background:#c9ced6;transform-origin:50% 100%;border-radius:2px}
-#fh_crank i::after{content:'';position:absolute;left:-4px;top:-6px;width:12px;height:12px;border-radius:50%;background:#e6b422}
+#fh_zone{position:absolute;left:3px;right:3px;bottom:0;height:20%;background:rgba(120,255,160,.3);border:3px solid #9dffb6;box-shadow:inset 0 0 0 2px rgba(10,40,20,.45)}
+#fh_zone.in{background:rgba(120,255,160,.55);border-color:#e8fff0;box-shadow:inset 0 0 0 2px rgba(10,40,20,.45),0 0 0 3px #9dffb6}
+#fh_fc{position:absolute;left:50%;bottom:0;width:100px;height:60px;margin-left:-50px;transform:translateY(50%);will-change:transform;pointer-events:none;image-rendering:pixelated}
+#fh_mt{position:relative;width:16px;background:#0a1a22;border:3px solid #0a1a22;box-shadow:inset 0 0 0 2px rgba(255,255,255,.28);overflow:hidden}
+#fh_mu{position:absolute;left:2px;right:2px;bottom:2px;height:calc(100% - 4px);transform-origin:50% 100%;transform:scaleY(.3);background:#9dffb6;box-shadow:inset -3px 0 0 rgba(0,0,0,.25)}
+#fh_crank{position:relative;width:52px;height:52px;background:#3a404c;border:3px solid #0a1a22;box-shadow:inset 0 0 0 3px #c9ced6,inset 0 0 0 6px #2a2f38,0 4px 0 rgba(0,0,0,.4)}
+#fh_crank i{position:absolute;left:50%;top:50%;width:4px;height:20px;margin:-20px 0 0 -2px;background:#c9ced6;transform-origin:50% 100%}
+#fh_crank i::after{content:'';position:absolute;left:-4px;top:-6px;width:12px;height:10px;background:#e6b422;box-shadow:inset 0 -3px 0 #a8742a}
 #fh_card{left:auto;right:3vw;top:50%;transform:translateY(-50%);width:min(420px,94vw);display:none;pointer-events:auto;text-align:center;padding:14px 18px 14px;border-width:3px}
 #fh_card .art{background:radial-gradient(circle,rgba(127,243,255,.28),rgba(8,26,34,0) 70%);padding:6px;margin:0 auto;display:flex;justify-content:center;min-height:100px;align-items:center}
 #fh_card .art canvas{max-width:100%;height:auto}
@@ -1116,13 +1116,13 @@ const CSS=`#fishhud{position:fixed;inset:0;z-index:7;pointer-events:none;display
 #fh_modal{left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);display:none;pointer-events:auto;text-align:left}
 #fh_modal h2{font-weight:normal;font-size:26px;margin:0 0 8px;color:var(--c)}#fh_modal p{font-size:12px;line-height:1.7;margin:4px 0}
 #fh_fade{position:absolute;inset:0;background:#06202a;opacity:0}
-@media (max-width:640px){#fh_reel{right:6px;width:110px}#fh_col{width:56px;height:min(300px,44vh)}#fh_fc{width:76px;height:46px;margin-left:-38px}#fh_rl{font-size:10px;max-width:130px}#fh_crank{width:40px;height:40px}#fh_crank i{height:15px;margin-top:-15px}#fh_tl{min-width:0;font-size:10px}#fh_tr{min-width:0;font-size:10px}#fh_msg{font-size:24px}}`;
+@media (max-width:640px){#fh_reel{right:6px;padding:6px}#fh_col{width:56px;height:min(300px,44vh)}#fh_fc{width:76px;height:46px;margin-left:-38px}#fh_rl{font-size:10px;max-width:130px}#fh_crank{width:40px;height:40px}#fh_crank i{height:15px;margin-top:-15px}#fh_tl{min-width:0;font-size:10px}#fh_tr{min-width:0;font-size:10px}#fh_msg{font-size:24px}}`;
 function hudOn(){if(!fhCSS){fhCSS=document.createElement('style');fhCSS.id='fishcss';fhCSS.textContent=CSS;document.head.appendChild(fhCSS)}
  hud=document.createElement('div');hud.id='fishhud';
  hud.innerHTML=`<div id=fh_tl class=fp></div><div id=fh_tr class=fp></div><div id=fh_msg></div>
 <div id=fh_bite><div class=rg></div><div class=in id=fh_bi></div><div class=ex>!</div><div class=tx id=fh_bt></div></div>
 <div id=fh_pwr><div class=bar><i id=fh_pf></i><div class=sw></div></div><span id=fh_pt></span></div>
-<div id=fh_reel><div id=fh_rw><div id=fh_rl>Something is on the line!</div><div id=fh_rr><div id=fh_col><div class=wt><div class=sand></div><i class=bb style="left:12%;animation-delay:0.0s;animation-duration:3.6s"></i><i class=bb style="left:34%;animation-delay:1.1s;animation-duration:4.4s"></i><i class=bb style="left:58%;animation-delay:2.3s;animation-duration:3.9s"></i><i class=bb style="left:78%;animation-delay:0.6s;animation-duration:4.8s"></i><i class=bb style="left:46%;animation-delay:3.1s;animation-duration:4.1s"></i><div id=fh_zone></div></div><canvas id=fh_fc width=150 height=90></canvas></div><div id=fh_mt><u id=fh_mu></u></div></div><div id=fh_crank><i id=fh_ck></i></div></div></div>
+<div id=fh_reel><div id=fh_rw><div id=fh_rl>Something is on the line!</div><div id=fh_rr><div id=fh_col><div class=wt><div class=sand></div><i class=bb style="left:12%;animation-delay:0.0s;animation-duration:3.6s"></i><i class=bb style="left:34%;animation-delay:1.1s;animation-duration:4.4s"></i><i class=bb style="left:58%;animation-delay:2.3s;animation-duration:3.9s"></i><i class=bb style="left:78%;animation-delay:0.6s;animation-duration:4.8s"></i><i class=bb style="left:46%;animation-delay:3.1s;animation-duration:4.1s"></i><div id=fh_zone></div></div><canvas id=fh_fc width=64 height=38></canvas></div><div id=fh_mt><u id=fh_mu></u></div></div><div id=fh_crank><i id=fh_ck></i></div></div></div>
 <div id=fh_hint></div><div id=fh_keys></div><div id=fh_card class=fp></div><div id=fh_modal class=fp></div><div id=fh_fade></div>`;
  document.body.appendChild(hud);hud.style.display='block';HC={};
 }
