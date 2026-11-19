@@ -3,7 +3,7 @@
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
 - v55.28.1 (2026-11-19): removed the blocked-domain fallback script from `index.html`.
-- v55.29.1 (2026-11-19): security audit and hardening: band-room id sanitising (`161`), strict Google photo host (`213`, `216`, rules), Firebase rules v55.29.1 (Google-only rooms/RTDB, `database.rules.json` now in the repo), `docs/SECURITY_CHECKLIST.md`, `tools/rules-test.js`, `tools/mp-ids-test.js`.
+- v55.30.2 (2026-11-19): security audit and hardening: band-room id sanitising (`161`), strict Google photo host (`213`, `216`, rules), Firebase rules v55.30.2 (Google-only rooms/RTDB, `database.rules.json` now in the repo), `docs/SECURITY_CHECKLIST.md`, `tools/rules-test.js`, `tools/mp-ids-test.js`.
 - v55.28.0 (2026-11-19): surfing rework: waves face the beach, sweet-spot marker and pop-up meter, new water shader and spray, smooth surfer animations, new surfboard.
 - v55.24.0 (2026-11-19): land around every destination city (`250-country-edges.js`): terrain per country to the horizon, coast, highways, farms, forests, landmarks; replaces the flat square ground.
 - v55.21.8 (2026-11-18): fixed lag spikes from the chat swear filter (`dev/dev-profanity-v1.js` memoised, scrub only re-checks changed message text). 250 chats x 25 log lines: 500 ms scrub took 550 ms avg (735 max) before, 0.4 ms avg after; frames in 15-20 s headless 124 -> 1718.

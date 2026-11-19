@@ -3,10 +3,12 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.29.1';
+const GAME_VERSION='v55.30.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.29.1',n:'Security hardening. A band host or bandmate can no longer send crafted ids that write into the game\'s own objects or run code from a Nudge/Skip button, profile pictures only load from real Google image hosts, and the Firebase rules now need a Google account for band rooms and friends (rules folder v55.29.1), and one account can now hold only one username (no name squatting). Nothing changes in how the game looks or plays. Saves still load.'},
+ {v:'v55.30.2',n:'Security hardening. A band host or bandmate can no longer send crafted ids that write into the game\'s own objects or run code from a Nudge/Skip button, profile pictures only load from real Google image hosts, and the Firebase rules now need a Google account for band rooms and friends (rules folder v55.30.2), and one account can now hold only one username (no name squatting). Nothing changes in how the game looks or plays. Saves still load.'},
+ {v:'v55.30.1',n:'Pier fishing: the reel sidebar now uses the game\'s pixel look (square panels, hard borders, banded water, a pixel fish shadow, square bubbles and crank).'},
+ {v:'v55.30.0',n:'Pier fishing: the fish are now blocky voxel 3D models that match the pixel style of the rest of the game, in the water, in your hands, on the catch card and in the journal.'},
  {v:'v55.29.0',n:'Security: the game now sends Firebase App Check tokens (reCAPTCHA Enterprise) with its cloud requests, so enforcement can be switched on in the Firebase console.'},
  {v:'v55.28.1',n:'Removed the wavefern.com fallback. The game no longer redirects to the GitHub address when wavefern.com fails to load.'},
  {v:'v55.28.0',n:'Surfing rework. Waves now roll straight in towards you (no more diagonal waves) and peel along the beach once they break. Every wave shows its perfect pop-up spot: a glowing ring on the water with a light beam, a floating arrow, a dotted trail from you and a label that tells you what to do (Sweet spot, In position, Paddle in, Pop up!), plus a timing meter that shows the wave coming up behind you: pop up in the green for a Perfect pop up and bonus style. The water looks better (deep teal wave faces, a glowing see-through lip, foam that moves with the wave, spray off the lip), there is a new smooth surfboard, and the surfer now has smooth animations: sitting on the board, a real paddling stroke, a proper pop-up, a wide surf stance that leans into every carve, grabs, landings that compress, a claim after good rides and climbing back on after a wipeout. Saves still load.'},

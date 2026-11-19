@@ -1,14 +1,14 @@
 # WaveFern security checklist
 
 Read this before touching: multiplayer/friends/leaderboard/profile code, anything that renders text from another player, `firebase-rules/`, `88-admin.js`, the deploy workflow, or anything that adds a new Firebase read/write.
-Threat model: WaveFern is a static page. **Everything in the browser is attacker-controlled** (JS, saves, `localStorage`, `FBU`, `isAdmin()`, messages from a host or bandmate). Only the Firebase rules, Firebase Auth and Firebase's own servers are trusted. Last audit: v55.29.1 (19 Nov 2026).
+Threat model: WaveFern is a static page. **Everything in the browser is attacker-controlled** (JS, saves, `localStorage`, `FBU`, `isAdmin()`, messages from a host or bandmate). Only the Firebase rules, Firebase Auth and Firebase's own servers are trusted. Last audit: v55.30.2 (19 Nov 2026).
 
 ## 1. Rules (the real security boundary)
 - [ ] Rules live in `firebase-rules/<version>/` (`firestore.rules`, `database.rules.json`). Change them there, bump the folder name to the game version, fix every path mention (`grep -rn "firebase-rules/"`).
 - [ ] Every Firestore/RTDB write is limited to the writer's own uid, bounded in size and shape (`hasOnly`, length and number limits, regexes with no `<>"`), and `auth != null` alone is **not** enough: use `google()` (Firestore) or `auth.token.firebase.sign_in_provider === 'google.com'` (RTDB) so free anonymous accounts cannot be used for spam.
 - [ ] Anything a player can create in bulk (usernames, rooms, profiles) needs a one-per-account rule or an accepted, documented limit. Usernames: created only in the same batch as `profiles/{me}.h` and only when the old name is released.
 - [ ] Anything that grants a privilege (admin, Founder, DEV, gifts, usernames) is decided by the rules or by a fixed uid list, never by a field the player writes.
-- [ ] Wildcard children in RTDB rules (`$other`) also match children you have not listed: list every legitimate key first, then `$other: false`. (The first v55.29.1 draft broke room creation this way; the emulator test caught it.)
+- [ ] Wildcard children in RTDB rules (`$other`) also match children you have not listed: list every legitimate key first, then `$other: false`. (The first v55.30.2 draft broke room creation this way; the emulator test caught it.)
 - [ ] Run `tools/rules-test.js` in the emulators (command in the file header). All lines must pass. Add a test for every new rule.
 - [ ] Publish the rules in the Firebase console (Firestore > Rules, Realtime Database > Rules). Rules in the repo do nothing until published; compare the console copy with the repo after each release.
 

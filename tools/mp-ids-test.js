@@ -1,4 +1,4 @@
-/* Multiplayer id sanitising test (v55.29.1): `node tools/mp-ids-test.js`. Pulls cln/idOk/idc out of 161-multiplayer.js (current and the previous commit) and replays
+/* Multiplayer id sanitising test (v55.30.2): `node tools/mp-ids-test.js`. Pulls cln/idOk/idc out of 161-multiplayer.js (current and the previous commit) and replays
    the prototype-pollution and onclick-breakout payloads. The NEW block must show 'no' on every attack line and 'YES' on the three normal-input lines. */
 const fs=require('fs'),cp=require('child_process'),vm=require('vm');
 function load(src){
@@ -6,7 +6,7 @@ function load(src){
  const m=src.match(/(?:const idOk=[^\n]*\n(?:const idc=[^\n]*\n)?)?function cln\(v,dp\)\{[\s\S]*?return null\}\n/);
  const ctx={};vm.createContext(ctx);vm.runInContext(m[0]+';this.cln=cln;this.idOk=typeof idOk!="undefined"?idOk:null;this.idc=typeof idc!="undefined"?idc:null;',ctx);return ctx}
 const oldSrc=cp.execSync('git show HEAD:161-multiplayer.js',{encoding:'utf8',maxBuffer:1e8}),newSrc=fs.readFileSync('161-multiplayer.js','utf8');
-for(const [label,src] of [['OLD (v55.28.0)',oldSrc],['NEW (v55.29.1)',newSrc]]){
+for(const [label,src] of [['OLD (v55.28.0)',oldSrc],['NEW (v55.30.2)',newSrc]]){
  const c=load(src);let r=[];
  // 1. prototype pollution: member id "__proto__" in a roster / band-song id "__proto__"
  const MB={};const msg=c.cln(JSON.parse('{"t":"ros","mem":[{"id":"__proto__","nm":"x","polluted":"yes"}]}'));
