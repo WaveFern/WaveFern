@@ -16,9 +16,9 @@ const FB_CFG={
  databaseURL:'https://waveferndata-default-rtdb.europe-west1.firebasedatabase.app'
 };
 /* ===== END FIREBASE CONFIG ===== */
-const FB_V='10.12.2',FB_RC='6LcPFSguAAAAAEzX_uoHaV4kLXSA8UxIFcgXlKwx'/* v55.29.0: public reCAPTCHA v3 site key for Firebase App Check */,FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
+const FB_V='10.12.2',FB_RC='6Lcv_ycuAAAAAEB34hu7jkN3uogbbgyCDmun3DDm'/* v55.29.0: public reCAPTCHA Enterprise site key for Firebase App Check */,FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
 /* v55.29.0: App Check. Attaches a reCAPTCHA token to every Firebase request so Firebase can later reject calls that do not come from the real game. Best effort: if it cannot load, the game carries on without a token. */
-function fbAppCheck(ac,app){if(!ac)return;try{ac.initializeAppCheck(app,{provider:new ac.ReCaptchaV3Provider(FB_RC),isTokenAutoRefreshEnabled:true})}catch(e){}}
+function fbAppCheck(ac,app){if(!ac)return;try{ac.initializeAppCheck(app,{provider:new ac.ReCaptchaEnterpriseProvider(FB_RC),isTokenAutoRefreshEnabled:true})}catch(e){}}
 let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
