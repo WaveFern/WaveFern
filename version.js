@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.29.0';
+const GAME_VERSION='v55.29.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.29.2',n:'Fix: the Google profile photo no longer fills the browser console with CORS errors. The animated-photo check now stops after the first blocked request.'},
  {v:'v55.29.0',n:'Security: the game now sends Firebase App Check tokens (reCAPTCHA Enterprise) with its cloud requests, so enforcement can be switched on in the Firebase console.'},
  {v:'v55.28.1',n:'Removed the wavefern.com fallback. The game no longer redirects to the GitHub address when wavefern.com fails to load.'},
  {v:'v55.28.0',n:'Surfing rework. Waves now roll straight in towards you (no more diagonal waves) and peel along the beach once they break. Every wave shows its perfect pop-up spot: a glowing ring on the water with a light beam, a floating arrow, a dotted trail from you and a label that tells you what to do (Sweet spot, In position, Paddle in, Pop up!), plus a timing meter that shows the wave coming up behind you: pop up in the green for a Perfect pop up and bonus style. The water looks better (deep teal wave faces, a glowing see-through lip, foam that moves with the wave, spray off the lip), there is a new smooth surfboard, and the surfer now has smooth animations: sitting on the board, a real paddling stroke, a proper pop-up, a wide surf stance that leans into every carve, grabs, landings that compress, a claim after good rides and climbing back on after a wipeout. Saves still load.'},
