@@ -16,11 +16,13 @@ const FB_CFG={
  databaseURL:'https://waveferndata-default-rtdb.europe-west1.firebasedatabase.app'
 };
 /* ===== END FIREBASE CONFIG ===== */
-const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
+const FB_V='10.12.2',FB_RC='6LcPFSguAAAAAEzX_uoHaV4kLXSA8UxIFcgXlKwx'/* v55.29.0: public reCAPTCHA v3 site key for Firebase App Check */,FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
+/* v55.29.0: App Check. Attaches a reCAPTCHA token to every Firebase request so Firebase can later reject calls that do not come from the real game. Best effort: if it cannot load, the game carries on without a token. */
+function fbAppCheck(ac,app){if(!ac)return;try{ac.initializeAppCheck(app,{provider:new ac.ReCaptchaV3Provider(FB_RC),isTokenAutoRefreshEnabled:true})}catch(e){}}
 let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
- return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js')]).then(([a,m,f])=>{const app=a.initializeApp(FB_CFG);FBM=m;FBF=f;FBA=m.getAuth(app);try{FBD=f.initializeFirestore(app,{experimentalAutoDetectLongPolling:true})}catch(e){FBD=f.getFirestore(app)}
+ return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js'),import(u+'app-check.js').catch(()=>null)]).then(([a,m,f,ac])=>{const app=a.initializeApp(FB_CFG);fbAppCheck(ac,app);FBM=m;FBF=f;FBA=m.getAuth(app);try{FBD=f.initializeFirestore(app,{experimentalAutoDetectLongPolling:true})}catch(e){FBD=f.getFirestore(app)}
   m.onAuthStateChanged(FBA,usr=>{window.FW_AUTH_DONE=1;if(csAcct(usr))return;FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()});
   return m.getRedirectResult(FBA).then(r=>{if(r&&r.user)fbSignedIn(r.user)},()=>{}).finally(()=>{if(CLD.signing&&!wiping){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}if(FBU)csCheck()}})})}
 /* v42.7.3: signing in to an account (or out) reloads into that account's own careers on this device, so one account's
