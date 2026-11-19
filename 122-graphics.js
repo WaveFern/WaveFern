@@ -55,7 +55,7 @@ function gfxAuto(gap,cap){if(GFX.p!='auto'||document.hidden||PAUSED||(mode!='pla
  if(avg>Math.max(25,want*1.3)){const i=GFX_LV.indexOf(GFX.al);if(i<GFX_LV.length-1){GFX.al=GFX_LV[i+1];gfxSv();gfxApply()}}}
 
 /* crowds and draw distance: hide people and cars that are off screen or thinned out (cars still drive, so traffic is unchanged) */
-/* v55.30.0: tested against the real camera view (zoom included). Normal keeps people and cars a little past the screen edge; Near hides the ones in the outer part of the screen
+/* v55.31.0: tested against the real camera view (zoom included). Normal keeps people and cars a little past the screen edge; Near hides the ones in the outer part of the screen
    (the old test used a box well outside the screen for both, so Near changed nothing you could see) */
 const GCV=new THREE.Vector3();
 function gfxCull(){const c=gfxCur(),keep=c.crowd||4,lim=c.far?1.15:.72;cam.updateMatrixWorld();
