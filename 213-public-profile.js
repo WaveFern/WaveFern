@@ -17,7 +17,7 @@ window.fwProfileSync=function(force){try{
  const ac=[ns>=1,ns>=10,lq>=1e5,lq>=1e6,fl>=25,fl>=50,!!gp(()=>MPS&&MPS.band),ts>=1e9].reduce((q,v,i)=>q|(v?1<<i:0),0);
  const mb=gp(()=>MPS&&MPS.band)?String(MPS.band).replace(/[<>"]/g,'').slice(0,24):'';
  if(ph&&!busy&&window.__pfPdU!==ph){busy=1;return enc(ph).then(()=>{busy=0;return fwProfileSync(force)})}
- const d={a,h,bio:'',pd:ph&&window.__pfPd||'',fame:fl,lis:lq,p:/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(ph)&&ph.length<=300?ph:'',j:cl(Date.parse(gp(()=>FBU.metadata.creationTime)||''),4e12)||Date.now(),sg:sgs,bn:mb,bi:mb?String(gp(()=>iName(MPS.inst))||'').slice(0,12):'',bm:mb?cl(gp(()=>Object.keys(MB).length)||1,50):0,ac,...fwPfpPart()},sig=JSON.stringify(d)+FBU.uid,n=Date.now();
+ const d={a,h,bio:'',pd:ph&&window.__pfPd||'',fame:fl,lis:lq,p:/^https:\/\/([a-z0-9-]+\.)+googleusercontent\.com\//.test(ph)&&ph.length<=300?ph:'',j:cl(Date.parse(gp(()=>FBU.metadata.creationTime)||''),4e12)||Date.now(),sg:sgs,bn:mb,bi:mb?String(gp(()=>iName(MPS.inst))||'').slice(0,12):'',bm:mb?cl(gp(()=>Object.keys(MB).length)||1,50):0,ac,...fwPfpPart()},sig=JSON.stringify(d)+FBU.uid,n=Date.now();
  if(!force&&sig==lastSig&&n-lastAt<900000)return Promise.resolve(0);busy=1;
  return FBF.getDoc(FBF.doc(FBD,'profiles',FBU.uid)).then(x=>{const cb=x.exists()&&typeof x.data().bio=='string'?x.data().bio.slice(0,160):'';d.bio=cb;try{const cp=x.exists()&&x.data().pfp;if(typeof cp=='string'&&cp.indexOf('data:image/jpeg;base64,')==0&&cp.length<=PFP_MAX&&cp!==fwCustomPfp())fwPfpCache(cp);Object.assign(d,fwPfpPart())}catch(e){}/* v49.94.5: the Edit profile screen keeps its bio in fw_prof_mock. A bio changed on this device is sent up; otherwise the cloud bio (maybe edited on another device) is copied down, so both always match */try{const r=JSON.parse(localStorage.getItem('fw_prof_mock'))||{};if(typeof r.bio=='string'&&r.bio!==r.bioSent)d.bio=r.bio.replace(/[<>"]/g,'').slice(0,160);else if(r.bio!==cb){r.bio=cb;r.bioSent=cb;localStorage.setItem('fw_prof_mock',JSON.stringify(r))}}catch(e){}
    /* v49.93.0: profiles/{uid}.founder (number, 1 = Founder, 0 = not) is set by the admin in the console and is kept as it is. Only a Founder with no f yet is written as 1 */
@@ -45,7 +45,7 @@ if(!document.getElementById('pubpfcss')){const c=document.createElement('style')
 #pubpf .pk{display:grid;grid-template-columns:auto 1fr;gap:6px 16px}#pubpf .pk span{color:#8aa094}
 #pubpf .pl{display:grid;grid-template-columns:1fr 1fr;gap:8px}#pubpf .pl div{border:1px solid #2e2e2e;padding:8px 10px}#pubpf .pl div.lk{opacity:.4}#pubpf .pl small{display:block;color:#8aa094;margin-top:2px}
 #pubpf .px{padding:14px 16px}@media(max-width:480px){#pubpf .ph{flex-direction:column}#pubpf .pl{grid-template-columns:1fr}}`;document.head.appendChild(c)}
-const pic=u=>/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(u||'')?'<img src="'+esc(u)+'" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=\''+NI.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\'">':NI;
+const pic=u=>/^https:\/\/([a-z0-9-]+\.)+googleusercontent\.com\//.test(u||'')?'<img src="'+esc(u)+'" referrerpolicy=no-referrer alt="" onerror="this.outerHTML=\''+NI.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\'">':NI;
 const fd=ts=>ts>0?new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'Unknown';
 function ppHtml(p,handle,me){
  const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')),ac=+p.ac||0;
@@ -67,7 +67,7 @@ window.fwProfileOpen=async function(handle,byUid){
  const o=document.createElement('div');o.id='pubpf';o.style.cssText='position:fixed;inset:0;z-index:99995;background:#000a;display:flex;align-items:center;justify-content:center;padding:12px';o.onclick=e=>{if(e.target===o)o.remove()};
  const box=h=>{o.innerHTML='<div class="box modal" style="width:min(380px,94vw)">'+h+'<div class=row2 style="margin-top:10px"><button onclick="document.getElementById(\'pubpf\').remove()">Close</button></div></div>'};
  const full=(p,handle,me,uid)=>{const P=window.FW_PROFILE;if(P&&P.open&&me){o.remove();P.open('me');return}if(P&&P.openData&&!me){o.remove();const sg=(Array.isArray(p.sg)?p.sg:[]).slice(0,5).map(x=>String(x).split('|')).map(x=>[x[0],+x[1]||0,0]);
-  const ac=+p.ac||0;const pd=/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p.pd||'')?p.pd:'';P.openData({uid:uid||'',artist:p.a||'',user:handle,founder:p.founder?1:0,fame:Math.round(+p.fame||0),listeners:+p.lis||0,joined:+p.j||0,bio:p.bio||'',songs:sg,band:p.bn?{name:p.bn,inst:p.bi||'',members:+p.bm||1}:null,ach:ACH.map((_,i)=>i).filter(i=>ac>>i&1),photo:pd||/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(p.p||'')?p.p:''});return}
+  const ac=+p.ac||0;const pd=/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p.pd||'')?p.pd:'';P.openData({uid:uid||'',artist:p.a||'',user:handle,founder:p.founder?1:0,fame:Math.round(+p.fame||0),listeners:+p.lis||0,joined:+p.j||0,bio:p.bio||'',songs:sg,band:p.bn?{name:p.bn,inst:p.bi||'',members:+p.bm||1}:null,ach:ACH.map((_,i)=>i).filter(i=>ac>>i&1),photo:pd||/^https:\/\/([a-z0-9-]+\.)+googleusercontent\.com\//.test(p.p||'')?p.p:''});return}
   o.innerHTML=ppHtml(Object.assign({},p,{_u:me?FBU.uid:uid}),handle,me)};
  box('<p class=m>Loading…</p>');document.body.appendChild(o);
  try{const{R,db}=F.r,uid=byUid||(await R.get(R.ref(db,'f/n/'+handle))).val();

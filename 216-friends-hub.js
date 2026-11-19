@@ -19,7 +19,7 @@ function pf(f){const F=X();if(!okU(f))return null;if(f in PRF)return PRF[f]||nul
  return null}
 const hOf=f=>{const F=X(),p=F&&F.P[f],q=PRF[f],h=p&&p.h?p.h:q&&q.h?q.h:'';return /^[a-z0-9_]{1,16}$/.test(String(h))?String(h):''}; /* v53.6.3: only a real handle (used inside onclick strings) */
 const nm=f=>hOf(f)||'friend';
-const picOf=f=>{const q=PRF[f];if(!q)return'';if(/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(q.pd||''))return q.pd;return/^https:\/\/[a-z0-9.-]*googleusercontent\.com\//.test(q.p||'')?q.p:''};
+const picOf=f=>{const q=PRF[f];if(!q)return'';if(/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(q.pd||''))return q.pd;return/^https:\/\/([a-z0-9-]+\.)+googleusercontent\.com\//.test(q.p||'')?q.p:''};
 const cdKey=f=>'fw_nudge_'+((X()||{}).me||'')+'_'+f;
 const lastN=f=>{try{return+localStorage.getItem(cdKey(f))||0}catch(e){return 0}};
 /* v55.21: nudge cooldown grows with use: 5 min, 10 min after two nudges, 30 min after four (count per friend, resets after a day) */

@@ -295,11 +295,16 @@ function buildRails(){RAILS.forEach(r=>{if(r.coping)return;railMesh(r)});
 let CARVED=[],CARVO=[];const CLIP=[];
 function carvePool(){try{renderer.localClippingEnabled=true;const x0=CX-HXM-.42,x1=CX+HXM+.42,z0=CZ-HZM-.42,z1=CZ+HZM+.42;
  if(!CLIP.length)CLIP.push(new THREE.Plane(new THREE.Vector3(-1,0,0),x0),new THREE.Plane(new THREE.Vector3(1,0,0),-x1),new THREE.Plane(new THREE.Vector3(0,0,-1),z0),new THREE.Plane(new THREE.Vector3(0,0,1),-z1));
- const box=new THREE.Box3(new THREE.Vector3(x0,-3,z0),new THREE.Vector3(x1,.1,z1)),bb=new THREE.Box3();
- scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.skate||CARVO.includes(o))return;for(let a=o.parent;a;a=a.parent)if(a===root)return;bb.setFromObject(o);if(bb.isEmpty()||bb.max.y>.2||!bb.intersectsBox(box))return;CARVO.push(o)});
- carveMats()}catch(e){soft(e,'carve')}}
+ carveScan();carveMats()}catch(e){soft(e,'carve')}}
+/* v55.30.4: the scan updates world matrices first (a ground plane built on the same tick as the park still had its unrotated, upright
+   matrix, so its box looked 100s of metres tall and it was skipped: the grass then filled the pool), and it runs again every 2 s for
+   ground built or rebuilt after the park (each mesh is only measured once) */
+const CARVSEEN=new WeakSet();const _cbx=new THREE.Box3(),_cbb=new THREE.Box3();
+function carveScan(){_cbx.min.set(CX-HXM-.42,-3,CZ-HZM-.42);_cbx.max.set(CX+HXM+.42,.1,CZ+HZM+.42);
+ scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.skate||CARVSEEN.has(o))return;for(let a=o.parent;a;a=a.parent)if(a===root)return;CARVSEEN.add(o);
+  o.updateWorldMatrix(true,false);_cbb.setFromObject(o);if(_cbb.isEmpty()||_cbb.max.y>.2||!_cbb.intersectsBox(_cbx)||Math.max(_cbb.max.x-_cbb.min.x,_cbb.max.z-_cbb.min.z)<4)return;if(!CARVO.includes(o))CARVO.push(o)})}
 function carveMats(){CARVO.forEach(o=>(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(!m||m.clippingPlanes===CLIP)return;CARVED.push([m,m.clippingPlanes,m.clipIntersection]);m.clippingPlanes=CLIP;m.clipIntersection=true;m.needsUpdate=true}))}
-let carveT=0;function carveTick(dt){if(!CLIP.length)return;carveT+=dt;if(carveT<2)return;carveT=0;try{carveMats()}catch(e){soft(e,'carve2')}}
+let carveT=0;function carveTick(dt){if(!CLIP.length)return;carveT+=dt;if(carveT<2)return;carveT=0;try{renderer.localClippingEnabled=true;carveScan();carveMats()}catch(e){soft(e,'carve2')}}
 function buildRamps(){
  const S2=soup(),cT=tcol('#b6bbc1'),cF=tcol('#9ea4aa'),cR=tcol('#8a8f96'),cS=tcol('#7e848b');
  EXT.forEach(e=>{if(e.kind=='hut'||e.kind=='rack'||e.kind=='prop'||e.kind=='box'&&e.id!='plat')return;
