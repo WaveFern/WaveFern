@@ -32,15 +32,18 @@ const NTV=new THREE.Vector3();
 function ntShown(s){let o=s.parent;while(o){if(!o.visible)return false;if(o===scene)return true;o=o.parent}return false}
 function ntTick(){
  /* sort new labels: on a person's group they become page tags, anywhere else they stay signs */
- for(let i=NTL.length-1;i>=0;i--){const s=NTL[i],p=s.parent;if(!p)continue;NTL.splice(i,1);if(!p.userData||!p.userData.ch)continue;
+ for(let i=NTL.length-1;i>=0;i--){const s=NTL[i],p=s.parent;if(!p)continue;NTL.splice(i,1);
+  /* v55.30.3: signs (Home, shops) are page tags too, so Pixel size never blurs them; made lazily when near */
+  if(!p.userData||!p.userData.ch){s.visible=false;NTAG.list.push({s,el:null,sign:1,on:false,gone:0});continue}
   const el=document.createElement('div');el.className='nt';el.textContent=s.userData.lt;ntBox().appendChild(el);s.visible=false;NTAG.list.push({s,el,on:false,gone:0})}
  const W=innerWidth,H=innerHeight,show=mode!='pc'&&mode!='sleep'&&mode!='load'&&mode!='creator';
  for(let i=NTAG.list.length-1;i>=0;i--){const t=NTAG.list[i],s=t.s;let on=false;
-  if(show&&ntShown(s)){s.getWorldPosition(NTV);NTV.y+=.12;NTV.project(NTAG.cam||cam);if(NTV.x>-1.15&&NTV.x<1.15&&NTV.y>-1.15&&NTV.y<1.2){on=true;
+  if(show&&ntShown(s)){s.getWorldPosition(NTV);NTV.y+=.12;if(t.sign&&NTV.distanceToSquared((NTAG.cam||cam).position)>3600)NTV.set(9,9,9);else NTV.project(NTAG.cam||cam);if(t.sign&&NTV.z>1)NTV.set(9,9,9);if(NTV.x>-1.15&&NTV.x<1.15&&NTV.y>-1.15&&NTV.y<1.2){on=true;
+   if(!t.el){t.el=document.createElement('div');t.el.className='nt';t.el.textContent=s.userData.lt;ntBox().appendChild(t.el)}
    const x=Math.round((NTV.x+1)/2*W),y=Math.round((1-NTV.y)/2*H);if(t.x!==x||t.y!==y){t.x=x;t.y=y;t.el.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-100%)'}
    }}
-  if(on!==t.on){t.on=on;t.el.style.display=on?'block':'none'}
+  if(on!==t.on&&t.el){t.on=on;t.el.style.display=on?'block':'none'}
   /* a person removed from the world for good (an artist after the session, a rebuilt list) drops its tag */
-  let o=s.parent;while(o&&o!==scene)o=o.parent;if(!o){if(++t.gone>240){t.el.remove();NTAG.list.splice(i,1)}}else t.gone=0}}
+  let o=s.parent;while(o&&o!==scene)o=o.parent;if(!o){if(++t.gone>240){if(t.el)t.el.remove();NTAG.list.splice(i,1)}}else t.gone=0}}
 /* after each frame is drawn, so the tags sit exactly on the camera the frame used */
 {const r0=renderer.render.bind(renderer);renderer.render=function(s,c){r0(s,c);if(s===scene)try{NTAG.cam=c;ntTick()}catch(e){}}}
