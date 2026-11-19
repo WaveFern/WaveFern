@@ -33,6 +33,8 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  await T('profile: empty photo accepted',assertSucceeds(A.doc('profiles/userAAAAAAAAAA1').set(prof({p:''}))));
  await T('profile: write someone else\'s profile refused',assertFails(B.doc('profiles/userAAAAAAAAAA1').set(prof())));
  await T('profile: bio with <script> refused',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({bio:'<script>alert(1)</script>'}))));
+ await T('profile: top-songs list with a 500 KB entry REFUSED (v55.28.2)',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['x'.repeat(500000)]}))));
+ await T('profile: normal top-songs list accepted',assertSucceeds(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['Song One|1200','Two|5']}))));
  await T('profile: self-granted founder REFUSED',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({founder:1}))));
  await T('profile: unauthenticated read refused',assertFails(U.doc('profiles/userAAAAAAAAAA1').get()));
  await T('profile: anonymous read refused',assertFails(AN.doc('profiles/userAAAAAAAAAA1').get()));

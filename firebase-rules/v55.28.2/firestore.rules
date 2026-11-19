@@ -77,6 +77,8 @@ service cloud.firestore {
       allow get: if google();
       allow create, update: if google() && me() == uid && profOk(request.resource.data);
       allow delete: if google() && me() == uid || admin();
+      // v55.28.2: top songs are 'title|streams' strings; every entry is bounded so one profile cannot be a megabyte that every viewer downloads
+      function sgOk(l) { return (l.size() < 1 || str(l[0], 0, 80)) && (l.size() < 2 || str(l[1], 0, 80)) && (l.size() < 3 || str(l[2], 0, 80)) && (l.size() < 4 || str(l[3], 0, 80)) && (l.size() < 5 || str(l[4], 0, 80)); }
       function profOk(d) {
         return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'founder', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd', 'pfp'])
           && (!('pfp' in d) || (d.pfp is string && d.pfp.size() <= 24000 && d.pfp.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]*')))
@@ -86,7 +88,7 @@ service cloud.firestore {
           // v49.83.0: Google photo (https googleusercontent only), Founder flag (only if the founders/ entry exists), join date, top songs, band, achievements bitmask
           && (!('p' in d) || d.p is string && d.p.size() <= 300 && d.p.matches('(https://([a-z0-9-]+[.])+googleusercontent[.]com/.*)?'))
           && profFlagOk(d)
-          && (!('j' in d) || (d.j is int && d.j >= 0 && d.j <= 4000000000000)) && (!('sg' in d) || d.sg is list && d.sg.size() <= 5)
+          && (!('j' in d) || (d.j is int && d.j >= 0 && d.j <= 4000000000000)) && (!('sg' in d) || d.sg is list && d.sg.size() <= 5 && sgOk(d.sg))
           && (!('bn' in d) || str(d.bn, 0, 24) && d.bn.matches('[^<>"]*')) && (!('bi' in d) || str(d.bi, 0, 12)) && (!('bm' in d) || d.bm is int && d.bm >= 0 && d.bm <= 50)
           && (!('pd' in d) || d.pd is string && d.pd.size() <= 12000 && (d.pd.size() == 0 || d.pd[0:23] == 'da' + 'ta:image/jpeg;base64,'))
           && (!('ac' in d) || d.ac is int && d.ac >= 0 && d.ac <= 255)
