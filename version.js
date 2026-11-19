@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.30.1';
+const GAME_VERSION='v55.30.2';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.30.2',n:'Removed the sports field from the world map, its sign in the world and its ambience zone.'},
  {v:'v55.30.1',n:'Pier fishing: the reel sidebar now uses the game\'s pixel look (square panels, hard borders, banded water, a pixel fish shadow, square bubbles and crank).'},
  {v:'v55.30.0',n:'Pier fishing: the fish are now blocky voxel 3D models that match the pixel style of the rest of the game, in the water, in your hands, on the catch card and in the journal.'},
  {v:'v55.29.0',n:'Security: the game now sends Firebase App Check tokens (reCAPTCHA Enterprise) with its cloud requests, so enforcement can be switched on in the Firebase console.'},
