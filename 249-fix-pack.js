@@ -98,3 +98,34 @@ if(typeof gpSf=='function'){const g0=gpSf;gpSf=function(){let h=g0.apply(this,ar
  if(on)h=h.replace(/<div class=gsb>[\s\S]*<\/div><\/div>$/,()=>`<div class=gsb>${sfSettings(1)}</div></div>`);return h}}
 const st=document.createElement('style');st.textContent='.sfset{padding:20px;color:#fff;display:flex;flex-direction:column;gap:16px}.sfset h1{margin:0}.sfsetc{background:#181818;border:3px solid #000;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px}.sfsetc h2{margin:0;font-size:15px}.sfsetr{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.sfsetr input{flex:1;min-width:0}.sfsetnav.on{color:#a66bff}';document.head.appendChild(st);
 })();
+
+/* v55.21.8: Settings opened from the main menu lists only options that do something there. Rows that only change the in-game
+   HUD and world (name tags, key hints, camera, FPS counter, clock, sunbeams, pause menu options...) are left out. */
+if(typeof stBody=='function'){const sb0=stBody;
+ const HUD=/^(Name tags|First-person monitor|Camera zoom|Always run|Key hints|Auto-pause|12-hour clock|FPS counter|Sunbeams|Pause menu music|Pause menu blur|Pause actually pauses)/;
+ stBody=function(){const h=sb0.apply(this,arguments);
+  try{if(typeof TT!='object'||!TT.on||typeof h!='string')return h;
+   const t=document.createElement('template');t.innerHTML=h;
+   t.content.querySelectorAll('.so').forEach(r=>{const s=r.firstElementChild;if(s&&HUD.test(s.textContent.trim()))r.remove()});
+   return t.innerHTML}catch(e){return h}}}
+
+/* v55.21.8: pause menu "Autosave" button for Google accounts (replaces the old save-to-account toast). Press it to save to the device and the account now:
+   three pixel dots pulse while it works (opacity steps), then a pixel tick fades in. It also runs by itself every time the pause menu opens. */
+if(typeof pauseUI=='function'){const pu0=pauseUI;
+ const st=document.createElement('style');st.textContent=`.asv{display:flex!important;align-items:center;justify-content:center;gap:10px}
+.asv .asd{display:inline-flex;gap:3px;height:12px;align-items:center}.asv .asd i{width:4px;height:4px;background:currentColor;opacity:.2;animation:asvd .9s steps(1) infinite}
+.asv .asd i:nth-child(2){animation-delay:.3s}.asv .asd i:nth-child(3){animation-delay:.6s}
+@keyframes asvd{0%{opacity:.2}33%{opacity:1}66%{opacity:.2}100%{opacity:.2}}
+.asv .ast{width:14px;height:11px;opacity:0;transition:opacity .35s steps(4);color:var(--g,#2ee88e)}.asv.done .ast{opacity:1}
+.asv .asd{opacity:0;transition:opacity .2s steps(2)}.asv.busy .asd{opacity:1}`;document.head.appendChild(st);
+ const TICK='<svg class=ast viewBox="0 0 7 6" shape-rendering="crispEdges" fill="currentColor"><path d="M0 3h1v1h1v1h1V4h1V3h1V2h1V1h1V0h-1v1h-1v1h-1v1H4v1H3v1H2V4H1V3z"/></svg>';
+ let ASV='';/* '', busy, done, fail: kept here because the pause menu is redrawn and the button node is replaced */
+ const paint=()=>{const b=document.getElementById('asvb');if(!b)return;b.classList.toggle('busy',ASV=='busy');b.classList.toggle('done',ASV=='done');b.querySelector('.asl').textContent=ASV=='done'?'Autosaved':ASV=='fail'?'Autosave failed':'Autosave'};
+ window.fwAutosave=function(){if(ASV=='busy')return;ASV='busy';paint();const t0=Date.now();
+  let p;try{try{autoSave()}catch(e){}p=(typeof FBU!='undefined'&&FBU&&typeof CLD!='undefined'&&CLD.ok&&typeof csPush=='function')?csPush(1):Promise.resolve(1)}catch(e){p=Promise.resolve(0)}
+  Promise.resolve(p).catch(()=>0).then(r=>{setTimeout(()=>{ASV=(r===0||r===false||(typeof CLD!='undefined'&&CLD.err&&FBU))?'fail':'done';paint()},Math.max(0,700-(Date.now()-t0)))})};
+ pauseUI=function(){pu0.apply(this,arguments);try{
+  if(typeof FBU=='undefined'||!FBU)return;const m=document.getElementById('pzm');if(!m||m.querySelector('#asvb'))return;
+  const b=document.createElement('button');b.id='asvb';b.className='asv';b.innerHTML='<span class=asl>Autosave</span><span class=asd><i></i><i></i><i></i></span>'+TICK;b.onclick=()=>{try{snd('click')}catch(e){}ASV='';fwAutosave()};
+  const q=[...m.querySelectorAll('button')].find(x=>/^Save and quit$/.test(x.textContent.trim()));m.insertBefore(b,q||null);
+  paint();if(!ASV)fwAutosave()}catch(e){}}}
