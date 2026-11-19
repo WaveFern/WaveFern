@@ -34,8 +34,11 @@
  const LEETRE=/[03478@$!|+(€¢£]|5/g;
  /* 1 can be i or l, so check both. Edge punctuation (ass! "ass") is dropped first so it is not read as a letter. */
  const variants=t=>{t=t.replace(/^[^a-z0-9@$]+|[^a-z0-9$]+$/g,'');const a=t.replace(LEETRE,c=>LEET[c]||c);return[a.replace(/1/g,'i'),a.replace(/1/g,'l')].map(v=>v.replace(/[^a-z]/g,''))};
+ /* v55.21.8: results are remembered per word and per text. The same words come up again and again (message logs, HUD text),
+    and each fresh check runs ~150 patterns, so re-checking them was freezing the game every 0.5 s on long-played saves. */
+ const memo=(f,cap)=>{let M=new Map();return(t,x)=>{if(typeof t!='string'||t.length>2000)return f(t,x);const k=(x?'1':'0')+t;let r=M.get(k);if(r===undefined){r=f(t,x);if(M.size>cap)M=new Map();M.set(k,r)}return r}};
  /* one word (no spaces) */
- function badWord(w,asName){
+ function badWord0(w,asName){
   for(const v of variants(strip(w))){if(!v)continue;const k=skel(v);
    if(WORDS.some(r=>r.test(k))||SHORT.some(r=>r.test(v)))return true;
    if(/nigg|nigha|nigah/.test(v.replace(/snigger\w*|niggl\w*|nigger?ly/g,'')))return true;
@@ -44,7 +47,8 @@
    if(asName){const k3=k2.replace(/^x+|x+$/g,'');if(WORDS.some(r=>r.test(k3))||/(dicks?|boobs|titty)$/.test(v)||NAMEEND.some(r=>r.test(k3)))return true}}
   return false}
  /* a whole text: each word, and runs of single letters read together (f u c k) */
- function badText(t,asName){
+ const badWord=memo(badWord0,20000);
+ function badText0(t,asName){
   t=String(t==null?'':t);if(!t.trim())return false;
   const toks=strip(t).split(/\s+/).filter(Boolean);
   if(toks.some(x=>badWord(x,asName))||(asName&&badWord(t.replace(/\s+/g,''),true)))return true;
@@ -53,10 +57,10 @@
   for(let i=0;i<toks.length;i++){let j=i,s='';while(j<toks.length&&toks[j].replace(/[^a-z0-9]/g,'').length<=1&&s.length<14){s+=toks[j].replace(/[^a-z0-9]/g,'');j++}
    if(s.length>=3&&/[a-z]/.test(s)&&badWord(s,true))return true}
   return false}
+ const badText=memo((t,x)=>badText0(t,x),4000);
  window.fwProfane=(t,asName)=>{try{return badText(t,!!asName)}catch(e){return false}};
- /* v55.19.0: the HUD re-adds the same texts many times a second, so results are remembered */
- const CLC=new Map();function clean(t){t=String(t==null?'':t);let r=CLC.get(t);if(r===undefined){if(CLC.size>3000)CLC.clear();r=clean0(t);CLC.set(t,r)}return r}
- function clean0(t){if(!t||!/[A-Za-z0-9@$!|+(À-￿]/.test(t)||!badText(t,false))return t;
+ function clean0(t){
+  t=String(t==null?'':t);if(!t||!/[A-Za-z0-9@$!|+(À-￿]/.test(t)||!badText(t,false))return t;
   const parts=t.split(/(\s+)/);
   /* single letters in a row */
   for(let i=0;i<parts.length;i+=2){let j=i,s='',n=0;while(j<parts.length&&parts[j].replace(/[^A-Za-z0-9]/g,'').length<=1&&parts[j]!==''&&n<14){s+=parts[j].replace(/[^A-Za-z0-9]/g,'');j+=2;n++}
@@ -65,6 +69,7 @@
    const m=w.match(/^([^A-Za-z0-9@$!|+(]*)(.*?)([^A-Za-z0-9@$!|+()]*)$/);const core=m?m[2]:w;
    if(core&&(badText(core,false)||badWord(core.replace(/[.\-_\/\\,~^]+/g,''),false))){parts[i]=(m?m[1]:'')+'*'.repeat(core.length)+(m?m[3]:'')}}
   return parts.join('')}
+ const clean=memo(t=>clean0(t),4000);
  window.fwClean=t=>{try{return clean(t)}catch(e){return String(t==null?'':t)}};
 
  /* ---- names: refuse them outright ---- */
@@ -95,13 +100,18 @@
  watch();
 
  /* ---- NPC messages: scrubbed in the data itself, so a baited NPC reply is never stored or replayed ---- */
+ /* v55.21.8: only text that is new or changed since the last pass is checked (a reference compare per entry), not every
+    message ever received twice a second */
+ const SEEN=new WeakMap();
  function scrub(){try{if(typeof S=='undefined'||!S||!Array.isArray(S.msgs))return;
-  for(const m of S.msgs){if(!m)continue;
-   if(typeof m.body=='string'&&m.a!==undefined&&badText(m.body,false))m.body=fall();
-   else if(typeof m.body=='string'){const c=clean(m.body);if(c!==m.body)m.body=c}
-   if(typeof m.sub=='string'){const c=clean(m.sub);if(c!==m.sub)m.sub=c}
-   if(Array.isArray(m.log))for(const e of m.log){if(!e||typeof e.t!='string')continue;
-    if(e.f==='a'){if(badText(e.t,false))e.t=fall()}else{const c=clean(e.t);if(c!==e.t)e.t=c}}}}catch(e){}}
+  for(const m of S.msgs){if(!m||typeof m!='object')continue;const k=SEEN.get(m);
+   if(!k||k.b!==m.body||k.s!==m.sub){
+    if(typeof m.body=='string'&&m.a!==undefined&&badText(m.body,false))m.body=fall();
+    else if(typeof m.body=='string'){const c=clean(m.body);if(c!==m.body)m.body=c}
+    if(typeof m.sub=='string'){const c=clean(m.sub);if(c!==m.sub)m.sub=c}
+    SEEN.set(m,{b:m.body,s:m.sub})}
+   if(Array.isArray(m.log))for(const e of m.log){if(!e||typeof e!='object'||typeof e.t!='string'||SEEN.get(e)===e.t)continue;
+    if(e.f==='a'){if(badText(e.t,false))e.t=fall()}else{const c=clean(e.t);if(c!==e.t)e.t=c}SEEN.set(e,e.t)}}}catch(e){}}
  {const wrapR=()=>{const r=window.reply;if(typeof r!='function'||r.__pf)return;const g=function(m,t){const out=r.apply(this,arguments);scrub();return out};g.__pf=1;window.reply=g;try{reply=g}catch(e){}};wrapR();setInterval(wrapR,1500)}
  setInterval(scrub,500);
  window.FW_PROFANITY=1;

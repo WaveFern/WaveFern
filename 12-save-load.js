@@ -29,7 +29,7 @@ const FW_ACCT=(()=>{try{return localStorage.getItem('fw_acct')||''}catch(e){retu
 const SAVE_PRE=FW_ACCT?'fw_u_'+FW_ACCT+'_':'fw_',SLOT_K=SAVE_PRE+'slot';
 const SLOTS=2;
 function curSlot(){try{const n=+localStorage.getItem(SLOT_K);return n==2?2:1}catch(e){return 1}}
-const BOOT_SLOT=curSlot();
+let BOOT_SLOT=curSlot();
 /* v26.139.2: a tab saves only to the slot it booted into, so a second tab on the other career can't overwrite it */
 function slotKey(n){return SAVE_PRE+'save_'+(n||BOOT_SLOT)}
 /* recovered backups are shared by every account on this device (fw_bak_1..12, label in fw_bakw_N), so a backup is never pushed out by another one */

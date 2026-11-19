@@ -43,3 +43,89 @@ if(typeof ttWorlds=='function'){const w0=ttWorlds;
   const sm=document.querySelector('#ttl .ttrb summary');if(sm&&!document.querySelector('#ttl .ttrb .ttbn')){const p=document.createElement('p');p.className='m ttbn';p.style.cssText='margin:4px 0;font-size:12px';p.textContent='Backups are deleted automatically after 30 days.';sm.after(p)}}catch(e){}return r}}
 bakSweep();
 })();
+
+/* ===== v55.22.1: one chat per official sender, and the WaveFern (Spotifly) Settings page =====
+   1. Every official sender (booking agents, brands, labels, WaveFern Team ...) keeps ONE chat. Any state-9 message that
+      arrives from a sender who already has a chat is folded into that chat's log (old saves are merged too). The chat moves to
+      the top, keeps the newest offer ids (cg / bcg / bd / lo) so Accept and Decline buttons still work, and is marked new.
+   2. WaveFern app: a Settings page (computer sidebar button, Gphone tab) holds the profile picture and artist name. */
+(function(){
+'use strict';
+const OFF=['cg','bcg','bd','lo','cfg'];
+function mergeChats(){const L=typeof S!='undefined'&&S&&Array.isArray(S.msgs)?S.msgs:null;if(!L||L.length<2)return;
+ const by=new Map();let dup=false;
+ for(const m of L){if(!m||m.state!==9||m.a!==undefined||m.g||typeof m.from!=='string')continue;if(by.has(m.from)){dup=true;break}by.set(m.from,1)}
+ if(!dup)return;
+ const keep=new Map(),drop=new Set(),ent=m=>Array.isArray(m.log)&&m.log.length?m.log:[{f:'a',t:m.body,d:m.day}];
+ for(const m of L){if(!m||m.state!==9||m.a!==undefined||m.g||typeof m.from!=='string')continue;
+  const t=keep.get(m.from);if(!t){keep.set(m.from,m);continue}
+  if(!Array.isArray(t.log))t.log=ent(t).slice();
+  ent(m).forEach(e=>t.log.push(e));t.body=m.body;t.day=m.day;if(m.unread)t.unread=1;
+  OFF.forEach(k=>{if(m[k]!==undefined)t[k]=m[k]});
+  if(S.chat===m.id)S.chat=t.id;drop.add(m);t._up=1}
+ S.msgs=L.filter(m=>!drop.has(m));
+ /* chats that just grew go to the top (the list shows newest last in the array) */
+ const up=S.msgs.filter(m=>m&&m._up);up.forEach(m=>delete m._up);
+ if(up.length){S.msgs=S.msgs.filter(m=>!up.includes(m)).concat(up)}}
+window.fwMergeChats=mergeChats;
+setInterval(()=>{try{mergeChats()}catch(e){console.error('chat merge',e)}},500);
+if(typeof PA=='object'&&PA.msg){const p0=PA.msg;PA.msg=function(){try{mergeChats()}catch(e){}return p0.apply(this,arguments)}}
+if(typeof loadCode=='function'){const l0=loadCode;loadCode=function(){const r=l0.apply(this,arguments);try{mergeChats()}catch(e){}return r}}
+
+/* 3. house: dev-models-v2.js leaves the north wall's skirting and crown open from x 3 to 4.9 for the extension doorway.
+   Without the extension that is a hole in the trim, so fill it, and hide the filler once the wing (WK>0) has been built. */
+{let fill=null;const wt=worldTick;worldTick=function(){const r=wt.apply(this,arguments);try{
+ if(!fill&&typeof NWM!='undefined'&&NWM.length&&typeof B=='function'){const H=NWM[0][0].parent,c='#efe9dc';fill=[B(H,1.9,.2,.05,c,3.95,.1,.03),B(H,1.9,.1,.07,c,3.95,2.94,.04)]}
+ if(fill){const v=!(typeof WK!='undefined'&&WK>0);fill.forEach(m=>{if(m&&m.visible!==v)m.visible=v})}}catch(e){}return r}}
+
+/* 2. WaveFern Settings */
+const sfSettings=ph=>{const u=(typeof pxURL=='function'&&S.pfpSp)?pxURL(S.pfpSp):pfp();
+ return`<div class="sfset${ph?' ph':''}"><h1>Settings</h1>
+ <div class=sfsetc><h2>Profile picture</h2><div class=sfsetr><img class=sfsetp src="${u}" alt="" style="width:72px;height:72px;image-rendering:pixelated;border-radius:50%;border:3px solid #000"><span class=pxb><button onclick="sfSetPic()">${S.pfpSp?'Change':'Upload'} picture</button>${S.pfpSp?'<button onclick="sfSetPicReset()">Use drawn avatar</button>':''}</span></div></div>
+ <div class=sfsetc><h2>Artist name</h2><div class=sfsetr><input id=sfsetn maxlength=24 value="${esc(S.artist||'')}" onkeydown="if(event.key=='Enter')sfSetName()"><button class=go onclick="sfSetName()">Save name</button></div></div></div>`};
+const redraw=()=>{try{mode=='phone'?phR():pcR()}catch(e){}};
+window.sfSetPic=function(){try{pxPick('sp',c=>{S.pfpSp=c;updateVersion();snd('ping');say('WaveFern profile picture updated.');redraw()})}catch(e){say('Could not open the picture picker.')}};
+window.sfSetPicReset=function(){delete S.pfpSp;snd('pop');say('Back to your drawn profile picture.');redraw()};
+window.sfSetName=function(){const i=document.getElementById('sfsetn'),v=((i||{}).value||'').trim().slice(0,24);if(v.length<2){snd('err');return say('Name needs 2+ characters.')}
+ S.artist=v;try{updateVersion()}catch(e){}snd('ping');say('Artist name changed to '+v+'.');redraw()};
+if(typeof PG=='object'){PG.sfset=()=>sfSettings(0)}
+if(typeof pcR=='function'){const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{
+ if(app==1&&S.artist){const sb=document.querySelector('#pc .sb');if(sb&&!sb.querySelector('.sfsetnav')){
+  if(pg=='sfset')sb.querySelectorAll('button.on').forEach(b=>b.classList.remove('on'));
+  sb.insertAdjacentHTML('beforeend',`<button class="sfsetnav${pg=='sfset'?' on':''}" onclick="pg='sfset';pcR()">Settings</button>`)}}}catch(e){console.error('sf settings nav',e)}return r}}
+if(typeof gpSf=='function'){const g0=gpSf;gpSf=function(){let h=g0.apply(this,arguments);if(!S.artist||typeof h!='string')return h;const on=PH.sft=='se';
+ h=h.replace(/(<div class=gstb>[\s\S]*?)(<\/div><div class=gsb>)/,(_,a,b)=>a+`<button class="${on?'on':''}" onclick="PH.sft='se';phR()">Settings</button>`+b);
+ if(on)h=h.replace(/<div class=gsb>[\s\S]*<\/div><\/div>$/,()=>`<div class=gsb>${sfSettings(1)}</div></div>`);return h}}
+const st=document.createElement('style');st.textContent='.sfset{padding:20px;color:#fff;display:flex;flex-direction:column;gap:16px}.sfset h1{margin:0}.sfsetc{background:#181818;border:3px solid #000;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px}.sfsetc h2{margin:0;font-size:15px}.sfsetr{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.sfsetr input{flex:1;min-width:0}.sfsetnav.on{color:#a66bff}';document.head.appendChild(st);
+})();
+
+/* v55.21.8: Settings opened from the main menu lists only options that do something there. Rows that only change the in-game
+   HUD and world (name tags, key hints, camera, FPS counter, clock, sunbeams, pause menu options...) are left out. */
+if(typeof stBody=='function'){const sb0=stBody;
+ const HUD=/^(Name tags|First-person monitor|Camera zoom|Always run|Key hints|Auto-pause|12-hour clock|FPS counter|Sunbeams|Pause menu music|Pause menu blur|Pause actually pauses)/;
+ stBody=function(){const h=sb0.apply(this,arguments);
+  try{if(typeof TT!='object'||!TT.on||typeof h!='string')return h;
+   const t=document.createElement('template');t.innerHTML=h;
+   t.content.querySelectorAll('.so').forEach(r=>{const s=r.firstElementChild;if(s&&HUD.test(s.textContent.trim()))r.remove()});
+   return t.innerHTML}catch(e){return h}}}
+
+/* v55.21.8: pause menu "Autosave" button for Google accounts (replaces the old save-to-account toast). Press it to save to the device and the account now:
+   three pixel dots pulse while it works (opacity steps), then a pixel tick fades in. It also runs by itself every time the pause menu opens. */
+if(typeof pauseUI=='function'){const pu0=pauseUI;
+ const st=document.createElement('style');st.textContent=`.asv{display:flex!important;align-items:center;justify-content:center;gap:10px}
+.asv .asd{display:inline-flex;gap:3px;height:12px;align-items:center}.asv .asd i{width:4px;height:4px;background:currentColor;opacity:.2;animation:asvd .9s steps(1) infinite}
+.asv .asd i:nth-child(2){animation-delay:.3s}.asv .asd i:nth-child(3){animation-delay:.6s}
+@keyframes asvd{0%{opacity:.2}33%{opacity:1}66%{opacity:.2}100%{opacity:.2}}
+.asv .ast{width:14px;height:11px;opacity:0;transition:opacity .35s steps(4);color:var(--g,#2ee88e)}.asv.done .ast{opacity:1}
+.asv .asd{opacity:0;transition:opacity .2s steps(2)}.asv.busy .asd{opacity:1}`;document.head.appendChild(st);
+ const TICK='<svg class=ast viewBox="0 0 7 6" shape-rendering="crispEdges" fill="currentColor"><path d="M0 3h1v1h1v1h1V4h1V3h1V2h1V1h1V0h-1v1h-1v1h-1v1H4v1H3v1H2V4H1V3z"/></svg>';
+ let ASV='';/* '', busy, done, fail: kept here because the pause menu is redrawn and the button node is replaced */
+ const paint=()=>{const b=document.getElementById('asvb');if(!b)return;b.classList.toggle('busy',ASV=='busy');b.classList.toggle('done',ASV=='done');b.querySelector('.asl').textContent=ASV=='done'?'Autosaved':ASV=='fail'?'Autosave failed':'Autosave'};
+ window.fwAutosave=function(){if(ASV=='busy')return;ASV='busy';paint();const t0=Date.now();
+  let p;try{try{autoSave()}catch(e){}p=(typeof FBU!='undefined'&&FBU&&typeof CLD!='undefined'&&CLD.ok&&typeof csPush=='function')?csPush(1):Promise.resolve(1)}catch(e){p=Promise.resolve(0)}
+  Promise.resolve(p).catch(()=>0).then(r=>{setTimeout(()=>{ASV=(r===0||r===false||(typeof CLD!='undefined'&&CLD.err&&FBU))?'fail':'done';paint()},Math.max(0,700-(Date.now()-t0)))})};
+ pauseUI=function(){pu0.apply(this,arguments);try{
+  if(typeof FBU=='undefined'||!FBU)return;const m=document.getElementById('pzm');if(!m||m.querySelector('#asvb'))return;
+  const b=document.createElement('button');b.id='asvb';b.className='asv';b.innerHTML='<span class=asl>Autosave</span><span class=asd><i></i><i></i><i></i></span>'+TICK;b.onclick=()=>{try{snd('click')}catch(e){}ASV='';fwAutosave()};
+  const q=[...m.querySelectorAll('button')].find(x=>/^Save and quit$/.test(x.textContent.trim()));m.insertBefore(b,q||null);
+  paint();if(!ASV)fwAutosave()}catch(e){}}}

@@ -12,10 +12,12 @@
  /* ---------- 1: main menu shows only the menu ---------- */
  const KEEP=/^(ui|c|fwmbg|fwdg-v|fwdg-b|fwmfade|annote|pzo|load|fatal|toast)$/;
  let wasT=false;
+ /* v55.21.8: only the overlays that exist when the menu opens are hidden. Panels opened FROM the menu (profile #pfx, leaderboard, stats, ...) are added later and must stay visible. */
  function sweep(){try{
   const t=typeof TT!='undefined'&&TT.on&&typeof mode!='undefined'&&mode=='title';
-  if(!t&&!wasT)return;wasT=t;
-  for(const e of document.body.children){if(/^(SCRIPT|STYLE|NOSCRIPT|LINK)$/.test(e.tagName)||KEEP.test(e.id))continue;e.classList.toggle('fwtth',t)}
+  if(t==wasT)return;wasT=t;
+  if(t){for(const e of document.body.children){if(/^(SCRIPT|STYLE|NOSCRIPT|LINK)$/.test(e.tagName)||KEEP.test(e.id))continue;e.classList.add('fwtth')}}
+  else document.querySelectorAll('.fwtth').forEach(e=>e.classList.remove('fwtth'));
  }catch(e){}}
  try{const mo=new MutationObserver(sweep);mo.observe(document.body,{childList:true});const u=document.getElementById('ui');if(u)mo.observe(u,{childList:true});sweep()}catch(e){}
 
@@ -65,7 +67,11 @@ body:has(#pzo) #hkbar{display:none!important}
 .ch i:hover,.ch i:focus{background:#fff;outline:0}
 .ch i[data-t]:hover::after,.ch i[data-t]:focus::after{content:attr(data-t);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#000;color:#e8f3ec;border:2px solid var(--g);padding:3px 7px;font:11px Silkscreen,ui-monospace,monospace;z-index:5;pointer-events:none}
 .ch i:first-child[data-t]:hover::after{left:0;transform:none}.ch i:last-child[data-t]:hover::after{left:auto;right:0;transform:none}
-.msx,.msx .crs,.msx .cvb,.chat,.chat .crs,.chat .cvb{--sbk:#0a0d0b;--sbt:#34604b;--sbh:var(--g);--sbe:#000;--sbw:10px}
+.msx{--sbw:10px}
+.msx .cl,.msx .crs{--sbk:#1e1537;--sbt:#8a4dff;--sbh:#ff3d81;--sbe:#1e1537}
+.msx .cv,.msx .cvb{--sbk:#fff7f0;--sbt:#c9a4ff;--sbh:#ff3d81;--sbe:#fff7f0}
+.msx ::-webkit-scrollbar-track{box-shadow:none;border-left:0}
+.msx ::-webkit-scrollbar-thumb{border-radius:8px;box-shadow:none}
 .sb button{padding:8px 12px 8px 14px}
 .gfxsl input[type=range]{display:block;width:calc(83.333% + 20px)!important;margin:6px 0 0 calc(8.333% - 10px)}
 .gfxl{display:grid;grid-template-columns:repeat(6,1fr);width:100%;font-size:11px;opacity:.75;text-align:center}

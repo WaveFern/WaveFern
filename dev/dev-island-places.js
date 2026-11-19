@@ -364,6 +364,7 @@ function offer(){const s=st(),o={id:S.nid++,pay:baseFee(),exp:S.day+2,day:S.day+
  try{snd('ping');say('Sunset Beach Club emailed you a gig offer. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}}
 window.bcgAccept=function(mid){const m=S.msgs.find(x=>x.id==mid),o=m&&find(m.bcg);if(!o||o.st!=0)return;if(S.day>o.exp){o.st=4;return pcR()}
  if(booked()){sn('err');return say('You already have a Beach Club gig booked.')}
+ try{const fk=(S.festBk||[]).find(b=>b.st!=2&&b.st!=1&&b.day==o.day&&[[600,840],[840,1080],[1080,1320],[1320,1560]][b.slot]&&[[600,840],[840,1080],[1080,1320],[1320,1560]][b.slot][0]<SLOT[1]&&[[600,840],[840,1080],[1080,1320],[1320,1560]][b.slot][1]>SLOT[0]);if(fk){sn('err');return say('You already have a festival set on Day '+o.day+' at that time. Cancel it first.')}}catch(e){}
  o.st=1;note(m.from,'Booked! See you on Day '+o.day+', '+hm(SLOT[0])+' to '+hm(SLOT[1])+', at the stage on the beach. Sound check is on us.');
  sn('chime');say('Beach Club gig booked for Day '+o.day+'.');try{updateVersion()}catch(e){}pcR()};
 window.bcgDecline=function(mid){const m=S.msgs.find(x=>x.id==mid),o=m&&find(m.bcg);if(!o||o.st!=0)return;o.st=2;sn('pop');pcR()};
