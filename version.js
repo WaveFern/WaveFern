@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.30.3';
+const GAME_VERSION='v55.30.4';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.30.4',n:'Skate Park: fixed the grass that could fill the pool bowl (and show under the concrete) after loading a save near the park. The park now finds the ground under it even when the ground is built on the same moment as the park, and keeps checking for ground built later. Saves still load.'},
  {v:'v55.30.3',n:'Fix: the Google profile photo no longer fills the browser console with CORS errors. The animated-photo check now stops after the first blocked request.'},
  {v:'v55.30.2',n:'Removed the sports field from the world map, its sign in the world and its ambience zone.'},
  {v:'v55.30.1',n:'Pier fishing: the reel sidebar now uses the game\'s pixel look (square panels, hard borders, banded water, a pixel fish shadow, square bubbles and crank).'},
