@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.30.15 (2026-11-19): airport terminal and brand HQ rooms no longer draw their own blob contact shadows (`139`, `239`); they use the game's normal sun shadows from `dev/dev-graphics-v12.js`.
 - v55.28.1 (2026-11-19): removed the blocked-domain fallback script from `index.html`.
 - v55.30.5 (2026-11-19): security audit and hardening: band-room id sanitising (`161`), strict Google photo host (`213`, `216`, rules), Firebase rules v55.30.5 (Google-only rooms/RTDB, `database.rules.json` now in the repo), `docs/SECURITY_CHECKLIST.md`, `tools/rules-test.js`, `tools/mp-ids-test.js`.
 - v55.28.0 (2026-11-19): surfing rework: waves face the beach, sweet-spot marker and pop-up meter, new water shader and spray, smooth surfer animations, new surfboard.
