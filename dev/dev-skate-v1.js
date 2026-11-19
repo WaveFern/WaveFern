@@ -296,7 +296,7 @@ let CARVED=[],CARVO=[];const CLIP=[];
 function carvePool(){try{renderer.localClippingEnabled=true;const x0=CX-HXM-.42,x1=CX+HXM+.42,z0=CZ-HZM-.42,z1=CZ+HZM+.42;
  if(!CLIP.length)CLIP.push(new THREE.Plane(new THREE.Vector3(-1,0,0),x0),new THREE.Plane(new THREE.Vector3(1,0,0),-x1),new THREE.Plane(new THREE.Vector3(0,0,-1),z0),new THREE.Plane(new THREE.Vector3(0,0,1),-z1));
  carveScan();carveMats()}catch(e){soft(e,'carve')}}
-/* v55.30.3: the scan updates world matrices first (a ground plane built on the same tick as the park still had its unrotated, upright
+/* v55.30.4: the scan updates world matrices first (a ground plane built on the same tick as the park still had its unrotated, upright
    matrix, so its box looked 100s of metres tall and it was skipped: the grass then filled the pool), and it runs again every 2 s for
    ground built or rebuilt after the park (each mesh is only measured once) */
 const CARVSEEN=new WeakSet();const _cbx=new THREE.Box3(),_cbb=new THREE.Box3();
