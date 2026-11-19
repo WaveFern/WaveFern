@@ -11,15 +11,9 @@ const SIDE=1.0;/* how far either side of their line people may step (pavement is
 function avoidPrep(L,vert){L.forEach(n=>{if(n._ao){if(vert)n.x-=n._ao;else n.z-=n._ao}if(n._sp0!==undefined)n.sp=n._sp0})}
 function avoidApply(L,vert,dt){const out=HIN||IN,r=mode=='drive'?1.9:1.05;L.forEach(n=>{
   if(n._sp0===undefined)n._sp0=n.sp;
-  let tgt=0,slow=1;const o=n._ao||0;
-  if(!out&&n.m.visible&&n.st!=1){
-   const lane=vert?n.x0:n.z0,al=(vert?P.z-n.z:P.x-n.x)*n.dir,pl=(vert?P.x:P.z)-lane;
-   if(al>-1.2&&al<4.5&&Math.abs(pl-o)<r+.6){
-    /* step to the side away from you, or the other side if you are near that edge */
-    let sd=o>=pl?1:-1;if(Math.abs(pl+sd*r)>SIDE)sd=-sd;
-    tgt=Math.max(-SIDE,Math.min(SIDE,pl+sd*r));
-    if(al>0&&Math.abs(pl-o)<r)slow=al<1.4?.25:.55}}
-  const no=o+(tgt-o)*Math.min(1,dt*(tgt?4:1.5));n._ao=Math.abs(no)<.005&&!tgt?0:no;n.sp=n._sp0*slow;
+  const o=n._ao||0;let al=0,pl=0;
+  if(!out&&n.m.visible&&n.st!=1){const lane=vert?n.x0:n.z0;al=(vert?P.z-n.z:P.x-n.x)*n.dir;pl=(vert?P.x:P.z)-lane}
+  const ss=NPCS.sidestep(o,pl,al,dt,!out&&n.m.visible&&n.st!=1);n._ao=ss[0];n.sp=n._sp0*ss[1];
   if(vert)n.x+=n._ao;else n.z+=n._ao;
   if(!n.m.visible)return;
   n.m.position.x=n.x;n.m.position.z=n.z;if(n.pet&&!vert)n.pet.position.z+=n._ao;
@@ -27,7 +21,7 @@ function avoidApply(L,vert,dt){const out=HIN||IN,r=mode=='drive'?1.9:1.05;L.forE
 /* two-way pavements: each direction of travel keeps to its own side (right-hand lane) so people passing head-on never meet.
    The base walk code eases people toward z0/x0 every frame, so moving that target by direction is all it takes; at the end
    of a pavement the target flips and they glide across to the other lane. */
-const LANE=.42;
+const LANE=.42;/* also NPCS.LANE */
 function lanes(L,vert){L.forEach(n=>{if(n._lb===undefined)n._lb=vert?n.x0:n.z0;const o=(vert?-1:1)*n.dir*LANE;if(vert)n.x0=n._lb+o;else n.z0=n._lb+o})}
 /* the old shove runs after the sidestep, on people's real positions */
 const push0=pushPeople;pushPeople=function(){};
@@ -87,22 +81,28 @@ dynB=function(x0,z0,x,z){if(IN||HIN)return false;const R0=.62,ppl=o=>{const a=Ma
    NPCS.walker(o,lane,p,dir,sp,opts) / NPCS.idle(o,x,z,ry) make entries; NPCS.tick(list,dt,{vis,avoid}) walks them;
    NPCS.blocks(x0,z0,x,z) is the hitbox (also wired into dynB below, so it works indoors). */
 const NPCS=(()=>{
-const R=.62,SIDE=1,reg=new Set();
-function walker(o,lane,p,dir,sp,x){x=x||{};return{o,ax:lane.ax,c:lane.c,a:lane.a,b:lane.b,p,dir:dir||1,sp,t:Math.random()*6,ao:0,bob:x.bob||0,x:0,z:0}}
+const R=.62,SIDE=1,LANE=.42,reg=new Set();
+/* the one sidestep rule for every pedestrian (home city NPC/VPED in the street-flow part above, airport, abroad):
+   ao = current sideways offset, pl = player's lane position relative to the lane, al = player's distance ahead along the walking direction;
+   returns [new offset, speed factor] */
+function sidestep(ao,pl,al,dt,on){let tgt=0,slow=1;const r=mode=='drive'?1.9:1.05;
+ if(on&&al>-1.2&&al<4.5&&Math.abs(pl-ao)<r+.6){let sd=ao>=pl?1:-1;if(Math.abs(pl+sd*r)>SIDE)sd=-sd;tgt=Math.max(-SIDE,Math.min(SIDE,pl+sd*r));if(al>0&&Math.abs(pl-ao)<r)slow=al<1.4?.25:.55}
+ const no=ao+(tgt-ao)*Math.min(1,dt*(tgt?4:1.5));return[Math.abs(no)<.005&&!tgt?0:no,slow]}
+function walker(o,lane,p,dir,sp,x){x=x||{};return{o,ax:lane.ax,c:lane.c,a:lane.a,b:lane.b,p,dir:dir||1,sp,t:Math.random()*6,ao:0,lo:0,bob:x.bob||0,x:0,z:0}}
 function idle(o,x,z,ry){o.g.position.set(x,0,z);o.g.rotation.y=ry||0;return{o,idle:1,x,z,t:Math.random()*6}}
 function tick(L,dt,k){k=k||{};reg.add(L);L._at=performance.now();const av=k.avoid!==false&&!(typeof HIN!=='undefined'&&HIN&&!k.indoor);
  L.forEach(n=>{const o=n.o,g=o.g;
   if(n.idle){n.t+=dt*8;const vis=!k.vis||k.vis(n.x,n.z);g.visible=vis;if(vis){o.arms[0].rotation.x=Math.sin(n.t*.15)*.08;o.arms[1].rotation.x=-Math.sin(n.t*.13)*.08}return}
-  const X=n.ax=='x',lx=X?n.p:n.c+n.ao,lz=X?n.c+n.ao:n.p,vis=!k.vis||k.vis(lx,lz);g.visible=vis;if(!vis)return;
-  let tgt=0,slow=1,blocked=false;
-  if(av){const al=((X?P.x-n.p:P.z-n.p))*n.dir,pl=(X?P.z:P.x)-n.c,r=mode=='drive'?1.9:1.05;
-   if(al>-1.2&&al<4.5&&Math.abs(pl-n.ao)<r+.6){let sd=n.ao>=pl?1:-1;if(Math.abs(pl+sd*r)>SIDE)sd=-sd;tgt=Math.max(-SIDE,Math.min(SIDE,pl+sd*r));if(al>0&&Math.abs(pl-n.ao)<r)slow=al<1.4?.25:.55}
+  const X=n.ax=='x';/* right-hand lane per direction, same as the home-city pavements */
+  n.lo+=((X?1:-1)*n.dir*LANE-n.lo)*Math.min(1,dt*3);const lc=n.c+n.lo,lx=X?n.p:lc+n.ao,lz=X?lc+n.ao:n.p,vis=!k.vis||k.vis(lx,lz);g.visible=vis;if(!vis)return;
+  let slow=1,blocked=false;
+  if(av){const ss=sidestep(n.ao,(X?P.z:P.x)-lc,((X?P.x-n.p:P.z-n.p))*n.dir,dt,true);n.ao=ss[0];slow=ss[1];
    blocked=Math.hypot(lx-P.x,lz-P.z)<R+.28}
-  n.ao+=(tgt-n.ao)*Math.min(1,dt*(tgt?4:1.5));if(Math.abs(n.ao)<.005&&!tgt)n.ao=0;
+  else n.ao=0;
   if(!blocked){n.p+=n.dir*n.sp*slow*dt;if(n.p>n.b){n.p=n.b;n.dir=-1}if(n.p<n.a){n.p=n.a;n.dir=1}n.t+=dt*7*Math.max(.3,slow)}
-  n.x=X?n.p:n.c+n.ao;n.z=X?n.c+n.ao:n.p;
+  n.x=X?n.p:n.c+n.lo+n.ao;n.z=X?n.c+n.lo+n.ao:n.p;
   g.position.set(n.x,n.bob&&!blocked?Math.abs(Math.sin(n.t))*n.bob:0,n.z);g.rotation.y=X?(n.dir>0?Math.PI/2:-Math.PI/2):(n.dir>0?0:Math.PI);
   const s=blocked?0:Math.sin(n.t)*.6;o.legs[0].rotation.x=s;o.legs[1].rotation.x=-s;o.arms[0].rotation.x=-s*.6;o.arms[1].rotation.x=blocked?0:s*.6})}
 function blocks(x0,z0,x,z){const now=performance.now();for(const L of reg){if(now-L._at>400)continue;for(const n of L){if(!n.o.g.visible||!n.o.g.parent)continue;const a=Math.hypot(n.x-x,n.z-z);if(a<R&&a<Math.hypot(n.x-x0,n.z-z0))return true}}return false}
-return{R,walker,idle,tick,blocks}})();
+return{R,LANE,walker,idle,tick,blocks,sidestep}})();
 {const d0=dynB;dynB=function(x0,z0,x,z){return d0(x0,z0,x,z)||NPCS.blocks(x0,z0,x,z)}}
