@@ -55,6 +55,7 @@
  const done=new WeakSet();
  /* v50.7.0: the whole scene (about 32,000 objects) was walked every 20 frames to flag new meshes, a 2 ms hitch about 3 times a second; now it only runs after something was added to a scene object */
  let markDirty=1;{const add0=THREE.Object3D.prototype.add;THREE.Object3D.prototype.add=function(){markDirty=1;return add0.apply(this,arguments)}}
+ const FLAT=new WeakMap(),FB=new THREE.Box3();
  function mark(all){
   const on=shOn;
   scene.traverse(o=>{
@@ -62,7 +63,9 @@
    if(!all&&done.has(o))return;done.add(o);
    const m=o.material;
    const solid=m&&!Array.isArray(m)&&m.isMeshLambertMaterial&&!m.transparent&&m.opacity>=1;
-   o.castShadow=on&&!!solid;o.receiveShadow=on&&!!solid;
+   /* v55.19.0: flat pieces lying on the ground (roads, floors, rugs) have nothing under them to shade, so they only receive */
+   let flat=FLAT.get(o);if(flat===undefined){flat=false;try{const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();o.updateWorldMatrix(true,false);FB.copy(g.boundingBox).applyMatrix4(o.matrixWorld);flat=FB.max.y<.12&&FB.max.y-FB.min.y<.12}catch(e){}FLAT.set(o,flat)}
+   o.castShadow=on&&!!solid&&!flat;o.receiveShadow=on&&!!solid;
   });
  }
  function frameFx(){
@@ -78,6 +81,14 @@
   hemi.intensity=.13*Math.min(1.3,amb.intensity/.75);
   if(!(frame%20)&&markDirty){markDirty=0;mark(false)}
  }
+ let shSig=NaN;
+ function shMoved(){let h=sun.position.x*7.1+sun.position.z*3.3+shRange;const R=shRange+3,cx=sun.target.position.x,cz=sun.target.position.z;
+  const add=(m,x,z)=>{if(!m||!m.visible||Math.abs(x-cx)>R||Math.abs(z-cz)>R)return;h+=x*1.37+z*2.11+m.rotation.y*.71+(m.position.y||0)*.53};
+  try{if(P&&P.mesh){add(P.mesh,P.mesh.position.x,P.mesh.position.z);if(P.legs)h+=P.legs[0].rotation.x*.3+P.arms[0].rotation.x*.2}}catch(e){}
+  try{NPC.forEach(n=>{add(n.m,n.m.position.x,n.m.position.z);if(n.pet)add(n.pet,n.pet.position.x,n.pet.position.z)})}catch(e){}
+  try{TRAF.forEach(t=>{if(t.m)add(t.m,t.m.position.x,t.m.position.z)})}catch(e){}
+  try{if(typeof VPED!='undefined')VPED.forEach(n=>add(n.m,n.m.position.x,n.m.position.z))}catch(e){}
+  if(h===shSig)return false;shSig=h;return true}
  const ac0=new THREE.Color(),sc0=new THREE.Color(),AW=new THREE.Color(),SW=new THREE.Color();
  const r0=renderer.render.bind(renderer);
  renderer.render=function(s,c){
@@ -88,7 +99,9 @@
    amb.intensity=a0*(.84-.09*d)*BR[bri];sun.intensity=s0*(1.32-.42*d)*BR[bri];
    const T=TONES[tone];AW.setHex(T.aw);SW.setHex(T.sw);amb.color.lerp(AW,T.a*d);sun.color.lerp(SW,T.s*d)}}
   /* the shadow map is redrawn at most about 60 times a second (fast screens do not need more) and not at all while the game is paused */
-  if(dp&&shOn){const n=performance.now();if(shForce||(n-lastSh>=gcfg().shi&&!(typeof PAUSED!='undefined'&&PAUSED))){renderer.shadowMap.needsUpdate=true;lastSh=n;shForce=false}}
+  /* v55.19.0 battery: the shadow pass costs more draw calls than the frame itself, so it is redrawn only when the shadow box moved,
+     or something that moves (you, people, cars) moved inside it; anything else still refreshes 5 times a second */
+  if(dp&&shOn){const n=performance.now(),gap=n-lastSh;if(shForce||(!(typeof PAUSED!='undefined'&&PAUSED)&&gap>=gcfg().shi&&(gap>=200||shMoved()))){renderer.shadowMap.needsUpdate=true;lastSh=n;shForce=false}}
   let o;try{o=r0(s,c)}finally{if(dp){amb.intensity=a0;sun.intensity=s0;amb.color.copy(ac0);sun.color.copy(sc0)}}
   /* glow: copy a tiny version of the frame right after drawing (the canvas is cleared later) */
   if(GLOW&&lv=='max'&&c===cam&&!(frame&1))try{bx.drawImage(cv,0,0,bc.width,bc.height)}catch(e){}
