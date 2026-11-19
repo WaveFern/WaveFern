@@ -891,7 +891,7 @@ function catchFish(){const g=G,o=st(),s=g.fsp,fr=g.fr,R=g.R,skill=R?skillOf(R):.
  const m=mast(pts,(isNew?'New ':'')+s.n);g.sess.n++;g.catches++;g.sess.cash+=value;if(!g.sess.best||fr.w>g.sess.best.w)g.sess.best=fr;
  g.card={s,fr,skill,isNew,isRec,trophy,value,mast:m,coins:s.k=='t'?value:0};g.st='land';g.stT=0;g.R=null;g.bite=0;g.hold=false;
  g.jump=null;g.fishM=g.fishF;g.fishF=null;if(!g.fishM){g.fishM=fish3(s.id,clamp(fr.l/100,.28,1.6));g.fishM.position.copy(g.lure)}g.fishM.name='caughtFish';g.fishM.rotation.order='YZX';scene.add(g.fishM);
- g.fishM.userData.len=g.fishM.scale.x;g.fishM.userData.hl=Math.min(g.fishM.scale.x,.8);g.fromLure=g.lure.clone();g.fromPos=g.fishM.position.clone();g.fromRot=g.fishM.rotation.y;g.flopAt=0;g.flop=.22;
+ g.fishM.userData.len=g.fishM.scale.x;g.fishM.userData.hl=clamp(g.fishM.scale.x*1.1,.42,.85);g.fromLure=g.lure.clone();g.fromPos=g.fishM.position.clone();g.fromRot=g.fishM.rotation.y;g.flopAt=0;g.flop=.22;
  if(s.k=='f'&&s.r>=2&&Math.random()<.9||Math.random()<.35)gullDive();if(s.k=='f'||s.id=='duck'||Math.random()<.4)if(Math.random()<.8)catBeg();
  try{S.fish.tales=(S.fish.tales|0)}catch(e){}sv()}
 /* keep puts the catch in the bucket; the bucket holds 40 (the cheapest is let go when it is full) */
@@ -975,7 +975,7 @@ function poseFrame(){const g=G,m=P.mesh;if(!m||!g.rod)return;const now=performan
  else if(s=='bite'){pitch=lerp(.85,.55,sm(0,.12,g.bT));ar=-.8;al=-.6;bend=.2+.55*sm(0,.12,g.bT)}
  else if(s=='hook'){direct=true;const u=sm(0,.25,g.stT);pitch=lerp(.55,1.65,u);ar=lerp(-.8,-1.35,u);al=lerp(-.6,-1.1,u);bend=.55}
  else if(s=='reel'&&R){pitch=.95+.2*Math.sin(g.t*1.3);ar=-.9;al=g.hold?-1.05+Math.sin(g.t*14)*.3:-.8;bend=.25+clamp(R.T,0,1.3)*1.05+(R.bst?Math.sin(g.t*30)*.05:0)}
- else if(s=='land'||s=='card'){pitch=1.25;ar=-1.35;al=-1.35;bend=.04}
+ else if(s=='land'||s=='card'){pitch=1.25;ar=-1.15;al=-1.15;bend=.04}
  else if(s=='release'){pitch=.9;const u=sm(0,.35,g.stT);ar=lerp(-1.35,-.55,u);al=lerp(-1.35,-.7,u);bend=.05}
  else if(s=='stow'){pitch=.9;const u=sm(0,.5,g.stT);ar=lerp(-1.35,-.6,u);al=lerp(-1.35,-.45,u);bend=.05}
  else if(s=='retract'){pitch=.95;ar=-.9;al=-1.0+Math.sin(g.t*16)*.3;bend=.2}
@@ -995,7 +995,7 @@ function poseFrame(){const g=G,m=P.mesh;if(!m||!g.rod)return;const now=performan
    const hx=Math.cos(ry),hz=-Math.sin(ry);ff.position.set(L.x-hx*len*.5,y,L.z-hz*len*.5);ff.rotation.set(rx,ry,pz);
    if(junk&&!j)swim(ff,g.t,0);else swim(ff,g.t,g.jump?.2:dash?.16:.09,g.jump?12:dash?11:6.5)}}
  /* the fish you just caught: flops through the air into your hands, is held in front of you, is thrown back or stowed in the bucket */
- if(g.fishM){const fm=g.fishM,d=[Math.sin(g.yaw),Math.cos(g.yaw)],rv=[-d[1],d[0]],ud=fm.userData,hp=[g.sp.wx+d[0]*.55,g.sp.y+1.3,g.sp.wz+d[1]*.55],hry=Math.atan2(-rv[1],rv[0]),aw=Math.atan2(-d[1],d[0]);
+ if(g.fishM){const fm=g.fishM,d=[Math.sin(g.yaw),Math.cos(g.yaw)],rv=[-d[1],d[0]],ud=fm.userData,hp=[g.sp.wx+d[0]*.75,g.sp.y+.98,g.sp.wz+d[1]*.75],hry=Math.atan2(-rv[1],rv[0]),aw=Math.atan2(-d[1],d[0]);
   const angTo=(a,b,u)=>{let q=b-a;q=Math.atan2(Math.sin(q),Math.cos(q));return a+q*u};
   if(s=='land'){const u=clamp(g.stT/1.0,0,1),e=u*u*(3-2*u),fl=g.fromPos||g.fromLure;fm.position.set(lerp(fl.x,hp[0],e),lerp(fl.y,hp[1],e)+Math.sin(u*Math.PI)*1.5,lerp(fl.z,hp[2],e));
    fm.rotation.set(Math.sin(u*26)*.7*(1-u),angTo(g.fromRot||0,hry,e),Math.sin(u*17)*.45*(1-u));fm.scale.setScalar(lerp(ud.len,ud.hl,e));g.flop=.22;swim(fm,g.t,.22,12)}
