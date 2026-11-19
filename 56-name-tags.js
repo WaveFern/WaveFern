@@ -25,6 +25,7 @@ function ntBox(){if(NTAG.box)return NTAG.box;const d=document.createElement('div
  '#ntags{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}'+
  /* v49.33.0: in the game's own style (v49.33.1: bigger): the pixel font on a dark panel with a hard black edge and drop shadow, and a little pixel tail */
  '#ntags .nt{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;font:400 18px/1 Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#e8f3ec;background:#0b0f0d;padding:6px 10px 5px;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,3px 3px 0 #0009;will-change:transform}'+
+ '#ntags .nt.sg{font-size:26px;padding:8px 14px 7px}'+
  '#ntags .nt:after{content:"";position:absolute;left:50%;bottom:-9px;margin-left:-4px;width:8px;height:6px;background:#000}'+
  document.head.appendChild(st)}
 const NTV=new THREE.Vector3();
@@ -39,7 +40,7 @@ function ntTick(){
  const W=innerWidth,H=innerHeight,show=mode!='pc'&&mode!='sleep'&&mode!='load'&&mode!='creator';
  for(let i=NTAG.list.length-1;i>=0;i--){const t=NTAG.list[i],s=t.s;let on=false;
   if(show&&ntShown(s)){s.getWorldPosition(NTV);NTV.y+=.12;if(t.sign&&NTV.distanceToSquared((NTAG.cam||cam).position)>3600)NTV.set(9,9,9);else NTV.project(NTAG.cam||cam);if(t.sign&&NTV.z>1)NTV.set(9,9,9);if(NTV.x>-1.15&&NTV.x<1.15&&NTV.y>-1.15&&NTV.y<1.2){on=true;
-   if(!t.el){t.el=document.createElement('div');t.el.className='nt';t.el.textContent=s.userData.lt;ntBox().appendChild(t.el)}
+   if(!t.el){t.el=document.createElement('div');t.el.className='nt sg';t.el.textContent=s.userData.lt;ntBox().appendChild(t.el)}
    const x=Math.round((NTV.x+1)/2*W),y=Math.round((1-NTV.y)/2*H);if(t.x!==x||t.y!==y){t.x=x;t.y=y;t.el.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-100%)'}
    }}
   if(on!==t.on&&t.el){t.on=on;t.el.style.display=on?'block':'none'}
