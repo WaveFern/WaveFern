@@ -14,7 +14,9 @@ function morningVinyl(){
  if(!ec||ec.dataset.bd)return;
  ec.dataset.bd=1;
  if(v>0){const b=ec.querySelector('b');if(b){const c=b.cloneNode(false);b.replaceWith(c);c.textContent=$$(h.e)}}
- const songs=(S.songs||[]).filter(s=>s.pd===S.day-1&&(+s.today||0)>0).sort((a,b)=>b.today-a.today);
+ /* last night's per-song streams: the day-history entry (kept up to date by 210-economy-rebalance.js), else today's counter */
+ const dn=s=>{const e=(s.dh||[]).find(x=>x[0]===S.day-1);return e?+e[1]||0:(s.pd===S.day-1?+s.today||0:0)};
+ const songs=(S.songs||[]).map(s=>({title:s.title,name:s.name,today:dn(s)})).filter(s=>s.today>0).sort((a,b)=>b.today-a.today);
  const rows=[['Streams pay',$$(+((+h.e||0)-(+h.v||0)).toFixed(2))],['Vinyl and CD sales',$$(+h.v||0)],['Total earned',$$(+h.e||0)]];
  const panel=document.createElement('div');panel.className='fwbd';panel.hidden=true;
  panel.innerHTML='<div class=fwbdt><b>Where it came from</b>'+rows.map(r=>'<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')+'</div><div class=fwbds><b>Streams by song</b>'+(songs.length?songs.map(s=>'<div><span>'+esc(s.title||s.name||'Song')+'</span><b>+'+Math.round(s.today).toLocaleString()+'</b></div>').join(''):'<small class=m>No song streams last night.</small>')+'</div>';
@@ -38,7 +40,8 @@ const w0=wakeUp;
 wakeUp=function(auto){
  window.FW_VIN=0;WAKING++;let r;
  try{r=w0.apply(this,arguments)}finally{WAKING--}
- try{morningVinyl()}catch(e){console.error('morning vinyl',e)}
+ /* v55.30.7: this file loads BEFORE 210-economy-rebalance.js and 231-label-press.js, whose wakeUp wrappers run outside this one and change the night's earnings and per-song streams afterwards. Build the breakdown once the whole wake chain has finished (wakeUp is synchronous, so a 0 ms timer runs after it), so it shows the same final figures as the Earned card. */
+ setTimeout(()=>{try{morningVinyl()}catch(e){console.error('morning vinyl',e)}},0)
  if(!WAKING)flushWake();
  return r};
 

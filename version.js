@@ -3,10 +3,12 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.30.12';
+const GAME_VERSION='v55.30.14';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.30.12',n:'The people in the airports and in the cities abroad are now the very same pedestrians as in the home city, not a copy: they walk, step around you and slow down the same way, and fans walk up to you for an autograph. The speech bubbles that popped up above their heads abroad are gone.'},
+ {v:'v55.30.14',n:'The people in the airports and in the cities abroad are now the very same pedestrians as in the home city, not a copy: they walk, step around you and slow down the same way, and fans walk up to you for an autograph. The speech bubbles that popped up above their heads abroad are gone.'},
+ {v:'v55.30.13',n:'The morning results now agree with each other. The "Where it came from" breakdown could show a different (larger) Earned figure and different per-song streams than the cards above it, because it was drawn before the final overnight adjustment. It now shows the same final numbers that were paid to you and added to your songs.'},
+ {v:'v55.30.12',n:'Sign labels such as Home outside your house are bigger and easier to read.'},
  {v:'v55.30.11',n:'Leaderboard fix. Your leaderboard row could stop updating for the rest of the session if one save never finished (for example after a dropped connection), so you slowly sank down the board on old numbers; the lock now clears after 30 seconds. A failed refresh no longer empties the board, and your own row is still added when you are outside the top 100 even if test rows were in the list.'},
  {v:'v55.30.10',n:'Airport and abroad-city pedestrians now use exactly the same sidestep rule as the home-city pedestrians: one shared function, and they keep to the right-hand side of the walkway so people passing each other head-on no longer walk through each other.'},
  {v:'v55.30.9',n:'Battery and frame rate: shadows are only redrawn when something in them moves (the shadow pass cost more than the frame itself), flat ground pieces no longer cast shadows, the frame cap no longer drops frames on 60 Hz screens, the pause menu and main menu stadium draw fewer frames, the minimap redraws 10 times a second instead of every few frames.'},
