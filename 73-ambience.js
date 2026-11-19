@@ -40,7 +40,6 @@ const ZONES=[
  {n:'Festival grounds',d:(x,z)=>dRect(x,z,FEST.X0,FEST.Z0,FEST.X1,FEST.Z1),r:30,on:festOn,t:T(.8,.1,0,.5,.3,.3,.4,0,1,.3)},
  {n:'West suburb',d:(x,z)=>Math.hypot(x+120,z-12),r:90,t:T(.3,.35,.1,.2,.15,.8,.4,.1,0,.25)},
  {n:'School',d:(x,z)=>Math.hypot(x+100,z-185),r:55,t:T(.35,.15,0,.4,.2,.6,.5,.8,0,.15)},
- {n:'Sports field',d:(x,z)=>Math.hypot(x-300,z-210),r:65,t:T(.3,.1,0,.3,.1,.5,.8,0,.25,.1)},
  {n:'Quiet fields',last:1,d:()=>0,r:1,t:T(.04,0,0,0,0,1,1,0,0,0)}];
 function night(){try{return ss(S.t,285,330)}catch(e){return 0}}
 function zoneAt(x,z){const nt=night(),tk=.3+.7*(1-nt),L={};LK.forEach(k=>L[k]=0);let best=null,bb=-1,raw=0,mw=0;
