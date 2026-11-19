@@ -31,22 +31,10 @@ function msg(){lt.classList.remove('in');void lt.offsetWidth;lt.textContent=M[i+
 tip.textContent=T[Math.random()*T.length|0];msg();
 var a=setInterval(function(){if(!document.getElementById('load'))return clearInterval(a),clearInterval(b);msg()},2200),
 b=setInterval(function(){if(!document.getElementById('load'))return clearInterval(b);var w=parseFloat(lb.style.width)||0;if(w>=100){lp.textContent='100%';return}p+=(40-p)*.06;var v=Math.max(w,p);lb.style.width=v.toFixed(1)+'%';lp.textContent=Math.round(v)+'%'},120)})();</script>
-<script>/* v55.22.1: blocked-domain fallback. On wavefern.com: if the game's own scripts fail to load, or the loading screen is still up after 40 s, and the GitHub address answers, go there. On the GitHub address: keep checking wavefern.com every 20 s; when it answers, go back (an empty browser goes straight back; a browser with a career gets a banner instead, because saves are per address). Add ?nofallback to the address to switch it off. */
-(function(){try{var P='https://wavefern.com/',M='https://wavefern.github.io/WaveFern/',H=location.hostname,L=location.search;if(/[?&]nofallback\b/.test(L))return;
-var onP=H==='wavefern.com'||H==='www.wavefern.com',onM=H==='wavefern.github.io';
-function probe(u,ok,no){var i=new Image(),d=0,t=setTimeout(function(){if(!d){d=1;no&&no()}},6000);i.onload=function(){if(!d){d=1;clearTimeout(t);ok()}};i.onerror=function(){if(!d){d=1;clearTimeout(t);no&&no()}};i.src=u+'favicon.png?fb='+Date.now()}
-if(onP){var gone=0;function go(){if(gone||/[?&]fwfb=/.test(L))return;if(document.getElementById('load')===null)return;probe(M,function(){if(gone)return;gone=1;location.replace(M+'?fwfb=1'+location.hash)},function(){setTimeout(go,15000)})}
-addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='SCRIPT'&&t.src&&t.src.indexOf(location.origin)===0)setTimeout(go,500)},true);
-setTimeout(function(){if(document.getElementById('load'))go()},40000)}
-else if(onM){var mine=/[?&]fwfb=/.test(L);if(!mine)return;
-function hasSave(){try{for(var i=0;i<localStorage.length;i++)if(/^fw_(save|u_)/.test(localStorage.key(i)))return 1}catch(e){}return 0}
-function back(){var u=P+location.search.replace(/[?&]fwfb=1/,'').replace(/^&/,'?')+location.hash;if(!hasSave())return location.replace(u);
-if(document.getElementById('fwfbn'))return;var b=document.createElement('div');b.id='fwfbn';b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:#000;color:#2fe68a;border:3px solid #2fe68a;padding:10px;font:12px ui-monospace,monospace;text-align:center';b.innerHTML='WaveFern is back at <a href="'+P+'" style="color:#fff">wavefern.com</a>. Export your save here (Settings) and import it there to keep playing.';(document.body||document.documentElement).appendChild(b)}
-(function chk(){probe(P,back,function(){setTimeout(chk,20000)})})()}
-}catch(e){}})();</script><script>window.FW_FEAT=1</script><script src="00-dev.js?v=49.72.0"></script><script src="00-moved-saves.js?v=49.54.3"></script><script src="00-guard.js?v=49.54.3"></script><script src="00-pause-core.js?v=55.18.0"></script><script src="00-tab-fade.js?v=55.18.0"></script><script src="00-pixel-icons.js?v=49.54.3"></script>
+<script>window.FW_FEAT=1</script><script src="00-dev.js?v=49.72.0"></script><script src="00-moved-saves.js?v=49.54.3"></script><script src="00-guard.js?v=49.54.3"></script><script src="00-pause-core.js?v=55.18.0"></script><script src="00-tab-fade.js?v=55.18.0"></script><script src="00-pixel-icons.js?v=49.54.3"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script><script>window.THREE||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>')</script>
 <script src="assets.js?v=49.54.3"></script>
-<script src="version.js?v=55.28.1"></script><script>try{var _l=document.querySelector('#load .ldin'),_v=document.createElement('div');_v.textContent=GAME_VERSION;_v.style.cssText='margin-top:10px;font:12px ui-monospace,monospace;color:#8aa094;text-align:center';_l.appendChild(_v)}catch(e){}</script>
+<script src="version.js?v=55.28.2"></script><script>try{var _l=document.querySelector('#load .ldin'),_v=document.createElement('div');_v.textContent=GAME_VERSION;_v.style.cssText='margin-top:10px;font:12px ui-monospace,monospace;color:#8aa094;text-align:center';_l.appendChild(_v)}catch(e){}</script>
 <script src="01-start.js?v=49.93.12"></script>
 <script src="02-data.js?v=55.22.0"></script>
 <script src="03-character.js?v=49.54.3"></script>
@@ -260,7 +248,7 @@ if(document.getElementById('fwfbn'))return;var b=document.createElement('div');b
 <script src="dev/dev-nohint-v1.js?v=promo1"></script>
 <script src="dev/dev-nopc-v1.js?v=promo1"></script>
 <script src="dev/dev-profile-v3.js?v=55.21.8"></script>
-<script src="dev/dev-graphics-v12.js?v=55.28.1"></script>
+<script src="dev/dev-graphics-v12.js?v=55.28.2"></script>
 <script src="dev/dev-perf.js?v=promo2"></script>
 <script src="dev/dev-crowds-v1.js?v=promo1"></script>
 <script src="dev/dev-awards-v1.js?v=promo1"></script>
