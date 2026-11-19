@@ -1,4 +1,4 @@
-/* Security rules test (v55.28.1): runs the Firestore + Realtime Database rules in the Firebase emulators and checks that
+/* Security rules test (v55.28.2): runs the Firestore + Realtime Database rules in the Firebase emulators and checks that
    players cannot do what they must not (admin writes, other players' data, founder flags, anonymous abuse, forged friend links...).
    Run it after ANY change in firebase-rules/. Needs Java and a one-off install OUTSIDE the repo, for example in a scratch folder:
      npm i firebase-tools@13 @firebase/rules-unit-testing@3 firebase@10
@@ -7,7 +7,7 @@
    Uses fake users only (demo project), never touches the real project. Ports: Firestore 8181, Database 9191. */
 const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
 const fs=require('fs');
-const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.28.1'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
+const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.28.2'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
 const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
 let pass=0,fail=0;
 const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fail++;console.log('FAIL ',name,'-',String(e.message).split('\n')[0])}};
