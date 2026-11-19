@@ -1140,7 +1140,7 @@ let intDone=false,HY2=0,ANT=0;
   p=f(-39,-21.2);INT.push({x:p[0],z:p[1],r:2.6,l:'Talk to Rex the coach',a:()=>openMenu('coach'),sk:3});
   p=f(LBX,LBZ+2.6);INT.push({x:p[0],z:p[1],r:3,l:'Skate park leaderboard and challenges',a:()=>openMenu('chal'),sk:4})}
  if(root.visible){if(!ppBuilt&&dd<260)buildPeople();ANT+=dt;lightsTick();carveTick(dt);
-  if(ppBuilt&&(dd<200||G))npcTick(dt,ANT);
+  if(ppBuilt&&((dd<200&&(!window.FW_ZONE||FW_ZONE.seen(root,25)))||G))npcTick(dt,ANT);/* v55.31.0: skaters only move while the park is on screen */
   if(boardKey&&!G){const o=st();if(boardKey!==[o.best,o.runs,o.bestCombo,Object.keys(o.challenges).length,o.wins].join('|'))drawBoard()}}
  if(G&&G.on){if(!(window.FW_SKATE&&FW_SKATE.hold)){P.x=CX+B.x;P.z=CZ+B.z;SY=SLAB;simTick(dt)}hudTick()}
  else if(!window.IN&&P.mesh&&dd<120&&mode=='play'){const inside=inPark(P.x,P.z,.6),h=inside?SLAB:0;HY2+=(h-HY2)*Math.min(1,dt*10);SY=HY2;P.mesh.position.y=HY2}else if(Math.abs(HY2)>.01&&mode=='play'){HY2*=1-Math.min(1,dt*10);SY=HY2}

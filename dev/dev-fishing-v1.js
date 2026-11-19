@@ -520,7 +520,7 @@ function npcTick(dt,t){NPC.forEach(n=>{const g=n.f.g;
  const bp=n.bob.position;_v.set(loc.x,loc.y,loc.z);setLine(n.line,_v,{x:bp.x,y:bp.y+.2,z:bp.z},n.a==2?.1:.5);
  if(n.bub){n.bub.l-=dt;if(n.bub.l<=0)n.bub=null}})}
 function npcFish(id,parent){const m=modelMesh(id,.7);m.position.set(0,2.3,.25);parent.add(m);return m}
-/* ---------- v55.23.0: real 3D fish. Every catch is a smooth model built from a recipe (FM): a lofted body with countershading, stripes, spots
+/* ---------- v55.30.0: real 3D fish. Every catch is a smooth model built from a recipe (FM): a lofted body with countershading, stripes, spots
    and a lateral line, real fins (forked, lunate, round, shark tails, spiny dorsals), eyes with pupils and the extras (hammer, bill, whiskers, lure,
    photophores, spikes, crest). Crab, squid, ray and the junk have their own builders. One swim shader bends the body (uM 0 = fish, 1 = ray wings,
    2 = crab legs); the same models draw the catch card, the journal and the reel game through one small offscreen renderer (IR). ---------- */
@@ -751,7 +751,7 @@ function drawFishTo(cv,id,o){o=o||{};const x=cv.getContext('2d'),W=cv.width,H=cv
 /* a cached picture of a model as an <img> (journal, shop) */
 function fishImg(id,w,h,sil){const k=id+'|'+w+'|'+h+'|'+(sil?1:0),im=new Image();im.width=w;im.height=h;im.className='f3';im.alt='';
  if(!ICON[k]){const cv=document.createElement('canvas');cv.width=w*2;cv.height=h*2;drawFishTo(cv,id,{sil,t:0,amp:0,fit:.9});ICON[k]=cv.toDataURL()}im.src=ICON[k];return im}
-/* the 3D model of a catch (v55.23.0: the smooth model, not the extruded pixel art), scaled to a longest side of `len` metres */
+/* the 3D model of a catch (v55.30.0: the smooth model, not the extruded pixel art), scaled to a longest side of `len` metres */
 function modelMesh(id,len){return fish3(id,len)}
 
 /* ---------- the fishing board and the speech bubbles ---------- */
@@ -1271,7 +1271,7 @@ function lightsTick(){const k=nightK(),wx=wxNow();if(ANIM.glMat)ANIM.glMat.color
   SPOTS.forEach((s,i)=>INT.push({x:s.wx,z:s.wz,r:s.s=='sand'?2.3:1.7,l:'Fish here: '+s.n,a:()=>startSession(i),fi:3}));
   const mp=lw(-1.2,-21),pp=lw(-5.3,-41.2);INT.push({x:mp[0],z:mp[1],r:2.4,l:'Talk to Old Mara',a:()=>openMara(),fi:4});INT.push({x:pp[0],z:pp[1],r:2.2,l:'Talk to Pete',a:()=>talkPete(),fi:5})}
  if(root.visible){if(!ppBuilt&&dd<220)buildPeople();ANT+=dt;lightsTick();
-  if(dd<320||G){ANIM.buoys.forEach(b=>{b.g.position.y=b.y+Math.sin(ANT*1.3+b.ph)*.05;b.g.rotation.z=Math.sin(ANT*.9+b.ph)*.1;b.g.rotation.x=Math.sin(ANT*1.1+b.ph*2)*.08});
+  if((dd<320&&(!window.FW_ZONE||FW_ZONE.seen(root,25)))||G){/* v55.30.0: animated only while the pier is on screen */ANIM.buoys.forEach(b=>{b.g.position.y=b.y+Math.sin(ANT*1.3+b.ph)*.05;b.g.rotation.z=Math.sin(ANT*.9+b.ph)*.1;b.g.rotation.x=Math.sin(ANT*1.1+b.ph*2)*.08});
    if(ppBuilt){npcTick(dt,ANT);bubbleTick()}
    if(!ANIM.animals&&ppBuilt){ANIM.animals=1;mkCat('#d98a3a','#fff3d9',-3.2,-41.85,DECK+.5,Math.PI);mkCat('#3a3a42','#e8e8ee',1.3,-31.5,DECK+.5,Math.PI/2);
     mkGull(-2.05,DECK+3.15,-33,.8);mkGull(9.3,DECK+.95,-43,2.4);mkGull(-15.75,5.55,4.6,1.2);mkGull(12.5,.45,-5.5,-.6);ANIM.gulls[0].home[1]=DECK+3.15;ANIM.gulls[1].home[1]=DECK+1.0}

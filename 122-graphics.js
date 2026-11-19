@@ -56,8 +56,11 @@ function gfxAuto(gap,cap){if(GFX.p!='auto'||document.hidden||PAUSED||(mode!='pla
  if(avg>Math.max(25,want*1.3)){const i=GFX_LV.indexOf(GFX.al);if(i<GFX_LV.length-1){GFX.al=GFX_LV[i+1];gfxSv();gfxApply()}}}
 
 /* crowds and draw distance: hide people and cars that are off screen or thinned out (cars still drive, so traffic is unchanged) */
-function gfxCull(){const c=gfxCur(),a=Math.max(1.8,innerWidth/Math.max(1,innerHeight)),R=c.far?Math.max(30,viewH*a*1.3+8):Math.max(18,viewH*a*.8+5),keep=c.crowd||4;
- const far=(m,x,z)=>Math.abs(x-camT.x)>R||Math.abs(z-camT.z)>R;
+/* v55.31.0: tested against the real camera view (zoom included). Normal keeps people and cars a little past the screen edge; Near hides the ones in the outer part of the screen
+   (the old test used a box well outside the screen for both, so Near changed nothing you could see) */
+const GCV=new THREE.Vector3();
+function gfxCull(){const c=gfxCur(),keep=c.crowd||4,lim=c.far?1.15:.72;cam.updateMatrixWorld();
+ const far=(m,x,z)=>{GCV.set(x,1,z).project(cam);return Math.abs(GCV.x)>lim||Math.abs(GCV.y)>lim};
  NPC.forEach((n,i)=>{if(!n.m.visible)return;const busy=n.fan||n.st||n.g||n.rob;if(far(n.m,n.x,n.z)||(!busy&&i%4>=keep)){n.m.visible=false;if(n.pet)n.pet.visible=false}});
  if(typeof VPED!='undefined')VPED.forEach((n,i)=>{if(n.m.visible&&(far(n.m,n.x,n.z)||i%4>=keep))n.m.visible=false});
  TRAF.forEach(t=>{if(t.m&&t.m.visible&&far(t.m,t.x,t.z))t.m.visible=false})}
@@ -81,10 +84,10 @@ function gfxDetail(force){const thr=+gfxCur().det||0;if(!thr&&!GFD.on)return;
  if(!thr&&GFD.on===0)scene.traverse(o=>{if(o._ghid){o.layers.set(0);o._ghid=0}})}
 {const w1=worldTick;worldTick=function(dt){const r=w1.apply(this,arguments);if(++GFD.n>=45){GFD.n=0;try{gfxDetail()}catch(e){}}return r}}
 
-/* weather: light = half the rain, off = no rain or fog drawn (the weather itself still happens) */
+/* weather: light = half the rain and snow, one fog layer instead of three; off = no rain, snow or fog drawn (the weather itself still happens) */
 if(typeof wxTick=='function'){const x0=wxTick;wxTick=function(dt){const r=x0.apply(this,arguments);try{const w=gfxCur().wx;
   if(w<2&&WTHR.mesh&&WTHR.mesh.visible){if(!w)WTHR.mesh.visible=false;else{const g=WTHR.mesh.geometry,d=g.drawRange;g.setDrawRange(0,Math.floor((d.count||0)/2))}}
-  if(!w)WTHR.fogs.forEach(m=>m.visible=false)}catch(e){}return r}}
+  if(!w)WTHR.fogs.forEach(m=>m.visible=false);else if(w==1)WTHR.fogs.forEach((m,i)=>{if(i)m.visible=false})}catch(e){}return r}}
 
 function gfxApply(){gfxSize();GFD.n=0;try{GFD.on=1;gfxDetail()}catch(e){}GFA.n=GFA.sum=0;GFA.due=0;document.body.classList.toggle('gfx-noblur',!gfxCur().blur)}
 gfxApply();
@@ -107,10 +110,10 @@ const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];if(k=='fps'&&gfxHz)
   +gfxRow('Frame rate cap','fps',[[30,'30'],[45,'45'],[60,'60'],[90,'90'],[120,'120'],[0,'Uncapped']],'Limited by your screen\'s refresh rate'+(gfxHz?' (about '+gfxHz+' Hz here)':''))
   +gfxH('World')
   +gfxRow('Crowds','crowd',[[4,'All'],[2,'Half'],[1,'Few']])
-  +gfxRow('Weather effects','wx',[[2,'Full'],[1,'Light'],[0,'Off']])
+  +gfxRow('Weather effects','wx',[[2,'Full'],[1,'Light'],[0,'Off']],'Rain, snow and fog. Light draws half the rain and snow and one fog layer')
   +stTog('FPS counter',GFX.fpsOn,"GFX.fpsOn=GFX.fpsOn?0:1;gfxSv();fpsShow()",'Frames per second, top of the screen')
   +gfxRow('Small props','det',[[0,'All'],[.15,'Fewer'],[.6,'Few']],'Hides tiny bins, pots and bits, so fewer things are drawn')
-  +gfxRow('Draw distance','far',[[1,'Normal'],[0,'Near']],'Near pulls the camera far plane in and hides far people and cars, for more FPS')
+  +gfxRow('Draw distance','far',[[1,'Normal'],[0,'Near']],'Near also pulls the camera far plane in. Normal: people, cars and places just past the screen edge are kept. Near: people and cars near the screen edge are hidden, and only places on screen are drawn')
   +stTog('Pause actually pauses',GFX.pp,"GFX.pp=GFX.pp?0:1;gfxSv();stDraw()",'Pausing stops drawing the world and all game ticks, so the GPU and CPU go idle')
   +gfxH('Battery')
   +gfxRow('When in the background','bg',[[0,'Full'],[1,'Reduced'],[2,'Pause']],'Tab hidden or window not focused: Reduced draws 10 fps, Pause stops drawing')

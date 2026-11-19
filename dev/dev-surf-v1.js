@@ -242,8 +242,10 @@ function distToSpot(){const m=NC>>1,dx=P.x-CX[m],dz=P.z-CZ[m];return Math.hypot(
  if(!surf.ready){buildSurf()}
  const dd=distToSpot();near=dd<330||(G&&G.on)||VIEW.on;
  if(G&&G.on){if(!G.paused)TT+=dt*G.ts}else if(near)TT+=dt;
- surf.mesh.visible=near;
- if(near){schedTick();lightUniforms();surfUpdate(dt)}
+ /* v55.31.0: the wave mesh is never frustum-culled, so it is only drawn and reshaped while its stretch of coast is on screen; the wave sets still run */
+ const seen=near&&(G&&G.on||VIEW.on||!window.FW_ZONE||FW_ZONE.seenBox(surf.box||(surf.box=new THREE.Box3().setFromBufferAttribute(surf.mesh.geometry.attributes.position).applyMatrix4(surf.mesh.matrixWorld)),12));
+ surf.mesh.visible=seen;
+ if(near){schedTick();lightUniforms();if(seen)surfUpdate(dt)}
  else if(SCH.mode=='idle'&&waves.length){waves.length=0;SCH.next=0}
  sbTick(dt);
  }catch(e){soft(e,'tick')}return r}}
