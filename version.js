@@ -7,6 +7,7 @@ const GAME_VERSION='v55.31.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
  {v:'v55.31.0',n:'Smoother and lighter on battery: places you cannot see (the skate park from home, far city blocks, the island) are no longer drawn or shadowed each frame, and the skaters, fishing pier animals and surf waves only move while they are on screen. Graphics settings fixed: Draw distance Near now really hides people and cars near the screen edge, Weather effects now also covers snow and fog (Light draws half the snow and one fog layer).'},
+ {v:'v55.30.2',n:'Removed the sports field from the world map, its sign in the world and its ambience zone.'},
  {v:'v55.30.1',n:'Pier fishing: the reel sidebar now uses the game\'s pixel look (square panels, hard borders, banded water, a pixel fish shadow, square bubbles and crank).'},
  {v:'v55.30.0',n:'Pier fishing: the fish are now blocky voxel 3D models that match the pixel style of the rest of the game, in the water, in your hands, on the catch card and in the journal.'},
  {v:'v55.29.0',n:'Security: the game now sends Firebase App Check tokens (reCAPTCHA Enterprise) with its cloud requests, so enforcement can be switched on in the Firebase console.'},
