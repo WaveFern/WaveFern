@@ -1,5 +1,5 @@
 rules_version = '2';
-// v55.28.2 (security audit, 19 Nov 2026): profiles.p photo host must be a real *.googleusercontent.com host (was any host ending in googleusercontent.com); rooms/{code} needs a Google account (was any anonymous login). Everything else unchanged from v51.3.0.
+// v55.29.1 (security audit, 19 Nov 2026): profiles.p photo host must be a real *.googleusercontent.com host (was any host ending in googleusercontent.com); rooms/{code} needs a Google account (was any anonymous login). Everything else unchanged from v51.3.0.
 // WaveFern Firestore rules v51.3.0, 12 Nov 2026 (16 Nov 2026: added newsletter/{id}, public read, admin write; republish to let the admin publish newsletter articles). Second admin uid added (admin() now accepts a list). Previous v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
 // ADMIN UID: the Google account has a NEW uid in the waveferndata project. Replace wE6oPZIH... below with your uid from Authentication > Users.
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
@@ -77,7 +77,7 @@ service cloud.firestore {
       allow get: if google();
       allow create, update: if google() && me() == uid && profOk(request.resource.data);
       allow delete: if google() && me() == uid || admin();
-      // v55.28.2: top songs are 'title|streams' strings; every entry is bounded so one profile cannot be a megabyte that every viewer downloads
+      // v55.29.1: top songs are 'title|streams' strings; every entry is bounded so one profile cannot be a megabyte that every viewer downloads
       function sgOk(l) { return (l.size() < 1 || str(l[0], 0, 80)) && (l.size() < 2 || str(l[1], 0, 80)) && (l.size() < 3 || str(l[2], 0, 80)) && (l.size() < 4 || str(l[3], 0, 80)) && (l.size() < 5 || str(l[4], 0, 80)); }
       function profOk(d) {
         return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'founder', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd', 'pfp'])
@@ -101,7 +101,7 @@ service cloud.firestore {
     // A player can create a name only if it is free (create is refused when the document exists), release only their own, and nobody edits one.
     match /usernames/{name} {
       allow get: if google();
-      // v55.28.2 anti-squatting: a name can only be created together with the same-batch profile write that sets profiles/{me}.h to it, and only if the profile's previous
+      // v55.29.1 anti-squatting: a name can only be created together with the same-batch profile write that sets profiles/{me}.h to it, and only if the profile's previous
       // name is the same or is released (deleted) in that batch. So one account holds one name, instead of a script reserving thousands.
       allow create: if google() && name.matches('[a-z0-9_]{3,16}') && name.matches('.*[a-z].*') && fields(['uid', 't'])
         && request.resource.data.uid == me() && stampNear(request.resource.data.t)

@@ -1,4 +1,4 @@
-/* Security rules test (v55.28.2): runs the Firestore + Realtime Database rules in the Firebase emulators and checks that
+/* Security rules test (v55.29.1): runs the Firestore + Realtime Database rules in the Firebase emulators and checks that
    players cannot do what they must not (admin writes, other players' data, founder flags, anonymous abuse, forged friend links...).
    Run it after ANY change in firebase-rules/. Needs Java and a one-off install OUTSIDE the repo, for example in a scratch folder:
      npm i firebase-tools@13 @firebase/rules-unit-testing@3 firebase@10
@@ -7,7 +7,7 @@
    Uses fake users only (demo project), never touches the real project. Ports: Firestore 8181, Database 9191. */
 const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
 const fs=require('fs');
-const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.28.2'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
+const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.29.1'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
 const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
 let pass=0,fail=0;
 const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fail++;console.log('FAIL ',name,'-',String(e.message).split('\n')[0])}};
@@ -33,7 +33,7 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  await T('profile: empty photo accepted',assertSucceeds(A.doc('profiles/userAAAAAAAAAA1').set(prof({p:''}))));
  await T('profile: write someone else\'s profile refused',assertFails(B.doc('profiles/userAAAAAAAAAA1').set(prof())));
  await T('profile: bio with <script> refused',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({bio:'<script>alert(1)</script>'}))));
- await T('profile: top-songs list with a 500 KB entry REFUSED (v55.28.2)',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['x'.repeat(500000)]}))));
+ await T('profile: top-songs list with a 500 KB entry REFUSED (v55.29.1)',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['x'.repeat(500000)]}))));
  await T('profile: normal top-songs list accepted',assertSucceeds(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['Song One|1200','Two|5']}))));
  await T('profile: self-granted founder REFUSED',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({founder:1}))));
  await T('profile: unauthenticated read refused',assertFails(U.doc('profiles/userAAAAAAAAAA1').get()));
