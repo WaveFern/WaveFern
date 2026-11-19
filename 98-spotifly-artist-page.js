@@ -96,7 +96,6 @@ PG.home=()=>{const L=sfOrder(),sh=SALL?L:L.slice(0,5),c=sfCur(),pl=!!(c&&sfIsSon
  <h2 class=sfh2>Popular</h2>${L.length?sh.map((s,i)=>sfRow(s,i+1,c)).join('')+(L.length>5?`<button class=sfmore onclick="SALL=!SALL;pcR()">${SALL?'Show less':'See more ('+L.length+')'}</button>`:''):'<p class=m>No releases yet. Record a song in the studio, then upload it from the Upload tab.</p>'}
  ${sfDisco()}</div>`};
 /* keep the "upload a picture" buttons under the monthly listeners line (84-pixel-pictures.js) */
-{const h0=PG.home;PG.home=function(){const h=h0.apply(this,arguments);return S.artist&&typeof pxBtns=='function'?h.replace(/(monthly listeners[^<]*<\/p>)/,'$1'+pxBtns('sp')):h}}
 {const a0=PG.albums;if(a0)PG.albums=function(){const h=a0.apply(this,arguments),k=h.lastIndexOf('<button class=go onclick="mkAlbum()">'),n='';return k<0?h+n:h.slice(0,k)+n+h.slice(k)}}
 
 /* ---------- Now playing panel and player bar (on every WaveFern page) ---------- */
@@ -183,11 +182,3 @@ function sfBar(){const c=sfCur(),I=c?sfInfo(c):null,pl=!!(c&&!c.held),d=c?sfLenB
 .sfpbr{display:flex;align-items:center;justify-content:flex-end;gap:8px}.sfpbr .sfvs{width:110px;height:auto;padding:0;margin:0;border:0;background:none;box-shadow:none;accent-color:#a66bff}
 @media (max-width:1100px){.sfnp{display:none}.sfr{grid-template-columns:30px 44px 1fr 100px 50px 32px;gap:10px}}
 @media (max-width:760px){.sfpb{grid-template-columns:1fr auto}.sfpbr{display:none}.sfr{grid-template-columns:26px 40px 1fr 50px 32px}.sfs{display:none}.sfhd{padding:0 18px 18px}.sfbd{padding:18px}}`;document.head.appendChild(st)}
-
-/* v55.21.0: change your Spotify name from the artist page. The name is saved on the career like the first name you pick. */
-let SFRN=0;
-{const h1=PG.home;PG.home=function(){const h=h1.apply(this,arguments);if(typeof h!='string'||!S.artist)return h;
- if(SFRN)return h.replace(/<h1 class=sfnm>[\s\S]*?<\/h1>/,()=>`<div class=sfrn style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0"><input id=sfrni maxlength=24 value="${esc(S.artist)}" style="min-width:0;flex:1" onkeydown="if(event.key=='Enter')sfRenameSave()"><button class=go onclick="sfRenameSave()">Save</button><button onclick="SFRN=0;pcR()">Cancel</button></div>`);
- return h.replace(/<h1 class=sfnm>[\s\S]*?<\/h1>/,m=>m+'<button class=sfrnb style="margin-top:4px" onclick="sfRename()">Edit name</button>')}}
-function sfRename(){snd('click');SFRN=1;pcR();setTimeout(()=>{const i=$('sfrni');if(i){i.focus();i.select()}},0)}
-function sfRenameSave(){const v=(($('sfrni')||{}).value||'').trim().slice(0,24);if(v.length<2)return say('Name needs 2+ characters.');S.artist=v;SFRN=0;try{updateVersion()}catch(e){}pcR()}
