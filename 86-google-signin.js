@@ -205,9 +205,12 @@ function fwIsGif(u){u=String(u||'');if(!u)return Promise.resolve(false);if(u in 
   if(t=='GIF87a'||t=='GIF89a')return true;
   if(String.fromCharCode.apply(null,a.subarray(0,4))=='RIFF'&&String.fromCharCode.apply(null,a.subarray(8,12))=='WEBP'){const f=String.fromCharCode.apply(null,a.subarray(12,16));return f=='VP8X'&&!!(a[20]&2)}
   return false};
- const look=x=>fetch(x,{credentials:'omit',referrerPolicy:'no-referrer'}).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(sig).catch(()=>false);
+ const NOC='fw_gif_nocors';let off=0;try{off=localStorage.getItem(NOC)=='1'}catch(e){}
+ if(off)return Promise.resolve(byName()).then(g=>(PFP_C[u]=!!g));/* v55.29.2: Google photos are served without CORS headers, so the byte check fails and the browser logs a console error each time; after one failure skip it and go by the file name */
+ let bad=0;
+ const look=x=>fetch(x,{credentials:'omit',referrerPolicy:'no-referrer'}).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(sig).catch(()=>{bad=1;return false});
  const alt=[];if(/=s\d+(-c)?$/.test(u)){alt.push(u.replace(/=s\d+(-c)?$/,'=s0'));alt.push(u.replace(/=s\d+(-c)?$/,'=s96-c-rw'))}
- return Promise.all([u].concat(alt).map(look)).then(r=>r.some(Boolean)||byName()).catch(byName).then(g=>(PFP_C[u]=!!g))}
+ return Promise.all([u].concat(alt).map(look)).then(r=>{if(bad)try{localStorage.setItem(NOC,'1')}catch(e){}return r.some(Boolean)||byName()}).catch(byName).then(g=>(PFP_C[u]=!!g))}
 function fwCustomPfp(){try{const u=FBU&&FBU.uid;const v=u?localStorage.getItem('fw_pfp_'+u):'';return v&&v.indexOf('data:image/jpeg;base64,')==0?v:''}catch(e){return ''}}
 function fwPhoto(){return FBU?(fwCustomPfp()||FBU.photoURL||''):''}
 function fwPfpCache(v){try{if(FBU)localStorage.setItem('fw_pfp_'+FBU.uid,v)}catch(e){}}

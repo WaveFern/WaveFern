@@ -3,10 +3,13 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.30.3';
+const GAME_VERSION='v55.30.6';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.30.3',n:'Battery and frame rate: shadows are only redrawn when something in them moves (the shadow pass cost more than the frame itself), flat ground pieces no longer cast shadows, the frame cap no longer drops frames on 60 Hz screens, the pause menu and main menu stadium draw fewer frames, the minimap redraws 10 times a second instead of every few frames.'},
+ {v:'v55.30.6',n:'Battery and frame rate: shadows are only redrawn when something in them moves (the shadow pass cost more than the frame itself), flat ground pieces no longer cast shadows, the frame cap no longer drops frames on 60 Hz screens, the pause menu and main menu stadium draw fewer frames, the minimap redraws 10 times a second instead of every few frames.'},
+ {v:'v55.30.5',n:'Security hardening. A band host or bandmate can no longer send crafted ids that write into the game\'s own objects or run code from a Nudge/Skip button, profile pictures only load from real Google image hosts, and the Firebase rules now need a Google account for band rooms and friends (rules folder v55.30.5), and one account can now hold only one username (no name squatting). Nothing changes in how the game looks or plays. Saves still load.'},
+ {v:'v55.30.4',n:'Skate Park: fixed the grass that could fill the pool bowl (and show under the concrete) after loading a save near the park. The park now finds the ground under it even when the ground is built on the same moment as the park, and keeps checking for ground built later. Saves still load.'},
+ {v:'v55.30.3',n:'Fix: the Google profile photo no longer fills the browser console with CORS errors. The animated-photo check now stops after the first blocked request.'},
  {v:'v55.30.2',n:'Removed the sports field from the world map, its sign in the world and its ambience zone.'},
  {v:'v55.30.1',n:'Pier fishing: the reel sidebar now uses the game\'s pixel look (square panels, hard borders, banded water, a pixel fish shadow, square bubbles and crank).'},
  {v:'v55.30.0',n:'Pier fishing: the fish are now blocky voxel 3D models that match the pixel style of the rest of the game, in the water, in your hands, on the catch card and in the journal.'},
