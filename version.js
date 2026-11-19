@@ -7,6 +7,7 @@ const GAME_VERSION='v55.30.15';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
  {v:'v55.30.15',n:'Shadows in the airport and the brand HQ rooms are now the same sun shadows as the rest of the game. The soft blob shadows those places drew under desks, planters and furniture were a second, different look and are gone.'},
+ {v:'v55.30.14',n:'The people in the airports and in the cities abroad are now the very same pedestrians as in the home city, not a copy: they walk, step around you and slow down the same way, and fans walk up to you for an autograph. The speech bubbles that popped up above their heads abroad are gone.'},
  {v:'v55.30.13',n:'The morning results now agree with each other. The "Where it came from" breakdown could show a different (larger) Earned figure and different per-song streams than the cards above it, because it was drawn before the final overnight adjustment. It now shows the same final numbers that were paid to you and added to your songs.'},
  {v:'v55.30.12',n:'Sign labels such as Home outside your house are bigger and easier to read.'},
  {v:'v55.30.11',n:'Leaderboard fix. Your leaderboard row could stop updating for the rest of the session if one save never finished (for example after a dropped connection), so you slowly sank down the board on old numbers; the lock now clears after 30 seconds. A failed refresh no longer empties the board, and your own row is still added when you are outside the top 100 even if test rows were in the list.'},
