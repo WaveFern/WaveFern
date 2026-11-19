@@ -9,7 +9,7 @@ WaveFern is a static browser game (GitHub Pages; the repo has no build step, but
 
 - 256 game scripts in the repo root + 67 files in `dev/` = **323 local script tags** in `index.html` (checked by `tools/check-globals.js`). Every root script is loaded; there are no orphan scripts. Other `.js` files (`tools/`, `wiki/`, `trailer/` etc.) are not part of the game page.
 - Three.js r128 (CDN, with a cdnjs fallback) renders the 3D world. The "computer", phone and menus are plain DOM (`style.css`, see `docs/THEMES.md`).
-- Firebase (Auth, Firestore, Analytics) is optional: the game runs fully offline as a guest. Rules are in `firebase-rules/`.
+- Firebase (Auth, Firestore, Analytics) is optional: the game runs fully offline as a guest. Rules are in `firebase-rules/<version>/` (Firestore + Realtime Database). **Security rules for every change: `docs/SECURITY_CHECKLIST.md`.**
 - Version and changelog live in `version.js` (`GAME_VERSION`, `VERSION_HISTORY`). Bump both in the same commit as every change.
 
 ### The "patch layering" style (most important thing to understand)
@@ -129,6 +129,7 @@ The real order is the order of tags in `index.html`, not file numbers. Known non
 **Testing** (no framework; tools in `tools/`)
 - `node tools/check-globals.js` (needs `acorn`, `eslint-scope`): duplicate declarations, early reads, syntax newer than ES2020. Baseline: **0 problems**. The 18 old UNDEFINED reports were investigated (v50.0.1) and are listed with reasons in the `KNOWN` table at the top of `tools/check-globals.js` (`--known` prints them): almost all are names private to a closure (`MPS`, `frStart`, `needLogin` in `161`; `fade`, `AP` in `139`; `inCity` in `150`; `toast` in `169`; `countUp` in `176`) read from another file behind a `typeof`/`try` guard, so that branch never runs. Any new report is a regression; fix it, do not add it to `KNOWN`. To make one of those branches work, expose the name from its closure on purpose (and check the behaviour change first).
 - `node tools/seal-test.js`: save codec and tamper checks.
+- `node tools/mp-ids-test.js`: band-room id sanitising (prototype pollution, onclick breakout). `tools/rules-test.js`: Firebase rules in the emulators (needs Java + firebase-tools, see its header and `docs/SECURITY_CHECKLIST.md`).
 - `node tools/music-test.js`: beat engine variety checks.
 - `node tools/load-test.js [url]`: headless boot, new career, open phone apps, save; prints page errors. Serve with `python3 -m http.server 8099`.
 - `node tools/wiki-data.js` refreshes `wiki/data.js` from the live game (also runs in deploy).

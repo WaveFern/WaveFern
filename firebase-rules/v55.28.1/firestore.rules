@@ -1,4 +1,5 @@
 rules_version = '2';
+// v55.28.1 (security audit, 19 Nov 2026): profiles.p photo host must be a real *.googleusercontent.com host (was any host ending in googleusercontent.com); rooms/{code} needs a Google account (was any anonymous login). Everything else unchanged from v51.3.0.
 // WaveFern Firestore rules v51.3.0, 12 Nov 2026 (16 Nov 2026: added newsletter/{id}, public read, admin write; republish to let the admin publish newsletter articles). Second admin uid added (admin() now accepts a list). Previous v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
 // ADMIN UID: the Google account has a NEW uid in the waveferndata project. Replace wE6oPZIH... below with your uid from Authentication > Users.
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
@@ -7,7 +8,7 @@ rules_version = '2';
 // gifts/{id}: the admin creates and deletes; a player reads their own and marks one claimed once.
 // usernames/{name}: reserved usernames (v49.80.7); profiles/{uid}.h must match a name the player reserved.
 // founders/{uid}: cloud Founder list; admin writes, player reads own. leaderboard/{uid}, profiles/{uid}: player writes own row, signed-in players read.
-// rooms/{code}: a band host (anonymous login) writes a heartbeat carrying their own uid; only the admin reads.
+// rooms/{code}: a band host (Google login) writes a heartbeat carrying their own uid; only the admin reads.
 service cloud.firestore {
   match /databases/{database}/documents {
     function me() { return request.auth.uid; }
@@ -83,7 +84,7 @@ service cloud.firestore {
           && str(d.bio, 0, 160) && d.bio.matches('[^<>"]*')
           && d.fame is int && d.fame >= 0 && d.fame <= 1000 && count(d.lis) && stampNear(d.t)
           // v49.83.0: Google photo (https googleusercontent only), Founder flag (only if the founders/ entry exists), join date, top songs, band, achievements bitmask
-          && (!('p' in d) || d.p is string && d.p.size() <= 300 && d.p.matches('(https://[a-z0-9.-]*googleusercontent[.]com/.*)?'))
+          && (!('p' in d) || d.p is string && d.p.size() <= 300 && d.p.matches('(https://([a-z0-9-]+[.])+googleusercontent[.]com/.*)?'))
           && profFlagOk(d)
           && (!('j' in d) || (d.j is int && d.j >= 0 && d.j <= 4000000000000)) && (!('sg' in d) || d.sg is list && d.sg.size() <= 5)
           && (!('bn' in d) || str(d.bn, 0, 24) && d.bn.matches('[^<>"]*')) && (!('bi' in d) || str(d.bi, 0, 12)) && (!('bm' in d) || d.bm is int && d.bm >= 0 && d.bm <= 50)
@@ -119,9 +120,9 @@ service cloud.firestore {
 
     match /rooms/{code} {
       allow get, list: if admin();
-      allow create: if request.auth != null && roomOk(request.resource.data);
-      allow update: if request.auth != null && resource.data.uid == me() && roomOk(request.resource.data);
-      allow delete: if admin() || request.auth != null && resource.data.uid == me();
+      allow create: if google() && roomOk(request.resource.data);
+      allow update: if google() && resource.data.uid == me() && roomOk(request.resource.data);
+      allow delete: if admin() || google() && resource.data.uid == me();
       function roomOk(d) {
         return code.matches('[A-Z0-9]{5}') && fields(['code', 'band', 'n', 'uid', 't'])
           && d.code == code && d.uid == me() && str(d.band, 1, 24) && d.n is int && d.n >= 1 && d.n <= 4 && stamp(d.t);
