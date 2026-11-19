@@ -152,14 +152,15 @@ document.addEventListener('dragstart',e=>{const s=e.target.closest&&e.target.clo
 document.addEventListener('dragover',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r){e.preventDefault();r.classList.add('drop')}});
 document.addEventListener('dragleave',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r)r.classList.remove('drop')});
 document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(!r)return;e.preventDefault();r.classList.remove('drop');let v='';try{v=e.dataTransfer.getData('text/plain')}catch(x){}if(/^slot:/.test(v))return ttSwap(+v.slice(5),+r.dataset.slot);const n=+v;if(n)ttRecAsk(n,+r.dataset.slot)});
-/* v55.21.0: swap two career slots. The save keys move with the slot, the active pointer follows its career, then the page reloads like Recover does. */
-function ttSwap(a,b){if(!a||!b||a==b)return;snd('click');if(TT.game)autoSave();wiping=true;
+/* v55.21.0: swap two career slots. The save keys move with the slot, the active pointer follows its career, then the slot list redraws (v55.21.8: no page reload; the loaded career follows its save key and keeps saving to it). */
+function ttSwap(a,b){if(!a||!b||a==b)return;snd('click');if(TT.game)autoSave();
  try{const ka=slotKey(a),kb=slotKey(b),va=localStorage.getItem(ka),vb=localStorage.getItem(kb);
   if(vb)localStorage.setItem(ka,vb);else localStorage.removeItem(ka);
   if(va)localStorage.setItem(kb,va);else localStorage.removeItem(kb);
   const c=curSlot();if(c==a)localStorage.setItem(SLOT_K,b);else if(c==b)localStorage.setItem(SLOT_K,a);
-  if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){wiping=false;return}
- location.reload()}
+  if(TT.game){if(BOOT_SLOT==a)BOOT_SLOT=b;else if(BOOT_SLOT==b)BOOT_SLOT=a}
+  if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){return}
+ ttWorlds()}
 function ttBack(){snd('click');TT.sel=0;titleUI()}
 function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
  if(TT.game)autoSave();wiping=true;const i=slotInfo(n);
@@ -196,10 +197,15 @@ addEventListener('pointerdown',()=>{if(TT.on&&MENUA&&MENUA.paused)MENUA.play().c
    "Later" asks again in the next session. */
 const PFP_MAX=24000,PFP_C={},PFP_ASK={};
 function fwIsGif(u){u=String(u||'');if(!u)return Promise.resolve(false);if(u in PFP_C)return Promise.resolve(PFP_C[u]);
+ /* v55.21.8: Google serves resized photos as a still frame, so also look at the original (=s0) and the animated (-rw) versions. */
  const byName=()=>/\.gif([?#]|$)/i.test(u);
- return fetch(u,{credentials:'omit',referrerPolicy:'no-referrer'}).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})
-  .then(b=>{const s=String.fromCharCode.apply(null,new Uint8Array(b,0,6));return s=='GIF87a'||s=='GIF89a'})
-  .catch(byName).then(g=>(PFP_C[u]=!!g))}
+ const sig=b=>{const a=new Uint8Array(b,0,Math.min(32,b.byteLength)),t=String.fromCharCode.apply(null,a.subarray(0,6));
+  if(t=='GIF87a'||t=='GIF89a')return true;
+  if(String.fromCharCode.apply(null,a.subarray(0,4))=='RIFF'&&String.fromCharCode.apply(null,a.subarray(8,12))=='WEBP'){const f=String.fromCharCode.apply(null,a.subarray(12,16));return f=='VP8X'&&!!(a[20]&2)}
+  return false};
+ const look=x=>fetch(x,{credentials:'omit',referrerPolicy:'no-referrer'}).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(sig).catch(()=>false);
+ const alt=[];if(/=s\d+(-c)?$/.test(u)){alt.push(u.replace(/=s\d+(-c)?$/,'=s0'));alt.push(u.replace(/=s\d+(-c)?$/,'=s96-c-rw'))}
+ return Promise.all([u].concat(alt).map(look)).then(r=>r.some(Boolean)||byName()).catch(byName).then(g=>(PFP_C[u]=!!g))}
 function fwCustomPfp(){try{const u=FBU&&FBU.uid;const v=u?localStorage.getItem('fw_pfp_'+u):'';return v&&v.indexOf('data:image/jpeg;base64,')==0?v:''}catch(e){return ''}}
 function fwPhoto(){return FBU?(fwCustomPfp()||FBU.photoURL||''):''}
 function fwPfpCache(v){try{if(FBU)localStorage.setItem('fw_pfp_'+FBU.uid,v)}catch(e){}}
@@ -216,8 +222,8 @@ function fwPfpResize(f){return new Promise((res,rej)=>{const u=URL.createObjectU
    let v='';for(const q of [.8,.7,.6,.5]){v=c.toDataURL('image/jpeg',q);if(v.length<=PFP_MAX)break}
    v.length<=PFP_MAX?done(0,v):done(new Error('That picture is too detailed. Try a simpler one.'))}catch(e){done(new Error('That picture could not be used.'))}};
  im.src=u})}
-function fwPfpShow(){const d=document.createElement('div');d.id='pfpq';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
- d.innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>Pick a profile picture</h2><p>Your Google profile picture is an animated GIF, which WaveFern cannot show. Upload a picture instead. It is cropped to a square and saved to your account.</p><p class=m id=pfpm></p><div class=row2><label class=go style="cursor:pointer">Upload picture<input type=file accept="image/*" id=pfpin style="display:none"></label><button id=pfpl>Later</button></div></div>`;
+function fwPfpShow(manual){if(document.getElementById('pfpq'))return;const d=document.createElement('div');d.id='pfpq';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
+ d.innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>Pick a profile picture</h2><p>${manual?'Upload your own picture to use instead of your Google one.':'Your Google profile picture is an animated GIF, which WaveFern cannot show. Upload a picture instead.'} It is cropped to a square and saved to your account.</p><p class=m id=pfpm></p><div class=row2><label class=go style="cursor:pointer">Upload picture<input type=file accept="image/*" id=pfpin style="display:none"></label><button id=pfpl>Later</button></div></div>`;
  document.body.appendChild(d);
  d.querySelector('#pfpl').onclick=()=>{try{sessionStorage.setItem('fw_pfp_later','1')}catch(e){}d.remove()};
  d.querySelector('#pfpin').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const m=d.querySelector('#pfpm');m.textContent='Saving...';
@@ -227,4 +233,4 @@ function fwPfpPrompt(){try{if(!FB_ON||!FBU||!TT.on||fwCustomPfp()||!FBU.photoURL
  PFP_ASK[uid]=1;const u=FBU.photoURL;
  fwIsGif(u).then(g=>{if(g&&TT.on&&FBU&&FBU.uid==uid&&!fwCustomPfp())fwPfpShow()},()=>{})}catch(e){}}
 {const pt0=titleUI;titleUI=function(){const r=pt0.apply(this,arguments);try{fwPfpPrompt()}catch(e){}return r}}
-window.FW_PFP_isGif=fwIsGif;
+window.FW_PFP_isGif=fwIsGif;window.FW_PFP_show=fwPfpShow;
