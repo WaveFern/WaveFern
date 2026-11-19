@@ -682,19 +682,45 @@ function buildChest(b){const W='#8a5a2c',W2='#9a6a36',G2='#e6b422';const wood=(x
  addG(b,new THREE.BoxGeometry(.08,.1,.03),{p:[0,.02,.21],c:G2,w:0});addG(b,new THREE.BoxGeometry(.025,.035,.01),{p:[0,.01,.227],c:'#3a2a10',w:0});
  for(let q=0;q<7;q++)addG(b,new THREE.CylinderGeometry(.035,.035,.01,10),{p:[-.2+q*.065,.08+(q%3)*.01,.22],r:[1.2,0,q*.3],c:'#f4d85a',w:0});
  for(let q=0;q<9;q++)addG(b,new THREE.SphereGeometry(.018+hsh(q,42)*.012,6,4),{p:[-.3+hsh(q,43)*.6,-.22+hsh(q,44)*.25,(hsh(q,45)>.5?1:-1)*.205],c:'#e8e4d8',w:0})}
+/* v55.29.0: the models are blocky voxels like the rest of the game. The smooth build is sampled onto a grid (about VOXN blocks along the longest side):
+   every triangle marks the cells it touches (later parts, like the pupils, win), the inside is filled by a flood fill from outside, and only the
+   faces that look outside are kept. Every block keeps its own centre (aCt) so the swim shader moves whole blocks and they stay square. */
+const VOXN=34;
+function voxelize(b){const P=b.p,n=P.length/3;let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9;for(let i=0;i<n;i++){const x=P[i*3],y=P[i*3+1],z=P[i*3+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}
+ const L=Math.max(x1-x0,y1-y0,z1-z0)||1,v=L/VOXN,NX=Math.ceil((x1-x0)/v)+3,NY=Math.ceil((y1-y0)/v)+3,NZ=Math.ceil((z1-z0)/v)+3,N=NX*NY*NZ,id=(i,j,k)=>(k*NY+j)*NX+i;
+ const occ=new Uint8Array(N),col=new Float32Array(N*3),sw=new Float32Array(N),gl=new Float32Array(N);
+ const mark=(x,y,z,t)=>{const i=Math.floor((x-x0)/v)+1,j=Math.floor((y-y0)/v)+1,k=Math.floor((z-z0)/v)+1,q=id(i,j,k);occ[q]=1;col[q*3]=b.c[t*3];col[q*3+1]=b.c[t*3+1];col[q*3+2]=b.c[t*3+2];sw[q]=b.w[t];gl[q]=Math.max(gl[q]*0,b.g[t])};
+ for(let t=0;t<n;t+=3){const a=t*3,ax=P[a],ay=P[a+1],az=P[a+2],bx2=P[a+3]-ax,by=P[a+4]-ay,bz=P[a+5]-az,cx=P[a+6]-ax,cy=P[a+7]-ay,cz=P[a+8]-az;
+  const m=Math.max(1,Math.ceil(Math.max(Math.hypot(bx2,by,bz),Math.hypot(cx,cy,cz),Math.hypot(cx-bx2,cy-by,cz-bz))/(v*.45)));
+  for(let i=0;i<=m;i++)for(let j=0;j<=m-i;j++){const u=i/m,w=j/m,vi=t+(u>w&&u>1-u-w?1:w>1-u-w?2:0);mark(ax+bx2*u+cx*w,ay+by*u+cy*w,az+bz*u+cz*w,vi)}}
+ /* outside = empty cells reachable from the border; every other empty cell is inside the body */
+ const out=new Uint8Array(N),st=[0];out[0]=1;while(st.length){const q=st.pop(),i=q%NX,j=Math.floor(q/NX)%NY,k=Math.floor(q/(NX*NY));
+  [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].forEach(([a,b2,c])=>{const I=i+a,J=j+b2,K=k+c;if(I<0||J<0||K<0||I>=NX||J>=NY||K>=NZ)return;const r=id(I,J,K);if(!out[r]&&!occ[r]){out[r]=1;st.push(r)}})}
+ const o=MB();o.ct=[];const F=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+ for(let k=1;k<NZ-1;k++)for(let j=1;j<NY-1;j++)for(let i=1;i<NX-1;i++){const q=id(i,j,k);if(!occ[q])continue;const cx=x0+(i-.5)*v,cy=y0+(j-.5)*v,cz=z0+(k-.5)*v,h=v/2;
+  const sh=.94+.06*hsh(q,77);
+  for(const [a,b2,c] of F){if(!out[id(i+a,j+b2,k+c)])continue;
+   /* the 4 corners of this face */
+   const U=a?[0,1,0]:b2?[0,0,1]:[1,0,0],W=a?[0,0,1]:b2?[1,0,0]:[0,1,0],sg=a+b2+c;
+   const fc=[cx+a*h,cy+b2*h,cz+c*h],co=(su,sv)=>[fc[0]+(U[0]*su+W[0]*sv)*h,fc[1]+(U[1]*su+W[1]*sv)*h,fc[2]+(U[2]*su+W[2]*sv)*h];
+   const qd=sg>0?[co(-1,-1),co(1,-1),co(1,1),co(-1,-1),co(1,1),co(-1,1)]:[co(-1,-1),co(1,1),co(1,-1),co(-1,-1),co(-1,1),co(1,1)];
+   const sd=a?(a>0?1:.82):b2?(b2>0?1.06:.7):.9;
+   for(const pt of qd){o.p.push(pt[0],pt[1],pt[2]);o.n.push(a,b2,c);o.c.push(col[q*3]*sh*sd,col[q*3+1]*sh*sd,col[q*3+2]*sh*sd);o.w.push(sw[q]);o.g.push(gl[q]);o.ct.push(cx,cy,cz)}}}
+ return o}
 const GEO={};
-function geoOf(id){if(GEO[id])return GEO[id];const o=FM[id]||FM.weed,b=MB();
+function geoOf(id){if(GEO[id])return GEO[id];const o=FM[id]||FM.weed;let b=MB();
  try{if(o.kind=='crab')buildCrab(b);else if(o.kind=='squid')buildSquid(b);else if(o.kind=='ray')buildRay(b);else if(o.kind=='boot')buildBoot(b);else if(o.kind=='can')buildCan(b);else if(o.kind=='weed')buildWeed(b);
   else if(o.kind=='duck')buildDuck(b);else if(o.kind=='bottle')buildBottle(b);else if(o.kind=='chest')buildChest(b);else buildFishBody(b,o)}catch(e){soft(e,'geo '+id)}
+ let vx=null;try{vx=voxelize(b)}catch(e){soft(e,'vox '+id)}if(vx&&vx.p.length)b=vx;else b.ct=b.p.slice();
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(b.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(b.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(b.c,3));
- g.setAttribute('aSw',new THREE.Float32BufferAttribute(b.w,1));g.setAttribute('aGl',new THREE.Float32BufferAttribute(b.g,1));
+ g.setAttribute('aSw',new THREE.Float32BufferAttribute(b.w,1));g.setAttribute('aGl',new THREE.Float32BufferAttribute(b.g,1));g.setAttribute('aCt',new THREE.Float32BufferAttribute(b.ct,3));
  g.computeBoundingBox();const bb=g.boundingBox,cx=(bb.min.x+bb.max.x)/2,cy=(bb.min.y+bb.max.y)/2,cz=(bb.min.z+bb.max.z)/2,L=Math.max(bb.max.x-bb.min.x,bb.max.z-bb.min.z,bb.max.y-bb.min.y)||1;
- g.translate(-cx,-cy,-cz);g.scale(1/L,1/L,1/L);g.computeBoundingBox();g.computeBoundingSphere();g.userData.fish=1;return GEO[id]=g}
-const FVS='attribute float aSw;attribute float aGl;uniform float uT;uniform float uA;uniform float uK;uniform float uM;varying float vGl;\n';
-function fishMat(id){const o=FM[id]||{},m=new THREE.MeshPhongMaterial({vertexColors:true,shininess:o.sh||55,specular:C3(o.spc||'#3c3c3c'),side:THREE.DoubleSide});
+ g.translate(-cx,-cy,-cz);g.scale(1/L,1/L,1/L);{const A=g.attributes.aCt.array;for(let i=0;i<A.length;i+=3){A[i]=(A[i]-cx)/L;A[i+1]=(A[i+1]-cy)/L;A[i+2]=(A[i+2]-cz)/L}}g.computeBoundingBox();g.computeBoundingSphere();g.userData.fish=1;return GEO[id]=g}
+const FVS='attribute float aSw;attribute float aGl;attribute vec3 aCt;uniform float uT;uniform float uA;uniform float uK;uniform float uM;varying float vGl;\n';
+function fishMat(id){const o=FM[id]||{},m=new THREE.MeshLambertMaterial({vertexColors:true});
  m.userData.U={uT:{value:0},uA:{value:.06},uK:{value:o.k||5},uM:{value:o.m!=null?o.m:o.kind=='crab'?2:0}};m.userData.xms=1;
  m.onBeforeCompile=function(sh){Object.assign(sh.uniforms,this.userData.U);
-  sh.vertexShader=FVS+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvGl=aGl;{float ph=uT-(uM<.5?position.x:(uM<1.5?abs(position.z):position.x*3.+position.z*2.))*uK;float of=aSw*uA*sin(ph);if(uM<.5)transformed.z+=of;else transformed.y+=of;}');
+  sh.vertexShader=FVS+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvGl=aGl;{float ph=uT-(uM<.5?aCt.x:(uM<1.5?abs(aCt.z):aCt.x*3.+aCt.z*2.))*uK;float of=aSw*uA*sin(ph);if(uM<.5)transformed.z+=of;else transformed.y+=of;}');
   sh.fragmentShader='varying float vGl;\n'+sh.fragmentShader.replace('#include <dithering_fragment>','#include <dithering_fragment>\ngl_FragColor.rgb=mix(gl_FragColor.rgb,vColor*1.3+.2,vGl);')};
  return m}
 /* a 3D catch: one mesh, its own material (the swim uniforms), the shared geometry; len = metres along its longest side */
