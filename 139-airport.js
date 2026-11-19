@@ -24,7 +24,7 @@ const T=TRAVEL,RU=T.RULES;
 const AX=4000,AZ=320,AW=72,AD=56,CX=4200,CW=34,CD=6;
 const GU=i=>6+12*(i-1),LANES=[30.7,36,41.3],SECV=34.2;
 const OUT={x0:-400,x1:-330,z0:-40,z1:80,fx:-322,fz:20};
-const AP={fadeI:[],idx:-1,cidx:-1,grp:null,cgrp:null,og:null,npc:[],cnpc:[],cols:[],ccols:[],tk:null,ph:null,t:0,msgT:0,signs:[],boards:[],gates:[],dirty:1,loc:null,fadeM:[],pend:null,seatM:null,doorM:[],light:null,clight:null,sec:0,anim:[],lastV:null};
+const AP={fadeI:[],idx:-1,cidx:-1,grp:null,cgrp:null,og:null,cnpc:[],cols:[],ccols:[],tk:null,ph:null,t:0,msgT:0,signs:[],boards:[],gates:[],dirty:1,loc:null,fadeM:[],pend:null,seatM:null,doorM:[],light:null,clight:null,sec:0,anim:[],lastV:null};
 window.APT=AP;
 const nf=()=>{const t=+S.t||0;return t<240?0:t<300?(t-240)/60*.5:t<330?.5+(t-300)/30*.4:.9};
 function rr(n){return Math.floor(Math.random()*n)}
@@ -415,7 +415,7 @@ function buildTerm(){if(AP.grp)return;const G=xgNew(),GL=xgNew(),g=AP.grp=new TH
  AP.light=new THREE.HemisphereLight('#ffffff','#8a8a8a',0);g.add(AP.light);
  buildNpc();AP.dirty=1}
 function buildNpc(){const g=AP.grp,u=v=>AX+v,w=v=>AZ+v,SW_T='#1d3d7a',SW_P='#1a1f2e';
- const stand=(a,b,o,ry)=>{const c=mkChar(o);g.add(c.g);AP.npc.push(NPCS.idle(c,u(a),w(b),ry));return c};
+ const stand=(a,b,o,ry)=>{const c=mkChar(o);g.add(c.g);c.g.position.set(u(a),0,w(b));c.g.rotation.y=ry||0;return c};
  [8,13,18,23].forEach(a=>stand(a,43.75,{tc:SW_T,pc:SW_P,top:0}));stand(50,43.75,{tc:'#ff6b4a',pc:SW_P,top:0});stand(62,46.8,{tc:'#1565d8',pc:SW_P,top:0});
  LANES.forEach(a=>stand(a+1.6,SECV-1.4,{tc:'#2b2b2b',pc:'#1b1b1b',top:0}));
  for(let i=1;i<=6;i++)stand(GU(i)+3.4,3.75,{tc:SW_T,pc:SW_P,top:0});
@@ -426,17 +426,16 @@ function buildNpc(){const g=AP.grp,u=v=>AX+v,w=v=>AZ+v,SW_T='#1d3d7a',SW_P='#1a1
  /* walkers with rolling cases on lanes that keep clear of every desk, column and planter: [lane, from, to, axis] */
  const bag=(c,i)=>{const s=new THREE.Mesh(new THREE.BoxGeometry(.38,.55,.24),pm(['#c0392b','#2d5a8d','#1b1b1b','#e6b422','#7a5ad8'][i%5]));s.position.set(.42,.32,-.34);c.g.add(s);const h=new THREE.Mesh(new THREE.BoxGeometry(.04,.36,.04),pm('#2b2f36'));h.position.set(.42,.76,-.24);c.g.add(h)};
  [[38.4,8,62],[39.8,8,62],[49.9,4,52],[50.9,4,53],[27,3,69],[28.2,3,69],[12.6,3,69],[14,3,69],[37.4,36.4,53.6,'z'],[27,3,69],[12.6,3,69]].forEach(([b,x0,x1,ax],i)=>{const c=mkChar();if(i%3!=2)bag(c,i);g.add(c.g);
-  AP.npc.push(NPCS.walker(c,ax=='z'?{ax:'z',c:u(b),a:w(x0),b:w(x1)}:{ax:'x',c:w(b),a:u(x0),b:u(x1)},(ax=='z'?w:u)(x0+Math.random()*(x1-x0)),i%2?1:-1,.9+Math.random()*.6,{bob:.04}))});
+  if(ax=='z')npcAdd(c,'z',u(b),w(x0),w(x1),w(x0+Math.random()*(x1-x0)),i%2?1:-1,.9+Math.random()*.6,inT);else npcAdd(c,'x',w(b),u(x0),u(x1),u(x0+Math.random()*(x1-x0)),i%2?1:-1,.9+Math.random()*.6,inT)});
  /* a crew of three pulling cases, and a cleaner with a scrubber */
  {const p0=10+Math.random()*40;[[SW_T,'#ffd84a'],[SW_T,'#ffffff'],['#ff6b4a','#ffffff']].forEach(([tc],k)=>{const c=mkChar({tc,pc:SW_P,top:0});bag(c,1);const cap=new THREE.Mesh(new THREE.BoxGeometry(.5,.12,.5),pm(SW_T));cap.position.set(0,1.62,0);if(k<2)c.g.add(cap);g.add(c.g);
-  AP.npc.push(NPCS.walker(c,{ax:'x',c:w(13.3),a:u(4+k*.9),b:u(66+k*.9)},u(p0+k*.9),1,1.05,{bob:.03}))});
-  const c=mkChar({tc:'#2fae5a',pc:'#1b1f26',top:0});const cart=new THREE.Mesh(new THREE.BoxGeometry(.6,.5,.7),pm('#ffd84a'));cart.position.set(0,.3,.75);c.g.add(cart);g.add(c.g);AP.npc.push(NPCS.walker(c,{ax:'x',c:w(26.1),a:u(3),b:u(60)},u(30),1,.5,{}))}
+  npcAdd(c,'x',w(13.3),u(4+k*.9),u(66+k*.9),u(p0+k*.9),1,1.05,inT)});
+  const c=mkChar({tc:'#2fae5a',pc:'#1b1f26',top:0});const cart=new THREE.Mesh(new THREE.BoxGeometry(.6,.5,.7),pm('#ffd84a'));cart.position.set(0,.3,.75);c.g.add(cart);g.add(c.g);npcAdd(c,'x',w(26.1),u(3),u(60),u(30),1,.5,inT)}
  /* people sitting on free seats (never one of the seats you can sit on) */
  const sit=(x,z,ry)=>{const c=mkChar();c.g.position.set(u(x),-.3,w(z));c.g.rotation.y=ry||0;c.legs[0].rotation.x=c.legs[1].rotation.x=-1.5;c.arms[0].rotation.x=c.arms[1].rotation.x=-.6;g.add(c.g)};
  const free=[];for(let i=1;i<=6;i++){[-2,0,2].forEach(k=>free.push([GU(i)+k,7.6]));for(let k=-3;k<=2;k++)free.push([GU(i)+k,10])}
  for(let n=0;n<12&&free.length;n++){const [x,z]=free.splice(rr(free.length),1)[0];sit(x,z)}
  [[31,21],[37,24.5],[41,21],[33,24.5],[55.5,50.5],[56.5,53.5]].forEach(([x,z])=>sit(x,z));sit(19.4,22.32,Math.PI);sit(22.4,24.18,0)}
-function npcTick(dt){NPCS.tick(AP.npc,dt,{indoor:1})}
 /* moving bits inside: bags on the check-in belt and the carousel, sliding entrance doors, light pools, sun stripes, clocks, jet beacons */
 function fxTick(dt){const f=nf();if(AP.fx){if(AP.fx.pool)AP.fx.pool.material.opacity=.1+.32*f/.9;if(AP.fx.sun){AP.fx.sun.material.opacity=.22*Math.max(0,1-f/.5);AP.fx.sun.visible=f<.5}}
  (AP.bags||[]).forEach(b=>{if(b.k=='ck'){b.p-=dt*.9;if(b.p<6.4)b.p=26.4;b.m.position.x=AX+b.p;b.m.visible=b.p<26.2}else{b.p+=dt*.22;const t=b.p;b.m.position.set(AX+b.cx+Math.cos(t)*2.2,.6,AZ+b.cz+Math.sin(t)*1.1);b.m.rotation.y=-t}});
@@ -627,7 +626,7 @@ function tick(dt){AP.t+=dt;outTick(dt);
  /* a boarded ticket only lives in the cabin: after a reload or anything else that took you out, you are back off the plane */
  if(AP.tk&&!c&&(AP.ph=='board'||AP.ph=='sit'||AP.ph=='landed')&&mode=='play'){if(AP.ph!='landed')AP.tk.bt=0;AP.tk=null;AP.ph=null}
  T.active().forEach(k=>{if(k.bt&&(!AP.tk||AP.tk.id!=k.id))k.bt=0});
- if(t){if(AP.loc!==here())relabel();const f=nf();if(AP.light)AP.light.intensity=.95*f;fadeAll(dt,AP.fadeI);npcTick(dt);fxTick(dt);
+ if(t){if(AP.loc!==here())relabel();const f=nf();if(AP.light)AP.light.intensity=.95*f;fadeAll(dt,AP.fadeI);fxTick(dt);
   if(AP.t-(AP.bt||0)>1){AP.bt=AP.t;AP.boards.forEach(drawBoard);AP.gates.forEach(drawGate)}
   const v=P.z-AZ;if(AP.lastV!=null&&AP.lastV>=SECV&&v<SECV){const lane=LANES.find(x=>Math.abs(P.x-AX-x)<1.2);if(lane!=null){const m=AP.doorM.find(q=>q.k=='sec'&&Math.abs(q.m.position.x-AX-lane)<.1);if(m)m.t=1.2;try{snd('chime')}catch(e){}const tk=T.pass();say('Security ✓'+(tk?' Now go to Gate '+tk.gate+'.':''))}}AP.lastV=v;
   AP.doorM.forEach(q=>{if(q.k=='sec'){q.t=Math.max(0,q.t-dt);q.m.material.color.set(q.t>0?'#56f08a':secOK()?'#2fae5a':'#c0392b')}else{const tk=gateTk(q.i),open=tk&&T.now()>=tk.dep-RU.BOARD&&T.now()<tk.dep-RU.CLOSE;q.o+=((open?1:0)-q.o)*Math.min(1,dt*3);q.L.position.x=q.x-.55-q.o*.9;q.R.position.x=q.x+.55+q.o*.9;q.lamp.material.color.set(open?'#2fe68a':'#c0392b')}});
