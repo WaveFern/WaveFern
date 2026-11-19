@@ -80,9 +80,9 @@ function score(st,z){let len=0,inn=0,pts=0,x0=9,x1=-9,y0=9,y1=-9;
  const zw=z.w*W,stay0=len>0?inn/len:0,ok=len>=zw*.35&&pts>6&&stay0>=.4;if(!ok)return{ok:0,q:0,why:len>0&&stay0<.4?'out':'short'};
  const stay=inn/len,size=Math.min(1,(x1-x0)*.5+.35+(y1-y0)*.4),scr=len>zw*10?Math.max(.45,1-(len-zw*10)/(zw*14)):1,strk=st.length>1?1:.92;
  return{ok:1,q:Math.max(.12,Math.min(1,Math.pow(stay,1.6)*size*scr*strk*1.05))}}
-const LINES=[[.85,'Amazing! Thank you so much!'],[.6,'Thank you! That looks great.'],[.35,'Um... thanks! I think.'],[0,'Is that... a squiggle? Thanks anyway.']];
+const LINES=[[.85,'Amazing! Thank you so much!'],[.6,'Thank you! That looks great.'],[.35,'Thank you! I love it.'],[0,'Thanks so much! I will keep it forever.']];
 
-const SIMLINES=[[.8,'Wow, that is spot on! Thank you!'],[.6,'That looks just like your signature!'],[.4,'Close enough, I guess. Thanks!'],[.2,'Hmm, that does not look like your usual one...'],[0,'That looks nothing like your signature. Is this a fake?']];
+const SIMLINES=[[.8,'Wow, that is spot on! Thank you!'],[.55,'That looks just like your signature! Thank you!'],[.35,'Lovely, thank you! Nice and personal.'],[.15,'Thanks so much! Every one is a little different.'],[0,'Thank you! Maybe try a little slower next time?']];
 window.signGame=function(o){o=o||{};return new Promise(res=>{
  const items=(o.items&&o.items.length?o.items:SIGN.random(3)).map((it,i)=>{const a=Object.assign({},it);a.who=a.who||NAMES[(Math.random()*NAMES.length)|0];a.ask=a.ask===false?'':(a.ask||ASK[a.kind]||'Could you sign this?');
   const nm=(typeof S!='undefined'&&S&&S.artist)||'You';a.art=Object.assign({artist:nm,title:(typeof S!='undefined'&&S&&S.songs&&S.songs.length?S.songs[S.songs.length-1].title:'')||'Live',col:null},a.art||{});
