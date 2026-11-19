@@ -169,7 +169,7 @@ function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
 /* v45.7.0: public room list for the admin. The host writes rooms/CODE (using a separate anonymous Firebase login, so Google sign-in is not needed) (band name, player count, heartbeat);
    the admin panel lists fresh entries. Best effort: hosts who are not signed in, or offline, just do not appear. */
 function regAuth(){if(NET.ra)return NET.ra;if(typeof FB_ON=='undefined'||!FB_ON)return Promise.reject('off');const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
- return NET.ra=Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js')]).then(([a,m,f])=>{const app=a.initializeApp(FB_CFG,'rooms');const au=m.getAuth(app);
+ return NET.ra=Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js'),import(u+'app-check.js').catch(()=>null)]).then(([a,m,f,ac])=>{const app=a.initializeApp(FB_CFG,'rooms');fbAppCheck(ac,app);const au=m.getAuth(app);
   return(au.currentUser?Promise.resolve(au.currentUser):m.signInAnonymously(au).then(r=>r.user)).then(usr=>({uid:usr.uid,F:f,D:f.getFirestore(app)}))}).catch(e=>{NET.ra=null;throw e})}
 function regBeat(){if(NET.regT||!isHost())return;const w=()=>{if(NET.closed||!NET.on)return;
   regAuth().then(r=>r.F.setDoc(r.F.doc(r.D,'rooms',MPS.code),{code:MPS.code,band:String(MPS.band||'Band').slice(0,24),n:Object.keys(MB).length,uid:r.uid,t:Date.now()})).then(()=>{if(NET.regBad){NET.regBad=0;try{say('Room list: registered.')}catch(e){}}console.log('[rooms] registered',MPS.code)},e=>{const c=(e&&e.code)||String(e);console.warn('[rooms] register failed',c,e);if(!NET.regBad){NET.regBad=1;try{say('Admin room list: could not register this room ('+c+').')}catch(x){}}})};
