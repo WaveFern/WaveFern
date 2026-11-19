@@ -44,6 +44,7 @@
  };
  const R0=.62;
  dynB=function(x0,z0,x,z){
+  if(NPCS.blocks(x0,z0,x,z))return true;/* shared NPC hitbox (airport, abroad) */
   if(IN||HIN)return false;
   const ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
   if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;
