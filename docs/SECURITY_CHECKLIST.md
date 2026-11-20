@@ -1,7 +1,7 @@
 # WaveFern security checklist
 
 Read this before touching: multiplayer/friends/leaderboard/profile code, anything that renders text from another player, `firebase-rules/`, `88-admin.js`, the deploy workflow, or anything that adds a new Firebase read/write.
-Threat model: WaveFern is a static page. **Everything in the browser is attacker-controlled** (JS, saves, `localStorage`, `FBU`, `isAdmin()`, messages from a host or bandmate). Only the Firebase rules, Firebase Auth and Firebase's own servers are trusted. Last audit: v55.30.5 (19 Nov 2026).
+Threat model: WaveFern is a static page. **Everything in the browser is attacker-controlled** (JS, saves, `localStorage`, `FBU`, `isAdmin()`, messages from a host or bandmate). Only the Firebase rules, Firebase Auth and Firebase's own servers are trusted. Last audit: v55.30.18 (20 Nov 2026, outside audit).
 
 ## 1. Rules (the real security boundary)
 - [ ] Rules live in `firebase-rules/<version>/` (`firestore.rules`, `database.rules.json`). Change them there, bump the folder name to the game version, fix every path mention (`grep -rn "firebase-rules/"`).
@@ -11,6 +11,9 @@ Threat model: WaveFern is a static page. **Everything in the browser is attacker
 - [ ] Wildcard children in RTDB rules (`$other`) also match children you have not listed: list every legitimate key first, then `$other: false`. (The first v55.30.5 draft broke room creation this way; the emulator test caught it.)
 - [ ] Run `tools/rules-test.js` in the emulators (command in the file header). All lines must pass. Add a test for every new rule.
 - [ ] Publish the rules in the Firebase console (Firestore > Rules, Realtime Database > Rules). Rules in the repo do nothing until published; compare the console copy with the repo after each release.
+
+- [ ] Never let an admin tool or script write a privilege (Founder, gifts, usernames) based on a player's save or any other player-written field. A cloud save is forgeable (the seal key is public), so `S.fdr` and `rv` prove nothing. Admin tools list candidates; the admin names the uids.
+- [ ] In RTDB, a `.write` on a parent node cascades to every child and cannot be narrowed below it. Grant the parent only create/delete and put host writes on the specific children.
 
 ## 2. Rendering other players' text (XSS)
 - [ ] Every string from Firebase, PeerJS, a save code, a URL or a gift is untrusted: render with `textContent`, or `esc()` / `E()` before `innerHTML`.
