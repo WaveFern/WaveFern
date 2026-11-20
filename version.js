@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.30.17';
+const GAME_VERSION='v55.30.18';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.30.18',n:'Draw distance like old GTA: people and cars are only drawn near you and drop out further away, with a gap between the two distances so they do not flicker at the edge.'},
  {v:'v55.30.17',n:'Three fixes. While you record, the backing music is now the same beat that gets released (a bug overwrote the beat\'s seed in the new studio games, so the released song sounded different). A Perfect song needs all 6 beat hits to be PERFECT, not just a clean run. Weak songs in your catalogue now get a fair share of your monthly listeners instead of a few hundred streams.'},
  {v:'v55.30.16',n:'Autograph judging fixed and kinder. Almost every signature was rated as nothing like yours because the match test was far too strict. Reasonable attempts now rate good or better, the fan comments are friendly, and street fans tip fairly.'},
  {v:'v55.30.15',n:'Shadows in the airport and the brand HQ rooms are now the same sun shadows as the rest of the game. The soft blob shadows those places drew under desks, planters and furniture were a second, different look and are gone.'},

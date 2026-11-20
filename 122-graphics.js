@@ -57,10 +57,11 @@ function gfxAuto(gap,cap){if(GFX.p!='auto'||document.hidden||PAUSED||(mode!='pla
 
 /* crowds and draw distance: hide people and cars that are off screen or thinned out (cars still drive, so traffic is unchanged) */
 function gfxCull(){const c=gfxCur(),a=Math.max(1.8,innerWidth/Math.max(1,innerHeight)),R=c.far?Math.max(30,viewH*a*1.3+8):Math.max(18,viewH*a*.8+5),keep=c.crowd||4;
- const far=(m,x,z)=>Math.abs(x-camT.x)>R||Math.abs(z-camT.z)>R;
- NPC.forEach((n,i)=>{if(!n.m.visible)return;const busy=n.fan||n.st||n.g||n.rob;if(far(n.m,n.x,n.z)||(!busy&&i%4>=keep)){n.m.visible=false;if(n.pet)n.pet.visible=false}});
- if(typeof VPED!='undefined')VPED.forEach((n,i)=>{if(n.m.visible&&(far(n.m,n.x,n.z)||i%4>=keep))n.m.visible=false});
- TRAF.forEach(t=>{if(t.m&&t.m.visible&&far(t.m,t.x,t.z))t.m.visible=false})}
+ /* v55.30.18 hysteresis (old GTA style): something already out is only drawn again inside R (spawn radius), something drawn is only dropped beyond R*1.25 (despawn radius), so it does not flicker at the edge */
+ const R2=R*1.25,far=(o,x,z)=>{const r=o._cf?R:R2,f=Math.abs(x-camT.x)>r||Math.abs(z-camT.z)>r;o._cf=f;return f};
+ NPC.forEach((n,i)=>{if(!n.m.visible)return;const busy=n.fan||n.st||n.g||n.rob;if(far(n,n.x,n.z)||(!busy&&i%4>=keep)){n.m.visible=false;if(n.pet)n.pet.visible=false}});
+ if(typeof VPED!='undefined')VPED.forEach((n,i)=>{if(n.m.visible&&(far(n,n.x,n.z)||i%4>=keep))n.m.visible=false});
+ TRAF.forEach(t=>{if(t.m&&t.m.visible&&far(t,t.x,t.z))t.m.visible=false})}
 {const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{gfxCull()}catch(e){}return r}}
 
 /* small props (v55.11): the game has hundreds of tiny separate meshes (bins, pots, lamp bits), each one a draw call. When det > 0 the small solid ones are moved to camera layer 1, which the camera does not draw
