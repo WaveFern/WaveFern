@@ -107,7 +107,7 @@
 
     "r": {
       "$code": {
-        ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && ((!data.exists() && newData.child('h').child('u').val() === auth.uid) || data.child('h').child('u').val() === auth.uid)",
+        ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && ((!data.exists() && newData.child('h').child('u').val() === auth.uid && !newData.hasChild('u') && !newData.hasChild('d')) || (data.child('h').child('u').val() === auth.uid && !newData.exists()))",
         ".validate": "$code.matches(/^[A-Z0-9]{5}$/)",
         "h": {
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com'",
@@ -118,10 +118,12 @@
         },
         "i": {
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com'",
+          ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && data.parent().child('h').child('u').val() === auth.uid",
           ".validate": "newData.hasChildren(['b', 'n', 'k'])",
           "b": { ".validate": "newData.isString() && newData.val().length <= 24" },
           "n": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 8" },
-          "k": { ".validate": "newData.isString() && newData.val().length <= 200" }
+          "k": { ".validate": "newData.isString() && newData.val().length <= 200" },
+          "$other": { ".validate": false }
         },
         "u": {
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && root.child('r').child($code).child('h').child('u').val() === auth.uid",
@@ -131,11 +133,14 @@
             "p": { ".validate": "newData.isString() && newData.val().length <= 40" },
             "m": { ".validate": "newData.isString() && newData.val().length <= 20000" },
             "l": { ".validate": "newData.isString() && newData.val().length <= 4000" },
-            "e": { "$k": { ".validate": "newData.isString() && newData.val().length <= 20000" } },
+            "e": { "$k": {
+              ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && !newData.exists() && root.child('r').child($code).child('h').child('u').val() === auth.uid",
+              ".validate": "newData.isString() && newData.val().length <= 20000" } },
             "$other": { ".validate": false }
           }
         },
         "d": {
+          ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && data.parent().child('h').child('u').val() === auth.uid",
           "$guest": {
             ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $guest || root.child('r').child($code).child('h').child('u').val() === auth.uid)"
           }
