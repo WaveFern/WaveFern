@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.40.0 (2026-11-22): key hints: `255-key-hints.js` (paced one-at-a-time chips for Shift/N/G/Tab/F, H Controls card + pause button, `S.kh`, `FW_KEYS`).
 - v55.39.0 (2026-11-22): removed Fern Rush (runner) from the arcade at James's request; menu shows Fern Flap and Fern Quest.
 - v55.37.0 (2026-11-22): day-1 retention: `254-first-session.js` (Next Goal chip, early bed + instant first listeners after the first release, early milestones, Welcome-back summary, funnel `FW_FUNNEL`), Big Vee five numbered steps, streak pays in full.
 - v55.35.0 (2026-11-22): arcade: enemy-floor collision fix (`ecol` zeroed vy mid-loop), hero run cycle, 3D voxel runner/guard/dog and hit effects in Fern Rush, static menu snapshots (`snap()`).
