@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.32.0';
+const GAME_VERSION='v55.32.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.32.1',n:'Behind the scenes only: added the Reel hook scorer tools (tools/ig-reel). Nothing in the game changed.'},
  {v:'v55.32.0',n:'Graphics Auto now fits your device. It picks a starting level from your graphics chip, memory, processor and whether you are on a phone or tablet, instead of always starting on High and sinking to Low. It then moves up when the game runs very smoothly and down when it runs slowly, judged over several seconds so one hitch changes nothing, and it will not keep flipping back and forth. A preset you pick yourself is never changed. Anyone stuck on Low from the old Auto is re-checked once.'},
  {v:'v55.31.1',n:'App Barn is now light mode (only this app) and its cards are a tidy uniform grid: icon, title and text on top, the button across the bottom. The World Tour card no longer squeezes its text into a thin column and its Fame Level badge stays inside the card.'},
  {v:'v55.31.0',n:'Fewer freezes. Saving your career (packing and encrypting the whole save) took 100 ms or more on a big save and ran right when you paused, every 30 seconds, and on every cloud sync. That work now happens in a background worker, and nothing is repacked when your save has not changed.'},
