@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.31.0';
+const GAME_VERSION='v55.31.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.31.1',n:'App Barn is now light mode (only this app) and its cards are a tidy uniform grid: icon, title and text on top, the button across the bottom. The World Tour card no longer squeezes its text into a thin column and its Fame Level badge stays inside the card.'},
  {v:'v55.31.0',n:'Fewer freezes. Saving your career (packing and encrypting the whole save) took 100 ms or more on a big save and ran right when you paused, every 30 seconds, and on every cloud sync. That work now happens in a background worker, and nothing is repacked when your save has not changed.'},
  {v:'v55.30.18',n:'Security fixes from an outside audit. Founder badges are no longer handed out automatically from other players\' cloud saves (a forged save could claim one): the admin Founder backfill now only lists candidates and writes the uids you name. Band-room database rules: the host can no longer write into guests\' slots, and the room info node rejects extra fields. Publish the new rules (firebase-rules/v55.30.18) in the Firebase console.'},
  {v:'v55.30.17',n:'Three fixes. While you record, the backing music is now the same beat that gets released (a bug overwrote the beat\'s seed in the new studio games, so the released song sounded different). A Perfect song needs all 6 beat hits to be PERFECT, not just a clean run. Weak songs in your catalogue now get a fair share of your monthly listeners instead of a few hundred streams.'},
