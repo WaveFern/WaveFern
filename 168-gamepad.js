@@ -31,7 +31,7 @@ body.gpad,body.gpad *{cursor:none}
 `;document.head.appendChild(st);
 const legend=()=>{if(!leg){leg=document.createElement('div');leg.id='gpl';document.body.appendChild(leg);cur=document.createElement('div');cur.id='gpc';document.body.appendChild(cur)}};
 const setLeg=t=>{legend();if(t!==legT){legT=t;leg.innerHTML=t}leg.classList.toggle('on',!!t)};
-const on=()=>{if(!act){act=1;document.body.classList.add('gpad')}};
+const on=()=>{if(!act){act=1;document.body.classList.add('gpad');if(window.WF_SETLAST)WF_SETLAST('kbd')/* v55.36.0: hide the touch buttons (Quest reports as a touch device) */}};
 const offPad=()=>{if(act){act=0;document.body.classList.remove('gpad');setFoc(null);if(cur)cur.style.display='none'}};
 /* v47.5.2: switching back to keyboard/mouse prompts needs a real key press or a deliberate mouse move (40 px within a quarter
    second), so a nudged desk or a jittery mouse does not flip the prompts back and forth while you play on the pad */
@@ -82,7 +82,9 @@ const ptr=(type,b)=>{const c=cvs();if(c)c.dispatchEvent(new PointerEvent(type,{b
    Xbox A, PlayStation ✕, Switch B. Labels below are keyed by the Xbox name the code uses. */
 const LAB={ps:{A:'✕',B:'○',X:'□',Y:'△',LB:'L1',RB:'R1',LT:'L2',RT:'R2',View:'Share',Start:'Options'},
  ns:{A:'B',B:'A',X:'Y',Y:'X',LB:'L',RB:'R',LT:'ZL',RT:'ZR',View:'−',Start:'+'}};
-const famOf=id=>/xbox|xinput|045e/i.test(id||'')?'xb':/054c|playstation|dualshock|dualsense|ps[345]|wireless controller/i.test(id||'')?'ps':/057e|nintendo|pro controller|joy-?con|switch/i.test(id||'')?'ns':'xb';
+const famOf=id=>/oculus|quest|meta|touch/i.test(id||'')&&!/xbox|xinput/i.test(id||'')?'oc':/xbox|xinput|045e/i.test(id||'')?'xb':/054c|playstation|dualshock|dualsense|ps[345]|wireless controller/i.test(id||'')?'ps':/057e|nintendo|pro controller|joy-?con|switch/i.test(id||'')?'ns':'xb';
+/* v55.36.0: Meta Quest Touch controllers: grips and triggers named as on the controller, A B on the right hand, X Y on the left */
+LAB.oc={LB:'L grip',RB:'R grip',LT:'L trigger',RT:'R trigger',View:'L stick click',Start:'Menu'};
 let fam='xb';
 const N_=s=>(LAB[fam]||{})[s]||s,P_=s=>'<b>'+N_(s)+'</b>';
 function prompts(m){hudFix();setLeg(legFor(m))}
@@ -113,15 +115,25 @@ if(window.MutationObserver)new MutationObserver(ms=>{if(!act||!MG.has(M()))retur
 const esc0=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---- the poll ---- */
+/* v55.36.0: Quest controllers (and any WebXR "xr-standard" pad) arrive as two pads, one per hand, with the thumbstick on axes 2/3.
+   Merge them into one virtual standard pad so everything below runs unchanged: left stick = left hand, right stick = right hand,
+   A/B (right) -> 0/1, X/Y (left) -> 2/3, grips -> 4/5, triggers -> 6/7, Menu -> 9, left stick click -> 8 (map), right click -> 11. */
+const hand=p=>p.hand||(/left/i.test(p.id)?'left':/right/i.test(p.id)?'right':'');
+function xrPad(ps){const L=ps.find(p=>hand(p)=='left')||(ps.length>1?ps[0]:null),R=ps.find(p=>hand(p)=='right')||(ps.length>1?ps[1]:(L?null:ps[0]));
+ const bt=(p,i)=>p&&p.buttons[i]||{pressed:false,value:0},ax=(p,i)=>p&&p.axes[i]||0,b=Array(17).fill(null).map(()=>({pressed:false,value:0}));
+ const set=(i,x)=>{b[i]=x};
+ set(0,bt(R,4));set(1,bt(R,5));set(2,bt(L,4));set(3,bt(L,5));set(4,bt(L,1));set(5,bt(R,1));set(6,bt(L,0));set(7,bt(R,0));set(8,bt(L,3));set(9,bt(L,2).pressed?bt(L,2):bt(R,2));set(11,bt(R,3));
+ return{id:(L||R).id,mapping:'standard',connected:true,buttons:b,axes:[ax(L,2)||ax(L,0),ax(L,3)||ax(L,1),ax(R,2)||ax(R,0),ax(R,3)||ax(R,1)]}}
 let lt=performance.now();
 function tick(now){requestAnimationFrame(tick);const dt=Math.min(.1,(now-lt)/1000);lt=now;
- let g=null;try{const ps=[...navigator.getGamepads()].filter(p=>p&&p.connected);g=ps.find(p=>p.mapping=='standard')||ps[0]||null}catch(_){}
+ let g=null;try{const ps=[...navigator.getGamepads()].filter(p=>p&&p.connected);g=ps.find(p=>p.mapping=='standard')||null;if(!g){const xr=ps.filter(p=>p.mapping=='xr-standard'||/oculus|quest/i.test(p.id));g=xr.length?xrPad(xr):ps[0]||null}}catch(_){}
  if(!g){if(Object.keys(held).length||own)freeAll();prev=[];return}
  {const f=famOf(g.id);if(f!==fam){fam=f;legT=''}}
  const B=i=>{const b=g.buttons[i];return!!b&&(b.pressed||b.value>.5)},V=i=>{const b=g.buttons[i];return b?b.value:0},dn=i=>B(i)&&!prev[i];
  const ax=g.axes[0]||0,ay=g.axes[1]||0,rx=g.axes[2]||0,ry=g.axes[3]||0,mag=Math.hypot(ax,ay),stick=mag>DZ;
  const any=g.buttons.some((b,i)=>b&&b.pressed)||stick||Math.abs(ry)>DZ||Math.abs(rx)>DZ;if(any)on();
  if(!act){prev=g.buttons.map((_,i)=>B(i));return}
+ const arc=!!(window.FW_ARCADE&&FW_ARCADE.isOpen&&FW_ARCADE.isOpen());
  const m=M(),phCam=typeof PH!='undefined'&&PH&&PH.camOn,world=WORLD.has(m)||phCam;
  const modal=!!document.querySelector('#ui .modal');
  if(m!==lastMode){lastMode=m;if(m!='build'&&cur)cur.style.display='none';if(world&&m!='build')setFoc(null)}
@@ -147,16 +159,20 @@ function tick(now){requestAnimationFrame(tick);const dt=Math.min(.1,(now-lt)/100
   if(dn(2))kd('e');if(dn(1)||dn(9))kd('Escape');
  }else{
   /* walking, driving, minigames, cutscenes */
-  if(m=='play'&&!phCam&&window.TCHJ){if(stick){TCHJ.on=1;TCHJ.x=ax;TCHJ.y=ay;own=1}else if(own){TCHJ.on=0;TCHJ.x=TCHJ.y=0;own=0}}
+  if(arc){/* v55.36.0: arcade overlay (Fern Flap / Quest / Rush) reads arrow keys, Space and Esc: stick and D-pad steer, A is jump / go, B or Start backs out */
+   if(own&&window.TCHJ){TCHJ.on=0;TCHJ.x=TCHJ.y=0;own=0}
+   hold('arrowleft',dl||stick&&ax<-.45);hold('arrowright',dr||stick&&ax>.45);hold('arrowup',du||stick&&ay<-.6);hold('arrowdown',dd||stick&&ay>.6);hold('shift',V(7)>.3||V(6)>.3||B(2));
+   if(dn(1))kd('Escape')}
+  else if(m=='play'&&!phCam&&window.TCHJ){if(stick){TCHJ.on=1;TCHJ.x=ax;TCHJ.y=ay;own=1}else if(own){TCHJ.on=0;TCHJ.x=TCHJ.y=0;own=0}}
   else{hold('a',stick&&ax<-.45);hold('d',stick&&ax>.45);
    hold('w',m=='drive'?V(7)>.2||stick&&ay<-.6:stick&&ay<-.45);hold('s',m=='drive'?V(6)>.2||stick&&ay>.6:stick&&ay>.45)}
-  hold('shift',m=='play'&&(V(6)>.3||B(10)));
-  if(!modal){hold('arrowup',du);hold('arrowdown',dd);hold('arrowleft',dl);hold('arrowright',dr)}
+  if(!arc)hold('shift',m=='play'&&(V(6)>.3||B(10)));
+  if(!modal&&!arc){hold('arrowup',du);hold('arrowdown',dd);hold('arrowleft',dl);hold('arrowright',dr)}
   if(modal&&dn(0)&&foc&&document.contains(foc))press(foc);
   else if(dn(0)){if(m=='drive')kd('e');else{kd(' ');held[' ']=1;if(typeof keys!='undefined')keys[' ']=1}}
   if(!B(0)&&held[' ']){delete held[' '];if(typeof keys!='undefined')delete keys[' '];kd(' ','keyup')}
   if(MG.has(m)){if(dn(2))kd('1');if(dn(3))kd('2');if(dn(1))kd('3');if(dn(5))kd('4');/* D-pad ← ↑ → ↓ also pick 1 2 3 4 */if(!modal){if(dn(14))kd('1');if(dn(12))kd('2');if(dn(15))kd('3');if(dn(13))kd('4')}}
-  else if(m=='play'||phCam){if(dn(2))kd('f');if(dn(3))kd('g');if(dn(8))kd('n');if(dn(1)&&phCam)kd('g')}
+  else if(!arc&&(m=='play'||phCam)){if(dn(2))kd('f');if(dn(3))kd('g');if(dn(8))kd('n');if(dn(1)&&phCam)kd('g')}
   if(dn(9))kd('Escape');
  }
  prompts(phCam?'play':m);
