@@ -76,7 +76,7 @@ window.fwNameBox=()=>{if(shown)return;if(document.getElementById('onbx'))return;
    Never blocks play: a failed check shows a small notice with Details and a Copy button, and retries by itself. ---- */
 const NM={st:'idle',busy:0,at:0,log:[],err:''};
 const errWhy=e=>{const c=String(e&&e.code||'').replace('firestore/',''),m=String(e&&e.message||e||'');
- if(c=='permission-denied')return'Firestore refused the read (permission denied). The Firestore rules in firebase-rules/v49.93.2/firestore.rules need publishing (Firebase console > Firestore Database > Rules > Publish) in the waveferndata project.';
+ if(c=='permission-denied')return'Firestore refused the read (permission denied). The Firestore rules in firebase-rules/v55.30.18/firestore.rules need publishing (Firebase console > Firestore Database > Rules > Publish) in the waveferndata project.';
  if(c=='unauthenticated')return'Google sign-in has expired on this device. Sign out and sign in again.';
  if(c=='unavailable'||/offline|no answer|network/i.test(m))return'Could not reach Firestore (blocked by a browser extension or network, or the database is not created in waveferndata). Try another browser or turn off ad blockers for this site.';
  if(c=='not-found'||/database.*(not exist|not found)/i.test(m))return'The Firestore database does not exist in the waveferndata project. Create it in the Firebase console > Firestore Database.';
@@ -96,7 +96,7 @@ async function fsClaim(nh,old){const uid=FBU.uid,F=FBF,b=F.writeBatch(FBD),now=D
 /* copy to the Realtime Database for Friends, best effort only */
 function rtMirror(nh,nd,chU,chD){try{const x=X(),F=x&&x.FR;if(!F||!F.ok||!F.r)return;const{R,db,uid}=F.r,ts=R.serverTimestamp(),up={['f/p/'+uid]:{h:nh,nm:nd||fwNameSafe((typeof S=='object'&&S&&S.artist)||''),o:1,rm:'',t:ts}},stp={};
  if(chU){up['f/n/'+nh]=uid;if(F.h&&F.h!==nh)up['f/n/'+F.h]=null;stp['f/u/'+uid+'/t']=ts}if(chD)stp['f/u/'+uid+'/d']=ts;
- R.update(R.ref(db),Object.assign({},up,stp)).catch(()=>R.update(R.ref(db),up)).then(()=>{F.h=nh;F.pk='';F.od=0;x.frPresence()},e=>console.warn('[names] friends copy',e&&e.code))}catch(e){}}
+ R.update(R.ref(db),Object.assign({},up,stp)).catch(()=>{/* v49.94.8: a refused display name (stamp used this week) must not stop the username and presence from saving: retry without nm */const pv=Object.assign({},up['f/p/'+uid]);if(F.snm)pv.nm=F.snm;else delete pv.nm;return R.update(R.ref(db),{['f/p/'+uid]:pv})}).then(()=>{F.h=nh;F.pk='';F.od=0;x.frPresence()},e=>console.warn('[names] friends copy',e&&e.code))}catch(e){}}
 function fsCheck(){if(NM.busy)return;if(typeof FBU=='undefined'||!FBU){NM.st='nouser';return}if(typeof FBF=='undefined'||!FBF||typeof FBD=='undefined'||!FBD){NM.st='nouser';return}
  NM.busy=1;NM.at=Date.now();const uid=FBU.uid;dlog('reading profile of '+uid.slice(0,6)+'… in '+FB_CFG.projectId);
  FBU.getIdToken().then(()=>dlog('login token ok'),e=>dlog('login token FAILED '+errTxt(e)));

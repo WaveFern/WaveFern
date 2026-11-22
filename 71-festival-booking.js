@@ -44,6 +44,7 @@ function festCanBook(day,n,k){const s=fStage(n),lv=festLv();
  if(lv<s.req)return 'Stage '+n+' ('+s.name+') needs Fame Level '+s.req+'. You are Level '+lv+'.';
  if(festBkOn(day,n))return 'You already have a slot on Stage '+n+' at this festival.';
  if(fBk().some(b=>b.day==day&&b.slot==k&&b.st!=2))return 'You are already playing another stage at that time.';
+ try{const bc=((S.bcg&&S.bcg.list)||[]).find(o=>o.st==1&&o.day==day);if(bc&&FSLOT[k][0]<1260&&FSLOT[k][1]>1080)return 'You have a Sunset Beach Club gig on Day '+day+' from 18:00 to 21:00, which clashes with that slot.'}catch(e){}
  if(festSlotTaken(day,n)[k])return 'That slot is taken by '+festSlotAct(day,n,k).name+'.';
  return ''}
 /* missed slots, reminders (checked twice a second) */

@@ -11,7 +11,7 @@
    Rooms use ixRoom (55-interiors.js). Street rooms are added in buildVenues; tower rooms when cdTower builds each front. */
 
 /* ---------- small helpers ---------- */
-const SF=(...a)=>SB(...a);
+const SF=(w,h,d,c,...r)=>SB(w,h,d,ixTone(c,.74),...r);
 const sfPick=(L,i)=>L[((i%L.length)+L.length)%L.length];
 
 /* ---------- 1. street shop fronts ---------- (shop body: x cx-4..cx+4, z 5..11, 3.4 tall; front face z 11, door at cx) */
@@ -45,7 +45,7 @@ const SFI={
 /* ---------- 2. Motors, Pet Shop and Security rooms ---------- */
 const SFSTREET=[
  {cx:-20,lab:'Visit Motors',name:'Motors',t:'car',kn:'Rex (car dealer)',kc:{hair:28,hc:0,eyes:0,mouth:3,top:2,tc:6,pc:4,skin:2,body:.5},no:'Rex: "Book a test drive on the Motors website first, then I\'ll have the keys ready."',
-  room:{fl:['marble','#e8e8ec','#d0d4da'],wl:['panel','#e4e9ef','#c9d2dc'],tr:'#1d4f9a',wa:'#1d4f9a',fw:'#1d4f9a',mat:'#1d4f9a',sign:['MOTORS','#ffffff','#1d4f9a',2.6,.5,2.7,5,{border:'#e03a3a'}],lights:[[2.5,4],[7.5,4],[5,6,.5]],lc:0xf4f8ff,
+  room:{fl:['marble','#8a919c','#767d89'],wl:['panel','#8a98ab','#76869b'],tr:'#1d4f9a',wa:'#1d4f9a',fw:'#1d4f9a',mat:'#1d4f9a',sign:['MOTORS','#ffffff','#1d4f9a',2.6,.5,2.7,5,{border:'#e03a3a'}],lights:[[2.5,4,.6],[7.5,4,.6],[5,6,.4]],lc:0xe6edf8,
    build(b,cl,add,ox){ixCounter(b,cl,5,3.2,3,.9,'#1d4f9a','#e8e8ec');b(.6,.4,.05,'#111',5.6,1.32,2.9);b(.54,.34,.02,'*7fd0ff',5.6,1.32,2.93);b(.5,.04,.36,'#f8f8f8',4.4,1.06,3.3);
     b(3,.08,3,'#cfd3d8',7.4,.04,5.6);b(2.8,.02,2.8,'#1d4f9a',7.4,.09,5.6);cl(6,4.2,8.8,7);
     [[1,'#e03a3a'],[2.4,'#ffe066'],[3.8,'#3b82f6']].forEach(q=>{ixFrame(b,q[0],1.9,.03,1.2,.8,'#1a1a1a',[q[1],'#2a2d33',q[1]])});

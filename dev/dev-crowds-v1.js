@@ -205,7 +205,7 @@
    const t=now(),w=want(t);C.want=w;
    crowd(dt,t,w);C.n=CW.filter(n=>n._cw).length;
    const ok=(mode=='play'||mode=='drive')&&!IN&&!HIN;
-   lists().forEach(([L,v])=>L.forEach(n=>{if(!n._fx)return;if(n._cw)return;ambient(n,v,dt,ok)}));
+   lists().forEach(([L,v])=>L.forEach(n=>{if(!n._fx)return;if(n._cw)return;ambient(n,v,dt,ok||(n.ext&&(mode=='play'||mode=='drive')))}));/* n.ext people (airport, abroad) get the same avoidance indoors */
    separate();
   }catch(e){console.error('crowd',e)}
  };

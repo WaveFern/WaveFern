@@ -10,12 +10,63 @@
    Guest players (no Google account) cannot be listed server-side; their claim stays on their device. */
 (function(){
 if(typeof RS=='undefined'||typeof rsGet!='function'||typeof FB_ON=='undefined'||!FB_ON)return;
-const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
+const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';const ADMINS=typeof ADMIN_UIDS!='undefined'?ADMIN_UIDS:[ADMIN];
 const rd=()=>FBF&&FBD&&FBU;
+
+/* v51.5.1: fdBackfill(write). Admin only. fdSnapshot lists only careers made before the fresh start, so a Founder whose cloud save is already a new career (or who was missed) has no founders/{uid} entry, and the rules then refuse their Founder flag on the leaderboard and profile.
+   This reads every cloud save, and for each career that carries a Founder claim (S.fdr) or is an eligible old career it creates the missing founders/{uid} entry. Existing entries (including f:0 set by hand) are never changed.
+   fdBackfill() is a dry run; fdBackfill(true) writes. */
+/* v51.8.1: fdClearLeaderboardRow(uid) deletes one leaderboard/{uid} row (no uid = your own). Your own row can always be deleted; another player's needs the admin account and the v51.3.0 rules published. */
+window.fdClearLeaderboardRow=async function(who){
+ if(!rd()||!FBU)return console.warn('Sign in with Google first.');
+ const F=FBF,admin=ADMINS.includes(FBU.uid);let ids=[];
+ if(!who)ids=[FBU.uid];
+ else if(/^[A-Za-z0-9]{20,40}$/.test(who))ids=[who];
+ else{/* a display name: look it up in the top 100 rows of each category (admin only) */
+  if(!admin)return console.warn('Only the admin account can remove a row by name.');
+  const w=String(who).trim().toLowerCase(),seen=new Set();
+  for(const k of ['day','lis','str','mon','fame','sg','fol']){try{const sn=await F.getDocs(F.query(F.collection(FBD,'leaderboard'),F.orderBy(k,'desc'),F.limit(100)));sn.forEach(d=>{const x=d.data();if(x&&String(x.a||'').trim().toLowerCase()==w&&!seen.has(d.id)){seen.add(d.id);ids.push(d.id)}})}catch(e){console.warn('lookup '+k,(e&&e.code)||e)}}
+  if(!ids.length)return console.warn('No leaderboard row named "'+who+'" found in the top 100 of any tab.')}
+ if(ids.some(u=>u!==FBU.uid)&&!admin)return console.warn('Only the admin account can clear another player\'s row.');
+ let n=0;for(const u of ids){try{await F.deleteDoc(F.doc(FBD,'leaderboard',u));n++;console.log('Leaderboard row deleted: '+u)}catch(e){console.warn('Could not delete '+u+': '+((e&&e.code)||e)+(e&&e.code=='permission-denied'?'. Publish firebase-rules/v51.3.0/firestore.rules in Firebase console > Firestore > Rules.':''))}}
+ try{if(window.LB&&LB.refresh)LB.refresh()}catch(e){}
+ return n};
+/* v51.8.3: fdClearLeaderboardRow() = your own row; fdClearLeaderboardRow('uid') = that account (admin); fdClearLeaderboardRow('TEST') = every row with that display name (admin). The admin also gets an x on each Leaderboard row. */
+window.fdBackfill=async function(write,only){/* v55.30.18: a cloud save is player-made data (the seal key is public), so its S.fdr / rv claims are NOT proof of Founder. Backfill is now manual: fdBackfill() lists candidates, fdBackfill(true,['uid',..]) writes only the uids you name. */
+ if(!rd())return console.warn('Sign in with the admin Google account first.');
+ if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');
+ const F=FBF,have=new Set();
+ for(let last=null;;){const q=last?F.query(F.collection(FBD,'founders'),F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(F.collection(FBD,'founders'),F.orderBy(F.documentId()),F.limit(100));
+  const s=await F.getDocs(q);if(s.empty)break;s.forEach(d=>have.add(d.id));last=s.docs[s.docs.length-1];if(s.size<100)break}
+ const col=F.collection(FBD,'saves');let last=null,seen=0,add=[],listed=0;
+ for(;;){
+  const q=last?F.query(col,F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(col,F.orderBy(F.documentId()),F.limit(100));
+  const s=await F.getDocs(q);if(s.empty)break;
+  s.forEach(d=>{seen++;if(have.has(d.id)){listed++;return}const x=d.data();let st=null;try{st=rsStats(x.code)}catch(e){}if(!st)return;
+   const claim=st.s&&st.s.fdr,old=!(st.rv>=RS.V)&&rsEligible(st,x.code);
+   if(claim||old)add.push({uid:d.id,a:String((claim&&claim.a)||st.artist||'').slice(0,24),d:Math.min(9999,(claim?claim.d:st.day)|0),why:claim?'S.fdr claim':'old career'})});
+  last=s.docs[s.docs.length-1];if(s.size<100)break}
+ console.log('Cloud saves read: '+seen+'. Already listed: '+listed+'. Founders missing from the list: '+add.length+'.');
+ if(!write||!Array.isArray(only)){add.forEach(e=>console.log(e.uid,e.a,'day '+e.d,e.why));console.log('Dry run: nothing written. Check the list by hand, then run fdBackfill(true,["uid",...]) with only the uids you trust.');return{seen,listed,missing:add.length,candidates:add}}
+ const ok=new Set(only),pick=add.filter(e=>ok.has(e.uid));
+ let n=0;for(let i=0;i<pick.length;i+=400){const b=F.writeBatch(FBD);pick.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,pick.length-i)}
+ console.log('Written: '+n+' Founder entries.');return{seen,listed,written:n}};
+
+/* v55.30.18: only the admin's OWN entry is automatic now; other players' entries are no longer created from their (forgeable) saves. v52.4.2: automatic backfill. When the admin account is signed in, the missing founders/{uid} entries are created without a console step: first the admin's own (if this career is a Founder one), then everyone else's from the cloud saves (fdBackfill(true)).
+   It runs at most once a day per browser, and only ever adds entries that do not exist yet, so an f set by hand is never changed. */
+{const KEY='fw_fd_auto',DAY=864e5;
+ const auto=async()=>{try{
+  if(!rd()||!FBU||FBU.isAnonymous||!ADMINS.includes(FBU.uid))return;
+  let at=0;try{at=+localStorage.getItem(KEY)||0}catch(e){}if(Date.now()-at<DAY)return;
+  try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}
+  const F=FBF,r=F.doc(FBD,'founders',FBU.uid);
+  try{const m=await F.getDoc(r);if(!m.exists()&&typeof S=='object'&&S&&S.fdr)await F.setDoc(r,{a:String(S.fdr.a||S.artist||'').slice(0,24),d:Math.min(9999,S.fdr.d|0),t:Date.now()})}catch(e){console.warn('founder auto (own)',(e&&e.code)||e)}
+ }catch(e){try{localStorage.removeItem(KEY)}catch(x){}console.warn('founder auto',(e&&e.code)||e)}};
+ setInterval(auto,15000);setTimeout(auto,6000)}
 
 window.fdSnapshot=async function(write){
  if(!rd())return console.warn('Sign in with the admin Google account first.');
- if(FBU.uid!==ADMIN)return console.warn('Only the admin account can do this.');
+ if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');
  const F=FBF,col=F.collection(FBD,'saves');let last=null,seen=0,elig=[],skipped=0;
  for(;;){
   const q=last?F.query(col,F.orderBy(F.documentId()),F.startAfter(last),F.limit(100)):F.query(col,F.orderBy(F.documentId()),F.limit(100));

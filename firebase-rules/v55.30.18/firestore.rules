@@ -1,5 +1,6 @@
 rules_version = '2';
-// WaveFern Firestore rules v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
+// v55.30.5 (security audit, 19 Nov 2026): profiles.p photo host must be a real *.googleusercontent.com host (was any host ending in googleusercontent.com); rooms/{code} needs a Google account (was any anonymous login). Everything else unchanged from v51.3.0.
+// WaveFern Firestore rules v51.3.0, 12 Nov 2026 (16 Nov 2026: added newsletter/{id}, public read, admin write; republish to let the admin publish newsletter articles). Second admin uid added (admin() now accepts a list). Previous v49.93.2, 7 Nov 2026. Founder flag founders/{uid}.f (1 or 0), checked on profile and leaderboard writes. Previous v49.91.1: Fix: profiles.j (join date, milliseconds) was capped at 1e12 so every full profile write was refused.
 // ADMIN UID: the Google account has a NEW uid in the waveferndata project. Replace wE6oPZIH... below with your uid from Authentication > Users.
 // WaveFern: paste this into Firebase console > Firestore Database > Rules, then Publish.
 // Only what the game uses is allowed; everything else is refused. No get()/exists() lookups, so rules never cost extra reads.
@@ -7,12 +8,12 @@ rules_version = '2';
 // gifts/{id}: the admin creates and deletes; a player reads their own and marks one claimed once.
 // usernames/{name}: reserved usernames (v49.80.7); profiles/{uid}.h must match a name the player reserved.
 // founders/{uid}: cloud Founder list; admin writes, player reads own. leaderboard/{uid}, profiles/{uid}: player writes own row, signed-in players read.
-// rooms/{code}: a band host (anonymous login) writes a heartbeat carrying their own uid; only the admin reads.
+// rooms/{code}: a band host (Google login) writes a heartbeat carrying their own uid; only the admin reads.
 service cloud.firestore {
   match /databases/{database}/documents {
     function me() { return request.auth.uid; }
     function google() { return request.auth != null && request.auth.token.firebase.sign_in_provider == 'google.com'; }
-    function admin() { return google() && me() == 'wE6oPZIHYifrqBFxzpPse6ripGY2'; }
+    function admin() { return google() && me() in ['wE6oPZIHYifrqBFxzpPse6ripGY2', 'T79oEtO29fUBYv4P9qq0vBDzZZt2']; }
     function fields(k) { return request.resource.data.keys().toSet() == k.toSet(); }
     function stamp(v) { return v is int && v > 1704067200000 && v < request.time.toMillis() + 604800000; }
     // tighter for saves: the device clock may be at most 2 days out, either way
@@ -76,15 +77,18 @@ service cloud.firestore {
       allow get: if google();
       allow create, update: if google() && me() == uid && profOk(request.resource.data);
       allow delete: if google() && me() == uid || admin();
+      // v55.30.5: top songs are 'title|streams' strings; every entry is bounded so one profile cannot be a megabyte that every viewer downloads
+      function sgOk(l) { return (l.size() < 1 || str(l[0], 0, 80)) && (l.size() < 2 || str(l[1], 0, 80)) && (l.size() < 3 || str(l[2], 0, 80)) && (l.size() < 4 || str(l[3], 0, 80)) && (l.size() < 5 || str(l[4], 0, 80)); }
       function profOk(d) {
-        return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'founder', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd'])
+        return d.keys().hasAll(['a', 'h', 'bio', 'fame', 'lis', 't']) && d.keys().hasOnly(['a', 'h', 'bio', 'fame', 'lis', 't', 'p', 'founder', 'j', 'sg', 'bn', 'bi', 'bm', 'ac', 'pd', 'pfp'])
+          && (!('pfp' in d) || (d.pfp is string && d.pfp.size() <= 24000 && d.pfp.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]*')))
           && str(d.a, 1, 24) && d.a.matches('[^<>"]*') && str(d.h, 0, 16) && d.h.matches('[a-z0-9_]*')
           && str(d.bio, 0, 160) && d.bio.matches('[^<>"]*')
           && d.fame is int && d.fame >= 0 && d.fame <= 1000 && count(d.lis) && stampNear(d.t)
           // v49.83.0: Google photo (https googleusercontent only), Founder flag (only if the founders/ entry exists), join date, top songs, band, achievements bitmask
-          && (!('p' in d) || d.p is string && d.p.size() <= 300 && d.p.matches('(https://[a-z0-9.-]*googleusercontent[.]com/.*)?'))
+          && (!('p' in d) || d.p is string && d.p.size() <= 300 && d.p.matches('(https://([a-z0-9-]+[.])+googleusercontent[.]com/.*)?'))
           && profFlagOk(d)
-          && (!('j' in d) || (d.j is int && d.j >= 0 && d.j <= 4000000000000)) && (!('sg' in d) || d.sg is list && d.sg.size() <= 5)
+          && (!('j' in d) || (d.j is int && d.j >= 0 && d.j <= 4000000000000)) && (!('sg' in d) || d.sg is list && d.sg.size() <= 5 && sgOk(d.sg))
           && (!('bn' in d) || str(d.bn, 0, 24) && d.bn.matches('[^<>"]*')) && (!('bi' in d) || str(d.bi, 0, 12)) && (!('bm' in d) || d.bm is int && d.bm >= 0 && d.bm <= 50)
           && (!('pd' in d) || d.pd is string && d.pd.size() <= 12000 && (d.pd.size() == 0 || d.pd[0:23] == 'da' + 'ta:image/jpeg;base64,'))
           && (!('ac' in d) || d.ac is int && d.ac >= 0 && d.ac <= 255)
@@ -97,8 +101,13 @@ service cloud.firestore {
     // A player can create a name only if it is free (create is refused when the document exists), release only their own, and nobody edits one.
     match /usernames/{name} {
       allow get: if google();
+      // v55.30.5 anti-squatting: a name can only be created together with the same-batch profile write that sets profiles/{me}.h to it, and only if the profile's previous
+      // name is the same or is released (deleted) in that batch. So one account holds one name, instead of a script reserving thousands.
       allow create: if google() && name.matches('[a-z0-9_]{3,16}') && name.matches('.*[a-z].*') && fields(['uid', 't'])
-        && request.resource.data.uid == me() && stampNear(request.resource.data.t);
+        && request.resource.data.uid == me() && stampNear(request.resource.data.t)
+        && getAfter(/databases/$(database)/documents/profiles/$(me())).data.h == name
+        && (!exists(/databases/$(database)/documents/profiles/$(me())) || get(/databases/$(database)/documents/profiles/$(me())).data.get('h', '') in ['', name]
+            || !existsAfter(/databases/$(database)/documents/usernames/$(get(/databases/$(database)/documents/profiles/$(me())).data.h)));
       allow delete: if google() && resource.data.uid == me() || admin();
     }
 
@@ -118,13 +127,24 @@ service cloud.firestore {
 
     match /rooms/{code} {
       allow get, list: if admin();
-      allow create: if request.auth != null && roomOk(request.resource.data);
-      allow update: if request.auth != null && resource.data.uid == me() && roomOk(request.resource.data);
-      allow delete: if admin() || request.auth != null && resource.data.uid == me();
+      allow create: if google() && roomOk(request.resource.data);
+      allow update: if google() && resource.data.uid == me() && roomOk(request.resource.data);
+      allow delete: if admin() || google() && resource.data.uid == me();
       function roomOk(d) {
         return code.matches('[A-Z0-9]{5}') && fields(['code', 'band', 'n', 'uid', 't'])
           && d.code == code && d.uid == me() && str(d.band, 1, 24) && d.n is int && d.n >= 1 && d.n <= 4 && stamp(d.t);
       }
+    }
+
+    // newsletter/{id}: wavefern.com/newsletter. Anyone reads; only the admin writes. t title, g tag, v version, d date YYYY-MM-DD, b body (paragraphs split by blank lines), i screenshot as a data URL, c created (ms).
+    match /newsletter/{id} {
+      allow read: if true;
+      allow create, update: if admin() && id.matches('[a-z0-9-]{3,70}')
+        && request.resource.data.keys().hasAll(['t', 'd', 'b', 'c']) && request.resource.data.keys().hasOnly(['t', 'g', 'v', 'd', 'b', 'i', 'c'])
+        && str(request.resource.data.t, 1, 120) && str(request.resource.data.d, 10, 10) && str(request.resource.data.b, 1, 6000) && stamp(request.resource.data.c)
+        && (!('g' in request.resource.data) || str(request.resource.data.g, 0, 20)) && (!('v' in request.resource.data) || str(request.resource.data.v, 0, 12))
+        && (!('i' in request.resource.data) || str(request.resource.data.i, 0, 700000));
+      allow delete: if admin();
     }
 
     match /{document=**} { allow read, write: if false; }

@@ -26,6 +26,7 @@ function sfPic(c,mine,key){const W=64,H=64,k=document.createElement('canvas');k.
  glow(x,'hsl('+h+',70%,46%)',W*.5,H*.4,30,.42,12);glow(x,'hsl('+h+',85%,72%)',W*.5,H*.36,14,.22,6);
  x.save();x.globalAlpha=.06;for(let i=0;i<3;i++)igxF(x,'#fff',W*.18+i*14+r()*4,0,3,H);x.restore();
  igxF(x,'#00000040',0,H-9,W,9);
+ igxInit();
  const old=IGX.L.key.position.clone(),oldR=IGX.L.rim.position.clone();IGX.L.key.position.set(-2.6,3,5);IGX.L.rim.position.set(3,2.2,-3);
  try{x.drawImage(igxRender([{c,mine}],{shot:'bust',xs:[0],ry:.06,lc:{amb:'#a8a8b0',key:'#fff4e8',rim:'hsl('+h+',90%,65%)'},pose:'none'},W,H),0,0)}
  finally{IGX.L.key.position.copy(old);IGX.L.rim.position.copy(oldR)}
@@ -48,9 +49,9 @@ const has=(c,mine,st)=>(st||'msg')=='msg'?!!IGX.PF[(mine?'me|':'')+JSON.stringif
 const Q=[],QK=new Set;let busy=0,FAIL=0;
 function later(c,mine,st,old){if(!IGX.on||!c)return old;if(has(c,mine,st))return igxPortrait(c,mine,st);const k=st+'|'+old;
  if(!QK.has(k)){QK.add(k);Q.push({c,mine,st,old,k});if(!busy){busy=1;requestAnimationFrame(pump)}}return old}
-function pump(){const t=performance.now();while(Q.length&&performance.now()-t<10){const j=Q.shift();QK.delete(j.k);let u;try{u=igxPortrait(j.c,j.mine,j.st)}catch(e){console.warn('portrait',e);if(++FAIL>=4){IGX.on=0;Q.length=0}break}
+function pump(){const t=performance.now();while(Q.length&&performance.now()-t<10){const j=Q.shift();QK.delete(j.k);let u;try{u=igxPortrait(j.c,j.mine,j.st)}catch(e){console.warn('portrait',e);FAIL++;try{if(IGX.r){IGX.r.dispose();IGX.r=null}}catch(_){IGX.r=null}QK.add(j.k);Q.push(j);busy=1;setTimeout(()=>{busy=0;if(Q.length){busy=1;requestAnimationFrame(pump)}},Math.min(8000,500*FAIL));return}
  if(shown()===j.st)document.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===j.old)i.src=u})}
- if(Q.length)requestAnimationFrame(pump);else busy=0}
+ FAIL=0;if(Q.length)requestAnimationFrame(pump);else busy=0}
 /* the app on screen right now; a late picture only swaps in while its own app is showing */
 function shown(){try{const a=mode=='phone'?{sf:'sf',spot:'sf',ig:'ig',msg:'msg'}[PH.app]:mode=='pc'?{1:'sf',ig:'ig',msg:'msg'}[app]:null;return a||null}catch(e){return null}}
 /* 16x16 face url -> look, from the pf2 cache, for faces drawn from a look the earlier swaps did not know about */

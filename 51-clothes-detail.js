@@ -39,7 +39,20 @@ function xDetailBottoms(x,c){const{g,w,d,legs}=x,bt=c.bt||0,pc=c.pc_custom||PANT
   if(bt!=5){xb(l,.012,.11,.01,st,s*lw*.32,-.1,z,0,0,s*.6);xb(l,lw*.5,.11,.01,xtone(pc,.85),0,-.12,-z);xb(l,lw*.52,.008,.012,st,0,-.068,-z-.002)}
   if(lh>=.4&&bt!=3)xb(l,lw+.006,.03,ld+.006,xtone(pc,.85),0,-lh+.03,0);
   [-.33,.33].forEach(k=>xb(l,.02,.06,.012,xtone(pc,.75),k*lw,-.04,z+.002));xb(l,.006,.16,.012,st,-s*lw*.42,-.1,z+.001)});
- if(bt!=5&&bt!=8){xb(g,w*.6,.035,d*.82,'#2a1a10',0,.49,0);xb(g,.075,.05,.016,'~#cfd3d8',0,.49,d*.41+.006);xb(g,.04,.03,.018,'#2a1a10',0,.49,d*.41+.01)}}
+ if(bt!=5&&bt!=8){xb(g,w*.6,.035,d*.82,'#2a1a10',0,.49,0);xb(g,.075,.05,.016,'~#cfd3d8',0,.49,d*.41+.006);xb(g,.04,.03,.018,'#2a1a10',0,.49,d*.41+.01)}
+ xBottomsVariant(x,nm,pc,lw,ld,lh,bt)}
+
+/* v50.7.1: bottoms that share one shape get their own cut by name (same ids and styles, so saves and owned items are unchanged) */
+function xBottomsVariant(x,nm,pc,lw,ld,lh,bt){const{g,w,d}=x,z=ld/2+.008,dkp=xtone(pc,.65),lgt=xlt(pc,.28);
+ if(nm=='Chinos')legEach(x,(l,s)=>{xb(l,.01,lh-.1,.012,xtone(pc,.88),0,-lh/2-.03,z);xb(l,lw+.026,.06,ld+.026,lgt,0,-lh+.065,0);xb(l,lw+.03,.008,ld+.03,dkp,0,-lh+.095,0)});
+ else if(nm=='Cargo Trousers')legEach(x,(l,s)=>{const sx=s*(lw/2+.03);xb(l,.06,.2,.2,xtone(pc,.8),sx,-.2,0);xb(l,.064,.05,.21,dkp,sx,-.1,0);xb(l,.068,.02,.02,'~#c8b56a',sx,-.1,.1);xb(l,.04,.14,.012,dkp,sx,-.22,.1);xb(l,lw+.01,.03,ld+.01,dkp,0,-.3,0)});
+ else if(nm=='Joggers'){legEach(x,(l,s)=>{xb(l,lw+.05,.07,ld+.05,xtone(pc,.55),0,-lh+.035,0);xb(l,lw+.052,.012,ld+.052,xlt(pc,.3),0,-lh+.07,0);xb(l,.008,.34,.03,xlt(pc,.3),s*(lw/2+.004),-.2,0)});
+  [-1,1].forEach(s=>xb(g,.014,.1,.012,'#f4f4f4',s*.05,.44,d*.41+.014));xb(g,.05,.03,.014,'#f4f4f4',0,.49,d*.41+.016)}
+ else if(nm=='Slim Jeans')legEach(x,(l,s)=>{xb(l,lw*.7,.012,.012,xlt(pc,.3),0,-.1,z+.001,0,0,s*.5);xb(l,lw*.7,.012,.012,xlt(pc,.3),0,-.15,z+.001,0,0,s*.5);xb(l,lw-.02,.07,ld+.014,xlt(pc,.12),0,-.22,0)});
+ else if(nm=='Denim Shorts')legEach(x,(l,s)=>{xb(l,lw+.014,.03,ld+.014,xlt(pc,.4),0,-lh+.015,0);for(let i=0;i<5;i++)xb(l,.014,.03,.012,xlt(pc,.55),-lw*.4+i*lw*.2,-lh-.01,z)});
+ else if(nm=='Baggy Shorts')legEach(x,(l,s)=>{xb(l,lw+.09,lh+.05,ld+.09,pc,0,-(lh+.05)/2,0);xb(l,lw+.1,.03,ld+.1,dkp,0,-lh-.035,0);xb(l,.016,.14,.15,dkp,s*(lw/2+.05),-.12,0)});
+ else if(nm=='Wide-Leg Jeans'){legEach(x,(l,s)=>{xb(l,.01,lh-.06,.012,dkp,0,-lh/2,z);xb(l,lw+.04,.07,ld+.04,xtone(pc,.8),0,-lh+.035,0)});xb(g,w+.02,.12,d+.02,xtone(pc,.85),0,.54,0)}
+ else if(nm=='Baggy Jeans')legEach(x,(l,s)=>{xb(l,lw*.6,.1,.012,xlt(pc,.45),0,-.14,z+.001);xb(l,lw*.6,.01,.014,xlt(pc,.7),0,-.1,z+.003);xb(l,lw*.6,.01,.014,xlt(pc,.7),0,-.18,z+.003);[0,1].forEach(i=>xb(l,lw+.05,.035,ld+.05,xtone(pc,.7),0,-lh+.02+i*.045,0))})}
 
 function xDetailShoes(x,c){const{w,d,legs}=x,sh=c.shs;if(sh>=2)return;const col=(c.sh>=0?SHC[c.sh]:null)||['#1d1d22',0],boot=col[1]==1,k=col[0],nm=c===ch?XDN('sh'):'',sw=w*.42,sd=d*.8+.1,z0=.05,con=xcon(k);
  legEach(x,(l,s)=>{const base=xShoe(l);

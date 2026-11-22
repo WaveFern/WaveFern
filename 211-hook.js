@@ -71,6 +71,7 @@
   if(h.play<=H.dropWindow){if(!nextAt)nextAt=h.play+R(20,40);if(h.play>=nextAt){nextAt=h.play+R(H.dropMin,H.dropMax);if(fanOk())drop()}}
   if(h.play%5==0){ladder();bar()}},'tick'),1000);
  /* 7: comeback */
- document.addEventListener('visibilitychange',()=>safe(()=>{const h=hk();if(document.hidden){h.seen=now();return}
+ document.addEventListener('visibilitychange',()=>safe(()=>{const h=hk();if(document.hidden){h.seen=now();h.pzd=(typeof PAUSED!='undefined'&&PAUSED&&mode=='pause')?1:0;return}
+  if(h.pzd){h.pzd=0;h.seen=now();return}/* v52.2.0: time spent paused earns nothing */
   const gone=(now()-h.seen)/6e4;if(live()&&gone>=10&&(S.songs||[]).length){const n=Math.min(500,Math.round(gone*R(1.5,3)*(1+Math.sqrt(S.listeners||0)/10)));S.followers=(S.followers||0)+FOLN(n);card('WELCOME BACK','+'+FOLN(n)+' new followers','Your music kept working while you were away.')}},'vis'));
 })();

@@ -53,6 +53,14 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/tz" terser@5
           TERSER_DIR="$RUNNER_TEMP/tz" node tools/build-dev-bundle.js
+      # One-request script bundle for the live game (fw-bundle.js). Rewrites index.html in the deployed copy only and keeps the original as
+      # index-src.html. If this step fails, the normal ~270 script tags are published unchanged. Must run after the dev bundle step.
+      - name: Build production bundle
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tz" terser@5
+          TERSER_DIR="$RUNNER_TEMP/tz" node tools/build-prod-bundle.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -16,4 +16,4 @@ const FAME_MAX=350;
  const moved=v=>v>K?fameLevel(oldStart(v)):v;
  try{AW.need=moved(AW.need)}catch(e){}
  try{FSTG.forEach(s=>s.req=moved(s.req))}catch(e){}
- const ch=cheat;cheat=function(){ch.apply(this,arguments);try{const need=Math.ceil(fameStart(FAME_MAX)/(1+.08*(S.bling||0)));if(S.listeners<need)S.listeners=need;FLC=[-1,0];refresh()}catch(e){}}}
+}
