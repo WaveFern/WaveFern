@@ -105,6 +105,7 @@ function relAll(){jRel();for(const id in held){kd(held[id],'keyup');delete held[
 function enable(){if(act)return;act=1;build();document.body.classList.add('tch');lastSig=''}
 function disable(){if(!act)return;act=0;relAll();if(ui)ui.classList.add('off');document.body.classList.remove('tch','tdrv');if(typeof keys!='undefined'&&runOn){runOn=0;delete keys.shift;const r=ui&&ui.querySelector('.tr2');if(r)r.classList.remove('on')}}
 function setLast(v){if(window.WF_LAST==v)return;window.WF_LAST=v;if(v=='touch')enable();else disable()}
+window.WF_SETLAST=setLast;/* v55.36.0: the controller code (168-gamepad.js) switches the touch buttons off through this */
 if(coarse())(document.body?enable():addEventListener('DOMContentLoaded',enable));
 addEventListener('pointerdown',e=>{if(e.pointerType=='touch')setLast('touch')},true);
 addEventListener('keydown',e=>{if(e.isTrusted)setLast('kbd')},true);
