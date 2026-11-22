@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.34.0 (2026-11-22): arcade redraw: 400x224, parallax, particles; platformer is now the original Fern Quest; Fern Rush is pseudo-3D behind the runner; new neon arcade menu.
 - v55.33.0 (2026-11-22): arcade (`252-arcade.js`: Fern Flap, Fern Bros 4 courses, Fern Rush, 2D pixel, opened from the arcade cabinet, gaming PC and tour-city arcades) and one shared furniture interaction system (`253-furniture-interact.js`, ~45 item types).
 - v55.31.0 (2026-11-20): freeze fix: save pack + seal (100-250 ms on a big save) moved to `12-save-worker.js` (autosave timer, pause and cloud sync via `saveCodeAsync`), `saveCode` memoised on unchanged JSON; `scPack`/`SC_A`/`SC_C` moved into `12-save-seal.js`.
 - v55.30.18 (2026-11-20): outside-audit fixes: Founder auto-backfill of other players removed (`209`: `fdBackfill(true,[uids])` is manual), RTDB room rules narrowed (host cannot write guest `u/` slots, `i` closed), rules now `firebase-rules/v55.30.18/`, 11 new rules tests.
