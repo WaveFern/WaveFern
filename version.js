@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.36.0';
+const GAME_VERSION='v55.36.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.36.1',n:'Fixed: the crowds at the main menu stadium and world tour shows looked like glitchy speckled shards after the cheaper-crowd update. The people are drawn properly again, still with the same lower cost.'},
  {v:'v55.36.0',n:'Meta Quest controllers. The Touch controllers now work in the Quest browser: left stick walks, right stick scrolls, A interacts, X storage, Y phone, left trigger runs, Menu pauses. The touch buttons hide as soon as you use a controller, and the arcade games (Fern Flap, Fern Quest, Fern Rush) steer with the stick or D-pad, A to jump and B to back out.'},
  {v:'v55.35.0',n:'Arcade fixes and polish. Fern Quest: enemies no longer sink or jump through the floor (a collision bug), and the hero has a proper run cycle that only plays while he moves. Fern Rush: the runner, the chasing guard and the dog are now 3D animated models, and bumping into something is unmissable (hit-stop, red flash, big OUCH, stars, screen shake, the obstacle flashes). The arcade menu shows still pictures of the games.'},
  {v:'v55.34.0',n:'The arcade looks far better. All three games are redrawn at a higher resolution with parallax backgrounds, particles, screen shake and detailed pixel art, and the arcade menu is a neon synthwave screen with live previews. The platformer is now Fern Quest, an original game (hearts, gems, double jump, one-way platforms, bats and spiky urchins, a checkpoint lantern, exit portals, four worlds: Meadow, Crystal Caves, Sunset Cliffs, Moon Temple). Fern Rush is now drawn from behind the runner with a pseudo-3D camera: perspective track, 3D trains, barriers and gantries, buildings along the street, and a chaser after the first hit.'},
