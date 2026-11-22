@@ -201,7 +201,7 @@ const ROOMS={
   rm.box(2,.15,2,'#2a2a3a',x0+w-4.4,.08,z0+d-3,0);[[0,-.5],[-.5,0],[.5,0],[0,.5]].forEach(([a,b],k)=>rm.glow(.4,.04,.4,N[k],x0+w-4.4+a,.17,z0+d-3+b));rm.box(2,2.4,.3,'#1a1a26',x0+w-4.4,1.2,z0+d-4.2,1);rm.glow(1.4,.9,.04,'#3ad0ff',x0+w-4.4,1.7,z0+d-4.04);
   rm.box(3,1,.8,'#3a2a5a',x0+3.4,.5,z0+d-2.6,1);for(let k=0;k<6;k++)rm.box(.3,.3,.3,N[k%5],x0+2.2+k*.48,1.15,z0+d-2.6);staff(rm,x0+3.4,z0+d-3.5,0);
   rm.title('ARCADE',x0+4,x0+9,3.25,3.85,{bg:'#0a0a1a',fg:'#ff3a9a'});
-  rm.int(x0+5,back+2,1.8,'Play a game ($2)',()=>{if(!pay(2))return;const sc=Math.round(R(1000,99999));snd('pop');if(sc>80000&&daily(C,'hiscore')){const f=fans(10,.1);return say('New high score: '+sc.toLocaleString()+'! A crowd films it · +'+f+' followers')}say('You scored '+sc.toLocaleString()+'.')});
+  rm.int(x0+5,back+2,1.8,'Play arcade ($2)',()=>{if(!pay(2))return;snd('pop');ARC.open()});
   rm.int(x0+w-1.2,z0+5.4,1.3,'Try the claw machine ($2)',()=>{if(!pay(2))return;snd('pop');say(Math.random()<.25?'You won a plush toy!':'The claw drops it at the last second. Typical.')});
   rm.int(x0+w-4.4,z0+d-2.2,1.3,'Dance machine ($3)',()=>{if(S.energy<5){snd('err');return say('Too tired to dance.')}if(!pay(3))return;S.energy=Math.max(0,S.energy-5);snd('pop');say(pick(['Perfect combo!','Great!','You kept up with the arrows.'])+' -5 energy')})},
  karaoke(C,rm){const{x0,z0,w,d,cx,back}=rm,ac=C.s.neon||'#ff3a9a';
