@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.31.0 (2026-11-20): freeze fix: save pack + seal (100-250 ms on a big save) moved to `12-save-worker.js` (autosave timer, pause and cloud sync via `saveCodeAsync`), `saveCode` memoised on unchanged JSON; `scPack`/`SC_A`/`SC_C` moved into `12-save-seal.js`.
 - v55.30.18 (2026-11-20): outside-audit fixes: Founder auto-backfill of other players removed (`209`: `fdBackfill(true,[uids])` is manual), RTDB room rules narrowed (host cannot write guest `u/` slots, `i` closed), rules now `firebase-rules/v55.30.18/`, 11 new rules tests.
 - v55.30.15 (2026-11-19): airport terminal and brand HQ rooms no longer draw their own blob contact shadows (`139`, `239`); they use the game's normal sun shadows from `dev/dev-graphics-v12.js`.
 - v55.28.1 (2026-11-19): removed the blocked-domain fallback script from `index.html`.
