@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.37.0';
+const GAME_VERSION='v55.38.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.38.0',n:'Arcade feel pass. Fern Quest: the hero no longer plays the running or jumping pose while standing still (it was flickering between ground and air), the run now blends smoothly in and out, and jumps and landings squash and stretch. Stomps and hits freeze the game for a split second, stomp chains score double, triple and quad, and gems chime higher the faster you grab them. Fern Rush: dust and sparks while running and sliding, bigger landings, a rising coin chime, a lighter shadow in the air and a SPEED UP banner at each speed step.'},
  {v:'v55.37.0',n:'A much clearer first 5 minutes. Big Vee now gives five numbered steps (walk, name, record, release, sleep) with exact buttons, and a Next Goal box at the bottom left always shows the one thing to do now. Your first release brings your first listeners at once, and the bed works straight after it on day 1 (you used to wait about 5 minutes). Early milestones (first song, first night, first upgrade, songs 2 and 3) pay a little cash with a pop-up. Coming back after 15+ minutes shows a Welcome back summary (royalties, followers, streak, next goal). The daily streak now pays in full ($30 on day 1 up to $400 on day 7). Anonymous day-1 funnel events (step reached, last step before leaving) when analytics are allowed.'},
  {v:'v55.36.1',n:'Fixed: the crowds at the main menu stadium and world tour shows looked like glitchy speckled shards after the cheaper-crowd update. The people are drawn properly again, still with the same lower cost.'},
  {v:'v55.36.0',n:'Meta Quest controllers. The Touch controllers now work in the Quest browser: left stick walks, right stick scrolls, A interacts, X storage, Y phone, left trigger runs, Menu pauses. The touch buttons hide as soon as you use a controller, and the arcade games (Fern Flap, Fern Quest, Fern Rush) steer with the stick or D-pad, A to jump and B to back out.'},
