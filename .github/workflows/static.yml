@@ -66,6 +66,9 @@ jobs:
         with:
           # Upload entire repository
           path: '.'
+      # Give GitHub a moment to list the just-uploaded artifact (deploy-pages sometimes could not find it right after upload).
+      - name: Wait for artifact to be listed
+        run: sleep 20
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
