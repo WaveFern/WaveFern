@@ -32,7 +32,7 @@ window.fdClearLeaderboardRow=async function(who){
  try{if(window.LB&&LB.refresh)LB.refresh()}catch(e){}
  return n};
 /* v51.8.3: fdClearLeaderboardRow() = your own row; fdClearLeaderboardRow('uid') = that account (admin); fdClearLeaderboardRow('TEST') = every row with that display name (admin). The admin also gets an x on each Leaderboard row. */
-window.fdBackfill=async function(write){
+window.fdBackfill=async function(write,only){/* v55.30.18: a cloud save is player-made data (the seal key is public), so its S.fdr / rv claims are NOT proof of Founder. Backfill is now manual: fdBackfill() lists candidates, fdBackfill(true,['uid',..]) writes only the uids you name. */
  if(!rd())return console.warn('Sign in with the admin Google account first.');
  if(!ADMINS.includes(FBU.uid))return console.warn('Only the admin account can do this.');
  const F=FBF,have=new Set();
@@ -44,14 +44,15 @@ window.fdBackfill=async function(write){
   const s=await F.getDocs(q);if(s.empty)break;
   s.forEach(d=>{seen++;if(have.has(d.id)){listed++;return}const x=d.data();let st=null;try{st=rsStats(x.code)}catch(e){}if(!st)return;
    const claim=st.s&&st.s.fdr,old=!(st.rv>=RS.V)&&rsEligible(st,x.code);
-   if(claim||old)add.push({uid:d.id,a:String((claim&&claim.a)||st.artist||'').slice(0,24),d:Math.min(9999,(claim?claim.d:st.day)|0)})});
+   if(claim||old)add.push({uid:d.id,a:String((claim&&claim.a)||st.artist||'').slice(0,24),d:Math.min(9999,(claim?claim.d:st.day)|0),why:claim?'S.fdr claim':'old career'})});
   last=s.docs[s.docs.length-1];if(s.size<100)break}
  console.log('Cloud saves read: '+seen+'. Already listed: '+listed+'. Founders missing from the list: '+add.length+'.');
- if(!write){console.log('Dry run: nothing written. Run fdBackfill(true) to add them.');return{seen,listed,missing:add.length}}
- let n=0;for(let i=0;i<add.length;i+=400){const b=F.writeBatch(FBD);add.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,add.length-i)}
+ if(!write||!Array.isArray(only)){add.forEach(e=>console.log(e.uid,e.a,'day '+e.d,e.why));console.log('Dry run: nothing written. Check the list by hand, then run fdBackfill(true,["uid",...]) with only the uids you trust.');return{seen,listed,missing:add.length,candidates:add}}
+ const ok=new Set(only),pick=add.filter(e=>ok.has(e.uid));
+ let n=0;for(let i=0;i<pick.length;i+=400){const b=F.writeBatch(FBD);pick.slice(i,i+400).forEach(e=>b.set(F.doc(FBD,'founders',e.uid),{a:e.a,d:e.d,t:Date.now()}));await b.commit();n+=Math.min(400,pick.length-i)}
  console.log('Written: '+n+' Founder entries.');return{seen,listed,written:n}};
 
-/* v52.4.2: automatic backfill. When the admin account is signed in, the missing founders/{uid} entries are created without a console step: first the admin's own (if this career is a Founder one), then everyone else's from the cloud saves (fdBackfill(true)).
+/* v55.30.18: only the admin's OWN entry is automatic now; other players' entries are no longer created from their (forgeable) saves. v52.4.2: automatic backfill. When the admin account is signed in, the missing founders/{uid} entries are created without a console step: first the admin's own (if this career is a Founder one), then everyone else's from the cloud saves (fdBackfill(true)).
    It runs at most once a day per browser, and only ever adds entries that do not exist yet, so an f set by hand is never changed. */
 {const KEY='fw_fd_auto',DAY=864e5;
  const auto=async()=>{try{
@@ -60,8 +61,6 @@ window.fdBackfill=async function(write){
   try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}
   const F=FBF,r=F.doc(FBD,'founders',FBU.uid);
   try{const m=await F.getDoc(r);if(!m.exists()&&typeof S=='object'&&S&&S.fdr)await F.setDoc(r,{a:String(S.fdr.a||S.artist||'').slice(0,24),d:Math.min(9999,S.fdr.d|0),t:Date.now()})}catch(e){console.warn('founder auto (own)',(e&&e.code)||e)}
-  const o=console.log;console.log=()=>{};let res;try{res=await window.fdBackfill(true)}finally{console.log=o}
-  if(res&&res.written)console.log('[founders] added '+res.written+' missing Founder entries automatically');
  }catch(e){try{localStorage.removeItem(KEY)}catch(x){}console.warn('founder auto',(e&&e.code)||e)}};
  setInterval(auto,15000);setTimeout(auto,6000)}
 

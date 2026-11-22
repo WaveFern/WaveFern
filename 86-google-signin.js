@@ -99,13 +99,15 @@ function csLoad(c){const uid=FBU&&FBU.uid;if(c&&isTrlCareer(c.code)){CLD.ok=1;cs
  if(cur&&!csCovers(cur,c.code)&&!bakKeep(cur,'Kept before your cloud save loaded')){CLD.err='No room to back up this career, so the cloud save was not loaded.';return fbRedraw()}
  if(mode=='pause')resumeGame();loadCode(c.code);if(!FBU)return;CLD.ok=1;CLD.last=c.code;csSetMark(c.t);autoSave();say('Loaded your cloud save (Day '+c.day+')');fbRedraw()}
 function csPush(force){if(!FBU||!CLD.ok||CLD.busy||!FBF||['creator','load'].includes(mode)||(mode=='title'&&!TT.game)||wiping)return Promise.resolve();
- const code=saveCode();if(code==CLD.last&&!force)return Promise.resolve();if(code.length>1e6){CLD.err='Your save is too big for the cloud.';return Promise.resolve()}
- const t=Date.now(),uid=FBU.uid;CLD.busy=1;
+ /* v55.31.0: the pack + seal runs in the save worker (saveCodeAsync), not on the main thread; a hidden tab / closing page still packs on the spot */
+ const uid=FBU.uid;CLD.busy=1;
+ return (document.hidden?Promise.resolve(saveCode()):saveCodeAsync()).then(code=>{if(code==CLD.last&&!force)return;if(code.length>1e6){CLD.err='Your save is too big for the cloud.';return}
+ const t=Date.now();
  /* only write over the cloud save this device last saw; if another device saved since, load that one instead */
  return FBF.getDoc(csRef()).then(d=>{if(!FBU||FBU.uid!=uid)return;const c=d.exists()?d.data():null;
   if(c&&c.t!=CLD.t){CLD.ok=0;csLoad(c);return}
   if(c&&![1,2].some(n=>csCovers(c.code,localStorage.getItem(slotKey(n))||''))&&!csCovers(c.code,code)&&!bakKeep(c.code,'Cloud save kept before it was replaced')){CLD.err='No room to back up your cloud save, so it was not replaced.';return}
-  csSetMark(t);return FBF.setDoc(csRef(),{code,day:S.day,artist:S.artist||'',t}).then(()=>{CLD.last=code;CLD.err='';return 1})}).catch(csFail).finally(()=>{CLD.busy=0})}
+  csSetMark(t);return FBF.setDoc(csRef(),{code,day:S.day,artist:S.artist||'',t}).then(()=>{CLD.last=code;CLD.err='';return 1})})}).catch(csFail).finally(()=>{CLD.busy=0})}
 setInterval(()=>csPush(),90000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)csPush()});
 addEventListener('pagehide',()=>csPush());
