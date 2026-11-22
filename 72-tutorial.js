@@ -76,15 +76,17 @@ const inAp=()=>!!IN&&typeof AX!='undefined'&&IN.x>=AX-10&&IN.x<AX+200;
 const tkt=()=>{try{return((S.travel||{}).tickets||[]).some(t=>t.st=='booked')}catch(e){return false}};
 const AP_DOOR={x:-328.4,z:20};
 const TIPS=[
- {k:'move',b:1,l:['Yo, new blood! Big Vee. Your manager, hype man and landlord\'s worst nightmare.','WASD to walk, hold Shift to sprint. E uses whatever you are standing next to.'],
+ {k:'move',b:1,l:['Yo, new blood! Big Vee, your manager. Your first 5 minutes: 1 walk, 2 pick a name, 3 record, 4 release, 5 sleep. First listeners land before you know it.','Step 1: WASD to walk, Shift to sprint, E uses whatever you stand next to. Take a few steps.'],
   go:{done:b=>Math.hypot(P.x-b.x,P.z-b.z)>4}},
- {k:'name',b:1,skip:()=>!!S.artist,l:['Every legend needs a name. Mine was DJ Gravy. Do not ask.','Use the laptop (E), open WaveFern and pick your artist name. Follow the line.'],pc:['Click WaveFern (the outlined icon), type your artist name and press Create profile.'],
+ {k:'name',b:1,skip:()=>!!S.artist,l:['Step 2: your artist name. Follow the green line to the laptop on your desk and press E.','On the laptop click the WaveFern icon, type a name and press Create profile.'],pc:['Click WaveFern (the outlined icon), type your artist name and press Create profile.'],
   go:{w:TUT_LAP,hl:()=>!S.artist&&mode=='pc'&&app!=1?TUT_PC(1):null,done:()=>!!S.artist}},
- {k:'record',b:1,skip:()=>S.songs.length+S.drafts.length>0,l:['Now we cook. The mic is in your studio: pick a genre, then three quick games.','Beat, Lyrics, Mix. It costs 15 energy, so do not be precious.'],
+ {k:'record',b:1,skip:()=>S.songs.length+S.drafts.length>0,l:['Step 3: record your first song. The mic stand in your studio is at the end of the green line. Press E at it.','Pick a genre, then play three quick games: Beat, Lyrics, Mix. It costs 15 energy. A rough song still counts.'],
   go:{w:/^Record a song/,done:b=>S.drafts.length>b.d||S.songs.length>b.s}},
- {k:'release',b:1,skip:()=>S.songs.length>0,l:['Do not sit on heat. Laptop, WaveFern, Upload.','Every night your streams pay out, and listeners grow your fame.'],pc:['WaveFern, then the Upload tab, then Upload on your song. Streams start right away.'],
+ {k:'release',b:1,skip:()=>S.songs.length>0,l:['Step 4: release it. Back to the laptop (E): WaveFern, the Upload tab, then Upload on your song.','The moment it is out you get your first listeners and a cash bonus.'],pc:['WaveFern, then the Upload tab, then Upload on your song. Streams start right away.'],
   go:{w:TUT_LAP,hl:()=>mode=='pc'?(app!=1?TUT_PC(1):`button[onclick*="pg='upload'"]`):null,done:b=>S.songs.length>b.s}},
- {k:'free',b:1,l:['That is the basics: record, release, sleep, spend, grow.','From now on I only drop in, now and then, when you find something new. Tips off on this box and I stay quiet for good.'],dm:['Yo, it is Big Vee. I will drop in now and then when you find something new. Want me quiet? Tips off on my box or in the pause menu.']},
+ {k:'sleep',b:1,skip:()=>S.day>1,l:['Step 5: go to bed. Your first night can start early. Press E at the bed (follow the line).','Overnight your streams pay out and your listeners jump. Sleeping is how you get paid.'],
+  go:{w:TUT_BED,done:b=>S.day>b.day}},
+ {k:'free',b:1,l:['That is the loop: record, release, sleep, spend, repeat. Next goal: buy headphones in the Gearshop (laptop) and record song #2.','The Next Goal box at the bottom left always shows your step. From now on I only drop in when you find something new. Tips off on this box and I stay quiet for good.'],dm:['Yo, it is Big Vee. I will drop in now and then when you find something new. Want me quiet? Tips off on my box or in the pause menu.']},
  /* contextual */
  {k:'tired',when:()=>mode=='play'&&S.t>=300,l:['It is getting late. Your bed (E) ends the day, and your streams pay out when you wake.','A day is 12 minutes: 6 light, 6 dark. Stay up past 06:00 and you pass out.'],
   go:{w:TUT_BED,done:b=>S.day>b.day,t:240}},
