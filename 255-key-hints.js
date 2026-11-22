@@ -1,4 +1,4 @@
-/* ===== v55.39.0: gentle key hints + the H controls card (loads last, `?nofirst` skips it) =====
+/* ===== v55.40.0: gentle key hints + the H controls card (loads last, `?nofirst` skips it) =====
    Why: the game is a lot at the start, and keys like N (map) and Tab (Music Mastery) were never shown early. This file:
    1 Key hint chip (#khint, top right): ONE short tip at a time, each shown once, in this order when it becomes useful:
      Shift run, N map (first time outside or after the first release), G Gphone and Tab Music Mastery (after the first release
