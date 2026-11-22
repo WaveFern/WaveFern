@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.32.2';
+const GAME_VERSION='v55.32.3';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.32.3',n:'World tour shows run smoother: the crowd figures are stored more compactly, so the graphics chip shades about a third fewer vertices per person. The crowd looks the same.'},
  {v:'v55.32.2',n:'Fewer things drawn off screen: scenery, skaters, cats, gulls and the surf wave are skipped while out of view, which saves frame time. Graphics settings fixed: Draw distance Near now really hides people and cars near the screen edge, and Weather effects Off hides the Christmas snow (Light draws half the snow and one fog layer).'},
  {v:'v55.32.1',n:'Behind the scenes only: added the Reel hook scorer tools (tools/ig-reel). Nothing in the game changed.'},
  {v:'v55.32.0',n:'Graphics Auto now fits your device. It picks a starting level from your graphics chip, memory, processor and whether you are on a phone or tablet, instead of always starting on High and sinking to Low. It then moves up when the game runs very smoothly and down when it runs slowly, judged over several seconds so one hitch changes nothing, and it will not keep flipping back and forth. A preset you pick yourself is never changed. Anyone stuck on Low from the old Auto is re-checked once.'},
