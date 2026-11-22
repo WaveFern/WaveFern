@@ -1,4 +1,4 @@
-/* ===== v55.36.0: first session and come-back loop (loads last, wraps only; `?nofirst` skips it) =====
+/* ===== v55.37.0: first session and come-back loop (loads last, wraps only; `?nofirst` skips it) =====
    Why: most ranked players are on day 1-15. The first listener used to arrive only after the first night's sleep, and the bed
    stayed locked until 06:00 game time (about 5 minutes of nothing after the first release). This file:
    1 Next Goal chip (#fsgoal, bottom left): the one step to do now, in plain words, from the first minute until song #2.

@@ -5,7 +5,7 @@
    3 Lucky break: a new song has a chance of a viral spike in its first 10 days (variable reward).
    4 Goal bar: always-visible "next milestone" bar, eased so it starts ~35% full (endowed progress) with near-miss text at 80%+.
    5 Milestone ladder: small rewards at each step, then each step is farther away (goal gradient).
-   6 Daily streak (v55.36.0: pays in full, $30 on day 1 up to $400 on day 7): one reward per real day, bigger each day to day 7; one missed day is forgiven (streak freeze), 2 resets it.
+   6 Daily streak (v55.37.0: pays in full, $30 on day 1 up to $400 on day 7): one reward per real day, bigger each day to day 7; one missed day is forgiven (streak freeze), 2 resets it.
    7 Comeback: leaving for 10+ min and returning shows "while you were away" fans. */
 (function(){
  if(/[?&]nohook/.test(location.search))return;
@@ -60,7 +60,7 @@
  function daily(){const h=hk(),day=Math.floor(now()/864e5);if(h.last===day)return;
   const gap=h.last?day-h.last:1;let note='';
   if(gap==2){note=' (streak saved by a free pass)'}else if(gap>2){h.str=0;note=' (your streak reset, start a new one!)'}
-  h.str=(h.str||0)+1;h.last=day;const i=Math.min(h.str,H.streak.length)-1,n=Math.round(H.streak[i]*(1+Math.floor((h.str-1)/7)*.5));S.money=+((+S.money||0)+n).toFixed(0);/* v55.36.0: the streak pays its full amount (it was x0.25, $7 on day 1) */
+  h.str=(h.str||0)+1;h.last=day;const i=Math.min(h.str,H.streak.length)-1,n=Math.round(H.streak[i]*(1+Math.floor((h.str-1)/7)*.5));S.money=+((+S.money||0)+n).toFixed(0);/* v55.37.0: the streak pays its full amount (it was x0.25, $7 on day 1) */
   const nx=Math.min(h.str+1,H.streak.length);
   card('DAY '+h.str+' STREAK','+$'+n+note,h.str>=7?'Seven days strong! The bonus keeps growing every week.':'Come back tomorrow for $'+Math.round(H.streak[nx-1]*(1+Math.floor(h.str/7)*.5))+' - day 7 is the big one.')}
 

@@ -77,7 +77,7 @@
    const bs=new THREE.Sphere(new THREE.Vector3(cx,cy+1,cz),rad+3.2);
    by.forEach((L,vi)=>{if(!L.length)return;
     /* the geometry shares its buffers with the variant; only the bounding sphere differs, so the tile can be culled on its own */
-    const g=new THREE.BufferGeometry(),src=set[vi];for(const a in src.attributes)g.setAttribute(a,src.attributes[a]);g.boundingSphere=bs.clone();
+    const g=new THREE.BufferGeometry(),src=set[vi];for(const a in src.attributes)g.setAttribute(a,src.attributes[a]);if(src.index)g.setIndex(src.index);g.boundingSphere=bs.clone();
     const im=new THREE.InstancedMesh(g,mat,L.length);im.instanceMatrix.setUsage(THREE.StaticDrawUsage);
     L.forEach((p,i)=>{q.setFromAxisAngle(Y,p.r||0);const h=.9+rr()*.2;v.set(p.x,p.y||0,p.z);s.set(1,h,1);M.compose(v,q,s);im.setMatrixAt(i,M);
      const b=.82+rr()*.28;col.setRGB(b,b*(.95+rr()*.1),b*(.95+rr()*.1));im.setColorAt(i,col)});
