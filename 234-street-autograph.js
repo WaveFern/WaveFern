@@ -12,13 +12,17 @@
  SIGN.random=(n,x)=>pick(n,x);
  /* on the street fans only hand you flat things (lined paper, a poster, a ticket, an album, a record): no caps or shirts */
  SIGN.street=n=>pick(n,null,['paper','poster','ticket','album','vinyl','cd'])}
+/* v55.21: each fan is decided once (the first time they are asked about): about half want an autograph, the rest just tip you */
+const wantsSig=n=>{if(!S.sig)return false;/* no signature set up in Label HQ yet: fans only tip */if(n.sgm===undefined)n.sgm=Math.random()<.5;return n.sgm};
+{const d0=dynInt;dynInt=function(){const a=d0.apply(this,arguments);try{a.forEach(i=>{if(i.l=='Sign autograph'){const n=NPC.find(q=>q.x===i.x&&q.z===i.z);if(n&&!wantsSig(n))i.l='Accept fan tip'}})}catch(e){}return a}}
 {const s0=sign;sign=function(n){
+ if(n&&n.fan&&!wantsSig(n)){return s0.apply(this,arguments)}
  if(!n||typeof signGame!='function'||typeof SIGN=='undefined'||SIGN.busy()||mode!='play')return s0.apply(this,arguments);
  mode='menu';let it;try{it=SIGN.street(1)}catch(e){it=null}
  signGame({noPay:true,title:'Autograph · a fan on the street',items:it||undefined,intro:'Draw your signature in the red box. Enter = next, Backspace = clear, Esc = skip.'}).then(r=>{
   try{if(mode=='menu')mode='play';if(!r||r.cancelled)return;
    if(!r.signed){n.st=2;n.cool=25;n.fan=false;say('You skipped the fan.');return}
-   const m0=+S.money||0,q=r.sim!=null&&S.sig?.3+1.1*r.sim-.6:+r.avg||0;s0.call(this,n);const d=(+S.money||0)-m0;
+   const m0=+S.money||0,q=r.sim!=null&&S.sig?.35+.9*r.sim:+r.avg||0;s0.call(this,n);const d=(+S.money||0)-m0;
    if(d>0){const k=.6+.8*q,adj=+(d*k-d).toFixed(2);S.money=+(S.money+adj).toFixed(2);say('Fan tipped '+$$(d*k)+(q>=.8?' for a lovely signature':''))}}
   catch(e){console.error('street autograph',e);if(mode=='menu')mode='play'}});
 }}

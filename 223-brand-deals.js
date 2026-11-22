@@ -87,7 +87,7 @@ function mk(bid){const s=st(),b=bid?BRD.by(bid):pickBrand();if(!b)return;const d
  let t=pick(A)+'We at '+b.n+' have watched you rise to Fame Level '+fl()+' and we want you as the face of our next '+CAMP[b.cat]+' campaign. It is one photoshoot day at our own headquarters in '+pl+', in our studio. Fee: '+fm(o.pay)+', paid when the shoot wraps, and the photos go on your Instagrime tagged as a partnership. ';
  t+='We pay for everything: your Swiftwing flight out (booked and checked in the moment you accept), a company car in the city, and your flight home. ';t+='What happens next: tap Accept, go to the airport and board the flight, then walk to our HQ for the photoshoot. ';
  t+='Our brief: a '+o.brief.mood.toLowerCase()+' mood with '+o.brief.light.toLowerCase()+' lighting. This offer stands for '+EXPIRE+' days.';
- S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:t});
+ brandPush({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body:t});
  S.hqLink=1;
  try{snd('ping');say(b.n+' wants to sponsor you. Check Messages.')}catch(e){}try{updateVersion()}catch(e){}return o}
 BRD.mk=mk;
@@ -99,8 +99,16 @@ function giveTicket(f,co){const t=T().st(),id='T'+(t.nid++),r=3+Math.floor(Math.
 function flightFor(from,to,lead){const n=T().now();return T().upcoming(from,80).find(f=>f.to==to&&f.dep>=n+lead)||null}
 BRD.dayWord=f=>{const d=T().dayOf(f.dep)-T().dayOf(T().now());return d<=0?'today':d==1?'tomorrow':'in '+d+' days'};
 
+/* v55.21.0: one chat per brand. Each new brand message is appended to that brand's chat log instead of opening a new chat; bd points at the newest deal. */
+function brandPush(m){const t=S.msgs.find(x=>x.state==9&&x.a===undefined&&!x.g&&x.from===m.from&&Array.isArray(x.log));
+ const e={f:'a',t:m.body,d:S.day,bd:m.bd};
+ if(!t){m.log=[e];S.msgs.push(m);return m}
+ t.log.push(e);t.body=m.body;t.unread=1;t.day=S.day;if(m.bd!=null)t.bd=m.bd;return t}
+
+BRD.brandPush=brandPush;
+
 /* ---------- accept / decline ---------- */
-function note(o,body){S.msgs.push({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body})}
+function note(o,body){brandPush({id:S.nid++,from:BRD.agent(o).from,state:9,unread:1,day:S.day,bd:o.id,body})}
 function book(o){const b=BRD.by(o.b),f=flightFor('home',o.d,TICKET_LEAD);if(!f)return null;
  const tk=giveTicket(f,o.b);o.tk=tk.id;o.due=S.day+4;o.st=1;
  note(o,'Confirmed. Your '+tk.fl+' ticket to '+placeOf(o.d)+' is booked and checked in: Gate '+tk.gate+', seat '+tk.seat+', boarding '+T().hm(tk.dep-120)+', gate closes '+T().hm(tk.dep-10)+' ('+BRD.dayWord(f)+'). Be at the airport. When you land a company car takes you to our HQ, and we cover the flight home too. Miss the gate and we have to give the slot to another artist.');

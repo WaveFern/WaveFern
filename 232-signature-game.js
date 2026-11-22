@@ -80,10 +80,11 @@ function score(st,z){let len=0,inn=0,pts=0,x0=9,x1=-9,y0=9,y1=-9;
  const zw=z.w*W,stay0=len>0?inn/len:0,ok=len>=zw*.35&&pts>6&&stay0>=.4;if(!ok)return{ok:0,q:0,why:len>0&&stay0<.4?'out':'short'};
  const stay=inn/len,size=Math.min(1,(x1-x0)*.5+.35+(y1-y0)*.4),scr=len>zw*10?Math.max(.45,1-(len-zw*10)/(zw*14)):1,strk=st.length>1?1:.92;
  return{ok:1,q:Math.max(.12,Math.min(1,Math.pow(stay,1.6)*size*scr*strk*1.05))}}
-const LINES=[[.85,'Amazing! Thank you so much!'],[.6,'Thank you! That looks great.'],[.35,'Um... thanks! I think.'],[0,'Is that... a squiggle? Thanks anyway.']];
+const LINES=[[.85,'Amazing! Thank you so much!'],[.6,'Thank you! That looks great.'],[.35,'Thank you! I love it.'],[0,'Thanks so much! I will keep it forever.']];
 
+const SIMLINES=[[.8,'Wow, that is spot on! Thank you!'],[.55,'That looks just like your signature! Thank you!'],[.35,'Lovely, thank you! Nice and personal.'],[.15,'Thanks so much! Every one is a little different.'],[0,'Thank you! Maybe try a little slower next time?']];
 window.signGame=function(o){o=o||{};return new Promise(res=>{
- const items=(o.items&&o.items.length?o.items:SIGN.random(3)).map((it,i)=>{const a=Object.assign({},it);a.who=a.who||NAMES[(Math.random()*NAMES.length)|0];a.ask=a.ask||ASK[a.kind]||'Could you sign this?';
+ const items=(o.items&&o.items.length?o.items:SIGN.random(3)).map((it,i)=>{const a=Object.assign({},it);a.who=a.who||NAMES[(Math.random()*NAMES.length)|0];a.ask=a.ask===false?'':(a.ask||ASK[a.kind]||'Could you sign this?');
   const nm=(typeof S!='undefined'&&S&&S.artist)||'You';a.art=Object.assign({artist:nm,title:(typeof S!='undefined'&&S&&S.songs&&S.songs.length?S.songs[S.songs.length-1].title:'')||'Live',col:null},a.art||{});
   a.zone=a.zone||ZONE[a.kind]||ZONE.paper;a.ink=a.ink||INK[a.kind]||'#111';return a});
  if(SIGN.cur){const r={signed:0,skipped:0,total:items.length,cancelled:true,avg:0,items:[]};if(o.onDone)try{o.onDone(r)}catch(e){console.error(e)}return res(r)}
@@ -98,13 +99,15 @@ window.signGame=function(o){o=o||{};return new Promise(res=>{
   strokes.forEach(s=>{if(!s.length)return;ink.lineWidth=lw+1.2;ink.beginPath();s.forEach((p,k)=>{const x=z.x+p[0]*z.w,y=z.y+p[1]*z.h;k?ink.lineTo(x,y):ink.moveTo(x,y)});if(s.length==1)ink.lineTo(z.x+s[0][0]*z.w+.1,z.y+s[0][1]*z.h);ink.stroke()})}
  function hint(){const it=items[i],z=zr();bg.save();bg.setLineDash([8,7]);bg.strokeStyle='#e03a3acc';bg.lineWidth=2;rr(bg,z.x,z.y,z.w,z.h,8);bg.stroke();bg.setLineDash([]);bg.fillStyle='#e03a3acc';bg.font='bold 22px sans-serif';bg.textAlign='left';bg.textBaseline='middle';bg.fillText('×',z.x+8,z.y+z.h*.78);bg.restore()}
  function show(n){i=n;strokes=[];cur=null;lock=0;const it=items[i];bg.clearRect(0,0,W,H);(it.draw||DRAW[it.kind]||DRAW.paper)(bg,it);hint();ink.clearRect(0,0,W,H);
-  $q('sgt').textContent=(o.title||'Autographs');$q('sgp').textContent='Item '+(i+1)+' of '+items.length;$q('sgq').innerHTML='<b>'+esc(it.who)+':</b> “'+esc(it.ask)+'”';$q('sgm').textContent='';$q('sgr').textContent='';$q('sgok').textContent=i==items.length-1?'Finish':'Next';
+  $q('sgt').textContent=(o.title||'Autographs');$q('sgp').textContent='Item '+(i+1)+' of '+items.length;$q('sgq').innerHTML=it.ask?'<b>'+esc(it.who)+':</b> “'+esc(it.ask)+'”':'';$q('sgm').textContent='';$q('sgr').textContent='';$q('sgok').textContent=i==items.length-1?'Finish':'Next';
   $q('sgm').className='';}
  function done(cancel){if(!SIGN.cur)return;SIGN.cur=null;removeEventListener('keydown',kd,true);ov.remove();R.cancelled=!!cancel;const s=R.items.filter(x=>x.signed);R.signed=s.length;R.skipped=items.length-s.length;R.avg=s.length?s.reduce((a,x)=>a+x.q,0)/s.length:0;if(o.onDone)try{o.onDone(R)}catch(e){console.error(e)}res(R)}
  function next(rec){R.items.push(rec);lock=1;if(i>=items.length-1)return setTimeout(()=>done(0),rec.signed?650:150);setTimeout(()=>show(i+1),rec.signed?850:120)}
  function ok(){if(lock)return;const it=items[i],sc=score(strokes,it.zone);
   if(!sc.ok){const m=$q('sgm');m.textContent=sc.why=='short'?'Sign a little bigger and longer in the red box, or skip this one.':'Sign inside the red box first, or skip this one.';m.className='sgw';try{snd('err')}catch(e){}return}
-  lock=1;const q=sc.q,l=LINES.find(a=>q>=a[0])[1];$q('sgr').textContent=l;$q('sgr').className=q>=.6?'sgg':'';try{snd('pop')}catch(e){}
+  lock=1;let q=sc.q,l=LINES.find(a=>q>=a[0])[1];
+  /* v55.21: when you have a saved signature (235-my-signature.js), the fan's comment is about how well this one matches it */
+  try{if(window.SIGNME&&S.sig&&!it.noGhost){const m=SIGNME.sim(strokes.map(a=>a.slice()),it.kind,it.zone);q=m;l=SIMLINES.find(a=>m>=a[0])[1]}}catch(e){}$q('sgr').textContent=l;$q('sgr').className=q>=.6?'sgg':'';try{snd('pop')}catch(e){}
   next({kind:it.kind,who:it.who,signed:1,q,strokes:strokes.map(s=>s.map(p=>[+p[0].toFixed(3),+p[1].toFixed(3)]))})}
  function skip(){if(lock)return;next({kind:items[i].kind,who:items[i].who,signed:0,q:0,strokes:[]})}
  const pos=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]};

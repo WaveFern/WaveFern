@@ -17,8 +17,8 @@
      let ok=1,msg='';
      try{
       if(!(typeof S=='object'&&S&&S.cheat)){
-       const stop=(typeof wtPlan=='function'?wtPlan():[]).some(s=>s&&s.d===id);
-       if(!stop){ok=0;msg=v+': no show scheduled today. The stadium only opens on a day you are booked to play.'}
+       const dn=(S.wtour&&S.wtour.done)||{},nx=(typeof wtPlan=='function'?wtPlan():[]).find(s=>s&&!dn[s.d+'|venue']);
+       if(!nx||nx.d!==id){ok=0;msg=v+(nx?': not your next tour stop. The stadium only opens for the next city on your world tour.':': no show scheduled. Plan a world tour in the World Tour app first.')}
        else if(typeof wtCanPlay=='function'){const c=wtCanPlay(id,'venue');if(!c.ok){ok=0;msg=v+': no show for you today. '+c.why}}
       }
      }catch(e){ok=1}
