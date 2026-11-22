@@ -44,9 +44,9 @@
  };
  const R0=.62;
  dynB=function(x0,z0,x,z){
-  if(IN||HIN)return false;
-  const ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
-  if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;
+  const ind=IN||HIN,ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
+  if(NPC.some(n=>n.m.visible&&(!ind||n.ext)&&ppl(n))||VPED.some(n=>n.m.visible&&(!ind||n.ext)&&ppl(n))||(!ind&&ART_M.some(o=>ppl(o))))return true;
+  if(ind)return false;
   return TRAF.some(c=>{if(!near(c,x,z))return false;const n=pen(c,x,z,.35);return n>.01&&n>pen(c,x0,z0,.35)+.004});
  };
  /* depenetration: a bot car that turns or creeps into your car pushes you out smoothly (no stick-slip "humping"),

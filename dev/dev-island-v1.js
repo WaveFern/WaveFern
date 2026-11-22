@@ -91,12 +91,12 @@
  safe(()=>{
   const M=WT_MAP,mlat=l=>1.25*Math.log(Math.tan(Math.PI/4+.4*l*Math.PI/180)),Y0=mlat(M.lat0),Y1=mlat(M.lat1);
   const proj=(lat,lon)=>[(lon+180)/360*M.W,(Y0-mlat(Math.max(M.lat1-10,Math.min(M.lat0,lat))))/(Y0-Y1)*M.H];
-  const LAT=29.5,LON=-52,c=proj(LAT,LON),sc=12/1500,cx0=60,cz0=0;
+  const LAT=29.5,LON=-52,c=proj(LAT,LON),sc=5/1500,cx0=60,cz0=0;
   const base=strided(L,9).map(p=>[c[0]+(p[0]-cx0)*sc,c[1]+(p[1]-cz0)*sc*1.25]);
   /* at world map size the coast needs bigger bays and bumps than the real one to read as an island */
-  const pts=base.map((p,i)=>{const a=base[(i+1)%base.length],b=base[(i+base.length-1)%base.length],tx=a[0]-b[0],tz=a[1]-b[1],n=Math.hypot(tx,tz)||1,w=(Math.sin(i*1.3)*.3+Math.sin(i*.47+1)*.45+Math.sin(i*3.1)*.12)*(ccw?1:-1);return[p[0]+tz/n*w,p[1]-tx/n*w]});
+  const pts=base.map((p,i)=>{const a=base[(i+1)%base.length],b=base[(i+base.length-1)%base.length],tx=a[0]-b[0],tz=a[1]-b[1],n=Math.hypot(tx,tz)||1,w=(Math.sin(i*1.3)*.3+Math.sin(i*.47+1)*.45+Math.sin(i*3.1)*.12)*(ccw?1:-1)*.42;return[p[0]+tz/n*w,p[1]-tx/n*w]});
   /* and a small islet off the north east coast */
-  const ix=c[0]+5.2,iy=c[1]-2.6,islet=[0,1,2,3,4,5,6,7].map(k=>[ix+Math.cos(k*.785)*(.55+.12*Math.sin(k*2.3)),iy+Math.sin(k*.785)*(.38+.08*Math.cos(k*1.7))]);
+  const ix=c[0]+2.2,iy=c[1]-1.1,islet=[0,1,2,3,4,5,6,7].map(k=>[ix+Math.cos(k*.785)*(.23+.05*Math.sin(k*2.3)),iy+Math.sin(k*.785)*(.16+.034*Math.cos(k*1.7))]);
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.concat(islet).forEach(p=>{x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1])});
   const sub=P=>'M'+P.map(p=>p[0].toFixed(2)+' '+p[1].toFixed(2)).join('L')+'Z';const d=sub(pts)+sub(islet);
   /* a continent key the tour map does not know, so only the flight and booking maps draw it (the tour map lists continents by key) */

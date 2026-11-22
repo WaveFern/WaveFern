@@ -1,19 +1,25 @@
 /* ---------- save / load ---------- */
 /* save codes: FW3- = current (see below); FW2- = LZW-packed JSON with ASCII-escaped text and base-46 digits (same data, roughly 40-70% shorter); FW1- = old base64 JSON, still loads */
-const SC_A=Array.from({length:94},(_,i)=>String.fromCharCode(33+i)).filter(c=>c!='"'&&c!='\\');
-function scPack(s,A=SC_A,B=46){s=s.replace(/[\u0080-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));/* v50.7.0: same codes as before, found with number keys (phrase code*128+char) instead of building strings: about 5x faster */const D=new Map(),o=[];let w=-1,nx=128;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);if(w<0){w=c;continue}const k=w*128+c,h=D.get(k);if(h!==undefined){w=h;continue}o.push(w);D.set(k,nx++);w=c}if(w>=0)o.push(w);return o.map(n=>{let t='';do{const d=n%B;n=Math.floor(n/B);t=A[(t?B:0)+d]+t}while(n);return t}).join('')}
 function scUnpack(t,A=SC_A,B=46){const C=[];let n=0;for(const ch of t){const v=A.indexOf(ch);if(v<0)throw new Error('bad character in save code: '+ch);n=n*B+v%B;if(v<B){C.push(n);n=0}}const T=[];let out='',p=null;for(const k of C){const cur=k<128?String.fromCharCode(k):k-128<T.length?T[k-128]:p+p[0];out+=cur;if(p!==null)T.push(p+cur[0]);p=cur}return out}
 /* v26.145.2: FW3- = same packing with a 76-character alphabet (base 38) that leaves out the characters chat apps eat or change
    (Discord/WhatsApp markdown * _ ~ ` |, smart quotes/dashes/emoji ' - . < > & : @ #), so a code sent through a chat survives.
    scClean also undoes harmless copy damage: line breaks and spaces, smart quotes and dashes. */
-const SC_C=SC_A.filter(c=>!"*_~`|'-.<>&:@#".includes(c)).slice(0,76);
 function scClean(c){return String(c||'').replace(/[\s\u200b-\u200d\ufeff]+/g,'').replace(/[\u2018\u2019\u2032]/g,"'").replace(/\u2014/g,'--').replace(/\u2013/g,'-').replace(/\u2026/g,'...')}
 /* v49.70.0: FW4- = sealed (encrypted and authenticated, see 12-save-seal.js). Opening one throws if it was edited or damaged. The last few opened codes are kept so reading the same slot again is free. */
 const SCC=new Map();
 function scOpen(c){let t=SCC.get(c);if(t===undefined){t=unseal(c);SCC.set(c,t);if(SCC.size>6)SCC.delete(SCC.keys().next().value)}return t}
 function scDecode(c){c=scClean(c);const h=c.slice(0,4).toUpperCase();if(h=='FW4-')return JSON.parse(scUnpack(scOpen(c),SC_C,38));if(h=='FW3-')return JSON.parse(scUnpack(c.slice(4),SC_C,38));if(h=='FW2-')return JSON.parse(scUnpack(c.slice(4)));return JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))))}
 /* x:1 marks a career whose numbers were impossible when it was saved (edited in the console); loading it repairs them. The admin account is exempt. */
-function saveCode(){const o={S,ch,PL:PL.map(q=>({t:q.t,x:q.x,z:q.z,r:q.r})),VOL,FX};try{if(!(typeof isAdmin=='function'&&isAdmin())&&scCheck(S).length)o.x=1}catch(e){}return seal(scPack(JSON.stringify(o),SC_C,38))}
+function saveCode(){const o={S,ch,PL:PL.map(q=>({t:q.t,x:q.x,z:q.z,r:q.r})),VOL,FX};try{if(!(typeof isAdmin=='function'&&isAdmin())&&scCheck(S).length)o.x=1}catch(e){}const j=JSON.stringify(o);if(SCJ){SCJ=j;return''}if(j===SCM.j)return SCM.c;const c=seal(scPack(j,SC_C,38));SCM={j,c};return c}
+/* v55.31.0: no repack when nothing changed (same JSON gives the same code), and saveCodeAsync() packs + seals in 12-save-worker.js so autosave, pause and cloud sync no longer freeze the game for ~100-250 ms on a big save.
+   saveJson() runs saveCode() (and every wrapper later files put around it) in capture mode to get the JSON; saveCode() itself stays synchronous for the callers that need the code on the spot. */
+let SCJ=0,SCM={j:'',c:''},SW=null,SWID=0;const SWP=new Map();
+function saveJson(){SCJ=1;try{saveCode()}finally{const j=SCJ;SCJ=0;saveJson.r=typeof j=='string'?j:null}return saveJson.r}
+function saveWorker(){if(SW!==null)return SW;try{SW=new Worker('12-save-worker.js?v='+(typeof GAME_VERSION!='undefined'?GAME_VERSION:''));
+ SW.onmessage=e=>{const m=e.data,p=SWP.get(m.id);if(!p)return;SWP.delete(m.id);clearTimeout(p.t);m.err?p.rej(new Error(m.err)):p.res(m.code)};
+ SW.onerror=()=>{SW=false;SWP.forEach(p=>{clearTimeout(p.t);p.rej(new Error('save worker'))});SWP.clear()}}catch(e){SW=false}return SW}
+function saveCodeAsync(){const j=saveJson();if(j===null)return Promise.resolve(saveCode());if(j===SCM.j)return Promise.resolve(SCM.c);const w=saveWorker();if(!w)return Promise.resolve(saveCode());
+ return new Promise((res,rej)=>{const id=++SWID,t=setTimeout(()=>{SWP.delete(id);rej(new Error('save worker timeout'))},8000);SWP.set(id,{res,rej,t});w.postMessage({id,json:j})}).then(c=>{SCM={j,c};return c},()=>saveCode())}
 /* fresh-new-game defaults, snapshotted at boot (27-boot.js) before any save is applied */
 let S0=null;function snapS(){S0=JSON.stringify(S)}
 function resetState(){if(!S0)return;Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,JSON.parse(S0));rec=null;dr=null;hold=null}
@@ -29,7 +35,7 @@ const FW_ACCT=(()=>{try{return localStorage.getItem('fw_acct')||''}catch(e){retu
 const SAVE_PRE=FW_ACCT?'fw_u_'+FW_ACCT+'_':'fw_',SLOT_K=SAVE_PRE+'slot';
 const SLOTS=2;
 function curSlot(){try{const n=+localStorage.getItem(SLOT_K);return n==2?2:1}catch(e){return 1}}
-const BOOT_SLOT=curSlot();
+let BOOT_SLOT=curSlot();
 /* v26.139.2: a tab saves only to the slot it booted into, so a second tab on the other career can't overwrite it */
 function slotKey(n){return SAVE_PRE+'save_'+(n||BOOT_SLOT)}
 /* recovered backups are shared by every account on this device (fw_bak_1..12, label in fw_bakw_N), so a backup is never pushed out by another one */
@@ -62,11 +68,16 @@ let lastWrote=null;
 /* v26.145.2: the same career at the same or an earlier day (e.g. the first re-save in a new code format) is not backed up, so it can't push out a real backup */
 function sameCareer(old){try{const o=scDecode(old).S;return o.artist==S.artist&&(o.day||0)<=(S.day||0)}catch(e){return false}}
 /* before overwriting a slot with something this tab did not write, keep the old code as fw_bak_N (recoverable from the career select) */
-function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;try{const k=slotKey(),c=saveCode(),old=localStorage.getItem(k);if(old&&old!==lastWrote&&old!==c&&!sameCareer(old)){bakKeep(old,'Backup from career '+BOOT_SLOT)}localStorage.setItem(k,c);lastWrote=c}catch(e){}}
+function saveWrite(k,c){const old=localStorage.getItem(k);if(old&&old!==lastWrote&&old!==c&&!sameCareer(old)){bakKeep(old,'Backup from career '+BOOT_SLOT)}localStorage.setItem(k,c);lastWrote=c}
+function autoSave(){if(wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;asSeq++;try{saveWrite(slotKey(),saveCode())}catch(e){}}
+/* v55.31.0: the timer save packs in the worker; a save made on the spot meanwhile (or a slot switch) wins and the late result is dropped */
+let asBusy=0,asSeq=0;
+function autoSaveBg(){if(asBusy||wiping||mode=='creator'||mode=='load'||(typeof TT!='undefined'&&TT.on&&!TT.game))return;asBusy=1;const k=slotKey(),sq=asSeq;
+ saveCodeAsync().then(c=>{if(sq!==asSeq||wiping||k!==slotKey())return;saveWrite(k,c)}).catch(()=>{}).finally(()=>{asBusy=0})}
 function restoreSave(){let c=null;try{c=localStorage.getItem(slotKey())}catch(e){}if(!c)return false;loadCode(c);if(mode=='play')return true;bakKeep(c,'Career '+BOOT_SLOT+' that did not load');return false}
 /* v26.140: packing a big save takes ~100ms+, so the timer saves every 30s when the browser is idle (and waits out driving/recording/camera) instead of every 5s */
 let asLast=0;
-function autoSaveTick(){const n=Date.now();if(n-asLast<30000)return;if((mode=='drive'||mode=='rec'||(typeof PH!='undefined'&&PH.camOn))&&n-asLast<120000)return;asLast=n;autoSave()}
+function autoSaveTick(){const n=Date.now();if(n-asLast<30000)return;if((mode=='drive'||mode=='rec'||(typeof PH!='undefined'&&PH.camOn))&&n-asLast<120000)return;asLast=n;autoSaveBg()}
 setInterval(()=>{if(typeof requestIdleCallback=='function')requestIdleCallback(autoSaveTick,{timeout:3000});else autoSaveTick()},5000);
 addEventListener('pagehide',autoSave);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave()});

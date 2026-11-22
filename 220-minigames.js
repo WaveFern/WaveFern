@@ -33,7 +33,7 @@ const NG={
 /* ---- the run ---- */
 function planStrip(){const q=rec.q;return q.p.map((k,i)=>i==q.i?'<b>'+(i+1)+'. '+NM[k]+'</b>':(i+1)+'. '+NM[k]).join(' → ')}
 function startItem(){const q=rec.q,k=q.p[q.i];q.cur=k;q.g=null;rec.cdn=0;rec.cgo=0;
- if(k=='beat'){rec.st=0;rec.hits=0;rec.miss=0;rec.cd=0;rec.pos=0;rec.wait=0;rec.cdn=3;document.body.classList.remove('mgon');MGK=''}
+ if(k=='beat'){rec.st=0;rec.hits=0;rec.miss=0;rec.pf=0;rec.cd=0;rec.pos=0;rec.wait=0;rec.cdn=3;document.body.classList.remove('mgon');MGK=''}
  else if(k=='lyrics'){q.go=1;try{m0(1)}finally{q.go=0}}
  else if(k=='mix'){q.go=1;try{m0(2)}finally{q.go=0}}
  else{rec.st=9;rec.wait=1;rec.wt=0;MG_N[9]=NM[k];q.g={t:0,over:0};NG[k].init&&NG[k].init(q.g);document.body.classList.add('mgon');MGK=''}}
@@ -41,7 +41,7 @@ function next(){const q=rec.q;q.i++;if(q.i>=q.p.length)return finishSong();start
 function done(s){const q=rec.q;q.res.push(cl(s));next()}
 function finishSong(){const q=rec.q;run(q.p.map(k=>NM[k]),q.res.slice())}
 let m0=null;
-{m0=mgStage;mgStage=function(n){const q=rec&&rec.q;if(q&&!q.go){const c=q.cur;if((c=='beat'&&n==1)||(c=='lyrics'&&n==2)||(c=='mix'&&n==3)){if(c=='beat')return done(1-(rec.miss||0)/6);return done(c=='lyrics'?(rec.sc.l||0):(rec.sc.x||0))}}return m0.apply(this,arguments)}}
+{m0=mgStage;mgStage=function(n){const q=rec&&rec.q;if(q&&!q.go){const c=q.cur;if((c=='beat'&&n==1)||(c=='lyrics'&&n==2)||(c=='mix'&&n==3)){if(c=='beat'){const g=rec.goal||6;return done((rec.pf||0)>=g&&!(rec.miss>0)?1:Math.min(.98,1-(rec.miss||0)/6))}/* a true 100% needs all 6 hits PERFECT (the middle of the zone) and no miss */return done(c=='lyrics'?(rec.sc.l||0):(rec.sc.x||0))}}return m0.apply(this,arguments)}}
 /* new activities: tick, input, drawing */
 function nmTick(dt){const q=rec.q,k=q.cur,g=q.g;if(!g)return;if(rec.wait){rec.wt+=dt;return}if(rec.cdn>0){rec.cdn-=dt;if(rec.cdn<=0){rec.cdn=0;rec.cgo=.5}return}if(rec.cgo>0)rec.cgo-=dt;
  if(g.lt>0)g.lt-=dt;NG[k].tick(g,dt);if(k=='echo'&&g.ph=='in'&&g.lit>=0&&!(g.lt>0))g.lit=-1;if(g.over)done(NG[k].score(g))}
@@ -60,16 +60,16 @@ function run(names,res){const avg=res.reduce((a,b)=>a+b,0)/res.length,bonus=Math
  rec.sc={l:avg,x:avg};rec.miss=Math.round((1-avg)*8);rec.cdn=0;
  document.body.classList.remove('mgon');const o=$('mg');if(o)o.remove();
  mgFinish();
- try{const d=S.drafts[S.drafts.length-1];if(d&&d.id===n0){d.q+=bonus;const box=document.querySelector('#ui .box.modal');if(box){const cs=box.querySelector('.cards');if(cs){cs.innerHTML=names.map((m,i)=>`<div class=card>${m}<b>${Math.round(res[i]*100)}%</b></div>`).join('')}
-  box.classList.add('nmw');if(avg>=.9&&res.every(v=>v>=.75))box.classList.add('fxperfect');
+ try{const d=S.drafts[S.drafts.length-1];if(d&&d.id===n0){d.q+=bonus;const box=document.querySelector('#ui .box.modal');if(box){const cs=box.querySelector('.cards');if(cs){cs.innerHTML=names.map((m,i)=>`<div class=card>${m}<b>${res[i]>=.999?100:Math.min(99,Math.round(res[i]*100))}%</b></div>`).join('')}
+  box.classList.add('nmr');/* v55.21: gold Perfect only when every game is a true 100% */const pf=res.every(v=>v>=.999);box.classList.toggle('fxperfect',pf);if(!pf){const bn=box.querySelector('.fxpbanner');if(bn)bn.remove()}
   const fq=document.getElementById('fxq');if(fq){const nf=fq.cloneNode();nf.textContent=d.q;fq.replaceWith(nf)}else{const p=box.querySelector('p.m');if(p)p.innerHTML=p.innerHTML.replace(/mix quality \d+/,'mix quality '+d.q)}}}}catch(e){console.error('nmg result',e)}}
 {const t0=recTick;recTick=function(dt){if(rec&&rec.nm===undefined){rec.nm=0;if(rec.st===0&&!rec.band&&!rec.ig&&typeof GT!='undefined'&&mode=='rec'){try{const p=plan();rec.q={p,i:0,res:[],cur:p[0],g:null};if(p[0]!='beat')startItem();else rec.q.cur='beat'}catch(e){console.error('nmg',e);rec.q=null}}}
  if(rec&&rec.q&&rec.st==9){nmTick(dt);return}
  if(rec&&rec.q&&rec.st===0&&!rec.wait&&!(rec.cdn>0))dt*=beatVar(dt);return t0.apply(this,arguments)}}
 /* Beat variation: every take picks a different speed pattern, starts from a random spot, and the green zone changes width after each hit */
-function beatVar(dt){const r=rec;if(r.bm===undefined){r.bm=ri(0,3);r.bph=Math.random()*6;r.zb=r.zw||.08;r.lh=r.hits||0;r.bs=1;r.pos=Math.random();r.dir=Math.random()<.5?-1:1;r.bk=0}
- r.bt=(r.bt||0)+dt;if(r.hits>r.lh){r.lh=r.hits;r.zw=r.zb*(.75+Math.random()*.55);if(r.bm==3)r.bs=.75+Math.random()*.75}
- if(r.bm==0){if(r.pos>=1||r.pos<=0){if(!r.bk){r.bk=1;r.bs=.8+Math.random()*.55}}else r.bk=0;return r.bs}
+function beatVar(dt){const r=rec;if(r.bm===undefined){r.bm=ri(0,3);r.bph=Math.random()*6;r.zb=r.zw||.08;r.lh=r.hits||0;r.bsp=1;r.pos=Math.random();r.dir=Math.random()<.5?-1:1;r.bk=0}
+ r.bt=(r.bt||0)+dt;if(r.hits>r.lh){r.lh=r.hits;r.zw=r.zb*(.75+Math.random()*.55);if(r.bm==3)r.bsp=.75+Math.random()*.75}
+ if(r.bm==0){if(r.pos>=1||r.pos<=0){if(!r.bk){r.bk=1;r.bsp=.8+Math.random()*.55}}else r.bk=0;return r.bsp}
  if(r.bm==1)return 1+.45*Math.sin(r.bt*2.2+r.bph);
  if(r.bm==2){const c=Math.floor(r.bt/.9+r.bph);return (c%2?1.55:.6)}
  return r.bs}
@@ -77,6 +77,6 @@ function beatVar(dt){const r=rec;if(r.bm===undefined){r.bm=ri(0,3);r.bph=Math.ra
 {const d0=mgDraw;mgDraw=function(){const o=$('mg');if(o&&o.offsetHeight>120)LASTH=o.offsetHeight;if(rec&&rec.q){if(rec.st==9){nmDraw();return}d0.apply(this,arguments);const s=document.querySelector('#mg .mgs');if(s)s.innerHTML=planStrip();return}return d0.apply(this,arguments)}}
 addEventListener('keydown',e=>{if(!rec||!rec.q||rec.st!=9||rec.wait||(e.repeat&&rec.q.cur!='hype')||/INPUT|TEXTAREA/.test(e.target.tagName))return;const n=parseInt(e.key);if(n>=1&&n<=4&&rec.q.cur=='echo')nmIn(n-1);if((e.key==' '||e.key=='Enter'||e.key.toLowerCase()=='e')&&rec.q.cur=='hype')nmIn(0)});
 {const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{const u=$('ui');if(u)u.innerHTML=u.innerHTML.replace(/Three steps:[^<]*?Costs 15 energy\./,GT.need()+' quick minigame'+(GT.need()>1?'s':'')+'. Costs 15 energy.')}catch(e){}return r}}
-{const st=document.createElement('style');st.textContent='#ui>.box.modal.fxperfect{position:absolute}#ui>.box.modal.nmw{width:min(380px,92vw);box-sizing:border-box}';document.head.appendChild(st)}
+{const st=document.createElement('style');st.textContent='#ui>.box.modal.fxperfect{position:absolute}#ui>.box.modal.nmr{width:min(380px,92vw);box-sizing:border-box}';document.head.appendChild(st)}
 window.NMG={games:NG,order:ORDER,names:NM};
 })();

@@ -32,13 +32,13 @@ const PH=3;
 /* ---------- the three courses: [par, metres] per hole; lanes run east-west and alternate direction ---------- */
 const CRS=[
  {n:'Meadow Links',sub:'Easy. Wide fairways, gentle hills, one pond.',x0:-210,x1:-40,z0:-224,lane:27,amp:1,fq:1,hw:8.5,wind:2.5,nb:1,ngb:1,wt:[1],carry:[],
-  col:{rough:'#3d8a36',fw:'#6dc24b',fr:'#58b84c',gr:'#4fdc5c',tee:'#7ad257',sand:'#efe0a8',leaf:['#2f7a34','#3a8c3c','#47a047'],flag:'#ff4d4d'},
+  col:{rough:'#4a8e44',fw:'#5f9c48',fr:'#559244',gr:'#6eaa53',tee:'#65a04d',sand:'#e2cf98',leaf:['#2f7a34','#3a8c3c','#47a047'],flag:'#ff4d4d'},
   H:[[3,95,-3],[4,135,6],[3,105,2],[4,145,-6],[3,110,4],[4,150,-4]]},
  {n:'Dune Run',sub:'Windy. Sand everywhere, rolling dunes.',x0:-405,x1:-225,z0:-190,lane:21,amp:1.5,fq:1.35,hw:7,wind:5.5,nb:3,ngb:2,wt:[3],carry:[],
-  col:{rough:'#9b9658',fw:'#8fbf4a',fr:'#7db548',gr:'#4fd35a',tee:'#8fc850',sand:'#f3e4ac',leaf:['#6d8f3a','#7b9c44','#58803a'],flag:'#ffd23f'},
+  col:{rough:'#8c9a58',fw:'#6b9c44',fr:'#629441',gr:'#71aa4f',tee:'#72a34b',sand:'#e8d6a0',leaf:['#6d8f3a','#7b9c44','#58803a'],flag:'#ffd23f'},
   H:[[3,115,3],[4,150,-5],[3,100,-1],[4,155,5],[3,125,-2],[4,150,4]]},
  {n:'Highland Fling',sub:'Hard. Big hills, narrow fairways, ponds.',x0:-625,x1:-415,z0:-172,lane:25,amp:2,fq:.9,hw:6.8,wind:3.5,nb:2,ngb:1,wt:[2,4],carry:[0,3],
-  col:{rough:'#3b6a3a',fw:'#5aa944',fr:'#4a9c44',gr:'#46cf58',tee:'#6bbd4c',sand:'#e8d9a0',leaf:['#27573a','#2f6a40','#3b7a46'],flag:'#b06bff'},
+  col:{rough:'#40793f',fw:'#568f41',fr:'#4d893e',gr:'#64a24d',tee:'#5c9846',sand:'#dbc890',leaf:['#27573a','#2f6a40','#3b7a46'],flag:'#b06bff'},
   H:[[3,120,-2],[4,160,7],[4,185,-4],[3,100,3],[4,175,6],[3,130,-5]]}];
 const pa=(o,u)=>u<.5?[lerp(o.path[0][0],o.path[1][0],u*2),lerp(o.path[0][1],o.path[1][1],u*2)]:[lerp(o.path[1][0],o.path[2][0],u*2-1),lerp(o.path[1][1],o.path[2][1],u*2-1)];
 function sd(px,pz,ax,az,bx,bz){const dx=bx-ax,dz=bz-az,l=dx*dx+dz*dz,t=l?clamp(((px-ax)*dx+(pz-az)*dz)/l,0,1):0;return Math.hypot(px-ax-dx*t,pz-az-dz*t)}
@@ -149,28 +149,78 @@ function cartMesh(color){const b=Batch();
  b.box(0,2.02,-.2,1.45,.07,2.0,'#f4f4f0');b.box(0,.95,-1.35,.5,.9,.3,'#3a3a40');b.box(0,1.45,-1.35,.4,.18,.22,'#ff6f61');/* roof, clubs on the back */
  return b.mesh()}
 /* ground and trees of one course */
-function buildCourse(ci){if(built[ci])return;built[ci]=1;const C=CRS[ci],g=new THREE.Group();g.name='golf'+ci;root.add(g);groups[ci]=g;
- const cs=2,x0=C.x0-4,z0=C.bz0,nx=Math.ceil((C.x1+4-x0)/cs),nz=Math.ceil((C.bz1-z0)/cs),hh=[];
- for(let j=0;j<=nz;j++){const row=new Float32Array(nx+1);for(let i=0;i<=nx;i++)row[i]=H(ci,x0+i*cs,z0+j*cs);hh.push(row)}
- const nrm={},nm=(i,j)=>{const k=i+'_'+j;if(nrm[k])return nrm[k];const gx=(hh[j][Math.min(nx,i+1)]-hh[j][Math.max(0,i-1)])/(cs*(Math.min(nx,i+1)-Math.max(0,i-1))),gz=(hh[Math.min(nz,j+1)][i]-hh[Math.max(0,j-1)][i])/(cs*(Math.min(nz,j+1)-Math.max(0,j-1))),l=Math.hypot(gx,1,gz);return nrm[k]=[-gx/l,1/l,-gz/l]},nor=[];
- const cc=C.col,cl=[cc.rough,cc.fw,cc.fr,cc.gr,cc.tee,cc.sand,'#3b94dc'].map(h=>colr(h)),pos=[],col=[];
- for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=x0+i*cs,z=z0+j*cs,sf=surf(ci,x+1,z+1);if(sf==7)continue;
-  const fc=sf==0&&C.holes.some(o=>Math.abs(z-o.zc)<30&&pdist(o,x+1,z+1)<o.hw+3.2),k=(Math.floor((x+1)/8)&1)?1.03:.985,nz2=1+(((i*7+j*13)%5)-2)*.004,c=cl[sf],fm=fc?.5:0,cr=lerp(c.r,cl[1].r,fm)*k*nz2,cg=lerp(c.g,cl[1].g,fm)*k*nz2,cb=lerp(c.b,cl[1].b,fm)*k*nz2;
-  const a=hh[j][i],b=hh[j][i+1],cx=hh[j+1][i],d=hh[j+1][i+1];
-  pos.push(x,a,z,x,cx,z+cs,x+cs,b,z,x+cs,b,z,x,cx,z+cs,x+cs,d,z+cs);for(let q=0;q<6;q++)col.push(cr,cg,cb);
-  [[i,j],[i,j+1],[i+1,j],[i+1,j],[i,j+1],[i+1,j+1]].forEach(v=>{const n=nm(v[0],v[1]);nor.push(n[0],n[1],n[2])})}
- const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
- const terr=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:2}));terr.frustumCulled=false;g.add(terr);
-/* a beige panel fence all round the course (like a vinyl privacy fence): panels between posts, a rail along the bottom, caps on the posts, stepping with the ground */
- {const fb=Batch(),PW=2.4,FH=2.3,gap=.12,fx0=C.x0-3.6,fx1=C.x1+3.6,fz0=C.bz0+.5,fz1=C.bz1-.5;
-  const seg=(x,z,alongX)=>{const gy=H(ci,x,z),h=FH+.3,w=alongX?PW-gap*2:.14,d=alongX?.14:PW-gap*2;
-   fb.box(x,gy-.3+h/2,z,w,h,d,'#d8cfb4');fb.box(x,gy+.16,z,alongX?w:.17,.32,alongX?.17:d,'#bdb394');fb.box(x,gy+FH-.05,z,alongX?w:.17,.1,alongX?.17:d,'#e6dfc9');
-   if(((x*.7+z*.3)|0)%2==0)fb.box(x,gy+FH*.55,z,alongX?w-.2:.15,FH*.5,alongX?.15:d-.2,'#d1c8ab')};
-  const post=(x,z)=>{const gy=H(ci,x,z);fb.box(x,gy-.3+1.45,z,.26,2.9,.26,'#c4b99b');fb.box(x,gy+2.5,z,.36,.1,.36,'#e9e2cd');fb.box(x,gy+2.58,z,.22,.08,.22,'#d8cfb4')};
-  const nx=Math.ceil((fx1-fx0)/PW),nz=Math.ceil((fz1-fz0)/PW),sx=(fx1-fx0)/nx,sz=(fz1-fz0)/nz;
-  for(let i=0;i<nx;i++){const x=fx0+sx*(i+.5);seg(x,fz0,1);seg(x,fz1,1);post(fx0+sx*i,fz0);post(fx0+sx*i,fz1)}
-  for(let j=0;j<nz;j++){const z=fz0+sz*(j+.5);seg(fx0,z,0);seg(fx1,z,0);post(fx0,fz0+sz*j);post(fx1,fz0+sz*j)}
-  post(fx1,fz1);post(fx0,fz1);g.add(fb.mesh())}
+/* v55.23.0: the course ground looks like the rest of the island. It uses the island grass's own 16 px pixel texture (rows every 4 px,
+   a few specks; here in grey so each cell's colour tints it) on a 1 m grid, so greens, bunkers and fairway edges are crisp.
+   Fairways have mown bands, greens a fine mown check, tees light stripes, bunkers a darker lip, ponds a pale shore and a deep middle,
+   the cart paths from the map are on the ground, and the rough fades into the club grounds (EST) at the edge. A trimmed hedge
+   replaces the old beige panel fence. */
+const DTEX=(()=>{const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d');x.fillStyle='#ffffff';x.fillRect(0,0,16,16);x.fillStyle='#dfdfdf';
+ for(let i=0;i<16;i+=4)x.fillRect(0,i,16,1);let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<12;i++)x.fillRect((r()*16)|0,(r()*16)|0,2,1);x.fillStyle='#ffffff';x.fillRect(14,2,2,1);/* a clean texel for smooth cells (greens, tees, water) */
+ const t=new THREE.CanvasTexture(c);t.magFilter=t.minFilter=THREE.NearestFilter;t.wrapS=t.wrapT=THREE.RepeatWrapping;return t})();
+const EST='#4f9248',WGR='#559a4e',WSH='#8fd6cf',WDP='#2f86b8',PATHC='#cdbf94';/* club grounds, island grass, pond shore and deep, cart path */
+const gmat=()=>new THREE.MeshLambertMaterial({map:DTEX,vertexColors:true,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:2});
+/* cart paths (the same lines the map draws): green to a bend 8 m towards the next hole, then on to the next tee */
+CRS.forEach(C=>{C.cp=[];C.holes.forEach((o,j)=>{const n=C.holes[j+1];if(!n)return;const m=[o.pin[0]+(n.tee[0]-o.pin[0])*.5,o.pin[1]+8*(j%2?-1:1)];C.cp.push([o.pin[0],o.pin[1],m[0],m[1]],[m[0],m[1],n.tee[0],n.tee[1]])})});
+/* a quad mesh: per cell 4 corners with their own colour (flat cells, like pixels), shared heights and normals; a cell colour with a 4th value set is smooth (no grass rows) */
+function quadMesh(nx,nz,vx,vz,vy,vn,cellCol,mat){const pos=[],nor=[],col=[],uv=[],idx=[];let v=0;
+ for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const c=cellCol(i,j);if(!c)continue;
+  for(const[a,b]of[[i,j],[i,j+1],[i+1,j],[i+1,j+1]]){const X=vx(a),Z=vz(b);pos.push(X,vy(a,b),Z);const n=vn(a,b);nor.push(n[0],n[1],n[2]);col.push(c[0],c[1],c[2]);if(c[3])uv.push(.96875,.84375);else uv.push(X/1.5,-Z/1.5)}
+  idx.push(v,v+1,v+2,v+2,v+1,v+3);v+=4}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
+ g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeBoundingSphere();return new THREE.Mesh(g,mat)}
+/* v55.23.0: the club grounds. The three courses and the clubhouse sit on one shared lawn (the strips between the courses and a band
+   round them) that fades into the island grass over its last 8 m, so the club no longer looks like three squares dropped on the field.
+   It lies at y -0.04: above the island and airfield grass, under the roads (cells on a road are left out) and the course ground. */
+const ERECTS=(()=>{const r=CRS.map(C=>[C.x0-4,C.bz0,C.x1+4,C.bz1]),s=CRS.slice().sort((a,b)=>a.x0-b.x0);
+ for(let k=0;k<s.length-1;k++){const A=s[k],B=s[k+1];r.push([A.x1+4,Math.max(A.bz0,B.bz0),B.x0-4,Math.min(A.bz1,B.bz1)])}
+ r.push([CLUB.x-26,CLUB.z-14,CLUB.x+26,CLUB.z+10]);return r})();
+const rDist=(x,z,r)=>Math.hypot(Math.max(r[0]-x,0,x-r[2]),Math.max(r[1]-z,0,z-r[3]));
+function inPolyG(P,x,z){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>z)!=(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+let estBuilt=0;
+function buildEstate(){if(estBuilt)return;estBuilt=1;try{
+ const cs=2,M=10,X0=Math.min(...ERECTS.map(r=>r[0]))-M,X1=Math.max(...ERECTS.map(r=>r[2]))+M,Z0=Math.min(...ERECTS.map(r=>r[1]))-M,Z1=Math.max(...ERECTS.map(r=>r[3]))+M,
+  nx=Math.ceil((X1-X0)/cs),nz=Math.ceil((Z1-Z0)/cs),GP=FI.grass,est=colr(EST),wg=colr(WGR),up=[0,1,0];
+ let rd=[];try{rd=ROADS.filter(q=>q&&q.length>=4&&q.slice(0,4).every(Number.isFinite))}catch(e){}
+ const m=quadMesh(nx,nz,i=>X0+i*cs,j=>Z0+j*cs,()=>-.04,()=>up,(i,j)=>{const x=X0+i*cs+1,z=Z0+j*cs+1;
+  for(let k=0;k<CRS.length;k++){const r=ERECTS[k];if(x>r[0]&&x<r[2]&&z>r[1]&&z<r[3])return null}
+  let d=1e9;for(const r of ERECTS)d=Math.min(d,rDist(x,z,r));if(d>M)return null;
+  if(rd.some(q=>x>Math.min(q[0],q[2])-1.2&&x<Math.max(q[0],q[2])+1.2&&z>Math.min(q[1],q[3])-1.2&&z<Math.max(q[1],q[3])+1.2))return null;
+  if(GP&&!inPolyG(GP,x,z))return null;
+  const t=sm((d-2)/(M-2)),w=1+.04*Math.sin(x*.081+1.3)*Math.cos(z*.067+.4)+(((i*7+j*13)%5)-2)*.006;
+  return[lerp(est.r,wg.r,t)*lerp(w,1,t),lerp(est.g,wg.g,t)*lerp(w,1,t),lerp(est.b,wg.b,t)*lerp(w,1,t)]},new THREE.MeshLambertMaterial({map:DTEX,vertexColors:true}));
+ m.name='golfEstate';root.add(m)}catch(e){console.warn('golf estate',e)}}
+function buildCourse(ci){if(built[ci])return;built[ci]=1;const C=CRS[ci],g=new THREE.Group();g.name='golf'+ci;root.add(g);groups[ci]=g;buildEstate();
+ const cs=1,x0=C.x0-4,z0=C.bz0,nx=Math.ceil((C.x1+4-x0)/cs),nz=Math.ceil((C.bz1-z0)/cs),W=nx+1,hh=new Float32Array(W*(nz+1));
+ for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++)hh[j*W+i]=H(ci,x0+i*cs,z0+j*cs);
+ const hv=(i,j)=>hh[j*W+i],nrm=new Map(),nm=(i,j)=>{const k=j*W+i;let n=nrm.get(k);if(n)return n;const i0=Math.max(0,i-1),i1=Math.min(nx,i+1),j0=Math.max(0,j-1),j1=Math.min(nz,j+1),
+  gx=(hv(i1,j)-hv(i0,j))/(cs*(i1-i0)),gz=(hv(i,j1)-hv(i,j0))/(cs*(j1-j0)),l=Math.hypot(gx,1,gz);n=[-gx/l,1/l,-gz/l];nrm.set(k,n);return n};
+ const cc=C.col,cl=[cc.rough,cc.fw,cc.fr,cc.gr,cc.tee,cc.sand].map(h=>colr(h)),est=colr(EST),pc=colr(PATHC),wsh=colr(WSH),wdp=colr(WDP),foam=colr('#cdeee6'),o3=[0,0,0];
+ const mix=(a,b,t,k)=>{o3[0]=lerp(a.r,b.r,t)*k;o3[1]=lerp(a.g,b.g,t)*k;o3[2]=lerp(a.b,b.b,t)*k;return o3};
+ const cell=(i,j)=>{const x=x0+i*cs+cs/2,z=z0+j*cs+cs/2,sf=surf(ci,x,z);if(sf==7)return null;
+  const near=C.holes.filter(o=>Math.abs(z-o.zc)<44),spk=1+(((i*7+j*13)%5)-2)*.006;
+  if(sf==6){let r=9;for(const o of near)for(const w of o.wt)r=Math.min(r,Math.hypot((x-w[0])/w[2],(z-w[1])/w[3]));return[...(r>.93?mix(foam,foam,0,1):mix(wsh,wdp,sm((.97-r)/.55),1)),1]}
+  if(sf==5){let r=9;for(const o of near)for(const b of o.bk)r=Math.min(r,Math.hypot(x-b[0],z-b[1])/b[2]);return mix(cl[5],cl[5],0,(r>.84?.86:1)*spk)}
+  if(sf==3)return[...mix(cl[3],cl[3],0,((Math.floor(x/1.5)+Math.floor(z/1.5))&1)?1.035:.965),1];
+  if(sf==4)return[...mix(cl[4],cl[4],0,(Math.floor(z)&1)?1.03:.97),1];
+  if(sf==2)return mix(cl[2],cl[2],0,spk);
+  if(sf==1)return mix(cl[1],cl[1],0,(Math.floor(x/5)&1)?1.045:.955);
+  /* rough: a slow wash of lighter and darker grass, a first cut along the fairways, the cart paths, then the club grounds at the edge */
+  const wash=1+.045*Math.sin(x*.093+C.p1)*Math.cos(z*.071+C.p2)+.02*Math.sin(x*.31+z*.27);
+  if(C.cp.some(s=>sd(x,z,s[0],s[1],s[2],s[3])<.9))return mix(pc,pc,0,spk);
+  const fc=near.some(o=>pdist(o,x,z)<o.hw+2.5),e=Math.min(x-(C.x0-4),C.x1+4-x,z-C.bz0,C.bz1-z),t=e<10?1-e/10:0;
+  const r0=fc?mix(cl[0],cl[1],.42,1).slice():[cl[0].r,cl[0].g,cl[0].b];
+  return[lerp(r0[0],est.r,t)*wash*spk,lerp(r0[1],est.g,t)*wash*spk,lerp(r0[2],est.b,t)*wash*spk]};
+ const terr=quadMesh(nx,nz,i=>x0+i*cs,j=>z0+j*cs,hv,nm,(i,j)=>{const c=cell(i,j);return c&&[c[0],c[1],c[2],c[3]]},gmat());terr.frustumCulled=false;g.add(terr);
+/* a trimmed hedge all round the course (was a beige panel fence), stepping with the ground; each 2.4 m block a slightly different green and height */
+ {const fb=Batch(),PW=2.4,fx0=C.x0-3.4,fx1=C.x1+3.4,fz0=C.bz0+.7,fz1=C.bz1-.7,HG=['#2f6b34','#346f37','#2b6431','#38753a'];
+  const shd=(h,k)=>'#'+colr(h).clone().multiplyScalar(k).getHexString();
+  const seg=(x,z,alongX,w)=>{const gy=H(ci,x,z),q=Math.abs(Math.floor(x*3.1+z*1.7)),c=HG[q%4],h=1.2+((q>>2)%3)*.08,L=w||PW;
+   fb.box(x,gy-.3+(h+.3)/2,z,alongX?L+.06:1.1,h+.3,alongX?1.1:L+.06,c);fb.box(x,gy+h+.09,z,alongX?L-.3:.8,.2,alongX?.8:L-.3,shd(c,1.14));
+   fb.box(x,gy+.12,z,alongX?L+.08:1.16,.24,alongX?1.16:L+.08,shd(c,.78))};
+  const nx2=Math.ceil((fx1-fx0)/PW),nz2=Math.ceil((fz1-fz0)/PW),sx=(fx1-fx0)/nx2,sz2=(fz1-fz0)/nz2;
+  for(let i=0;i<nx2;i++){const x=fx0+sx*(i+.5);seg(x,fz0,1,sx);seg(x,fz1,1,sx)}
+  for(let j=0;j<nz2;j++){const z=fz0+sz2*(j+.5);seg(fx0,z,0,sz2);seg(fx1,z,0,sz2)}
+  g.add(fb.mesh())}
  const b=Batch();
  const sh=(h,k)=>'#'+colr(h).clone().multiplyScalar(k).getHexString();
  C.trees.forEach(t=>{const gy=t[2],s=1+t[3]*.55,lf=cc.leaf[Math.floor(t[3]*9)%3],ry=t[3]*6,pine=ci==2&&t[3]>.3,tr=sh('#6b4a2b',.8+t[3]*.4);
@@ -605,6 +655,8 @@ function mapEdge(ci){if(EDGE[ci])return EDGE[ci];const C=CRS[ci],bx0=C.x0-2,bx1=
   const poly=(P,fill,stroke,lw)=>{x.beginPath();P.forEach((p,i)=>i?x.lineTo(sx(p[0]),sz(p[1])):x.moveTo(sx(p[0]),sz(p[1])));x.closePath();if(fill){x.fillStyle=fill;x.fill()}if(stroke){x.strokeStyle=stroke;x.lineWidth=lw;x.stroke()}};
   const lw=Math.max(.8,kx*.5),sh='rgba(0,0,0,.2)',off=Math.max(.6,kx*.7);
   const blob=(P,col,rim)=>{poly(P.map(p=>[p[0]+.9,p[1]+.9]),sh);poly(P,col,rim,lw*.8)};
+  /* v55.23.0: the shared club grounds under the three courses and the clubhouse, like in 3D */
+  {x.fillStyle='rgba(120,180,105,.16)';ERECTS.forEach(r=>{const X=sx(r[0]-3),Z=sz(r[1]-3),w=(r[2]-r[0]+6)*kx,h=(r[3]-r[1]+6)*kx;x.beginPath();x.roundRect?x.roundRect(X,Z,w,h,8*kx):x.rect(X,Z,w,h);x.fill()})}
   CRS.forEach((C,ci)=>{const cc=C.col,bx0=C.x0-2,bx1=C.x1+2,bz0=C.bz0+6,bz1=C.bz1-6,W=(bx1-bx0)*kx,Hh=(bz1-bz0)*kx;
    /* the course: a rounded plot of speckled rough with a soft shadow and a tree line round the edge */
    x.beginPath();x.roundRect?x.roundRect(sx(bx0)+off,sz(bz0)+off,W,Hh,10*kx):x.rect(sx(bx0)+off,sz(bz0)+off,W,Hh);x.fillStyle='rgba(0,0,0,.22)';x.fill();

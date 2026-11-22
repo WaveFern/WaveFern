@@ -99,7 +99,7 @@ const svInfo=x=>{try{const c=localStorage.getItem(SAVE_PRE+'mp_'+x.code+'_'+x.in
 window.mpRooms=()=>{if(needLogin())return;snd('click');TT.sel=1;const L=lsGet(),rows=L.map((x,i)=>{const v=svInfo(x);
   return`<div class=ttsl><div><b>${esc(x.band||'Band')}</b><small>Room ${esc(x.code)} · ${iName(x.inst)} · ${x.host?'you host':'you joined'}${v?' · Day '+v.day:''}</small></div><button class=go onclick="mpRoomGo(${i})">${x.host?'Host':'Join'}</button><button class=ttdel title="Delete this band career" aria-label="Delete band career ${i+1}" onclick="mpRoomDel(${i})">✕</button></div>`});
  for(let i=L.length;i<MPMAX;i++)rows.push(`<div class="ttsl empty"><div><b>Empty slot</b><small>Band career ${i+1}</small></div></div>`);
- $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Your rooms</h2><p class=m style="text-align:center;margin:0">Play as a band of up to ${MAXN} with friends. Keep up to ${MPMAX} band careers.</p>${rows.join('')}${L.length>=MPMAX?`<p class=m style="margin:0"><small>You have ${MPMAX} band careers. Delete one to create or join a new room.</small></p>`:''}
+ $('ui').innerHTML=`<div id=ttl><div class=ttw><h2>Your rooms</h2><p class=m style="text-align:center;margin:0">Up to ${MAXN} players per band. Keep up to ${MPMAX} band careers.</p>${rows.join('')}${L.length>=MPMAX?`<p class=m style="margin:0"><small>You have ${MPMAX} band careers. Delete one to create or join a new room.</small></p>`:''}
   <div class=row2><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpCreateUI()">Create a room</button><button class=go ${L.length>=MPMAX?'disabled':''} onclick="mpJoinUI()">Join a room</button></div><button onclick="frOpen()">Friends<span class=frbadge></span></button><button onclick="ttBack()">Back</button></div></div>`;frDraw()};
 window.mpRoomGo=i=>{const x=lsGet()[i];if(!x)return;if(x.host)return mpHostAgain(x.code,x.inst);mpJoinUI();$('mpcd').value=x.code;mpFind()};
 window.mpRoomDel=i=>{const x=lsGet()[i];if(!x)return;snd('click');mpAsk('Delete this band career?','Your progress in '+(x.band||'Band')+' (room '+x.code+') is lost for good.','Delete',()=>{
@@ -168,8 +168,10 @@ function hostOpen(){const p=NET.peer=new Peer(pid(MPS.code),peerOpts());
   if(e&&(e.type=='network'||e.type=='server-error'||e.type=='socket-error')&&!NET.pOn){try{p.destroy()}catch(x){}if(!NET.on)say('Could not reach the room service. Trying again…');setTimeout(hostOpen,6000)}})}
 /* v45.7.0: public room list for the admin. The host writes rooms/CODE (using a separate anonymous Firebase login, so Google sign-in is not needed) (band name, player count, heartbeat);
    the admin panel lists fresh entries. Best effort: hosts who are not signed in, or offline, just do not appear. */
-function regAuth(){if(NET.ra)return NET.ra;if(typeof FB_ON=='undefined'||!FB_ON)return Promise.reject('off');const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
- return NET.ra=Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js')]).then(([a,m,f])=>{const app=a.initializeApp(FB_CFG,'rooms');const au=m.getAuth(app);
+function regAuth(){/* v55.30.5: the rooms rules now need a Google account, so the heartbeat uses the signed-in Google user (the anonymous login below is only the old fallback) */
+ if(typeof FBU!='undefined'&&FBU&&!FBU.isAnonymous&&FBD&&FBF)return Promise.resolve({uid:FBU.uid,F:FBF,D:FBD});
+ if(NET.ra)return NET.ra;if(typeof FB_ON=='undefined'||!FB_ON)return Promise.reject('off');const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
+ return NET.ra=Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js'),import(u+'app-check.js').catch(()=>null)]).then(([a,m,f,ac])=>{const app=a.initializeApp(FB_CFG,'rooms');fbAppCheck(ac,app);const au=m.getAuth(app);
   return(au.currentUser?Promise.resolve(au.currentUser):m.signInAnonymously(au).then(r=>r.user)).then(usr=>({uid:usr.uid,F:f,D:f.getFirestore(app)}))}).catch(e=>{NET.ra=null;throw e})}
 function regBeat(){if(NET.regT||!isHost())return;const w=()=>{if(NET.closed||!NET.on)return;
   regAuth().then(r=>r.F.setDoc(r.F.doc(r.D,'rooms',MPS.code),{code:MPS.code,band:String(MPS.band||'Band').slice(0,24),n:Object.keys(MB).length,uid:r.uid,t:Date.now()})).then(()=>{if(NET.regBad){NET.regBad=0;try{say('Room list: registered.')}catch(e){}}console.log('[rooms] registered',MPS.code)},e=>{const c=(e&&e.code)||String(e);console.warn('[rooms] register failed',c,e);if(!NET.regBad){NET.regBad=1;try{say('Admin room list: could not register this room ('+c+').')}catch(x){}}})};
@@ -177,7 +179,7 @@ function regBeat(){if(NET.regT||!isHost())return;const w=()=>{if(NET.closed||!NE
 window.mpAdminJoin=c=>{try{mpJoinUI();$('mpcd').value=c;mpFind()}catch(e){console.error(e)}};
 function hostData(c,d){if(!d||!d.t)return;
  /* v49.70.0: a link id is only letters, digits, - and _ (it ends up in button handlers), and one link can send at most 60 messages a second; the rest are dropped */
- if(!/^[A-Za-z0-9_-]{1,128}$/.test(String(c.peer||''))){try{c.close()}catch(e){}return}
+ if(!idOk(String(c.peer||''))){try{c.close()}catch(e){}return}
  {const rl=NET.rl=NET.rl||{},n=Date.now(),b=rl[c.peer]||(rl[c.peer]={t:n,c:0});if(n-b.t>=1000){b.t=n;b.c=0}if(++b.c>60)return}
  d=cln(d);
  if(NET.kk[c.peer]){try{c.close()}catch(e){}return}
@@ -218,7 +220,7 @@ function bindHost(c){
  c.on('data',d=>{if(!d||!d.t)return;d=cln(d);
   if(d.t=='kick'){kicked();return}
   if(d.t=='no'){NET.closed=1;NET.on=0;noJoin(d.why);return}
-  if(d.t=='wel'){NET.on=1;NET.tries=0;NET.dead=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(d.mem||[]).forEach(m=>{if(m.id!==ME.id)MB[m.id]=Object.assign({},m)});
+  if(d.t=='wel'){NET.on=1;NET.tries=0;NET.dead=0;for(const k in MB)if(k!==ME.id){rmAv(k);delete MB[k]}MB[ME.id]=ME;(Array.isArray(d.mem)?d.mem:[]).forEach(m=>{if(m&&idOk(m.id)&&m.id!==ME.id)MB[m.id]=Object.assign({},m)});
    if(d.band){MPS.band=d.band;try{sessionStorage.setItem(SK,JSON.stringify(MPS))}catch(e){}}if(d.an){S.artist=d.an;NET.an=d.an}clock({day:d.day,tm:d.tm},1);say('Joined '+(MPS.band||'the band')+' in room '+MPS.code+(NET.fb?' through the Firebase relay.':'.'));NET.lastSt='';NET.gk='';NET.cs={};return}
   handle(d,d.id)});
  c.on('close',()=>{if(NET.hc===c){NET.hc=null;lost()}})}
@@ -245,7 +247,10 @@ function rtdb(){if(FBRP)return FBRP;if(typeof FB_ON=='undefined'||!FB_ON)return 
  return FBRP=waitA().then(()=>FBA.authStateReady()).then(()=>import(u+'database.js')).then(R=>{const usr=FBA.currentUser;if(!usr||usr.isAnonymous)throw new Error('Google sign-in needed');
   return FB.r={R,db:R.getDatabase(FBA.app,RTDB_URL),uid:usr.uid}}).catch(e=>{FBRP=null;throw e})}
 /* everything from other players is cleaned before the game uses it: no HTML characters, bounded sizes */
-function cln(v,dp){dp=dp||0;if(typeof v=='string')return v.slice(0,4000).replace(/[<>"]/g,c=>c=='<'?'‹':c=='>'?'›':'”');
+/* v55.30.5: ids that other players send end up as object keys (MB[id], BQ[bl]) and inside onclick='...' text. A value of __proto__ would write into Object.prototype, and a ' would break out of the quotes. */
+const idOk=s=>typeof s=='string'&&/^[A-Za-z0-9_-]{1,128}$/.test(s)&&s!='__proto__'&&s!='constructor'&&s!='prototype';
+const idc=(s,n)=>{s=String(s==null?'':s).replace(/[^A-Za-z0-9_-]/g,'').slice(0,n||128);return s=='__proto__'||s=='constructor'||s=='prototype'?'_':s};
+function cln(v,dp){dp=dp||0;if(typeof v=='string'){if(v=='__proto__'||v=='constructor'||v=='prototype')return'_';return v.slice(0,4000).replace(/[<>"]/g,c=>c=='<'?'‹':c=='>'?'›':'”')}
  if(typeof v=='number')return isFinite(v)?v:0;if(typeof v=='boolean'||v==null)return v;if(dp>8)return null;
  if(Array.isArray(v))return v.slice(0,2000).map(x=>cln(x,dp+1));
  if(typeof v=='object'){const o={};let n=0;for(const k in v){if(++n>300)break;if(k=='__proto__'||k=='constructor'||k=='prototype')continue;o[k]=cln(v[k],dp+1)}return o}return null}
@@ -323,13 +328,15 @@ function guestVC(r,base,uid){const{R,db}=r,up=k=>R.ref(db,base+'/u/'+uid+'/'+k),
  return vc}
 /* messages from members (relayed by the host) */
 function handle(d,id,self){
+  /* v55.30.5: band-song id and member ids are plain id text (they are put inside onclick handlers and used as object keys) */
+  for(const k of['bl','w','to','id'])if(k in d)d[k]=typeof d[k]=='string'?idc(d[k],k=='bl'?60:128):'';
   /* v49.70.0: numbers that other players (or a host) send are bounded before the game uses them, so a modified client can not push crazy values into your career */
   if(!self){const nb=(v,lo,hi,df)=>{v=+v;return isFinite(v)?Math.min(hi,Math.max(lo,v)):df};
    if('q' in d)d.q=nb(d.q,0,150,0);if('sc' in d)d.sc=nb(d.sc,0,1,0);if('n' in d)d.n=Math.floor(nb(d.n,1,MAXN||4,1));if('cnt' in d)d.cnt=Math.floor(nb(d.cnt,1,MAXN||4,1));
    if('day' in d)d.day=Math.floor(nb(d.day,1,1e5,1));if('tm' in d)d.tm=nb(d.tm,0,1e5,0);
    if(typeof d.v=='string')d.v=d.v.slice(0,40);if(typeof d.title=='string')d.title=d.title.slice(0,60);if(typeof d.bl=='string')d.bl=d.bl.slice(0,60);
    if(d.t=='clk'&&!(d.day>=1))return}
- if(d.t=='ros'){if(isHost())return;const ids=new Set(d.mem.map(m=>m.id));for(const k in MB)if(k!==ME.id&&!ids.has(k)){rmAv(k);delete MB[k]}
+ if(d.t=='ros'){if(isHost())return;d.mem=(Array.isArray(d.mem)?d.mem:[]).filter(m=>m&&idOk(m.id));const ids=new Set(d.mem.map(m=>m.id));for(const k in MB)if(k!==ME.id&&!ids.has(k)){rmAv(k);delete MB[k]}
   d.mem.forEach(m=>{if(m.id===ME.id)return;MB[m.id]=Object.assign(MB[m.id]||{},m)});if(d.band)MPS.band=d.band;return}
  if(d.t=='clk'){if(!isHost())clock(d);return}
  if(d.t=='pn'){NET.ping=Math.max(0,Date.now()-(+d.ts||Date.now()));return}
@@ -790,11 +797,11 @@ function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;
   R.onValue(R.ref(db,'.info/connected'),s=>{if(s.val()===true){FR.pk='';FR.pbo=0;FR.od=0;frPresence()}});
   R.onValue(R.ref(db,'f/l/'+uid),s=>{const v=s.val()||{};for(const f in FR.pu)if(!v[f]){try{FR.pu[f]()}catch(e){}delete FR.pu[f];delete FR.P[f]}FR.L=v;
    for(const f in v)if(!FR.pu[f]&&okId(f))FR.pu[f]=R.onValue(R.ref(db,'f/p/'+f),x=>{const o=FR.P[f],n=x.val();FR.P[f]=n;if(o&&!o.o&&n&&n.o&&n.h)say('@'+n.h+' is online.');frDraw()},()=>{});frDraw()},frErr);
-  R.onValue(R.ref(db,'f/q/'+uid),s=>{const v=s.val()||{},nw=Object.keys(v).filter(k=>!FR.Q[k]&&v[k]&&v[k].h);if(FR.qd&&nw.length){snd('ping');say('Friend request from @'+v[nw[0]].h+'. Open Friends to answer.')}FR.qd=1;FR.Q=v;frDraw()},frErr);
+  R.onValue(R.ref(db,'f/q/'+uid),s=>{const v=s.val()||{},nw=Object.keys(v).filter(k=>!FR.Q[k]&&v[k]&&v[k].h);if(FR.qd&&nw.length){const dv=window.fwIsDev&&fwIsDev(nw[0]);snd(dv?'chime':'ping');say(dv?'A WaveFern dev (@'+v[nw[0]].h+') wants to be your friend. Open Friends to answer.':'Friend request from @'+v[nw[0]].h+'. Open Friends to answer.')}FR.qd=1;FR.Q=v;frDraw()},frErr);
   R.onValue(R.ref(db,'f/i/'+uid),s=>{FR.I=s.val()||{};frInvite()},()=>{});
   R.onValue(R.ref(db,'f/b/'+uid),s=>{FR.B=s.val()||{};frDraw()},()=>{});
  }).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);console.warn('[friends] start failed:',e);frErr(e)})}
-function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
+function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:Date.now()-LAST>600000?0:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
  if(k===FR.pk||Date.now()<(FR.pbo||0))return;FR.pk=k;
  /* send the name stamp with a changed name; if the stamp or nm is refused, retry once without nm */
  const nmChanged=o.nm&&o.nm!==FR.snm&&!frNmDenied(),go=(withNm)=>{const v=Object.assign({},o);if(!withNm||frNmDenied())delete v.nm;const u={['f/p/'+uid]:Object.assign({t:R.serverTimestamp()},v)};if(withNm&&nmChanged)u['f/u/'+uid+'/d']=R.serverTimestamp();return R.update(R.ref(db),u).then(()=>{if(withNm)FR.snm=o.nm})};
@@ -847,7 +854,7 @@ function frDraw(force){document.querySelectorAll('.frbadge').forEach(b=>b.textCo
  else if(!FR.h)h+=`<p>Pick a username so your friends can find you. It is the only thing other players see, so keep your real name out of it.</p><div class=ng><input id=frh maxlength=16 placeholder="username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frClaim()"><button class=go onclick="frClaim()">Save</button></div>`;
  else{h+=`<p class=m style="margin:0">Your username <b style="color:var(--g)">@${esc(FR.h)}</b> <button onclick="frCopyH()" style="padding:3px 8px;font-size:12px">Copy</button> <button onclick="fwNameBox()" style="padding:3px 8px;font-size:12px">Change name</button> <button onclick="fwProfileOpen('${esc(FR.h)}')" style="padding:3px 8px;font-size:12px">My profile</button></p>
   <div class=ng><input id=fra maxlength=17 placeholder="Friend's username" autocomplete=off spellcheck=false onkeydown="if(event.key=='Enter')frAdd()"><button class=go onclick="frAdd()">Add friend</button></div>`;
-  const Q=Object.keys(FR.Q).filter(okId);if(Q.length)h+='<h3>Requests</h3>'+Q.map(f=>{const q=FR.Q[f]||{};return`<div class=frr><div><b>@${esc(q.h||'?')}</b><small>${q.nm?'Plays as '+esc(q.nm):'Wants to be friends'}</small></div><button class=go onclick="frAcc('${f}')">Accept</button><button onclick="frDec('${f}')">Decline</button><button onclick="frBlock('${f}')">Block</button></div>`}).join('');
+  const Q=Object.keys(FR.Q).filter(okId);if(Q.length)h+='<h3>Requests</h3>'+Q.map(f=>{const q=FR.Q[f]||{};const dv=window.fwIsDev&&fwIsDev(f);return`<div class="frr${dv?' fhdev':''}"><div><b>@${esc(q.h||'?')}${dv?fwDevTag():''}</b><small>${dv?'A WaveFern dev wants to be your friend':q.nm?'Plays as '+esc(q.nm):'Wants to be friends'}</small></div><button class=go onclick="frAcc('${f}')">Accept</button><button onclick="frDec('${f}')">Decline</button><button onclick="frBlock('${f}')">Block</button></div>`}).join('');
   const L=Object.keys(FR.L).filter(okId).sort((a,b)=>((FR.P[b]||{}).o?1:0)-((FR.P[a]||{}).o?1:0)||frName(a).localeCompare(frName(b)));
   h+=`<h3>Friends${L.length?' ('+L.filter(f=>(FR.P[f]||{}).o).length+' online)':''}</h3>`;
   h+=L.length?L.map(f=>{const p=FR.P[f]||{},on=!!p.o,inMine=MPS&&p.rm===MPS.code,st=!on?'Offline':p.rm?(inMine?'In your band room':'In a band room'):'Online, playing solo';

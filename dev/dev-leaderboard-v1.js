@@ -31,12 +31,13 @@
  /* only a career made after the full progress reset counts, never a trailer career or an old one */
  const eligible=()=>{try{return live()&&!window.fwTainted()&&typeof S=='object'&&S&&!FW_TRL&&typeof RS!='undefined'&&rsOn()&&S.rv>=RS.V&&mode!='creator'&&mode!='load'&&!(typeof TT!='undefined'&&TT.on&&!TT.game)&&!wiping&&!!boardName()}catch(e){return false}};
  const vals=()=>({a:boardName(),day:cl(S.day,1e5),lis:cl(S.listeners,1e12),str:cl(S.streams,1e12),mon:cl(S.money,1e12),fame:cl((()=>{try{return fameLevel()}catch(e){return 0}})(),1000),sg:cl((S.songs||[]).length,1e5),fol:cl(S.followers,1e12)});
- let lastSig='',lastAt=0,noFUntil=0,wbusy=0;
- LB.push=function(force){if(wbusy||!eligible())return Promise.resolve(0);
+ let lastSig='',lastAt=0,noFUntil=0,wbusy=0,wAt=0;
+ /* v55.30.10: a write that never settles (offline, dropped connection) no longer blocks every later write for the whole session; after 30 s the lock is released so the row keeps updating and the player does not sink down the board on stale numbers */
+ LB.push=function(force){if(wbusy&&Date.now()-wAt>30000)wbusy=0;if(wbusy||!eligible())return Promise.resolve(0);
   const v=vals(),sig=JSON.stringify(v)+((S.fdr&&!S.fdh)?1:0)+FBU.uid,n=Date.now();if(!force&&sig==lastSig&&n-lastAt<600000)return Promise.resolve(0);
   /* v49.91.0: the profile is written from the same moment, so the board and the profile never disagree */
   try{if(typeof fwProfileSync=='function')fwProfileSync(1)}catch(e){}
-  const d=Object.assign({},v,{t:n});if(Date.now()>=noFUntil)d.f=(S.fdr&&!S.fdh)?1:0;const uid=FBU.uid;wbusy=1;
+  const d=Object.assign({},v,{t:n});if(Date.now()>=noFUntil)d.f=(S.fdr&&!S.fdh)?1:0;const uid=FBU.uid;wbusy=1;wAt=Date.now();
   const put=x=>FBF.setDoc(FBF.doc(FBD,'leaderboard',uid),x);
   /* v49.95.2: a refused founder flag is not kept off for the whole session: the row is written without it, and the flag is tried again after 10 minutes (so a rules update takes effect without a reload) */
   return put(d).catch(e=>{if(e&&e.code=='permission-denied'&&d.f!==undefined){noFUntil=Date.now()+600000;delete d.f;return put(d)}throw e}).then(()=>{lastSig=sig;lastAt=n;LBS.werr='';return 1},e=>{LBS.werr=(e&&e.code)||'error';console.warn('leaderboard write',LBS.werr);return 0}).finally(()=>{wbusy=0})};
@@ -45,8 +46,8 @@
   const F=FBF,uid=FBU.uid;LBS.st='load';LBS.err='';
   return F.getDocs(F.query(F.collection(FBD,'leaderboard'),F.orderBy(k,'desc'),F.limit(CAP))).then(async sn=>{
    const rows=[];sn.forEach(d=>{const x=d.data();if(x&&typeof x.a=='string'&&!junk(x))rows.push({id:d.id,name:x.a,v:+x[k]||0,me:d.id==uid,fdr:!!x.f})});
-   if(!rows.some(r=>r.me)&&rows.length>=CAP){try{const m=await F.getDoc(F.doc(FBD,'leaderboard',uid));if(m.exists()){const x=m.data();rows.push({id:uid,name:x.a,v:+x[k]||0,me:true,fdr:!!x.f,rk:CAP+'+'})}}catch(e){}}
-   cache[k]={at:Date.now(),rows};LBS.st='ok'},e=>{LBS.st='err';LBS.err=(e&&e.code)||'error';cache[k]={at:Date.now()-TTL+8000,rows:[]};console.warn('leaderboard read',LBS.err)}).then(()=>{if(document.getElementById('lbd')&&CATS[cur].k==k)draw()})};
+   if(!rows.some(r=>r.me)&&sn.size>=CAP){try{const m=await F.getDoc(F.doc(FBD,'leaderboard',uid));if(m.exists()){const x=m.data();rows.push({id:uid,name:x.a,v:+x[k]||0,me:true,fdr:!!x.f,rk:CAP+'+'})}}catch(e){}}
+   cache[k]={at:Date.now(),rows};LBS.st='ok'},e=>{LBS.st='err';LBS.err=(e&&e.code)||'error';cache[k]={at:Date.now()-TTL+8000,rows:c?c.rows:[]};console.warn('leaderboard read',LBS.err)}).then(()=>{if(document.getElementById('lbd')&&CATS[cur].k==k)draw()})};
  /* returns [{name,v,me,fdr}] sorted high to low */
  LB.board=function(k){const c=cache[k];if(!c||Date.now()-c.at>=TTL)LB.load(k);return c?c.rows:[]};
  const emptyMsg=()=>!live()?'Sign in with Google to see the leaderboard and join it.':LBS.st=='err'?(LBS.err=='permission-denied'?'The leaderboard is not switched on yet.':'Could not load the leaderboard. Try again soon.'):LBS.st=='load'||LBS.st=='idle'?'Loading...':!eligible()&&0?'':'No ranked players yet.';
@@ -64,6 +65,7 @@
  document.addEventListener('visibilitychange',()=>{if(document.hidden)LB.push(1)});
  addEventListener('pagehide',()=>LB.push(1));
  let cur=0,back='title',anim=1;
+ const dvm=x=>{try{return window.fwIsDev&&fwIsDev(x.id)?fwDevTag():x.fdr?fm():''}catch(e){return''}};
  const fm=()=>{try{return typeof fdMark=='function'?fdMark(13):''}catch(e){return''}};
  const css='<style>@keyframes lbIn{from{transform:translateX(-12px);opacity:0}to{transform:none;opacity:1}}@keyframes lbPop{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}'+
   '@keyframes lbShine{0%{background-position:-200% 0}100%{background-position:200% 0}}@keyframes lbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes lbFall{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(300px);opacity:0}}'+
@@ -82,7 +84,7 @@
  const adx=x=>isAdm()&&!x.me?` <u onclick="event.stopPropagation();LB.remove('${x.id}')" title="Admin: remove this row" style="color:#ff6b6b;cursor:pointer">[x]</u>`:'';
  LB.remove=id=>{if(!isAdm())return;if(!confirm('Admin: delete this leaderboard row?'))return;FBF.deleteDoc(FBF.doc(FBD,'leaderboard',id)).then(()=>LB.refresh(),e=>{console.warn('leaderboard remove',(e&&e.code)||e);say('Could not remove it ('+((e&&e.code)||'error')+').')})};
  LB.refresh=()=>{for(const k in cache)delete cache[k];if(document.getElementById('lbd'))LB.load(CATS[cur].k)};
- function podCell(x,i,c){const h=[0,18,30][i];return`<div onclick="LB.view('${x.id}')" class="c${i+1}${x.me?' me':''}" style="order:${[1,0,2][i]};padding:${i==0?16:6}px 4px ${h+6}px"><span class=k>#${i+1}</span><span class=nm>${esc(x.name)}${x.fdr?fm():''}${adx(x)}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
+ function podCell(x,i,c){const h=[0,18,30][i];return`<div onclick="LB.view('${x.id}')" class="c${i+1}${x.me?' me':''}" style="order:${[1,0,2][i]};padding:${i==0?16:6}px 4px ${h+6}px"><span class=k>#${i+1}</span><span class=nm>${esc(x.name)}${dvm(x)}${adx(x)}</span><span class=v>${esc(c.fmt(x.v))}</span></div>`}
  function confetti(){const col=['#2fe68a','#1a8a52','#b8ffd9','#e8f3ec','#26302a'];let o='';for(let i=0;i<22;i++)o+=`<i class=cf style="left:${(i*4.7+((i*37)%9))%100}%;background:${col[i%5]};animation-delay:${(i%8)*.27}s"></i>`;return o}
  const tabsH=()=>`<div class=cat><button onclick="LB.tab(cur-1)" aria-label=Previous>&#9664;</button><b>${CATS[cur].t} <small>${cur+1}/${CATS.length}</small></b><button onclick="LB.tab(cur+1)" aria-label=Next>&#9654;</button></div><div class=tabs role=tablist>${CATS.map((x,i)=>`<button role=tab class="${i==cur?'on':''}" onclick="LB.tab(${i})">${x.t}</button>`).join('')}</div>`;
  function draw(){
@@ -96,7 +98,7 @@
   $('ui').innerHTML=css+`<div id=lbd class="box modal${rk==1?' top1':''}" style="width:min(460px,94vw)">${rk<=3?confetti():''}<h2>Leaderboard</h2>
    ${tabsH()}${ban}
    <div class=pod>${[0,1,2].filter(i=>rows[i]).map(i=>podCell(rows[i],i,c)).join('')}</div>
-   <div class=list>${rest.concat(lastRow).map((x,j)=>{const i=j+3;return`<div onclick="LB.view('${x.id}')" class="row${x.me?' me':''}${anim?' a':''}" style="animation-delay:${Math.min(j,12)*.03}s"><b class=r>${x.rk||i+1}</b><span>${esc(x.name)}${x.fdr?fm():''}${x.me?' (you)':''}${adx(x)}</span><b>${esc(c.fmt(x.v))}</b></div>`}).join('')}</div>
+   <div class=list>${rest.concat(lastRow).map((x,j)=>{const i=j+3;return`<div onclick="LB.view('${x.id}')" class="row${x.me?' me':''}${anim?' a':''}" style="animation-delay:${Math.min(j,12)*.03}s"><b class=r>${x.rk||i+1}</b><span>${esc(x.name)}${dvm(x)}${x.me?' (you)':''}${adx(x)}</span><b>${esc(c.fmt(x.v))}</b></div>`}).join('')}</div>
    <p class=m><small>${c.u} · tap a player to view their profile · arrows change tab, Esc goes back</small></p><div class=row2><button class=go onclick="LB.close()">Back</button></div></div>`;
   const ab=document.querySelector('#lbd .tabs .on');if(ab)ab.scrollIntoView({block:'nearest',inline:'center'});const me=document.querySelector('#lbd .row.me');if(me&&mi>=3)me.scrollIntoView({block:'nearest'})}
  LB.view=id=>{try{if(typeof fwProfileOpen=='function')fwProfileOpen('',id)}catch(e){}};
