@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.39.0 (2026-11-22): removed Fern Rush (runner) from the arcade at James's request; menu shows Fern Flap and Fern Quest.
 - v55.37.0 (2026-11-22): day-1 retention: `254-first-session.js` (Next Goal chip, early bed + instant first listeners after the first release, early milestones, Welcome-back summary, funnel `FW_FUNNEL`), Big Vee five numbered steps, streak pays in full.
 - v55.35.0 (2026-11-22): arcade: enemy-floor collision fix (`ecol` zeroed vy mid-loop), hero run cycle, 3D voxel runner/guard/dog and hit effects in Fern Rush, static menu snapshots (`snap()`).
 - v55.34.0 (2026-11-22): arcade redraw: 400x224, parallax, particles; platformer is now the original Fern Quest; Fern Rush is pseudo-3D behind the runner; new neon arcade menu.
