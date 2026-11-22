@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.32.6';
+const GAME_VERSION='v55.33.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.33.0',n:'Arcade games and a livelier home. The Retro arcade cabinet and the RGB gaming PC now play three retro 2D pixel games: Fern Flap (flappy-style), Fern Bros (a platformer with four courses) and Fern Rush (a three-lane runner), and the arcade in tour cities opens the same games. Placed furniture is interactive through one shared system: play the piano, synth, guitar, drums, turntable and jukebox, switch lamps, neon and the fireplace on and off, feed the fish, water plants, grab popcorn, make coffee, bounce on beds and more, with small effects.'},
  {v:'v55.32.6',n:'Profile saving is more forgiving: if the cloud refuses the join date, the profile is saved again without it instead of falling back to the bare basics.'},
  {v:'v55.32.5',n:'A booked collab now lapses if you keep the artist waiting more than one in-game day: the artist sends a passive aggressive text, the money is refunded, the waiting figure leaves and the chat goes back to open terms.'},
  {v:'v55.32.4',n:'Friends keep their display name: when the once-a-week name change is refused, the saved name is sent again instead of being wiped, and the refusal is remembered for 7 days, so the permission_denied error stops.'},

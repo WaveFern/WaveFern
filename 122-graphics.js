@@ -53,7 +53,7 @@ GFA.pz=0;
   if(idle&&c.bg==2){requestAnimationFrame(loop);return}
   if(idle&&c.bg==1)cap=cap?Math.min(cap,10):10;else if(PAUSED&&mode=='pause')cap=cap?Math.min(cap,10):10;
   /* v55.19.0 battery: the full-screen Mastery panel hides the world (10 fps), and the computer view is a still desk scene (30 fps; dt stays under the 0.05 s clamp so game time runs at the same speed) */
-  else if(window.FW_MASTERY&&FW_MASTERY.isOpen&&FW_MASTERY.isOpen())cap=cap?Math.min(cap,10):10;else if(mode=='pc'||mode=='title')cap=cap?Math.min(cap,30):30;
+  else if(window.FW_ARCADE&&FW_ARCADE.isOpen()||window.FW_MASTERY&&FW_MASTERY.isOpen&&FW_MASTERY.isOpen())cap=cap?Math.min(cap,10):10;else if(mode=='pc'||mode=='title')cap=cap?Math.min(cap,30):30;
   /* scheduled cap: keeps the average on target even when it is not a divisor of the screen's refresh rate (45 on 60 Hz).
      v55.19.2: only on screens clearly faster than the cap, so a 60 cap never drops a frame on a ~60 Hz screen; pause and main menu stadium capped too */
   const iv=cap&&!(gfxHz&&gfxHz<=cap*1.1)?1000/cap:0;
