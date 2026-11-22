@@ -118,7 +118,7 @@ const qOf=s=>isFinite(+s.q)?+s.q:0;
 function countUp(el,from,to,ms,fmt,tick){if(!el)return;const t0=performance.now();let lt=0;const f=fmt||(v=>Math.round(v).toLocaleString());
  (function step(n){const k=Math.min(1,(n-t0)/ms),e=1-Math.pow(1-k,3);el.textContent=f(from+(to-from)*e);if(tick&&k<1&&n-lt>70){lt=n;tick(k)}if(k<1&&el.isConnected)requestAnimationFrame(step);else el.textContent=f(to)})(t0)}
 {const f0=mgFinish;mgFinish=function(){const n0=S.nid,mine=[...(S.songs||[]),...(S.drafts||[])].filter(s=>s&&!s.ft),best=mine.reduce((a,s)=>Math.max(a,qOf(s)),0),
- last=mine.slice().sort((a,b)=>(b.id||0)-(a.id||0))[0],pf=rec&&rec.pf||0,perf=!!(rec&&pf>=3&&(rec.hits||0)<=pf&&!(rec.miss>0)),band=!!(rec&&rec.band>1);
+ last=mine.slice().sort((a,b)=>(b.id||0)-(a.id||0))[0],pf=rec&&rec.pf||0,perf=!!(rec&&pf>=(rec.goal||6)&&(rec.hits||0)<=pf&&!(rec.miss>0)),band=!!(rec&&rec.band>1);
  const r=f0.apply(this,arguments);
  try{const d=S.drafts[S.drafts.length-1],box=document.querySelector('#ui .box.modal');if(!d||d.id!==n0||!box)return r;
   const cs=box.querySelector('.cards');if(cs)cs.classList.add('fxcards'),cs.querySelectorAll('.card').forEach((c,i)=>c.style.animationDelay=(.15+i*.14)+'s');

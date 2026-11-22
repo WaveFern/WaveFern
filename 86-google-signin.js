@@ -16,11 +16,13 @@ const FB_CFG={
  databaseURL:'https://waveferndata-default-rtdb.europe-west1.firebasedatabase.app'
 };
 /* ===== END FIREBASE CONFIG ===== */
-const FB_V='10.12.2',FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
+const FB_V='10.12.2',FB_RC='6Lcv_ycuAAAAAEB34hu7jkN3uogbbgyCDmun3DDm'/* v55.29.0: public reCAPTCHA Enterprise site key for Firebase App Check */,FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
+/* v55.29.0: App Check. Attaches a reCAPTCHA token to every Firebase request so Firebase can later reject calls that do not come from the real game. Best effort: if it cannot load, the game carries on without a token. */
+function fbAppCheck(ac,app){if(!ac)return;try{ac.initializeAppCheck(app,{provider:new ac.ReCaptchaEnterpriseProvider(FB_RC),isTokenAutoRefreshEnabled:true})}catch(e){}}
 let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
- return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js')]).then(([a,m,f])=>{const app=a.initializeApp(FB_CFG);FBM=m;FBF=f;FBA=m.getAuth(app);try{FBD=f.initializeFirestore(app,{experimentalAutoDetectLongPolling:true})}catch(e){FBD=f.getFirestore(app)}
+ return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js'),import(u+'app-check.js').catch(()=>null)]).then(([a,m,f,ac])=>{const app=a.initializeApp(FB_CFG);fbAppCheck(ac,app);FBM=m;FBF=f;FBA=m.getAuth(app);try{FBD=f.initializeFirestore(app,{experimentalAutoDetectLongPolling:true})}catch(e){FBD=f.getFirestore(app)}
   m.onAuthStateChanged(FBA,usr=>{window.FW_AUTH_DONE=1;if(csAcct(usr))return;FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()});
   return m.getRedirectResult(FBA).then(r=>{if(r&&r.user)fbSignedIn(r.user)},()=>{}).finally(()=>{if(CLD.signing&&!wiping){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}if(FBU)csCheck()}})})}
 /* v42.7.3: signing in to an account (or out) reloads into that account's own careers on this device, so one account's
@@ -97,13 +99,15 @@ function csLoad(c){const uid=FBU&&FBU.uid;if(c&&isTrlCareer(c.code)){CLD.ok=1;cs
  if(cur&&!csCovers(cur,c.code)&&!bakKeep(cur,'Kept before your cloud save loaded')){CLD.err='No room to back up this career, so the cloud save was not loaded.';return fbRedraw()}
  if(mode=='pause')resumeGame();loadCode(c.code);if(!FBU)return;CLD.ok=1;CLD.last=c.code;csSetMark(c.t);autoSave();say('Loaded your cloud save (Day '+c.day+')');fbRedraw()}
 function csPush(force){if(!FBU||!CLD.ok||CLD.busy||!FBF||['creator','load'].includes(mode)||(mode=='title'&&!TT.game)||wiping)return Promise.resolve();
- const code=saveCode();if(code==CLD.last&&!force)return Promise.resolve();if(code.length>1e6){CLD.err='Your save is too big for the cloud.';return Promise.resolve()}
- const t=Date.now(),uid=FBU.uid;CLD.busy=1;
+ /* v55.31.0: the pack + seal runs in the save worker (saveCodeAsync), not on the main thread; a hidden tab / closing page still packs on the spot */
+ const uid=FBU.uid;CLD.busy=1;
+ return (document.hidden?Promise.resolve(saveCode()):saveCodeAsync()).then(code=>{if(code==CLD.last&&!force)return;if(code.length>1e6){CLD.err='Your save is too big for the cloud.';return}
+ const t=Date.now();
  /* only write over the cloud save this device last saw; if another device saved since, load that one instead */
  return FBF.getDoc(csRef()).then(d=>{if(!FBU||FBU.uid!=uid)return;const c=d.exists()?d.data():null;
   if(c&&c.t!=CLD.t){CLD.ok=0;csLoad(c);return}
   if(c&&![1,2].some(n=>csCovers(c.code,localStorage.getItem(slotKey(n))||''))&&!csCovers(c.code,code)&&!bakKeep(c.code,'Cloud save kept before it was replaced')){CLD.err='No room to back up your cloud save, so it was not replaced.';return}
-  csSetMark(t);return FBF.setDoc(csRef(),{code,day:S.day,artist:S.artist||'',t}).then(()=>{CLD.last=code;CLD.err='';return 1})}).catch(csFail).finally(()=>{CLD.busy=0})}
+  csSetMark(t);return FBF.setDoc(csRef(),{code,day:S.day,artist:S.artist||'',t}).then(()=>{CLD.last=code;CLD.err='';return 1})})}).catch(csFail).finally(()=>{CLD.busy=0})}
 setInterval(()=>csPush(),90000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)csPush()});
 addEventListener('pagehide',()=>csPush());
@@ -152,14 +156,15 @@ document.addEventListener('dragstart',e=>{const s=e.target.closest&&e.target.clo
 document.addEventListener('dragover',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r){e.preventDefault();r.classList.add('drop')}});
 document.addEventListener('dragleave',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(r)r.classList.remove('drop')});
 document.addEventListener('drop',e=>{const r=e.target.closest&&e.target.closest('#ttl .ttsl[data-slot]');if(!r)return;e.preventDefault();r.classList.remove('drop');let v='';try{v=e.dataTransfer.getData('text/plain')}catch(x){}if(/^slot:/.test(v))return ttSwap(+v.slice(5),+r.dataset.slot);const n=+v;if(n)ttRecAsk(n,+r.dataset.slot)});
-/* v55.21.0: swap two career slots. The save keys move with the slot, the active pointer follows its career, then the page reloads like Recover does. */
-function ttSwap(a,b){if(!a||!b||a==b)return;snd('click');if(TT.game)autoSave();wiping=true;
+/* v55.21.0: swap two career slots. The save keys move with the slot, the active pointer follows its career, then the slot list redraws (v55.21.8: no page reload; the loaded career follows its save key and keeps saving to it). */
+function ttSwap(a,b){if(!a||!b||a==b)return;snd('click');if(TT.game)autoSave();
  try{const ka=slotKey(a),kb=slotKey(b),va=localStorage.getItem(ka),vb=localStorage.getItem(kb);
   if(vb)localStorage.setItem(ka,vb);else localStorage.removeItem(ka);
   if(va)localStorage.setItem(kb,va);else localStorage.removeItem(kb);
   const c=curSlot();if(c==a)localStorage.setItem(SLOT_K,b);else if(c==b)localStorage.setItem(SLOT_K,a);
-  if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){wiping=false;return}
- location.reload()}
+  if(TT.game){if(BOOT_SLOT==a)BOOT_SLOT=b;else if(BOOT_SLOT==b)BOOT_SLOT=a}
+  if(FBU)localStorage.setItem(CS_KEY,JSON.stringify({uid:FBU.uid,t:CLD.t}))}catch(e){return}
+ ttWorlds()}
 function ttBack(){snd('click');TT.sel=0;titleUI()}
 function ttSlot(n){snd('click');const a=curSlot();if(n==a){TT.sel=0;return ttPlay()}
  if(TT.game)autoSave();wiping=true;const i=slotInfo(n);
@@ -196,10 +201,18 @@ addEventListener('pointerdown',()=>{if(TT.on&&MENUA&&MENUA.paused)MENUA.play().c
    "Later" asks again in the next session. */
 const PFP_MAX=24000,PFP_C={},PFP_ASK={};
 function fwIsGif(u){u=String(u||'');if(!u)return Promise.resolve(false);if(u in PFP_C)return Promise.resolve(PFP_C[u]);
+ /* v55.21.8: Google serves resized photos as a still frame, so also look at the original (=s0) and the animated (-rw) versions. */
  const byName=()=>/\.gif([?#]|$)/i.test(u);
- return fetch(u,{credentials:'omit',referrerPolicy:'no-referrer'}).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})
-  .then(b=>{const s=String.fromCharCode.apply(null,new Uint8Array(b,0,6));return s=='GIF87a'||s=='GIF89a'})
-  .catch(byName).then(g=>(PFP_C[u]=!!g))}
+ const sig=b=>{const a=new Uint8Array(b,0,Math.min(32,b.byteLength)),t=String.fromCharCode.apply(null,a.subarray(0,6));
+  if(t=='GIF87a'||t=='GIF89a')return true;
+  if(String.fromCharCode.apply(null,a.subarray(0,4))=='RIFF'&&String.fromCharCode.apply(null,a.subarray(8,12))=='WEBP'){const f=String.fromCharCode.apply(null,a.subarray(12,16));return f=='VP8X'&&!!(a[20]&2)}
+  return false};
+ const NOC='fw_gif_nocors';let off=0;try{off=localStorage.getItem(NOC)=='1'}catch(e){}
+ if(off)return Promise.resolve(byName()).then(g=>(PFP_C[u]=!!g));/* v55.29.2: Google photos are served without CORS headers, so the byte check fails and the browser logs a console error each time; after one failure skip it and go by the file name */
+ let bad=0;
+ const look=x=>fetch(x,{credentials:'omit',referrerPolicy:'no-referrer'}).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(sig).catch(()=>{bad=1;return false});
+ const alt=[];if(/=s\d+(-c)?$/.test(u)){alt.push(u.replace(/=s\d+(-c)?$/,'=s0'));alt.push(u.replace(/=s\d+(-c)?$/,'=s96-c-rw'))}
+ return Promise.all([u].concat(alt).map(look)).then(r=>{if(bad)try{localStorage.setItem(NOC,'1')}catch(e){}return r.some(Boolean)||byName()}).catch(byName).then(g=>(PFP_C[u]=!!g))}
 function fwCustomPfp(){try{const u=FBU&&FBU.uid;const v=u?localStorage.getItem('fw_pfp_'+u):'';return v&&v.indexOf('data:image/jpeg;base64,')==0?v:''}catch(e){return ''}}
 function fwPhoto(){return FBU?(fwCustomPfp()||FBU.photoURL||''):''}
 function fwPfpCache(v){try{if(FBU)localStorage.setItem('fw_pfp_'+FBU.uid,v)}catch(e){}}
@@ -216,8 +229,8 @@ function fwPfpResize(f){return new Promise((res,rej)=>{const u=URL.createObjectU
    let v='';for(const q of [.8,.7,.6,.5]){v=c.toDataURL('image/jpeg',q);if(v.length<=PFP_MAX)break}
    v.length<=PFP_MAX?done(0,v):done(new Error('That picture is too detailed. Try a simpler one.'))}catch(e){done(new Error('That picture could not be used.'))}};
  im.src=u})}
-function fwPfpShow(){const d=document.createElement('div');d.id='pfpq';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
- d.innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>Pick a profile picture</h2><p>Your Google profile picture is an animated GIF, which WaveFern cannot show. Upload a picture instead. It is cropped to a square and saved to your account.</p><p class=m id=pfpm></p><div class=row2><label class=go style="cursor:pointer">Upload picture<input type=file accept="image/*" id=pfpin style="display:none"></label><button id=pfpl>Later</button></div></div>`;
+function fwPfpShow(manual){if(document.getElementById('pfpq'))return;const d=document.createElement('div');d.id='pfpq';d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000a';
+ d.innerHTML=`<div class="box modal" style="width:min(420px,92vw)"><h2>Pick a profile picture</h2><p>${manual?'Upload your own picture to use instead of your Google one.':'Your Google profile picture is an animated GIF, which WaveFern cannot show. Upload a picture instead.'} It is cropped to a square and saved to your account.</p><p class=m id=pfpm></p><div class=row2><label class=go style="cursor:pointer">Upload picture<input type=file accept="image/*" id=pfpin style="display:none"></label><button id=pfpl>Later</button></div></div>`;
  document.body.appendChild(d);
  d.querySelector('#pfpl').onclick=()=>{try{sessionStorage.setItem('fw_pfp_later','1')}catch(e){}d.remove()};
  d.querySelector('#pfpin').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const m=d.querySelector('#pfpm');m.textContent='Saving...';
@@ -227,4 +240,4 @@ function fwPfpPrompt(){try{if(!FB_ON||!FBU||!TT.on||fwCustomPfp()||!FBU.photoURL
  PFP_ASK[uid]=1;const u=FBU.photoURL;
  fwIsGif(u).then(g=>{if(g&&TT.on&&FBU&&FBU.uid==uid&&!fwCustomPfp())fwPfpShow()},()=>{})}catch(e){}}
 {const pt0=titleUI;titleUI=function(){const r=pt0.apply(this,arguments);try{fwPfpPrompt()}catch(e){}return r}}
-window.FW_PFP_isGif=fwIsGif;
+window.FW_PFP_isGif=fwIsGif;window.FW_PFP_show=fwPfpShow;

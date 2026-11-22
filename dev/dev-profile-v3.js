@@ -230,7 +230,7 @@ const PX={
   const st=load(),bad=V.err||'';
   return`<div class=fwpc><div class=pf-top><span>EDIT PROFILE</span><button data-pf=done>Cancel</button></div><div class=pf-sec>
   <div class=pf-f><label>Avatar</label><div class=pf-av-pick>${[3,8,14,21,34,55].map(s=>`<button data-av="${s}" class="${st.pfp==s?'on':''}">${avatar(s,44)}</button>`).join('')}</div></div>
-  ${g(()=>FBU.photoURL)?`<div class=pf-f><label class=pf-sw style="display:flex;gap:10px;align-items:center"><input type=checkbox id=pf-gp ${st.gphoto===0?'':'checked'}><span>Show my Google profile picture</span></label><small>When off, you use the pixel avatar above and your photo is removed from your public profile.</small></div>`:''}
+  ${g(()=>FBU.photoURL)?`<div class=pf-f><label class=pf-sw style="display:flex;gap:10px;align-items:center"><input type=checkbox id=pf-gp ${st.gphoto===0?'':'checked'}><span>Show my Google profile picture</span></label><small>When off, you use the pixel avatar above and your photo is removed from your public profile.</small><button type=button class=go data-pf=upic style="margin-top:6px">Upload my own picture</button></div>`:''}
   <div class=pf-f><label for=pf-user>Username (letters, numbers and underscore, 3 to 16)</label><input id=pf-user maxlength=16 value="${esc(st.user)}" autocomplete=off spellcheck=false ${left(st)?'disabled':''}><small>${left(st)?'You changed your username recently. You can change it again in '+left(st)+' day'+(left(st)==1?'':'s')+'.':'You can change your username once every 30 days. Friends find you by it.'}</small></div>
   <div class=pf-f><label for=pf-bio>Bio</label><textarea id=pf-bio maxlength=80>${esc(st.bio)}</textarea><small class="${bad?'er':''}">${bad||'Up to 80 characters. Bios and usernames are checked before they show to other players.'}</small></div>
   <div class=pf-f><label for=pf-car>Career shown on your profile</label><select id=pf-car>${(careers().length?careers():[{k:'cur',label:'Sample career'}]).map(c=>`<option value="${c.k}" ${(mine().career||st.career)==c.k||st.career==c.k?'selected':''}>${esc(c.label)}</option>`).join('')}</select><small>Visitors see this career's artist name, fame level, listeners, songs and band. Your friends can still find you by username.</small></div></div>
@@ -270,6 +270,7 @@ const PX={
   else if(k=='back'){V.id=V.stack.pop()||'me';V.mode='view';V.msg='';draw()}
   else if(k=='edit'){V.mode='edit';V.err='';dirty=0;draw();refresh()}
   else if(k=='priv'){V.mode='priv';draw()}
+  else if(k=='upic'){try{window.FW_PFP_show&&FW_PFP_show(1)}catch(e){}}
   else if(k=='done'){V.mode='view';dirty=0;draw();refresh()}
   else if(k=='visitor'){V.visitor=V.visitor?0:1;draw()}
   else if(k=='savee'){

@@ -356,7 +356,8 @@ function sweepWorld(){
   /* snowfall */
   const snow=S.wx&&S.wx.k=='snow'&&W;
   if(snow&&!sMesh)sMesh=snowMesh();
-  if(sMesh){sMesh.visible=!!snow;if(snow){const u=sMesh.material.uniforms,hr=wxHouse();u.c.value.set(camT.x,0,camT.z);u.t.value=(u.t.value+dt)%5000;u.hr.value.set(hr[0],hr[1],hr[2],hr[3]);u.hin.value=(typeof HIN!='undefined'&&HIN||mode=='build')?1:0}}
+  const wq=typeof gfxCur=='function'?+gfxCur().wx:2;/* Settings > Graphics > Weather effects: Light = half the flakes, Off = none */
+  if(sMesh){sMesh.visible=!!snow&&wq>0;sMesh.geometry.setDrawRange(0,wq==1?1300:Infinity);if(snow){const u=sMesh.material.uniforms,hr=wxHouse();u.c.value.set(camT.x,0,camT.z);u.t.value=(u.t.value+dt)%5000;u.hr.value.set(hr[0],hr[1],hr[2],hr[3]);u.hin.value=(typeof HIN!='undefined'&&HIN||mode=='build')?1:0}}
  }
  {const u0=update;update=function(dt){const px=P.x,pz=P.z;u0(dt);try{xmasTick(dt,px,pz)}catch(e){if(!xmasTick.err){xmasTick.err=1;console.warn('xmas tick',e)}}}}
 

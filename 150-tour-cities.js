@@ -488,7 +488,7 @@ function dsTraffic(C){const s=C.s,r=C.r,n=s.big?30:16,lanes=[];const lft=s.left?
 function dsPeople(C){const s=C.s,r=C.r,n=s.big?44:28,e=C.hr+2,paths=[];
  C.rz.forEach(z=>{if(z===C.canalZ)return;for(let i=0;i<C.rx.length-1;i++){paths.push({ax:'x',c:z+e,a:C.rx[i]+e,b:C.rx[i+1]-e},{ax:'x',c:z-e,a:C.rx[i]+e,b:C.rx[i+1]-e})}});
  C.rx.forEach(x=>{for(let j=0;j<C.rz.length-1;j++)paths.push({ax:'z',c:x+e,a:C.rz[j]+e,b:C.rz[j+1]-e},{ax:'z',c:x-e,a:C.rz[j]+e,b:C.rz[j+1]-e})});
- for(let i=0;i<n;i++){const P0=paths[(r()*paths.length)|0];let o;try{o=buildChar(fCfg())}catch(e){continue}scene.add(o.g);C.extra.push(o.g);{const X=P0.ax=='x';C.peds.push(NPCS.walker(o,{ax:P0.ax,c:P0.c+(X?OZ:OX),a:P0.a+(X?OX:OZ),b:P0.b+(X?OX:OZ)},P0.a+r()*(P0.b-P0.a)+(X?OX:OZ),r()<.5?1:-1,R(1.1,1.7)))}}
+ for(let i=0;i<n;i++){const P0=paths[(r()*paths.length)|0];let o;try{o=buildChar(fCfg())}catch(e){continue}scene.add(o.g);C.extra.push(o.g);{const X=P0.ax=='x';C.peds.push(npcAdd(o,P0.ax,P0.c+(X?OZ:OX),P0.a+(X?OX:OZ),P0.b+(X?OX:OZ),P0.a+r()*(P0.b-P0.a)+(X?OX:OZ),r()<.5?1:-1,R(1.1,1.7),()=>D.C===C))}}
  /* fans waiting on the stadium plaza */
  for(let i=0;i<(s.big?26:14);i++){let o;try{o=buildChar(fCfg())}catch(e){continue}const a=-Math.PI*.15-r()*Math.PI*.7,rr=1.15+r()*.35;o.g.position.set(OX+C.st.x+Math.cos(a)*C.st.a*rr*.95,0,OZ+C.st.z-Math.sin(a)*C.st.b*rr);o.g.rotation.y=Math.atan2(C.st.x-(o.g.position.x-OX),C.st.z-(o.g.position.z-OZ));
   scene.add(o.g);C.extra.push(o.g);C.fans.push({o,t:r()*6,k:r()})}}
@@ -615,7 +615,7 @@ D.arrive=function(id,o){o=o||{};dsCutCSS();if(!wtDest(id))return false;if(D.on&&
  if(o.at=='hotel'&&D.C.spots.hotel)dsPlace(D.C.spots.hotel.x,D.C.spots.hotel.z+1,0);else dsPlace(D.C.air.x1+10,D.C.mid+1.5,Math.PI/2);
  if(!o.quiet){dsCutscene(()=>{say((first?dw(D.C.s.lang).wel+' ':'Back in ')+wtPlace(D.C.d)+'! Press N for the city map.')})}
  return true};
-function dsTear(){const C=D.C;D.hooks.forEach(f=>{try{f('leave',C)}catch(e){}});dsDispose(C);D.C=null;D.on=0;D.id=null;D.room=null;D.view=null;const h=$('dshud');if(h)h.remove()}
+function dsTear(){const C=D.C;(C.peds||[]).forEach(n=>{for(const L of[NPC,VPED]){const i=L.indexOf(n);if(i>=0)L.splice(i,1)}});D.hooks.forEach(f=>{try{f('leave',C)}catch(e){}});dsDispose(C);D.C=null;D.on=0;D.id=null;D.room=null;D.view=null;const h=$('dshud');if(h)h.remove()}
 D.leave=function(home){if(D.on)dsTear();if(S.dcity)S.dcity.loc=null;if(home){P.x=8;P.z=14;P.rot=0;camT.x=P.x;camT.z=P.z}return true};
 
 /* ---------- hooks into the game ---------- */
@@ -645,7 +645,6 @@ function dsTick(dt){const C=D.C;if(!C)return;const t=performance.now()/1000,px=P
   if(want>0&&yieldAt(C,L,v))want=0;
   v.v+=(want-v.v)*Math.min(1,dt*(want<v.v?4:1.2));v.p+=v.v*L.dir*dt;if(v.p>L.hi)v.p=L.lo;if(v.p<L.lo)v.p=L.hi;v.x=L.ax=='x'?v.p:L.c;v.z=L.ax=='x'?L.c:v.p;
   const vis=cut||near(lx,lz,80);v.m.visible=vis;if(vis){v.m.position.set(OX+lx,0,OZ+lz);v.m.rotation.y=L.ax=='x'?(L.dir>0?Math.PI/2:-Math.PI/2):(L.dir>0?0:Math.PI)}}});
- NPCS.tick(C.peds,dt,{avoid:!D.room,vis:(x,z)=>cut||near(x-OX,z-OZ,48)});
  C.fans.forEach(fn=>{const vis=cut||near(fn.o.g.position.x-OX,fn.o.g.position.z-OZ,50);fn.o.g.visible=vis;if(!vis)return;const k=t*3+fn.t;fn.o.arms[0].rotation.x=fn.k<.5?-2.6+Math.sin(k)*.4:-.2;fn.o.arms[1].rotation.x=-2.6+Math.sin(k+1)*.4;fn.o.g.position.y=Math.max(0,Math.sin(k*1.6))*.12});
  C.tugs.forEach(g=>{g.p+=dt;g.m.position.z=g.z0+Math.sin(g.p*.3)*14;g.m.rotation.y=Math.cos(g.p*.3)>0?0:Math.PI});
  if(C.fly){const F=C.fly;F.t+=dt;const T=F.t%46;let z,y=2.1,pitch=0;if(T<6){z=F.z0}else if(T<26){const u=(T-6)/20;z=F.z0+(F.z1-F.z0)*u*u*.9;if(u>.62){const k=(u-.62)/.38;y=2.1+k*k*40;pitch=k*.25}}else{z=F.z1-(T-26)*60;y=40+(T-26)*14;pitch=.25}
