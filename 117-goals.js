@@ -16,4 +16,4 @@ function glBurst(n){try{tutBurst(innerWidth/2,innerHeight*.3,n)}catch(e){}}
 /* release feedback: song count, quality and a first-song fanfare */
 if(typeof upl=='function'){const u0=upl;upl=function(id){const n0=S.songs.length,d=S.drafts.find(x=>x.id==id),r=u0.apply(this,arguments);
  try{if(S.songs.length>n0){const s=S.songs[S.songs.length-1],q=+s.q||0,tag=q>=90?'Instant classic':q>=70?'Fire':q>=45?'Solid':'Rough but real';
-  glCard(n0?'NEW RELEASE':'FIRST RELEASE',s.title,tag+' · song #'+S.songs.length+(n0?'':' · you are on Spotifly'));snd('chime');setTimeout(()=>snd('cash'),150);glBurst(n0?24:44)}}catch(e){}return r}}
+  glCard(n0?'NEW RELEASE':'FIRST RELEASE',s.title,tag+' · song #'+S.songs.length+(n0?'':' · you are on WaveFern'));snd('chime');setTimeout(()=>snd('cash'),150);glBurst(n0?24:44)}}catch(e){}return r}}

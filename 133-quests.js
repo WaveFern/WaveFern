@@ -29,15 +29,15 @@ const DAILY=[
  {g:'move',f:()=>{const t=400+50*Math.min(6,Math.floor(FL()/10));return{k:'walk',t,x:t=>`Walk or run ${fmt(t)} m`}}}
 ];
 const WEEKLY=[
- {g:'grow',f:()=>{const w=lastWeek('st');if(!(w>0))return null;return{k:'st',t:nice(w*1.35),x:t=>`Get ${fmt(t)} streams this week`}}},
- {g:'grow',f:()=>{const w=lastWeek('e');if(!(w>=1))return null;return{k:'earn',t:nice(w*1.35),x:t=>`Earn $${fmt(t)} from your music this week`}}},
- {g:'grow',f:()=>{const w=lastWeek('st')*.05;if(!(w>=20))return null;return{k:'fol',t:nice(w*1.35),x:t=>`Gain ${fmt(t)} followers this week`}}},
- {g:'make',f:()=>{const t=5+2*(FL()>=15)+2*(FL()>=40);return{k:'rel',t,x:t=>`Release ${t} songs this week`}}},
- {g:'make',f:()=>{const t=12+3*(FL()>=15)+3*(FL()>=40);return{k:'rec',t,x:t=>`Record ${t} songs this week`}}},
+ {g:'grow',f:()=>{const w=lastWeek('st');if(!(w>0))return null;return{k:'st',t:nice(w*1.1),x:t=>`Get ${fmt(t)} streams this week`}}},
+ {g:'grow',f:()=>{const w=lastWeek('e');if(!(w>=1))return null;return{k:'earn',t:nice(w*1.1),x:t=>`Earn $${fmt(t)} from your music this week`}}},
+ {g:'grow',f:()=>{const w=lastWeek('st')*.05;if(!(w>=20))return null;return{k:'fol',t:nice(w*1.1),x:t=>`Gain ${fmt(t)} followers this week`}}},
+ {g:'make',f:()=>{const t=3+1*(FL()>=15)+1*(FL()>=40);return{k:'rel',t,x:t=>`Release ${t} songs this week`}}},
+ {g:'make',f:()=>{const t=6+2*(FL()>=15)+2*(FL()>=40);return{k:'rec',t,x:t=>`Record ${t} songs this week`}}},
  {g:'qual',f:()=>{if((S.songs||[]).length<3)return null;const q=Math.max(20,Math.min(97,Math.round(avgQ()+6)));return{k:'hq',t:3,q,fix:1,x:()=>`Release 3 songs with quality ${q} or higher`}}},
  {g:'qual',f:()=>(S.songs||[]).length>=6&&Array.isArray(S.albums)?{k:'alb',t:1,fix:1,x:()=>'Release an album'}:null},
- {g:'soc',f:()=>hasIG()?{k:'post',t:5,x:t=>`Post on Instagrime on ${t} different days`}:null},
- {g:'move',f:()=>{const t=3000+300*Math.min(10,Math.floor(FL()/10));return{k:'walk',t,x:t=>`Walk or run ${fmt(t)} m`}}}
+ {g:'soc',f:()=>hasIG()?{k:'post',t:4,x:t=>`Make ${t} Instagrime posts`}:null},
+ {g:'move',f:()=>{const t=1200+150*Math.min(10,Math.floor(FL()/10));return{k:'walk',t,x:t=>`Walk or run ${fmt(t)} m`}}}
 ];
 /* a week joined part way through (old saves, new careers) scales its counts to the days left */
 function roll(pool,seed,scale){const R=rng(seed),bag=pool.map(x=>({x,o:R()})).sort((a,b)=>a.o-b.o),out=[],gs={};

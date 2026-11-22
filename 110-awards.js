@@ -88,9 +88,9 @@ function awBuildOut(){if(AWB.on||AW.i==null)return;AWB.on=1;const X=AWB.cx,zf=AW
  SB(W+.7,.5,D+.7,trim,X,H+.1,zc);SB(W+.3,.7,D+.3,'#f2e8d0',X,H+.7,zc);SB(W+.8,.14,D+.8,'#8e8a84',X,H+1.1,zc);
  /* steps and the red carpet */
  for(let k=0;k<3;k++)SB(17-k*.7,.2*(k+1),.8,'#d8ceb6',X,.1*(k+1),zf+.8+(2-k)*.8);
- SB(3.4,.05,8,'#b01020',X,.04,zf+4.9);SB(3.5,.03,8.1,'#d4a52a',X,.025,zf+4.9);
- [-1.9,1.9].forEach(sd=>{for(let z=zf+3.6;z<=14.4;z+=1.4){SB(.1,1,.1,'#e6c34a',X+sd,.5,z);SB(.22,.06,.22,'#c9a227',X+sd,.03,z);SB(.16,.12,.16,'#f6d86a',X+sd,1.04,z);if(z<14)SB(.04,.05,1.3,'#8a0f1e',X+sd,.9,z+.7)}});
- for(let k=0;k<4;k++)SB(.9,.03,.9,k%2?'#f6d86a':'#e6c34a',X,.07,zf+5.4+k*2.3);
+ SB(3.4,.05,7,'#b01020',X,.04,zf+4.4);SB(3.5,.03,7.1,'#d4a52a',X,.025,zf+4.4);
+ [-1.9,1.9].forEach(sd=>{for(let z=zf+3.6;z<=13.4;z+=1.4){SB(.1,1,.1,'#e6c34a',X+sd,.5,z);SB(.22,.06,.22,'#c9a227',X+sd,.03,z);SB(.16,.12,.16,'#f6d86a',X+sd,1.04,z);if(z<13)SB(.04,.05,1.3,'#8a0f1e',X+sd,.9,z+.7)}});
+ for(let k=0;k<3;k++)SB(.9,.03,.9,k%2?'#f6d86a':'#e6c34a',X,.07,zf+5+k*1.6);
  /* portico: six fluted columns, entablature, stepped pediment, sign */
  [-9,-6,-3,3,6,9].forEach(o=>{SB(1.2,.35,1.2,'#d8ceb6',X+o,.78,zf+2.2);SB(.85,6.2,.85,'#f4ecd8',X+o,4.1,zf+2.2);[-.3,.3].forEach(q=>SB(.06,6.2,.06,'#d9cfb4',X+o+q,4.1,zf+2.65));SB(1.25,.45,1.25,trim,X+o,7.5,zf+2.2)});
  SB(22,.9,2.2,'#f4ecd8',X,8.2,zf+1.6);SB(22.4,.2,2.4,trim,X,7.7,zf+1.6);SB(22.4,.2,2.4,trim,X,8.75,zf+1.6);
@@ -308,7 +308,7 @@ function awShow(F0,song){
   flashes.forEach(m=>{m.visible=A.cl>.3&&Math.random()<.08;if(m.visible)m.position.set(R(-14,14),R(1.8,4),R(6,17))});
   for(let i=0;i<NC;i++){const j=i*3;if(cp[j+1]>-40){cp[j]+=cv[j]*dt;cp[j+1]+=cv[j+1]*dt;cp[j+2]+=cv[j+2]*dt;cv[j]+=Math.sin(A.t*3+i)*dt;if(cp[j+1]<0)cp[j+1]=-50}}cg.attributes.position.needsUpdate=true;cg.attributes.color.needsUpdate=true;
   /* applause sound */
-  const ca=O.clapA;if(ca&&!O.clapFail){const v=(typeof FX!='undefined'&&!FX)?0:Math.min(1,A.cl*.85+(A.cheer>0?.15:0));ca.volume=Math.max(0,Math.min(1,v));if(v>.04&&ca.paused)ca.play().catch(()=>{});else if(v<=.03&&!ca.paused)ca.pause()}
+  const ca=O.clapA;if(ca&&!O.clapFail){const v=(typeof FX!='undefined'&&!FX)?0:Math.min(1,A.cl*.85+(A.cheer>0?.15:0));ca.volume=Math.max(0,Math.min(1,v*(window.HF?HF.f:1)));if(v>.04&&ca.paused)ca.play().catch(()=>{});else if(v<=.03&&!ca.paused)ca.pause()}
   else{A.lastClap-=dt;if(A.cl>.2&&A.lastClap<=0){A.lastClap=.07;nz(.06,1800+R(0,2400),.2*A.cl,1,'bandpass')}}
   /* fades */
   const f=$c('awfade');if(A.si==0&&A.t<.6)f.style.opacity=1-A.t/.6;else if(A.out)f.style.opacity=Math.min(1,A.t/2.8);else if(!A.end)f.style.opacity=A.si==0?0:f.style.opacity>.05?0:0};
@@ -322,3 +322,6 @@ function awRng(s){return()=>(s=Math.imul(s^s>>>15,1|s)+0x6D2B79F5|0,((s^s>>>7)>>
 function awPlay(F0,song){const O=AWC;O.bg=scene.background;O.fog=scene.fog;scene.background=new THREE.Color(0x07040d);scene.fog=null;O.hud=$('hud').style.display;$('hud').style.display='none';mode='cutawd';O.on=1;AWP=1;const go=awShow(F0,song);O.go=go;go(0)}
 {const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(AWC.on&&c===cam&&AWC.cam)return r0(sc,AWC.cam);return r0(sc,c)}}
 {const u0=update;update=function(dt){u0(dt);if(AWC.on&&AWC.tick){try{AWC.tick(dt)}catch(e){console.error('awards show',e);awEnd(false)}}}}
+
+/* walk up the front steps: the player rises with each of the three steps (they used to walk straight through them) */
+{const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{if(AWB.on&&mode=='play'&&!IN&&!HIN&&Math.abs(P.x-AWB.cx)<8.4){const z=P.z-AWB.z1,h=z<1.2?.6:z<2?.4:z<2.8?.2:0;if(z<2.8&&z>0.1||SY>0&&h==0){SY+=(h-SY)*Math.min(1,(dt||.016)*14);if(Math.abs(SY-h)<.01)SY=h;P.mesh.position.y=SY}}}catch(e){}return r}}

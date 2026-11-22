@@ -5,7 +5,7 @@
  if(!window.FW_FEAT||/[?&]nofade/.test(location.search))return;
  function boot(){try{
   if(typeof fadeT!=='function'||typeof CT==='undefined'||typeof P==='undefined')return false;
-  const f0=fadeT,LOW=.04,MARGIN=1.4;
+  const f0=fadeT,LOW=.25,MARGIN=1.4;
   fadeT=function(dt){
    f0.apply(this,arguments);
    try{

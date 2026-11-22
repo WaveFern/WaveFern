@@ -65,12 +65,18 @@
    ['Bodyguards with me: 0',need(()=>{S.guards=0;g(()=>syncF());sv('0 bodyguards')})],
    ['Bodyguards with me: 1',need(()=>{S.guards=1;S.gs='follow';g(()=>syncF());sv('1 bodyguard')})],
    ['Bodyguards with me: 3',need(()=>{S.guards=3;S.gs='follow';g(()=>syncF());sv('3 bodyguards')})]]],
+  ['Brand sponsors me (test mode)',[
+   ...((window.BRD&&BRD.brands)||[]).map(b=>['Sponsored by '+b.n,need(()=>{
+    if(!S.cheat)return say('Test mode only: type test as the save code first.');
+    if(BRD.active())return say('You already have a brand shoot to finish.');
+    const o=BRD.mk(b.id);if(!o)return say('Could not create the offer.');
+    bdAccept(o.id);sv(o.st==1?b.n+' sponsors you: flight booked, see Messages.':b.n+' offer sent, but it could not be accepted yet (fly home first?). See Messages.')})])]],
   ['Time',[
    ['Skip 1 day',jump(1)],['Skip 7 days',jump(7)],['Skip 30 days',jump(30)],['Skip 100 days',jump(100)]]],
   ['Progress',[
    ['Add 1,000,000 money',need(()=>{S.money=+((S.money||0)+1e6).toFixed(2);sv('Money added')})],
    ['Refill energy',need(()=>{S.energy=100;S.stam=100;sv('Energy full')})],
-   ['Unlock everything (test career)',need(()=>{cheat();sv('Test career applied')})]]]
+   ]]
  ];
  const box=document.getElementById('fwdvb');
  sections.forEach(([h,items])=>{const e=document.createElement('h5');e.textContent=h;box.appendChild(e);items.forEach(([l,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=f;box.appendChild(b)})});

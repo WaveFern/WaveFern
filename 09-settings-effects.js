@@ -47,7 +47,8 @@ rec:()=>{sdNz(.012,1800,.16,{q:1.5});sdHit(300,.08,.2,WOOD,{bend:.1});sdHit(880,
 let SDT=0;const SDL={};
 const snd=n=>{const f=SND[n],t=performance.now();if(!f||t-(SDL[n]||0)<30||(n=='click'&&t-SDT<40))return;SDL[n]=t;if(n!='click')SDT=t;f()},chime=()=>snd('chime');
 setInterval(()=>{if(!MU.on||!FX||mode=='load'||PAUSED)return;if(S.t>=300){const f=4300+R(0,400),pn=R(-.6,.6),n=2+(Math.random()*3|0);for(let i=0;i<n;i++)sdHit(f,.035,.02,[[1,1,1]],{del:i*.065,jit:.005,pan:pn,rev:.1})}else if(Math.random()<.3)nz(1.4,900+R(0,500),.04,1,'lowpass',0,300)},1400);
-document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button'))snd('click')});
+/* v55.20.1: skip the automatic click sound if ANY sound was already made since this click began (the button's own sound, even when a slow redraw ran between the two) */
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button')){const t0=e.timeStamp||0;if(SDT>=t0||(SDL.click||0)>=t0)return;snd('click')}});
 /* v26.97: Settings has tabs (Sound, Music, Game, Save) and more options; everything except the volumes lives in OPT (08-music.js) */
 let STAB='sound';const TRN=['Track 1','Track 2','Track 3','Box','Catch','Rocket','Refresh'];
 const stTog=(l,on,f,n)=>`<div class=so><span>${l}${n?`<small class=m>${n}</small>`:''}</span><button class="${on?'go':''}" onclick="${f};stDraw()">${on?'On':'Off'}</button></div>`;
@@ -65,7 +66,7 @@ function stPrev(i){const was=PRV&&PRV.i==i;stPrevStop();if(was)return;if(!VOL){s
  const a=new Audio(TR[i].src),q={i,a,t:0,hold:MU.hold};const bg=MU.a[MU.cur];if(MU.pl&&bg&&!bg.paused){q.bg=bg;bg.pause();MU.hold=1}if(MENUA&&!MENUA.paused){q.menu=1;MENUA.pause()}
  PRV=q;a.volume=0;a.preload='auto';a.addEventListener('loadedmetadata',()=>{if(PRV!==q)return;try{a.currentTime=(a.duration||0)/2}catch(e){}a.play().then(()=>{q.on=1}).catch(()=>stPrevStop())},{once:true});
  /* fade in over 0.4 s, out over the last 0.6 s of the 5 */
- q.iv=setInterval(()=>{if(!q.on)return;q.t+=.05;const v=Math.min(1,q.t/.4,Math.max(0,(5-q.t)/.6));a.volume=Math.max(0,Math.min(1,v*VOL));if(q.t>=5)stPrevStop()},50);stDraw()}
+ q.iv=setInterval(()=>{if(!q.on)return;q.t+=.05;const v=Math.min(1,q.t/.4,Math.max(0,(5-q.t)/.6));a.volume=Math.max(0,Math.min(1,v*VOL*(window.HF?HF.f:1)));if(q.t>=5)stPrevStop()},50);stDraw()}
 function stBody(){const T=STAB;
  if(T=='sound')return stSl('Music',VOL,"VOL=this.value/100;if(VOL)LAST=VOL;sv()")+stSl('Effects',FX,"FX=this.value/100;sv()","onchange=\"snd('ping')\"")+stSl('Ambience',OPT.amb,"OPT.amb=this.value/100;svOpt()")
   +`<p class=m><small>Music is the soundtrack and menu music. Effects covers clicks and chimes. Ambience is the city outside: traffic, birds and people. Press M to mute music.</small></p>`

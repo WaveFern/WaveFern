@@ -40,7 +40,6 @@ const ZONES=[
  {n:'Festival grounds',d:(x,z)=>dRect(x,z,FEST.X0,FEST.Z0,FEST.X1,FEST.Z1),r:30,on:festOn,t:T(.8,.1,0,.5,.3,.3,.4,0,1,.3)},
  {n:'West suburb',d:(x,z)=>Math.hypot(x+120,z-12),r:90,t:T(.3,.35,.1,.2,.15,.8,.4,.1,0,.25)},
  {n:'School',d:(x,z)=>Math.hypot(x+100,z-185),r:55,t:T(.35,.15,0,.4,.2,.6,.5,.8,0,.15)},
- {n:'Sports field',d:(x,z)=>Math.hypot(x-300,z-210),r:65,t:T(.3,.1,0,.3,.1,.5,.8,0,.25,.1)},
  {n:'Quiet fields',last:1,d:()=>0,r:1,t:T(.04,0,0,0,0,1,1,0,0,0)}];
 function night(){try{return ss(S.t,285,330)}catch(e){return 0}}
 function zoneAt(x,z){const nt=night(),tk=.3+.7*(1-nt),L={};LK.forEach(k=>L[k]=0);let best=null,bb=-1,raw=0,mw=0;
@@ -180,7 +179,7 @@ function mcTick(out){
   const q=clamp(1-d/LIM,0,1);m.vol=Math.pow(q,1.8)*.95*m.env;m.pan=panOf(c.x,c.z);m.fc=500+3600*q*q;
   if(m.kind=='song'){try{Beats.setVolume(Math.max(.0001,m.vol))}catch(e){}chainFx(m.fc,9,m.pan);
    /* the soundtrack keeps playing under the car, so we drive its volume (the beat engine pauses it otherwise) */
-   if(m.pl){const a=MU.a[MU.cur];if(a&&a.ended){m.pl=0}else if(a&&!a.paused){const T=TR[MU.cur],t=a.currentTime,du=a.duration||0;let v=1;if(T.fin&&t<T.fin)v=Math.min(v,t/T.fin);if(T.fout&&du&&t>du-T.fout)v=Math.min(v,(du-t)/T.fout);a.volume=clamp(v,0,1)*VOL*window.MU_DIP}}}
+   if(m.pl){const a=MU.a[MU.cur];if(a&&a.ended){m.pl=0}else if(a&&!a.paused){const T=TR[MU.cur],t=a.currentTime,du=a.duration||0;let v=1;if(T.fin&&t<T.fin)v=Math.min(v,t/T.fin);if(T.fout&&du&&t>du-T.fout)v=Math.min(v,(du-t)/T.fout);a.volume=clamp(v,0,1)*VOL*window.MU_DIP*(window.HF?HF.f:1)}}}
   else{const n=m.n,t=n.g.context.currentTime;n.g.gain.setTargetAtTime(m.vol*(VOL||0)*.8,t,.06);n.lp.frequency.setTargetAtTime(m.fc,t,.08);n.pn.pan.setTargetAtTime(m.pan,t,.08)}
  }
  /* soundtrack dip: 30% while a car with music is audible, back up over about 1.5 s */

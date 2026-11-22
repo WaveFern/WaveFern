@@ -7,7 +7,7 @@
    document.querySelectorAll('#ui .cards .card').forEach(c=>{
     const b=c.querySelector('b');if(!b)return;
     const t=b.textContent.trim();
-    if(t==='100%'||(t==='Clean'&&/^Beat/.test(c.textContent)))b.textContent='Perfect';
+    if(/^Interest/.test(c.textContent))return;if(t==='100%'||(t==='Clean'&&/^Beat/.test(c.textContent)))b.textContent='Perfect';
    });
   }catch(e){}
  }

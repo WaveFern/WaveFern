@@ -1,3 +1,4 @@
+/* v49.93.27: the 808 and hi hat pickers were removed from Extras (rows no longer drawn; old picks are dropped). Songs already made keep their saved sounds. */
 /* ===== v43.0.0: pick the 808 and hi hat for a recording (v49.25.0: and the sub-genre) ===== */
 /* The record menu gets two pickers under the diss track row. Auto lets the song's beat pick a recorded sample,
    Built-in keeps the old code-made sound, or pick one by name (picking plays it once). The choice is kept in S.bpick
@@ -25,9 +26,9 @@ function smpRows(){const I=Beats.instruments,pk=(S.bpick||{}).smp||{};
   return `<div class=r style="margin-top:8px"><span>${SMPL[f]||cap(f)}</span><select class=dsel data-k="smp_${f}" data-l="${SMPL[f]||cap(f)}" data-fam="${f}">${o}</select></div>`}).join('')}
 function smpFill(d){if(!d.isConnected)return;const h=smpRows();if(!h)return;const w=d.querySelector('.dsmp');if(!w)return;w.innerHTML=h;
  w.querySelectorAll('select[data-fam]').forEach(s=>s.onchange=()=>{const smp=Object.assign({},(S.bpick||{}).smp,{[s.dataset.fam]:s.value});S.bpick=Object.assign({},S.bpick,{smp});if(s.value&&s.value!='auto')Beats.instruments.preview(s.dataset.fam,s.value)})}
-const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{if(mode!='menu'||typeof Beats=='undefined'||!Beats.drums)return r;
+const r0=recMenu;recMenu=function(){const r=r0.apply(this,arguments);try{if(S.bpick&&(S.bpick.s8!=null||S.bpick.hh!=null)){const b=Object.assign({},S.bpick);delete b.s8;delete b.hh;S.bpick=b}}catch(e){}try{if(mode!='menu'||typeof Beats=='undefined'||!Beats.drums)return r;
   const box=document.querySelector('#ui .box'),gen=box&&box.querySelector('.gen');if(!gen||box.querySelector('.dpk'))return r;
-  const d=document.createElement('div');d.className='dpk';d.innerHTML=subRow()+row('808','808','s8',Beats.drums.s808)+row('Hi hat','hat','hh',Beats.drums.hats)+'<div class=dsmp></div>';
+  const d=document.createElement('div');d.className='dpk';d.innerHTML=subRow()+'<div class=dsmp></div>';
   if(Beats.instruments){const w=d;smpFill(w);Beats.instruments.load().then(()=>{smpFill(w)})}
   d.querySelectorAll('select[data-kind]').forEach(s=>s.onchange=()=>{S.bpick=Object.assign({},S.bpick,{[s.dataset.k]:s.value});if(s.value&&s.value!='auto')Beats.previewDrum(s.dataset.kind,s.value)});
   const sg=d.querySelector('select[data-k=sg]');if(sg)sg.onchange=()=>{S.bpick=Object.assign({},S.bpick,{sg:sg.value});try{snd('click')}catch(e){}recMenu()};

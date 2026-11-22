@@ -13,11 +13,19 @@ function buildHouse(){
  
  const l1=new THREE.PointLight(0xffc080,.5,9);l1.position.set(3,1.5,1);g.add(l1);lamps.push(l1);
  
- B(g,.9,1.2,.05,'#c8506a',3.8,1.9,.04);B(g,.7,.2,.06,'#ffd27a',3.8,2.2,.05);B(g,1.6,1.2,.05,'*8fd0ff',1.2,1.8,.02);
+ /* v55.8.0: detailed bedroom dressing (window, curtains, pictures, fairy lights, shelf, wardrobe, plants) */
+ {const P=(w,h,d,c,x,y,z)=>B(g,w,h,d,c,x,y,z),Wt='#e8e4da',pl=(x,z,s)=>{P(.3*s,.28*s,.3*s,'#b5482a',x,.14*s,z);P(.34*s,.05*s,.34*s,'#8a3a22',x,.29*s,z);P(.26*s,.03*s,.26*s,'#4a3320',x,.3*s,z);
+   [[0,.55,0,.07],[-.1,.45,.04,.06],[.1,.5,-.05,.06],[.04,.7,.08,.05]].forEach(a=>P(a[3]*s*1.4,(.3+a[1]*.5)*s,a[3]*s*1.4,'#3a6b3a',x+a[0]*s,(.3+a[1]*.25)*s+.15*s,z+a[2]*s));
+   [[-.18,.62,.02],[.18,.58,-.04],[0,.82,.0],[-.08,.7,.14],[.1,.72,.12]].forEach(a=>P(.2*s,.1*s,.2*s,'#4f9a4f',x+a[0]*s,a[1]*s+.2*s,z+a[2]*s))};
+  /* window over the desk */
+  P(1.8,1.3,.06,Wt,6,1.95,.03);P(1.55,1.05,.04,'*a9d8f2',6,1.95,.06);P(1.55,.3,.045,'*dff1fb',6,2.28,.065);P(.05,1.05,.06,Wt,6,1.95,.08);P(1.55,.05,.06,Wt,6,1.95,.08);
+  P(2.5,.04,.04,'#333',6,2.7,.08);P(.34,1.45,.08,'#c8506a',5.1,1.95,.07);P(.34,1.45,.08,'#c8506a',6.9,1.95,.07);P(.12,1.45,.09,'#a63e56',5.25,1.95,.075);P(.12,1.45,.09,'#a63e56',6.75,1.95,.075);
+  /* v55.12.0: pictures, wall clock, fairy lights, wardrobe and plants are now movable items (246-movable-house.js) */
+ }
  buildStudio();return g}
 function buildStudio(){
  if(studio)scene.remove(studio);const g=studio=new THREE.Group();scene.add(g);dyn=[];const G=S.gear;
- B(g,3.2,.03,3,'#3a2f4a',12.6,.02,2.6);B(g,1.6,1.2,.05,'*8fd0ff',9.4,1.8,.02);
+ B(g,3.2,.03,3,'#3a2f4a',12.6,.02,2.6);
  const l=G.chair,cc=['#8b6b47','#333a44','#2f6fb5','#a8242c'][l];
  B(g,.5+.05*l,.4+.05*l,.5+.05*l,cc,13.6,.2+.03*l,2.8);if(l){B(g,.5+.05*l,.3+.25*l,.08,cc,13.6,.7+.1*l,2.55);B(g,.08,.4,.08,'#222',13.6,.1,2.8)}if(l==3)B(g,.7,.1,.1,'#e6b422',13.6,1.4,2.55);
  B(g,.45,.04,.45,'#222',12.2,.02,1.5);B(g,.06,1.2,.06,'#222',12.2,.6,1.5);const mc=['#555','#2a2a2e','#aab3bd','#c9a227'][G.mic];B(g,.14+.03*G.mic,.25,.14+.03*G.mic,mc,12.2,1.3,1.5);if(G.mic>=2)B(g,.4,.4,.03,'#111',12.2,1.35,1.75);

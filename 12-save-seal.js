@@ -1,3 +1,7 @@
+/* v55.31.0: the save alphabets and scPack moved here from 12-save-load.js so the save worker (12-save-worker.js) can importScripts this one file */
+const SC_A=Array.from({length:94},(_,i)=>String.fromCharCode(33+i)).filter(c=>c!='"'&&c!='\\');
+function scPack(s,A=SC_A,B=46){s=s.replace(/[\u0080-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));/* v50.7.0: same codes as before, found with number keys (phrase code*128+char) instead of building strings: about 5x faster */const D=new Map(),o=[];let w=-1,nx=128;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);if(w<0){w=c;continue}const k=w*128+c,h=D.get(k);if(h!==undefined){w=h;continue}o.push(w);D.set(k,nx++);w=c}if(w>=0)o.push(w);return o.map(n=>{let t='';do{const d=n%B;n=Math.floor(n/B);t=A[(t?B:0)+d]+t}while(n);return t}).join('')}
+const SC_C=SC_A.filter(c=>!"*_~`|'-.<>&:@#".includes(c)).slice(0,76);
 /* ---------- v49.71.0: sealed save codes (FW4-) and load-time sanity checks ----------
    Loads right before 12-save-load.js, which uses these.
    FW4- = the same packed save, but encrypted and authenticated, so a code (or a copy of fw_save_N in localStorage) that was edited,

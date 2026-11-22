@@ -15,6 +15,10 @@ const IXM={l:null,b:null};
 const ixMat=e=>e?(IXM.b||(IXM.b=new THREE.MeshBasicMaterial({vertexColors:true}))):(IXM.l||(IXM.l=new THREE.MeshLambertMaterial({vertexColors:true})));
 
 /* ---- pixel textures: one 64 px tile = 2 m of floor or 1 m of wall ---- */
+/* v49.94.7: tone down glaring near-white colours (floors, walls, props) so lit rooms and shop fronts are not blown out */
+const IXCAP=.66;
+function ixLum(c){const k=new THREE.Color(c);return .2126*k.r+.7152*k.g+.0722*k.b}
+function ixTone(c,cap){cap=cap||IXCAP;try{if(typeof c!='string'||c[0]!='#')return c;const k=new THREE.Color(c),l=ixLum(c);if(l<=cap)return c;k.multiplyScalar(cap/l);return'#'+k.getHexString()}catch(e){return c}}
 function ixShade(c,f){const k=new THREE.Color(c).multiplyScalar(f);k.r=Math.min(1,k.r);k.g=Math.min(1,k.g);k.b=Math.min(1,k.b);return'#'+k.getHexString()}
 function ixTex(kind,a,b,rx,ry){const cv=document.createElement('canvas');cv.width=cv.height=64;const x=cv.getContext('2d'),r=mb(hs(kind+a+b)),F=(c,X,Y,W,H)=>{x.fillStyle=c;x.fillRect(X,Y,W,H)};F(a,0,0,64,64);
  if(kind=='plank'){for(let row=0;row<4;row++){const y=row*16;let s=-(row*23%40);while(s<64){const L=24+Math.floor(r()*24),c=r()<.5?a:ixShade(a,.9+r()*.16);F(c,s,y,L,16);for(let k=0;k<3;k++)F(ixShade(c,.86),s+2+Math.floor(r()*(L-6)),y+3+Math.floor(r()*10),4+Math.floor(r()*6),1);F(b,s,y,1,16);s+=L}F(b,0,y+15,64,1)}}
@@ -42,11 +46,11 @@ const IXL=[];/* [group of lights, shop index] */
 function ixRoom(i,o){const s=SHOPS[i],g=IG[i];if(!s||!g)return;const ox=s.ox;
  const keep=new Set(i==6&&typeof GCM!='undefined'?GCM:[]);g.children.slice().forEach(c=>{if(!keep.has(c))g.remove(c)});
  for(let j=wc.length-1;j>=0;j--){const c=wc[j];if(c[0]>=ox-.6&&c[2]<=ox+10.6&&c[1]>=319.4&&c[3]<=328.6)wc.splice(j,1)}
- const L=[],E=[],b=(w,h,d,c,x,y,z)=>(c[0]=='*'?E:L).push([w,h,d,c[0]=='*'?'#'+c.slice(1):c,ox+x,y,320+z]),cl=(x0,z0,x1,z1)=>wc.push([ox+x0,320+z0,ox+x1,320+z1]);
+ const L=[],E=[],b=(w,h,d,c,x,y,z)=>(c[0]=='*'?E:L).push([w,h,d,c[0]=='*'?'#'+c.slice(1):ixTone(c),ox+x,y,320+z]),cl=(x0,z0,x1,z1)=>wc.push([ox+x0,320+z0,ox+x1,320+z1]);
  const add=(m,x,y,z,ry)=>{m.position.set(ox+x,y,320+z);if(ry)m.rotation.y=ry;g.add(m);return m};
  /* floor, walls (textured), skirting, dado rail, cornice, low front walls with caps, door mat and frame */
- add(new THREE.Mesh(geo(10,.2,8),ixTex(o.fl[0],o.fl[1],o.fl[2],5,4)),5,-.1,4);
- const wm=ixTex(o.wl[0],o.wl[1],o.wl[2],10,3),wm2=ixTex(o.wl[0],o.wl[1],o.wl[2],8,3);add(new THREE.Mesh(geo(10,3,.3),wm),5,1.5,-.15);add(new THREE.Mesh(geo(.3,3,8),wm2),-.15,1.5,4);
+ add(new THREE.Mesh(geo(10,.2,8),ixTex(o.fl[0],ixTone(o.fl[1],.6),ixTone(o.fl[2],.55),5,4)),5,-.1,4);
+ const w1=ixTone(o.wl[1],.62),w2=ixTone(o.wl[2],.56),wm=ixTex(o.wl[0],w1,w2,10,3),wm2=ixTex(o.wl[0],w1,w2,8,3);add(new THREE.Mesh(geo(10,3,.3),wm),5,1.5,-.15);add(new THREE.Mesh(geo(.3,3,8),wm2),-.15,1.5,4);
  const tr=o.tr,wa=o.wa;
  if(wa){b(10,1,.04,wa,5,.5,.02);b(.04,1,8,wa,.02,.5,4)}
  b(10,.16,.07,tr,5,.08,.035);b(.07,.16,8,tr,.035,.08,4);b(10,.06,.08,tr,5,wa?1.02:1,.04);b(.08,.06,8,tr,.04,wa?1.02:1,4);b(10.3,.14,.4,tr,4.85,3.04,-.1);b(.4,.14,8.3,tr,-.1,3.04,3.85);
@@ -55,7 +59,7 @@ function ixRoom(i,o){const s=SHOPS[i],g=IG[i];if(!s||!g)return;const ox=s.ox;
  /* sign */
  if(o.sign){const[t,fg,bg,w,h,y,x,op]=o.sign;add(ixSign(t,fg,bg,w,h,op),x||5,y||2.55,.025);b(w+.12,h+.12,.03,ixShade(bg,.6),x||5,y||2.55,.005)}
  /* lights: warm point lights that only shine while you are in this room, plus a fill light */
- const lg=new THREE.Group();(o.lights||[[2.5,4.5],[7.5,4.5]]).forEach(p=>{const pl=new THREE.PointLight(o.lc||0xffe2b8,(p[2]||.75)*1.35,14,1);pl.position.set(ox+p[0],2.7,320+p[1]);lg.add(pl)});lg.visible=false;g.add(lg);IXL.push([lg,i]);
+ const lg=new THREE.Group();(o.lights||[[2.5,4.5],[7.5,4.5]]).forEach(p=>{const pl=new THREE.PointLight(o.lc||0xffe2b8,(p[2]||.75)*1.35*(ixLum(o.fl[1])+ixLum(o.wl[1])>1.3?.7:.9),14,1);pl.position.set(ox+p[0],2.7,320+p[1]);lg.add(pl)});lg.visible=false;g.add(lg);IXL.push([lg,i]);
  o.build(b,cl,add,ox);
  g.add(new THREE.Mesh(ixGeo(L),ixMat(0)));if(E.length)g.add(new THREE.Mesh(ixGeo(E),ixMat(1)))}
 

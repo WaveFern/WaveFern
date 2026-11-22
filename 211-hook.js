@@ -49,6 +49,8 @@
 
  /* 2: surprise drops during the first 15 minutes of play */
  let nextAt=0;
+ /* v49.93.26: no fans, no fan surprises. Needs at least 1 monthly listener (so fame level 1+). Waits instead of skipping the window. */
+ const fanOk=()=>(+S.listeners||0)>=1;
  function drop(){const h=hk();h.drops++;const r=Math.random();let t,s;
   if(r<.5){const n=Math.round(R(15,45)*(1+h.drops*.15));cash(n);t='Fan tip';s='A fan slipped you $'+n+'.'}
   else if(r<.85){const n=Math.round(R(6,20)*(1+h.drops*.2));S.followers=(S.followers||0)+FOLN(n);t='New fans';s='+'+FOLN(n)+' followers just found you.'}
@@ -66,9 +68,10 @@
  setInterval(()=>safe(()=>{if(!live()||typeof mode=='undefined')return;if(typeof PAUSED!='undefined'&&PAUSED)return;if(mode!='play'&&mode!='drive'&&mode!='rec'&&mode!='pc')return;
   const h=hk();h.play++;
   if(h.play==3)daily();
-  if(h.play<=H.dropWindow){if(!nextAt)nextAt=h.play+R(20,40);if(h.play>=nextAt){nextAt=h.play+R(H.dropMin,H.dropMax);drop()}}
+  if(h.play<=H.dropWindow){if(!nextAt)nextAt=h.play+R(20,40);if(h.play>=nextAt){nextAt=h.play+R(H.dropMin,H.dropMax);if(fanOk())drop()}}
   if(h.play%5==0){ladder();bar()}},'tick'),1000);
  /* 7: comeback */
- document.addEventListener('visibilitychange',()=>safe(()=>{const h=hk();if(document.hidden){h.seen=now();return}
+ document.addEventListener('visibilitychange',()=>safe(()=>{const h=hk();if(document.hidden){h.seen=now();h.pzd=(typeof PAUSED!='undefined'&&PAUSED&&mode=='pause')?1:0;return}
+  if(h.pzd){h.pzd=0;h.seen=now();return}/* v52.2.0: time spent paused earns nothing */
   const gone=(now()-h.seen)/6e4;if(live()&&gone>=10&&(S.songs||[]).length){const n=Math.min(500,Math.round(gone*R(1.5,3)*(1+Math.sqrt(S.listeners||0)/10)));S.followers=(S.followers||0)+FOLN(n);card('WELCOME BACK','+'+FOLN(n)+' new followers','Your music kept working while you were away.')}},'vis'));
 })();

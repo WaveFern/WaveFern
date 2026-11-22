@@ -359,7 +359,7 @@ window.popPose=function(i){const C=CUR;if(!C||!C.P)return;const p=C.P[i],r=Math.
 #ui .popr{display:flex;align-items:center;gap:8px;padding:4px 8px;border-top:1px solid #222;font-size:12px}#ui .popr i{width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:#111;border:2px solid #000;flex-shrink:0}
 #ui .popr span{flex:1;display:flex;flex-direction:column;min-width:0}#ui .popr small{color:#9a9a9a}#ui .popr em{font-style:normal;font-size:11px;color:#2fe68a}#ui .popr.over,#ui .popr.done{opacity:.45}#ui .popr.done em,#ui .popr.over em{color:#8aa094}
 #ui .popr button{padding:3px 8px}
-.popam{margin:10px 0 0;padding:8px 10px;border:2px dashed currentColor}.popam b{display:block;margin-bottom:4px}.popam div{display:flex;align-items:center;gap:6px;font-size:13px;margin:2px 0}.popam i{width:10px;height:10px;border:1px solid #000;flex-shrink:0}.popam span{opacity:.75}
+.popam{margin:10px 0 18px;padding:8px 10px;border:2px dashed currentColor}.popam b{display:block;margin-bottom:4px}.popam div{display:flex;align-items:center;gap:6px;font-size:13px;margin:2px 0}.popam i{width:10px;height:10px;border:1px solid #000;flex-shrink:0}.popam span{opacity:.75}
 `;document.head.appendChild(s)})();
 try{build()}catch(e){}
 })();

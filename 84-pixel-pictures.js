@@ -36,14 +36,13 @@ function pxPick(kind,done){if(!PXIN){PXIN=document.createElement('input');PXIN.t
  PXIN.value='';PXIN.onchange=()=>{const f=PXIN.files&&PXIN.files[0];if(!f)return;if(!/^image\//.test(f.type||'')){snd('err');return say('That file is not a picture.')}
   const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{let c=null;try{const[w,h]=PXS[kind];c=pxFromImage(im,w,h)}catch(e){console.error('picture',e)}URL.revokeObjectURL(u);if(!c){snd('err');return say('Could not read that picture.')}done(c)};
   im.onerror=()=>{URL.revokeObjectURL(u);snd('err');say('Could not read that picture.')};im.src=u};PXIN.click()}
-function pxSetPfp(where){pxPick(where,c=>{S[where=='sp'?'pfpSp':'pfpIg']=c;updateVersion();snd('ping');say((where=='sp'?'Spotifly':'Instagrime')+' profile picture updated.');pcR()})}
+function pxSetPfp(where){pxPick(where,c=>{S[where=='sp'?'pfpSp':'pfpIg']=c;updateVersion();snd('ping');say((where=='sp'?'WaveFern':'Instagrime')+' profile picture updated.');pcR()})}
 function pxResetPfp(where){delete S[where=='sp'?'pfpSp':'pfpIg'];snd('pop');say('Back to your drawn profile picture.');pcR()}
 /* ---- showing them: your drawn avatar is swapped for your upload after each render ---- */
 const PXD={k:null,u:null},pxDef=()=>{const k=JSON.stringify(ch);if(PXD.k!==k){PXD.k=k;PXD.u=pfp(ch)}return PXD.u};
 function pxSwap(){const pc=document.getElementById('pc');if(!pc)return;const u=app==1?pxURL(S.pfpSp):app=='ig'?pxURL(S.pfpIg):null;if(!u)return;const d=pxDef();pc.querySelectorAll('img').forEach(i=>{if(i.getAttribute('src')===d)i.src=u})}
 {const p0=pcR;pcR=function(){p0.apply(this,arguments);try{pxSwap()}catch(e){console.error('picture swap',e)}}}
 const pxBtns=w=>`<span class=pxb><button onclick="pxSetPfp('${w}')">${S[w=='sp'?'pfpSp':'pfpIg']?'Change':'Upload'} picture</button>${S[w=='sp'?'pfpSp':'pfpIg']?`<button onclick="pxResetPfp('${w}')">Use drawn avatar</button>`:''}</span>`;
-{const h0=PG.home;PG.home=function(){const h=h0.apply(this,arguments);return S.artist?h.replace(/(monthly listeners[^<]*<\/p>)/,'$1'+pxBtns('sp')):h}}
 {const st=document.createElement('style');st.textContent='.pxb{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.pxb button{font-size:12px;padding:5px 9px}.pxpv{display:block;width:100%;max-width:384px;margin:0 auto;image-rendering:pixelated;border:1px solid #262626}.ig .pxf{padding:10px 14px;display:flex;flex-direction:column;gap:8px}.ig .pxf input{width:100%;padding:8px;background:#121212;color:#fff;border:1px solid #363636;border-radius:6px;box-sizing:border-box}';document.head.appendChild(st)}
 
 /* ---- photo posts ---- */

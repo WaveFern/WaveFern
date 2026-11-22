@@ -9,7 +9,7 @@
 /* ---------- 1. pedestrians step around you ---------- */
 const SIDE=1.0;/* how far either side of their line people may step (pavement is about 2.4 wide) */
 function avoidPrep(L,vert){L.forEach(n=>{if(n._ao){if(vert)n.x-=n._ao;else n.z-=n._ao}if(n._sp0!==undefined)n.sp=n._sp0})}
-function avoidApply(L,vert,dt){const out=HIN||IN,r=mode=='drive'?1.9:1.05;L.forEach(n=>{
+function avoidApply(L,vert,dt){const out0=HIN||IN,r=mode=='drive'?1.9:1.05;L.forEach(n=>{const out=!n.ext&&out0;/* n.ext: people placed in the airport or a city abroad stay active indoors */
   if(n._sp0===undefined)n._sp0=n.sp;
   let tgt=0,slow=1;const o=n._ao||0;
   if(!out&&n.m.visible&&n.st!=1){
@@ -58,14 +58,14 @@ trafTick=function(dt){const pl=mode=='play'||mode=='drive';TRAF.forEach(c=>{if(!
   if(!c.ne)nextEdge(c);
   const hx=Math.sin(c.h),hz=Math.cos(c.h),toEnd=c.e.len-c.t,q0=curS(c);
   /* the car ahead: same road, or just round the corner on the road we are turning into */
-  TRAF.forEach(o=>{if(o===c||!o.e)return;let g=-1;if(o.a===c.a&&o.e===c.e)g=o.t-c.t;else if(o.e===c.ne&&o.a===c.e.to)g=toEnd+o.t;if(g>0&&g<9)tg=Math.min(tg,g<4.8?0:o.s)});
+  if(c.fr>0)c.fr-=dt;TRAF.forEach(o=>{if(c.fr>0||o===c||!o.e)return;let g=-1;if(o.a===c.a&&o.e===c.e)g=o.t-c.t;else if(o.e===c.ne&&o.a===c.e.to)g=toEnd+o.t;if(g>0&&g<9)tg=Math.min(tg,g<4.8?0:o.s)});
   if(pl&&!IN){const dx=P.x-c.x,dz=P.z-c.z,al=dx*hx+dz*hz,pp=dx*hz-dz*hx;if(al>0&&al<9&&Math.abs(pp)<1.6)tg=al<5?0:Math.min(tg,2.5)}
   /* brake into a turn, hold the turn speed through it */
   if(q0)tg=Math.min(tg,q0[1].v);else if(c.cv){const v=c.cv;if(c.e===v.e1){const d=toEnd-v.din;tg=Math.min(tg,v.v+Math.max(0,d)*.55)}}
   /* give way: wait before the junction while another car is moving through it */
   const wz=c.cv&&c.e===c.cv.e1?c.cv.din+.8:4;
-  if(toEnd<wz&&!q0&&c.w<5){const to=c.e.to;if(TRAF.some(o=>o!==c&&o.e&&o.s>.5&&Math.hypot(o.x-to.x,o.z-to.z)<4.5&&!(o.a===c.a&&o.e===c.e)))tg=0}
-  c.w=tg<.1&&c.s<.5?c.w+dt:0;c.s+=(tg-c.s)*Math.min(1,dt*(tg<c.s?3:1.1));
+  if(toEnd<wz&&!q0&&c.w<5&&!(c.fr>0)){const to=c.e.to;if(TRAF.some(o=>o!==c&&o.e&&o.s>.5&&Math.hypot(o.x-to.x,o.z-to.z)<4.5&&!(o.a===c.a&&o.e===c.e)))tg=0}
+  c.w=tg<.1&&c.s<.5?c.w+dt:0;/* stuck for 6s (jam or deadlock): ignore cars ahead and give-way for a few seconds so traffic always flows */if(c.w>6&&!(c.fr>0)){c.fr=4;c.w=0}if(c.fr>0&&tg<c.cr*.6&&!(pl&&!IN&&(()=>{const dx=P.x-c.x,dz=P.z-c.z,al=dx*hx+dz*hz,pp=dx*hz-dz*hx;return al>0&&al<9&&Math.abs(pp)<1.6})()))tg=c.cr*.6;c.s+=(tg-c.s)*Math.min(1,dt*(tg<c.s?3:1.1));
   /* on the curve the road distance is not the driven distance: scale so the car really moves at c.s */
   c.t+=c.s*dt*(q0?q0[1].span/q0[1].arc:1);
   while(c.t>=c.e.len){c.t-=c.e.len;const b=c.e.to;if(!c.ne)nextEdge(c);c.a=b;c.e=c.ne;c.cx=c.cv;c.ne=null;c.cv=null;c.w=0}
@@ -76,7 +76,16 @@ trafTick=function(dt){const pl=mode=='play'||mode=='drive';TRAF.forEach(c=>{if(!
   const m=c.m;if(c.f||!m.visible){c.rx=c.x;c.rz=c.z;c.h=th;c.f=0}else if(q1){c.rx=c.x;c.rz=c.z}else{c.rx+=(c.x-c.rx)*Math.min(1,dt*8);c.rz+=(c.z-c.rz)*Math.min(1,dt*8)}
   m.position.set(c.rx,0,c.rz);m.rotation.y=c.h;m.visible=Math.abs(c.x-P.x)<50&&Math.abs(c.z-P.z)<50&&!HIN&&!IN})};
 /* on foot, a traffic car is a box along its real heading (also mid-turn) */
-dynB=function(x0,z0,x,z){if(IN||HIN)return false;const R0=.62,ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
- if(NPC.some(n=>n.m.visible&&ppl(n))||VPED.some(n=>n.m.visible&&ppl(n))||ART_M.some(o=>ppl(o)))return true;
+dynB=function(x0,z0,x,z){const ind=IN||HIN,R0=.62,ppl=o=>{const a=Math.hypot(o.x-x,o.z-z);return a<R0&&a<Math.hypot(o.x-x0,o.z-z0)};
+ if(NPC.some(n=>n.m.visible&&(!ind||n.ext)&&ppl(n))||VPED.some(n=>n.m.visible&&(!ind||n.ext)&&ppl(n))||(!ind&&ART_M.some(o=>ppl(o))))return true;if(ind)return false;
  return TRAF.some(c=>{if(!c.e||!c.m.visible||Math.abs(c.x-x)>4||Math.abs(c.z-z)>4)return false;const hx=Math.sin(c.h),hz=Math.cos(c.h),cx=c.rx??c.x,cz=c.rz??c.z,dep=(px,pz)=>{const dx=px-cx,dz=pz-cz,al=Math.abs(dx*hx+dz*hz),pp=Math.abs(dx*hz-dz*hx);return Math.min(2.2-al,1.15-pp)};const n=dep(x,z);return n>0&&n>dep(x0,z0)})};
 })();
+
+/* ===== people in the airport and abroad are the same NPC / VPED people as in the home city =====
+   npcAdd puts an existing buildChar result into the home-city lists, so worldTick (walking, fans who walk up and ask for an
+   autograph), the lanes and sidestep above, pedTick, pushPeople and dynB all treat them exactly like home pedestrians.
+   n.ext (a function) says when they are active; it replaces the "outdoors in the home city" check. All world coordinates.
+   ax 'x': walks along x on lane z=c (NPC list); ax 'z': walks along z on lane x=c (VPED list). */
+function npcAdd(o,ax,c,a,b,p,dir,sp,ext){const base={m:o.g,legs:o.legs,arms:o.arms,dir:dir||1,sp,t:R(0,6),ext};
+ if(ax=='x'){const n=Object.assign(base,{x:p,z:c,z0:c,mn:a,mx:b,k:Math.random(),st:0,cool:0,fan:false});NPC.push(n);return n}
+ const n=Object.assign(base,{x:c,x0:c,z:p,mn:a,mx:b});VPED.push(n);return n}

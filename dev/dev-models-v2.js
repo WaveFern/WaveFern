@@ -68,12 +68,6 @@
   [[0,3,'#7a6a8a'],[4.9,8,'#7a6a8a'],[8,16,'#5a4a6a']].forEach(a=>{const l=a[1]-a[0],cx=(a[0]+a[1])/2;B(g,l,.8,.03,dkc(a[2],.82),cx,.6,.025);B(g,l,.06,.06,tr2,cx,1.03,.03)});
   B(g,.03,.8,6,dkc('#7a6a8a',.82),.025,.6,3);B(g,.06,.06,6,tr2,.03,1.03,3);
   B(g,.03,.8,6,dkc('#8a7f6a',.82),.025,.6,9);B(g,.06,.06,6,tr2,.03,1.03,9);
-  /* window dressing on the two painted back-wall windows (frame, sill, shutters, curtain rail): the detailed windows */
-  const win=(x,cur)=>{
-   B(g,1.8,.1,.07,tr,x,2.45,.05);B(g,1.8,.1,.07,tr,x,1.15,.05);B(g,.1,1.3,.07,tr,x-.85,1.8,.05);B(g,.1,1.3,.07,tr,x+.85,1.8,.05);
-   B(g,.06,1.2,.05,tr,x,1.8,.05);B(g,1.6,.06,.05,tr,x,1.8,.05);B(g,2.0,.08,.22,tr,x,1.09,.12);
-   B(g,2.2,.06,.06,'#3a2f2a',x,2.62,.12);[-1,1].forEach(s=>{B(g,.5,1.55,.08,cur,x+s*1.0,1.85,.12);B(g,.5,.05,.09,dkc(cur,.8),x+s*1.0,1.2,.125)})};
-  win(1.2,'#b8607a');win(9.4,'#3b4a6a');
   /* plus two more on the left wall (bedroom and living room) */
   const lwin=(z,cur)=>{
    B(g,.03,1.2,1.6,'*8fd0ff',.03,1.8,z);

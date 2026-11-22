@@ -266,15 +266,17 @@
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;
  function bApply(on){bOn=on;bset.forEach(e=>{e.o.material=on?e.sn:e.orig});
-  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d'),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
+  lawns.forEach(lawn=>{try{const k=lawn.cv.getContext('2d',{willReadFrequently:true}),W2=lawn.cv.width,H2=lawn.cv.height;k.putImageData(lawn.orig,0,0);
    if(on){/* solid snow, the same white as the snowy grass everywhere else, with a few slightly cooler flecks */k.fillStyle='#f1f5fa';k.fillRect(0,0,W2,H2);k.fillStyle='#e6edf5';for(let i=0;i<W2*H2/8;i++)k.fillRect(RI(0,W2-1),RI(0,H2-1),1,1)}
    lawn.map.needsUpdate=true}catch(e){}})}
  const lawns=[];
- function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const k=cv.getContext('2d'),gc=k.getImageData(0,0,1,1).data;if(gc[1]>gc[0]*1.12){smoothGrass(m.map);lawns.push({cv,map:m.map,orig:k.getImageData(0,0,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
+ /* read pixels through a scratch canvas made with willReadFrequently: the lawn canvases were created elsewhere without it, so asking again on them is ignored and Chrome warns on every readback */
+ let rdCv=null;function rdPix(cv,w,h){if(!rdCv)rdCv=document.createElement('canvas');rdCv.width=w;rdCv.height=h;const k=rdCv.getContext('2d',{willReadFrequently:true});k.clearRect(0,0,w,h);k.drawImage(cv,0,0,w,h);return k.getImageData(0,0,w,h)}
+ function addLawn(m){try{const cv=m.map.image;if(cv&&cv.getContext&&!lawns.some(l=>l.cv===cv)){const gc=rdPix(cv,1,1).data;if(gc[1]>gc[0]*1.12){smoothGrass(m.map);lawns.push({cv,map:m.map,orig:rdPix(cv,cv.width,cv.height)});if(bOn)bApply(true)}}}catch(e){}}
 const topM=new THREE.MeshLambertMaterial({color:'#eef3f8'}),sideCache={};
    function smoothGrass(t){if(!t||t.userData&&t.userData.smooth)return;t.userData=t.userData||{};t.userData.smooth=1;
    const c=t.image,k=c.getContext('2d'),W=c.width,H=c.height;let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
-   const d=k.getImageData(0,0,W,H),a=d.data;let r=0,g=0,b=0;for(let i=0;i<a.length;i+=4){r+=a[i];g+=a[i+1];b+=a[i+2]}const n=a.length/4;r/=n;g/=n;b/=n;
+   const d=rdPix(c,W,H),a=d.data;let r=0,g=0,b=0;for(let i=0;i<a.length;i+=4){r+=a[i];g+=a[i+1];b+=a[i+2]}const n=a.length/4;r/=n;g/=n;b/=n;
    for(let i=0;i<a.length;i+=4){const v=1+(rnd()-.5)*.05;a[i]=r*v;a[i+1]=g*v;a[i+2]=b*v}
    k.putImageData(d,0,0);t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;try{t.anisotropy=8}catch(e){}t.needsUpdate=true}
 function sweepWorld(){
@@ -332,7 +334,7 @@ function sweepWorld(){
  let sweepT=0,first=true,sT=0;
  function xmasTick(dt,px,pz){
   sweepT+=dt;if(first||sweepT>2){if(first)try{plazaTree()}catch(e){console.warn('xmas tree',e)}first=false;sweepT=0;try{sweepWorld()}catch(e){console.warn('xmas sweep',e)}try{freezePond()}catch(e){}}
-  const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut',inner=(typeof wxInterior=='function')&&wxInterior();
+  const live=mode=='play'||mode=='drive'||mode=='rec'||mode=='pc'||mode=='build'||mode=='cut'||mode=='menu'||mode=='pause'||mode=='sleep'||mode=='phone'||mode=='fest'||mode=='dshow'||mode=='dcut'||mode=='cutawd',inner=(typeof wxInterior=='function')&&wxInterior();
   /* snow cover follows today's weather */
   const want=!!(S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&live)?1:0;
   if(want!==snowTarget){snowTarget=want;if(want&&!bOn||!want&&bOn){bApply(!!want);if(!want){prClear(FP);prClear(TR)}}}
@@ -354,7 +356,8 @@ function sweepWorld(){
   /* snowfall */
   const snow=S.wx&&S.wx.k=='snow'&&W;
   if(snow&&!sMesh)sMesh=snowMesh();
-  if(sMesh){sMesh.visible=!!snow;if(snow){const u=sMesh.material.uniforms,hr=wxHouse();u.c.value.set(camT.x,0,camT.z);u.t.value=(u.t.value+dt)%5000;u.hr.value.set(hr[0],hr[1],hr[2],hr[3]);u.hin.value=(typeof HIN!='undefined'&&HIN||mode=='build')?1:0}}
+  const wq=typeof gfxCur=='function'?+gfxCur().wx:2;/* Settings > Graphics > Weather effects: Light = half the flakes, Off = none */
+  if(sMesh){sMesh.visible=!!snow&&wq>0;sMesh.geometry.setDrawRange(0,wq==1?1300:Infinity);if(snow){const u=sMesh.material.uniforms,hr=wxHouse();u.c.value.set(camT.x,0,camT.z);u.t.value=(u.t.value+dt)%5000;u.hr.value.set(hr[0],hr[1],hr[2],hr[3]);u.hin.value=(typeof HIN!='undefined'&&HIN||mode=='build')?1:0}}
  }
  {const u0=update;update=function(dt){const px=P.x,pz=P.z;u0(dt);try{xmasTick(dt,px,pz)}catch(e){if(!xmasTick.err){xmasTick.err=1;console.warn('xmas tick',e)}}}}
 

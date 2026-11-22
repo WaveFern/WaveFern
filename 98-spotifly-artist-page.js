@@ -1,5 +1,5 @@
 /* ===== v26.105: WaveFern looks like a real artist page, with a song player =====
-   Artist page: a big header (your picture as the artwork, your name, "Verified by Spotifly", monthly listeners),
+   Artist page: a big header (your picture as the artwork, your name, "Verified by WaveFern", monthly listeners),
    a play / shuffle row and a numbered Popular list (cover, title, streams, length). A Now playing panel sits on the
    right and a player bar along the bottom of the WaveFern window. Both have a pause button that really pauses the song
    (Beats.hold), and the bar also has previous / next, shuffle and repeat and a volume slider.
@@ -71,7 +71,14 @@ function sfMute(){S.sfVol=(S.sfVol==null?1:S.sfVol)>0?0:1;sfVol(S.sfVol);pcR()}
 function sfBig(){const c=sfCur();if(c&&sfIsSong(c))return sfToggle();const L=sfOrder();if(!L.length)return;if(SPQ.sh)sfStart(L[Math.floor(Math.random()*L.length)],L.map(x=>x.id));else sfStart(L[0],L.map(x=>x.id))}
 
 /* ---------- artist page ---------- */
-const sfAcc=()=>{let h=0;for(const c of String(S.artist||''))h=(h*31+c.charCodeAt(0))>>>0;return['#5a1414','#14385a','#3a145a','#14503a','#5a3a14','#5a1446'][h%6]};
+const sfAvg={};/* v55.21.0: the page colour is the average colour of your picture (a fully blue picture gives a fully blue page); a name-based colour shows until the picture is read */
+const sfAcc=()=>{let h=0;for(const c of String(S.artist||''))h=(h*31+c.charCodeAt(0))>>>0;const fb=['#5a1414','#14385a','#3a145a','#14503a','#5a3a14','#5a1446'][h%6];let src='';try{src=pfp()}catch(e){}
+ if(!src)return fb;const k=src.length+':'+src.slice(-40);if(sfAvg[k])return sfAvg[k];sfAvg[k]=fb;
+ try{const im=new Image;im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d');x.drawImage(im,0,0,24,24);const d=x.getImageData(0,0,24,24).data;let r=0,g=0,b=0,n=0;for(let q=0;q<d.length;q+=4)if(d[q+3]>128){r+=d[q];g+=d[q+1];b+=d[q+2];n++}
+  if(!n)return;r/=n;g/=n;b/=n;const L=(r*.299+g*.587+b*.114)/255;if(L>.6){const f=.6/L;r*=f;g*=f;b*=f}
+  const col='#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');sfAvg[k]=col;
+  document.querySelectorAll('.sfhd,.sfbd,.gsp').forEach(e=>{if(e.style.getPropertyValue('--acc')===fb)e.style.setProperty('--acc',col)})}catch(e){}};im.src=src}catch(e){}
+ return fb};
 function sfRow(s,i,c){const on=!!(c&&c.src===s),pl=on&&!c.held,f=sfAlbumOf(s.id),lk=typeof luckTag=='function'?luckTag(s):'';
  return`<div class="sfr${on?' on':''}" ondblclick="sfPlayId(${s.id})"><span class=sfn><b>${on?(pl?'<i class=sfeq><i></i><i></i><i></i></i>':i):i}</b><button class=sfnb title="${pl?'Pause':'Play'}" aria-label="${pl?'Pause':'Play'} ${esc(s.title)}" onclick="sfPlayId(${s.id})">${sfIco(pl?'pause':'play')}</button></span>
  <img class=sfrc src="${sfCover(s)}" alt=""><span class=sft><b>${esc(s.title)}${lk}</b><small>${esc(s.g||'')} · +${(s.today||0).toLocaleString()} today</small></span>
@@ -83,13 +90,12 @@ function sfDisco(){const A=S.albums||[];if(!A.length)return'';return`<h2 class=s
  `}
 PG.home=()=>{const L=sfOrder(),sh=SALL?L:L.slice(0,5),c=sfCur(),pl=!!(c&&sfIsSong(c)&&!c.held);
  return`<div class=sfhd style="--acc:${sfAcc()}"><img class=sfart src="${pfp()}" alt=""><div class=sfhi><h1 class=sfnm>${esc(S.artist)}</h1>
- <div class=sfver>${sfIco('ver','sfvi')}<b>Verified by Spotifly</b></div><p class=sfml>${S.listeners.toLocaleString()} monthly listeners</p></div></div>
+ <div class=sfver>${sfIco('ver','sfvi')}<b>Verified by WaveFern</b></div><p class=sfml>${S.listeners.toLocaleString()} monthly listeners</p></div></div>
  <div class=sfbd style="--acc:${sfAcc()}"><div class=sfact><button class=sfgo title="${pl?'Pause':'Play'}" aria-label="${pl?'Pause':'Play'}" onclick="sfBig()" ${L.length?'':'disabled'}>${sfIco(pl?'pause':'play')}</button>
  <button class="sfib${SPQ.sh?' on':''}" title="Shuffle ${SPQ.sh?'on':'off'}" onclick="sfShuf()">${sfIco('shuf')}</button><span class=sfpill>${S.followers.toLocaleString()} followers</span><span class=sfpill>Fame ${fameStr()}</span></div>
  <h2 class=sfh2>Popular</h2>${L.length?sh.map((s,i)=>sfRow(s,i+1,c)).join('')+(L.length>5?`<button class=sfmore onclick="SALL=!SALL;pcR()">${SALL?'Show less':'See more ('+L.length+')'}</button>`:''):'<p class=m>No releases yet. Record a song in the studio, then upload it from the Upload tab.</p>'}
  ${sfDisco()}</div>`};
 /* keep the "upload a picture" buttons under the monthly listeners line (84-pixel-pictures.js) */
-{const h0=PG.home;PG.home=function(){const h=h0.apply(this,arguments);return S.artist&&typeof pxBtns=='function'?h.replace(/(monthly listeners[^<]*<\/p>)/,'$1'+pxBtns('sp')):h}}
 {const a0=PG.albums;if(a0)PG.albums=function(){const h=a0.apply(this,arguments),k=h.lastIndexOf('<button class=go onclick="mkAlbum()">'),n='';return k<0?h+n:h.slice(0,k)+n+h.slice(k)}}
 
 /* ---------- Now playing panel and player bar (on every WaveFern page) ---------- */

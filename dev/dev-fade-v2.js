@@ -17,10 +17,11 @@
   const L=meshesOf(b);if(!L.length){MAP=null;return[]}
   b._pp=L.map(o=>{const p=new THREE.Mesh(o.geometry,DM);p.userData.fwPre=1;p.renderOrder=-1;p.visible=false;p.matrixAutoUpdate=false;p.raycast=()=>{};o.add(p);return p});
   return b._pp}
- const show=(b,v)=>{if(b._pp||v)pre(b).forEach(p=>{p.visible=v})};
+ /* v51.4.0: the depth-only pre-pass is gone: it wrote depth for the whole faded building, so anything see-through behind it (name tags, shadows, glass) was hidden or flickered, which made the scene look broken. A building is a convex box, so it has no layers to double up on its own. */
+ const show=()=>{};
  function boot(){try{
   if(typeof fadeT!=='function'||typeof CT==='undefined'||typeof P==='undefined'||typeof scene==='undefined')return false;
-  const f0=fadeT,LOW=.04,MARGIN=1.4;
+  const f0=fadeT,LOW=.25,MARGIN=1.4;
   fadeT=function(dt){
    f0.apply(this,arguments);
    try{
