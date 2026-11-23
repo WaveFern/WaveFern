@@ -27,7 +27,7 @@ const LEARN={};H.forEach(h=>LEARN[h[2]]=h[0]);
 let el=null,tm=0,cur='';
 function css(){if($('khcss'))return;const s=document.createElement('style');s.id='khcss';s.textContent=`
 #khint{position:fixed;right:10px;top:100px;z-index:57;width:min(270px,66vw);box-sizing:border-box;display:flex;gap:8px;align-items:flex-start;background:#0b0f0def;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,0 0 0 2px #2fe68a66,4px 4px 0 #0008;padding:8px 8px 7px 9px;font:12px/1.35 system-ui,sans-serif;color:#c9d8cf;animation:khin .25s ease-out}
-#khint .kk{flex:none;min-width:22px;text-align:center;font:700 12px Silkscreen,ui-monospace,monospace;color:#0a0d0b;background:#ffd27a;border:2px solid #000;padding:3px 6px;box-shadow:0 3px 0 #0008}
+#khint .kv{flex:none;width:34px;height:34px;image-rendering:pixelated;border:2px solid #000;box-shadow:0 0 0 2px #2fe68a66;background:#2a4a38}#khint .kn{display:block;font:10px Silkscreen,ui-monospace,monospace;color:var(--g);margin-bottom:2px}#khint .kk{flex:none;min-width:22px;text-align:center;font:700 12px Silkscreen,ui-monospace,monospace;color:#0a0d0b;background:#ffd27a;border:2px solid #000;padding:3px 6px;box-shadow:0 3px 0 #0008}
 #khint .kt{flex:1}#khint .kt small{display:block;margin-top:3px;color:#6f8578;font:10px Silkscreen,ui-monospace,monospace}
 #khint .kx{flex:none;background:none;border:0;color:#8aa094;font:700 14px/1 system-ui;cursor:pointer;padding:0 2px;margin:0;box-shadow:none}
 @keyframes khin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
@@ -35,8 +35,8 @@ function css(){if($('khcss'))return;const s=document.createElement('style');s.id
 @media (max-width:700px){#khint{top:96px;width:min(250px,62vw)}}`;document.head.appendChild(s)}
 function hide(){clearTimeout(tm);tm=0;cur='';if(el){el.remove();el=null}}
 function show(h){css();hide();const t=touch();cur=h[0];K().s[h[0]]=1;K().last=K().sec;
- el=document.createElement('div');el.id='khint';el.innerHTML='<span class=kk></span><span class=kt><span class=tx></span><small></small></span><button class=kx title="Close" aria-label="Close hint">✕</button>';
- el.querySelector('.kk').textContent=t?'TIP':h[1];el.querySelector('.tx').textContent=t?h[4]:h[3];
+ el=document.createElement('div');el.id='khint';el.innerHTML='<img class=kv alt="Big Vee"><span class=kk></span><span class=kt><span class=kn>BIG VEE</span><span class=tx></span><small></small></span><button class=kx title="Close" aria-label="Close hint">✕</button>';
+ el.querySelector('.kv').src=safe(tutPic,'');el.querySelector('.kk').textContent=t?'TIP':h[1];el.querySelector('.tx').textContent=t?h[4]:h[3];
  el.querySelector('small').textContent=t?'Settings: Controls':'H: all controls';
  el.querySelector('.kx').onclick=()=>{safe(()=>snd('click'));hide()};document.body.appendChild(el);safe(()=>snd('ping'));
  tm=setTimeout(hide,14000)}
