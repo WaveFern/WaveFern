@@ -129,3 +129,11 @@ if(typeof pauseUI=='function'){const pu0=pauseUI;
   const b=document.createElement('button');b.id='asvb';b.className='asv';b.innerHTML='<span class=asl>Autosave</span><span class=asd><i></i><i></i><i></i></span>'+TICK;b.onclick=()=>{try{snd('click')}catch(e){}ASV='';fwAutosave()};
   const q=[...m.querySelectorAll('button')].find(x=>/^Save and quit$/.test(x.textContent.trim()));m.insertBefore(b,q||null);
   paint();if(!ASV)fwAutosave()}catch(e){}}}
+/* ---------- v55.44.0: the old bedroom rug goes into Storage, silently ----------
+   One-time migration, same pattern as 99-starter-furniture (flag in S, placed piece in PL, stored count in S.inv). A placed
+   'srug' is removed from the room and counted in S.inv.srug, so nobody loses it; S.rugSt=1 stops it running again, so a
+   player can place the rug back whenever they like. No message is shown. ensureStarters skips a piece with S.inv[k]>0. */
+{const b0=buildTick;let n=0;buildTick=function(){if(++n%30==0&&!S.rugSt&&S.sp&&typeof PL!='undefined'&&scene&&mode!='load'&&mode!='creator'&&mode!='build'&&!hold){try{
+  S.rugSt=1;if(!S.inv)S.inv={};
+  for(let i=PL.length-1;i>=0;i--)if(PL[i].t=='srug'){scene.remove(PL[i].m);PL.splice(i,1);S.inv.srug=(S.inv.srug||0)+1}
+ }catch(e){}}return b0.apply(this,arguments)}}

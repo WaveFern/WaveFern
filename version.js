@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.43.1';
+const GAME_VERSION='v55.44.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.44.0',n:'The old bedroom rug now sits in your Storage, ready to place again.'},
  {v:'v55.43.1',n:'Fewer lag spikes: the skate park ground-cutting scan no longer re-runs a scene-wide raycast every 2 seconds (a 25 to 45 ms hitch each time), and the dev wall-clear scan checks every 2 minutes instead of 30 seconds.'},
  {v:'v55.43.0',n:'Music Mastery page made simpler: a Do this next card, plain labels, only the next three rewards (the rest and the extra numbers sit behind expanders), shorter activity rows with details on click. The mastery rules and rewards are unchanged.'},
  {v:'v55.42.0',n:'Weak songs earn more. Each night 60% of your streams are now shared evenly across all your songs (was 35%), and songs that had hit their stream cap are included, so with 30K monthly listeners your least-streamed songs get a fair daily share instead of a few hundred streams in total. Total streams and earnings are unchanged.'},
