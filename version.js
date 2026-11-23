@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.45.0';
+const GAME_VERSION='v55.46.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.46.0',n:'Graphics Auto now starts as high as your device can run. Desktop graphics cards start on Best, normal and integrated graphics chips and phones start on High (they used to start on Medium), and only very old or software-drawn chips start on Low. Auto still steps down by itself if the game runs slowly, and up again when it runs very smoothly. A preset you picked yourself is never changed. Anyone left on a low Auto level is re-checked once.'},
  {v:'v55.45.0',n:'Spotify timeline seeking. Click, tap or drag the song progress bar in the WaveFern music app to jump to that part of the song (works with mouse, touch and the Quest laser pointer, also while paused).'},
  {v:'v55.44.0',n:'The old bedroom rug now sits in your Storage, ready to place again.'},
  {v:'v55.43.1',n:'Fewer lag spikes: the skate park ground-cutting scan no longer re-runs a scene-wide raycast every 2 seconds (a 25 to 45 ms hitch each time), and the dev wall-clear scan checks every 2 minutes instead of 30 seconds.'},

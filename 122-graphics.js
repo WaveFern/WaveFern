@@ -11,20 +11,23 @@
    bat (Battery Saver) is the lightest: Low's look plus a 30 fps cap and reduced drawing in the background. */
 /* det = small props hidden: any solid prop whose longest side is under that many world units is not drawn (0 = all drawn). v55.11: every step is cheaper than the one above it. shi = shadow redraw gap in ms (shadows are redrawn at most that often). Battery is the lightest and also draws at 30 fps. */
 const GFX_PRE={best:{px:2,fps:0,crowd:4,wx:2,far:1,bg:0,blur:1,sh:4,shd:1,shi:14,cg:1,det:0},high:{px:3,fps:60,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,cg:1,det:0},med:{px:3,fps:60,crowd:2,wx:1,far:1,bg:0,blur:1,sh:1,shd:0,shi:100,cg:1,det:0.15},low:{px:5,fps:60,crowd:1,wx:0,far:0,bg:0,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6},bat:{px:5,fps:30,crowd:1,wx:0,far:0,bg:1,blur:0,sh:0,shd:0,shi:100,cg:0,det:0.6}};
-const GFX_LV=['high','med','low'];
+const GFX_LV=['best','high','med','low'];
 const GFX_DEF={p:'auto',al:'high',px:3,fps:60,crowd:4,wx:2,far:1,bg:0,blur:1,sh:3,shd:1,shi:33,det:0,cg:1,pp:0,dv:0};let GFX=Object.assign({},GFX_DEF);
 try{const g=JSON.parse(localStorage.getItem('fw_gfx')||'null');if(g&&typeof g=='object')Object.assign(GFX,g)}catch(e){}
 if(!GFX_PRE[GFX.al])GFX.al='high';
 /* v55.31: Auto picks its first level from the device (graphics chip name, cores, memory, phone/tablet), once, then moves up or down from measured frame times (gfxAuto). Old Auto saves that had sunk to a low level are re-detected once (dv flag). Manual presets are never touched. */
 function gfxDetect(){let lv=2;try{let r='';try{const gl=renderer.getContext(),e=gl.getExtension('WEBGL_debug_renderer_info');r=String(e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)||'').toLowerCase()}catch(e){}
- const mob=/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent||'')||(matchMedia&&matchMedia('(pointer:coarse)').matches&&innerWidth<1100),cores=navigator.hardwareConcurrency||4,mem=navigator.deviceMemory||0;
- const soft=/swiftshader|llvmpipe|software|basic render|microsoft basic|softpipe/.test(r),weak=/mali-4|mali-t|adreno \(?[2-4]\d\d|powervr|videocore|vivante|intel.*(gma|hd graphics [2-5]\d\d\b)/.test(r),igpu=/intel|uhd|iris|mali|adreno|powervr|apple a\d/.test(r)&&!/apple m\d|arc/.test(r);
- if(soft||weak)lv=0;else if(igpu)lv=1;
- if(mob)lv=Math.min(lv,1);
- if(cores<=2||(mem&&mem<=2))lv-=1;else if(mem&&mem<=4)lv=Math.min(lv,1);
- if(innerWidth*innerHeight/Math.pow(Math.max(2,+gfxCur().px||3),2)>900000&&lv>1)lv=1}catch(e){}
- return GFX_LV[2-Math.max(0,Math.min(2,lv))]}
-if(GFX.p=='auto'&&!GFX.dv){GFX.al=gfxDetect();GFX.dv=1;try{localStorage.setItem('fw_gfx',JSON.stringify(GFX))}catch(e){}}
+ const mob=/android|iphone|ipad|ipod|mobile|oculus|quest/i.test(navigator.userAgent||'')||(matchMedia&&matchMedia('(pointer:coarse)').matches&&innerWidth<1100),cores=navigator.hardwareConcurrency||4,mem=navigator.deviceMemory||0;
+ const soft=/swiftshader|llvmpipe|software|basic render|microsoft basic|softpipe/.test(r),weak=/mali-4|mali-t|adreno[^0-9]*[2-4]\d\d|powervr|videocore|vivante|intel.*(gma|hd graphics [2-5]\d{2,3}\b)/.test(r),mid=/adreno[^0-9]*5\d\d|mali-g[3-6]\d\b|mali-g7[0-2]\b/.test(r),dgpu=/geforce|nvidia|rtx|gtx|quadro|radeon rx|radeon pro|apple m\d|intel.*arc/.test(r);
+ /* v55.46: a normal GPU starts on High and a desktop-class one on Best; only software or very old chips start low, only mid-range phone chips on Medium. Auto then steps down by itself if the game runs slowly (the old rule put every integrated chip, phone and 4 GB machine on Medium, and Auto never went above High). */
+ if(dgpu&&!mob&&cores>=4)lv=3;
+ if(mob)lv=Math.min(lv,2);
+ if(soft||weak)lv=0;else if(mid)lv=Math.min(lv,1);
+ if(cores<=2||(mem&&mem<=2))lv-=1;
+ const px=GFX_PRE[GFX_LV[3-Math.max(0,Math.min(3,lv))]].px;
+ if(innerWidth*innerHeight/(px*px)>(lv>2?1200000:900000)&&lv>1)lv-=1}catch(e){}
+ return GFX_LV[3-Math.max(0,Math.min(3,lv))]}
+if(GFX.p=='auto'&&!(GFX.dv>=2)){GFX.al=gfxDetect();GFX.dv=2;try{localStorage.setItem('fw_gfx',JSON.stringify(GFX))}catch(e){}}
 if(GFX.p!='auto'&&GFX.p!='custom'&&!GFX_PRE[GFX.p])GFX.p='auto';
 /* shadows: sh 0 off, 1-4 = 512/1024/2048/4096 map (3 = the long-standing look); shd 0 near, 1 normal, 2 far; cg: colour grade and vignette */
 for(const k in GFX_DEF)if(k!='p'&&k!='al'&&typeof GFX[k]!='number')GFX[k]=GFX_DEF[k];
@@ -112,8 +115,8 @@ gfxApply();
 /* Settings > Graphics */
 {const s0=settings;settings=function(){const r=s0.apply(this,arguments);const t=$('stt');
   if(t&&!t.querySelector('[data-t=gfx]')){const b=document.createElement('button');b.dataset.t='gfx';b.textContent='Graphics';b.onclick=()=>{STAB='gfx';stDraw()};const g=t.querySelector('[data-t=game]');g?g.after(b):t.appendChild(b);if(STAB=='gfx')stDraw()}return r}}
-function gfxReset(){const f=GFX.fpsOn;GFX=Object.assign({},GFX_DEF);if(f)GFX.fpsOn=f;GFX.al=gfxDetect();GFX.dv=1;gfxSv();gfxApply();stDraw();say('Graphics reset')}
-function gfxSet(k,v){if(k=='p'){GFX.p=v;if(v=='auto'){GFX.al=gfxDetect();GFX.dv=1}}else{if(GFX.p!='custom')Object.assign(GFX,gfxCur());GFX.p='custom';GFX[k]=v}gfxSv();gfxApply();stDraw()}
+function gfxReset(){const f=GFX.fpsOn;GFX=Object.assign({},GFX_DEF);if(f)GFX.fpsOn=f;GFX.al=gfxDetect();GFX.dv=2;gfxSv();gfxApply();stDraw();say('Graphics reset')}
+function gfxSet(k,v){if(k=='p'){GFX.p=v;if(v=='auto'){GFX.al=gfxDetect();GFX.dv=2}}else{if(GFX.p!='custom')Object.assign(GFX,gfxCur());GFX.p='custom';GFX[k]=v}gfxSv();gfxApply();stDraw()}
 const gfxH=t=>`<div class=so style="border:0;padding-bottom:0"><b style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7">${t}</b></div>`;
 const gfxRow=(l,k,opts,n)=>{const c=k=='p'?GFX.p:gfxCur()[k];if(k=='fps'&&gfxHz)opts=opts.filter(o=>o[0]==c||(o[0]?o[0]<=gfxHz+6:gfxHz>66));return`<div class=so><span>${l}${n?`<small class=m>${n}</small>`:''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${opts.map(([v,t])=>`<button class="${c==v?'go':''}" onclick="gfxSet('${k}',${typeof v=='string'?`'${v}'`:v})">${t}</button>`).join('')}</span></div>`};
 {const b0=stBody;stBody=function(){if(STAB!='gfx')return b0.apply(this,arguments);
