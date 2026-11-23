@@ -2,7 +2,7 @@
    A brand-new career starts with the bare basics only: walk, pick a stage name, record a song, release it. After that you
    are free, and Big Vee pops up the first time you reach something new (your first DM, the street, a car, a shop, the
    airport, a festival, a tour city, being tired, ...). Tips stay on for the whole first career; the dialogue box has a
-   "Tips off" button and the pause menu turns them on or off. There is no progress panel.
+   "Tips off" button and Settings > Game turns them on or off. There is no progress panel.
    When a tip is about a place, a glowing guide line runs along the ground from you to it (like a Roblox tutorial beam)
    with a bobbing arrow over it. Inside a building the line points to the way out first. On the laptop, the button to
    press is outlined.
@@ -124,7 +124,7 @@ function tutDone(t){const T=S.tut;T.goal=null;T.gb=null;tutClr();snd('chime');tu
  if(t.b)tutBurst(innerWidth/2,innerHeight-150,30)}
 function tutStart(){const o=S.tut||{};S.tut={v:2,on:1,seen:{},f:{},g:o.g||0,goal:null};
  if(!S.tut.g){S.tut.g=1;S.money=+(S.money+TUT_GIFT).toFixed(2);say('Big Vee gave you $'+TUT_GIFT+' for gear and clothes')}TUTLAST=0}
-function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.x=1;S.tut.goal=null;tutClr();tutSayEnd(1);say('Tips off. Turn them back on from the pause menu.')}
+function tutEnd(){if(!S.tut)return;S.tut.on=0;S.tut.x=1;S.tut.goal=null;tutClr();tutSayEnd(1);say('Tips off. Turn them back on in Settings > Game.')}
 function tutClr(){document.querySelectorAll('.tutHL').forEach(e=>e.classList.remove('tutHL'))}
 const tutTip=k=>TIPS.find(t=>t.k==k);
 function tutPoll(){if(!tutOn()){tutClr();return}const T=S.tut;T.seen=T.seen||{};T.f=T.f||{};
@@ -181,6 +181,6 @@ function tutBeam(){if(TUTG)return TUTG;const c=document.createElement('canvas');
  const T=S.tut;if(T&&T.v!=2){const on=!!(T.on&&!T.done);S.tut={v:2,on:on?1:0,seen:{},f:{},g:T.g||0,goal:null};
   if(on){const s=S.tut.seen;s.move=1;if(S.artist)s.name=1;if(S.songs.length+S.drafts.length)s.record=1;if(S.songs.length){s.release=1;s.free=1}}}
  else if(T&&T.goal&&!tutTip(T.goal))T.goal=null}catch(e){}return r}}
-/* pause menu: tips on / off */
-{const p0=pauseUI;pauseUI=function(){p0();const m=$('pzm');if(m){const b=document.createElement('button');b.textContent=tutOn()?'Tips: on':'Tips: off';
- b.onclick=()=>{if(tutOn())tutEnd();else{if(!S.tut||S.tut.v!=2)tutStart();else{S.tut.on=1;S.tut.x=0}say('Tips on. Big Vee will pop up when you find something new.')}b.textContent=tutOn()?'Tips: on':'Tips: off'};m.appendChild(b)}}}
+/* Settings > Game: tips on / off (was a pause-menu button; v55.41.0) */
+function tutToggle(){if(tutOn())tutEnd();else{if(!S.tut||S.tut.v!=2)tutStart();else{S.tut.on=1;S.tut.x=0}say('Tips on. Big Vee will pop up when you find something new.')}}
+{const b0=stBody;stBody=function(){const h=b0.apply(this,arguments);return STAB=='game'?h+stTog('Tips',tutOn(),'tutToggle()','Big Vee pops up when you find something new'):h}}
