@@ -22,7 +22,7 @@
   /* cheap rolling hash instead of building a ~15 KB string every 0.5 s (v perf: big houses) */
   let h=PL.length;for(let i=0;i<PL.length;i++){const q=PL[i];h=(Math.imul(h,31)+(q.x*1e3|0)*7+(q.z*1e3|0)*13+(q.r|0)*17+q.t.length*19+q.t.charCodeAt(q.t.length-1)+q.t.charCodeAt(0)*3)|0}
   const s=h+':'+PL.length;
-  const nw=performance.now();if(s===sig&&(scene.children.length===kids||nw-lastC<30000))return;lastC=nw;sig=s;kids=scene.children.length;
+  const nw=performance.now();if(s===sig&&(scene.children.length===kids||nw-lastC<120000))return;lastC=nw;sig=s;kids=scene.children.length;
   hidden.forEach(o=>{o.visible=true});hidden.clear();
   if(!PL.length)return;
   collect();
