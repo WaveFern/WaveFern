@@ -5,7 +5,7 @@
 ## Rules for every change
 - Newest file wins: later scripts re-assign earlier functions. Search for a function name across `*.js` and `dev/*.js` and read the last definition in `index.html` tag order.
 - Never reorder or rename script tags in `index.html` without checking the load-order section of `ARCHITECTURE.md`. Files wrapped in one closure (`161-multiplayer.js`, `150-tour-cities.js`, `139-airport.js`) cannot be split mechanically.
-- Every change bumps `GAME_VERSION` in `version.js`, adds a `VERSION_HISTORY` entry, and bumps the `?v=` on any changed script tag (including `version.js?v=`). Pull `main` first: other changes land often.
+- Versions and releases: read `docs/releases.md`. Fixes and small tweaks ship at once as a patch; exciting features merge dark (behind the `FW_DEV` gate or a `HELD` flag) and go live together on release day as the next major (v56.0.0). Never edit version numbers by hand: run `node tools/bump.js patch "note"` (or `drop`), which bumps `GAME_VERSION`, adds the `VERSION_HISTORY` entry and bumps the `?v=` of changed scripts (including `version.js?v=`). Pull `main` first; on a version-only merge conflict run `node tools/bump.js renumber`; before merging run `node tools/bump.js trial` and `check`. No history rewrites or force pushes.
 - Saves must keep loading: add new saved fields with defaults in `S` (`02-data.js`); never remove an old save-code decoder; append to `ART`, never reorder it.
 - Tell the user the version number whenever you merge to `main`.
 

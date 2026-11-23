@@ -1,11 +1,12 @@
 /* ---------- version ----------
-   Version code: vMAJOR.MINOR.PATCH
-   - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
-   - PATCH: every bug fix, however small
-   Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.52.0';
+   Version code: vMAJOR.MINOR.PATCH   (see docs/releases.md; use `node tools/bump.js`, never edit these numbers by hand)
+   - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
+   - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
+   - MINOR: no longer bumped (old entries below used it for features). */
+const GAME_VERSION='v55.52.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.1',n:'Behind the scenes: new release scheme (quiet patch numbers, one big drop per week) and tools/bump.js to number versions and avoid merge conflicts. Nothing in the game changed.'},
  {v:'v55.52.0',n:'Big Vee is back on the whole tutorial. The Next Goal box and the key hint chips now show his portrait and name, and his steps 1 to 5 stay numbered.'},
  {v:'v55.51.0',n:'Dev build: the money roll now also plays for the pay you earn overnight (when the new day screen shows) and for the while you were away pay and autograph pay and tips, with the gold +amount pop.'},
  {v:'v55.50.0',n:'Friends see you as offline when you switch away from the tab (after 5 seconds) and online again when you return. If a friend nudges you while the tab is hidden, the icon gets a red dot and the tab title says who nudged you and how long ago for a few seconds. Saves still load.'},

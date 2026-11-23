@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.52.1 (2026-11-23): release scheme: quiet patches all week, one major drop on release day (docs/releases.md); `tools/bump.js` (patch, drop, check, trial, renumber) replaces hand-edited version lines.
 - v55.49.0 (2026-11-23): desktop wallpapers: 22 more built-ins (CSS only), scrollable picker, "Add your own picture" (reuses `pxPick`/`pxEnc` from `84-pixel-pictures.js`, 128x72 16-colour, `S.wpc` ~6 KB, slot 100).
 - v55.40.0 (2026-11-22): key hints: `255-key-hints.js` (paced one-at-a-time chips for Shift/N/G/Tab/F, H Controls card + pause button, `S.kh`, `FW_KEYS`).
 - v55.39.0 (2026-11-22): removed Fern Rush (runner) from the arcade at James's request; menu shows Fern Flap and Fern Quest.

@@ -39,7 +39,7 @@ li>span:last-child{flex:1;min-width:0}
 <script>
   document.getElementById('cur').textContent = GAME_VERSION;
   document.getElementById('list').innerHTML = VERSION_HISTORY.map((e, i) =>
-    `<li><span class="v">${e.v}${i === 0 ? '<span class="cur">current</span>' : ''}</span><span>${e.n}</span></li>`
+    `<li${/^v\d+\.0\.0$/.test(e.v) ? ' style="border-left:3px solid #2fe68a;padding-left:8px"' : ''}><span class="v">${e.v}${i === 0 ? '<span class="cur">current</span>' : ''}</span><span>${e.n}</span></li>`
   ).join('');
 </script>
 </body>
