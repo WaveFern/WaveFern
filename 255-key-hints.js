@@ -4,7 +4,7 @@
      Shift run, N map (first time outside or after the first release), G Gphone and Tab Music Mastery (after the first release
      and the first night), F furniture (some cash or day 3). Paced: none before 40 s of play, 75 s between hints, never over a
      Big Vee box, card or pop-up. Fades after 14 s, has a close button, and pressing the key itself counts as learned.
-   2 H opens the Controls card (every key, one list) any time in play; the pause menu has a Controls button; every chip says "H: all controls".
+   2 H opens the Controls card (every key, one list) any time in play; Settings > Game has a Controls button; every chip says "H: all controls".
    3 Careers that are already past day 2 or have 3+ songs get no chips (the Controls card still works).
    Touch devices see button names (Map, Phone, Run, Storage) instead of keys. State S.kh={s:{id:1 once shown or learned},sec:play s,last:sec at last hint,off:1 hints turned off}.
    Test hook: window.FW_KEYS. */
@@ -37,7 +37,7 @@ function hide(){clearTimeout(tm);tm=0;cur='';if(el){el.remove();el=null}}
 function show(h){css();hide();const t=touch();cur=h[0];K().s[h[0]]=1;K().last=K().sec;
  el=document.createElement('div');el.id='khint';el.innerHTML='<span class=kk></span><span class=kt><span class=tx></span><small></small></span><button class=kx title="Close" aria-label="Close hint">✕</button>';
  el.querySelector('.kk').textContent=t?'TIP':h[1];el.querySelector('.tx').textContent=t?h[4]:h[3];
- el.querySelector('small').textContent=t?'Pause menu: Controls':'H: all controls';
+ el.querySelector('small').textContent=t?'Settings: Controls':'H: all controls';
  el.querySelector('.kx').onclick=()=>{safe(()=>snd('click'));hide()};document.body.appendChild(el);safe(()=>snd('ping'));
  tm=setTimeout(hide,14000)}
 /* what blocks a hint: another box on screen */
@@ -58,10 +58,11 @@ addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||!saf
 const ROWS=[['W A S D','Walk (arrow keys too)'],['Shift','Hold to run'],['E or Space','Use what you stand at: laptop, mic, bed, doors'],['N','Map and taxi'],['G','Gphone: messages, Instagrime, food'],['Tab','Music Mastery'],['F','Furniture: move and place (R turns it)'],['M','Mute and unmute'],['Esc','Pause and Settings'],['H','This list']];
 const TROWS=[['Joystick','Walk (bottom left)'],['Use','Use what you stand at'],['Run','Sprint (tap to toggle)'],['Map','Map and taxi'],['Phone','Gphone: messages, Instagrime, food'],['Storage','Move and place furniture'],['Tab · Mastery','Music Mastery pill (bottom left)'],['Pause','Pause and Settings']];
 function card(fromPause){const t=touch(),rows=(t?TROWS:ROWS).map(r=>'<div class=kr><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join(''),k=safe(K,{off:0});
- css();if(!fromPause){mode='menu'}
+ css();if(!fromPause){mode='menu'}else if(mode=='menu'){mode=SP}
  $('ui').innerHTML='<div id=khcard class="box modal"><h2>Controls</h2><p class=m><small>'+(t?'On a touch screen the buttons are at the bottom right.':'Press H any time to open this.')+'</small></p>'+rows
-  +'<button id=khoff style="margin-top:8px">Key hints: '+(k.off?'off':'on')+'</button><button class=go onclick="'+(fromPause?'pauseUI()':'closeUI()')+'">'+(fromPause?'Back':'Got it')+'</button></div>';
+  +'<button id=khoff style="margin-top:8px">Key hints: '+(k.off?'off':'on')+'</button><button class=go onclick="'+(fromPause?'settings()':'closeUI()')+'">'+(fromPause?'Back':'Got it')+'</button></div>';
  $('khoff').onclick=()=>{const q=K();q.off=q.off?0:1;if(q.off)hide();$('khoff').textContent='Key hints: '+(q.off?'off':'on');safe(()=>snd('click'))}}
-if(typeof pauseUI=='function'){const p0=pauseUI;pauseUI=function(){p0.apply(this,arguments);const m=$('pzm');if(m){const b=document.createElement('button');b.textContent='Controls';b.onclick=()=>card(1);m.appendChild(b)}}}
+/* Settings > Game: Controls button (was a pause-menu button; v55.41.0) */
+if(typeof stBody=='function'){const b0=stBody;stBody=function(){const h=b0.apply(this,arguments);return STAB=='game'?h+'<div class=so><span>Controls<small class=m>Every key in one list</small></span><button onclick="FW_KEYS.card(1)">Open</button></div>':h}}
 window.FW_KEYS={hints:H.map(h=>h[0]),state:()=>K(),card,hide,tick,show:id=>{const h=H.find(x=>x[0]==id);if(h)show(h)}};
 })();

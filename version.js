@@ -3,10 +3,12 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.41.0';
+const GAME_VERSION='v55.43.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.41.0',n:'Spotify timeline seeking. Click, tap or drag the song progress bar in the WaveFern music app to jump to that part of the song (works with mouse, touch and the Quest laser pointer, also while paused).'},
+ {v:'v55.43.0',n:'Spotify timeline seeking. Click, tap or drag the song progress bar in the WaveFern music app to jump to that part of the song (works with mouse, touch and the Quest laser pointer, also while paused).'},
+ {v:'v55.42.0',n:'Weak songs earn more. Each night 60% of your streams are now shared evenly across all your songs (was 35%), and songs that had hit their stream cap are included, so with 30K monthly listeners your least-streamed songs get a fair daily share instead of a few hundred streams in total. Total streams and earnings are unchanged.'},
+ {v:'v55.41.0',n:'Controls and Tips moved from the pause menu into Settings > Game.'},
  {v:'v55.40.0',n:'Gentler start: key hints. Short tips now show the keys at the right moment, one at a time and only once each: Shift to run, N for the map (when you walk into the street or release a song), G for the Gphone and Tab for Music Mastery (after your first release and night), F for furniture. They fade by themselves, have a close button, and never appear over Big Vee or a card. Press H any time for a list of every control (also in the pause menu), where you can turn the hints off. On touch screens they name the on-screen buttons. Careers past day 2 get no hints.'},
  {v:'v55.39.0',n:'Removed the Subway Surfers style runner (Fern Rush) from the arcade. The arcade now has two games, Fern Flap and Fern Quest, and the menu shows just those two.'},
  {v:'v55.38.0',n:'Arcade feel pass. Fern Quest: the hero no longer plays the running or jumping pose while standing still (it was flickering between ground and air), the run now blends smoothly in and out, and jumps and landings squash and stretch. Stomps and hits freeze the game for a split second, stomp chains score double, triple and quad, and gems chime higher the faster you grab them. Fern Rush: dust and sparks while running and sliding, bigger landings, a rising coin chime, a lighter shadow in the air and a SPEED UP banner at each speed step.'},
