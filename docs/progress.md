@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.49.0 (2026-11-23): desktop wallpapers: 22 more built-ins (CSS only), scrollable picker, "Add your own picture" (reuses `pxPick`/`pxEnc` from `84-pixel-pictures.js`, 128x72 16-colour, `S.wpc` ~6 KB, slot 100).
 - v55.40.0 (2026-11-22): key hints: `255-key-hints.js` (paced one-at-a-time chips for Shift/N/G/Tab/F, H Controls card + pause button, `S.kh`, `FW_KEYS`).
 - v55.39.0 (2026-11-22): removed Fern Rush (runner) from the arcade at James's request; menu shows Fern Flap and Fern Quest.
 - v55.37.0 (2026-11-22): day-1 retention: `254-first-session.js` (Next Goal chip, early bed + instant first listeners after the first release, early milestones, Welcome-back summary, funnel `FW_FUNNEL`), Big Vee five numbered steps, streak pays in full.
@@ -18,4 +19,4 @@ Newest first. One line per shipped change; details live in `version.js` (`VERSIO
 - v55.21.8 (2026-11-18): fixed lag spikes from the chat swear filter (`dev/dev-profanity-v1.js` memoised, scrub only re-checks changed message text). 250 chats x 25 log lines: 500 ms scrub took 550 ms avg (735 max) before, 0.4 ms avg after; frames in 15-20 s headless 124 -> 1718.
 - v55.20.1 (2026-11-18): bug fix pack for section 1 of James's list (idle offline, house-front fade, storage placing, real overnight streams, vinyl money in Earned, double click sound, sleep zoom, version tag, face-on-cover button, backup delete, wake-money console error). Not reproduced: Instagrime brand post crash (phone guard added), house framing gap.
 - v55.19.1 (2026-11-18): money accessor guard (root cause of "$0 after sleep"), cents under $100 in `$$`, Mastery surf/fish texts, PC view 30 fps and Mastery panel 10 fps caps.
-- v55.48.0: Big Vee portrait and name on the Next Goal box and key hint chips (his 5 numbered tutorial steps in 72-tutorial.js were never removed).
+- v55.50.0: Big Vee portrait and name on the Next Goal box and key hint chips (his 5 numbered tutorial steps in 72-tutorial.js were never removed).

@@ -35,7 +35,8 @@ function pcSafeFix(){if(!S)return;
  if(S.appsOff)for(const k in S.appsOff)if(APPD[k]||BI[k]){S.apps[k]=S.appsOff[k];delete S.appsOff[k]}
  if(!S.ipos||typeof S.ipos!='object')S.ipos={};
  for(const k in S.ipos){const q=S.ipos[k];if(!Array.isArray(q)||!isFinite(q[0])||!isFinite(q[1]))delete S.ipos[k]}
- if(!WP[S.wp])S.wp=WP[10]?10:0;
+ if(typeof S.wpc!='string'||S.wpc.length>9000)S.wpc='';/* a saved wallpaper picture is at most about 6,200 characters */
+ if(!WP[S.wp]&&!(S.wp==WLPIC&&S.wpc&&pxURL(S.wpc)))S.wp=WP[10]?10:0;
  if(!Array.isArray(OA))OA=[];
  OA=OA.filter(k=>k=='1'||k=='store'||k=='web'||k=='msg'||k=='gear'||(S.apps[k]&&PA[k]));
  if(app&&app!=1&&!PA[app])app=0}

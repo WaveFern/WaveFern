@@ -3,10 +3,13 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.48.0';
+const GAME_VERSION='v55.50.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.48.0',n:'Big Vee is back on the whole tutorial. The Next Goal box and the key hint chips now show his portrait and name, and his steps 1 to 5 stay numbered.'},
+ {v:'v55.50.0',n:'Big Vee is back on the whole tutorial. The Next Goal box and the key hint chips now show his portrait and name, and his steps 1 to 5 stay numbered.'},
+ {v:'v55.49.0',n:'Desktop wallpapers: 22 more built-in ones, a scrollable list, and Add your own picture, which is shrunk to a 128x72 16-colour pixel grid like your profile pictures (about 6 KB in the save).'},
+ {v:'v55.48.1',n:'Autograph tips are whole dollars. Street fans no longer tip cents, and one popup now shows exactly what you were paid instead of two different amounts. Saves still load.'},
+ {v:'v55.48.0',n:'Graphics Auto now starts as high as your device can run. Desktop graphics cards start on Best, normal and integrated graphics chips and phones start on High (they used to start on Medium), and only very old or software-drawn chips start on Low. Auto still steps down by itself if the game runs slowly, and up again when it runs very smoothly. A preset you picked yourself is never changed. Anyone left on a low Auto level is re-checked once.'},
  {v:'v55.47.0',n:'Dev build: the money roll is more satisfying. Bigger gains roll longer and harder, digits land with a small bounce, a gold +amount pops up, the amount flashes gold with a sparkle burst, and ticks slow down into a rising chime (Effects volume applies).'},
  {v:'v55.46.0',n:'Dev build: when your money goes up (from any source) the amount in the top left rolls like a casino counter with a motion blur and a green glow. Only on gains; skipped with reduced motion.'},
  {v:'v55.45.0',n:'Spotify timeline seeking. Click, tap or drag the song progress bar in the WaveFern music app to jump to that part of the song (works with mouse, touch and the Quest laser pointer, also while paused).'},

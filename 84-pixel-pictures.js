@@ -5,7 +5,7 @@
    Storage: one short string per picture (pxEnc): base64 of [width, height, colour count, palette RGB, 4-bit pixels].
    A profile picture (32x32) is 563 bytes, about 750 characters; a photo post (48x36) is 915 bytes, about 1,220 characters.
    Only the PX_KEEP newest photo posts keep their photo; older ones fall back to the game's drawn picture. */
-const PXS={sp:[32,32],ig:[32,32],post:[48,36]},PX_KEEP=40,PX_COLS=16;
+const PXS={sp:[32,32],ig:[32,32],post:[48,36],wp:[128,72]},PX_KEEP=40,PX_COLS=16;
 /* ---- encode / decode ---- */
 function pxQuant(px,n){/* px: Uint8ClampedArray RGBA. Median cut into at most n colours; returns {pal:[[r,g,b]],idx:Uint8Array} */
  const N=px.length/4,all=[];for(let i=0;i<N;i++)all.push(i);let boxes=[all];

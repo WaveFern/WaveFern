@@ -22,8 +22,11 @@ const wantsSig=n=>{if(!S.sig)return false;/* no signature set up in Label HQ yet
  signGame({noPay:true,title:'Autograph · a fan on the street',items:it||undefined,intro:'Draw your signature in the red box. Enter = next, Backspace = clear, Esc = skip.'}).then(r=>{
   try{if(mode=='menu')mode='play';if(!r||r.cancelled)return;
    if(!r.signed){n.st=2;n.cool=25;n.fan=false;say('You skipped the fan.');return}
-   const m0=+S.money||0,q=r.sim!=null&&S.sig?.35+.9*r.sim:+r.avg||0;s0.call(this,n);const d=(+S.money||0)-m0;
-   if(d>0){const k=.6+.8*q,adj=+(d*k-d).toFixed(2);S.money=+(S.money+adj).toFixed(2);say('Fan tipped '+$$(d*k)+(q>=.8?' for a lovely signature':''))}}
+   const m0=+S.money||0,q=r.sim!=null&&S.sig?.35+.9*r.sim:+r.avg||0;
+   /* v55.45.1: sign() toasts 'Autograph signed! Fan tipped $t' with the unscaled tip; hold it back so only the final amount shows */
+   const say0=say;say=function(t){if(!/^Autograph signed!/.test(String(t)))return say0.apply(this,arguments)};try{s0.call(this,n)}finally{say=say0}
+   const d=(+S.money||0)-m0;
+   if(d>0){const k=.6+.8*q,tip=Math.round(d*k),adj=tip-d;/* whole dollars: credited = shown */S.money=+(S.money+adj).toFixed(2);say('Fan tipped $'+tip+(q>=.8?' for a lovely signature':''))}}
   catch(e){console.error('street autograph',e);if(mode=='menu')mode='play'}});
 }}
 })();
