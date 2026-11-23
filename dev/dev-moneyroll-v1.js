@@ -1,4 +1,4 @@
-/* ===== dev only: money roll (v55.47.0) =====
+/* ===== dev only: money roll (v55.51.0) =====
    Casino style roll on the money readout in the top-left HUD, only when the amount goes UP (any source: pay, sales, gifts, rewards).
    One central hook: a wrapper on hud() compares S.money each time the HUD is drawn, so no money source is patched.
    v55.47.0 payoff: the bigger the gain the longer and bigger the show (tier 0-3 by amount). Digits spin with a vertical motion blur and
@@ -7,6 +7,7 @@
    Cost: CSS only (transforms/opacity on a few elements, one vertical SVG blur while it moves) and sounds are scheduled once on the audio clock;
    the only JS is one number compare per hud() call. hud() rebuilds the HUD whenever its text changes, so the roll is re-applied to the new
    element with a negative animation-delay and keeps playing from where it was. prefers-reduced-motion: nothing animates, no sound. ?nomoneyroll skips it.
+   Also plays for the nightly pay (gain made in mode 'sleep', rolled once the new day screen is up) and the while-you-were-away pay (earn() in play mode).
    Nothing is saved. The DEV panel section 'Money roll preview' calls FW_MONEYROLL.preview(amount): a fake gain, S.money is untouched.
    Loads after dev-skate-v1.js, /dev/ only (needs window.FW_DEV). */
 (function(){
@@ -14,7 +15,7 @@
  const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)');
  const DUR=700,STEP=110,SC=[1,1.15,1.4,1.8]; /* ms: left-most digit, extra per digit to the right; SC = length scale per tier */
  const SEL='#hud .tl>b[style*="var(--g)"]';
- let lastS=null,last=null,roll=null;
+ let lastS=null,last=null,roll=null,pend=null,pm=null; /* pend: gains made while asleep, rolled once the morning screen is up */
  const tier=g=>g<20?0:g<500?1:g<20000?2:3;
  const total=r=>(DUR+STEP*12)*SC[r.tier];
  function css(){
@@ -94,13 +95,24 @@
  hud=function(){
   const r=o.apply(this,arguments);
   try{
-   if(typeof S!='undefined'&&S&&typeof mode!='undefined'&&mode!='load'&&mode!='pc'){
+   if(typeof S!='undefined'&&S&&typeof mode!='undefined'&&mode!='load'){
     const m=+S.money||0;
-    if(S!==lastS||last===null){lastS=S;last=m;roll=null}
+    if(S!==lastS||last===null||pm=='load'){lastS=S;last=m;roll=null;pend=null} /* a load is not a gain */
     else if(m!==last){
-     if(m>last&&!(RM&&RM.matches)&&!roll){const pre=$$(last);if(pre!==$$(m))start(pre,$$(m),m-last)}
+     if(m>last&&!(RM&&RM.matches)){
+      /* night pay lands in mode 'sleep' (black screen), Label HQ signing pay in 'pc': remember them and roll when the new day screen shows */
+      if(pend||mode=='sleep'||mode=='pc'){pend=pend||{from:$$(last),gain:0,w:0};pend.gain+=m-last}
+      else if(!roll){const pre=$$(last);if(pre!==$$(m))start(pre,$$(m),m-last)}
+     }
      last=m;
     }
+    if(pend&&(mode=='sleep'||mode=='pc'))pend.w=0;
+    if(pend&&mode!='sleep'&&mode!='pc'){
+     const nw=performance.now();
+     if(!pend.w)pend.w=nw; /* wait a moment: later wake wrappers still add to the night's pay */
+     else if(nw-pend.w>300&&!roll){if(pend.from!==$$(m))start(pend.from,$$(m),pend.gain);pend=null}
+    }
+    pm=mode;
     if(roll){
      if(performance.now()-roll.t0>total(roll)+500){
       if(roll.fake){const e=document.querySelector(SEL);if(e){e.textContent=$$(+S.money||0);delete e.dataset.fwmr;e.classList.remove('fwmg')}}

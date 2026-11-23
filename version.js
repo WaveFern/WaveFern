@@ -3,10 +3,11 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.51.0';
+const GAME_VERSION='v55.52.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.51.0',n:'Big Vee is back on the whole tutorial. The Next Goal box and the key hint chips now show his portrait and name, and his steps 1 to 5 stay numbered.'},
+ {v:'v55.52.0',n:'Big Vee is back on the whole tutorial. The Next Goal box and the key hint chips now show his portrait and name, and his steps 1 to 5 stay numbered.'},
+ {v:'v55.51.0',n:'Dev build: the money roll now also plays for the pay you earn overnight (when the new day screen shows) and for the while you were away pay and autograph pay and tips, with the gold +amount pop.'},
  {v:'v55.50.0',n:'Friends see you as offline when you switch away from the tab (after 5 seconds) and online again when you return. If a friend nudges you while the tab is hidden, the icon gets a red dot and the tab title says who nudged you and how long ago for a few seconds. Saves still load.'},
  {v:'v55.49.3',n:'Friends: fixed the Realtime Database permission_denied warning that repeated every few minutes. Presence no longer sends an empty display name, which the rules refuse. Saves still load.'},
  {v:'v55.49.2',n:'The game no longer pauses while you pick a photo: opening the file picker for a profile picture, wallpaper or save import keeps the game running. Switching tabs still pauses. Saves still load.'},
