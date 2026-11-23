@@ -44,8 +44,8 @@ const w0=wakeUp;wakeUp=function(){let L0=0;try{L0=+S.listeners||0;if(S.eco&&S.ec
   /* streams of the last 31 days must add up to listeners x divisor: set last night's streams to fill the gap */
   if(h&&h.d===S.day-1&&!h.cp){h.cp=1;
    const prev=S.hist.slice(-31,-1).reduce((a,x)=>a+(x.st||0),0),want=Math.max(Lf*md-prev,Lf*md/62),tot=Math.round(want);
-   const songs=(S.songs||[]).filter(s=>s.pd===S.day-1&&s.today>0),nat=songs.reduce((a,s)=>a+s.today,0);
-   if(nat>0){const k=tot/nat,mean=tot/songs.length;/* v55.31: 35% of the night's streams are shared evenly, so with 37k listeners even your weakest song gets thousands a month, not a few hundred (the total is unchanged) */songs.forEach(s=>{const dl=Math.round(s.today*k*.65+mean*.35-s.today);s.today+=dl;s.streams=(s.streams||0)+dl;const e=(s.dh||[]).find(x=>x[0]===S.day-1);if(e)e[1]=Math.round(s.today)})}
+   const songs=(S.songs||[]).filter(s=>s.pd===S.day-1),nat=songs.reduce((a,s)=>a+(s.today||0),0);
+   if(nat>0){const k=tot/nat,mean=tot/songs.length;/* v55.31: part of the night's streams is shared evenly so weak songs keep earning (the total is unchanged). v55.42: 60% shared (was 35%) and songs at 0 streams that night (stream cap reached) are included, so a 30k-listener artist's weakest song gets about 0.6 x the average song's streams, not ~200 total */songs.forEach(s=>{const t0=s.today||0,dl=Math.round(t0*k*.4+mean*.6-t0);s.today=t0+dl;s.streams=(s.streams||0)+dl;const e=(s.dh||[]).find(x=>x[0]===S.day-1);if(e)e[1]=Math.round(s.today);else if(Array.isArray(s.dh)&&dl>0)s.dh.push([S.day-1,Math.round(s.today)])})}
    const dS=tot-(h.st||0),e1=+(tot*PAY*MF(Lf)*EARLY(Lf)*upkeep(S.day)).toFixed(2),dE=e1-(+h.e||0);
    S.streams=(S.streams||0)+dS;h.st=tot;h.e=e1;
    S.money=+Math.max(0,S.money+dE).toFixed(2);S.earn=+((S.earn||0)+dE).toFixed(2)}
