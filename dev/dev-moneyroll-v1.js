@@ -9,13 +9,16 @@
    element with a negative animation-delay and keeps playing from where it was. prefers-reduced-motion: nothing animates, no sound. ?nomoneyroll skips it.
    Also plays for the nightly pay (gain made in mode 'sleep', rolled once the new day screen is up) and the while-you-were-away pay (earn() in play mode).
    Nothing is saved. The DEV panel section 'Money roll preview' calls FW_MONEYROLL.preview(amount): a fake gain, S.money is untouched.
-   Loads after dev-skate-v1.js, /dev/ only (needs window.FW_DEV). */
+   v55.52.2: LIVE (the FW_DEV gate is gone). Any gain made while the readout is hidden (sleep fade, phone, PC, menus) waits in 'pend' and rolls when it shows again.
+   Loads after dev-skate-v1.js. */
 (function(){
- if(!window.FW_DEV||/[?&]nomoneyroll/.test(location.search)||typeof hud!='function')return;
+ if(/[?&]nomoneyroll/.test(location.search)||typeof hud!='function')return;
  const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)');
  const DUR=700,STEP=110,SC=[1,1.15,1.4,1.8]; /* ms: left-most digit, extra per digit to the right; SC = length scale per tier */
  const SEL='#hud .tl>b[style*="var(--g)"]';
- let lastS=null,last=null,roll=null,pend=null,pm=null; /* pend: gains made while asleep, rolled once the morning screen is up */
+ let lastS=null,last=null,roll=null,pend=null,pm=null; /* pend: gains made while the readout is hidden, rolled when it shows again */
+ /* is the HUD money readout really on screen (not covered by the phone, the PC, a menu or the sleep fade)? */
+ function vis(){const e=document.querySelector(SEL);if(!e)return false;const b=e.getBoundingClientRect();if(!b.width)return false;const t=document.elementFromPoint(b.left+3,b.top+b.height/2);/* #hud has pointer-events:none, so the hit test skips it: the readout is visible when the hit is the bare canvas, not a panel, the phone or the fade */return !!t&&(t.id=='c'||t===document.body||t===document.documentElement||t.id=='hud'||t.id=='ui')}
  const tier=g=>g<20?0:g<500?1:g<20000?2:3;
  const total=r=>(DUR+STEP*12)*SC[r.tier];
  function css(){
@@ -101,15 +104,16 @@
     else if(m!==last){
      if(m>last&&!(RM&&RM.matches)){
       /* night pay lands in mode 'sleep' (black screen), Label HQ signing pay in 'pc': remember them and roll when the new day screen shows */
-      if(pend||mode=='sleep'||mode=='pc'){pend=pend||{from:$$(last),gain:0,w:0};pend.gain+=m-last}
+      if(pend||!vis()){pend=pend||{from:$$(last),gain:0,w:0,t:performance.now()};pend.gain+=m-last}
       else if(!roll){const pre=$$(last);if(pre!==$$(m))start(pre,$$(m),m-last)}
      }
      last=m;
     }
-    if(pend&&(mode=='sleep'||mode=='pc'))pend.w=0;
-    if(pend&&mode!='sleep'&&mode!='pc'){
+    if(pend){
      const nw=performance.now();
-     if(!pend.w)pend.w=nw; /* wait a moment: later wake wrappers still add to the night's pay */
+     if(nw-pend.t>180000)pend=null; /* too old to be worth a roll */
+     else if(!vis())pend.w=0;
+     else if(!pend.w)pend.w=nw; /* wait a moment: later wake wrappers still add to the night's pay */
      else if(nw-pend.w>300&&!roll){if(pend.from!==$$(m))start(pend.from,$$(m),pend.gain);pend=null}
     }
     pm=mode;
