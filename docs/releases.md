@@ -29,7 +29,6 @@ A change that is not ready simply keeps its gate for next week.
 ## Held features
 | Feature | File | Gate | Ready? |
 |---|---|---|---|
-| Money roll | `dev/dev-moneyroll-v1.js` | `FW_DEV` | yes |
 
 ## Avoiding merge pain
 The old pain was never the numbers: every PR edited the same few lines (`GAME_VERSION`, the top history entry, the `?v=` tags), so any two open PRs conflicted and each was renumbered by hand (55 of the last 300 commits are "Merge main; renumber").
