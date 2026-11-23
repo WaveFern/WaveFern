@@ -73,6 +73,8 @@
     bdAccept(o.id);sv(o.st==1?b.n+' sponsors you: flight booked, see Messages.':b.n+' offer sent, but it could not be accepted yet (fly home first?). See Messages.')})])]],
   ['Time',[
    ['Skip 1 day',jump(1)],['Skip 7 days',jump(7)],['Skip 30 days',jump(30)],['Skip 100 days',jump(100)]]],
+  ['Money roll preview (no real money)',[
+   ...[['Small +$5',5],['Medium +$250',250],['Large +$12,500',12500],['Huge +$3,400,000',3.4e6]].map(([l,n])=>[l,()=>{if(!(window.FW_MONEYROLL&&FW_MONEYROLL.preview(n)))say('Walk around in the game first (and turn off reduced motion), then try again.')}])]],
   ['Progress',[
    ['Add 1,000,000 money',need(()=>{S.money=+((S.money||0)+1e6).toFixed(2);sv('Money added')})],
    ['Refill energy',need(()=>{S.energy=100;S.stam=100;sv('Energy full')})],

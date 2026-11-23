@@ -4,7 +4,7 @@
    Cost: the roll is pure CSS (a transform on one strip per digit, plus a vertical-only SVG blur while it moves); the only JS is
    one number compare per hud() call. hud() rebuilds the HUD whenever its text changes, so the roll is re-applied to the new element
    with a negative animation-delay and keeps playing from where it was. prefers-reduced-motion: nothing animates. ?nomoneyroll skips it.
-   Nothing is saved. Loads after dev-skate-v1.js, /dev/ only (needs window.FW_DEV). */
+   Nothing is saved. The DEV panel section 'Money roll preview' calls FW_MONEYROLL.preview(amount): a fake gain, S.money is untouched. Loads after dev-skate-v1.js, /dev/ only (needs window.FW_DEV). */
 (function(){
  if(!window.FW_DEV||/[?&]nomoneyroll/.test(location.search)||typeof hud!='function')return;
  const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)');
@@ -29,7 +29,7 @@
  function decorate(){
   const el=document.querySelector('#hud .tl>b[style*="var(--g)"]');
   if(!el||el.dataset.fwmr)return;
-  const to=el.textContent,n=to.length,el0=performance.now()-roll.t0;
+  const to=roll.fake||el.textContent,n=to.length,el0=performance.now()-roll.t0;
   const A=roll.from.padStart(n,' ').slice(-n); /* old text aligned to the new one from the right */
   let first=-1,k=0,h='';
   for(let i=0;i<n;i++)if(first<0&&/\d/.test(to[i]))first=i;
@@ -44,6 +44,10 @@
   }
   el.dataset.fwmr=1;el.innerHTML=h;el.classList.add('fwmg');el.style.setProperty('--dl',(-el0)+'ms');
  }
+ /* preview from the DEV panel: plays a roll up by amt without touching S.money; the real amount is put back when it ends */
+ window.FW_MONEYROLL={preview(amt){
+  if(typeof S=='undefined'||!S||(RM&&RM.matches)||(mode!='play'&&mode!='drive'))return false;
+  const m=+S.money||0;css();roll={from:$$(m),fake:$$(m+amt),t0:performance.now()};return true}};
  const o=hud;
  hud=function(){
   const r=o.apply(this,arguments);
@@ -55,7 +59,12 @@
      if(m>last&&!(RM&&RM.matches)&&!roll){const pre=$$(last);if(pre!==$$(m)){css();roll={from:pre,t0:performance.now()}}}
      last=m;
     }
-    if(roll){if(performance.now()-roll.t0>END)roll=null;else decorate()}
+    if(roll){
+     if(performance.now()-roll.t0>END){
+      if(roll.fake){const e=document.querySelector('#hud .tl>b[style*="var(--g)"]');if(e){e.textContent=$$(+S.money||0);delete e.dataset.fwmr}}
+      roll=null;
+     }else decorate();
+    }
    }
   }catch(e){}
   return r;
