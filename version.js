@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.42.0';
+const GAME_VERSION='v55.42.1';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.42.1',n:'Fewer lag spikes: the skate park ground-cutting scan no longer re-runs a scene-wide raycast every 2 seconds (a 25 to 45 ms hitch each time), and the dev wall-clear scan checks every 2 minutes instead of 30 seconds.'},
  {v:'v55.42.0',n:'Weak songs earn more. Each night 60% of your streams are now shared evenly across all your songs (was 35%), and songs that had hit their stream cap are included, so with 30K monthly listeners your least-streamed songs get a fair daily share instead of a few hundred streams in total. Total streams and earnings are unchanged.'},
  {v:'v55.41.0',n:'Controls and Tips moved from the pause menu into Settings > Game.'},
  {v:'v55.40.0',n:'Gentler start: key hints. Short tips now show the keys at the right moment, one at a time and only once each: Shift to run, N for the map (when you walk into the street or release a song), G for the Gphone and Tab for Music Mastery (after your first release and night), F for furniture. They fade by themselves, have a close button, and never appear over Big Vee or a card. Press H any time for a list of every control (also in the pause menu), where you can turn the hints off. On touch screens they name the on-screen buttons. Careers past day 2 get no hints.'},
