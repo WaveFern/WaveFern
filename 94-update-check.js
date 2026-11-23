@@ -1,11 +1,15 @@
 /* ---------- update notice ----------
-   Every 30 seconds (and when the tab comes back into view) checks version.js on the server.
+   Every 30 seconds while visible (and on tab return, focus, reconnect, with retry after a failed fetch) checks version.js on the server.
    If GAME_VERSION there differs from the running one, a small notice offers to update.
    Update saves the game (and to the cloud when signed in), refreshes the cached game files, then reloads. */
 const UPD={seen:null,busy:0};
-function updCheck(){if(UPD.busy||location.protocol=='file:')return;
- fetch('version.js?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/GAME_VERSION\s*=\s*'([^']+)'/);
-  if(m&&m[1]!=GAME_VERSION&&m[1]!=UPD.seen)updShow(m[1])}).catch(()=>{})}
+/* v55.49.1: checks while the tab is visible (every 30 s), the moment it comes back (visibility, focus, pageshow, online), and retries a failed fetch
+   after 5/10/20/40 s. Never checks while hidden (no battery drain). Calls closer than 4 s apart are skipped; the request is the tiny version.js with a cache-busting query. */
+UPD.last=0;UPD.fail=0;UPD.rt=0;
+function updCheck(force){if(UPD.busy||location.protocol=='file:'||document.hidden)return;
+ const n=Date.now();if(!force&&n-UPD.last<4000)return;UPD.last=n;clearTimeout(UPD.rt);
+ fetch('version.js?t='+n,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{UPD.fail=0;const m=t.match(/GAME_VERSION\s*=\s*'([^']+)'/);
+  if(m&&m[1]!=GAME_VERSION&&m[1]!=UPD.seen)updShow(m[1])}).catch(()=>{if(UPD.fail<4)UPD.rt=setTimeout(()=>updCheck(1),5000*Math.pow(2,UPD.fail++))})}
 function updShow(v){UPD.seen=v;let d=document.getElementById('upd');if(!d){d=document.createElement('div');d.id='upd';document.body.appendChild(d)}
  d.style.cssText='position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;max-width:calc(100% - 24px);padding:8px 10px 8px 14px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:13px';
  let tried=0;try{tried=sessionStorage.getItem('fw_upd')==v}catch(e){}
@@ -30,3 +34,4 @@ function updGo(){if(UPD.busy)return;UPD.busy=1;try{sessionStorage.setItem('fw_up
  Promise.all([cloud,fresh]).then(()=>{if(b)b.textContent='Updating…';location.replace(location.pathname+'?r='+Date.now())})}
 setTimeout(updCheck,5000);setInterval(updCheck,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)updCheck()});
+['focus','pageshow','online'].forEach(e=>addEventListener(e,()=>updCheck()));

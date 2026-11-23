@@ -29,7 +29,7 @@ let PCKEEP=null;
  const ui=document.getElementById('ui');if(ui)new MutationObserver(()=>{if(PAUSED&&PS=='pc'&&PCKEEP&&!PCKEEP.parentNode)ui.insertBefore(PCKEEP,ui.firstChild)}).observe(ui,{childList:true})}
 
 {const r0=resumeGame;resumeGame=function(){const was=PS=='pc';PCKEEP=null;document.body.classList.remove('pcpaused');const r=r0.apply(this,arguments);if(was&&mode=='pc')pcR();return r}}
-{const ap=()=>{if(!PAUSED&&mode=='pc')pauseGame()};document.addEventListener('visibilitychange',()=>{if(document.hidden)ap()});addEventListener('blur',ap)}
+{const ap=()=>{if(window.FWPICK&&FWPICK.on())return;if(!PAUSED&&mode=='pc')pauseGame()};document.addEventListener('visibilitychange',()=>{if(document.hidden)ap()});addEventListener('blur',ap)}
 {const st=document.createElement('style');st.textContent=`
 body.pcmode #ui{background:
  linear-gradient(#0003 0 0) 0 0/100% 100% no-repeat,

@@ -3,10 +3,12 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.50.0';
+const GAME_VERSION='v55.51.0';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.50.0',n:'Big Vee is back on the whole tutorial. The Next Goal box and the key hint chips now show his portrait and name, and his steps 1 to 5 stay numbered.'},
+ {v:'v55.51.0',n:'Big Vee is back on the whole tutorial. The Next Goal box and the key hint chips now show his portrait and name, and his steps 1 to 5 stay numbered.'},
+ {v:'v55.49.2',n:'The game no longer pauses while you pick a photo: opening the file picker for a profile picture, wallpaper or save import keeps the game running. Switching tabs still pauses. Saves still load.'},
+ {v:'v55.49.1',n:'Update notice checks more reliably: also when you return to the tab, refocus the window or reconnect to the internet, retries a failed check after a few seconds, and stops checking while the tab is hidden to save battery.'},
  {v:'v55.49.0',n:'Desktop wallpapers: 22 more built-in ones, a scrollable list, and Add your own picture, which is shrunk to a 128x72 16-colour pixel grid like your profile pictures (about 6 KB in the save).'},
  {v:'v55.48.1',n:'Autograph tips are whole dollars. Street fans no longer tip cents, and one popup now shows exactly what you were paid instead of two different amounts. Saves still load.'},
  {v:'v55.48.0',n:'Graphics Auto now starts as high as your device can run. Desktop graphics cards start on Best, normal and integrated graphics chips and phones start on High (they used to start on Medium), and only very old or software-drawn chips start on Low. Auto still steps down by itself if the game runs slowly, and up again when it runs very smoothly. A preset you picked yourself is never changed. Anyone left on a low Auto level is re-checked once.'},

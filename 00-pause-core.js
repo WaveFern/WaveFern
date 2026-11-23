@@ -37,3 +37,21 @@
    const h=Array.from(HELD);HELD.clear();h.forEach(book)},
   counts:()=>({iv:IV.size,raf:RF.size,held:HELD.size})};
 })();
+
+/* v55.49.2: FWPICK = "a file picker is open". Opening the OS file picker blurs the window, which auto-paused the game.
+   Every file input (profile pictures, wallpapers, save import...) goes through input.click() or a real click, both seen here.
+   The auto-pause handlers (28-v25, 105-desktop-pc-pause) call FWPICK.on() and skip. Cleared when a file is chosen (change),
+   the picker is cancelled, or the window gets focus back (short grace), with a 5 minute safety limit. Tab switches still pause. */
+(function(){
+ if(window.FWPICK)return;
+ let t0=0,gt=0;
+ const done=()=>{clearTimeout(gt);gt=0;t0=0};
+ const open=el=>{try{if(el&&el.tagName=='INPUT'&&el.type=='file'){t0=Date.now();clearTimeout(gt);gt=0}}catch(e){}};
+ const c=HTMLInputElement.prototype.click;
+ HTMLInputElement.prototype.click=function(){open(this);return c.apply(this,arguments)};
+ document.addEventListener('click',e=>open(e.target),true);
+ document.addEventListener('change',e=>{if(e.target&&e.target.type=='file')gt=setTimeout(done,1500)},true);
+ document.addEventListener('cancel',e=>{if(e.target&&e.target.type=='file')gt=setTimeout(done,1500)},true);
+ addEventListener('focus',()=>{if(t0&&!gt)gt=setTimeout(done,1500)});
+ window.FWPICK={on:()=>!!t0&&Date.now()-t0<300000}
+})();
