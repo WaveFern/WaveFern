@@ -139,3 +139,5 @@ The real order is the order of tags in `index.html`, not file numbers. Known non
 
 ## Newsletter
 `newsletter/index.html` (served at wavefern.com/newsletter/) renders `newsletter/articles.js`; screenshots in `newsletter/img/`. Not part of the game, no version bump. How to add an article and the Monday roundup: `docs/newsletter.md`.
+
+Release tooling (v55.52.1): `tools/bump.js` (version bump, `?v=` tags, `check`, `trial`, `renumber`) and `docs/releases.md` (quiet patches, weekly drop, held features).
