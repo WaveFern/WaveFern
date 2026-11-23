@@ -49,22 +49,22 @@ function milestones(silent){const m=F().m;MS.forEach(x=>{if(m[x[0]])return;if(x[
 
 /* ---------- 1: the Next Goal chip ---------- */
 function goal(){const n=nSong(),d=nDraft(),pc=typeof mode!='undefined'&&mode=='pc';
- if(!S.artist)return{i:1,t:'Pick your artist name',d:pc?'Click the WaveFern icon, type a name, press Create profile.':'Walk to the laptop on your desk (green line), press E, then open WaveFern.'};
- if(!n&&!d)return{i:2,t:'Record your first song',d:'Press E at the mic stand in your studio, pick a genre, then play the 3 mini-games. Costs 15 energy.'};
- if(!n)return{i:3,t:'Release your song',d:pc?'WaveFern, Upload tab, then Upload on your song.':'Laptop (E), WaveFern, Upload tab, Upload. You get your first listeners at once.'};
- if(S.day<=1)return{i:4,t:'Go to bed',d:'Press E at your bed. Overnight your streams pay out and your listeners jump. You can sleep early tonight.'};
- if(n<2)return{i:5,t:'Record song #2',d:'Songs are your income. Make another at the mic, then release it on the laptop.',x:gearN()?'':'Tip: headphones from the Gearshop ($96) make better songs.'};
+ if(!S.artist)return{i:1,v:"Pick your artist name. Follow the green line to the laptop on your desk, press E, open WaveFern.",t:'Pick your artist name',d:pc?'Click the WaveFern icon, type a name, press Create profile.':'Walk to the laptop on your desk (green line), press E, then open WaveFern.'};
+ if(!n&&!d)return{i:2,v:"Record your first song. E at the mic stand in your studio, pick a genre, play the 3 mini-games. Costs 15 energy.",t:'Record your first song',d:'Press E at the mic stand in your studio, pick a genre, then play the 3 mini-games. Costs 15 energy.'};
+ if(!n)return{i:3,v:"Release it. Laptop (E), WaveFern, Upload tab, Upload. You get your first listeners at once.",t:'Release your song',d:pc?'WaveFern, Upload tab, then Upload on your song.':'Laptop (E), WaveFern, Upload tab, Upload. You get your first listeners at once.'};
+ if(S.day<=1)return{i:4,v:"Go to bed. E at your bed. Overnight your streams pay out and your listeners jump. You can sleep early tonight.",t:'Go to bed',d:'Press E at your bed. Overnight your streams pay out and your listeners jump. You can sleep early tonight.'};
+ if(n<2)return{i:5,v:"Record song #2. Songs are your income. Make another at the mic, then release it on the laptop.",t:'Record song #2',d:'Songs are your income. Make another at the mic, then release it on the laptop.',x:gearN()?'':'Tip: headphones from the Gearshop ($96) make better songs.'};
  return null}
 let gel=null,gk='';
 function chip(){const g=inGame()?goal():null;
  if(!g){if(gel)gel.style.display='none';return}
  if(!gel){const s=document.createElement('style');s.textContent=`#fsgoal{position:fixed;left:10px;bottom:44px;z-index:58;width:min(290px,64vw);box-sizing:border-box;background:#0b0f0dec;border:3px solid #000;box-shadow:inset 0 0 0 2px #2a352e,0 0 0 2px #ffd27a55,4px 4px 0 #0008;padding:7px 10px 8px;color:#e8f3ec;font-size:12px;line-height:1.35;pointer-events:none}
-#fsgoal .k{font:10px Silkscreen,ui-monospace,monospace;color:#ffd27a;letter-spacing:.5px}#fsgoal .t{font-size:15px;font-weight:700;color:#fff;margin:2px 0 3px}#fsgoal .d{color:#c9d8cf}#fsgoal .x{color:#2fe68a;margin-top:3px}
+#fsgoal{display:flex;gap:8px}#fsgoal .w{flex:1;min-width:0}#fsgoal .v{flex:none;width:40px;height:40px;image-rendering:pixelated;border:2px solid #000;box-shadow:0 0 0 2px #2fe68a66;background:#2a4a38}#fsgoal .k{font:10px Silkscreen,ui-monospace,monospace;color:#ffd27a;letter-spacing:.5px}#fsgoal .t{font-size:15px;font-weight:700;color:#fff;margin:2px 0 3px}#fsgoal .d{color:#c9d8cf}#fsgoal .x{color:#2fe68a;margin-top:3px}
 #fsgoal .b{height:6px;margin-top:6px;background:#000;border:1px solid #2a352e}#fsgoal .b i{display:block;height:100%;background:#2fe68a;transition:width .5s}
 @media (max-width:700px){#fsgoal{bottom:150px;width:min(260px,70vw)}}`;document.head.appendChild(s);gel=document.createElement('div');gel.id='fsgoal';document.body.appendChild(gel)}
- const key=g.i+g.t+g.d+(g.x||'');gel.style.display='';
- if(key!==gk){gk=key;gel.innerHTML='<div class=k>NEXT GOAL · STEP '+g.i+' OF 5</div><div class=t></div><div class=d></div>'+(g.x?'<div class=x></div>':'')+'<div class=b><i></i></div>';
-  gel.querySelector('.t').textContent=g.t;gel.querySelector('.d').textContent=g.d;if(g.x)gel.querySelector('.x').textContent=g.x;gel.querySelector('i').style.width=((g.i-1)/5*100+8)+'%'}}
+ const key=g.i+g.t+g.d+(g.x||'')+(typeof mode!='undefined'&&mode=='pc'?'p':'');gel.style.display='flex';
+ if(key!==gk){gk=key;gel.innerHTML='<img class=v alt="Big Vee"><div class=w><div class=k>BIG VEE · NEXT GOAL '+g.i+'/5</div><div class=t></div><div class=d></div>'+(g.x?'<div class=x></div>':'')+'<div class=b><i></i></div></div>';
+  gel.querySelector('.v').src=safe(tutPic,'');gel.querySelector('.t').textContent=g.t;gel.querySelector('.d').textContent=g.v&&!(typeof mode!='undefined'&&mode=='pc')?g.v:g.d;if(g.x)gel.querySelector('.x').textContent=g.x;gel.querySelector('i').style.width=((g.i-1)/5*100+8)+'%'}}
 
 /* ---------- 5: funnel ---------- */
 const STEPS=[['career',()=>true],['moved',()=>!!F().mv],['named',()=>!!S.artist],['recorded',()=>nDraft()+nSong()>0],['released',()=>nSong()>0],['listeners',()=>(+S.listeners||0)>0],['slept',()=>S.day>=2],['song2',()=>nSong()>=2],['gear',()=>gearN()>0],['day3',()=>S.day>=3]];
