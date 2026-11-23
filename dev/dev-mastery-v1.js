@@ -329,6 +329,7 @@ const CSS=`
 #mst .lo small{color:var(--m,#8aa094);min-width:110px;text-align:right}
 #mst .lo .none{color:var(--m,#8aa094)}
 #mst .ft{margin-top:14px;color:var(--m,#8aa094);font-size:11px}
+#mst .chip.todo{flex:1 1 100%;border-color:#ffd23f}#mst .chip.todo>small:first-child{color:#ffd23f;font:10px 'Silkscreen',ui-monospace,monospace}#mst .chip.todo b{font-size:20px;margin:3px 0}#mst details.mx{flex:1 1 100%;margin-top:8px}#mst details.mx>summary{cursor:pointer;color:var(--m,#8aa094);font-size:12px;margin-bottom:6px}#mst details.mx .mRw{margin-top:6px}#mst .mRwW .mRw{margin-top:8px}
 #mstpill{position:fixed;left:10px;bottom:10px;z-index:3;display:none;padding:4px 9px;font:11px 'Silkscreen',ui-monospace,monospace;color:#8aa094;background:#000a;border:2px solid #000;box-shadow:inset 0 0 0 1px #2a352e;cursor:pointer;opacity:.75}
 #mstpill:hover{opacity:1;color:#e8f3ec}
 #mstpill b{color:#2fe68a}
@@ -348,6 +349,7 @@ function ring(pct){const r=54,c=2*Math.PI*r;return`<svg viewBox="0 0 140 140"><c
 function ago(d){const n=num(S.day)-d;return n<=0?'today':n==1?'yesterday':n+' days ago'}
 function render(first){
  const el=ST;if(!el)return;const g=get();
+ const od=[...el.querySelectorAll('details.mx')].map(d=>d.open);
  const gold=g.rewards.some(r=>r.fx=='gold'&&r.got);el.classList.toggle('gold',gold);
  const nx=g.rewards.find(r=>!r.got);
  /* left side */
@@ -359,27 +361,30 @@ function render(first){
  /* right side */
  const R=el.querySelector('.mR');
  const qb=g.qBonus*100;
+ const low=g.cats.filter(c=>!c.state).sort((a,b)=>a.done-b.done)[0];
  R.querySelector('.mC').innerHTML=
-  `<div class=chip><b>+${qb.toFixed(1)}%${g.qFlat?' +'+g.qFlat:''}</b><small>song quality bonus from mastery${g.qFlat?' and studio perks':''}</small></div>`+
-  `<div class=chip><b>${g.base.toFixed(1)}%</b><small>from your activity masteries${g.weakest?' (-'+((1-g.factor)*100).toFixed(1)+'% balance: '+E(g.weakest)+' holds it back)':', no balance penalty'}</small></div>`+
+  (low?`<div class="chip todo"><small>DO THIS NEXT</small><b>${E(low.mname)}</b><small>${E(low.how)}</small><div class=bar2><i style="width:${low.done.toFixed(1)}%"></i></div></div>`:'')+
+  `<div class=chip><b>+${qb.toFixed(1)}%${g.qFlat?' +'+g.qFlat:''}</b><small>bonus to your new songs</small></div>`+
   `<div class=chip><b>${g.claimed}/${RW.length}</b><small>rewards unlocked</small></div>`+
-  `<div class=chip><b>${g.ad}</b><small>days you earned mastery (day ${num(S.day)})</small></div>`;
- R.querySelector('.mRw').innerHTML=g.rewards.map(r=>{const st=r.got?'got':r===nx?'nx':'';return`<div class="rw ${st}" title="${E(r.d)}"><i>${r.got?'UNLOCKED':r===nx?'NEXT':'LOCKED'}</i><div class=at>${r.at}%</div><b>${E(r.n)}</b><small>${E(KIND[r.k])} · ${E(r.d)}</small></div>`}).join('');
- R.querySelector('.mNx').innerHTML=nx?`Next reward: <b>${nx.at}% ${E(nx.n)}</b> · ${(nx.at-g.pct).toFixed(1)}% to go<div class=bar2><i style="width:${cl(((g.pct-(prevAt(nx.at)))/(nx.at-prevAt(nx.at)))*100,0,100).toFixed(1)}%"></i></div>`:'Every reward unlocked. You are a Music Master.';
+  `<details class=mx><summary>More numbers</summary><div class=mC><div class=chip><b>${g.base.toFixed(1)}%</b><small>from your activities${g.weakest?' (-'+((1-g.factor)*100).toFixed(1)+'% because '+E(g.weakest)+' is lagging)':', nothing lagging'}</small></div><div class=chip><b>${g.ad}</b><small>days you earned mastery (day ${num(S.day)})</small></div></div></details>`;
+ const rwH=l=>'<div class=mRw>'+l.map(r=>{const st=r.got?'got':r===nx?'nx':'';return`<div class="rw ${st}" title="${E(r.d)}"><i>${r.got?'UNLOCKED':r===nx?'NEXT':'LOCKED'}</i><div class=at>${r.at}%</div><b>${E(r.n)}</b><small>${E(KIND[r.k])} · ${E(r.d)}</small></div>`}).join('')+'</div>';
+ const ni=nx?g.rewards.indexOf(nx):g.rewards.length-3;
+ R.querySelector('.mRwW').innerHTML=rwH(g.rewards.slice(Math.max(0,ni),Math.max(0,ni)+3))+`<details class=mx><summary>All ${RW.length} rewards</summary>${rwH(g.rewards)}</details>`;
+ R.querySelector('.mNx').innerHTML=nx?`Next reward at <b>${nx.at}%</b>: ${E(nx.n)} · ${(nx.at-g.pct).toFixed(1)}% to go<div class=bar2><i style="width:${cl(((g.pct-(prevAt(nx.at)))/(nx.at-prevAt(nx.at)))*100,0,100).toFixed(1)}%"></i></div>`:'Every reward unlocked. You are a Music Master.';
  R.querySelector('.mLg').innerHTML=g.cats.map((c,i)=>{
   const sub=c.state?(c.id=='fame'?'Fame tier '+c.raw.toFixed(1)+' of '+c.cap:'Day '+num(S.day)+' · '+g.ad+' active days'):c.raw.toFixed(0)+' / '+c.cap+' pts';
   const rs=c.reasons.length?c.reasons.map(q=>'<div>'+E(q[0])+' <span class=m>+'+q[1].toFixed(1)+' pts</span></div>').join(''):'<div class=m>Nothing yet.</div>';
   const day=c.dayCap?`<div><span class=m>Today:</span> ${c.today.toFixed(1)} / ${c.dayCap} pts${c.today>=c.dayCap-.05?' (daily cap reached)':''} · next contribution worth x${c.mult}</div>`:'<div class=m>No daily cap: this one follows your progress.</div>';
   return`<div class="lg${EXP[c.id]?' open':''}${i==SELI?' sel':''}" data-i=${i} data-id=${c.id} title="${E(c.mname)} ${c.done.toFixed(0)}% complete: ${c.raw.toFixed(0)} of ${c.cap} points, worth ${c.pct.toFixed(1)} of ${c.weight}% of Music Mastery">
-  <div class=t><div class=nm><b>${E(c.mname)}</b><span>Rank: <u>${E(c.rank)}</u> · ${sub}</span></div><div class=pc><b>${c.done.toFixed(0)}%</b><small>complete</small></div></div>
+  <div class=t><div class=nm><b>${E(c.mname)}</b><span>${E(c.rank)}</span></div><div class=pc><b>${c.done.toFixed(0)}%</b><small>done</small></div></div>
   <div class=bar2><i style="width:${c.done.toFixed(1)}%"></i></div>
-  <div class=sh>Adds <b>${c.pct.toFixed(1)}</b> of its <b>${c.weight}</b> points to your Music Mastery (${c.weight}% weight)</div>
-  <div class=h>Raises it: ${E(c.how)}</div>
-  <div class=dt><div><span class=m>Points:</span> ${c.raw.toFixed(1)} of ${c.cap} (${c.done.toFixed(1)}% complete)</div>${day}<div class=m>Best sources:</div>${rs}</div></div>`}).join('');
+  <div class=h>How: ${E(c.how)}</div>
+  <div class=dt><div><span class=m>Progress:</span> ${sub}</div><div><span class=m>Adds</span> ${c.pct.toFixed(1)} of its ${c.weight} points to your total</div><div><span class=m>Points:</span> ${c.raw.toFixed(1)} of ${c.cap} (${c.done.toFixed(1)}% complete)</div>${day}<div class=m>Best sources:</div>${rs}</div></div>`}).join('');
  /* the compact strip beside the player: top contributors, ranked */
  const top=g.cats.filter(c=>c.pct>=.05).sort((a,b)=>b.pct-a.pct).slice(0,6);
- L.querySelector('.mSm').innerHTML='<h4>Your activity masteries (% complete)</h4>'+(top.length?top.map(c=>`<div class=sr><span>${E(c.name)}</span><b>${c.done.toFixed(0)}%</b><i><s style="width:${c.done.toFixed(1)}%"></s></i></div>`).join(''):'<div class=sn>Nothing yet. Play, perform, golf, shoot...</div>')+(g.weakest?`<div class=sp>Held back ${((1-g.factor)*100).toFixed(1)}% by ${E(g.weakest)}</div>`:'');
+ L.querySelector('.mSm').innerHTML='<h4>Your top activities</h4>'+(top.length?top.map(c=>`<div class=sr><span>${E(c.name)}</span><b>${c.done.toFixed(0)}%</b><i><s style="width:${c.done.toFixed(1)}%"></s></i></div>`).join(''):'<div class=sn>Nothing yet. Play, perform, golf, shoot...</div>')+(g.weakest?`<div class=sp>Held back ${((1-g.factor)*100).toFixed(1)}% by ${E(g.weakest)}</div>`:'');
  R.querySelector('.lo').innerHTML=g.log.length?g.log.map(e=>{const c=BY[e.c];return e.c=='reward'?`<div><span>Reward: ${E(e.r)}</span><em>unlocked</em><small>Day ${e.d} ${E(e.t)} · ${ago(e.d)}</small></div>`:`<div><span>${E(c?c.name:e.c)}: ${E(e.r)}</span><em>+${(+e.p).toFixed(1)}</em><small>Day ${e.d} ${E(e.t)} · ${ago(e.d)}</small></div>`}).join(''):'<div class=none>Nothing yet. Release a song, play a set or finish a round.</div>';
+ el.querySelectorAll('details.mx').forEach((d,i)=>{if(od[i])d.open=true});
  DIRTY=0}
 function prevAt(a){let p=0;RW.forEach(r=>{if(r.at<a)p=r.at});return p}
 
@@ -388,8 +393,8 @@ function build(){
  ST=document.createElement('div');ST.id='mst';
  ST.innerHTML=`<div class=mL><canvas id=mstc></canvas><div class=mG></div><div class=mTi></div><div class=mSm></div><div class=mRk></div></div>
  <div class=mR><div class=mH><h2 class=px>Music Mastery</h2><button id=mstx>Close (Tab)</button></div>
- <div class=mC></div><h3>Reward track</h3><div class=mRw></div><div class=mNx></div><h3>Activity masteries</h3><div class=intro>Music Mastery is built from your activity masteries. Each activity has its own mastery (0 to 100% of its own goal) that you raise by playing it well and often; the total is the sum of their shares. An activity you leave untouched holds the total back: 100% needs every activity above 95%.</div><div class=mLg></div><h3>Recent activity</h3><div class=lo></div>
- <div class=ft>Click a row or use Up / Down and Enter for its breakdown. Points are skill-weighted, capped per day and worth less when repeated, so this takes a very long time. Tab or Esc closes.</div></div>`;
+ <div class=mC></div><h3>Rewards</h3><div class=mNx></div><div class=mRwW></div><h3>Your activities</h3><div class=intro>Raise each activity by playing it well and often. Leaving one untouched holds your total back. Click a row for details.</div><div class=mLg></div><details class=mx><summary>Recent activity</summary><div class=lo></div></details>
+ <div class=ft>Progress is slow on purpose. Tab or Esc closes.</div></div>`;
  document.body.appendChild(ST);
  ST.querySelector('#mstx').onclick=close;
  ST.querySelector('.mLg').addEventListener('click',e=>{const r=e.target.closest('.lg');if(!r)return;SELI=+r.dataset.i;EXP[r.dataset.id]=!EXP[r.dataset.id];render()});
