@@ -137,3 +137,25 @@ if(typeof pauseUI=='function'){const pu0=pauseUI;
   S.rugSt=1;if(!S.inv)S.inv={};
   for(let i=PL.length-1;i>=0;i--)if(PL[i].t=='srug'){scene.remove(PL[i].m);PL.splice(i,1);S.inv.srug=(S.inv.srug||0)+1}
  }catch(e){}}return b0.apply(this,arguments)}}
+
+/* v55.52.2 pedestrian knockdown: a car hitting a walker at speed knocks them over (fly back, lie, get up). It is funny a
+   couple of times and then dull on purpose: each hit in the last 40 s shrinks the next one (power), a knocked walker cannot be
+   hit again for 15 s, and below power .3 the walker only stumbles aside. No damage, no penalty. Visual only: after the normal
+   tick the person is pinned to the knock position and posed. Reuses NPC/VPED (+ npcAdd people) and the pushPeople shove. */
+{const KD=2.6;let recent=[];
+ function knockStart(n,pw){const hx=Math.sin(dr.h||0),hz=Math.cos(dr.h||0),sg=dr.v<0?-1:1;
+  n.kd={t:0,pw,x:n.x,z:n.z,dx:hx*sg*(.8+2.2*pw),dz:hz*sg*(.8+2.2*pw),cd:15,ord:n.m.rotation.order,ry:n.m.rotation.y}}
+ function knockPose(n,dt){const k=n.kd;k.t+=dt;const T=k.t,pw=k.pw;
+  const fly=Math.min(1,T/.45),ease=1-(1-fly)*(1-fly);
+  n.x=k.x+k.dx*ease;n.z=k.z+k.dz*ease;
+  const lay=(pw<.3?.45:1)*(T<.3?T/.3:T<1.7?1:Math.max(0,1-(T-1.7)/(KD-1.7)));/* down, hold, get up */
+  const m=n.m;m.rotation.order='YXZ';m.rotation.y=k.ry;m.rotation.x=-Math.PI/2*lay;m.position.set(n.x,.12*lay,n.z);
+  const f=Math.sin(T*18)*.5*(T<1.7?1:.2);n.legs&&n.legs.forEach((l,i)=>{l.rotation.x=f*(i?-1:1)});n.arms&&n.arms.forEach((a,i)=>{a.rotation.x=-2.4*lay;a.rotation.z=(i?1:-1)*(.9+f)*lay})}
+ function knockEnd(n){const m=n.m;m.rotation.order=n.kd.ord;m.rotation.x=0;m.position.y=0;n.arms&&n.arms.forEach(a=>{a.rotation.z=0});n.kcd=n.kd.cd;n.kd=null}
+ const w0=worldTick;worldTick=function(dt){w0.apply(this,arguments);try{
+  const now=performance.now()/1000;recent=recent.filter(t=>now-t<40);
+  [NPC,VPED].forEach(L=>L.forEach(n=>{
+   if(n.kd){n.kd.t>=KD?knockEnd(n):knockPose(n,dt);return}
+   if(n.kcd>0)n.kcd-=dt;
+   if(mode!='drive'||!dr||PAUSED||!n.m.visible||n.st==1||n.fan||n.kcd>0||Math.abs(dr.v)<3.5||(!n.ext&&(HIN||IN)))return;
+   if(Math.hypot(n.x-P.x,n.z-P.z)<2.5){const pw=Math.max(.15,1-.28*recent.length);recent.push(now);knockStart(n,pw);knockPose(n,0)}}))}catch(e){console.error('knockdown',e)}}}
