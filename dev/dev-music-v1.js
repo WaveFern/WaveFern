@@ -737,6 +737,9 @@ return{play,stop:f=>stop(f),setIntensity:x=>{if(cur)cur.I=Math.max(0,Math.min(1,
   return out},
  plan:src=>{const P=plan(src);return{genre:P.genre,style:P.style,variant:P.si+1,of:P.count,bpm:P.bpm,key:P.keyName,seed:P.seed}},
  beat:()=>{const E=cur;if(!E||E.t0==null||E.wt)return-1;const t=E.paused?E.pt:E.c.currentTime-(E.c.outputLatency||0);return(t-E.t0)/(E.sd*4)},
+ /* v55.41.0: seek(b) jumps the playing song to quarter note b (the Spotify bar's click-to-seek); works while held/paused too */
+ seek:b=>{const E=cur;if(!E||E.t0==null||E.wt)return false;const n=Math.max(0,Math.round((+b||0)*4)),c=E.c,now=c.currentTime;
+  if(E.paused){E.t0=E.pt-n*E.sd}else{E.t0=now+.05-n*E.sd}E.step=n;E.next=stepTime(E,n);return true},
  bpm:()=>cur?cur.P.bpm:0,
  /* dev: the loudness leveller's gain (dB) and how many 400 ms blocks it has measured */
  loudness:()=>cur?{gainDb:+(cur.lvdb||0).toFixed(2),blocks:(cur.lvB||[]).length,target:LUFS}:null,
