@@ -29,10 +29,18 @@ const cdMs=f=>{const n=cnt(f);return n>=4?30*6e4:n>=2?10*6e4:5*6e4};
 const wait=f=>Math.max(0,lastN(f)+cdMs(f)-Date.now());
 const mins=ms=>Math.ceil(ms/60000)+' min';
 /* ---- nudges ---- */
+/* v55.50.0: nudge while the tab is hidden: favicon gets a red dot and the tab title says who nudged and how long ago; it clears after 8s or when you return */
+const TA={t:0,links:null,title:''};
+function tabAlertClear(){clearTimeout(TA.t);TA.t=0;if(TA.links){document.querySelectorAll('link[data-fhn]').forEach(l=>l.remove());TA.links.forEach(l=>document.head.appendChild(l));TA.links=null;document.title=TA.title}}
+function tabAlert(who,at){if(!document.hidden||TA.links)return;const m=Math.max(0,Math.round((Date.now()-(+at||Date.now()))/60000));
+ const img=new Image();img.onload=()=>{try{if(!document.hidden||TA.links)return;const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.drawImage(img,0,0,64,64);x.fillStyle='#e53935';x.beginPath();x.arc(48,16,14,0,7);x.fill();x.strokeStyle='#fff';x.lineWidth=3;x.stroke();
+  TA.links=[...document.querySelectorAll('link[rel~=icon]')];TA.links.forEach(l=>l.remove());const n=document.createElement('link');n.rel='icon';n.type='image/png';n.href=c.toDataURL('image/png');n.dataset.fhn=1;document.head.appendChild(n);
+  TA.title=document.title;document.title=(who||'A friend')+' nudged you to play '+(m<1?'just now':m+(m==1?' min':' mins')+' ago');TA.t=setTimeout(tabAlertClear,8000)}catch(e){}};img.src='favicon.png'}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tabAlertClear()});
 function sub(){const F=X();if(FH.sub||!F||!F.r||!F.h)return;FH.sub=1;const{R,db,uid}=F.r;
  R.onValue(R.ref(db,'f/k/'+uid),s=>{const v=s.val()||{},now=Date.now();let first=!FH.kd;
   for(const k in v){if(!okU(k)||!v[k]||now-(+v[k].t||0)>86400000){try{R.remove(R.ref(db,'f/k/'+uid+'/'+k))}catch(e){}delete v[k]}}
-  if(FH.kd)for(const k in v)if(!FH.K[k]||FH.K[k].t!==v[k].t){try{snd('ping');say((v[k].nm||'A friend')+' nudged you to play together.')}catch(e){}}
+  if(FH.kd)for(const k in v)if(!FH.K[k]||FH.K[k].t!==v[k].t){try{snd('ping');say((v[k].nm||'A friend')+' nudged you to play together.')}catch(e){}try{tabAlert(v[k].nm,v[k].t)}catch(e){}}
   FH.kd=1;FH.K=v;draw();notif()},()=>{})}
 window.fhNudge=f=>{const F=X();if(!F||!F.r||!okU(f))return;const w=wait(f);if(w>0){FH.msg='You can nudge @'+nm(f)+' again in '+mins(w)+'.';try{snd('err')}catch(e){}return draw()}
  const{R,db,uid}=F.r,ts=R.serverTimestamp();

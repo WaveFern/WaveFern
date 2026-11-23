@@ -801,15 +801,17 @@ function frStart(){if(FR.on||MPTR||typeof FW_ACCT=='undefined'||!FW_ACCT)return;
   R.onValue(R.ref(db,'f/i/'+uid),s=>{FR.I=s.val()||{};frInvite()},()=>{});
   R.onValue(R.ref(db,'f/b/'+uid),s=>{FR.B=s.val()||{};frDraw()},()=>{});
  }).catch(e=>{FR.on=0;FR.rerr=String(e&&(e.code||e.message)||e);console.warn('[friends] start failed:',e);frErr(e)})}
-function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:Date.now()-LAST>600000?0:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
+function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR.h,nm:frNm(),o:Date.now()-LAST>600000||(FR.hs&&Date.now()-FR.hs>=5000)?0:1,rm:MPS&&!MPTR&&MPS.code?MPS.code:''},k=JSON.stringify(o);
  if(k===FR.pk||Date.now()<(FR.pbo||0))return;FR.pk=k;
  /* send the name stamp with a changed name; if the stamp or nm is refused, retry once without nm */
- const nmChanged=o.nm&&o.nm!==FR.snm&&!frNmDenied(),go=(withNm)=>{const v=Object.assign({},o);if(!withNm||frNmDenied()){if(FR.snm)v.nm=FR.snm;else delete v.nm}/* v52.4.3: keep the stored name (always accepted) instead of wiping it */const u={['f/p/'+uid]:Object.assign({t:R.serverTimestamp()},v)};if(withNm&&nmChanged)u['f/u/'+uid+'/d']=R.serverTimestamp();return R.update(R.ref(db),u).then(()=>{if(withNm)FR.snm=o.nm})};
+ const nmChanged=o.nm&&o.nm!==FR.snm&&!frNmDenied(),go=(withNm)=>{const v=Object.assign({},o);if(!v.nm||!withNm||frNmDenied()){if(FR.snm)v.nm=FR.snm;else delete v.nm}/* v55.49.3: an empty name was sent as nm:'' and the rules refuse it (1-24 characters), which denied every presence write *//* v52.4.3: keep the stored name (always accepted) instead of wiping it */const u={['f/p/'+uid]:Object.assign({t:R.serverTimestamp()},v)};if(withNm&&nmChanged)u['f/u/'+uid+'/d']=R.serverTimestamp();return R.update(R.ref(db),u).then(()=>{if(withNm)FR.snm=o.nm})};
  go(1).catch(e=>{if(!/PERMISSION/i.test(String(e&&(e.code||e.message)))||!nmChanged)throw e;frNmMark();return go(0)}).then(()=>{FR.pbf=0;if(!FR.od){FR.od=1;R.onDisconnect(R.ref(db,'f/p/'+uid+'/o')).remove().catch(()=>{})}}).catch(e=>{
   /* back off instead of retrying every 4 seconds: 30s, 60s, 2min ... up to 10min, and keep the failed key so it is not re-sent until then */
   FR.pbf=Math.min((FR.pbf||0)+1,6);FR.pbo=Date.now()+Math.min(600000,15000*Math.pow(2,FR.pbf));FR.pk='';
   if(!FR.pw){FR.pw=1;console.warn('[friends] presence blocked, backing off',e&&(e.code||e.message))}})}
 setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);
+/* v55.50.0: a hidden tab shows offline to friends after 5s (debounced, so quick tab flicks write nothing); back online at once on return. onDisconnect still removes o. */
+document.addEventListener('visibilitychange',()=>{try{if(document.hidden){FR.hs=Date.now();setTimeout(()=>{try{if(document.hidden)frPresence()}catch(e){}},5200)}else{FR.hs=0;FR.pbo=0;frPresence()}}catch(e){}});
 const frN=()=>Object.keys(FR.Q||{}).length;
 const frName=f=>{const p=FR.P[f],q=FR.PF&&FR.PF[f],h=p&&p.h||q&&q.h;return h?'@'+h:'Friend'};
 /* pick a username (once) */
