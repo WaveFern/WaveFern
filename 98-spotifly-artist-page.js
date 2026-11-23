@@ -115,9 +115,17 @@ function sfBar(){const c=sfCur(),I=c?sfInfo(c):null,pl=!!(c&&!c.held),d=c?sfLenB
  <div class=sfpbr><button class="sfib sfvb" title="Mute" onclick="sfMute()">${sfIco(v>0?'vol':'mute')}</button><input class=sfvs type=range min=0 max=1 step=.01 value="${v}" oninput="sfVol(this.value)" aria-label="Volume"></div></div>`}
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{if(app==1&&S.artist){const w=document.querySelector('#pc .win'),wb=w&&w.querySelector('.wb'),mn=wb&&wb.querySelector('.mn');if(wb&&!wb.querySelector('.sfnp')){
  w.classList.add('sfw');if(mn)mn.classList.add('sfm');wb.insertAdjacentHTML('beforeend',sfPanel());w.insertAdjacentHTML('beforeend',sfBar())}}}catch(e){console.error('spotifly player',e)}return r}}
+/* click / tap / drag on a progress bar (Now playing panel or player bar) jumps the song there (v55.41.0); one pointer path covers mouse, touch and the Quest laser */
+const SFSK={on:0,bar:null};
+function sfSeekF(e){const r=SFSK.bar.getBoundingClientRect();return r.width>0?Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)):0}
+function sfSeekDraw(f){const c=sfCur();if(!c)return;const d=sfLenB()*60/(c.bpm||90),t=sfTime(f*d);document.querySelectorAll('#pc .sfprog>i').forEach(i=>i.style.width=(f*100).toFixed(2)+'%');document.querySelectorAll('#pc .sfel').forEach(x=>x.textContent=t)}
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#pc .sfprog');if(!b||(e.button||0)||!sfCur())return;e.preventDefault();SFSK.on=1;SFSK.bar=b;try{b.setPointerCapture(e.pointerId)}catch(_){}sfSeekDraw(sfSeekF(e))});
+document.addEventListener('pointermove',e=>{if(SFSK.on)sfSeekDraw(sfSeekF(e))});
+const sfSeekEnd=e=>{if(!SFSK.on)return;SFSK.on=0;if(e.type=='pointercancel'){SFSK.bar=null;return}const f=sfSeekF(e);SFSK.bar=null;try{Beats.seek(Math.min(f*sfLenB(),sfLenB()-1))}catch(_){}pcR()};
+document.addEventListener('pointerup',sfSeekEnd);document.addEventListener('pointercancel',sfSeekEnd);
 /* every frame: move the progress bars and go to the next song when one ends */
 {const u0=update;update=function(dt){u0(dt);try{const c=sfCur();if(!c)return;if(!c.held&&!c.paused&&Beats.beat()>=sfLenB()){sfStep(1,1);return}
- if(mode=='pc'&&app==1){const el=sfEl(c),d=sfLenB()*60/(c.bpm||90),w=Math.min(100,el/d*100).toFixed(2)+'%',t=sfTime(el);
+ if(mode=='pc'&&app==1&&!SFSK.on){const el=sfEl(c),d=sfLenB()*60/(c.bpm||90),w=Math.min(100,el/d*100).toFixed(2)+'%',t=sfTime(el);
   document.querySelectorAll('#pc .sfprog>i').forEach(i=>{if(i.style.width!=w)i.style.width=w});document.querySelectorAll('#pc .sfel').forEach(e=>{if(e.textContent!=t)e.textContent=t})}}catch(e){}}}
 
 {const st=document.createElement('style');st.textContent=`
@@ -169,7 +177,7 @@ function sfBar(){const c=sfCur(),I=c?sfInfo(c):null,pl=!!(c&&!c.held),d=c?sfLenB
 .sfabt{background:color-mix(in srgb,#a66bff 22%,#181818);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px;font-size:13px}.sfabt>b{color:#fff;font-size:15px;margin-bottom:2px}
 .sfabt>div{display:flex;justify-content:space-between;gap:10px}.sfabt>div>span:first-child{color:#b3b3b3}.sfabt>div>span:last-child{color:#fff;text-align:right}
 .sfemp{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#727272;text-align:center}.sfemp .sfi{height:40px}
-.sfprog{flex:1;height:6px;background:#4d4d4d;position:relative}.sfprog>i{position:absolute;left:0;top:0;bottom:0;background:#fff}
+.sfprog{flex:1;height:6px;background:#4d4d4d;position:relative;cursor:pointer;touch-action:none}.sfprog::before{content:'';position:absolute;left:0;right:0;top:-8px;bottom:-8px}.sfprog>i{position:absolute;left:0;top:0;bottom:0;background:#fff}
 .sfpb:hover .sfprog>i,.sfnp:hover .sfprog>i{background:#a66bff}
 .sftm{display:flex;justify-content:space-between;color:#b3b3b3;font-size:12px;font-variant-numeric:tabular-nums;margin-top:-6px}
 .sfnc{display:flex;align-items:center;gap:14px}

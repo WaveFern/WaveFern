@@ -1,4 +1,4 @@
-/* ===== dev only: money roll (v55.45.0) =====
+/* ===== dev only: money roll (v55.46.0) =====
    Casino style roll on the money readout in the top-left HUD, only when the amount goes UP (any source: pay, sales, gifts, rewards).
    One central hook: a wrapper on hud() compares S.money each time the HUD is drawn, so no money source is patched.
    Cost: the roll is pure CSS (a transform on one strip per digit, plus a vertical-only SVG blur while it moves); the only JS is
