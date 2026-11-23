@@ -3,9 +3,10 @@
    - MAJOR/MINOR: feature builds (MINOR goes up for a new feature; after x.9.0 the next feature is (MAJOR+1).0.0)
    - PATCH: every bug fix, however small
    Bump GAME_VERSION and add a VERSION_HISTORY entry in the same commit as the change. */
-const GAME_VERSION='v55.49.2';
+const GAME_VERSION='v55.49.3';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.49.3',n:'Friends: fixed the Realtime Database permission_denied warning that repeated every few minutes. Presence no longer sends an empty display name, which the rules refuse. Saves still load.'},
  {v:'v55.49.2',n:'The game no longer pauses while you pick a photo: opening the file picker for a profile picture, wallpaper or save import keeps the game running. Switching tabs still pauses. Saves still load.'},
  {v:'v55.49.1',n:'Update notice checks more reliably: also when you return to the tab, refocus the window or reconnect to the internet, retries a failed check after a few seconds, and stops checking while the tab is hidden to save battery.'},
  {v:'v55.49.0',n:'Desktop wallpapers: 22 more built-in ones, a scrollable list, and Add your own picture, which is shrunk to a 128x72 16-colour pixel grid like your profile pictures (about 6 KB in the save).'},
