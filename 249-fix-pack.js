@@ -118,7 +118,7 @@ if(typeof pauseUI=='function'){const pu0=pauseUI;
 @keyframes asvd{0%{opacity:.2}33%{opacity:1}66%{opacity:.2}100%{opacity:.2}}
 .asv .ast{width:14px;height:11px;opacity:0;transition:opacity .35s steps(4);color:var(--g,#2ee88e)}.asv.done .ast{opacity:1}
 .asv .asd{opacity:0;transition:opacity .2s steps(2)}.asv.busy .asd{opacity:1}`;document.head.appendChild(st);
- const TICK='<svg class=ast viewBox="0 0 7 6" shape-rendering="crispEdges" fill="currentColor"><path d="M0 3h1v1h1v1h1V4h1V3h1V2h1V1h1V0h-1v1h-1v1h-1v1H4v1H3v1H2V4H1V3z"/></svg>';
+ const TICK='<svg class=ast viewBox="0 0 9 7" shape-rendering="crispEdges" fill="currentColor"><path d="M7 0h2v1H7zM6 1h2v1H6zM5 2h2v1H5zM0 3h2v1H0zM4 3h2v1H4zM1 4h4v1H1zM2 5h2v1H2z"/></svg>';
  let ASV='';/* '', busy, done, fail: kept here because the pause menu is redrawn and the button node is replaced */
  const paint=()=>{const b=document.getElementById('asvb');if(!b)return;b.classList.toggle('busy',ASV=='busy');b.classList.toggle('done',ASV=='done');b.querySelector('.asl').textContent=ASV=='done'?'Autosaved':ASV=='fail'?'Autosave failed':'Autosave'};
  window.fwAutosave=function(){if(ASV=='busy')return;ASV='busy';paint();const t0=Date.now();
