@@ -115,7 +115,7 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  await T('rtdb: guest can NOT write room info i',assertFails(dbB.ref('r/ABCDE/i').set({b:'x',n:1,k:'gt'})));
  await T('rtdb: host can write relay d/guest',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/p/fb-userAAAAAAAAAA1').set('1,2,3')));
  await T('rtdb: guest can NOT write host relay d/',assertFails(dbB.ref('r/ABCDE/d/userBBBBBBBBBB2/p/fb-userAAAAAAAAAA1').set('9,9,9')));
- // v55.52.17: the host relay d/ has a fixed shape, so it cannot carry anything else or be used as storage
+ // v55.52.18: the host relay d/ has a fixed shape, so it cannot carry anything else or be used as storage
  await T('rtdb: host relay c clock string ok',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/c').set('12,10.50')));
  await T('rtdb: host relay m/l/e entries ok',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2').update({'m/fb-userAAAAAAAAAA1':'{"a":1}','l/fb-userAAAAAAAAAA1':'{"hair":1}','e/-Nabc123':'{"t":"x"}'})));
  await T('rtdb: host relay unknown field REFUSED',assertFails(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/inv').set({xm_tree:5})));
