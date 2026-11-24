@@ -7,7 +7,7 @@
    Uses fake users only (demo project), never touches the real project. Ports: Firestore 8181, Database 9191. */
 const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
 const fs=require('fs');
-const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.52.17'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
+const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.52.18'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
 const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
 let pass=0,fail=0;
 const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fail++;console.log('FAIL ',name,'-',String(e.message).split('\n')[0])}};
