@@ -3,7 +3,7 @@
 Asked: update the Firebase rules so nobody can give themselves anything (inventory, borders, money, crates, rewards).
 
 ## Result: the Realtime Database rules already allow none of it, so they are unchanged
-`firebase-rules/v55.52.18/database.rules.json` (tightened further in v55.52.17, see below) is default-deny at the root and only opens `f/*` (friends, usernames, invites, presence) and `r/*` (band rooms). No game progress is stored there: the game never writes inventory, borders, money, crates or rewards to the Realtime Database. `tools/rules-test.js` now asserts this (7 new "google can NOT write ..." lines; 97 of 97 pass in the emulators). Nothing needs publishing for this part, and I did not touch the live project.
+`firebase-rules/v55.52.18/database.rules.json` (tightened further in v55.52.18, see below) is default-deny at the root and only opens `f/*` (friends, usernames, invites, presence) and `r/*` (band rooms). No game progress is stored there: the game never writes inventory, borders, money, crates or rewards to the Realtime Database. `tools/rules-test.js` now asserts this (7 new "google can NOT write ..." lines; 97 of 97 pass in the emulators). Nothing needs publishing for this part, and I did not touch the live project.
 
 ## Where the "things" really live, and why rules cannot stop a self-grant there
 - All progress (`S.inv`, `S.wr`, `S.cars`, `S.wraps`, `S.pbd` borders, money, advent doors `S.adv`) is the player's career save. It is held in the browser (localStorage) and backed up as one opaque string `saves/{uid}.code` in Firestore (`FW4-...`, a sealed save).
