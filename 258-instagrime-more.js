@@ -41,7 +41,7 @@ const NEWSU={music:['popwatch','fern.times'],other:['fern.times']};
 function genNews(r,S_){const d=S.day-(r()<.55?0:Math.floor(r()*Math.min(5,S.day-1)));let L=FWNEWS.storiesOf(Math.max(1,d));
  if(r()<.5)L=L.filter(s=>s.cat=='music');L=L.filter(s=>!S_.has(s.h));if(!L.length)return null;
  const s=r()<.6?(L.find(x=>x.you)||pk(L,r)):pk(L,r),mus=s.cat=='music',u=mus&&IFLN.popwatch&&r()<.7?'popwatch':'fern.times',x=IFLN[u];
- return mk({u,cfg:x?x.c:lk(u),cap:s.h,kind:s.k=='album'?'album':s.k,inf:1,about:s.you?1:0,news:s.id,l:Math.round((x?x.f:3e6)*(.01+r()*.03))},r)}
+ return mk({u,cfg:x?x.c:lk(u),cap:s.h,kind:s.k=='album'?'album':s.k,inf:1,about:s.you?1:0,news:s.id,...(FWNEWS.sceneFor?FWNEWS.sceneFor(s)||{}:{}),l:Math.round((x?x.f:3e6)*(.01+r()*.03))},r)}
 function genAbout(r,S_){const a=S.artist,songs=S.songs||[];if(!a||!songs.length)return null;const L=+S.listeners||0,last=songs[songs.length-1],top=songs.slice().sort((x,y)=>(y.streams||0)-(x.streams||0))[0]||last,
  alb=(S.albums||[]).slice(-1)[0],rv=((S.rvl&&S.rvl.rv)||[]).filter(x=>x&&x.n),pool=[];
  const fan=()=>({u:L>=2e4&&r()<.4?igzStan(a,r):igzFan(r),cfg:igzCf(r)}),crit=()=>{const u=pk(CRIT,r);return{u,cfg:lk(u)}};
