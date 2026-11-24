@@ -143,8 +143,10 @@ if(typeof pauseUI=='function'){const pu0=pauseUI;
    hit again for 15 s, and below power .3 the walker only stumbles aside. No damage, no penalty. Visual only: after the normal
    tick the person is pinned to the knock position and posed. Reuses NPC/VPED (+ npcAdd people) and the pushPeople shove. */
 {const KD=2.6;let recent=[];
- function knockStart(n,pw){const hx=Math.sin(dr.h||0),hz=Math.cos(dr.h||0),sg=dr.v<0?-1:1;
-  n.kd={t:0,pw,x:n.x,z:n.z,dx:hx*sg*(.8+2.2*pw),dz:hz*sg*(.8+2.2*pw),cd:15,ord:n.m.rotation.order,ry:n.m.rotation.y}}
+ /* v55.52.9: knocked SIDEWAYS, out of the car's path (right of the car's heading is (hz,-hx)), so the car can never drive over them */
+ function knockStart(n,pw){const hx=Math.sin(dr.h||0),hz=Math.cos(dr.h||0),fw=dr.v<0?-1:1,sd=(n.x-dr.x)*hz-(n.z-dr.z)*hx,sg=sd<0?-1:1,
+   dd=sg*(2.4+1.6*pw)-sd,fo=fw*.5*pw;
+  n.kd={t:0,pw,x:n.x,z:n.z,dx:hz*dd+hx*fo,dz:-hx*dd+hz*fo,cd:15,ord:n.m.rotation.order,ry:n.m.rotation.y}}
  function knockPose(n,dt){const k=n.kd;k.t+=dt;const T=k.t,pw=k.pw;
   const fly=Math.min(1,T/.45),ease=1-(1-fly)*(1-fly);
   n.x=k.x+k.dx*ease;n.z=k.z+k.dz*ease;
