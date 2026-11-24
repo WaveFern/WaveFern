@@ -1,4 +1,4 @@
-# Can a player give themselves items? Firebase audit (v55.52.13)
+# Can a player give themselves items? Firebase audit (v55.52.15)
 
 Asked: update the Firebase rules so nobody can give themselves anything (inventory, borders, money, crates, rewards).
 

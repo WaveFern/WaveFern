@@ -1,4 +1,4 @@
-/* ===== v55.52.13: PROFILE PICTURE BORDERS (Christmas crates) =====
+/* ===== v55.52.15: PROFILE PICTURE BORDERS (Christmas crates) =====
    A border is a round pixel-art ring drawn on a 16x16 grid around your own profile picture (the drawn avatar, the 3D
    press shot / selfie and uploaded pixel pictures), so it stays chunky at any size. The nine Christmas borders only drop
    from the Christmas crates of the advent calendar (dev/dev-advent-v1.js reads FW_PBORDER.defs for its prize pool).

@@ -82,7 +82,7 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  const dbA=g('userAAAAAAAAAA1').database(),dbB=g('userBBBBBBBBBB2').database(),dbAN=an('anonxxxxxxxx3').database(),dbU=env.unauthenticatedContext().database();
  const TS={'.sv':'timestamp'};
  await T('rtdb: root read refused',assertFails(dbA.ref('/').get()));
-  // v55.52.13: nobody can store or grant themselves items, borders, money, crates or rewards in the Realtime Database (all game progress lives in the player's own save, never here)
+  // v55.52.15: nobody can store or grant themselves items, borders, money, crates or rewards in the Realtime Database (all game progress lives in the player's own save, never here)
  for(const [n,path,val] of [['inventory','inv/userAAAAAAAAAA1',{xm_tree:5}],['profile border','users/userAAAAAAAAAA1/borders',{star:1}],['currency','wallet/userAAAAAAAAAA1',999999],['crates','crates/userAAAAAAAAAA1/x',1],['rewards','rewards/userAAAAAAAAAA1',{a:1}],['inside f/p own profile','f/p/userAAAAAAAAAA1/inv',{a:1}],['inside f/u own node','f/u/userAAAAAAAAAA1/money',5]])
   await T('rtdb: google can NOT write '+n,assertFails(dbA.ref(path).set(val)));
  await T('rtdb: anonymous can NOT write presence',assertFails(dbAN.ref('f/s/anonxxxxxxxx3').set(TS)));
