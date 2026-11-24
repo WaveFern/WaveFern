@@ -1,4 +1,4 @@
-/* Security rules test (v55.30.18): runs the Firestore + Realtime Database rules in the Firebase emulators and checks that
+/* Security rules test: runs the Firestore + Realtime Database rules in the Firebase emulators and checks that
    players cannot do what they must not (admin writes, other players' data, founder flags, anonymous abuse, forged friend links...).
    Run it after ANY change in firebase-rules/. Needs Java and a one-off install OUTSIDE the repo, for example in a scratch folder:
      npm i firebase-tools@13 @firebase/rules-unit-testing@3 firebase@10
@@ -7,7 +7,7 @@
    Uses fake users only (demo project), never touches the real project. Ports: Firestore 8181, Database 9191. */
 const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
 const fs=require('fs');
-const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.30.18'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
+const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.52.17'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
 const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
 let pass=0,fail=0;
 const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fail++;console.log('FAIL ',name,'-',String(e.message).split('\n')[0])}};
@@ -33,7 +33,7 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  await T('profile: empty photo accepted',assertSucceeds(A.doc('profiles/userAAAAAAAAAA1').set(prof({p:''}))));
  await T('profile: write someone else\'s profile refused',assertFails(B.doc('profiles/userAAAAAAAAAA1').set(prof())));
  await T('profile: bio with <script> refused',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({bio:'<script>alert(1)</script>'}))));
- await T('profile: top-songs list with a 500 KB entry REFUSED (v55.30.18)',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['x'.repeat(500000)]}))));
+ await T('profile: top-songs list with a 500 KB entry REFUSED',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['x'.repeat(500000)]}))));
  await T('profile: normal top-songs list accepted',assertSucceeds(A.doc('profiles/userAAAAAAAAAA1').set(prof({sg:['Song One|1200','Two|5']}))));
  await T('profile: self-granted founder REFUSED',assertFails(A.doc('profiles/userAAAAAAAAAA1').set(prof({founder:1}))));
  await T('profile: unauthenticated read refused',assertFails(U.doc('profiles/userAAAAAAAAAA1').get()));
@@ -111,16 +111,28 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  await T('rtdb: guest can NOT read other guests\' slots',assertFails(dbB.ref('r/ABCDE/u').get()));
  await T('rtdb: host can read guests\' slots',assertSucceeds(dbA.ref('r/ABCDE/u').get()));
  await T('rtdb: host can write room info i',assertSucceeds(dbA.ref('r/ABCDE/i').set({b:'Band',n:1,k:'gt'})));
- await T('rtdb: host room info with extra field REFUSED (v55.30.18)',assertFails(dbA.ref('r/ABCDE/i').set({b:'Band',n:1,k:'gt',junk:'x'.repeat(5000)})));
+ await T('rtdb: host room info with extra field REFUSED',assertFails(dbA.ref('r/ABCDE/i').set({b:'Band',n:1,k:'gt',junk:'x'.repeat(5000)})));
  await T('rtdb: guest can NOT write room info i',assertFails(dbB.ref('r/ABCDE/i').set({b:'x',n:1,k:'gt'})));
- await T('rtdb: host can write relay d/guest',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/p').set('1,2,3')));
- await T('rtdb: guest can NOT write host relay d/',assertFails(dbB.ref('r/ABCDE/d/userBBBBBBBBBB2/p').set('9,9,9')));
+ await T('rtdb: host can write relay d/guest',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/p/fb-userAAAAAAAAAA1').set('1,2,3')));
+ await T('rtdb: guest can NOT write host relay d/',assertFails(dbB.ref('r/ABCDE/d/userBBBBBBBBBB2/p/fb-userAAAAAAAAAA1').set('9,9,9')));
+ // v55.52.17: the host relay d/ has a fixed shape, so it cannot carry anything else or be used as storage
+ await T('rtdb: host relay c clock string ok',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/c').set('12,10.50')));
+ await T('rtdb: host relay m/l/e entries ok',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2').update({'m/fb-userAAAAAAAAAA1':'{"a":1}','l/fb-userAAAAAAAAAA1':'{"hair":1}','e/-Nabc123':'{"t":"x"}'})));
+ await T('rtdb: host relay unknown field REFUSED',assertFails(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/inv').set({xm_tree:5})));
+ await T('rtdb: host relay oversize entry REFUSED',assertFails(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/l/fb-userAAAAAAAAAA1').set('x'.repeat(4001))));
+ await T('rtdb: host relay plain string in place of entries REFUSED',assertFails(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/m').set('x'.repeat(3000))));
+ await T('rtdb: host relay bad guest key REFUSED',assertFails(dbA.ref('r/ABCDE/d/a-b/c').set('1')));
+ await T('rtdb: no unlisted top-level key can be created',assertFails(dbA.ref('anything').set(1)));
+ await T('rtdb: no unlisted key under f',assertFails(dbA.ref('f/inv').set({a:1})));
+ await T('rtdb: blocked list key too short for a uid',assertFails(dbA.ref('f/b/userAAAAAAAAAA1/ab').set('x')));
+ await T('rtdb: blocked list entry with a real uid ok',assertSucceeds(dbA.ref('f/b/userAAAAAAAAAA1/userBBBBBBBBBB2').set('Bob')));
+ await T('rtdb: guest slot e key too long REFUSED',assertFails(dbB.ref('r/ABCDE/u/userBBBBBBBBBB2/e/'+'k'.repeat(41)).set('x')));
  await dbB.ref('r/ABCDE/u/userBBBBBBBBBB2/e/k1').set('hello');
- await T('rtdb: host can NOT write into a guest slot (v55.30.18)',assertFails(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2/m').set('forged')));
- await T('rtdb: host can NOT overwrite a guest slot (v55.30.18)',assertFails(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2').set({o:1})));
- await T('rtdb: host can NOT add a relay entry for a guest (v55.30.18)',assertFails(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2/e/k2').set('forged')));
+ await T('rtdb: host can NOT write into a guest slot',assertFails(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2/m').set('forged')));
+ await T('rtdb: host can NOT overwrite a guest slot',assertFails(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2').set({o:1})));
+ await T('rtdb: host can NOT add a relay entry for a guest',assertFails(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2/e/k2').set('forged')));
  await T('rtdb: host can remove a guest relay entry e/',assertSucceeds(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2/e/k1').remove()));
- await T('rtdb: host can NOT replace room with guest data (v55.30.18)',assertFails(dbA.ref('r/ABCDE').set({h:{u:'userAAAAAAAAAA1',t:TS},u:{userBBBBBBBBBB2:{m:'forged'}}})));
+ await T('rtdb: host can NOT replace room with guest data',assertFails(dbA.ref('r/ABCDE').set({h:{u:'userAAAAAAAAAA1',t:TS},u:{userBBBBBBBBBB2:{m:'forged'}}})));
  await T('rtdb: host can delete the room',assertSucceeds(dbA.ref('r/ABCDE').remove()));
  console.log(`\n${pass} passed, ${fail} failed`);
  await env.cleanup();process.exit(fail?1:0);
