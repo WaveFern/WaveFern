@@ -1,4 +1,4 @@
-/* ===== v55.52.22 (held): News app (laptop + phone) =====
+/* ===== v55.52.2x (held): News app (laptop + phone) =====
    A preinstalled news app, "Fern Times". Every story is made from the day number and the career, so nothing new is saved:
    music news (your albums and songs, diss tracks and replies from S.news, rivals from S.rvl, the album chart) mixed with
    world, sport, culture, tech, business and science stories from invented places and teams. Today's stories come first,
@@ -183,7 +183,7 @@ function css(){if(document.getElementById('nwcss'))return;const s=document.creat
 .nw .art .bk{all:unset;cursor:pointer;color:#d6322b;font:700 12px/1 sans-serif;letter-spacing:.08em;text-transform:uppercase}
 .nw .art h1{margin:12px 0 8px;font:700 clamp(26px,5vw,38px)/1.1 Georgia,serif}
 .nw .art .pc{aspect-ratio:16/10;background:#222;margin:14px 0;border-radius:3px;overflow:hidden}
-.nw .bd p{font:18px/1.6 Georgia,serif;margin:0 0 16px}.nw .bd p:first-child:first-letter{font-size:3.1em;float:left;line-height:.9;padding:4px 8px 0 0;font-weight:700;color:#d6322b}
+.nw .nwbd p{font:18px/1.6 Georgia,serif;margin:0 0 16px}
 .nw .art h4{margin:28px 0 10px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#6a6559}
 .nw .end{text-align:center;color:#6a6559;font:12px ui-monospace,monospace;padding:18px}
 .nw .sent{height:40px;text-align:center;color:#6a6559;font:12px ui-monospace,monospace;padding-top:14px}
@@ -206,7 +206,7 @@ function articleH(s,ctx){const rel=storiesOf(s.d).filter(x=>x.cat==s.cat&&x.id!=
  return`<div class="nw${ctx=='ph'?' nwph':''}"><div class=mast><div class=dt><span>Fern Times</span><span>${dayName(s.d)}</span></div><h1>The Fern <i>Times</i></h1></div><div class=art><button class=bk onclick="nwBack()">‹ Back to news</button>
  <div class=meta style="margin-top:14px">${tagH(s)}</div><h1>${esc(s.h)}</h1><p class=dek style="font-size:18px">${esc(s.dek)}</p><div class=meta>By ${s.by} · ${dayName(s.d)} · ${s.mins} min read</div>
  <div class=pc><img src="${img(s)}" alt=""></div><div class=fx>${s.facts.map(f=>`<div>${esc(f[0])}<b>${esc(f[1])}</b></div>`).join('')}</div>
- <h4>What happened</h4><div class=bd>${s.p.map(t=>`<p>${esc(t)}</p>`).join('')}</div>
+ <h4>What happened</h4><div class=nwbd>${s.p.map(t=>`<p>${esc(t)}</p>`).join('')}</div>
  <div class=bq>“${esc(s.quote[0])}”<small>${esc(s.quote[1])}</small></div>
  <div class=sec><h4>Why it matters</h4><p>${esc(s.why)}</p></div><div class=sec><h4>What happens next</h4><p>${esc(s.next)}</p></div>${rel.length?`<h4>More in ${CN[s.cat]}</h4><div class=grid style="margin-bottom:20px">${rel.map(card).join('')}</div>`:''}</div></div>`}
 function page(ctx){css();N.ctx=ctx;
