@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.5';
+const GAME_VERSION='v55.52.6';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.6',n:'NPCs stay on the pavement: sidestepping, shoves and spawns no longer put them on the road'},
  {v:'v55.52.5',n:'Profile: a refused full profile write no longer wipes stored songs, join date and achievements (fallbacks merge)'},
  {v:'v55.52.4',n:'Fix: fans and waiting people can now be knocked down by your car too'},
  {v:'v55.52.3',n:'Walkers you hit with your car at speed get knocked down and get up again (weaker each time, no way to farm it)'},

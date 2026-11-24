@@ -29,9 +29,19 @@ function avoidApply(L,vert,dt){const out0=HIN||IN,r=mode=='drive'?1.9:1.05;L.for
    of a pavement the target flips and they glide across to the other lane. */
 const LANE=.42;
 function lanes(L,vert){L.forEach(n=>{if(n._lb===undefined)n._lb=vert?n.x0:n.z0;const o=(vert?-1:1)*n.dir*LANE;if(vert)n.x0=n._lb+o;else n.z0=n._lb+o})}
+/* pedestrians never stand on the asphalt: the sidestep (+/-1.0) plus the lane (+/-.42) can reach past the 1.2 half-width of the pavement,
+   the old shove can push people off it, and the random spawn can drop one inside a crossing road. Uses the same npcOnRoad test as the
+   walk code. Sideways: pulled back toward the lane. Along the walk: one standing on asphalt walks out the nearest way (and faces it). */
+function keepOff(L,vert,dt){L.forEach(n=>{if(!n.m.visible||n.st==1)return;const c=vert?n.x:n.z,t=vert?n.x0:n.z0,al=vert?n.z:n.x,
+  on=(a,l)=>vert?npcOnRoad(l,a):npcOnRoad(a,l),bad=v=>on(al,v),m=.25;let v=c;
+  if(!bad(t-m)&&!bad(t+m))for(let i=0;i<30&&(bad(v-m)||bad(v+m));i++)v+=Math.sign(t-v)*.05;
+  if(v!=c){if(n._ao)n._ao+=v-c;if(vert)n.x=v;else n.z=v}
+  if(on(al,v)){let to=0;for(let d=.5;d<24&&!to;d+=.5)for(const sg of[n.dir,-n.dir])if(!on(al+sg*d,v)){to=sg;break}
+   if(to){n.dir=to;const k=to*Math.min(2.5*dt,.2);if(vert)n.z+=k;else n.x+=k}}
+  n.m.position.x=n.x;n.m.position.z=n.z})}
 /* the old shove runs after the sidestep, on people's real positions */
 const push0=pushPeople;pushPeople=function(){};
-{const w0=worldTick;worldTick=function(dt){try{lanes(NPC,0);lanes(VPED,1)}catch(e){}let ok=1;try{avoidPrep(NPC,0);avoidPrep(VPED,1)}catch(e){ok=0}w0(dt);if(ok)try{avoidApply(NPC,0,dt);avoidApply(VPED,1,dt)}catch(e){console.error('street avoid',e)}push0()}}
+{const w0=worldTick;worldTick=function(dt){try{lanes(NPC,0);lanes(VPED,1)}catch(e){}let ok=1;try{avoidPrep(NPC,0);avoidPrep(VPED,1)}catch(e){ok=0}w0(dt);if(ok)try{avoidApply(NPC,0,dt);avoidApply(VPED,1,dt)}catch(e){console.error('street avoid',e)}push0();try{keepOff(NPC,0,dt);keepOff(VPED,1,dt)}catch(e){}}}
 
 /* ---------- 2. traffic turns along curves ---------- */
 const RT_IN=3,RT_OUT=5.5,V_IN=3.6,V_OUT=5,V_U=2.6;
