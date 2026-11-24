@@ -91,7 +91,7 @@ async function fsClaim(nh,old){const uid=FBU.uid,F=FBF,b=F.writeBatch(FBD),now=D
  b.set(F.doc(FBD,'usernames',nh),{uid,t:now});if(old&&old!==nh)b.delete(F.doc(FBD,'usernames',old));
  const cl=(v,m)=>Math.max(0,Math.min(m,Math.floor(+v||0)));let fl=0;try{fl=fameLevel()}catch(e){}
  const a=String((typeof S=='object'&&S&&S.artist)||'Player').replace(/[<>"]/g,'').slice(0,24)||'Player';
- b.set(F.doc(FBD,'profiles',uid),{a,h:nh,bio,fame:cl(fl,1000),lis:cl(typeof S=='object'&&S&&S.listeners,1e12),t:now});
+ b.set(F.doc(FBD,'profiles',uid),{a,h:nh,bio,fame:cl(fl,1000),lis:cl(typeof S=='object'&&S&&S.listeners,1e12),t:now},{merge:true});/* merge: claiming or changing a username must not erase the stored songs, join date, achievements, band, photo or Founder flag */
  dlog('saving @'+nh);await b.commit();dlog('saved @'+nh)}
 /* copy to the Realtime Database for Friends, best effort only */
 function rtMirror(nh,nd,chU,chD){try{const x=X(),F=x&&x.FR;if(!F||!F.ok||!F.r)return;const{R,db,uid}=F.r,ts=R.serverTimestamp(),up={['f/p/'+uid]:{h:nh,nm:nd||fwNameSafe((typeof S=='object'&&S&&S.artist)||''),o:1,rm:'',t:ts}},stp={};
