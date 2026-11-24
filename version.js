@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.8';
+const GAME_VERSION='v55.52.9';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.9',n:'Cars can no longer run over pedestrians: anyone the car hits is now knocked sideways out of its path instead of flung ahead of it.'},
  {v:'v55.52.8',n:'Username claim/change keeps the stored profile (songs, join date, achievements) instead of replacing it'},
  {v:'v55.52.7',n:'Presence heartbeat writes field by field so a stale display name can no longer be refused; says in the console why if the database still refuses it'},
  {v:'v55.52.6',n:'NPCs stay on the pavement: sidestepping, shoves and spawns no longer put them on the road'},
