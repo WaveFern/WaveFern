@@ -50,7 +50,7 @@
  const BIG={24:'b22',12:'b21',6:'b12',18:'b21'};
  const MW={1:'m21',9:'m21'};/* on phones (4 columns) two more wide doors so the board stays a full rectangle */
  const STY=['red','grn','cane','navy','gold','plum'];
- const CAT={k:'Clothing',f:'Furniture',p:'Pet',c:'Car',w:'Car wrap',x:'Present'};
+ const CAT={k:'Clothing',f:'Furniture',p:'Pet',c:'Car',w:'Car wrap',x:'Present',b:'Profile border'};
 
  const Sv=()=>{const s=typeof S!='undefined'?S:null;return s&&typeof s=='object'&&s.day!==undefined?s:null};
  const st=()=>{const s=Sv();if(!s)return null;const y=yr();if(!s.adv||typeof s.adv!='object'||s.adv.y!==y||s.adv.v!==PLANV)s.adv={y,c:{},v:PLANV};/* the doors were rearranged (crates), so older claim records are cleared once; items already received stay */if(!s.adv.c||typeof s.adv.c!='object')s.adv.c={};if(!s.adv.p||typeof s.adv.p!='object')s.adv.p={};return s.adv};
@@ -82,6 +82,7 @@
   const r=resolve(d);if(!r||r.t=='x')return null;
   if(r.t=='w'){s.wraps=s.wraps&&typeof s.wraps=='object'?s.wraps:{};s.wraps[r.pat]=1}
   if(r.t=='k'){s.wr=s.wr||[];if(!s.wr.includes(r.id))s.wr.push(r.id);s.wc=s.wc||{};const g=GAR.find(x=>x.id==r.id);let c=null;safe(()=>{c=THC[r.id]},'thc');if(!s.wc[r.id])s.wc[r.id]=c||g.dc}
+  if(r.t=='b'){if(!window.FW_PBORDER||!window.FW_PBORDER.give(r.bid))return null}
   if(r.t=='f'){s.inv=s.inv||{};s.inv[r.key]=(s.inv[r.key]||0)+1}
   if(r.t=='p'){s.pets=s.pets||[];if(!s.pets.includes(r.i))s.pets.push(r.i);safe(()=>syncF(),'pet')}
   if(r.t=='c'){s.cars=s.cars||[];if(!s.cars.includes(r.i))s.cars.push(r.i);if(!s.garage)s.garage=1;safe(()=>parkCars(),'car')}
@@ -106,6 +107,8 @@
   if(typeof F!='undefined')Object.getOwnPropertyNames(F).forEach(key=>{const f=F[key];if(!f||!f.b)return;if(key.indexOf('sv_')==0)return;const v=key.indexOf('xm_')==0?X[key]:0;if(v>0)out.push({t:'f',key,n:f.n,v,k:'f:'+key})});
   if(typeof GAR!='undefined')GAR.forEach(g=>{const v=g.xm?X[g.n]:0;if(v>0)out.push({t:'k',id:g.id,n:g.n,v,k:'k:'+g.id})});
   WRAPS.forEach(w=>out.push({t:'w',pat:w[0],n:w[1],v:w[2],k:'w:'+w[0]}));
+  /* profile picture borders (256-pfp-borders.js): Christmas-only, they drop from these crates and nowhere else */
+  if(window.FW_PBORDER)window.FW_PBORDER.defs.forEach(b=>out.push({t:'b',bid:b.id,n:b.n,v:b.v,k:'b:'+b.id}));
   /* anything a calendar door gives is never in a present, so each prize is only found in one place */
   const door=new Set(Object.values(PLAN).filter(p=>p.t!='x').map(p=>p.n));
   for(let i=out.length-1;i>=0;i--)if(door.has(out[i].n)||door.has(out[i].key))out.splice(i,1);
@@ -125,6 +128,7 @@
   const sv=Sv()||{},r={t:o.t,k:o.k,n:o.n,rar:o.tier};
   if(o.t=='f'){const have=(sv.inv&&sv.inv[o.key])||0;r.key=o.key;r.note=have?'DUPLICATE: you already have '+have+' of these, so this is another one. Delivered to your Storage.':'Delivered to your Storage. Press F at home to place it.'}
   if(o.t=='k'){r.id=o.id;const dup=(sv.wr||[]).includes(o.id);r.note=dup?'DUPLICATE: already in your wardrobe, so this one is a spare.':'In your wardrobe now. Wear it from the wardrobe in your bedroom.'}
+  if(o.t=='b'){r.bid=o.bid;const P=window.FW_PBORDER,dup=P&&P.own(o.bid);r.note=dup?'DUPLICATE: you already own this border, so this one is a spare.':'A new profile picture border'+(P&&P.eq()?'. Change it any time in your Wardrobe (PROFILE BORDER).':', worn from now on. Change it any time in your Wardrobe (PROFILE BORDER).')}
   if(o.t=='w'){r.pat=o.pat;const dup=sv.wraps&&sv.wraps[o.pat];r.note=dup?"DUPLICATE: you already own this wrap, so this one is a spare.":"Unlocked in Tom's Garage: pick a car, then Pattern. Wraps are free to apply."}
   return r}
  /* a wrapped Christmas present: red box, lid, white ribbon cross and a big bow */
@@ -139,6 +143,7 @@
  /* the model for any key: crates and wraps are made here, everything else is the game's own item model */
  function rawModel(k){
   if(k=='x:crate')return crateModel();
+  if(k.slice(0,2)=='b:'&&window.FW_PBORDER)return window.FW_PBORDER.model(k.slice(2));
   if(k.slice(0,2)=='w:'){const w=WRAPS.find(x=>x[0]==+k.slice(2));const G=window.FW_GARAGE;
    if(w&&G&&typeof mkS=='function')return mkS(G.looked(0,{c:w[3],p:w[0],c2:'#f2f2f2'}))}
   return pvModel(k).clone(true)}
@@ -241,6 +246,7 @@
 #advw .st{font:11px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:#8aa094}
 #advw .tt{color:#f2c14e;font-size:11px}
 #advw .x{flex:none;width:36px;height:36px;padding:0;font:700 14px Silkscreen,ui-monospace,monospace}
+#advw .bdg{flex:none;height:36px;margin-left:auto;padding:0 10px;font:700 11px Silkscreen,ui-monospace,monospace}
 #advw .gw{position:relative;flex:1;min-height:0;overflow:auto;padding:8px;background:#000;border:2px solid #000;box-shadow:inset 0 0 0 2px #1a1a1a;scrollbar-width:thin}
 #advw .grid{display:grid;height:100%;min-height:400px;box-sizing:border-box;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(5,1fr);grid-auto-flow:row dense;gap:8px}
 #advw .ft{margin-top:8px;color:#8aa094;font-size:12px;text-align:center}
@@ -416,12 +422,13 @@
     W=document.createElement('div');W.id='advw';W.setAttribute('role','dialog');W.setAttribute('aria-label','Advent calendar');
   W.innerHTML=`<div class=advf>
    <div class=hd><div class=sub><h2><b>*</b> ADVENT CALENDAR</h2><p>A free gift behind every door, 1 to 24 December. A new door opens every morning.</p><div class=prog><div class=bar></div><span class=st></span><span class=tt></span></div></div>
-    <button type=button class=x aria-label=Close>X</button></div>
+    <button type=button class=bdg>BORDERS</button><button type=button class=x aria-label=Close>X</button></div>
    <div class=gw><div class=grid></div></div>
    <div class=ft>Clothes, furniture, pets and one very special car. Missed a day? Open it any time in December.</div>
   </div>`;
   document.body.appendChild(W);
   W.querySelector('.x').onclick=()=>{sfx('click');close()};
+  W.querySelector('.bdg').onclick=()=>{sfx('click');if(window.FW_PBORDER)window.FW_PBORDER.pick()};
   W.querySelector('.grid').addEventListener('click',e=>{const b=e.target.closest('.advd');if(b)tap(b,+b.dataset.d)});
   render()}
  function close(){if(REV){if(!REV.done&&!REV.view)return;return endReveal(1)}if(W){W.remove();W=null}if(typeof mode!='undefined'&&mode=='menu')mode='play'}
@@ -470,7 +477,7 @@
  function fillCard(o,r){
   o.querySelector('h3').textContent=r.n;
   const T=r.rar!=null?TIERS[r.rar]:null;
-  o.querySelector('.meta').innerHTML=(T?`<span class=rar style="--rc:${T.c}">${T.n.toUpperCase()}</span>`:'')+`<span class=cat>${icon({k:'sock',f:'gift',p:'star',c:'bell',w:'bell',x:'gift'}[r.t]||'gift')}${CAT[r.t]||''}</span>`;
+  o.querySelector('.meta').innerHTML=(T?`<span class=rar style="--rc:${T.c}">${T.n.toUpperCase()}</span>`:'')+`<span class=cat>${icon({k:'sock',f:'gift',p:'star',c:'bell',w:'bell',x:'gift',b:'star'}[r.t]||'gift')}${CAT[r.t]||''}</span>`;
   o.querySelector('p').textContent=r.note||'';
   o.querySelector('.stage').style.setProperty('--rc',T?T.c:'#26302a')}
  /* the case opening: a strip of items slides past a marker, slows, and stops on your prize. The roll was made and saved before this starts. */
