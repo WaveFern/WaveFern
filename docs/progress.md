@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.52.17 (2026-11-24, held dark): News app "Fern Times" (`257-news-app.js`, preinstalled on laptop and phone, music + world/sport/culture/tech/business/science, infinite scroll by day, album chart) and Instagrime feed upgrade (`258-instagrime-more.js`, infinite scroll, richer posts about you, time/place/tags). Shared `FWINF` infinite-scroll helper. Release day: set `HELD=false` in both files.
 - v55.52.1 (2026-11-23): release scheme: quiet patches all week, one major drop on release day (docs/releases.md); `tools/bump.js` (patch, drop, check, trial, renumber) replaces hand-edited version lines.
 - v55.49.0 (2026-11-23): desktop wallpapers: 22 more built-ins (CSS only), scrollable picker, "Add your own picture" (reuses `pxPick`/`pxEnc` from `84-pixel-pictures.js`, 128x72 16-colour, `S.wpc` ~6 KB, slot 100).
 - v55.40.0 (2026-11-22): key hints: `255-key-hints.js` (paced one-at-a-time chips for Shift/N/G/Tab/F, H Controls card + pause button, `S.kh`, `FW_KEYS`).

@@ -29,6 +29,8 @@ A change that is not ready simply keeps its gate for next week.
 ## Held features
 | Feature | File | Gate | Ready? |
 |---|---|---|---|
+| News app (Fern Times) on laptop and phone | `257-news-app.js` | `HELD=true` + `FW_DEV` | yes |
+| Instagrime feed upgrade: infinite scroll, better posts about you | `258-instagrime-more.js` | `HELD=true` + `FW_DEV` | yes |
 
 ## Avoiding merge pain
 The old pain was never the numbers: every PR edited the same few lines (`GAME_VERSION`, the top history entry, the `?v=` tags), so any two open PRs conflicted and each was renumbered by hand (55 of the last 300 commits are "Merge main; renumber").
