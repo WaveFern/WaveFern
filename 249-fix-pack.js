@@ -86,7 +86,7 @@ const sfSettings=ph=>{const u=(typeof pxURL=='function'&&S.pfpSp)?pxURL(S.pfpSp)
 const redraw=()=>{try{mode=='phone'?phR():pcR()}catch(e){}};
 window.sfSetPic=function(){try{pxPick('sp',c=>{S.pfpSp=c;updateVersion();snd('ping');say('WaveFern profile picture updated.');redraw()})}catch(e){say('Could not open the picture picker.')}};
 window.sfSetPicReset=function(){delete S.pfpSp;snd('pop');say('Back to your drawn profile picture.');redraw()};
-window.sfSetName=function(){const i=document.getElementById('sfsetn'),v=((i||{}).value||'').trim().slice(0,24);if(v.length<2){snd('err');return say('Name needs 2+ characters.')}
+window.sfSetName=function(){const i=document.getElementById('sfsetn'),v=fwArtistClean((i||{}).value);if(!v){snd('err');return say('Name needs 2+ characters.')}
  S.artist=v;try{updateVersion()}catch(e){}snd('ping');say('Artist name changed to '+v+'.');redraw()};
 if(typeof PG=='object'){PG.sfset=()=>sfSettings(0)}
 if(typeof pcR=='function'){const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{
