@@ -354,6 +354,7 @@
  /* ================================================================ CAR ================================================================ */
  const SI=CARS.length;
  CARS.push({n:"Santa's Sleigh",p:30000,c:'#c0392b',top:40,mph:80,xm:1});
+ const TEAMTAG=.0123;
  function sleighBoxes(){const R='#c0392b',D='#8e1424',Y=GOLD,W='#f4f4f4',b=[];
   /* two gold runners that curl up at the front, joined to the body by struts */
   [-1,1].forEach(s=>{const X=s*.66;b.push([.1,.12,3.3,Y,X,.1,-.1],[.1,.12,.3,Y,X,.2,1.68],[.1,.12,.2,Y,X,.34,1.78],[.1,.12,.16,Y,X,.5,1.82],[.1,.12,.2,Y,X,.64,1.74],[.1,.1,.34,Y,X,.74,1.58],[.14,.04,3.3,'#b8860b',X,.03,-.1]);
@@ -377,10 +378,86 @@
   /* holly and a wreath on the front */
   b.push([.5,.05,.05,'#2ecc71',0,1.55,1.58],[.1,.1,.1,'#c0392b',-.1,1.6,1.6],[.1,.1,.1,'#c0392b',.1,1.6,1.6],[.3,.3,.06,'#1f7a3a',0,1.08,1.35],[.18,.18,.08,'#a3202f',0,1.08,1.35],[.09,.09,.09,'#c0392b',.1,1.2,1.4]);
   /* shrunk to about the size of a normal car */
-  const K=.62;return b.map(q=>q.map((v,n)=>(n<3||(n>3&&n<7))&&typeof v=='number'?v*K:v))}
+  const K=.62;const out=b.map(q=>q.map((v,n)=>(n<3||(n>3&&n<7))&&typeof v=='number'?v*K:v));
+  /* a speck that tells B() below to hitch the reindeer team onto this sleigh */
+  out.push([TEAMTAG,TEAMTAG,TEAMTAG,'#c0392b',0,.01,0]);return out}
  /* the driver stays visible, sitting in the sleigh */
  {const u0=update;update=function(dt){const r=u0.apply(this,arguments);try{if(mode=='drive'&&dr&&dr.i===SI&&P.mesh){P.mesh.visible=true;P.mesh.rotation.y=dr.h;P.mesh.position.set(dr.x+Math.sin(dr.h)*.1,.42,dr.z+Math.cos(dr.h)*.1)}}catch(e){}return r}}
  {const c0=carList;carList=function(i,cc,fixed){if(i===SI&&!fixed&&cc===undefined)return sleighBoxes();return c0.apply(this,arguments)}}
+
+
+ /* ================================================================ REINDEER TEAM ================================================================ */
+ /* Four reindeer pull the sleigh: Rudy and a partner in front, a pair at the shafts. They are Rudy's pet model (reindeer() above, built by
+    ptFill and kept alive by petAnim: blinking, breathing, ears, tail, antler sway) with a harness added. Only the gait is new: it is driven
+    by the distance the sleigh travels, so the hooves always match the ground, and the walk, trot and gallop blend in with the speed. */
+ const TS=1.1,POS=[[-.32,2.0],[.32,2.0],[-.32,3.2],[.32,3.2]],TPH=[0,.42,.17,.6];
+ const WOFF=[1.57,4.71,0,3.14],TOFF=[0,3.14,3.14,0],GOFF=[0,.45,3.5,3.95],WAMP=.42,TAMP=.62,GAMP=.95;
+ const specs={};
+ function teamSpec(lead){if(specs[lead])return specs[lead];const S=reindeer(),LE='#3a2412',RD='#7a1a2a',gd=GOLD;
+  {const L=S.body.L;
+   /* padded breast collar with gold studs and a bell, a white-trimmed back pad, flank straps and the trace rings */
+   pbx(L,RD,.35,.1,.1,0,.6,.27);pbx(L,RD,.04,.3,.1,-.165,.5,.27);pbx(L,RD,.04,.3,.1,.165,.5,.27);pbx(L,'#f4f4f4',.37,.025,.11,0,.655,.27);
+   for(let i=-2;i<=2;i++)pbx(L,gd,.03,.03,.03,i*.065,.6,.325);pbx(L,gd,.07,.07,.06,0,.43,.33);pbx(L,'#fff2a8',.025,.025,.02,0,.4,.36);
+   pbx(L,'#f4f4f4',.34,.02,.36,0,.685,-.04);pbx(L,LE,.012,.03,.54,-.168,.56,-.02);pbx(L,LE,.012,.03,.54,.168,.56,-.02);
+   pbx(L,LE,.012,.1,.03,-.168,.62,.1);pbx(L,LE,.012,.1,.03,.168,.62,.1);
+   [-1,1].forEach(s=>pbx(L,gd,.03,.05,.05,s*.172,.56,-.3));pbx(L,'#f4f4f4',.1,.1,.03,0,.54,-.37)}
+  {const L=S.head.L;
+   /* bridle: brow band, noseband, cheek straps and a gold ring where the rein clips on */
+   pbx(L,LE,.23,.03,.03,0,1.02,.5);pbx(L,LE,.17,.03,.03,0,.96,.74);pbx(L,LE,.012,.12,.03,-.115,.95,.6);pbx(L,LE,.012,.12,.03,.115,.95,.6);
+   [-1,1].forEach(s=>{pbx(L,gd,.03,.045,.045,s*.12,.92,.7);pbx(L,'#8a1424',.01,.14,.02,s*.115,1.04,.4)});
+   if(!lead)L.forEach(r=>{if(r[0]=='#ff2a2a')r[0]='#2a1a14'})}
+  [0,1].forEach(i=>{const s=i?1:-1,L=S['ant'+i].L;
+   pbx(L,GOLD,.035,.17,.035,s*.1,1.3,.5,.7,0,-s*.2);pbx(L,GOLD,.03,.12,.03,s*.2,1.64,.44,0,0,-s*.95);pbx(L,GOLD,.03,.12,.03,s*.12,1.52,.36,-.5,0,-s*.3)});
+  for(const n in S){const q=S[n];q.L=q.L.filter(r=>r[4]>0);q.geo=ptGeo(q.L,q.p)}
+  return specs[lead]=S}
+ const teams=[],WP=new THREE.Vector3(),LM=new THREE.BoxGeometry(1,1,1),UZ=new THREE.Vector3(0,0,1),TMP=new THREE.Vector3(),TQ=new THREE.Quaternion();
+ const sm=x=>{x=Math.min(1,Math.max(0,x));return x*x*(3-2*x)};
+ function link(T,col,w){const m=new THREE.Mesh(LM,new THREE.MeshLambertMaterial({color:col}));m.userData.w=w;T.root.add(m);return m}
+ function linkSet(m,a,b){const d=TMP.set(b[0]-a[0],b[1]-a[1],b[2]-a[2]),L=d.length()||.001;m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);m.scale.set(m.userData.w,m.userData.w,L);m.quaternion.copy(TQ.setFromUnitVectors(UZ,d.multiplyScalar(1/L)))}
+ function attachTeam(car){if(car.userData.xmTeam)return;
+  const T={root:new THREE.Group(),car,d:[],lx:0,lz:0,ly:0,v:0,yr:0,ph:0,dir:1,init:0,age:0,acc:0,vp:0,links:[]};T.root.name='xmTeam';car.add(T.root);car.userData.xmTeam=T;
+  POS.forEach((p,i)=>{const lead=i>1,g=new THREE.Group();ptFill(g,PI,teamSpec(lead));g.scale.setScalar(TS);g.position.set(p[0],0,p[1]);T.root.add(g);
+   g.userData.pr.t=i*3.7;g.userData.pr.sd=i*1.9;T.d.push({g,r:g.userData.pr,lead,po:TPH[i]*6.283})});
+  for(let i=0;i<2;i++){T.links.push({k:'sh',i,m:link(T,'#3a2412',.025)});T.links.push({k:'tr',i,m:link(T,'#3a2412',.025)});
+   T.links.push({k:'r1',i,m:link(T,'#c0392b',.018)});T.links.push({k:'r2',i,m:link(T,'#c0392b',.018)})}
+  teams.push(T);teamStep(T,.016)}
+ /* collar / hip / bridle points of deer d in the sleigh's own space */
+ const cp=(d,k)=>{const s=TS,p=d.g.position,y=d.r.R.position.y,h=d.r.P.head,b=d.r.R.rotation.x;
+  return k=='c'?[p.x,p.y+(.6+y)*s*1+b*.2,p.z+.27*s]:k=='h'?[p.x,p.y+(.56+y)*s-b*.1,p.z-.3*s]:[p.x,p.y+(.95+y)*s-(h?h.rotation.x*.25:0)*s,p.z+.75*s]};
+ function teamStep(T,dt){const m=T.car;m.getWorldPosition(WP);const sc=m.scale.x||1,dx=WP.x-T.lx,dz=WP.z-T.lz;T.lx=WP.x;T.lz=WP.z;
+  let d=Math.hypot(dx,dz)/sc;if(!T.init||d>6){d=0;T.init=1;T.ly=m.rotation.y}
+  const fw=dx*Math.sin(m.rotation.y)+dz*Math.cos(m.rotation.y),v0=dt>0?d/dt:0;T.dir+=((fw<-1e-5?-1:1)-T.dir)*Math.min(1,dt*8);
+  T.vp=T.v;T.v+=(v0-T.v)*Math.min(1,dt*6);T.acc+=((T.v-T.vp)/Math.max(dt,.001)-T.acc)*Math.min(1,dt*5);
+  let dy=m.rotation.y-T.ly;T.ly=m.rotation.y;dy=Math.atan2(Math.sin(dy),Math.cos(dy));T.yr+=((dt>0?dy/dt:0)-T.yr)*Math.min(1,dt*6);
+  const v=T.v,mv=sm(v/.4),wk=1-sm((v-1.5)/2),gl=sm((v-6.5)/4),tr=Math.max(0,1-wk-gl),hz=Math.min(v/(1.3+.28*v),3.8);
+  T.ph+=dt*hz*6.283*T.dir;
+  T.d.forEach((e,di)=>{const r=e.r,P=r.P,g=e.g,pp=g.position;r.lx=pp.x;r.lz=pp.z;petAnim(g,dt);/* petAnim sees no travel: idle blink, breath, ears, tail */
+   const ph=T.ph+e.po;let bob=0,lift=[0,0,0,0];
+   r.legs.forEach((l,i)=>{const a=ph+wk*0+0,w=wk*Math.sin(a+WOFF[i])*WAMP+tr*Math.sin(a+TOFF[i])*TAMP+gl*Math.sin(a+GOFF[i])*GAMP;
+    l.rotation.x=-w*mv;const c=wk*Math.max(0,Math.cos(a+WOFF[i]))*.6+tr*Math.max(0,Math.cos(a+TOFF[i]))+gl*Math.max(0,Math.cos(a+GOFF[i]))*1.3;
+    l.position.y=l.userData.y0+c*.03*mv});
+   bob=mv*(tr*Math.abs(Math.sin(ph))*.02+gl*(.5+.5*Math.sin(ph*1+.8))*.06+wk*Math.abs(Math.sin(ph))*.008);
+   r.R.position.y=bob;r.R.rotation.x=-gl*mv*Math.sin(ph+.9)*.07-Math.max(-.05,Math.min(.05,T.acc*.004));r.R.rotation.z=tr*mv*Math.sin(ph)*.015;
+   if(P.head){P.head.rotation.y=P.head.rotation.y*(1-mv)+Math.max(-.35,Math.min(.35,T.yr*.18))*mv;
+    P.head.rotation.x=P.head.rotation.x*(1-mv)+mv*(.1+gl*.08+(tr*.07+gl*.1+wk*.05)*Math.sin(ph*(wk>.5?1:2)+.6))}
+   [P.ant0,P.ant1].forEach((a,i)=>{if(!a)return;a.rotation.x=-mv*Math.sin(ph*(wk>.5?1:2)-.9)*(.05+gl*.08)-T.acc*.004;a.rotation.z+=(i?-1:1)*(Math.sin(ph*2-1.3)*.03*mv+T.yr*.02)});
+   if(P.tail0)P.tail0.rotation.x=-gl*mv*.6;
+   const ya=Math.max(-.22,Math.min(.22,T.yr*.07));g.rotation.y=e.lead?ya:ya*.5});
+  /* harness lines: shafts -> rear pair -> lead pair, and the reins back to the driver's hands */
+  const D=T.d,K=.62,sh=[[-.25,.35,1.52],[.25,.35,1.52]];
+  T.links.forEach(l=>{const i=l.i,rear=D[i],lead=D[i+2];let a,b;
+   if(l.k=='sh'){a=sh[i];b=cp(rear,'h')}else if(l.k=='tr'){a=cp(rear,'c');b=cp(lead,'h')}
+   else{const hand=[(i?1:-1)*.14,.64,.5],br=cp(lead,'b'),mid=[(hand[0]+br[0])/2,(hand[1]+br[1])/2+.07+Math.sin(T.ph*2+i)*.012*mv,(hand[2]+br[2])/2];
+    if(l.k=='r1'){a=hand;b=mid}else{a=mid;b=br}}
+   linkSet(l.m,a,b)})}
+ {const B0=B;B=function(g,w){const m=B0.apply(this,arguments);if(w===TEAMTAG&&g&&g.isGroup)attachTeam(g);return m}}
+ {const w0=worldTick;worldTick=function(dt){w0.apply(this,arguments);if(!teams.length)return;const d=Math.min(dt,.1);
+  for(let i=teams.length-1;i>=0;i--){const T=teams[i],c=T.car;T.age+=dt;
+   if(!c.parent){if(T.age>8){teams.splice(i,1);c.userData.xmTeam=null}continue}
+   let vis=true;for(let o=c;o;o=o.parent)if(!o.visible){vis=false;break}
+   if(!vis||(typeof P=='object'&&P&&c.parent===scene&&Math.hypot(c.position.x-P.x,c.position.z-P.z)>90)){T.init=0;continue}
+   try{teamStep(T,d)}catch(e){if(!teamStep.w){teamStep.w=1;console.warn('xmas team',e)}}}}}
+ window.FW_XMTEAMS=teams;
 
  /* ================================================================ NOT IN THE SHOPS ================================================================ */
  /* clothes: take them out of the shop's list while it draws (same trick as the Founder pieces) */
