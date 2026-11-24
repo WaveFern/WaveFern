@@ -81,14 +81,16 @@ function csFail(e){CLD.err=e&&e.code=='permission-denied'?'Cloud saves are not s
 function csCheck(){const uid=FBU&&FBU.uid;if(!uid)return;
  if(!csReady()&&mode!='creator')return setTimeout(()=>{if(FBU&&FBU.uid==uid&&!CLD.ok)csCheck()},700);
  if(CLD.asking)return;
- CLD.err='';FBF.getDoc(csRef()).then(d=>{if(!FBU||FBU.uid!=uid)return;
+ CLD.err='';let late=0;/* slow or stalled network: after 15 s Play is allowed (offline notice); a late answer only loads if the title is still showing */
+ const to=setTimeout(()=>{if(FBU&&FBU.uid==uid&&!CLD.ok){late=1;csFail({code:'timeout'})}},15000);
+ FBF.getDoc(csRef()).then(d=>{clearTimeout(to);if(!FBU||FBU.uid!=uid)return;if(late){if(mode!='title'||TT.game)return;CLD.err='';fbRedraw()}
   if(!d.exists()){if(!csGame()&&!csMark().fresh&&!slotInfo(1)&&!slotInfo(2)&&csGuestCode())return csAsk();CLD.ok=1;CLD.t=0;fbRedraw();return csPush(1)}
   const c=d.data(),m=csMark();
   if(!csGame()&&m.uid==uid&&m.fresh){CLD.ok=1;CLD.t=c.t;return fbRedraw()}
   if(csGame()&&m.uid==uid&&m.t==c.t){CLD.ok=1;CLD.t=c.t;fbRedraw();return csPush()}
   if(csGame()&&c.code==saveCode()){CLD.ok=1;CLD.last=c.code;csSetMark(c.t);return fbRedraw()}
   if(csGame()&&csAhead(saveCode(),c.code)){CLD.ok=1;CLD.t=c.t;fbRedraw();return csPush(1)}
-  csLoad(c)}).catch(csFail)}
+  csLoad(c)}).catch(e=>{clearTimeout(to);if(!late)csFail(e)})}
 /* b is the same career as a and at least as far along, so replacing a with b loses nothing */
 function csCovers(a,b){if(!a||a==b)return true;try{const x=scDecode(a).S,y=scDecode(b).S;return x.artist==y.artist&&(y.day||0)>=(x.day||0)}catch(e){return false}}
 function csAhead(a,b){try{const x=scDecode(a).S,y=scDecode(b).S;return x.artist==y.artist&&(x.day||0)>(y.day||0)}catch(e){return false}}
