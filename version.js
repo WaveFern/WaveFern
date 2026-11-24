@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.18';
+const GAME_VERSION='v55.52.19';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.19',n:'Reindeer pull the sleigh on real ropes: they surge first, ropes go taut, slack when stopping (dev only)'},
  {v:'v55.52.18',n:'News app (Fern Times) on laptop and phone, and an Instagrime feed upgrade with infinite scroll: both held behind the dev gate until release day'},
  {v:'v55.52.17',n:'Santa\'s Sleigh is pulled by an animated reindeer team (dev only)'},
  {v:'v55.52.16',n:'Pedestrians no longer start with lanes on the road: lanes snap onto the pavement'},
