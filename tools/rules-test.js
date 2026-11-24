@@ -7,7 +7,7 @@
    Uses fake users only (demo project), never touches the real project. Ports: Firestore 8181, Database 9191. */
 const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
 const fs=require('fs');
-const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.52.25'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
+const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.52.26'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
 const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
 let pass=0,fail=0;
 const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fail++;console.log('FAIL ',name,'-',String(e.message).split('\n')[0])}};
@@ -115,7 +115,7 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  await T('rtdb: guest can NOT write room info i',assertFails(dbB.ref('r/ABCDE/i').set({b:'x',n:1,k:'gt'})));
  await T('rtdb: host can write relay d/guest',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/p/fb-userAAAAAAAAAA1').set('1,2,3')));
  await T('rtdb: guest can NOT write host relay d/',assertFails(dbB.ref('r/ABCDE/d/userBBBBBBBBBB2/p/fb-userAAAAAAAAAA1').set('9,9,9')));
- // v55.52.25: the host relay d/ has a fixed shape, so it cannot carry anything else or be used as storage
+ // v55.52.26: the host relay d/ has a fixed shape, so it cannot carry anything else or be used as storage
  await T('rtdb: host relay c clock string ok',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/c').set('12,10.50')));
  await T('rtdb: host relay m/l/e entries ok',assertSucceeds(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2').update({'m/fb-userAAAAAAAAAA1':'{"a":1}','l/fb-userAAAAAAAAAA1':'{"hair":1}','e/-Nabc123':'{"t":"x"}'})));
  await T('rtdb: host relay unknown field REFUSED',assertFails(dbA.ref('r/ABCDE/d/userBBBBBBBBBB2/inv').set({xm_tree:5})));

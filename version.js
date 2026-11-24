@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.25';
+const GAME_VERSION='v55.52.26';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.52.25',n:'Realtime Database rules tightened: no unlisted keys anywhere, uid-shaped keys only, fixed shape and size limits for the band-room relay (publish firebase-rules/v55.52.16/database.rules.json)'},
+ {v:'v55.52.26',n:'Realtime Database rules tightened: no unlisted keys anywhere, uid-shaped keys only, fixed shape and size limits for the band-room relay (publish firebase-rules/v55.52.16/database.rules.json)'},
+ {v:'v55.52.25',n:'Artist names now drop invisible and text-flipping characters and can\'t be blank-looking; a slow or stalled network no longer leaves Play stuck on \'Loading your save\''},
  {v:'v55.52.24',n:'More backgrounds for Instagrime posts and News pictures: 24 new pixel-art scenes (rooftop, neon alley, old town, subway, harbour, market, snow, blossom, lake dock, skatepark, campfire, balcony, home studio, reading nook, control room, basement, radio booth, stadium, backstage, busking, poster wall, listening party, thrift store, runway) and 8 news scenes (pitch, court, lab, newsroom, cinema, observatory, town hall, expo), matched to each story; held dark'},
  {v:'v55.52.23',n:'Fern Times article text no longer draws over the window title bar (a class name clashed with an existing game style)'},
  {v:'v55.52.22',n:'Instagrime tab bar now sits at the bottom edge of the window (window padding left a gap, so it floated over the feed)'},
