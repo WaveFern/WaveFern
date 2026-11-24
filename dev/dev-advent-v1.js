@@ -352,6 +352,17 @@
  .advd.m21{grid-column:span 2}
  #advr .stage{height:min(270px,36vh)}
 }
+#advr .stage.chg{animation:advchg .35s steps(3,end) infinite alternate}
+@keyframes advchg{from{box-shadow:inset 0 0 0 2px #262626,inset 0 0 0 0 #fff0}to{box-shadow:inset 0 0 0 2px #f2c14e,inset 0 0 50px 8px #f2c14e55}}
+#advr .tl.hot{border-color:var(--rc);transform:translateY(-6px);transition:transform .08s}
+#advr .tl{transition:transform .12s}
+#advr .skip{position:absolute;right:8px;bottom:8px;z-index:6;padding:3px 8px;background:#000;color:#8aa094;border:2px solid #26302a;font:10px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer}
+#advr .skip:hover{color:#fff;border-color:#8aa094}
+#advr .advring{position:absolute;left:50%;top:50%;width:90px;height:90px;border:4px solid #fff;border-radius:50%;pointer-events:none;z-index:4;box-sizing:border-box}
+#advr .advrays{position:absolute;left:50%;top:50%;width:760px;height:760px;pointer-events:none;z-index:0;opacity:0;background:repeating-conic-gradient(from 0deg,var(--rc) 0 8deg,transparent 8deg 24deg);-webkit-mask:radial-gradient(circle,#000 0,#0000 68%);mask:radial-gradient(circle,#000 0,#0000 68%)}
+#advr .strip{z-index:1}
+#advr .strip.landed{background:transparent}
+#advr .advban{position:absolute;left:50%;top:10px;z-index:7;pointer-events:none;font:700 28px Silkscreen,ui-monospace,monospace;letter-spacing:3px;text-shadow:3px 3px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){#advw *,#advr *{animation-duration:.01s!important}.advd .lf{transition-duration:.2s}}
 `;
  document.head.appendChild(css);
@@ -470,8 +481,37 @@
    s.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v-40}px)`,opacity:1,offset:.55},{transform:`translate(${Math.cos(a)*v*1.2}px,${Math.sin(a)*v+90}px)`,opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.15,.6,.4,1)'}).onfinish=()=>s.remove()}}
  function flash(stage,col,ms){const f=document.createElement('div');f.className='fl';f.style.background=col;stage.appendChild(f);f.animate([{opacity:.7},{opacity:.7,offset:.2},{opacity:0}],{duration:ms||500,easing:'steps(4,end)'}).onfinish=()=>f.remove()}
  function shake(el,amp,ms){el.animate([{transform:'translate(0,0)'},{transform:`translate(${-amp}px,${amp*.6}px)`},{transform:`translate(${amp}px,${-amp*.6}px)`},{transform:`translate(${-amp*.6}px,${-amp}px)`},{transform:`translate(${amp*.6}px,${amp}px)`},{transform:'translate(0,0)'}],{duration:ms||400,iterations:2})}
- /* the case opening: the strip starts fast and slows down smoothly onto the prize, which then stays lit on the marker.
-    The roll was made and saved before this starts. */
+ /* ---- v55.53: the satisfying roll. Presentation only: the prize, odds and save were fixed before spin() runs. ---- */
+ const TFREQ=[392,440,523,659,880],TNAME=['','NICE!','GREAT!','AMAZING!','LEGENDARY!'];
+ const reduced=()=>{try{return matchMedia('(prefers-reduced-motion:reduce)').matches}catch(e){return false}};
+ const buzz=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+ /* rising "charging" tones for the wind-up */
+ const charge=i=>safe(()=>{sdHit(262*Math.pow(1.26,i*2),.25,.1,TINE,{jit:0,rev:.2});sdNz(.22,900+i*500,.05,{q:5,f2:2400+i*900,sw:.9})},'chg');
+ /* shockwave ring and light rays behind the prize */
+ function ring(stage,col,big){const r=document.createElement('div');r.className='advring';r.style.borderColor=col;stage.appendChild(r);
+  r.animate([{transform:'translate(-50%,-50%) scale(.1)',opacity:1},{transform:`translate(-50%,-50%) scale(${big?6:4})`,opacity:0}],{duration:big?800:560,easing:'cubic-bezier(.1,.7,.3,1)'}).onfinish=()=>r.remove()}
+ function rays(stage,col){const r=document.createElement('div');r.className='advrays';r.style.setProperty('--rc',col);stage.insertBefore(r,stage.firstChild);
+  r.animate([{opacity:0,transform:'translate(-50%,-50%) rotate(0) scale(.4)'},{opacity:1,offset:.15},{opacity:1,transform:'translate(-50%,-50%) rotate(110deg) scale(1)'}],{duration:4200,easing:'ease-out',fill:'forwards'})}
+ function banner(stage,T,t){const b=document.createElement('div');b.className='advban';b.textContent=TNAME[t];b.style.color=T.c;stage.appendChild(b);
+  b.animate([{transform:'translate(-50%,0) scale(2.6)',opacity:0},{transform:'translate(-50%,0) scale(.9)',opacity:1,offset:.3},{transform:'translate(-50%,0) scale(1)',opacity:1,offset:.4},{transform:'translate(-50%,-18px) scale(1)',opacity:1,offset:.85},{transform:'translate(-50%,-30px) scale(1)',opacity:0}],{duration:1500,easing:'ease-out'}).onfinish=()=>b.remove()}
+ /* the landing: everything scales with the tier (0 Frost ... 4 Starlight) */
+ function celebrate(stage,w,T,t){
+  const col=TIERS[t].c,red=reduced(),card=stage.closest('.card');
+  ring(stage,col,t>=3);
+  burst(w,col,[14,28,46,80,130][t]);
+  if(t>=1)banner(stage,TIERS[t],t);
+  if(t>=2)flash(stage,col,[0,0,380,560,820][t]);
+  if(t>=3){rays(stage,col);sparkle(w,[0,0,0,16,34][t])}
+  if(!red){if(t>=1)shake(stage,[0,3,5,8,12][t],[0,300,360,460,640][t]);if(t>=3&&card)shake(card,t==4?6:3,520)}
+  /* sound: a rising run of bell notes, longer the rarer it is, then the full jingle for the top tier */
+  const f=TFREQ[t],run=[[1,1.5],[1,1.25,1.5],[1,1.25,1.5,2],[1,1.25,1.5,2,2.5],[1,1.25,1.5,2,2.5,3]][t];
+  safe(()=>{run.forEach((m,i)=>sdHit(f*m,.9,.1,TINE,{del:i*.075,jit:0,rev:.35}));sdHit(f/2,.6,.14,WOOD,{jit:0});if(t>=2)sdNz(.5,3000,.05,{q:2,f2:800})},'fan');
+  if(t==4)setTimeout(()=>jingle(),500);
+  buzz([[20],[25,40,25],[30,50,30,50,40],[40,60,40,60,40,60,80],[50,60,50,60,50,60,50,60,160]][t]);
+  /* sparkles keep falling on a big win */
+  if(t>=3&&!red){let n=0;const iv=setInterval(()=>{if(!REV||REV.o!==stage.closest('#advr')||++n>5){clearInterval(iv);return}sparkle(w,t==4?10:5)},520)}}
+ /* the case opening: the strip starts fast and slows onto the prize (tick for every tile, pitched by its rarity, a heartbeat as it
+    crawls, a small overshoot and settle), SKIP jumps to the end, and the landing celebrates by rarity. The roll was made and saved before this starts. */
  function spin(stage,pr,done){
   const N=56,Wn=44+Math.floor(Math.random()*6),flat=()=>{let r=Math.random()*100;for(let i=0;i<TIERS.length;i++){if(r<TIERS[i].flat)return i;r-=TIERS[i].flat}return 0};
   const items=[];for(let i=0;i<N;i++){const c=byTier(flat());items.push(c.length?pick(c):pick(pool()))}
@@ -486,26 +526,36 @@
   st0.innerHTML=`<div class=rail>${items.map(tl).join('')}</div><div class=mk></div><div class=sh></div>`;
   stage.appendChild(st0);stage.classList.add('spin');REV.strip=st0;
   const rail=st0.querySelector('.rail'),tiles=rail.children,TW=tiles[0].offsetWidth+parseFloat(getComputedStyle(tiles[0]).marginRight||0)*2||110,SW=stage.clientWidth;
-  const jit=(Math.random()-.5)*TW*.4,X=Wn*TW+TW/2-SW/2+jit,red=matchMedia('(prefers-reduced-motion:reduce)').matches,dur=red?1400:5600;
-  /* one plain, smooth slow-down: no pauses, no creeping, so the stop says nothing about the prize */
-  const kf=[{transform:'translateX(0)',easing:'cubic-bezier(.12,.55,.18,1)'},{transform:`translateX(${-X}px)`}];
+  const red=reduced(),jit=(Math.random()-.5)*TW*.4,X=Wn*TW+TW/2-SW/2+jit,dur=red?1400:6400,os=red?0:Math.min(18,TW*.16);
+  /* fast start, long smooth slow-down, then a small overshoot that settles back: it stays in the same tile, so the stop says nothing about the prize */
+  const kf=[{transform:'translateX(0)',easing:'cubic-bezier(.1,.5,.16,1)'},{transform:`translateX(${-X-os}px)`,offset:.93,easing:'ease-in-out'},{transform:`translateX(${-X}px)`}];
   const an=rail.animate(kf,{duration:dur,fill:'forwards'});
-  const mk=st0.querySelector('.mk');let last=-1,raf=0;
+  const mk=st0.querySelector('.mk'),sk=document.createElement('button');sk.type='button';sk.className='skip';sk.textContent='SKIP ▸▸';stage.appendChild(sk);
+  sk.onclick=e=>{e.stopPropagation();sfx('click');sk.remove();try{an.finish()}catch(x){}};
+  let last=-1,raf=0,lt=0,hb=0,hot=null;
   const tick=()=>{if(!REV||REV.o!==stage.closest('#advr')){cancelAnimationFrame(raf);return}
-   const m=new DOMMatrix(getComputedStyle(rail).transform),idx=Math.floor((-m.m41+SW/2)/TW);
-   if(idx!==last){last=idx;sfx('click');const t=items[idx];
-    mk.animate([{transform:'scaleX(2.4)'},{transform:'scaleX(1)'}],{duration:130});
-    }
+   const now=performance.now(),p=an.currentTime/dur,m=new DOMMatrix(getComputedStyle(rail).transform),idx=Math.floor((-m.m41+SW/2)/TW);
+   if(idx!==last&&idx>=0&&idx<N){last=idx;const it=items[idx],dt=now-lt;lt=now;
+    mk.animate([{transform:'scaleX(2.6)',background:TIERS[it.tier].c},{transform:'scaleX(1)'}],{duration:150});
+    if(hot)hot.classList.remove('hot');hot=tiles[idx];hot.classList.add('hot');
+    /* slow ticks are fuller and louder; rare tiles ring in their own pitch */
+    const slow=Math.min(1,dt/200);
+    if(dt>34)safe(()=>{if(it.tier>=2)sdHit(TFREQ[it.tier]*2,.18+.2*slow,.05+.07*slow,TINE,{jit:0,rev:.15});sdHit(520+it.tier*60,.05+.05*slow,.05+.1*slow,WOOD,{jit:.01})},'tk');
+    if(slow>.6)buzz(8)}
+   /* heartbeat while it crawls to a stop: the closer to the end, the heavier */
+   if(p>.72&&p<.99&&now-hb>Math.max(260,620-(p-.72)*900)){hb=now;safe(()=>sdHit(70,.22,.22,WOOD,{jit:0,bend:.5}),'hb');stage.style.setProperty('--vg',(.25+(p-.72)).toFixed(2));
+    st0.animate([{boxShadow:'inset 0 0 0 0 #0000'},{boxShadow:`inset 0 0 40px 6px ${TIERS[teased||T].c}66`},{boxShadow:'inset 0 0 0 0 #0000'}],{duration:360})}
    raf=requestAnimationFrame(tick)};tick();
-  an.onfinish=()=>{cancelAnimationFrame(raf);if(!REV)return;
-   const w=tiles[Wn];
+  an.onfinish=()=>{cancelAnimationFrame(raf);if(!REV)return;sk.remove();
+   const w=tiles[Wn];if(hot)hot.classList.remove('hot');
    /* make sure the prize is centred on the marker whatever the layout did meanwhile */
    const mr=mk.getBoundingClientRect(),wr=w.getBoundingClientRect(),dx=(mr.left+mr.width/2)-(wr.left+wr.width/2);
    const cur=new DOMMatrix(getComputedStyle(rail).transform).m41;an.cancel();rail.style.transform=`translateX(${cur+dx}px)`;
    if(Math.abs(dx)>2)rail.animate([{transform:`translateX(${cur}px)`},{transform:`translateX(${cur+dx}px)`}],{duration:260,easing:'ease-out'});
    w.classList.add('won');st0.classList.add('landed');stage.style.setProperty('--rc',TIERS[T].c);
-   sfx('chime');
-   burst(w,TIERS[T].c,12);
+   /* near miss: the better tile beside it wobbles and fades back */
+   if(teased&&teased>T){const nb=tiles[Wn+side];if(nb&&!red)nb.animate([{transform:'translateY(0)'},{transform:'translateY(-10px)'},{transform:'translateY(0)'}],{duration:420,easing:'ease-out'});safe(()=>sdHit(180,.4,.12,WOOD,{jit:0,bend:-.3}),'nm')}
+   celebrate(stage,w,T,T);
    setTimeout(done,350)}}
  function openCrate(cb){
   if(!REV||REV.opened)return;REV.opened=1;REV.busy=1;const {d,o}=REV,s=Sv(),a=st();
@@ -521,9 +571,12 @@
     const nc=document.createElement('canvas');nc.setAttribute('aria-label','3D view. Drag to spin.');cv.replaceWith(nc);cv=nc;cv.style.display='';if(h){h.style.display='';h.classList.remove('gone')}REV.v=safe(()=>Viewer(cv,pr.k),'viewer')};
    cb.disabled=false;cb.textContent='CLAIM';REV.busy=0};
   /* wind-up: the present shakes and flashes, then the strip starts */
-  sfx('whoosh');shake(stage,6,260);flash(stage,'#ffffff',300);
-  setTimeout(()=>{if(!REV||REV.o!==o)return;if(REV.v){REV.v.dispose();REV.v=null}cv.style.display='none';if(h)h.style.display='none';
-   try{spin(stage,pr,fin)}catch(e){fin()}},620)}
+  /* wind-up: the stage glows and shakes harder with each rising tone, a white flash, then the strip launches */
+  const red=reduced(),WU=red?250:1050;
+  sfx('whoosh');if(!red){stage.classList.add('chg');[0,1,2].forEach(i=>setTimeout(()=>{if(!REV||REV.o!==o)return;charge(i);shake(stage,2+i*2,240);buzz(12+i*8)},i*300));
+   setTimeout(()=>{if(!REV||REV.o!==o)return;flash(stage,'#ffffff',360);safe(()=>sdNz(.35,1800,.1,{q:2,f2:300}),'wh');buzz(40)},WU-130)}
+  setTimeout(()=>{if(REV&&REV.o===o)stage.classList.remove('chg');if(!REV||REV.o!==o)return;if(REV.v){REV.v.dispose();REV.v=null}cv.style.display='none';if(h)h.style.display='none';
+   try{spin(stage,pr,fin)}catch(e){fin()}},WU)}
  function claim(cb){
   if(!REV||REV.done||REV.view||REV.busy)return;const {d}=REV;
   if(REV.r.t=='x')return openCrate(cb);
