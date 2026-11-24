@@ -84,6 +84,9 @@ function deco(n){const on=n.querySelector('[onclick^="openPostId("]'),id=on&&+((
  const vc=n.querySelector('.ln small');if(vc){const c=3+hsh(p.id+'c')%(p.inf?900:60)+(p.about?20:0);vc.textContent='View all '+c+' comments'}
  if(p.about)n.classList.add('igma');return n}
 function css(){if(document.getElementById('igmcss'))return;const s=document.createElement('style');s.id='igmcss';s.textContent=`
+/* the window padding made the sticky tab bar stop short of the bottom edge: the feed fills the window and the bar sits on its bottom edge */
+#pc .mn:has(>.ig){padding:0!important}
+.mn>.ig{min-height:100%}
 .ig .post{border:1px solid #262626!important;border-radius:14px;margin:12px 10px;background:#0b0b0b;overflow:hidden;padding-bottom:12px!important}
 .ig .post.igma{border-color:#8b6b00!important;box-shadow:0 0 0 1px #ffd54a55}
 .ig .igmw{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.ig .igmw b{cursor:pointer}
@@ -98,7 +101,7 @@ function css(){if(document.getElementById('igmcss'))return;const s=document.crea
 const ig1=PA.ig;
 function parse(h){const t=document.createElement('template');t.innerHTML=h;return t.content}
 function render(list){const all=IGF;IGF=list;let h;try{h=ig1()}finally{IGF=all}const R=parse(h);return[...R.querySelectorAll('.post')].map(deco)}
-PA.ig=function(){if(typeof igv=='undefined'||igv!='feed')return ig1.apply(this,arguments);css();
+PA.ig=function(){css();if(typeof igv=='undefined'||igv!='feed')return ig1.apply(this,arguments);
  if(!IGF.length)genFeed();fill(LIM+3);const all=IGF;let h;IGF=all.slice(0,LIM);try{h=ig1.apply(this,arguments)}finally{IGF=all}
  if(typeof h!='string'||!/class="?ig"?>/.test(h))return h;
  try{const R=parse(h),ps=[...R.querySelectorAll('.post')];ps.forEach(deco);
