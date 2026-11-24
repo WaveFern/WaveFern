@@ -157,5 +157,5 @@ if(typeof pauseUI=='function'){const pu0=pauseUI;
   [NPC,VPED].forEach(L=>L.forEach(n=>{
    if(n.kd){n.kd.t>=KD?knockEnd(n):knockPose(n,dt);return}
    if(n.kcd>0)n.kcd-=dt;
-   if(mode!='drive'||!dr||PAUSED||!n.m.visible||n.st==1||n.fan||n.kcd>0||Math.abs(dr.v)<3.5||(!n.ext&&(HIN||IN)))return;
+   if(mode!='drive'||!dr||PAUSED||!n.m.visible||n.kcd>0||Math.abs(dr.v)<3.5||(!n.ext&&(HIN||IN)))return;
    if(Math.hypot(n.x-P.x,n.z-P.z)<2.5){const pw=Math.max(.15,1-.28*recent.length);recent.push(now);knockStart(n,pw);knockPose(n,0)}}))}catch(e){console.error('knockdown',e)}}}

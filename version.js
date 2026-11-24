@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.4';
+const GAME_VERSION='v55.52.5';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v55.52.4',n:'NPCs stay on the pavement: sidestepping, shoves and spawns no longer put them on the road'},
+ {v:'v55.52.5',n:'NPCs stay on the pavement: sidestepping, shoves and spawns no longer put them on the road'},
+ {v:'v55.52.4',n:'Fix: fans and waiting people can now be knocked down by your car too'},
  {v:'v55.52.3',n:'Walkers you hit with your car at speed get knocked down and get up again (weaker each time, no way to farm it)'},
  {v:'v55.52.2',n:'The money roll is now live for everyone: whenever your money goes up from any source (night pay, tips, autographs, sales, gifts, rewards) the amount rolls like a casino counter with a gold +amount pop. Gains made behind the phone, PC or sleep screen roll once the amount is visible again.'},
  {v:'v55.52.1',n:'Behind the scenes: new release scheme (quiet patch numbers, one big drop per week) and tools/bump.js to number versions and avoid merge conflicts. Nothing in the game changed.'},
