@@ -421,13 +421,14 @@
   for(let i=0;i<2;i++){['sh','sh2','tr','tr2'].forEach(k=>T.links.push({k,i,m:link(T,'#3a2412',.025)}));
    ['r1','r2'].forEach(k=>T.links.push({k,i,m:link(T,'#c0392b',.018)}))}
   /* rope state: how far each pair is from taut (0 = taut, negative = slack), its speed, and how hard the team is pulling */
-  T.q=[SL1,SL2];T.qv=[0,0];T.pl=[0,0];T.snap=0;T.rph=[0,0];
+  T.q=[SL1,SL2];T.qv=[0,0];T.a=[0,0];T.av=[0,0];T.pl=[0,0];T.snap=0;T.rph=[0,0];
   /* a rope's taut length is the distance between its ends with the team at rest */
   T.links.forEach(l=>{if(/2$/.test(l.k))return;const e=ends(T,l);l.L=Math.hypot(e[1][0]-e[0][0],e[1][1]-e[0][1],e[1][2]-e[0][2])});
   teams.push(T);teamStep(T,.016)}
  /* collar / hip / bridle points of deer d in the sleigh's own space */
- const cp=(d,k)=>{const s=TS,p=d.g.position,y=d.r.R.position.y,h=d.r.P.head,b=d.r.R.rotation.x;
-  return k=='c'?[p.x,p.y+(.6+y)*s*1+b*.2,p.z+.27*s]:k=='h'?[p.x,p.y+(.56+y)*s-b*.1,p.z-.3*s]:[p.x,p.y+(.95+y)*s-(h?h.rotation.x*.25:0)*s,p.z+.75*s]};
+ const cp=(d,k)=>{const s=TS,p=d.g.position,y=d.r.R.position.y,h=d.r.P.head,b=d.r.R.rotation.x,ry=d.g.rotation.y,sn=Math.sin(ry),cs=Math.cos(ry);
+  const at=(dz,yy)=>[p.x+dz*sn,p.y+yy,p.z+dz*cs];
+  return k=='c'?at(.27*s,(.6+y)*s+b*.2):k=='h'?at(-.3*s,(.56+y)*s-b*.1):at(.75*s,(.95+y)*s-(h?h.rotation.x*.25:0)*s)};
  const SH=[[-.25,.35,1.52],[.25,.35,1.52]];
  /* the two ends of one rope, in the sleigh's own space */
  function ends(T,l){const D=T.d,i=l.i,rear=D[i],lead=D[i+2],k=l.k[0]=='s'?'sh':l.k[0]=='t'?'tr':l.k;
@@ -447,11 +448,20 @@
   T.snap*=Math.max(0,1-dt*5);
   const RW=[0,1].map(i=>{const vg=T.v*T.dir+T.qv[i]+(i?T.qv[0]:0),v=Math.abs(vg),mv=sm(v/.4),wk=1-sm((v-1.5)/2),gl=sm((v-6.5)/4),tr=Math.max(0,1-wk-gl),hz=Math.min(v/(1.3+.28*v),3.8);
    T.rph[i]+=dt*hz*6.283*(vg<0?-1:1);return{mv,wk,gl,tr,ph:T.rph[i]}});T.ph=T.rph[0];
-  T.d.forEach((e,di)=>{const r=e.r,P=r.P,g=e.g,pp=g.position,row=e.lead?1:0,Z=POS[di][1]+T.q[0]+(row?T.q[1]:0);g.position.z=Z;r.lx=pp.x;r.lz=pp.z;petAnim(g,dt);/* petAnim sees no travel: idle blink, breath, ears, tail */
+  /* turning: the team swings round the hitch on its ropes. The lead pair swings into the turn first and furthest, the rear pair follows,
+     and each overshoots a little and settles back (springs), so the team arcs and fans out instead of being locked to the sleigh */
+  const yrc=Math.max(-2.6,Math.min(2.6,T.yr)),ta=[yrc*.17,yrc*.32],KA=[60,38],CA=[9,5];
+  for(let i=0;i<2;i++){T.av[i]+=(KA[i]*(ta[i]-T.a[i])-CA[i]*T.av[i])*dt;T.a[i]+=T.av[i]*dt;T.a[i]=Math.max(-.62,Math.min(.62,T.a[i]))}
+  const HZ=1.52,s1=Math.sin(T.a[0]),c1=Math.cos(T.a[0]),s2=Math.sin(T.a[1]),c2=Math.cos(T.a[1]),zr=POS[0][1]+T.q[0],Qw=[(zr-HZ)*s1,HZ+(zr-HZ)*c1];
+  const lean=-Math.max(-.16,Math.min(.16,yrc*.06)),inner=Math.max(-.35,Math.min(.35,yrc*.25));
+  T.d.forEach((e,di)=>{const r=e.r,P=r.P,g=e.g,pp=g.position,row=e.lead?1:0,x0=POS[di][0];
+   if(row){const dz=POS[di][1]+T.q[0]+T.q[1]-zr;g.position.set(Qw[0]+x0*c2+dz*s2,0,Qw[1]-x0*s2+dz*c2);g.rotation.y=T.a[1]}
+   else{const dz=POS[di][1]+T.q[0]-HZ;g.position.set(x0*c1+dz*s1,0,HZ-x0*s1+dz*c1);g.rotation.y=T.a[0]}
+   r.lx=pp.x;r.lz=pp.z;petAnim(g,dt);/* petAnim sees no travel: idle blink, breath, ears, tail */
    const{mv,wk,gl,tr}=RW[row];
    const ph=RW[row].ph+e.po;let bob=0;
    r.legs.forEach((l,i)=>{const a=ph+wk*0+0,w=wk*Math.sin(a+WOFF[i])*WAMP+tr*Math.sin(a+TOFF[i])*TAMP+gl*Math.sin(a+GOFF[i])*GAMP;
-    l.rotation.x=-w*mv;const c=wk*Math.max(0,Math.cos(a+WOFF[i]))*.6+tr*Math.max(0,Math.cos(a+TOFF[i]))+gl*Math.max(0,Math.cos(a+GOFF[i]))*1.3;
+    l.rotation.x=-w*mv*(1+(i&1?-inner:inner));const c=wk*Math.max(0,Math.cos(a+WOFF[i]))*.6+tr*Math.max(0,Math.cos(a+TOFF[i]))+gl*Math.max(0,Math.cos(a+GOFF[i]))*1.3;
     l.position.y=l.userData.y0+c*.03*mv});
    bob=mv*(tr*Math.abs(Math.sin(ph))*.02+gl*(.5+.5*Math.sin(ph*1+.8))*.06+wk*Math.abs(Math.sin(ph))*.008);
    r.R.position.y=bob;r.R.rotation.x=-gl*mv*Math.sin(ph+.9)*.07-Math.max(-.05,Math.min(.05,T.acc*.004))+T.snap*.05;r.R.rotation.z=tr*mv*Math.sin(ph)*.015;
@@ -459,13 +469,13 @@
     P.head.rotation.x=P.head.rotation.x*(1-mv)+mv*(.1+gl*.08+(tr*.07+gl*.1+wk*.05)*Math.sin(ph*(wk>.5?1:2)+.6))}
    [P.ant0,P.ant1].forEach((a,i)=>{if(!a)return;a.rotation.x=-mv*Math.sin(ph*(wk>.5?1:2)-.9)*(.05+gl*.08)-T.acc*.004;a.rotation.z+=(i?-1:1)*(Math.sin(ph*2-1.3)*.03*mv+T.yr*.02)});
    if(P.tail0)P.tail0.rotation.x=-gl*mv*.6;
-   const ya=Math.max(-.22,Math.min(.22,T.yr*.07));g.rotation.y=e.lead?ya:ya*.5});
+   r.R.rotation.z+=lean});
   /* harness lines: shafts -> rear pair -> lead pair, and the reins back to the driver's hands. A rope is straight when taut and
      hangs in a curve when slack (the sag follows from its fixed length), and it twangs when the team snaps it taut. */
   const byK={};T.links.forEach(l=>{byK[l.k+l.i]=l});
   T.links.forEach(l=>{if(/2$/.test(l.k)&&l.k!='r2')return;const base=byK[l.k+l.i],e=ends(T,base),a=e[0],b=e[1],c=Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]),Lr=base.L*(l.k[0]=='r'?1.03:1);
    const sag=Math.sqrt(Math.max(0,3*c*(Lr-c)/8))*1.15+(l.k[0]=='r'?.03*(1-sm((Lr-c)*20)):0),tw=T.snap*.05*Math.sin(T.rph[0]*0+performance.now()*.05+l.i),
-    mid=[(a[0]+b[0])/2,(a[1]+b[1])/2-sag+tw,(a[2]+b[2])/2];
+    mid=[(a[0]+b[0])/2-T.yr*.012-Math.max(-.04,Math.min(.04,T.av[1]*.01))*(l.k[0]=='r'?0:1),(a[1]+b[1])/2-sag+tw,(a[2]+b[2])/2];
    const seg2=l.k[0]=='r'?byK['r2'+l.i]:byK[l.k+'2'+l.i];
    if(l.k=='r2')return;linkSet(l.m,a,mid);if(seg2)linkSet(seg2.m,mid,b)})}
  {const B0=B;B=function(g,w){const m=B0.apply(this,arguments);if(w===TEAMTAG&&g&&g.isGroup)attachTeam(g);return m}}
