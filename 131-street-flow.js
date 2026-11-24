@@ -28,7 +28,12 @@ function avoidApply(L,vert,dt){const out0=HIN||IN,r=mode=='drive'?1.9:1.05;L.for
    The base walk code eases people toward z0/x0 every frame, so moving that target by direction is all it takes; at the end
    of a pavement the target flips and they glide across to the other lane. */
 const LANE=.42;
-function lanes(L,vert){L.forEach(n=>{if(n._lb===undefined)n._lb=vert?n.x0:n.z0;const o=(vert?-1:1)*n.dir*LANE;if(vert)n.x0=n._lb+o;else n.z0=n._lb+o})}
+/* pedestrians built before the road warp ended up with lanes on the asphalt (about half of all of them, 2.7-5.2 from the road centre,
+   so keepOff had no pavement to pull them to). First time we see one, snap its lane onto the pavement middle of the road it follows. */
+function snapLane(n,vert){if(n.ext||n.f||typeof PAVE_MID=='undefined')return;const lat=vert?n.x0:n.z0,al=vert?n.z:n.x;let b=null,bd=1e9;
+  (vert?RVV:RH).forEach(r=>{const d=Math.abs(lat-r[0]);if(d<bd&&al>r[1]-6&&al<r[2]+6){bd=d;b=r}});
+  if(!b||bd>=ROAD_HALF*ROAD_K+.3)return;const v=b[0]+(lat>=b[0]?1:-1)*PAVE_MID;if(vert)n.x0=v;else n.z0=v}
+function lanes(L,vert){L.forEach(n=>{if(n._lb===undefined){try{snapLane(n,vert)}catch(e){}n._lb=vert?n.x0:n.z0;if(vert)n.x=n.x0;else n.z=n.z0}const o=(vert?-1:1)*n.dir*LANE;if(vert)n.x0=n._lb+o;else n.z0=n._lb+o})}
 /* pedestrians never stand on the asphalt: the sidestep (+/-1.0) plus the lane (+/-.42) can reach past the 1.2 half-width of the pavement,
    the old shove can push people off it, and the random spawn can drop one inside a crossing road. Uses the same npcOnRoad test as the
    walk code. Sideways: pulled back toward the lane. Along the walk: one standing on asphalt walks out the nearest way (and faces it). */
