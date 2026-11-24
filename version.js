@@ -3,9 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.20';
+const GAME_VERSION='v55.52.22';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.22',n:'Instagrime tab bar now sits at the bottom edge of the window (window padding left a gap, so it floated over the feed)'},
+ {v:'v55.52.21',n:'Fern Times stories: What happened summary on every card, and article pages with key facts, a quote, Why it matters and What happens next; more stories about your new songs and rival moves (still held)'},
  {v:'v55.52.20',n:'Reindeer swing and fan out through turns on their ropes (dev only)'},
  {v:'v55.52.19',n:'Reindeer pull the sleigh on real ropes: they surge first, ropes go taut, slack when stopping (dev only)'},
  {v:'v55.52.18',n:'News app (Fern Times) on laptop and phone, and an Instagrime feed upgrade with infinite scroll: both held behind the dev gate until release day'},

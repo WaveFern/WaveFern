@@ -1,4 +1,4 @@
-/* ===== v55.52.17 (held): News app (laptop + phone) =====
+/* ===== v55.52.22 (held): News app (laptop + phone) =====
    A preinstalled news app, "Fern Times". Every story is made from the day number and the career, so nothing new is saved:
    music news (your albums and songs, diss tracks and replies from S.news, rivals from S.rvl, the album chart) mixed with
    world, sport, culture, tech, business and science stories from invented places and teams. Today's stories come first,
@@ -68,23 +68,56 @@ function chartRows(){const L=+S.listeners||0,rv=(S.rvl&&S.rvl.rv)||[],rows=rv.ma
 function playerStories(d){const o=[],a=me(),songs=S.songs||[],alb=S.albums||[],L=+S.listeners||0;
  /* diss tracks and replies (uses the same data as the Instagrime drama) */
  songs.forEach(s=>{if(s.diss&&s.day==d)o.push({cat:'music',you:1,k:'stage',cfg:'ch',h:a+' drops diss track "'+s.title+'" aimed at '+s.diss,dek:'The industry is watching to see how '+s.diss+' answers.',
-  p:['"'+s.title+'" landed this week and is already being passed around group chats.','The track takes direct aim at '+s.diss+', and people are calling the second verse "disrespectful, in the best way".','So far '+s.diss+' has stayed quiet. A reply is widely expected. '+a+' said only: "I said what I said."','Streams in the first day: '+fmt(s.streams||0)+'.']})});
+  p:['"'+s.title+'" landed this week and is already being passed around group chats.','The track takes direct aim at '+s.diss+', and people are calling the second verse "disrespectful, in the best way".','So far '+s.diss+' has stayed quiet. A reply is widely expected. '+a+' said only: "I said what I said."','Streams in the first day: '+fmt(s.streams||0)+'.'],
+  why:'Diss tracks are the fastest way to get noticed and the fastest way to start a feud. Whoever answers best usually wins the week.',next:s.diss+' has not replied yet. Replies usually land within a few days, often with a harder verse.',quote:['I said what I said.',a],facts:[['Target',s.diss],['Track',s.title],['First-day streams',fmt(s.streams||0)]]})});
  (S.news||[]).forEach(n=>{if(n.day==d)o.push({cat:'music',you:1,k:'studio',cfg:n.u,h:String(n.cap).replace(/\.$/,''),dek:n.u+' has answered '+a+' and the internet has opinions.',
-  p:[n.cap,'Within an hour the reply had more plays than the original.','Fans have split into camps: Team '+a+' and Team '+n.u+'. Both camps are loud.','Neither artist has ruled out a third round.']})});
+  p:[n.cap,'Within an hour the reply had more plays than the original.','Fans have split into camps: Team '+a+' and Team '+n.u+'. Both camps are loud.','Neither artist has ruled out a third round.'],
+  why:'A reply turns a one-off diss into a full feud, and feuds are what the whole feed talks about. Both artists usually gain listeners.',next:'A third round is likely. '+a+' has the next move.',quote:['Team '+a+' or Team '+n.u+'? Nobody is neutral.','Music Twitter'],facts:[['Replying artist',n.u],['Answering',a],['Day',String(n.day)]]})});
  alb.forEach(x=>{if(x.day==d){const st=(x.songs||[]).reduce((t,id)=>t+((songs.find(s=>s.id==id)||{}).streams||0),0);o.push({cat:'music',you:1,k:'album',cfg:'ch',h:a+' releases "'+x.name+'" and fans cannot stop talking about it',dek:(x.songs||[]).length+' tracks, one clear favourite and a very good cover.',
-  p:['"'+x.name+'" arrived today with '+(x.songs||[]).length+' songs and a cover people are already printing on t-shirts.','Early listeners call it "the most complete thing '+a+' has made".','The album\'s songs have '+fmt(st)+' streams between them so far.']})}});
+  p:['"'+x.name+'" arrived today with '+(x.songs||[]).length+' songs and a cover people are already printing on t-shirts.','Early listeners call it "the most complete thing '+a+' has made".','The album\'s songs have '+fmt(st)+' streams between them so far.'],
+  why:'An album is the moment an artist stops being "that one song" and becomes a body of work. Critics, playlists and awards all start here.',next:'Reviews land over the next few days. If the numbers hold, expect a chart entry by the end of the week.',quote:['This is the one I am proudest of.',a],facts:[['Album',x.name],['Tracks',String((x.songs||[]).length)],['Streams so far',fmt(st)]]})}});
+ /* a new song out that day, and rival news from the rivals system */
+ songs.forEach(x=>{if(x.day==d&&!x.diss)o.push({cat:'music',you:1,k:'studio',cfg:'ch',h:a+' drops new single "'+x.title+'"',dek:(x.g?x.g+' fans':'Fans')+' have a new song to argue about.',
+  p:['"'+x.title+'" is out now on WaveFern, the latest release from '+a+'.','It arrives '+(songs.length>1?'after '+(songs.length-1)+' earlier release'+(songs.length>2?'s':''):'as the first release of the career')+', and early listeners say it is the most polished yet.','Within the first day it had picked up '+fmt(x.streams||0)+' plays and a handful of lyric breakdowns online.'],
+  why:'Every new release is a test of whether listeners will stick around. A good first day tends to decide how much playlist space a song gets.',next:'Watch the weekend numbers. If "'+x.title+'" holds, a video and a live version are the obvious next steps.',facts:[['Artist',a],['Song',x.title],['Streams so far',fmt(x.streams||0)]]})});
+ (((S.rvl&&S.rvl.log)||[]).filter(e=>e&&e.d==d)).slice(0,2).forEach(e=>o.push({cat:'music',k:'stage',cfg:String(e.t),h:String(e.t).replace(/\.$/,'').replace(/^./,c=>c.toUpperCase()),dek:'Chart watchers say the race for the top of the scene just got tighter.',
+  p:[String(e.t).replace(/\.$/,'')+'.','The move shakes up the rankings that '+a+' and the other rising artists are chasing.','Fans on both sides are already comparing numbers.'],
+  why:'The listener ranking decides who gets booked, featured and quoted. A single week can swap the order.',next:'Expect a reply, a new release or a surprise collab within days.',facts:[['Rivals tracked',String(((S.rvl&&S.rvl.rv)||[]).length)],['Your listeners',fmt(+S.listeners||0)]]}));
  if(d==S.day){
   /* an album that is performing really well */
   const best=alb.slice().sort((x,y)=>{const f=q=>(q.songs||[]).reduce((t,id)=>t+((songs.find(s=>s.id==id)||{}).streams||0),0);return f(y)-f(x)})[0];
   if(best&&S.day-best.day>=1){const st=(best.songs||[]).reduce((t,id)=>t+((songs.find(s=>s.id==id)||{}).streams||0),0);
    if(st>=2000)o.push({cat:'music',you:1,k:'album',cfg:'ch',h:'"'+best.name+'" by '+a+' keeps climbing: '+fmt(st)+' streams and counting',dek:'The album is one of the most played releases in the country this week.',
-    p:['"'+best.name+'" has been on repeat since it came out '+(S.day-best.day)+' days ago.','Playlist editors say it is "sticking around" in the top spots, which almost never happens.','If the pace holds it will go gold before the month is out.']})}
+    p:['"'+best.name+'" has been on repeat since it came out '+(S.day-best.day)+' days ago.','Playlist editors say it is "sticking around" in the top spots, which almost never happens.','If the pace holds it will go gold before the month is out.'],
+    why:'Most albums peak in week one and fade. One that keeps growing means people are telling their friends, which is the best marketing there is.',next:'A deluxe edition or a tour announcement would ride the wave. So would a new single.',quote:['It sounds better every time I hear it.','one playlist editor'],facts:[['Album',best.name],['Days since release',String(S.day-best.day)],['Total streams',fmt(st)]]})}
   const top=songs.slice().sort((x,y)=>(y.streams||0)-(x.streams||0))[0];
   if(top&&top.streams>=1e3){const m=Math.pow(10,Math.floor(Math.log10(top.streams)));o.push({cat:'music',you:1,k:'studio',cfg:'ch',h:'"'+top.title+'" passes '+fmt(m)+' streams',dek:a+' has the song of the moment, according to the numbers.',
-   p:['"'+top.title+'" has now been played '+fmt(top.streams)+' times.','Fans have been posting covers, edits and at least one interpretive dance.','The next target is '+fmt(m*(String(m)[0]==='1'?5:2))+'.']})}
+   p:['"'+top.title+'" has now been played '+fmt(top.streams)+' times.','Fans have been posting covers, edits and at least one interpretive dance.','The next target is '+fmt(m*(String(m)[0]==='1'?5:2))+'.'],
+   why:'Stream milestones are how the industry measures a song. Passing '+fmt(m)+' puts "'+top.title+'" ahead of most releases this year.',next:'Next stop: '+fmt(m*(String(m)[0]==='1'?5:2))+'. At the current pace it could arrive within weeks.',facts:[['Song',top.title],['Total streams',fmt(top.streams)],['Today',fmt(top.today||0)]]})}
   if(L>=100)o.push({cat:'music',you:1,k:'stage',cfg:'ch',h:a+' now has '+fmt(L)+' monthly listeners',dek:L>=1e6?'A very big number for someone who started in a bedroom.':'Growing fast, and the people listening are not leaving.',
-   p:[a+' has grown to '+fmt(L)+' monthly listeners.','Industry watchers rank the act among this month\'s risers.','"Whatever they are doing, keep doing it," said one label scout.']})}
+   p:[a+' has grown to '+fmt(L)+' monthly listeners.','Industry watchers rank the act among this month\'s risers.','"Whatever they are doing, keep doing it," said one label scout.'],
+   why:'Monthly listeners are the number that labels, brands and promoters look at first. '+(L>=1e5?'Six figures opens doors that were shut a month ago.':'Every jump makes the next offer easier to get.'),next:'The next milestone is '+fmt(Math.pow(10,Math.ceil(Math.log10(L+1)))*(L<Math.pow(10,Math.ceil(Math.log10(L+1)))/2?.5:1))+' listeners.',facts:[['Monthly listeners',fmt(L)],['Songs out',String(songs.length)],['Albums',String(alb.length)]]})}
  return o}
+/* explainer text for every story: why it matters, what happens next, key facts and a pull quote (player stories bring their own) */
+const WHY={music:['Music news moves fast: a single song or a single post can change who gets booked, quoted and streamed next.','Streaming numbers are now the first thing labels, promoters and fans look at, so any shift in them is news.','Artists in this part of the scene tend to feed off each other, so one move usually sets off another.'],
+ world:['Local decisions like this shape daily life: how people travel, what they pay and where they spend their time.','Stories like this tend to spread to neighbouring towns that face the same problem.','Whatever happens here is likely to be copied or argued about elsewhere.'],
+ sport:['In a tight table a single result can change who qualifies and who goes home.','Results like this reshape the season and decide where the money and the crowds go.','Records and upsets are what fill stadiums the following week.'],
+ culture:['What people watch, read and share decides what gets made next.','A breakout hit can change what studios, publishers and festivals are willing to back.','Culture moves in waves, and this one is still building.'],
+ tech:['Gadgets and apps that get the basics right quietly change what everyone else has to build.','Small changes to devices people use every day add up faster than big launches.','Whoever solves the boring problems usually wins the next year.'],
+ biz:['Prices and profits end up in everyone\'s shopping basket, sooner or later.','Markets read small signals, and this one is being read closely.','Businesses plan months ahead, so a change now shows up in the shops later.'],
+ sci:['Discoveries like this rarely change anything overnight, but they point researchers at the next question.','Each result narrows down what is possible and what is just a good story.','Findings are only the start: other teams now try to repeat them.']},
+ NEXT={music:['Watch the weekend numbers and the replies. Both usually arrive within days.','Expect a follow-up release, a surprise collab or a loud social media post.','The next chart update will show whether this was a blip or a trend.'],
+ world:['A vote or an update is expected within the next two weeks.','Officials say more details will be published next week.','Local groups plan to keep the pressure on until the first results show.'],
+ sport:['The next fixture is the real test. Both sides are back in action this weekend.','Fans will get the full picture when the table updates.','Expect a response from the other side before the next round.'],
+ culture:['Streaming figures for the weekend will say whether this one has legs.','Announcements for a follow-up are expected soon.','Critics and fans will keep arguing about it for weeks.'],
+ tech:['Reviews and early customer reports arrive over the next fortnight.','An update is promised within the month.','Rivals are expected to answer with their own versions this season.'],
+ biz:['The next quarterly report will show whether the trend holds.','Analysts will update their forecasts by Friday.','Watch prices in the shops over the coming weeks.'],
+ sci:['A follow-up study is already planned.','The team will publish its full data later this month.','Other labs have been asked to try to repeat the result.']},
+ QUOTE={music:['I did not expect it to get this big.','You can hear the difference immediately.'],world:['We have been waiting years for this.','People are cautiously happy.'],sport:['We never stopped believing.','It is the best game I have played.'],culture:['I could not stop talking about it.','Everyone I know has seen it.'],tech:['Finally, someone fixed the basics.','It just works, which is rare.'],biz:['We are cautiously optimistic.','It is a good start.'],sci:['We did not expect that result.','It opens up a lot of questions.']};
+function enrich(s,r){const c=s.cat;if(!s.why)s.why=pk(WHY[c]||WHY.music,r);if(!s.next)s.next=pk(NEXT[c]||NEXT.music,r);
+ if(!s.facts)s.facts=[['Section',CN[c]],['Reported',s.d==S.day?'Today':'Day '+s.d],['Reporter',s.by]];
+ if(!s.quote){const q=pk(QUOTE[c]||QUOTE.music,r);s.quote=[q,pk(['a local resident','an industry insider','one spokesperson','a longtime fan','an analyst'],r)]}
+ s.sum=(s.p[0]+' '+s.p[1]).length<=230?s.p[0]+' '+s.p[1]:s.p[0]}
 const cache={};
 function storiesOf(d){const key=d+'|'+(S.artist||'')+'|'+(d==S.day?[(S.songs||[]).length,(S.albums||[]).length,(S.news||[]).length,Math.floor(Math.log10(1+(+S.listeners||0)))].join(','):'');
  if(cache[key])return cache[key];const r=rng('news|'+d+'|'+(S.artist||'')),out=[];
@@ -96,7 +129,7 @@ function storiesOf(d){const key=d+'|'+(S.artist||'')+'|'+(d==S.day?[(S.songs||[]
  /* a second music piece from the chart, with the album of the week */
  const ch=chartRows(),top=ch[0];
  if(d==S.day&&top&&!top.you)out.splice(Math.min(1,out.length),0,{cat:'music',k:'album',cfg:top.n,h:top.n+'\'s "'+top.al+'" is the album everyone is playing',dek:'It sits at No. 1 on the Fern Times album chart this week.',p:['"'+top.al+'" has taken the top spot with about '+fmt(top.v*3)+' plays this week.','"It does not sound like anything else out right now," said one critic.','The chart refreshes every week.']});
- out.forEach((s,i)=>{s.id=d+'.'+i;s.d=d;s.i=i;s.nid=5e7+d*64+i;s.by=pk(['Maya Quill','Tom Brannock','Dee Okoro','Sam Whitlock','Jules Ferrand','R. Navarro','Priya Anand','Leo Hartmann'],rng('by'+s.id));s.mins=2+(hsh(s.id)%4)});
+ out.forEach((s,i)=>{s.id=d+'.'+i;s.d=d;s.i=i;s.nid=5e7+d*64+i;s.by=s.by||pk(['Maya Quill','Tom Brannock','Dee Okoro','Sam Whitlock','Jules Ferrand','R. Navarro','Priya Anand','Leo Hartmann'],rng('by'+s.id));s.mins=2+(hsh(s.id)%4);enrich(s,rng('en'+s.id))});
  cache[key]=out;const ks=Object.keys(cache);if(ks.length>40)delete cache[ks[0]];return out}
 const find=id=>{const [d,i]=String(id).split('.').map(Number);return storiesOf(d)[i]};
 function img(s){try{const cfg=s.cfg=='ch'?{...ch}:lk(String(s.cfg||s.h));return postPic({id:s.nid,kind:s.k,cap:s.h,u:s.by,cfg,cfg2:null})}catch(e){return''}}
@@ -134,6 +167,13 @@ function css(){if(document.getElementById('nwcss'))return;const s=document.creat
 .nw .card .tx{padding:0 12px 12px}
 .nw .card h3{margin:6px 0 6px;font:700 18px/1.2 Georgia,"Times New Roman",serif}
 .nw .card p{margin:0 0 8px;font-size:13px;color:#4b473d}
+.nw .wh{font-size:13px;line-height:1.45;color:#2d2a24;margin:0 0 10px;padding-left:10px;border-left:3px solid #d6322b;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.nw .hero .wh{font-size:14px;-webkit-line-clamp:7}
+.nw .wh b{display:block;font:700 10px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#d6322b;margin-bottom:4px}
+.nw .bq{margin:22px 0;padding:6px 0 6px 18px;border-left:4px solid #d6322b;font:italic 22px/1.35 Georgia,serif}.nw .bq small{display:block;margin-top:6px;font:700 11px/1 sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6a6559;font-style:normal}
+.nw .sec{background:#fffdf7;border:1px solid #d8d1bf;border-radius:3px;padding:12px 16px;margin:0 0 14px}.nw .sec h4{margin:0 0 6px!important}.nw .sec p{font:16px/1.55 Georgia,serif;margin:0}
+.nw .fx{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;background:#1b1a17;color:#f5f1e8;border-radius:3px;padding:12px 16px;margin:0 0 14px}
+.nw .fx div{font-size:12px;color:#b9b3a1}.nw .fx b{display:block;font:700 17px/1.2 Georgia,serif;color:#ffe45e;margin-top:2px;word-break:break-word}
 .nw .chart{background:#1b1a17;color:#f5f1e8;border-radius:3px;padding:14px;border:0}
 .nw .chart h3{margin:0 0 2px;font:700 16px/1.2 Georgia,serif;color:#ffe45e}.nw .chart small{color:#b9b3a1;display:block;margin-bottom:8px}
 .nw .chart ol{margin:0;padding:0;list-style:none}.nw .chart li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid #3a3830}
@@ -152,8 +192,8 @@ function css(){if(document.getElementById('nwcss'))return;const s=document.creat
 /* ---------- pieces ---------- */
 const tagH=s=>`<span class=tag style="background:${CC[s.cat]}">${CN[s.cat]}</span>${s.you?'<span class="tag you">About you</span>':''}`;
 const metaH=s=>`<div class=meta>${tagH(s)}${s.by} · ${s.mins} min read</div>`;
-const hero=s=>`<div class=hero onclick="nwOpen('${s.id}')"><div class=pc><img src="${img(s)}" alt=""></div><div><div class=meta>${tagH(s)}</div><h2>${esc(s.h)}</h2><p class=dek>${esc(s.dek)}</p><div class=meta>${s.by} · ${s.mins} min read</div></div></div>`;
-const card=s=>`<div class=card onclick="nwOpen('${s.id}')"><div class=pc><img src="${img(s)}" alt="" loading=lazy></div><div class=tx><div class=meta>${tagH(s)}</div><h3>${esc(s.h)}</h3><p>${esc(s.dek)}</p><div class=meta>${s.by} · ${s.mins} min</div></div></div>`;
+const hero=s=>`<div class=hero onclick="nwOpen('${s.id}')"><div class=pc><img src="${img(s)}" alt=""></div><div><div class=meta>${tagH(s)}</div><h2>${esc(s.h)}</h2><p class=dek>${esc(s.dek)}</p><div class=wh><b>What happened</b>${esc(s.sum)}</div><div class=meta>${s.by} · ${s.mins} min read</div></div></div>`;
+const card=s=>`<div class=card onclick="nwOpen('${s.id}')"><div class=pc><img src="${img(s)}" alt="" loading=lazy></div><div class=tx><div class=meta>${tagH(s)}</div><h3>${esc(s.h)}</h3><p>${esc(s.dek)}</p><div class=wh><b>What happened</b>${esc(s.sum)}</div><div class=meta>${s.by} · ${s.mins} min · Read more ›</div></div></div>`;
 const chartH=()=>`<div class="card chart" style="cursor:default"><h3>Album chart</h3><small>Most played this week</small><ol>${chartRows().map((x,i)=>`<li class="${x.you?'me':''}"><b>${i+1}</b><span>${esc(x.n)}${x.you?'<i>YOU</i>':''}<em>${esc(x.al||'')}</em></span></li>`).join('')}</ol></div>`;
 /* one day: the first day of a feed gets the big story */
 function daySec(d,first){let L=storiesOf(d);if(N.tab!='top')L=L.filter(s=>s.cat==N.tab);if(!L.length)return'';
@@ -165,7 +205,10 @@ window.nwMore=()=>{const d=S.day-N.days;if(d<1)return null;N.days++;return daySe
 function articleH(s,ctx){const rel=storiesOf(s.d).filter(x=>x.cat==s.cat&&x.id!=s.id).slice(0,3);
  return`<div class="nw${ctx=='ph'?' nwph':''}"><div class=mast><div class=dt><span>Fern Times</span><span>${dayName(s.d)}</span></div><h1>The Fern <i>Times</i></h1></div><div class=art><button class=bk onclick="nwBack()">‹ Back to news</button>
  <div class=meta style="margin-top:14px">${tagH(s)}</div><h1>${esc(s.h)}</h1><p class=dek style="font-size:18px">${esc(s.dek)}</p><div class=meta>By ${s.by} · ${dayName(s.d)} · ${s.mins} min read</div>
- <div class=pc><img src="${img(s)}" alt=""></div><div class=bd>${s.p.map(t=>`<p>${esc(t)}</p>`).join('')}</div>${rel.length?`<h4>More in ${CN[s.cat]}</h4><div class=grid style="margin-bottom:20px">${rel.map(card).join('')}</div>`:''}</div></div>`}
+ <div class=pc><img src="${img(s)}" alt=""></div><div class=fx>${s.facts.map(f=>`<div>${esc(f[0])}<b>${esc(f[1])}</b></div>`).join('')}</div>
+ <h4>What happened</h4><div class=bd>${s.p.map(t=>`<p>${esc(t)}</p>`).join('')}</div>
+ <div class=bq>“${esc(s.quote[0])}”<small>${esc(s.quote[1])}</small></div>
+ <div class=sec><h4>Why it matters</h4><p>${esc(s.why)}</p></div><div class=sec><h4>What happens next</h4><p>${esc(s.next)}</p></div>${rel.length?`<h4>More in ${CN[s.cat]}</h4><div class=grid style="margin-bottom:20px">${rel.map(card).join('')}</div>`:''}</div></div>`}
 function page(ctx){css();N.ctx=ctx;
  if(N.open){const s=find(N.open);if(s)return articleH(s,ctx);N.open=null}
  if(N.days<2)N.days=2;N.days=Math.min(N.days,S.day);
