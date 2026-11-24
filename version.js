@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.10';
+const GAME_VERSION='v55.52.11';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.11',n:'Lighthouse dialog, lookout bar and map labels restyled to the game\'s pixel panels'},
  {v:'v55.52.10',n:'Cars can no longer run over pedestrians: anyone the car hits is now knocked sideways out of its path instead of flung ahead of it.'},
  {v:'v55.52.9',n:'Support us (Buy Me a Coffee) link in site page footers'},
  {v:'v55.52.8',n:'Username claim/change keeps the stored profile (songs, join date, achievements) instead of replacing it'},
