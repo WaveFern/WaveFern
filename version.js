@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.23';
+const GAME_VERSION='v55.52.24';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.24',n:'More backgrounds for Instagrime posts and News pictures: 24 new pixel-art scenes (rooftop, neon alley, old town, subway, harbour, market, snow, blossom, lake dock, skatepark, campfire, balcony, home studio, reading nook, control room, basement, radio booth, stadium, backstage, busking, poster wall, listening party, thrift store, runway) and 8 news scenes (pitch, court, lab, newsroom, cinema, observatory, town hall, expo), matched to each story; held dark'},
  {v:'v55.52.23',n:'Fern Times article text no longer draws over the window title bar (a class name clashed with an existing game style)'},
  {v:'v55.52.22',n:'Instagrime tab bar now sits at the bottom edge of the window (window padding left a gap, so it floated over the feed)'},
  {v:'v55.52.21',n:'Fern Times stories: What happened summary on every card, and article pages with key facts, a quote, Why it matters and What happens next; more stories about your new songs and rival moves (still held)'},

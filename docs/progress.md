@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v55.52.24 (2026-11-24, held dark): 24 new pixel-art post backgrounds (`259-photo-scenes.js`) and 8 news scenes matched to story topic (`260-news-scenes.js`). Release day: `HELD=false` in both.
 - v55.52.17 (2026-11-24, held dark): News app "Fern Times" (`257-news-app.js`, preinstalled on laptop and phone, music + world/sport/culture/tech/business/science, infinite scroll by day, album chart) and Instagrime feed upgrade (`258-instagrime-more.js`, infinite scroll, richer posts about you, time/place/tags). Shared `FWINF` infinite-scroll helper. Release day: set `HELD=false` in both files.
 - v55.52.1 (2026-11-23): release scheme: quiet patches all week, one major drop on release day (docs/releases.md); `tools/bump.js` (patch, drop, check, trial, renumber) replaces hand-edited version lines.
 - v55.49.0 (2026-11-23): desktop wallpapers: 22 more built-ins (CSS only), scrollable picker, "Add your own picture" (reuses `pxPick`/`pxEnc` from `84-pixel-pictures.js`, 128x72 16-colour, `S.wpc` ~6 KB, slot 100).

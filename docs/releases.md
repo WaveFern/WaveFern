@@ -30,6 +30,7 @@ A change that is not ready simply keeps its gate for next week.
 | Feature | File | Gate | Ready? |
 |---|---|---|---|
 | News app (Fern Times) on laptop and phone | `257-news-app.js` | `HELD=true` + `FW_DEV` | yes |
+| More post and News backgrounds (24 variants + 8 news scenes) | `259-photo-scenes.js`, `260-news-scenes.js` | `HELD=true` + `FW_DEV` | yes |
 | Instagrime feed upgrade: infinite scroll, better posts about you | `258-instagrime-more.js` | `HELD=true` + `FW_DEV` | yes |
 
 ## Avoiding merge pain
