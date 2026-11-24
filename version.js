@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.14';
+const GAME_VERSION='v55.52.15';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.15',n:'Christmas profile picture borders drop from the advent crates (nine pixel borders, worn on your own picture; pick one in the Wardrobe)'},
  {v:'v55.52.14',n:'Christmas present roll: wind-up charge, pitched ticks, heartbeat, overshoot settle, skip button, rarity-scaled celebration (rays, banner, shockwave, haptics)'},
  {v:'v55.52.13',n:'Autosaved icon now draws as a clear pixel tick'},
  {v:'v55.52.12',n:'Lighthouse dialog, lookout bar and map labels restyled to the game\'s pixel panels'},
