@@ -426,10 +426,8 @@ function bar(){if(mode!='play'||away())return;if(S.bcBar===S.day){sn('err');retu
 
 /* ---------- the lighthouse: climb to the gallery and walk round the top in first person ---------- */
 let LHV=null,lhCam=null;
-const LHBOX='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;background:rgba(18,22,30,.94);color:#fff;font:15px/1.45 system-ui,sans-serif;border-radius:14px;padding:20px 22px;width:min(360px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.45)';
-const LHBTN='padding:10px 16px;border:0;border-radius:8px;font:600 15px system-ui,sans-serif;cursor:pointer;color:#fff;';
 function climb(){if(mode!='play'||away())return;mode='menu';const fresh=S.lhDay!==S.day;
- $('ui').innerHTML=`<div style="${LHBOX}"><div style="font-size:18px;font-weight:600;margin-bottom:6px">Lighthouse</div><div style="opacity:.8;margin-bottom:16px">Climb to the lookout and look out over the whole island.${fresh?' The sea air gives you +20 energy (once a day).':''}</div><div style="display:flex;gap:8px"><button onclick="lhGo()" style="${LHBTN}flex:1;background:#2f7bf5">Climb up</button><button onclick="closeUI()" style="${LHBTN}background:rgba(255,255,255,.14)">Not now</button></div></div>`}
+ $('ui').innerHTML=`<div class="box modal pe" style="width:min(420px,94vw)"><div class=pehd><span class=pek>North Point Islet</span><h2>Lighthouse</h2></div><div class=pebd><p class=pebl>Spiral stairs up to the gallery. You can see the whole island from there.</p>${fresh?'<p class=pesm>First climb of the day: +20 energy.</p>':'<p class=pesm>You already got today\'s sea air.</p>'}<div class=row2><button class=go onclick="lhGo()">Climb up</button><button onclick="closeUI()">Not now</button></div></div></div>`}
 let lhH=null;
 window.lhGo=function(){if(!light||LHV||mode!='menu')return;$('ui').innerHTML='';
  if(S.lhDay!==S.day){S.lhDay=S.day;S.energy=Math.min(100,(S.energy||0)+20);sv();sn('chime');say('Fresh sea air at the top. +20 energy.')}
@@ -437,11 +435,11 @@ window.lhGo=function(){if(!light||LHV||mode!='menu')return;$('ui').innerHTML='';
  LHV={x:0,z:2.8,yaw:Math.PI,pit:-.08,f:light.userData.floor,fog:scene.fog&&scene.fog.near!=null?[scene.fog.near,scene.fog.far]:null,drag:0,lab:[]};
  if(LHV.fog){scene.fog.near=500;scene.fog.far=3200}
  try{P.mesh.visible=false}catch(e){}document.body.classList.add('fston');
- const d=document.createElement('div');d.id='lhv';d.style.cssText='position:fixed;inset:0;z-index:55;pointer-events:none;font:12px system-ui,sans-serif;color:#fff;overflow:hidden';
- d.innerHTML='<div id=lhl></div><div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(18,22,30,.82);padding:8px 14px;border-radius:10px;display:flex;gap:14px;align-items:center;pointer-events:auto;font:14px system-ui,sans-serif"><span style="opacity:.85">WASD walk · mouse or arrows look · Shift run</span><button onclick="lhDown()" style="'+LHBTN+'background:#2f7bf5;padding:7px 14px">Climb down</button></div>';
+ const d=document.createElement('div');d.id='lhv';d.style.cssText='position:fixed;inset:0;z-index:55;pointer-events:none;font-size:12px;color:var(--t);overflow:hidden';
+ d.innerHTML='<div id=lhl></div><div class=box style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;pointer-events:auto;padding:8px 12px;font-size:12px;color:var(--m)"><span>WASD walk \u00b7 mouse or arrows look \u00b7 Shift run</span><button onclick="lhDown()">Climb down</button></div>';
  document.body.appendChild(d);const box=d.firstChild;
  /* a small label for each place on the map: name and distance */
- POIS.forEach(q=>{if(q[2]=='Lighthouse')return;const e=document.createElement('div');e.style.cssText='position:absolute;left:0;top:0;white-space:nowrap;background:rgba(18,22,30,.72);padding:2px 7px;border-radius:9px;border-left:3px solid '+(q[3]||'#fff')+';display:none';box.appendChild(e);LHV.lab.push({q,e})});
+ POIS.forEach(q=>{if(q[2]=='Lighthouse')return;const e=document.createElement('div');e.style.cssText='position:absolute;left:0;top:0;white-space:nowrap;background:#0b0f0dd9;border:2px solid #000;box-shadow:2px 2px 0 #0008;padding:2px 6px;border-left:4px solid '+(q[3]||'#fff')+';display:none';box.appendChild(e);LHV.lab.push({q,e})});
  const cv=renderer.domElement,mm=e=>{if(!LHV)return;if(document.pointerLockElement===cv||LHV.drag){LHV.yaw-=(e.movementX||0)*.0025;LHV.pit=Math.max(-1.2,Math.min(1.2,LHV.pit-(e.movementY||0)*.0025))}},
   md=e=>{if(!LHV||e.target!==cv)return;LHV.drag=1;try{cv.requestPointerLock&&cv.requestPointerLock()}catch(x){}},mu=()=>{if(LHV)LHV.drag=0},
   kd=e=>{if(!LHV)return;const k=(e.key||'').toLowerCase();if(k=='e'||k=='escape'){e.preventDefault();e.stopPropagation();lhDown()}else if(k.startsWith('arrow')||k==' ')e.preventDefault()},
