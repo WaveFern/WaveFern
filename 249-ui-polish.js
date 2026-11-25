@@ -122,5 +122,10 @@ body:has(#pzo) #hkbar{display:none!important}
 .site.st .card button.go{background:#2fe68a;color:#06210f}
 .site.st .card button:hover:not(:disabled){filter:brightness(.95)}
 .site.st .card button:disabled{background:#eceff2;color:#77838e;border-color:#9aa6b1;cursor:default}
+/* the laptop window pads its content, so the Instagrime tab bar (search, new post) floated above the bottom edge: no padding while the feed fills the window.
+   Done with a class from a pcR wrap as well as :has, so browsers without :has get it too. */
+#pc .mn.igmn,#pc .mn:has(>.ig){padding:0!important}
+#pc .mn>.ig{min-height:100%;box-sizing:border-box}
 `;document.head.appendChild(st);
+ if(typeof pcR=='function'){const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('igmn',!!m.querySelector(':scope>.ig'))}catch(e){}return r}}
 })();

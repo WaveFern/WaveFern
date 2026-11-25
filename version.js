@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.46';
+const GAME_VERSION='v55.52.47';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.47',n:'Instagrime tab bar (search, new post) sits at the bottom of the laptop window again'},
  {v:'v55.52.46',n:'Instagrime brand ads: 3D product models on a plain backdrop (dev page only)'},
  {v:'v55.52.45',n:'Instagrime brand posts: original product names and new pixel-style ads (dev page only)'},
  {v:'v55.52.44',n:'Smoother walking held for /dev (FW_DEV): eased start/stop, smooth turning'},
