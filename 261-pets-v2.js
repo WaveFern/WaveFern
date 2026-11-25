@@ -82,10 +82,11 @@ const lerp=(a,b,t)=>a+(b-a)*t;
   if(w.si>.01&&!bird){R.rotation.x=lerp(R.rotation.x,-.3,w.si);R.position.y-=.04*w.si;if(P.head)P.head.rotation.x-=.2*w.si}}}
 /* ---------- name tags, sleeping Zs, loafing when you stand still ---------- */
 const tex=(w,h,fn)=>{const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);return t};
-function tagOf(f){const g=f.m;let T=g.userData.p2t;if(!T){
-  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex(2,2,()=>{}),transparent:true,depthWrite:false})),zz=new THREE.Sprite(new THREE.SpriteMaterial({map:tex(64,64,(c)=>{c.font='bold 40px monospace';c.fillStyle='#d6c8ff';c.strokeStyle='#241a44';c.lineWidth=6;c.strokeText('Z',20,44);c.fillText('Z',20,44)}),transparent:true,depthWrite:false}));
-  sp.scale.set(1.5,.36,1);sp.position.set(0,1.3,0);zz.scale.set(.5,.5,1);zz.visible=false;g.add(sp,zz);T=g.userData.p2t={sp,zz,n:null}}
- const n=nm(f.k);if(T.n!==n){T.n=n;T.sp.material.map=tex(256,60,(c,W,H)=>{c.font='bold 30px monospace';c.textAlign='center';c.fillStyle='#000a';c.fillRect(0,6,W,H-12);c.strokeStyle='#2fe68a';c.lineWidth=3;c.strokeRect(1.5,7.5,W-3,H-15);c.fillStyle='#fff';c.fillText(n.slice(0,14),W/2,H/2+10)});T.sp.material.needsUpdate=true}return T}
+function tagOf(f){const g=f.m;let T=g.userData.p2t;if(!T){/* the name is a crisp page tag from 56-name-tags (NTAG), anchored to an invisible point above the head */
+  const zz=new THREE.Sprite(new THREE.SpriteMaterial({map:tex(64,64,(c)=>{c.font='bold 40px monospace';c.fillStyle='#d6c8ff';c.strokeStyle='#241a44';c.lineWidth=6;c.strokeText('Z',20,44);c.fillText('Z',20,44)}),transparent:true,depthWrite:false})),hold=new THREE.Group(),pt=new THREE.Object3D();
+  pt.position.set(0,1.3,0);pt.userData.lt=nm(f.k);hold.add(pt);hold.visible=false;zz.scale.set(.5,.5,1);zz.visible=false;g.add(hold,zz);
+  const el=document.createElement('div');el.className='nt pt';el.textContent=nm(f.k);ntBox().appendChild(el);NTAG.list.push({s:pt,el,on:false,gone:0});T=g.userData.p2t={sp:hold,pt,zz,el,n:nm(f.k)}}
+ const n=nm(f.k);if(T.n!==n){T.n=n;T.el.textContent=n;T.pt.userData.lt=n}return T}
 function post(dt){
  const mv=Math.hypot(P.x-ST.lx,P.z-ST.lz);ST.lx=P.x;ST.lz=P.z;ST.still=mv>.002||mode!='play'?0:ST.still+dt;
  const z=zone();FOL.forEach(f=>{if(!f.pet||!f.m)return;const g=f.m,T=tagOf(f),near=g.visible&&mode=='play'&&Math.hypot(g.position.x-P.x,g.position.z-P.z)<6;T.sp.visible=near;
@@ -111,16 +112,21 @@ const nameBox=k=>ST.ren===k?`<div class=pt2-r><input id=pt2in maxlength=14 value
  :`<div class=pt2-n><b>${esc(nm(k))}</b><button class=pt2-pen title="Rename" onclick="FW_PETS.ren(${k})">Rename</button></div>`;
 const perk=k=>`<span class=pt2-perk><b>${esc(pk(k)[0])}</b>${esc(pk(k)[1])}</span>`;
 /* ---------- the P menu ---------- */
-function render(){mig();const ui=document.getElementById('pt2');if(!ui)return;
- const slots=[0,1,2].map(i=>{const k=S.pets[i];return k==null?`<div class="pt2-slot e"><b>Empty slot ${i+1}</b><span>Equip a pet from below</span></div>`
-  :`<div class="pt2-slot"><small>SLOT ${i+1}</small>${pvc('p:'+k,112)}${nameBox(k)}<span class=pt2-sp>${esc(PETS[k][0])}</span>${perk(k)}<button onclick="FW_PETS.eq(${k})">Unequip</button></div>`}).join('');
- const cards=S.petOwn.map(k=>`<div class="pt2-card${eqd(k)?' on':''}">${pvc('p:'+k,88)}${nameBox(k)}<span class=pt2-sp>${esc(PETS[k][0])}</span>${perk(k)}${eqd(k)?'<button onclick="FW_PETS.eq('+k+')">Unequip</button>':`<button class=go ${S.pets.length>=MAX?'disabled':''} onclick="FW_PETS.eq(${k})">${S.pets.length>=MAX?'Slots full':'Equip'}</button>`}</div>`).join('');
- const locked=PETS.map((c,k)=>k).filter(k=>!S.petOwn.includes(k)&&PETS[k][1]>0).map(k=>`<div class="pt2-card off">${pvc('p:'+k,72)}<b>${esc(PETS[k][0])}</b><span class=pt2-sp>${$$(PETS[k][1])} at the Pet Shop</span></div>`).join('');
- ui.innerHTML=`<div class=pt2-h><h2>Pets</h2><span class=pt2-c>${S.pets.length}/${MAX} equipped</span><button onclick="closeUI()" style="margin-left:auto">Close (P)</button></div>
- <p class=pt2-i>Pick up to ${MAX} pets. Equipped pets follow you around town, roam your home and each give you a small powerup. Pets you are not using wait at home.</p>
- <div class=pt2-slots>${slots}</div><h3>Your pets</h3>${cards?`<div class=pt2-grid>${cards}</div>`:'<p class=pt2-i>You have no pets yet. Book one on the computer (Pets page), then visit the Pet Shop.</p>'}
- ${locked?`<h3>Still to adopt</h3><div class="pt2-grid pt2-lk">${locked}</div>`:''}`}
-function open(r){if(mode!='play'||document.getElementById('ui').innerHTML)return;mode='menu';ST.ren=r==null?null:r;$('ui').innerHTML='<div id=pt2 class="box modal gu wrd pt2"></div>';render();snd('pop');if(r!=null)setTimeout(()=>{const i=document.getElementById('pt2in');if(i)i.focus()},30)}
+const mName=k=>ST.ren===k?`<div class=pm-r><input id=pt2in maxlength=14 value="${esc(S.petNames[k]||'')}" placeholder="${esc(PETS[k][0])}" onkeydown="if(event.key=='Enter')FW_PETS.saveName(${k});else if(event.key=='Escape'){event.stopPropagation();FW_PETS.cancelName()}"><button class=pm-ok onclick="FW_PETS.saveName(${k})">Save</button></div>`
+ :`<div class=pm-nm><b>${esc(nm(k))}</b><button class=pm-pen title="Rename" onclick="FW_PETS.ren(${k})">Rename</button></div>`;
+const col=k=>(typeof PETC!='undefined'&&PETC[k])||'#e39b5b';
+const mPerk=k=>`<div class=pm-perk><i></i><div><b>${esc(pk(k)[0])}</b><span>${esc(pk(k)[1])}</span></div></div>`;
+function render(){mig();const ui=document.getElementById('pt2');if(!ui)return;const n=S.pets.length,full=n>=MAX;
+ const slots=[0,1,2].map(i=>{const k=S.pets[i];return k==null?`<div class="pm-slot pm-e"><div class=pm-band><small>SLOT ${i+1}</small></div><div class=pm-empty><span>+</span><b>Empty</b><em>Pick a pet from the roster</em></div></div>`
+  :`<div class=pm-slot style="--c:${col(k)}"><div class=pm-band><small>SLOT ${i+1}</small><em>${esc(PETS[k][0])}</em></div><div class=pm-win>${pvc('p:'+k,132)}</div>${mName(k)}${mPerk(k)}<button class=pm-btn onclick="FW_PETS.eq(${k})">Unequip</button></div>`}).join('');
+ const roster=S.petOwn.map(k=>`<div class="pm-row${eqd(k)?' on':''}" style="--c:${col(k)}"><div class=pm-mini>${pvc('p:'+k,72)}</div><div class=pm-info>${mName(k)}<em>${esc(PETS[k][0])}</em>${mPerk(k)}</div>${eqd(k)?'<button class=pm-btn onclick="FW_PETS.eq('+k+')">Unequip</button>':`<button class="pm-btn pm-go" ${full?'disabled':''} onclick="FW_PETS.eq(${k})">${full?'Slots full':'Equip'}</button>`}${eqd(k)?'<span class=pm-out>OUT</span>':''}</div>`).join('');
+ const more=PETS.map((c,k)=>k).filter(k=>!S.petOwn.includes(k)&&PETS[k][1]>0).map(k=>`<div class=pm-lock style="--c:${col(k)}"><div class=pm-mini>${pvc('p:'+k,56)}</div><b>${esc(PETS[k][0])}</b><em>${$$(PETS[k][1])} at the Pet Shop</em></div>`).join('');
+ ui.innerHTML=`<div class=pm-top><div class=pm-ttl><h2>My Pets</h2><div class=pm-dots title="${n} of ${MAX} out">${[0,1,2].map(i=>`<s class="${i<n?'f':''}"></s>`).join('')}<span>${n} of ${MAX} out</span></div></div><button class=pm-x onclick="closeUI()">Close <kbd>P</kbd></button></div>
+ <p class=pm-sub>Bring up to ${MAX} pets. They follow you around town, roam your home, and each gives you a small powerup.</p>
+ <div class=pm-slots>${slots}</div>
+ <div class=pm-sec><h3>Roster</h3><span>${S.petOwn.length} adopted</span></div>${roster?`<div class=pm-roster>${roster}</div>`:'<p class=pm-sub>No pets yet. Book one on the computer (Pets page), then visit the Pet Shop.</p>'}
+ ${more?`<div class=pm-sec><h3>Meet more</h3></div><div class=pm-more>${more}</div>`:''}`}
+function open(r){if(mode!='play'||document.getElementById('ui').innerHTML)return;mode='menu';ST.ren=r==null?null:r;$('ui').innerHTML='<div id=pt2 class="box modal wrd pm"></div>';render();snd('pop');if(r!=null)setTimeout(()=>{const i=document.getElementById('pt2in');if(i)i.focus()},30)}
 addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.key.toLowerCase()!='p'||/INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||''))return;
  if(mode=='play')open();else if(mode=='menu'&&document.getElementById('pt2'))closeUI()});
 /* ---------- buying: own them all, then name and equip ---------- */
@@ -163,6 +169,37 @@ const st=document.createElement('style');st.textContent=`
 .pt2n.x{opacity:0}.pt2n small{display:block;color:#2fe68a;font:700 10px Silkscreen,monospace;letter-spacing:1px}.pt2n b{display:block;font:700 16px Silkscreen,monospace}.pt2n span{display:block;font-size:12px;line-height:1.35;color:#cfd8d3}.pt2n i{font-style:normal;color:#2fe68a;font-weight:700}
 @keyframes pt2in{from{transform:translate(-50%,24px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 @media(max-width:640px){.pt2-slots{gap:6px}.pt2-slot{padding:6px}.pt2-slot canvas.pv{width:72px!important;height:72px!important}.pt2-perk{font-size:11px}}`;
+st.textContent+=`
+#ntags .nt.pt{font-size:14px;padding:4px 9px 3px;color:#fff;background:#2b2118;box-shadow:inset 0 0 0 2px #7a5a3c,3px 3px 0 #0009}
+#ui>.box.modal.pm{--ink:#3b2a20;--paper:#fff4e0;--card:#fffaf0;--line:#e3cfae;--coral:#ff6b57;--teal:#1fa6a0;width:min(1060px,96vw);max-height:92vh;overflow:auto;background:var(--paper);background-image:radial-gradient(#f0dcb8 1.2px,transparent 1.4px);background-size:18px 18px;color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 #0007;padding:20px 22px 22px;font-family:ui-rounded,"Nunito","Trebuchet MS",Verdana,sans-serif;display:flex;flex-direction:column;gap:14px;animation:pmin .28s cubic-bezier(.2,1.3,.4,1)}
+.pm *{box-sizing:border-box}
+.pm-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.pm-ttl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pm h2{margin:0;padding:6px 18px;font:900 28px ui-rounded,"Trebuchet MS",sans-serif;color:#fff;background:var(--coral);border:3px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);transform:rotate(-1.5deg);letter-spacing:.5px}
+.pm-dots{display:flex;align-items:center;gap:6px;font-weight:800;color:var(--ink)}.pm-dots s{width:20px;height:20px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:inline-block;text-decoration:none}.pm-dots s.f{background:var(--teal)}.pm-dots span{margin-left:6px;font-size:14px}
+.pm-x{margin-left:auto;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:8px 14px;font:800 14px inherit;box-shadow:3px 3px 0 var(--ink);cursor:pointer}.pm-x:hover{background:#ffe3b8}.pm-x kbd{background:var(--ink);color:#fff;border-radius:5px;padding:1px 6px;margin-left:4px;font:800 12px inherit}
+.pm-sub{margin:0;color:#7a5f48;font-size:14px;line-height:1.45;font-weight:600}
+.pm-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.pm-slot{background:var(--card);border:3px solid var(--ink);border-radius:16px;box-shadow:5px 5px 0 var(--ink);overflow:hidden;display:flex;flex-direction:column;gap:10px;padding-bottom:14px;text-align:center;transition:transform .15s}
+.pm-slot:hover{transform:translateY(-3px)}
+.pm-band{background:var(--c,#d9c7a3);border-bottom:3px solid var(--ink);padding:7px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.pm-band small{font:900 11px inherit;letter-spacing:1.5px;color:#fff;text-shadow:0 1px 0 #0006;background:#0003;padding:2px 8px;border-radius:20px}.pm-band em{font:800 12px inherit;font-style:normal;color:#fff;text-shadow:0 1px 0 #0007}
+.pm-win{margin:0 auto;border:3px solid var(--ink);border-radius:50%;width:150px;height:150px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 28%,#fff);--pvb:transparent}.pm-win canvas.pv{margin:0!important;background:transparent!important}
+.pm-nm{display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px;min-width:0}.pm-nm b{font:900 22px ui-rounded,"Trebuchet MS",sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-pen{background:transparent;border:2px dashed #b8996f;color:#7a5f48;border-radius:8px;padding:2px 8px;font:800 11px inherit;cursor:pointer}.pm-pen:hover{background:#fff;border-style:solid;color:var(--ink)}
+.pm-r{display:flex;gap:6px;padding:0 10px}.pm-r input{flex:1;min-width:0;border:3px solid var(--ink);border-radius:10px;padding:7px 10px;font:800 16px inherit;background:#fff;color:var(--ink);outline:0}.pm-r input:focus{border-color:var(--coral)}
+.pm-ok,.pm-go{background:var(--teal)!important;color:#fff!important}
+.pm-perk{display:flex;gap:10px;text-align:left;align-items:center;margin:0 12px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 10px}.pm-perk i{flex:none;width:30px;height:30px;border-radius:50%;background:var(--c,#f5b73c);border:2px solid var(--ink);position:relative}.pm-perk i:after{content:"\\2605";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:15px;font-style:normal;text-shadow:0 1px 0 #0006}
+.pm-perk b{display:block;font:900 13px inherit;color:var(--ink)}.pm-perk span{display:block;font-size:12.5px;line-height:1.3;color:#6b5240;font-weight:600}
+.pm-btn{margin:0 12px;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:9px 12px;font:900 14px inherit;box-shadow:3px 3px 0 var(--ink);cursor:pointer}.pm-btn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}.pm-btn:active:not(:disabled){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}.pm-btn:disabled{opacity:.45;cursor:not-allowed}
+.pm-e{background:transparent;border-style:dashed;box-shadow:none;min-height:300px}.pm-e .pm-band{background:#e9d9b8}.pm-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#a98e69}.pm-empty span{width:64px;height:64px;border:3px dashed #c6aa7d;border-radius:50%;display:grid;place-items:center;font:900 38px inherit;line-height:1}.pm-empty b{font-size:18px}.pm-empty em{font-size:12px;font-style:normal;font-weight:600}
+.pm-sec{display:flex;align-items:baseline;gap:10px;border-bottom:3px solid var(--ink);padding-bottom:4px;margin-top:4px}.pm-sec h3{margin:0;font:900 18px inherit;color:var(--ink)}.pm-sec span{font-size:13px;font-weight:700;color:#7a5f48}
+.pm-roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px}
+.pm-row{position:relative;display:flex;align-items:center;gap:12px;background:var(--card);border:3px solid var(--line);border-left:10px solid var(--c);border-radius:14px;padding:10px 12px 10px 10px;min-width:0}.pm-row.on{border-color:var(--ink);border-left-color:var(--c);box-shadow:4px 4px 0 var(--ink);background:#fff}
+.pm-mini{flex:none;width:84px;height:84px;border-radius:12px;border:2px solid var(--ink);display:grid;place-items:center;background:color-mix(in srgb,var(--c) 26%,#fff);--pvb:transparent}.pm-mini canvas.pv{margin:0!important;background:transparent!important}
+.pm-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}.pm-info .pm-nm{justify-content:flex-start;padding:0}.pm-info .pm-nm b{font-size:18px}.pm-info .pm-r{padding:0}.pm-info em{font-style:normal;font-size:12px;color:#8b7054;font-weight:700;margin-top:-3px}.pm-info .pm-perk{margin:0;padding:5px 8px}
+.pm-row .pm-btn{margin:0;flex:none}.pm-out{position:absolute;top:-10px;right:12px;background:var(--teal);color:#fff;border:2px solid var(--ink);border-radius:20px;padding:0 9px;font:900 11px inherit;letter-spacing:1px}
+.pm-more{display:flex;gap:12px;flex-wrap:wrap}.pm-lock{display:flex;align-items:center;gap:10px;background:#f1e5cb;border:3px dashed #c6aa7d;border-radius:14px;padding:8px 14px 8px 8px;opacity:.9}.pm-lock .pm-mini{width:60px;height:60px;filter:grayscale(.6)}.pm-lock b{display:block;font-size:14px}.pm-lock em{font-size:12px;font-style:normal;color:#8b7054;font-weight:700}
+@keyframes pmin{from{transform:translate(-50%,-46%) scale(.94);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+@media(max-width:760px){.pm-slots{gap:8px}.pm-win{width:84px;height:84px}.pm-win canvas.pv{width:76px!important;height:76px!important}.pm-nm b{font-size:15px}.pm-perk{margin:0 6px;padding:5px}.pm-perk span{font-size:11px}.pm-roster{grid-template-columns:1fr}.pm-btn{margin:0 6px;padding:7px 4px;font-size:12px}.pm-e{min-height:200px}}`;
 document.head.appendChild(st);
 window.FW_PETS={eq,ren,saveName,cancelName,open,zone,state:ST};
 })();
