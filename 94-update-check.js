@@ -9,13 +9,13 @@ UPD.last=0;UPD.fail=0;UPD.rt=0;
 function updCheck(force){if(UPD.busy||location.protocol=='file:'||document.hidden)return;
  const n=Date.now();if(!force&&n-UPD.last<4000)return;UPD.last=n;clearTimeout(UPD.rt);
  fetch('version.js?t='+n,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{UPD.fail=0;const m=t.match(/GAME_VERSION\s*=\s*'([^']+)'/);
-  if(m&&updMajor(m[1])>updMajor(GAME_VERSION)&&m[1]!=UPD.seen)updShow(m[1])}).catch(()=>{if(UPD.fail<4)UPD.rt=setTimeout(()=>updCheck(1),5000*Math.pow(2,UPD.fail++))})}
+  if(m&&updMajor(m[1])>updMajor(GAME_VERSION)&&m[1]!=UPD.seen)updShow(m[1],fwShowVer(m[1],[...t.matchAll(/^ \{v:'([^']+)'/gm)].map(x=>x[1])))}).catch(()=>{if(UPD.fail<4)UPD.rt=setTimeout(()=>updCheck(1),5000*Math.pow(2,UPD.fail++))})}
 /* major number of 'v56.1.2' -> 56; patches and minors never trigger the notice */
 function updMajor(v){return parseInt(String(v).replace(/^v/,''),10)||0}
-function updShow(v){UPD.seen=v;let d=document.getElementById('upd');if(!d){d=document.createElement('div');d.id='upd';document.body.appendChild(d)}
+function updShow(v,shown){UPD.seen=v;let d=document.getElementById('upd');if(!d){d=document.createElement('div');d.id='upd';document.body.appendChild(d)}
  d.style.cssText='position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;max-width:calc(100% - 24px);padding:8px 10px 8px 14px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:13px';
  let tried=0;try{tried=sessionStorage.getItem('fw_upd')==v}catch(e){}
- d.innerHTML=`<span>${tried?'The update to':'New version'} <b style="color:var(--g)">${v}</b> ${tried?'did not load. Press again, or hard refresh (Ctrl+Shift+R)':'is out'}</span><button id=updGo class=go style="margin:0;padding:5px 12px">${tried?'Retry':'Update'}</button><button title="Later" onclick="updLater()" style="margin:0;padding:5px 8px;background:none;border:none;color:var(--m)">✕</button>`;
+ d.innerHTML=`<span>${tried?'The update to':'New version'} <b style="color:var(--g)">${shown||v}</b> ${tried?'did not load. Press again, or hard refresh (Ctrl+Shift+R)':'is out'}</span><button id=updGo class=go style="margin:0;padding:5px 12px">${tried?'Retry':'Update'}</button><button title="Later" onclick="updLater()" style="margin:0;padding:5px 8px;background:none;border:none;color:var(--m)">✕</button>`;
  document.getElementById('updGo').onclick=updGo}
 /* dismissed notices come back after 5 minutes if the game is still out of date */
 function updLater(){const d=document.getElementById('upd');if(d)d.remove();setTimeout(()=>{UPD.seen=null},300000)}

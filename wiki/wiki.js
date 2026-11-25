@@ -64,7 +64,7 @@ function histTab(p){if(typeof VERSION_HISTORY=='undefined')return N('The version
  const re=new RegExp('\\b('+ws.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(e?s)?\\b','i');
  const vs=ws.length?VERSION_HISTORY.filter(v=>re.test(v.n)):[];
  return `<p>Game updates whose notes mention this topic, newest first (${vs.length} of ${VERSION_HISTORY.length}).</p>`+
-  (vs.length?`<ol class=hist>${vs.slice(0,60).map(v=>`<li><span class="tag${/\.0$/.test(v.v)?' g':''}">${v.v}</span> ${esc(v.n).replace(re,m=>'<mark>'+m+'</mark>')}</li>`).join('')}</ol>`:N('No updates mention this page by name.'))+
+  (vs.length?`<ol class=hist>${vs.slice(0,60).map(v=>`<li><span class="tag${/\.0$/.test(v.v)?' g':''}">${fwShowVer(v.v)}</span> ${esc(v.n).replace(re,m=>'<mark>'+m+'</mark>')}</li>`).join('')}</ol>`:N('No updates mention this page by name.'))+
   `<p>${L('versions','See every version')}</p>`}
 /* screenshots (wiki/img, made by tools/wiki-shots.js): the first floats beside the lead like a thumbnail, any others go in
    a Screenshots gallery at the end of the article. Clicking one opens it full size. */
@@ -135,5 +135,5 @@ addEventListener('DOMContentLoaded',()=>{catPages();
  document.addEventListener('click',e=>{if(!e.target.closest('#srch'))$('sug').classList.remove('on');if(e.target.closest('#sug a'))$('q').value=''});
  document.addEventListener('keydown',e=>{if(e.key=='/'&&document.activeElement!==$('q')&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$('q').focus()}});
  $('menu').onclick=()=>$('side').classList.toggle('on');
- $('ver').textContent=typeof GAME_VERSION!='undefined'?GAME_VERSION:(D.version||'');
+ $('ver').textContent=typeof GAME_VERSION!='undefined'?fwShowVer(GAME_VERSION):(D.version||'');
  addEventListener('hashchange',render);render()});
