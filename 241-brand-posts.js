@@ -33,7 +33,9 @@ const fol=b=>Math.round(2.5e6*(1+b.t*2.2)+idx(b)*3e5);
 function mk(b,day,pi,launch,k){const pr=prods(b)[pi],i=idx(b);
  const cap=launch?['NEW DROP: '+pr[0]+' is out now. '+pr[1]+'. Link in bio.','JUST LANDED: '+pr[0]+'. '+pr[1]+'. Tap to shop.','It is here. '+pr[0]+'. '+pr[1]+'.'][(day+i)%3]
   :[pr[0]+'. '+pr[1]+'.','Spotted in the wild: '+pr[0]+'. '+pr[1]+'.','Have you tried '+pr[0]+' yet? '+pr[1]+'.','Paid partnership. '+pr[0]+': '+pr[1]+'.'][(day*2+i+k)%4];
- return{id:4e7+i*1e6+(day%1000)*10+k,u:hdl(b),cap,kind:'brand',l:Math.round(fol(b)*(.006+((day*7+i*13+k*5)%9)/1000)),cfg:{brandLogo:b.id},cfg2:null,inf:1,brandAd:b.id,prod:pi,launch:launch?1:0}}
+ const p={id:4e7+i*1e6+(day%1000)*10+k,u:hdl(b),cap,kind:'brand',l:Math.round(fol(b)*(.006+((day*7+i*13+k*5)%9)/1000)),cfg:{brandLogo:b.id},cfg2:null,inf:1,brandAd:b.id,prod:pi,launch:launch?1:0};
+ if(BRD.adHook)try{BRD.adHook(p,b,pr,launch,day,i,k)}catch(e){console.warn('brand ad hook',e)}/* 262-brand-posts-v2.js (held) rewrites caption and look */
+ return p}
 function todays(){const day=S.day||0,L=[],R=[];
  BRD.brands.forEach((b,i)=>{const c=cur(b,day);if(c.age<WIN)L.push(mk(b,day,c.pi,1,0))});
  /* one rotating regular ad: a brand whose launch is not on, showing its current product */

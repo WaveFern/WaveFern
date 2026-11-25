@@ -43,3 +43,4 @@ The old pain was never the numbers: every PR edited the same few lines (`GAME_VE
 - Before opening or merging a PR: `git fetch origin && node tools/bump.js trial` lists the files that would conflict.
 - If only `version.js`, `index.html` ?v= tags or `docs/progress.md` conflict: `git merge origin/main`, then `node tools/bump.js renumber` (takes main's lines, re-adds your one entry, bumps the tags) and `node tools/bump.js check`.
 - Never rewrite history, force-push, or keep a branch open for days. Merge small, merge often. Close stale PRs rather than reviving them.
+| Instagrime brand posts: original product names, new captions, 4 pixel-style ad layouts | `262-brand-posts-v2.js` (+ `BRD.adHook` in `241`) | `HELD=true` + `FW_DEV` | yes |
