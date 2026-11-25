@@ -25,7 +25,7 @@
 #wfnews button{font-family:Silkscreen,ui-monospace,monospace;padding:10px 16px;margin-top:10px;align-self:flex-end}`;
   document.head.appendChild(css);
   const o=document.createElement('div');o.id='wfnews';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');
-  o.innerHTML='<div class=nb><small class=k>WHAT\'S NEW</small><div class=ns>'+list.map(n=>'<h2>'+esc(n.t)+'</h2><div class=nt>'+esc(n.tag||'UPDATE')+' · '+esc(n.v)+' · '+esc(n.d)+'</div><ul>'+n.items.map(i=>'<li>'+i+'</li>').join('')+'</ul>').join('')+'</div><button class=go id=wfnok>Got it</button></div>';
+  o.innerHTML='<div class=nb><small class=k>WHAT\'S NEW</small><div class=ns>'+list.map(n=>'<h2>'+esc(n.t)+'</h2><div class=nt>'+esc(n.tag||'UPDATE')+' · '+esc(fwShowVer(n.v))+' · '+esc(n.d)+'</div><ul>'+n.items.map(i=>'<li>'+i+'</li>').join('')+'</ul>').join('')+'</div><button class=go id=wfnok>Got it</button></div>';
   document.body.appendChild(o);
   const close=()=>{mark();try{snd('click')}catch(e){}o.remove();css.remove();document.removeEventListener('keydown',kd,true)};
   const kd=e=>{if(e.key=='Escape'||e.key=='Enter'){e.stopPropagation();e.preventDefault();close()}else if(o.contains(e.target)||e.target===document.body)e.stopPropagation()};

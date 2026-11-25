@@ -10,7 +10,9 @@
 | Exciting feature | held, goes live on release day | still a quiet patch when it merges; the drop is the big number | see below |
 | The weekly drop | Thursday | next major: v55.x.y → **v56.0.0**, then v57.0.0 ... | `node tools/bump.js drop "Headline"` |
 
-No reset, no renaming: the next number is simply the current one plus one. Old versions, saves and the `?v=` cache tags stay as they are.
+Shown numbers: players see `v1.N` (before the Founder fresh start, build v49.72.0) and `v2.N` (from it on), counted by position in `VERSION_HISTORY` through `fwShowVer` in `version.js`. The build id (v55.x.y) stays the real id for `bump.js`, the `?v=` tags and the update check; never show it raw, wrap it in `fwShowVer`.
+
+No reset, no renaming of build ids: the next number is simply the current one plus one. Old versions, saves and the `?v=` cache tags stay as they are.
 
 ## How a feature is held (no hold branch)
 Merge it to `main` like any change, but dark:

@@ -37,9 +37,9 @@ li>span:last-child{flex:1;min-width:0}
 </main>
 <script src="version.js"></script>
 <script>
-  document.getElementById('cur').textContent = GAME_VERSION;
+  document.getElementById('cur').textContent = fwShowVer(GAME_VERSION);
   document.getElementById('list').innerHTML = VERSION_HISTORY.map((e, i) =>
-    `<li${/^v\d+\.0\.0$/.test(e.v) ? ' style="border-left:3px solid #2fe68a;padding-left:8px"' : ''}><span class="v">${e.v}${i === 0 ? '<span class="cur">current</span>' : ''}</span><span>${e.n}</span></li>`
+    `<li${/^v\d+\.0\.0$/.test(e.v) ? ' style="border-left:3px solid #2fe68a;padding-left:8px"' : ''}><span class="v">${fwShowVer(e.v)}<small style="color:var(--m);font-weight:400;font-size:10px">${e.v}</small>${i === 0 ? '<span class="cur">current</span>' : ''}</span><span>${e.n}</span></li>`
   ).join('');
 </script>
 </body>

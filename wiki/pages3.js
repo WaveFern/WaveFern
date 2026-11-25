@@ -95,8 +95,8 @@ ${T(['Preset','Pixel size','Frame cap','Crowds','Weather','Draw distance'],[['Hi
 <p><b>Auto</b> starts on High and steps down while the game runs slowly, remembering the level it settled on. Graphics settings are saved per device, never in your career.</p>`});
 
 page('versions','Version history','meta',{e:'',sum:'Every update to the game, newest first.',kw:'changelog version update history patch',body:()=>typeof VERSION_HISTORY=='undefined'?N('The version list could not be loaded.','warn'):`
-<p class=lead>The game is on <b class=g>${GAME_VERSION}</b>. This list is read live from the game, so it is always current.</p>
-${T(['Version','What changed'],VERSION_HISTORY.map(v=>[`<span class=tag${/\.0$/.test(v.v)?' g':''}>${v.v}</span>`,esc(v.n)]),{filter:1,tall:1})}`});
+<p class=lead>The game is on <b class=g>${fwShowVer(GAME_VERSION)}</b>. This list is read live from the game, so it is always current.</p>
+${T(['Version','What changed'],VERSION_HISTORY.map(v=>[`<span class=tag${/\.0$/.test(v.v)?' g':''}>${fwShowVer(v.v)}</span>`,esc(v.n)]),{filter:1,tall:1})}`});
 
 page('about-wiki','About this wiki','meta',{e:'',sum:'How the wiki is made and kept up to date.',body:()=>`
 <p class=lead>This wiki is written from the game's own code. Every table that lists game data (gear, artists, cars, labels, stages, destinations, fame levels and more) is copied out of the running game by <code>tools/wiki-data.js</code> each time the site is published, so it can't fall behind.</p>

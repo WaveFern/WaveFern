@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.39';
+const GAME_VERSION='v55.52.40';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.40',n:'Version numbers renumbered for players: v1.x is everything before the Founder fresh start, v2.x from it on (the real build id still drives updates, cache tags and saves)'},
  {v:'v55.52.39',n:'Small fixes no longer pop an update notice; only the weekly drop does. Release day is Thursday.'},
  {v:'v55.52.38',n:'Instagrime: hundreds of different comments (car posts most, some mention your like), dock search replaces photo post (dev only)'},
  {v:'v55.52.37',n:'Main menu: Newsletter button and Contact link (set URLs in WF_LINKS)'},
@@ -857,3 +858,10 @@ const VERSION_HISTORY=[
  {v:'v7',n:'Albums, rivals, Instagrime profiles, sites, companions, tower'},
  {v:'v6',n:'Fade, garage room, endgame, natural chat'}
 ];
+
+/* Shown version numbers. The build number above (v55.x.y) stays the real id: it drives the update check, the ?v= cache tags, bump.js and saves.
+   What players see is v1.N (before the Founder fresh start, v49.72.0) and v2.N (from it on), counted by position in VERSION_HISTORY:
+   v1.0 is the oldest entry, v2.0 is the fresh start, and every new entry is simply the next number. Unknown ids come back unchanged.
+   ids = optional list of build ids newest first (the update check passes the ids it read from the server's version.js). */
+const FW_RESET_BUILD='v49.72.0';
+function fwShowVer(v,ids){ids=ids||VERSION_HISTORY.map(e=>e.v);const i=ids.indexOf(v),r=ids.indexOf(FW_RESET_BUILD);if(i<0||r<0)return v;return i<=r?'v2.'+(r-i):'v1.'+(ids.length-1-i)}
