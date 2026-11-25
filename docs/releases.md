@@ -2,6 +2,8 @@
 
 **Release day: Thursday.** Everything else ships the moment it is merged. The in-game "New version" notice only appears for a drop (a new major); patches reload in silently the next time the game opens or is refreshed.
 
+**Before merging a big feature to `main` on any day but Thursday, Claude asks James first ("really merge this now?").** Bug fixes and small tweaks merge any day without asking.
+
 | Kind of change | Ships | Version | Example |
 |---|---|---|---|
 | Bug fix, small tweak, balance, copy | straight away | patch: v55.52.0 → v55.52.1 | `node tools/bump.js patch "Fixed X"` |
