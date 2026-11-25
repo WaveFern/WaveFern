@@ -1,12 +1,14 @@
 # Releases: quiet patches all week, one drop on release day
 
-**Release day: Friday.** Everything else ships the moment it is merged.
+**Release day: Thursday.** Everything else ships the moment it is merged. The in-game "New version" notice only appears for a drop (a new major); patches reload in silently the next time the game opens or is refreshed.
+
+**Before merging a big feature to `main` on any day but Thursday, Claude asks James first ("really merge this now?").** Bug fixes and small tweaks merge any day without asking.
 
 | Kind of change | Ships | Version | Example |
 |---|---|---|---|
 | Bug fix, small tweak, balance, copy | straight away | patch: v55.52.0 → v55.52.1 | `node tools/bump.js patch "Fixed X"` |
 | Exciting feature | held, goes live on release day | still a quiet patch when it merges; the drop is the big number | see below |
-| The weekly drop | Friday | next major: v55.x.y → **v56.0.0**, then v57.0.0 ... | `node tools/bump.js drop "Headline"` |
+| The weekly drop | Thursday | next major: v55.x.y → **v56.0.0**, then v57.0.0 ... | `node tools/bump.js drop "Headline"` |
 
 No reset, no renaming: the next number is simply the current one plus one. Old versions, saves and the `?v=` cache tags stay as they are.
 
