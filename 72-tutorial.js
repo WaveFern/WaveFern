@@ -94,7 +94,7 @@ const TIPS=[
   go:{w:TUT_LAP,hl:()=>mode=='pc'&&app!='msg'?TUT_PC('msg'):null,done:()=>S.tut.f.msg,t:180}},
  {k:'gear',when:()=>S.songs.length>0&&gearSum()==0&&S.money>=120,l:['Better gear makes better mixes and more streams.','The Gearshop on the laptop has headphones for $120. Treat yourself.'],pc:['Gearshop is outlined. Headphones are the cheapest upgrade.'],
   go:{w:TUT_LAP,hl:()=>mode=='pc'?(app!='gear'?TUT_PC('gear'):`button[onclick="buy('phones')"]`):null,done:b=>gearSum()>b.g,t:180}},
- {k:'songnag',rep:2,when:()=>mode=='play'&&S.t<300&&S.energy>=15&&(S.songs||[]).length>=2&&!(S.drafts||[]).length&&S.day-Math.max(...S.songs.map(x=>+x.day||0))>=2,
+ {k:'songnag',rep:2,when:()=>mode=='play'&&S.t<300&&S.energy>=15&&(S.songs||[]).length>=2&&!(S.drafts||[]).length&&fwSongGap()>=2,
   l:['Hey, when did you last make a song? Songs are your income, and there is a lot to do, so it is easy to forget.','Mic stand in your studio (E), then release it on the laptop. One a day keeps the streams coming.'],go:{w:/record|mic/i,done:b=>S.drafts.length>b.d||S.songs.length>b.s,t:240}},
  {k:'wear',when:()=>S.tut.f.buy&&!S.tut.f.wear,l:['New drip? Do not leave it in the bag. The wardrobe is in your bedroom.'],go:{w:/wardrobe/i,done:()=>S.tut.f.wear,t:180}},
  {k:'street',when:()=>mode=='play'&&!IN&&!HIN&&P.z>13,l:['The street! Shops, Motors and the Pet Shop are all around here.','Press N for the map. The city is way east: walk, drive, or grab a taxi from the map.']},
@@ -116,6 +116,8 @@ const TIPS=[
  {k:'upstairs',when:()=>mode=='play'&&!!IN&&typeof ANX!='undefined'&&IN.i==ANX.idx,l:['Your new floor! Press F up here to place furniture, and paint the rooms with tins from Amazoom.']}
 ];
 function tutOn(){const T=S.tut;return!!(T&&T.on&&T.v==2)}
+/* days since your last release, -1 with no songs (Big Vee's song reminder and the Instagrime "where is the music" posts both use it) */
+window.fwSongGap=()=>(S.songs||[]).length?S.day-Math.max(...S.songs.map(x=>+x.day||0)):-1;
 function tutBase(){return{x:P.x,z:P.z,d:S.drafts.length,s:S.songs.length,g:gearSum(),day:S.day}}
 let TUTQ=0;
 function tutShow(t){const T=S.tut;T.seen[t.k]=t.rep?S.day:1;TUTLAST=Date.now();if(t.k=='free')TUTQ=Date.now()+90000;(t.dm||[]).forEach(tutDM);

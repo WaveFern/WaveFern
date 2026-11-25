@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.33';
+const GAME_VERSION='v55.52.34';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.34',n:'Instagrime reacts to your career: fans complain when you go quiet, album drop and split-opinion photoshoot posts, more diss track chatter, endless scroll, double tap to like (dev only)'},
  {v:'v55.52.33',n:'Pets: crisp name tags over pets, new P menu design (held)'},
  {v:'v55.52.32',n:'Real footstep and PC click recordings (CC0), snow footprints fade smoothly, car tyre tracks follow the wheels'},
  {v:'v55.52.31',n:'Storage placing: a moved piece no longer pulls another copy out of Storage, a held piece is no longer lost if the game saves, pieces on rugs can be picked, Esc drops what you hold before leaving Storage'},

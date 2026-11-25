@@ -65,11 +65,17 @@ function chartRows(){const L=+S.listeners||0,rv=(S.rvl&&S.rvl.rv)||[],rows=rv.ma
  const alb=(S.albums||[]).slice(-1)[0];rows.push({n:me(),v:Math.max(L,1),you:1,al:alb?alb.name:null});
  const names=artists();let i=0;while(rows.length<6&&i<20){const n=names[(hsh(String(S.day))+i*7)%names.length];i++;if(!rows.some(x=>x.n==n))rows.push({n,v:Math.max(2e3,L*(.1+((hsh(n)%90)/100))),al:null})}
  rows.sort((a,b)=>b.v-a.v);rows.forEach((x,k)=>{if(!x.al){const r=rng('al|'+x.n+'|'+Math.floor(S.day/8));x.al=album(r)}});return rows.slice(0,6)}
+/* about 2 in 5 of your brand shoots stir up an argument; picked from the post id so nothing is saved */
+const ctrlShoot=p=>!!(p&&p.brand&&hsh(String(p.id)+'ctrl')%100<40);
 function playerStories(d){const o=[],a=me(),songs=S.songs||[],alb=S.albums||[],L=+S.listeners||0;
  /* diss tracks and replies (uses the same data as the Instagrime drama) */
  songs.forEach(s=>{if(s.diss&&s.day==d)o.push({cat:'music',you:1,k:'stage',cfg:'ch',h:a+' drops diss track "'+s.title+'" aimed at '+s.diss,dek:'The industry is watching to see how '+s.diss+' answers.',
   p:['"'+s.title+'" landed this week and is already being passed around group chats.','The track takes direct aim at '+s.diss+', and people are calling the second verse "disrespectful, in the best way".','So far '+s.diss+' has stayed quiet. A reply is widely expected. '+a+' said only: "I said what I said."','Streams in the first day: '+fmt(s.streams||0)+'.'],
   why:'Diss tracks are the fastest way to get noticed and the fastest way to start a feud. Whoever answers best usually wins the week.',next:s.diss+' has not replied yet. Replies usually land within a few days, often with a harder verse.',quote:['I said what I said.',a],facts:[['Target',s.diss],['Track',s.title],['First-day streams',fmt(s.streams||0)]]})});
+ /* a brand photoshoot that split opinion (the same pick Instagrime uses for its mixed-reaction posts) */
+ (S.igPosts||[]).forEach(x=>{if(x.brand&&x.day==d&&ctrlShoot(x)){const bn=((typeof BRD!='undefined'&&BRD.by&&BRD.by(x.brand))||{}).n||'a big brand';o.push({cat:'music',you:1,k:'fit',cfg:'ch',h:a+'\'s new '+bn+' campaign has everyone arguing',dek:'Half the internet calls it bold. The other half wants it taken down.',
+  p:['The shoot for '+bn+' went up on Instagrime this week and the replies have not stopped.','Supporters call it "the first honest campaign in years". Critics say it "tries way too hard".','Neither side is quiet, and '+bn+' has not commented.'],
+  why:'Controversy sells. A shoot people argue about travels further than one everybody likes, but brands remember how it felt.',next:'Expect think pieces, a few brand-safety jokes and a lot of reposts.',quote:['I do not mind being talked about.',a],facts:[['Brand',bn],['Reaction','Split'],['Day',String(d)]]})}});
  (S.news||[]).forEach(n=>{if(n.day==d)o.push({cat:'music',you:1,k:'studio',cfg:n.u,h:String(n.cap).replace(/\.$/,''),dek:n.u+' has answered '+a+' and the internet has opinions.',
   p:[n.cap,'Within an hour the reply had more plays than the original.','Fans have split into camps: Team '+a+' and Team '+n.u+'. Both camps are loud.','Neither artist has ruled out a third round.'],
   why:'A reply turns a one-off diss into a full feud, and feuds are what the whole feed talks about. Both artists usually gain listeners.',next:'A third round is likely. '+a+' has the next move.',quote:['Team '+a+' or Team '+n.u+'? Nobody is neutral.','Music Twitter'],facts:[['Replying artist',n.u],['Answering',a],['Day',String(n.day)]]})});
@@ -119,7 +125,7 @@ function enrich(s,r){const c=s.cat;if(!s.why)s.why=pk(WHY[c]||WHY.music,r);if(!s
  if(!s.quote){const q=pk(QUOTE[c]||QUOTE.music,r);s.quote=[q,pk(['a local resident','an industry insider','one spokesperson','a longtime fan','an analyst'],r)]}
  s.sum=(s.p[0]+' '+s.p[1]).length<=230?s.p[0]+' '+s.p[1]:s.p[0]}
 const cache={};
-function storiesOf(d){const key=d+'|'+(S.artist||'')+'|'+(d==S.day?[(S.songs||[]).length,(S.albums||[]).length,(S.news||[]).length,Math.floor(Math.log10(1+(+S.listeners||0)))].join(','):'');
+function storiesOf(d){const key=d+'|'+(S.artist||'')+'|'+(d==S.day?[(S.songs||[]).length,(S.albums||[]).length,(S.news||[]).length,(S.igPosts||[]).length,Math.floor(Math.log10(1+(+S.listeners||0)))].join(','):'');
  if(cache[key])return cache[key];const r=rng('news|'+d+'|'+(S.artist||'')),out=[];
  const add=(cat,t,i)=>{const x=t(r);out.push(Object.assign({cat,k:pk(KIND[cat],r),cfg:x.h},x))};
  const pick=(a,i,n)=>a[(d*3+i+hsh(S.artist||'x'))%a.length];
@@ -248,5 +254,5 @@ if(!window.FWINF){let io=null;const IO=()=>io||(io=new IntersectionObserver(es=>
   setTimeout(()=>{try{if(!el.isConnected)return;const f=window[el.dataset.inf],h=typeof f=='function'?f():null;if(h===null){el.remove();return}
    if(h)el.insertAdjacentHTML('beforebegin',h);el.removeAttribute('data-infb');FWINF.scan()}catch(x){console.error('infinite scroll',x);el.remove()}},60)}),{rootMargin:'300px'}));
  window.FWINF={scan(){if(typeof IntersectionObserver=='undefined')return;document.querySelectorAll('[data-inf]:not([data-infb])').forEach(el=>{el.setAttribute('data-infb','1');IO().observe(el)})}}}
-window.FWNEWS={sceneFor,storiesOf,chartRows,find,state:N,page};
+window.FWNEWS={ctrlShoot,sceneFor,storiesOf,chartRows,find,state:N,page};
 })();
