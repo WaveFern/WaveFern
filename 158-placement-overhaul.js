@@ -85,7 +85,7 @@ function settleTick(done){const now=performance.now();for(let i=SET.length-1;i>=
   if(u>=1){a.m.position.y=0;a.m.scale.set(1,1,1);SET.splice(i,1)}}}
 function place(){if(!hold)return;if(gp.ok&&!valid(hold,gp.x,gp.z,gp.r,-1))gp.ok=0;/* v55.20.1: re-check right at the click: never outside the room */if(!gp.ok){snd('err');return say(F[hold].wall?'Hang it on a wall: move it right up against one, back to the wall.':'It does not fit there. Move it or turn it.')}
  const t=hold,m=mkF(t);m.position.set(gp.x,DEV()&&ghost?ghost.position.y:0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t,x:gp.x,z:gp.z,r:gp.r,m});if(DEV())settle(m);snd('thunk');
- moving=null;if(S.inv[t]>0){S.inv[t]--;man=false}else{hold=null;clrGhost();sel=PL.length-1}buildUI()}
+ const wasMoving=!!moving;moving=null;/* v55.52.31: a piece you moved ends there; it never pulls another copy out of Storage */if(!wasMoving&&S.inv[t]>0){S.inv[t]--;man=false}else{hold=null;clrGhost();sel=PL.length-1}buildUI()}
 function pickUp(i){const q=PL[i];if(!q||hold)return;if(q.t=='desk'){snd('err');return say('Your desk is part of the house. Upgrade it in the Gear shop.')}
  scene.remove(q.m);PL.splice(i,1);moving={t:q.t,x:q.x,z:q.z,r:q.r};hold=q.t;gp.r=q.r;gp.ok=0;man=true;sel=-1;mkGhost();if(DEV()){ghost.position.set(q.x,0,q.z);ghost.rotation.y=q.r*Math.PI/2;gFresh=false;gT=performance.now()}snd('pop');buildUI()}
 function restore(){if(!moving)return;const q=moving,m=mkF(q.t);moving=null;m.position.set(q.x,0,q.z);m.rotation.y=q.r*Math.PI/2;scene.add(m);PL.push({t:q.t,x:q.x,z:q.z,r:q.r,m});hold=null;clrGhost();sel=PL.length-1}
@@ -118,6 +118,7 @@ addEventListener('pointerup',e=>{if(mode!='build'||!drag||e.pointerId!=drag.id)r
  if(d.place){if(!onUI(e))place()}else if(d.drop&&gp.ok)place()},true);
 addEventListener('pointercancel',()=>{drag=null},true);
 addEventListener('keydown',e=>{if(mode!='build'||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key.toLowerCase();
+ if(k=='escape'&&(hold||sel>=0)){e.stopImmediatePropagation();cancel();return}/* v55.52.31: Esc first drops what you hold (or moves it back), the next Esc leaves Storage */
  if(k=='r'&&!e.repeat){man=true;if(!hold&&sel>=0){e.stopImmediatePropagation();rot(1);buildUI()}}
  else if((k=='enter')&&hold&&e.target.tagName!='BUTTON'){e.preventDefault();place()}},true);
 
@@ -211,5 +212,5 @@ window.PBdo=a=>{if(mode!='build')return;if(a=='place')place();else if(a=='rl'){r
 window.PBset=(k,v)=>{PS()[k]=v;snd('click');buildUI()};
 window.PBgear=()=>{setOpen=!setOpen;snd('click');buildUI()};
 /* v55.12.4: an item you are moving is out of the room and out of Storage. Saving then (switching apps on a phone fires an autosave) used to lose it for good, bed included. The save now counts it as stored. */
-{const s0=saveCode;saveCode=function(){const t=mode=='build'&&moving&&hold?hold:null;if(t)S.inv[t]=(S.inv[t]||0)+1;try{return s0.apply(this,arguments)}finally{if(t){S.inv[t]--;if(S.inv[t]<=0)delete S.inv[t]}}}}
+{const s0=saveCode;saveCode=function(){const t=mode=='build'&&hold?hold:null;/* v55.52.31: any held piece counts as stored, not only a moved one */if(t)S.inv[t]=(S.inv[t]||0)+1;try{return s0.apply(this,arguments)}finally{if(t){S.inv[t]--;if(S.inv[t]<=0)delete S.inv[t]}}}}
 })();
