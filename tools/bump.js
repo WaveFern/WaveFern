@@ -41,7 +41,9 @@ function check(){
   for(const m of ix.matchAll(/(?:src|href)="([^"?]+)\?v=([^"]+)"/g))if(ch.has(m[1])&&old[m[1]]===m[2]){console.log('FAIL '+m[1]+' changed but its ?v='+m[2]+' was not bumped (browsers would keep the cached copy)');bad++}}
  const mv=tryS('git show origin/main:version.js');if(mv){const a=verOf(mv),b=verOf(vj);
   if(a.join()!==b.join()&&(b[0]<a[0]||(b[0]==a[0]&&(b[1]<a[1]||(b[1]==a[1]&&b[2]<=a[2])))))console.log('WARN branch version v'+cur+' is not newer than main v'+fmt(a)+': run renumber / bump again')}
- console.log(bad?bad+' problem(s)':'version check OK (v'+cur+')');process.exit(bad?1:0)}
+ console.log(bad?bad+' problem(s)':'version check OK (v'+cur+')');
+ if(!bad&&new Date().getUTCDay()!==4)console.log('NOTE: today is not Thursday (release day). A big feature (not a bug fix) must not merge to main now without asking James "really merge this now?" first.');
+ process.exit(bad?1:0)}
 function trial(branch){
  branch=branch||'HEAD';const r=tryS('git merge-tree --write-tree --name-only origin/main '+branch);
  if(r!==null){console.log('Clean: origin/main merges into '+branch+' with no conflicts.');return}
