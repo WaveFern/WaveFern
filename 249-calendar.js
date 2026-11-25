@@ -2,7 +2,7 @@
    Everything dated in the career shows up here on its own: Swiftwing flights, brand deal offers and photoshoot deadlines,
    festival bookings and Sunset Beach Club gigs. The player can also add their own events.
    Past items are copied into S.cal.log as they appear (the source lists get trimmed over time), so the history stays.
-   State (lazy, old saves start empty): S.cal={ev:[{id,d,t,tm}],log:{key:{k,d,tm,t,s}},nid}
+   State (lazy, old saves start empty): S.cal={ev:[{id,d,t,tm}],log:{key:{k,d,tm,t,s}},nid,rem:{key:1}}
    Look: a wall calendar in the game's dark green, 28-day months (4 weeks), hard-edged pixel tags per kind. */
 (function(){
 const TY={fl:['Flight','#3fa0ff'],br:['Brand','#ff3d81'],fe:['Festival','#2fe68a'],bc:['Beach club','#ffb000'],me:['Mine','#f4efe2']},
@@ -19,7 +19,7 @@ function derived(){const o=[],T=window.TRAVEL;
   if(b.st==3)o.push({key:'bd'+b.id,k:'br',d:b.due||S.day,t:n+' photoshoot done',s:'done'});
   if(b.st==5)o.push({key:'bd'+b.id,k:'br',d:b.due||S.day,t:n+' deal lost',s:'missed'})})}catch(e){}
  try{(S.festBk||[]).forEach(b=>{o.push({key:'fe'+b.id,k:'fe',d:b.day,tm:hm([600,840,1080,1320][b.slot]||600),t:'Festival set, stage '+b.n,s:b.st?'done':''})})}catch(e){}
- try{((S.bcg&&S.bcg.list)||[]).forEach(b=>{if(b.st==1||b.st==3||b.st==5)o.push({key:'bc'+b.id,k:'bc',d:b.day,t:'Sunset Beach Club gig',s:b.st==3?'done':b.st==5?'missed':''})})}catch(e){}
+ try{((S.bcg&&S.bcg.list)||[]).forEach(b=>{if(b.st==1||b.st==3||b.st==5)o.push({key:'bc'+b.id,k:'bc',d:b.day,tm:'18:00',t:'Sunset Beach Club gig',s:b.st==3?'done':b.st==5?'missed':''})})}catch(e){}
  return o}
 function all(){const c=st(),d=derived();d.forEach(e=>{if(e.d<S.day||e.s){c.log[e.key]=e}});
  const ks=Object.keys(c.log);if(ks.length>150){ks.sort((a,b)=>c.log[a].d-c.log[b].d).slice(0,ks.length-150).forEach(k=>delete c.log[k])}
@@ -83,5 +83,16 @@ PA.cal=()=>page('pc');
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('calmn',app=='cal'&&!!m.querySelector('.cal'))}catch(e){}return r}}
 try{if(typeof GP_APPS!='undefined'&&!GP_APPS.some(a=>a[0]=='cal')){GP_APPS.push(['cal','Calendar',()=>IC.cal,'#ff3d81']);if(typeof GP_TITLE!='undefined')GP_TITLE.cal='Calendar'}
  if(typeof phBody=='function'){const b0=phBody;phBody=function(){if(typeof PH!='undefined'&&PH.app=='cal')return`<div class=phx>${page('ph')}</div>`;return b0.apply(this,arguments)}}}catch(e){console.error('calendar phone',e)}
-window.CAL={all,derived,st};
+/* v55.52.x: every calendar event pops up like the festival set reminder (71 festBkCheck: say() toast an hour before).
+   Timed events: once, within 60 game minutes of the start. Untimed ones (brand deadlines, your own events without a time): once on the day.
+   Festival sets keep their own reminder in 71, so 'fe' is skipped here. Done keys live in S.cal.rem. */
+function calRemind(){if(!S||!S.artist||typeof mode!='undefined'&&(mode=='load'||mode=='creator')||!window.TRAVEL)return;
+ const c=st(),r=c.rem&&typeof c.rem=='object'?c.rem:(c.rem={}),now=TRAVEL.now(),today=S.day;
+ all().forEach(e=>{if(e.k=='fe'||e.s||r[e.key+':'+e.d]||e.d<today)return;
+  if(e.tm){const p=e.tm.split(':'),mn=(+p[0]||0)*60+(+p[1]||0),a=e.d*1440+mn+(mn<360?1440:0),dt=a-now;
+   if(dt>0&&dt<=60){r[e.key+':'+e.d]=1;say(TY[e.k][0]+' at '+e.tm+': '+e.t+' (in '+Math.max(1,Math.round(dt))+' min)')}}
+  else if(e.d==today&&e.k!='fl'){r[e.key+':'+e.d]=1;say('Today: '+e.t)}});
+ Object.keys(r).forEach(k=>{if(+k.split(':')[1]<today-2)delete r[k]})}
+setInterval(()=>{try{calRemind()}catch(e){}},1000);
+window.CAL={all,derived,st,remind:calRemind};
 })();

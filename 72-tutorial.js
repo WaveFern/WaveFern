@@ -94,6 +94,8 @@ const TIPS=[
   go:{w:TUT_LAP,hl:()=>mode=='pc'&&app!='msg'?TUT_PC('msg'):null,done:()=>S.tut.f.msg,t:180}},
  {k:'gear',when:()=>S.songs.length>0&&gearSum()==0&&S.money>=120,l:['Better gear makes better mixes and more streams.','The Gearshop on the laptop has headphones for $120. Treat yourself.'],pc:['Gearshop is outlined. Headphones are the cheapest upgrade.'],
   go:{w:TUT_LAP,hl:()=>mode=='pc'?(app!='gear'?TUT_PC('gear'):`button[onclick="buy('phones')"]`):null,done:b=>gearSum()>b.g,t:180}},
+ {k:'songnag',rep:2,when:()=>mode=='play'&&S.t<300&&S.energy>=15&&(S.songs||[]).length>=2&&!(S.drafts||[]).length&&S.day-Math.max(...S.songs.map(x=>+x.day||0))>=2,
+  l:['Hey, when did you last make a song? Songs are your income, and there is a lot to do, so it is easy to forget.','Mic stand in your studio (E), then release it on the laptop. One a day keeps the streams coming.'],go:{w:/record|mic/i,done:b=>S.drafts.length>b.d||S.songs.length>b.s,t:240}},
  {k:'wear',when:()=>S.tut.f.buy&&!S.tut.f.wear,l:['New drip? Do not leave it in the bag. The wardrobe is in your bedroom.'],go:{w:/wardrobe/i,done:()=>S.tut.f.wear,t:180}},
  {k:'street',when:()=>mode=='play'&&!IN&&!HIN&&P.z>13,l:['The street! Shops, Motors and the Pet Shop are all around here.','Press N for the map. The city is way east: walk, drive, or grab a taxi from the map.']},
  {k:'shop',when:()=>mode=='play'&&!!IN&&!inAp()&&!(typeof ANX!='undefined'&&IN.i==ANX.idx),l:['Inside a building, walk up to things and press E. The door gets you back out.']},
@@ -116,7 +118,7 @@ const TIPS=[
 function tutOn(){const T=S.tut;return!!(T&&T.on&&T.v==2)}
 function tutBase(){return{x:P.x,z:P.z,d:S.drafts.length,s:S.songs.length,g:gearSum(),day:S.day}}
 let TUTQ=0;
-function tutShow(t){const T=S.tut;T.seen[t.k]=1;TUTLAST=Date.now();if(t.k=='free')TUTQ=Date.now()+90000;(t.dm||[]).forEach(tutDM);
+function tutShow(t){const T=S.tut;T.seen[t.k]=t.rep?S.day:1;TUTLAST=Date.now();if(t.k=='free')TUTQ=Date.now()+90000;(t.dm||[]).forEach(tutDM);
  if(t.go){T.goal=t.k;T.gb=tutBase();T.gt=Date.now()}
  const o=tutTgt();if(o){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d>5&&d<90)TUTPAN={x:o.x,z:o.z,t:performance.now()}}
  tutSay(t.l)}
@@ -144,7 +146,7 @@ function tutPoll(){if(!tutOn()){tutClr();return}const T=S.tut;T.seen=T.seen||{};
  if(nb){if(T.goal&&tutTip(T.goal).b)return;if(nb.skip&&nb.skip()){T.seen[nb.k]=1;return}if(pcm&&!(nb.go&&nb.go.hl))return;return tutShow(nb)}
  /* after the basics he only drops in now and then: at least 45 s between tips, and 90 s of quiet after he says so */
  if(since<45000||Date.now()<TUTQ)return;
- const c=TIPS.find(t=>!t.b&&!T.seen[t.k]&&(!t.go||!T.goal)&&(!pcm||t.go&&t.go.hl)&&t.when());if(c)tutShow(c)}
+ const c=TIPS.find(t=>!t.b&&(!T.seen[t.k]||t.rep&&S.day-T.seen[t.k]>=t.rep)&&(!t.go||!T.goal)&&(!pcm||t.go&&t.go.hl)&&t.when());if(c)tutShow(c)}
 setInterval(()=>{try{tutPoll()}catch(e){}},250);
 /* where the goal is: an interaction (by label) or a spot. Inside a building, a spot outside it points to the way out. */
 function tutTgt(){if(!tutOn())return null;const T=S.tut,g=T.goal&&tutTip(T.goal);if(!g||!g.go||(mode!='play'&&mode!='drive'))return null;
