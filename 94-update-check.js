@@ -1,6 +1,6 @@
 /* ---------- update notice ----------
    Every 30 seconds while visible (and on tab return, focus, reconnect, with retry after a failed fetch) checks version.js on the server.
-   If GAME_VERSION there differs from the running one, a small notice offers to update.
+   Only a new MAJOR (the weekly Thursday drop) shows the notice; bug-fix patches update silently on the next reload (docs/releases.md).
    Update saves the game (and to the cloud when signed in), refreshes the cached game files, then reloads. */
 const UPD={seen:null,busy:0};
 /* v55.49.1: checks while the tab is visible (every 30 s), the moment it comes back (visibility, focus, pageshow, online), and retries a failed fetch
@@ -9,7 +9,9 @@ UPD.last=0;UPD.fail=0;UPD.rt=0;
 function updCheck(force){if(UPD.busy||location.protocol=='file:'||document.hidden)return;
  const n=Date.now();if(!force&&n-UPD.last<4000)return;UPD.last=n;clearTimeout(UPD.rt);
  fetch('version.js?t='+n,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()).then(t=>{UPD.fail=0;const m=t.match(/GAME_VERSION\s*=\s*'([^']+)'/);
-  if(m&&m[1]!=GAME_VERSION&&m[1]!=UPD.seen)updShow(m[1])}).catch(()=>{if(UPD.fail<4)UPD.rt=setTimeout(()=>updCheck(1),5000*Math.pow(2,UPD.fail++))})}
+  if(m&&updMajor(m[1])>updMajor(GAME_VERSION)&&m[1]!=UPD.seen)updShow(m[1])}).catch(()=>{if(UPD.fail<4)UPD.rt=setTimeout(()=>updCheck(1),5000*Math.pow(2,UPD.fail++))})}
+/* major number of 'v56.1.2' -> 56; patches and minors never trigger the notice */
+function updMajor(v){return parseInt(String(v).replace(/^v/,''),10)||0}
 function updShow(v){UPD.seen=v;let d=document.getElementById('upd');if(!d){d=document.createElement('div');d.id='upd';document.body.appendChild(d)}
  d.style.cssText='position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;max-width:calc(100% - 24px);padding:8px 10px 8px 14px;background:var(--p);color:var(--t);border:2px solid var(--g);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.5);font-size:13px';
  let tried=0;try{tried=sessionStorage.getItem('fw_upd')==v}catch(e){}
