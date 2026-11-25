@@ -31,6 +31,7 @@ A change that is not ready simply keeps its gate for next week.
 |---|---|---|---|
 | News app (Fern Times) on laptop and phone | `257-news-app.js` | `HELD=true` + `FW_DEV` | yes |
 | More post and News backgrounds (24 variants + 8 news scenes) | `259-photo-scenes.js`, `260-news-scenes.js` | `HELD=true` + `FW_DEV` | yes |
+| Pets overhaul: own all, equip 3, names, P menu, roaming and sleeping at home, bodyguards wait outside home | `261-pets-v2.js` (needs the powerups of `dev/dev-pets.js` to go live with it) | `HELD=true` + `FW_DEV` | testing |
 | Instagrime feed upgrade: infinite scroll, better posts about you | `258-instagrime-more.js` | `HELD=true` + `FW_DEV` | yes |
 
 ## Avoiding merge pain
