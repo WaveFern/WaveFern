@@ -24,3 +24,4 @@ Newest first. One line per shipped change; details live in `version.js` (`VERSIO
 - v55.20.1 (2026-11-18): bug fix pack for section 1 of James's list (idle offline, house-front fade, storage placing, real overnight streams, vinyl money in Earned, double click sound, sleep zoom, version tag, face-on-cover button, backup delete, wake-money console error). Not reproduced: Instagrime brand post crash (phone guard added), house framing gap.
 - v55.19.1 (2026-11-18): money accessor guard (root cause of "$0 after sleep"), cents under $100 in `$$`, Mastery surf/fish texts, PC view 30 fps and Mastery panel 10 fps caps.
 - v55.52.0: Big Vee portrait and name on the Next Goal box and key hint chips (his 5 numbered tutorial steps in 72-tutorial.js were never removed).
+- v55.52.26: profanity filter (`dev/dev-profanity-v1.js`) limited to public text; private typing and NPC replies untouched.
