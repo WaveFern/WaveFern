@@ -140,7 +140,7 @@ if(typeof pauseUI=='function'){const pu0=pauseUI;
 
 /* v55.52.2 pedestrian knockdown: a car hitting a walker at speed knocks them over (fly back, lie, get up). It is funny a
    couple of times and then dull on purpose: each hit in the last 40 s shrinks the next one (power), a knocked walker cannot be
-   hit again for 15 s, and below power .3 the walker only stumbles aside. No damage, no penalty. Visual only: after the normal
+   hit again for 15 s, and weaker hits fly less far and lie for a shorter time (always flat on the ground). No damage, no penalty. Visual only: after the normal
    tick the person is pinned to the knock position and posed. Reuses NPC/VPED (+ npcAdd people) and the pushPeople shove. */
 {const KD=2.6;let recent=[];
  /* v55.52.9: knocked SIDEWAYS, out of the car's path (right of the car's heading is (hz,-hx)), so the car can never drive over them */
@@ -150,9 +150,9 @@ if(typeof pauseUI=='function'){const pu0=pauseUI;
  function knockPose(n,dt){const k=n.kd;k.t+=dt;const T=k.t,pw=k.pw;
   const fly=Math.min(1,T/.45),ease=1-(1-fly)*(1-fly);
   n.x=k.x+k.dx*ease;n.z=k.z+k.dz*ease;
-  const lay=(pw<.3?.45:1)*(T<.3?T/.3:T<1.7?1:Math.max(0,1-(T-1.7)/(KD-1.7)));/* down, hold, get up */
+  const H=1+.7*pw,lay=T<.3?T/.3:T<H?1:Math.max(0,1-(T-H)/(KD-H));/* always flat on the ground; weaker hits just lie there shorter */
   const m=n.m;m.rotation.order='YXZ';m.rotation.y=k.ry;m.rotation.x=-Math.PI/2*lay;m.position.set(n.x,.12*lay,n.z);
-  const f=Math.sin(T*18)*.5*(T<1.7?1:.2);n.legs&&n.legs.forEach((l,i)=>{l.rotation.x=f*(i?-1:1)});n.arms&&n.arms.forEach((a,i)=>{a.rotation.x=-2.4*lay;a.rotation.z=(i?1:-1)*(.9+f)*lay})}
+  const f=Math.sin(T*18)*.5*(T<H?1:.2);n.legs&&n.legs.forEach((l,i)=>{l.rotation.x=f*(i?-1:1)});n.arms&&n.arms.forEach((a,i)=>{a.rotation.x=-2.4*lay;a.rotation.z=(i?1:-1)*(.9+f)*lay})}
  function knockEnd(n){const m=n.m;m.rotation.order=n.kd.ord;m.rotation.x=0;m.position.y=0;n.arms&&n.arms.forEach(a=>{a.rotation.z=0});n.kcd=n.kd.cd;n.kd=null}
  const w0=worldTick;worldTick=function(dt){w0.apply(this,arguments);try{
   const now=performance.now()/1000;recent=recent.filter(t=>now-t<40);
