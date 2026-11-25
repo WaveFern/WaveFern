@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.28';
+const GAME_VERSION='v55.52.29';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.29',n:'Big Vee now reminds you to record a song when you have not made one for 2 or more days (reuses his tip system, respects Tips off)'},
  {v:'v55.52.28',n:'Every Calendar event now pops up a reminder like the festival set one: an hour before when it has a time, on the day when it does not.'},
  {v:'v55.52.27',n:'Pets overhaul (held): own every pet, equip 3, names, P menu, new pet shop page, pets roam and sleep at home, bodyguards wait outside home'},
  {v:'v55.52.26',n:'Profanity filter now only covers public text (names, bios, song titles, room chat, friends, leaderboard); private typing and NPC replies are untouched'},
