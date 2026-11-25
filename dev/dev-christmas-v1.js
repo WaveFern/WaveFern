@@ -217,51 +217,57 @@
     void main(){if(wp.y<0.)discard;if(inH(wp.xz)&&(hin>.5||wp.y<3.7))discard;if(hin>.5&&inH(wp.xz-vec2(wp.y*${(16/13).toFixed(4)})))discard;gl_FragColor=vec4(.96,.98,1.,op);}`});
   const L=new THREE.Points(g,m);L.frustumCulled=false;L.renderOrder=6;L.visible=false;scene.add(L);return L}
 
- /* ---------- footprints and tyre tracks in the snow: each print slowly fades back into the snow over 5 s ---------- */
- const FADE=5,FPC=new THREE.Color(),FP_DARK=new THREE.Color('#7f8da0'),TR_DARK=new THREE.Color('#6a7789'),FPD=new THREE.Object3D();
- function mkPrints(N,w,l,dark){return{N,w,l,dark,mesh:null,i:0,age:null}}
- const FP=mkPrints(700,.13,.26,FP_DARK),TR=mkPrints(1400,.2,.9,TR_DARK);
+ /* ---------- footprints and tyre tracks in the snow: each print fades out smoothly over 5 s ----------
+    The fade runs on the GPU: every print stores the time it was laid (attribute fb) and the shader turns that into transparency against the
+    shared clock FPU.t, so the print dissolves into whatever ground is under it (no colour guess, no 10 Hz stepping) and nothing is rewritten per frame. */
+ const FADE=5,FPD=new THREE.Object3D(),FPU={t:{value:0}},OLD=-1e4;
+ function mkPrints(N,w,l,dark,peak){return{N,w,l,dark,peak,mesh:null,i:0,fb:null}}
+ const FP=mkPrints(700,.13,.26,'#7f8da0',.7),TR=mkPrints(1400,1,1,'#6a7789',.6);
  let fpMesh=null;/* kept for the visibility switch below */
  function prInit(K){
-  const g=new THREE.BoxGeometry(K.w,.01,K.l),m=new THREE.MeshLambertMaterial({color:0xffffff,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
-  K.mesh=new THREE.InstancedMesh(g,m,K.N);K.age=new Float32Array(K.N).fill(-1);K.mesh.frustumCulled=false;K.mesh.userData.xm=1;
-  FPD.position.set(0,-50,0);FPD.rotation.set(0,0,0);FPD.updateMatrix();
-  for(let i=0;i<K.N;i++){K.mesh.setMatrixAt(i,FPD.matrix);K.mesh.setColorAt(i,SNOW)}
+  const g=new THREE.BoxGeometry(1,.01,1),fb=new THREE.InstancedBufferAttribute(new Float32Array(K.N).fill(OLD),1);g.setAttribute('fb',fb);K.fb=fb;
+  const m=new THREE.MeshLambertMaterial({color:K.dark,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+  m.onBeforeCompile=sh=>{sh.uniforms.fpT=FPU.t;
+   sh.vertexShader=sh.vertexShader.replace('void main(){','attribute float fb;uniform float fpT;varying float vfa;void main(){float ag=(fpT-fb)/${FADE.toFixed(1)};ag=clamp(ag,0.,1.);vfa=${K.peak.toFixed(2)}*(1.-ag*ag*(3.-2.*ag));');
+   sh.fragmentShader=sh.fragmentShader.replace('void main(){','varying float vfa;void main(){').replace('#include <dithering_fragment>','#include <dithering_fragment>\n gl_FragColor.a*=vfa;if(gl_FragColor.a<.004)discard;')};
+  K.mesh=new THREE.InstancedMesh(g,m,K.N);K.mesh.frustumCulled=false;K.mesh.userData.xm=1;K.mesh.renderOrder=2;
+  FPD.position.set(0,-50,0);FPD.rotation.set(0,0,0);FPD.scale.set(1,1,1);FPD.updateMatrix();
+  for(let i=0;i<K.N;i++)K.mesh.setMatrixAt(i,FPD.matrix);
   scene.add(K.mesh);if(K===FP)fpMesh=K.mesh}
- function prStamp(K,x,z,rot,y){
+ /* one print: centre x,z, heading rot, width w and length l (a tyre track is one long strip from the last point to this one) */
+ function prStamp(K,x,z,rot,y,w,l){
   if(!K.mesh)prInit(K);
-  /* every print sits a hair higher than the one laid before it (cycling through 24 levels), so overlapping prints of different ages never fight over the same pixels = no flicker */
-  FPD.position.set(x,(y||.05)+(K.i%24)*.0009,z);FPD.rotation.set(0,rot,0);FPD.updateMatrix();K.mesh.setMatrixAt(K.i,FPD.matrix);K.age[K.i]=0;K.mesh.setColorAt(K.i,K.dark);
-  K.i=(K.i+1)%K.N;K.mesh.instanceMatrix.needsUpdate=true;K.mesh.instanceColor.needsUpdate=true}
- function prFade(K,dt){if(!K.mesh)return;let c=0,mv=0;
-  for(let i=0;i<K.N;i++){if(K.age[i]<0)continue;K.age[i]+=dt;let a=Math.min(1,K.age[i]/FADE);a=a*a*(3-2*a);/* slow at the start and the end */
-   FPC.copy(K.dark).lerp(SNOW,a);K.mesh.setColorAt(i,FPC);c=1;
-   if(K.age[i]>=FADE){K.age[i]=-1;FPD.position.set(0,-50,0);FPD.updateMatrix();K.mesh.setMatrixAt(i,FPD.matrix);mv=1}}
-  if(c)K.mesh.instanceColor.needsUpdate=true;if(mv)K.mesh.instanceMatrix.needsUpdate=true}
- function prClear(K){if(!K.mesh)return;K.i=0;K.age.fill(-1);FPD.position.set(0,-50,0);FPD.updateMatrix();for(let i=0;i<K.N;i++)K.mesh.setMatrixAt(i,FPD.matrix);K.mesh.instanceMatrix.needsUpdate=true}
+  FPD.position.set(x,y||.05,z);FPD.rotation.set(0,rot,0);FPD.scale.set(w||K.w,1,l||K.l);FPD.updateMatrix();K.mesh.setMatrixAt(K.i,FPD.matrix);K.fb.array[K.i]=FPU.t.value;
+  K.i=(K.i+1)%K.N;K.mesh.instanceMatrix.needsUpdate=true;K.fb.needsUpdate=true}
+ function prClear(K){if(!K.mesh)return;K.i=0;K.fb.array.fill(OLD);K.fb.needsUpdate=true}
+ window.FW_PRINTS={FP,TR,FPU};/* test hook */
  function stamp(x,z,rot,side){prStamp(FP,x+Math.cos(rot)*.1*side,z-Math.sin(rot)*.1*side,rot)}
  function walker(o,x,z){/* o keeps its last print; a print is laid every .55 m of walking */
   const l=o._xp;if(!l){o._xp=[x,z,1];return}
   const dx=x-l[0],dz=z-l[1],d=Math.hypot(dx,dz);if(d>3){o._xp=[x,z,l[2]];return}
   if(d>.55){l[2]=-l[2];stamp(x,z,Math.atan2(dx,dz),l[2]);l[0]=x;l[1]=z}}
- function roller(o,x,z){/* a car: two tyre tracks (left and right wheels), one pair every .8 m */
-  const l=o._xt;if(!l){o._xt=[x,z];return}
-  const dx=x-l[0],dz=z-l[1],d=Math.hypot(dx,dz);if(d>6){o._xt=[x,z];return}
-  if(d>.8){const r=Math.atan2(dx,dz),cx=Math.cos(r)*.78,cz=-Math.sin(r)*.78,mx=(x+l[0])/2,mz=(z+l[1])/2;
-   prStamp(TR,mx+cx,mz+cz,r,.045);prStamp(TR,mx-cx,mz-cz,r,.045);l[0]=x;l[1]=z}}
+ function roller(o,x,z,h){/* a car: each wheel lays one continuous strip along the path that wheel really took (left and right wheel .62 m off the car's centre line, across its own heading) */
+  const sh=Math.sin(h),ch=Math.cos(h),wx=ch*.62,wz=-sh*.62,l=o._xt;
+  if(!l){o._xt=[x-wx,z-wz,x+wx,z+wz,x,z];return}
+  if(Math.hypot(x-l[4],z-l[5])>6){o._xt=[x-wx,z-wz,x+wx,z+wz,x,z];return}/* teleport or respawn: start over, no streak across the map */
+  if(Math.hypot(x-l[4],z-l[5])<.45)return;
+  const nx=[x-wx,z-wz,x+wx,z+wz];
+  for(let k=0;k<4;k+=2){const dx=nx[k]-l[k],dz=nx[k+1]-l[k+1],d=Math.hypot(dx,dz);if(d<.05)continue;
+   prStamp(TR,(nx[k]+l[k])/2,(nx[k+1]+l[k+1])/2,Math.atan2(dx,dz),.045,.2,d)}
+  o._xt=[nx[0],nx[1],nx[2],nx[3],x,z]}
  let fpT=0;
  function fpTick(dt,live,inner){
   const indoors=!!(inner||IN||(typeof HIN!='undefined'&&HIN)||inHome(P.x,P.z)),vis=SNOWU.value>.4&&!indoors;/* no prints shown while you are inside a building */
   [FP,TR].forEach(K=>{if(K.mesh)K.mesh.visible=vis});
-  fpT+=dt;if(fpT>.1){[FP,TR].forEach(K=>prFade(K,fpT));fpT=0}
+  FPU.t.value+=dt;fpT+=dt;if(fpT>.1){fpT=0}
   if(!(vis&&live&&!indoors))return;
   if(mode=='play'&&!IN&&!(typeof HIN!='undefined'&&HIN)&&!P.sit&&!inHome(P.x,P.z))walker(P,P.x,P.z);
   [NPC,typeof VPED!='undefined'?VPED:[]].forEach(L=>L.forEach(n=>{const m=n.m;if(!m||!m.visible)return;
    const x=m.position.x,z=m.position.z;if(Math.abs(x-P.x)>24||Math.abs(z-P.z)>24||inHome(x,z))return;walker(n,x,z)}));
   /* your car, and traffic near you */
-  if(mode=='drive'&&dr&&isFinite(dr.x)&&outdoorXZ(dr.x,dr.z))roller(dr,dr.x,dr.z);
+  if(mode=='drive'&&dr&&isFinite(dr.x)&&outdoorXZ(dr.x,dr.z))roller(dr,dr.x,dr.z,dr.h);
   if(typeof TRAF!='undefined')TRAF.forEach(c=>{const m=c.m;if(!m||!m.visible||m.position.y>.6)return;const x=m.position.x,z=m.position.z;
-   if(Math.abs(x-P.x)>40||Math.abs(z-P.z)>40||!outdoorXZ(x,z))return;roller(c,x,z)})}
+   if(Math.abs(x-P.x)>40||Math.abs(z-P.z)>40||!outdoorXZ(x,z))return;roller(c,x,z,m.rotation.y)})}
 
  /* ---------- B-built boxes (ground, trees, fences ...) can't use the vertex shader: swap their materials ---------- */
  const bset=[];let bOn=false;

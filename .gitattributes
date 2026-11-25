@@ -22,3 +22,5 @@ og-image.png -filter -diff -merge binary
 audio/inst/**/*.mp3 -filter -diff -merge binary
 audio/kits/**/*.mp3 -filter -diff -merge binary
 audio/refresh.mp3 -filter -diff -merge binary
+# real CC0 footsteps and PC click: plain files so GitHub Pages serves the real mp3 (the deploy workflow does not fetch LFS)
+audio/sfx/*.mp3 -filter -diff -merge binary
