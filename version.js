@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.31';
+const GAME_VERSION='v55.52.32';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.32',n:'Real footstep and PC click recordings (CC0), snow footprints fade smoothly, car tyre tracks follow the wheels'},
  {v:'v55.52.31',n:'Storage placing: a moved piece no longer pulls another copy out of Storage, a held piece is no longer lost if the game saves, pieces on rugs can be picked, Esc drops what you hold before leaving Storage'},
  {v:'v55.52.30',n:'Realtime Database rules tightened: no unlisted keys anywhere, uid-shaped keys only, fixed shape and size limits for the band-room relay (publish firebase-rules/v55.52.16/database.rules.json)'},
  {v:'v55.52.29',n:'Big Vee now reminds you to record a song when you have not made one for 2 or more days (reuses his tip system, respects Tips off)'},

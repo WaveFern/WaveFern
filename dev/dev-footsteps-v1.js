@@ -4,7 +4,8 @@
    - floorboards: a hollow wooden knock with a rare creak (your house and every other interior)
    - concrete: a tight hard tick (roads and pavements, city streets abroad)
    - grass: a muffled soft swish (everywhere else outdoors)
-   All sounds are synthesised live, quiet, and still follow the Footsteps and sound-effect settings (OPT.steps, FX, volume). */
+   v55.52.31: footsteps are now real recordings (Kenney Impact Sounds, CC0, five takes per surface in audio/sfx/step-*.mp3; the PC mouse click is Kenney Interface Sounds, CC0, audio/sfx/pc-*.mp3; see audio/sfx/LICENSE.txt). The old synthesised sounds below stay as the fallback while a file is loading or missing.
+   All sounds still follow the Footsteps and sound-effect settings (OPT.steps, FX, volume). */
 (function(){
  if(!window.FW_FEAT||/[?&]nofootsteps/.test(location.search))return;
  if(typeof stepSnd!='function'||typeof sdNz!='function'||typeof sdHit!='function'||typeof STP!='object')return;
@@ -21,7 +22,7 @@
   if(typeof ROADS!='undefined'&&ROADS.some(r=>P.x>r[0]-m&&P.x<r[2]+m&&P.z>r[1]-m&&P.z<r[3]+m))return true;
   if(D&&D.on&&D.inCity&&D.inCity())return true;
  }catch(e){}return false};
- const snowy=()=>{try{return !!(S&&S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&!hot())}catch(e){return false}};
+ const snowy=()=>{try{const U=window.FW_SNOWU;if(U&&U.value>.4)return true;return !!(S&&S.wx&&S.wx.k=='snow'&&S.wx.d===S.day&&!hot())}catch(e){return false}};
  function surface(){
   if(indoors())return 'wood';
   if(snowy())return 'snow';
@@ -51,9 +52,24 @@
    sdNz(.03,900+R(0,200),.1*v,{q:1.2,ty:'bandpass',pan:pn});
    sdNz(.02,2600+R(0,500),.02*v,{q:1.3,del:.03,pan:pn});
    if(Math.random()<.12)sdHit(310+R(0,90),.14,.012*v,[[1,1,1],[1.5,.3,.5]],{del:.04,bend:.25,jit:0,lp:900,pan:pn})}};
+ /* ---------- real recordings: loaded once, decoded on first use, played through the game's master gain ---------- */
+ const BUF={};
+ function load(n){if(BUF[n]!==undefined)return;BUF[n]=null;try{ac();fetch('audio/sfx/'+n+'.mp3').then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status)).then(b=>new Promise((ok,no)=>AC.decodeAudioData(b,ok,no))).then(d=>{BUF[n]=d}).catch(e=>{BUF[n]=false;warn('load '+n,e)})}catch(e){BUF[n]=false}}
+ function play(n,v,rate,pan){const b=BUF[n];if(!b){load(n);return false}
+  try{const s=AC.createBufferSource(),g=AC.createGain();s.buffer=b;s.playbackRate.value=rate;g.gain.value=v;
+   let o=g;if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=pan||0;g.connect(p);o=p}
+   s.connect(g);o.connect(MG);s.start();return true}catch(e){warn('play',e);return false}}
+ const GAIN={concrete:.9,grass:.6,snow:.8,wood:.9};let last_={};
+ function realStep(sf,v,pn,run){let i=Math.random()*5|0;if(i===last_[sf])i=(i+1)%5;last_[sf]=i;/* never the same take twice in a row */
+  return play('step-'+sf+'-'+i,GAIN[sf]*v*(run?1.15:1),(run?1.08:1)*R(.93,1.07),pn)}
+ /* the PC: a real mouse click on press and a lighter release, anywhere on the desktop screen */
+ const pcOn=()=>{try{return mode=='pc'&&FX}catch(e){return false}};
+ if(typeof SND=='object'&&SND.click){const c0=SND.click;SND.click=function(){if(pcOn()&&BUF['pc-click'])return;return c0.apply(this,arguments)}}/* the synthesised click stands down while the real one plays */
+ document.addEventListener('pointerdown',e=>{if(!pcOn()||e.button>0)return;try{ac()}catch(x){}load('pc-click');load('pc-release');play('pc-click',.8,R(.97,1.03),0)},true);
+ document.addEventListener('pointerup',e=>{if(!pcOn()||e.button>0)return;play('pc-release',.5,R(.97,1.03),0)},true);
  stepSnd=function(run){
   if(!FX||!OPT.steps)return;
-  try{ac();const t=AC.currentTime;if(t-STP.last<.18)return;STP.last=t;STP.ft=-(STP.ft||1);
+  try{ac();const t=AC.currentTime;if(!load.all){load.all=1;['concrete','grass','snow','wood'].forEach(f=>{for(let i=0;i<5;i++)load('step-'+f+'-'+i)})}if(t-STP.last<.18)return;STP.last=t;STP.ft=-(STP.ft||1);
    const v=(run?1.2:1)*R(.85,1.1),pn=STP.ft*.1;
-   SND_[surface()](v,pn,run)}catch(e){warn('step',e)}};
+   const sf=surface();if(!realStep(sf,v,pn,run))SND_[sf](v,pn,run)}catch(e){warn('step',e)}};
 })();

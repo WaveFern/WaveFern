@@ -1,0 +1,3 @@
+step-*.mp3: trimmed and converted from "Impact Sounds" by Kenney (www.kenney.nl), footstep_concrete/grass/snow/wood_000-004. Licence CC0 1.0 (public domain), no attribution required.
+pc-click.mp3, pc-release.mp3: converted from "Interface Sounds" by Kenney (www.kenney.nl), mouseclick1 and mouserelease1. Licence CC0 1.0.
+Obtained from the copies in github.com/iree-gd/iree.gd (sample/assets/audio/impact and /ui), which carry the unmodified Kenney files.
