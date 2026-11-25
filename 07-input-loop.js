@@ -10,15 +10,20 @@ function update(dt){tt+=dt;const play=mode=='play'||mode=='rec'||mode=='drive';
  if(play){S.t+=dt*(typeof DAYK!='undefined'?DAYK:1);if(S.t>=600)return sleepNow(1)}
  let ix=0,iy=0,mv=0;
  if(mode=='play'){ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);if(window.TCHJ&&TCHJ.on){ix=TCHJ.x;iy=TCHJ.y}
-  if((S.stam??100)<=0){if(!S.exh)say('Out of breath! Walk until you recover.');S.exh=1}else if((S.stam??100)>=30)S.exh=0;const run=keys.shift&&!S.exh&&(S.stam??100)>0&&(ix||iy);S.stam=Math.max(0,Math.min(100,(S.stam??100)+(run?-15:10)*dt));if(ix||iy){P.sv=(P.sv||3.3)+((run?6.5:3.3)-(P.sv||3.3))*Math.min(1,dt*5);const L=Math.hypot(ix,iy),dx=(ix+iy)/L/Math.SQRT2*P.sv*dt,dz=(-ix+iy)/L/Math.SQRT2*P.sv*dt;mv=1;
-   if(!hit(P.x+dx,P.z,.28)&&!dynB(P.x,P.z,P.x+dx,P.z))P.x+=dx;if(!hit(P.x,P.z+dz,.28)&&!dynB(P.x,P.z,P.x,P.z+dz))P.z+=dz;P.rot=Math.atan2(dx,dz)}}
+  if((S.stam??100)<=0){if(!S.exh)say('Out of breath! Walk until you recover.');S.exh=1}else if((S.stam??100)>=30)S.exh=0;const run=keys.shift&&!S.exh&&(S.stam??100)>0&&(ix||iy);S.stam=Math.max(0,Math.min(100,(S.stam??100)+(run?-15:10)*dt));let tvx=0,tvz=0;if(ix||iy){P.sv=(P.sv||3.3)+((run?6.5:3.3)-(P.sv||3.3))*(1-Math.exp(-dt*5));const L=Math.hypot(ix,iy);tvx=(ix+iy)/L/Math.SQRT2*P.sv;tvz=(-ix+iy)/L/Math.SQRT2*P.sv}
+   /* v55.52.43 (held: /dev only via FW_DEV, live players keep the old snap): velocity eases toward the wanted speed (quick start, short glide stop, turns blend) and the body turns smoothly; all frame-rate independent */
+   const vx0=P.vx||0,vz0=P.vz||0,sp0=Math.hypot(tvx,tvz),acc=window.FW_DEV?1-Math.exp(-dt*(sp0>0?(tvx*vx0+tvz*vz0<0?26:16):20)):1;P.vx=vx0+(tvx-vx0)*acc;P.vz=vz0+(tvz-vz0)*acc;const spd=Math.hypot(P.vx,P.vz);
+   if(spd<.05&&!sp0){P.vx=P.vz=0}else{mv=1;const dx=P.vx*dt,dz=P.vz*dt;
+    if(!hit(P.x+dx,P.z,.28)&&!dynB(P.x,P.z,P.x+dx,P.z))P.x+=dx;else P.vx=0;if(!hit(P.x,P.z+dz,.28)&&!dynB(P.x,P.z,P.x,P.z+dz))P.z+=dz;else P.vz=0;
+    if(spd>.4){const w=Math.atan2(P.vx,P.vz);let d=w-P.rot;d=Math.atan2(Math.sin(d),Math.cos(d));P.rot+=window.FW_DEV?d*(1-Math.exp(-dt*18)):d}}}
+ else{P.vx=P.vz=0}
  if(mode=='rec')recTick(dt);worldTick(dt);
  if(P.mesh){P.t+=dt*(mv?10:2);const s=mv?.7:.05;if(P.sit&&mode=='play'){P.legs[0].rotation.x=-1.5;P.legs[1].rotation.x=-1.5;P.arms[0].rotation.x=-.6;P.arms[1].rotation.x=-.6}else{P.legs[0].rotation.x=Math.sin(P.t)*s;P.legs[1].rotation.x=-Math.sin(P.t)*s;P.arms[0].rotation.x=-Math.sin(P.t)*s;P.arms[1].rotation.x=Math.sin(P.t)*s}
   if(mode=='rec'||mode=='cut'){P.arms[1].rotation.x=-1+Math.sin(tt*9)*.3;P.arms[0].rotation.x=-.2}
   P.mesh.position.set(P.x,(mv?Math.abs(Math.sin(P.t))*.06:0)+SY,P.z);P.mesh.rotation.y=cr()?Math.PI/4+Math.sin(tt*.8)*.6:P.rot}
  buildTick();stepTick(dt,mv);near=null;if(mode=='play'){let b=9;INT.concat(dynInt()).forEach(o=>{const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<o.r&&d<b){b=d;near=o}})}
  const f=S.t<240?0:S.t<300?(S.t-240)/60*.5:S.t<330?.5+(S.t-300)/30*.4:.9;amb.intensity=.75-.4*f;amb.color.copy(cD).lerp(cN,f);sun.intensity=.85-.55*f;sun.color.copy(cD).lerp(cN,f);lamps.forEach(l=>l.intensity=.2+.9*f);scene.background.copy(cBD).lerp(cBN,f);
- viewT=(typeof VIEWX=='function'&&VIEWX())||(IN&&IN.i==7&&mode=='play'?12:cr()||mode=='load'?3.6:mode=='build'?(bUp()?18:16+WGX*.7):mode=='rec'?5.5:mode=='cut'?4.5:mode=='drive'?(typeof drvView=='function'?drvView():11):9);viewH+=(viewT-viewH)*Math.min(1,dt*4);const up=mode=='build'&&bUp(),tx=up?900+ANX.W/2:mode=='build'?8:P.x,tz=up?320+ANX.D/2:mode=='build'?6-WGX/2:P.z;camT.x+=(tx-camT.x)*Math.min(1,dt*6);camT.z+=(tz-camT.z)*Math.min(1,dt*6);
+ viewT=(typeof VIEWX=='function'&&VIEWX())||(IN&&IN.i==7&&mode=='play'?12:cr()||mode=='load'?3.6:mode=='build'?(bUp()?18:16+WGX*.7):mode=='rec'?5.5:mode=='cut'?4.5:mode=='drive'?(typeof drvView=='function'?drvView():11):9);viewH+=(viewT-viewH)*Math.min(1,dt*4);const up=mode=='build'&&bUp(),tx=up?900+ANX.W/2:mode=='build'?8:P.x,tz=up?320+ANX.D/2:mode=='build'?6-WGX/2:P.z;const ck=window.FW_DEV?1-Math.exp(-dt*6):Math.min(1,dt*6);camT.x+=(tx-camT.x)*ck;camT.z+=(tz-camT.z)*ck;
  const a=innerWidth/innerHeight;cam.left=-viewH*a/2;cam.right=viewH*a/2;cam.top=viewH/2;cam.bottom=-viewH/2;cam.updateProjectionMatrix();
  cam.position.set(camT.x+16,13,camT.z+16);cam.lookAt(camT.x,.8,camT.z);hud();mmDraw()}
 function hud(){if(cr()){const g='<button class="hb gear px" style="top:10px;right:10px;bottom:auto" onclick="settings()">Settings</button>';if(hc!=g){hc=g;$('hud').innerHTML=g}return}
