@@ -14,5 +14,5 @@ Read `VERSION_HISTORY` in `version.js` and `git log --since="7 days ago"`. Write
 
 ## Publishing from the page (admin)
 Sign in with the admin Google account on wavefern.com/newsletter/ (the account name sits in the top right of the page). The account's Publish button opens a form: title, tag, version, date, text, optional screenshot. It saves to Firestore `newsletter/{id}` and shows up for everyone, merged with `articles.js`, newest date first. Admin also sees a Delete link on those articles.
-One-off setup: publish `firebase-rules/v55.52.26/firestore.rules` (it now has a `newsletter` block, public read, admin write) in Firebase console > Firestore Database > Rules. Until then, publishing shows "permission-denied".
+One-off setup: publish `firebase-rules/v55.52.27/firestore.rules` (it now has a `newsletter` block, public read, admin write) in Firebase console > Firestore Database > Rules. Until then, publishing shows "permission-denied".
 Admin uids live in `88-admin.js` (ADMIN_UIDS), in the rules `admin()` and in the page script. Add a new admin in all three.

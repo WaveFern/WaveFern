@@ -815,7 +815,7 @@ function frPresence(){const r=FR.r;if(!r||!FR.h)return;const{R,db,uid}=r,o={h:FR
 function frWhy(R,db,uid){const h=FR.h;if(!h)return;R.get(R.ref(db,'f/n/'+h)).then(n=>{const v=n.val();
  if(!n.exists()){FR.why='f/n/'+h+' is missing';console.warn('[friends] presence refused: username entry f/n/'+h+' is missing, re-creating it');FR.pbo=0;return R.update(R.ref(db),{['f/n/'+h]:uid,['f/u/'+uid+'/t']:R.serverTimestamp()}).then(()=>{FR.pk='';FR.pw=0;frPresence()},e=>console.warn('[friends] could not re-create f/n/'+h,e&&e.code))}
  if(v!==uid){FR.why='@'+h+' belongs to another account';console.warn('[friends] presence refused: @'+h+' is owned by another account in the database (f/n/'+h+'). Pick a new username in Friends.');FR.pbo=Date.now()+36e5;return}
- FR.why='rules refused the write (username is yours)';console.warn('[friends] presence refused although @'+h+' is yours: check the published database rules match firebase-rules/v55.52.26')}).catch(e=>console.warn('[friends] presence check failed',e&&e.code))}
+ FR.why='rules refused the write (username is yours)';console.warn('[friends] presence refused although @'+h+' is yours: check the published database rules match firebase-rules/v55.52.27')}).catch(e=>console.warn('[friends] presence check failed',e&&e.code))}
 setInterval(()=>{try{if(!FR.on)frStart();else frPresence()}catch(e){}},4000);
 /* v55.50.0: a hidden tab shows offline to friends after 5s (debounced, so quick tab flicks write nothing); back online at once on return. onDisconnect still removes o. */
 document.addEventListener('visibilitychange',()=>{try{if(document.hidden){FR.hs=Date.now();setTimeout(()=>{try{if(document.hidden)frPresence()}catch(e){}},5200)}else{FR.hs=0;FR.pbo=0;frPresence()}}catch(e){}});

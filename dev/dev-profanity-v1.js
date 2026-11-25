@@ -1,15 +1,19 @@
-/* WaveFern dev: strict profanity and slur filter. Only loaded on /dev/. Add ?noprofanity to the address to skip it.
+/* WaveFern dev: strict profanity and slur filter. Add ?noprofanity to the address to skip it.
+   v55.52.x: ONLY text that goes public is filtered (usernames, display and artist names, bios, song and album titles, band and
+   room names, room chat, friends, leaderboard, public profiles). What the player types privately (chatting to NPCs and
+   artists, Vee, notes, searches) and what NPCs say back is never touched. Public places are listed in PUBIN (inputs) and PUB (screens).
    - window.fwProfane(text, asName) -> true if the text holds a swear or slur. Catches number swaps (sh1t), symbol swaps (a$$, sh!t),
      letter swaps (fvck, phuck, kunt), stretched letters (shiiit), spaced out letters (f u c k, f.u.c.k) and starred ones (f*ck).
    - window.fwClean(text) -> the text with each bad word turned into stars.
-   - Every text box masks bad words as you type, names are refused, and every piece of text that appears on the page (NPC messages,
-     friends, room chat, other players' names, toasts) is masked the moment it shows up, so an NPC can never say one, even if you bait it.
-   - NPC message logs in the save are scrubbed too, so nothing bad is ever stored or replayed. */
+   - Public text boxes mask bad words as you type, names are refused, and public screens mask text the moment it shows up. */
 (function(){
  if(!window.FW_FEAT||/[?&]noprofanity/.test(location.search))return;
- const FALL=['lol sorry, lost my train of thought. what were we saying?','haha anyway, lets keep it nice. so whats the plan?','hmm, not gonna go there. what else is up?','ok moving on, what do you want to do next?','sorry, my phone is acting up. say that again?'];
- let fi=0;const fall=()=>FALL[(fi++)%FALL.length];
- const NPCB='.bb.a,.bb.n,[data-npc],.npc,.npcbub,.npcsay,#npcsay,#npcbub';
+ /* public text boxes (by id) and by what their handler writes (song and album titles) */
+ const PUBIN=/^(onbu|onbd|frh|fra|mpyn|mpbn|mpst|mpci|pf-bio|pf-user|an|sfsetn|tin)$/;
+ const PUBH=/dTitle\(|saveT\(|AL\.name|S\.drafts/;
+ const isPubIn=el=>PUBIN.test(el.id||'')||PUBH.test((el.getAttribute('oninput')||'')+(el.getAttribute('onkeydown')||''));
+ /* public screens: room chat and band bar, friends, public profile, leaderboard */
+ const PUB='#mpc,#mpb,#mpfr,#frinv,#fhub,#pfx,#pubpf,#lbd,.mpig';
  const LEET={'0':'o','3':'e','4':'a','5':'s','7':'t','8':'b','@':'a','$':'s','!':'i','|':'i','+':'t','(':'c','€':'e','¢':'c','£':'l'};
  /* Matching is whole-word. Short or ambiguous words (ass, cock, tit, cum, dam...) only match as the whole word, never inside another word.
     Only long, unmistakable swears are also found inside longer text (usernames like xxfuckxx). */
@@ -81,17 +85,18 @@
   if(a){try{snd('err')}catch(e){}try{say(NOPE)}catch(e){}a.value='';return}return f.apply(this,arguments)};g.__pf=1;window[n]=g};
  const hook=()=>{['frClaim','frAdd','mpSay'].forEach(wrapName)};hook();setInterval(hook,1500);
 
- /* ---- text boxes: bad words are starred out as you type or paste ---- */
+ /* ---- public text boxes only: bad words are starred out as you type or paste ---- */
  const SKIP=/^(password|number|range|checkbox|radio|color|file|hidden)$/;
- addEventListener('input',e=>{const el=e.target;if(!el||!/^(INPUT|TEXTAREA)$/.test(el.tagName)||SKIP.test(el.type||'')||el.closest&&el.closest('#fwdevp,.devp'))return;
+ addEventListener('input',e=>{const el=e.target;if(!el||!/^(INPUT|TEXTAREA)$/.test(el.tagName)||SKIP.test(el.type||'')||!isPubIn(el)||el.closest&&el.closest('#fwdevp,.devp'))return;
   const v=el.value;if(!v)return;const c=clean(v);if(c!==v){let p=null;try{p=el.selectionStart}catch(x){}el.value=c;try{if(p!=null)el.setSelectionRange(p,p)}catch(x){}try{snd('err')}catch(x){}}},true);
 
- /* ---- everything that shows up on the page is cleaned: NPC messages, other players' names and chat, toasts ---- */
+ /* ---- public screens are cleaned as text appears: other players' names, chat, friends, profiles, leaderboard ---- */
  const q=new Set();let qt=0;
- function cleanNode(n){if(n.nodeType===3){const p=n.parentNode;if(!p||/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/.test(p.nodeName))return;const v=n.nodeValue;if(p.closest&&p.closest(NPCB)&&badText(v,false)){n.nodeValue=fall();return}const c=clean(v);if(c!==v)n.nodeValue=c;return}
+ function cleanText(n){const v=n.nodeValue,c=clean(v);if(c!==v)n.nodeValue=c}
+ function cleanNode(n){if(n.nodeType===3){const p=n.parentNode;if(!p||/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/.test(p.nodeName)||!(p.closest&&p.closest(PUB)))return;cleanText(n);return}
   if(n.nodeType!==1||/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT|CANVAS)$/.test(n.nodeName))return;
-  if(n.nodeName==='INPUT'){if(n.value&&!SKIP.test(n.type||'')){const c=clean(n.value);if(c!==n.value)n.value=c}return}
-  const w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT);let t;while(t=w.nextNode())cleanNode(t)}
+  const roots=n.closest(PUB)?[n]:[...n.querySelectorAll(PUB)];
+  for(const r of roots){const w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT);let t;while(t=w.nextNode()){const p=t.parentNode;if(p&&!/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/.test(p.nodeName))cleanText(t)}}}
  function flush(){qt=0;const a=[...q];q.clear();a.forEach(n=>{try{if(n.isConnected!==false)cleanNode(n)}catch(e){}})}
  function sched(n){q.add(n);if(!qt)qt=setTimeout(flush,0)}
  function watch(){if(!document.body)return setTimeout(watch,100);
@@ -99,20 +104,5 @@
   cleanNode(document.body)}
  watch();
 
- /* ---- NPC messages: scrubbed in the data itself, so a baited NPC reply is never stored or replayed ---- */
- /* v55.21.8: only text that is new or changed since the last pass is checked (a reference compare per entry), not every
-    message ever received twice a second */
- const SEEN=new WeakMap();
- function scrub(){try{if(typeof S=='undefined'||!S||!Array.isArray(S.msgs))return;
-  for(const m of S.msgs){if(!m||typeof m!='object')continue;const k=SEEN.get(m);
-   if(!k||k.b!==m.body||k.s!==m.sub){
-    if(typeof m.body=='string'&&m.a!==undefined&&badText(m.body,false))m.body=fall();
-    else if(typeof m.body=='string'){const c=clean(m.body);if(c!==m.body)m.body=c}
-    if(typeof m.sub=='string'){const c=clean(m.sub);if(c!==m.sub)m.sub=c}
-    SEEN.set(m,{b:m.body,s:m.sub})}
-   if(Array.isArray(m.log))for(const e of m.log){if(!e||typeof e!='object'||typeof e.t!='string'||SEEN.get(e)===e.t)continue;
-    if(e.f==='a'){if(badText(e.t,false))e.t=fall()}else{const c=clean(e.t);if(c!==e.t)e.t=c}SEEN.set(e,e.t)}}}catch(e){}}
- {const wrapR=()=>{const r=window.reply;if(typeof r!='function'||r.__pf)return;const g=function(m,t){const out=r.apply(this,arguments);scrub();return out};g.__pf=1;window.reply=g;try{reply=g}catch(e){}};wrapR();setInterval(wrapR,1500)}
- setInterval(scrub,500);
  window.FW_PROFANITY=1;
 })();
