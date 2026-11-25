@@ -3,7 +3,7 @@
 Asked: update the Firebase rules so nobody can give themselves anything (inventory, borders, money, crates, rewards).
 
 ## Result: the Realtime Database rules already allow none of it, so they are unchanged
-`firebase-rules/v55.30.18/database.rules.json` is default-deny at the root and only opens `f/*` (friends, usernames, invites, presence) and `r/*` (band rooms). No game progress is stored there: the game never writes inventory, borders, money, crates or rewards to the Realtime Database. `tools/rules-test.js` now asserts this (7 new "google can NOT write ..." lines; 97 of 97 pass in the emulators). Nothing needs publishing for this part, and I did not touch the live project.
+`firebase-rules/v55.52.27/database.rules.json` (tightened further in v55.52.27, see below) is default-deny at the root and only opens `f/*` (friends, usernames, invites, presence) and `r/*` (band rooms). No game progress is stored there: the game never writes inventory, borders, money, crates or rewards to the Realtime Database. `tools/rules-test.js` now asserts this (7 new "google can NOT write ..." lines; 97 of 97 pass in the emulators). Nothing needs publishing for this part, and I did not touch the live project.
 
 ## Where the "things" really live, and why rules cannot stop a self-grant there
 - All progress (`S.inv`, `S.wr`, `S.cars`, `S.wraps`, `S.pbd` borders, money, advent doors `S.adv`) is the player's career save. It is held in the browser (localStorage) and backed up as one opaque string `saves/{uid}.code` in Firestore (`FW4-...`, a sealed save).
@@ -20,3 +20,12 @@ Tightening `saves/{uid}` further is impossible without parsing the save (rules c
 3. Cheaper stopgap with no new infrastructure: keep treating saves as untrusted (already true), keep tainted/cheat careers off leaderboards and profiles, and never let a save field decide anything others see (already in `docs/SECURITY_CHECKLIST.md` section 4). Borders are cosmetic and only shown on your own picture, so a forged border affects nobody else.
 
 Recommendation: ship as is now (no rules to publish), and decide on option 2 before the calendar goes live on 1 December if scarcity of the Starlight tier matters.
+
+## Update (v55.52.27): Realtime Database rules tightened
+James asked for the rules to be tightened as far as possible. Changes in `firebase-rules/v55.52.27/database.rules.json` (Firestore rules unchanged, copied over):
+- Root and `f/` refuse any unlisted key (`$other: false`), so nothing like `inv`, `wallet` or `crates` can ever be created.
+- Every uid-keyed node (`f/u,p,s,b,l,q,i,k,kc`) must be keyed by something shaped like a uid (6 to 128 letters and digits), so the blocked list and other maps cannot be filled with junk keys.
+- The band-room host relay `r/CODE/d/GUEST` now has a fixed shape: `c`, `p/ID`, `m/ID`, `l/ID`, `e/ID` strings with length caps (it was writable with any data of any size), and relay entry keys are length-capped. Nothing else can be stored there.
+- 11 new emulator tests; 108 of 108 pass.
+
+Plain words: these rules stop people writing junk or other people's data to the shared database, but nothing can stop a player editing their own save on their own device, because the save is theirs and the server never sees inside it.

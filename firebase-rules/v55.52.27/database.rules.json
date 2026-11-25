@@ -2,8 +2,10 @@
   "rules": {
     ".read": false,
     ".write": false,
+    "$other": { ".validate": false },
 
     "f": {
+      "$other": { ".validate": false },
       "n": {
         "$h": {
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com'",
@@ -13,6 +15,7 @@
       },
       "u": {
         "$uid": {
+          ".validate": "$uid.matches(/^[A-Za-z0-9]{6,128}$/)",
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $uid",
           ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $uid",
           "t": { ".validate": "newData.val() === now && (!data.exists() || data.val() < now - 2592000000)" },
@@ -24,7 +27,7 @@
         "$uid": {
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $uid || root.child('f').child('l').child($uid).child(auth.uid).exists())",
           ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $uid",
-          ".validate": "!newData.exists() || newData.hasChildren(['h', 't'])",
+          ".validate": "$uid.matches(/^[A-Za-z0-9]{6,128}$/) && (!newData.exists() || newData.hasChildren(['h', 't']))",
           "h": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9_]{3,16}$/) && newData.parent().parent().parent().child('n').child(newData.val()).val() === auth.uid" },
           "nm": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24 && (newData.val() === data.val() || newData.parent().parent().parent().child('u').child($uid).child('d').val() === now)" },
           "o": { ".validate": "newData.isNumber() || newData.isBoolean()" },
@@ -38,7 +41,7 @@
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $a",
           "$b": {
             ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $a || auth.uid === $b) && (!newData.exists() || root.child('f').child('q').child(auth.uid).child(auth.uid === $a ? $b : $a).exists())",
-            ".validate": "newData.val() === true"
+            ".validate": "$a.matches(/^[A-Za-z0-9]{6,128}$/) && $b.matches(/^[A-Za-z0-9]{6,128}$/) && newData.val() === true"
           }
         }
       },
@@ -47,7 +50,7 @@
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $to",
           "$from": {
             ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $to || auth.uid === $from) && (!newData.exists() || (auth.uid === $from && !root.child('f').child('b').child($to).child($from).exists() && (!root.child('f').child('s').child($from).exists() || root.child('f').child('s').child($from).val() < now - 10000) && newData.parent().parent().parent().child('s').child($from).val() === now))",
-            ".validate": "!newData.exists() || newData.hasChildren(['h', 't'])",
+            ".validate": "$to.matches(/^[A-Za-z0-9]{6,128}$/) && $from.matches(/^[A-Za-z0-9]{6,128}$/) && (!newData.exists() || newData.hasChildren(['h', 't']))",
             "h": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9_]{3,16}$/)" },
             "nm": { ".validate": "newData.isString() && newData.val().length <= 26" },
             "t": { ".validate": "newData.val() === now" },
@@ -57,15 +60,15 @@
       },
       "s": {
         "$uid": {
-          ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $uid",
-          ".validate": "newData.val() === now"
+          ".validate": "$uid.matches(/^[A-Za-z0-9]{6,128}$/) && newData.val() === now",
+          ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $uid"
         }
       },
       "b": {
         "$uid": {
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $uid",
           ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $uid",
-          "$other": { ".validate": "newData.isString() && newData.val().length <= 24" }
+          "$other": { ".validate": "$other.matches(/^[A-Za-z0-9]{6,128}$/) && newData.isString() && newData.val().length <= 24" }
         }
       },
       "i": {
@@ -73,7 +76,7 @@
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $to",
           "$from": {
             ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $to || (auth.uid === $from && root.child('f').child('l').child($to).child($from).exists() && !root.child('f').child('b').child($to).child($from).exists()))",
-            ".validate": "!newData.exists() || newData.hasChildren(['c', 'b', 'nm', 't'])",
+            ".validate": "$to.matches(/^[A-Za-z0-9]{6,128}$/) && $from.matches(/^[A-Za-z0-9]{6,128}$/) && (!newData.exists() || newData.hasChildren(['c', 'b', 'nm', 't']))",
             "c": { ".validate": "newData.isString() && newData.val().matches(/^[A-Z0-9]{5}$/)" },
             "b": { ".validate": "newData.isString() && newData.val().length <= 24" },
             "nm": { ".validate": "newData.isString() && newData.val().length <= 26" },
@@ -87,7 +90,7 @@
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $to",
           "$from": {
             ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $to || (auth.uid === $from && root.child('f').child('l').child($to).child($from).exists() && !root.child('f').child('b').child($to).child($from).exists() && (!root.child('f').child('kc').child($from).child($to).exists() || root.child('f').child('kc').child($from).child($to).val() < now - 300000)))",
-            ".validate": "!newData.exists() || newData.hasChildren(['nm', 't'])",
+            ".validate": "$to.matches(/^[A-Za-z0-9]{6,128}$/) && $from.matches(/^[A-Za-z0-9]{6,128}$/) && (!newData.exists() || newData.hasChildren(['nm', 't']))",
             "nm": { ".validate": "newData.isString() && newData.val().length <= 26" },
             "t": { ".validate": "newData.val() === now" },
             "$other": { ".validate": false }
@@ -99,7 +102,7 @@
           ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $from",
           "$to": {
             ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && auth.uid === $from && (!data.exists() || data.val() < now - 300000)",
-            ".validate": "newData.val() === now"
+            ".validate": "$from.matches(/^[A-Za-z0-9]{6,128}$/) && $to.matches(/^[A-Za-z0-9]{6,128}$/) && newData.val() === now"
           }
         }
       }
@@ -135,14 +138,21 @@
             "l": { ".validate": "newData.isString() && newData.val().length <= 4000" },
             "e": { "$k": {
               ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && !newData.exists() && root.child('r').child($code).child('h').child('u').val() === auth.uid",
-              ".validate": "newData.isString() && newData.val().length <= 20000" } },
+              ".validate": "$k.length <= 40 && newData.isString() && newData.val().length <= 20000" } },
             "$other": { ".validate": false }
           }
         },
         "d": {
           ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && data.parent().child('h').child('u').val() === auth.uid",
           "$guest": {
-            ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $guest || root.child('r').child($code).child('h').child('u').val() === auth.uid)"
+            ".read": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (auth.uid === $guest || root.child('r').child($code).child('h').child('u').val() === auth.uid)",
+            ".validate": "$guest.matches(/^[A-Za-z0-9]{6,128}$/)",
+            "c": { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "p": { ".validate": "newData.hasChildren()", "$m": { ".validate": "$m.length <= 64 && newData.isString() && newData.val().length <= 100" } },
+            "m": { ".validate": "newData.hasChildren()", "$m": { ".validate": "$m.length <= 64 && newData.isString() && newData.val().length <= 4000" } },
+            "l": { ".validate": "newData.hasChildren()", "$m": { ".validate": "$m.length <= 64 && newData.isString() && newData.val().length <= 4000" } },
+            "e": { ".validate": "newData.hasChildren()", "$k": { ".validate": "$k.length <= 40 && newData.isString() && newData.val().length <= 20000" } },
+            "$other": { ".validate": false }
           }
         }
       }
