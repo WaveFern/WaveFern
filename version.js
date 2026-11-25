@@ -3,18 +3,12 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-<<<<<<< HEAD
-const GAME_VERSION='v55.52.37';
+const GAME_VERSION='v55.52.38';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.38',n:'Instagrime: hundreds of different comments (car posts most, some mention your like), dock search replaces photo post (dev only)'},
  {v:'v55.52.37',n:'Main menu: Newsletter button and Contact link (set URLs in WF_LINKS)'},
  {v:'v55.52.36',n:'Chat understands typos and many more words: one shared fuzzy fixer (fwFix) for NPC replies and yes/no parsing'},
-=======
-const GAME_VERSION='v55.52.36';
-const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
-const VERSION_HISTORY=[
- {v:'v55.52.36',n:'Instagrime: hundreds of different comments (car posts most, some mention your like), dock search replaces photo post (dev only)'},
->>>>>>> origin/claude/project-thread-dl44wr
  {v:'v55.52.35',n:'Walkers hit by your car now always fall flat on the ground'},
  {v:'v55.52.34',n:'Instagrime reacts to your career: fans complain when you go quiet, album drop and split-opinion photoshoot posts, more diss track chatter, endless scroll, double tap to like (dev only)'},
  {v:'v55.52.33',n:'Pets: crisp name tags over pets, new P menu design (held)'},
