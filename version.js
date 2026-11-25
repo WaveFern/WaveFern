@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.41';
+const GAME_VERSION='v55.52.42';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.42',n:'Main menu Newsletter and Contact held behind FW_DEV (dev page only)'},
  {v:'v55.52.41',n:'Main menu: Newsletter opens /newsletter, Contact opens the wiki contact page'},
  {v:'v55.52.40',n:'Version numbers renumbered for players: v1.x is everything before the Founder fresh start, v2.x from it on (the real build id still drives updates, cache tags and saves)'},
  {v:'v55.52.39',n:'Small fixes no longer pop an update notice; only the weekly drop does. Release day is Thursday.'},
