@@ -26,16 +26,10 @@ function mkGhost(){clrGhost();ghost=mkF(hold);scene.add(ghost);if(!GF){GF=new TH
 function holdItem(t){if(hold){S.inv[hold]++}if(!S.inv[t])return;S.inv[t]--;hold=t;gp.r=0;mkGhost();buildUI()}
 let HOVO=null,HOVI=-1;
 function hovClr(){if(HOVO)HOVO.visible=false;HOVI=-1}
-function hovFind(){RC.setFromCamera(mouse,cam);const p=new THREE.Vector3();if(!RC.ray.intersectPlane(PLN,p))return -1;for(let i=PL.length-1;i>=0;i--){const q=PL[i],c=fb(q.t,q.x,q.z,q.r);if(p.x>c[0]&&p.x<c[2]&&p.z>c[1]&&p.z<c[3])return i}return -1}
+function hovFind(){RC.setFromCamera(mouse,cam);const p=new THREE.Vector3();if(!RC.ray.intersectPlane(PLN,p))return -1;let rg=-1;/* v55.52.31: rugs and other floor pieces only win when nothing stands on them */for(let i=PL.length-1;i>=0;i--){const q=PL[i],c=fb(q.t,q.x,q.z,q.r);if(p.x>c[0]&&p.x<c[2]&&p.z>c[1]&&p.z<c[3]){if(!F[q.t].f)return i;if(rg<0)rg=i}}return rg}
 function hovTick(){const i=hovFind();if(i<0)return hovClr();HOVI=i;const b=new THREE.Box3().setFromObject(PL[i].m),sz=b.getSize(new THREE.Vector3()),ct=b.getCenter(new THREE.Vector3());if(!HOVO){HOVO=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1)),new THREE.LineBasicMaterial({color:0xffee55,depthTest:false}));HOVO.renderOrder=999;scene.add(HOVO)}HOVO.position.copy(ct);HOVO.scale.set(sz.x+.06,sz.y+.06,sz.z+.06);HOVO.visible=true}
 function storeKey(){if(mode!='build')return;if(hold){S.inv[hold]++;hold=null;clrGhost();buildUI();snd('pop');return}const i=hovFind();if(i<0)return;const q=PL[i];scene.remove(q.m);PL.splice(i,1);S.inv[q.t]=(S.inv[q.t]||0)+1;hovClr();snd('pop');buildUI()}
 addEventListener('keydown',e=>{if(e.key.toLowerCase()=='e'&&!e.repeat&&!/INPUT|TEXTAREA/.test(e.target.tagName))storeKey()});
-function buildTick(){if(mode!='build'){if(HOVO&&HOVO.visible)hovClr();return}if(hold){if(HOVO&&HOVO.visible)hovClr()}else return hovTick();RC.setFromCamera(mouse,cam);const p=new THREE.Vector3();if(!RC.ray.intersectPlane(PLN,p))return;const f=F[hold],x=Math.round(p.x*2)/2,z=Math.round(p.z*2)/2,c=fb(hold,x,z,gp.r);gp.x=x;gp.z=z;
- let ok=c[0]>=-1e-6&&c[1]>=-WGX-1e-6&&c[2]<=16+1e-6&&c[3]<=12+1e-6;if(ok&&!f.f){const o=r=>c[0]<r[2]&&c[2]>r[0]&&c[1]<r[3]&&c[3]>r[1];ok=!(cols.some(o)||dyn.some(o)||PL.some(q=>!F[q.t].f&&o(fb(q.t,q.x,q.z,q.r)))||o([P.x-.45,P.z-.45,P.x+.45,P.z+.45]))}
- gp.ok=ok;ghost.position.set(x,0,z);ghost.rotation.y=gp.r*Math.PI/2;GF.position.set(x,.05,z);GF.scale.set(c[2]-c[0],1,c[3]-c[1]);GF.material.color.set(ok?0x44ff88:0xff4455)}
+function buildTick(){if(mode!='build'){if(HOVO&&HOVO.visible)hovClr();return}if(hold){if(HOVO&&HOVO.visible)hovClr();return}return hovTick()}/* the ghost is driven by 158-placement-overhaul */
 addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-e.clientY/innerHeight*2+1});addEventListener('contextmenu',e=>{if(mode=='build')e.preventDefault()});
-addEventListener('mousedown',e=>{if(mode!='build'||e.target.closest('#ui>*,#hud button'))return;
- if(e.button==2)return;
- if(hold){if(!gp.ok)return snd('err');const m=mkF(hold);m.position.set(gp.x,0,gp.z);m.rotation.y=gp.r*Math.PI/2;scene.add(m);PL.push({t:hold,x:gp.x,z:gp.z,r:gp.r,m});snd('thunk');if(S.inv[hold]>0)S.inv[hold]--;else{hold=null;clrGhost()}buildUI();return}
- RC.setFromCamera(mouse,cam);const p=new THREE.Vector3();if(!RC.ray.intersectPlane(PLN,p))return;
- for(let i=PL.length-1;i>=0;i--){const q=PL[i],c=fb(q.t,q.x,q.z,q.r);if(p.x>c[0]&&p.x<c[2]&&p.z>c[1]&&p.z<c[3]){scene.remove(q.m);PL.splice(i,1);hold=q.t;gp.r=q.r;mkGhost();snd('pop');buildUI();return}}});
+/* placing, moving and picking up live in 158-placement-overhaul (pointer events) */
