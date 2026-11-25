@@ -32,7 +32,7 @@ A change that is not ready simply keeps its gate for next week.
 | News app (Fern Times) on laptop and phone | `257-news-app.js` | `HELD=true` + `FW_DEV` | yes |
 | More post and News backgrounds (24 variants + 8 news scenes) | `259-photo-scenes.js`, `260-news-scenes.js` | `HELD=true` + `FW_DEV` | yes |
 | Pets overhaul: own all, equip 3, names, P menu, roaming and sleeping at home, bodyguards wait outside home | `261-pets-v2.js` (needs the powerups of `dev/dev-pets.js` to go live with it) | `HELD=true` + `FW_DEV` | testing |
-| Instagrime feed upgrade: endless scroll, better posts about you, career reactions (quiet spells, albums, split-opinion shoots, diss tracks), comments only from the comment button, double-tap pixel-heart like | `258-instagrime-more.js` | `HELD=true` + `FW_DEV` | yes |
+| Instagrime feed upgrade: endless scroll, better posts about you, career reactions (quiet spells, albums, split-opinion shoots, diss tracks), comments only from the comment button, double-tap pixel-heart like, hundreds of varied comments (car posts most, "liked the vid" ones after you like), dock Search instead of Photo post | `258-instagrime-more.js` | `HELD=true` + `FW_DEV` | yes |
 
 ## Avoiding merge pain
 The old pain was never the numbers: every PR edited the same few lines (`GAME_VERSION`, the top history entry, the `?v=` tags), so any two open PRs conflicted and each was renumbered by hand (55 of the last 300 commits are "Merge main; renumber").

@@ -112,8 +112,30 @@ const fill=n=>{while(IGF.length<n){const b=batch(6);if(!b.length)break;IGF.push(
   :['both of them are loud, I love it','team '+a,'this beef is the best thing on my feed','popcorn ready'];
  const add=[0,1,2].map(()=>({u:igzFan(r),t:pk(pool,r),l:Math.floor(r()*300),img:pf2(igzCf(r))})).filter((c,i,A)=>A.findIndex(o=>o.t==c.t)==i);return CMT[p.id]=[...add,...out]}}
 
-{const c0=cmts;cmts=function(p){if(!p||CMT[p.id]||!p.igm||p.about||p.inf)return c0.apply(this,arguments);const out=c0.apply(this,arguments),r=rg('cm'+p.id),pool=CAC[p.kind]||CAC.city;
- const add=[0,1,2].map(()=>({u:igzFan(r),t:pk(pool,r),l:Math.floor(r()*300),img:pf2(igzCf(r))})).filter((c,i,A)=>A.findIndex(o=>o.t==c.t)==i);return CMT[p.id]=[...add,...out.slice(0,3)]}}
+/* a big pool of different comments: every kind of picture has its own, cars have the most, and the posts you already know (about you, drama, events) keep theirs */
+const BIG={
+ car:['that paint is unreal','what engine is that','stance is perfect','sounds so clean','rate: 11/10','sell it to me, name your price','the wheels!!','those rims though','is it manual or auto','I would never leave the garage','dream car right there','how many horsepower','respect for keeping it clean','what colour is this called','low and mean','tell me you spent the weekend washing it','the exhaust note is illegal in three countries','I need this in my driveway','first car or fifth car','drive it, do not park it','is that a turbo','insurance must hurt','clean build','the interior!!','who else zoomed in on the dashboard','the headlights are staring into my soul','mine does not look like that after a wash','petrol heads assemble','I would drive that to the shops. Every day.','beast','matte black is always the answer','what is the top speed','bro your car is nicer than my flat','tyres look fresh','spoiler check, nice','I can hear it from here','drift it','quarter mile time?','that engine bay is spotless','white car gang','red ones go faster, I read that somewhere','cannot stop looking at the side profile','car meet when?','that is a proper machine','neighbours are going to hate it and I love it','new wheels? looks sharp','keys please','okay you win cars','nice ride, no notes','the sunset on that bodywork!!','garage goals','I would put a sticker on it. Do not tell anyone','smooth lines','pure engineering','is that carbon fibre','sound check next time please','you ever take it on the coast road?','the reflection in the paint is wild','fuel economy: do not ask','which gear is that','the lights at night look so good'],
+ food:['I am so hungry now','recipe in the bio?','where is this place','that looks dangerous in a good way','I would eat three of these','save me a plate','the colours!!','okay but is it spicy','dinner sorted, thanks','portion sizes are elite','cook for me please','I tried this once and cried (good)','that plate is art','does it come with chips','extra sauce, always','I smelled that through the screen'],
+ city:['those lights though','that skyline is something else','where was this taken','I miss walking there','golden hour wins again','take me here next time','the colours on those buildings','quiet streets are the best streets','what a view','moving there tomorrow','the photo is better than the real thing','rooftop gang','my favourite corner of the city','was that a train in the back','okay Instagrime, calm down, that is gorgeous'],
+ park:['so peaceful','I can hear the birds','what a lovely day','bring me next time','the grass looks so green','best bench in town','that is a lot of squirrels','I needed this view today','perfect picnic weather','fresh air looks good on you'],
+ home:['so cosy','where is the lamp from','that corner is perfect','plant count approved','I would never leave the couch','the vibe is immaculate','tidy room, tidy mind','okay the blanket stays','warm lighting is everything','love how you did the shelves'],
+ pet:['AWWW','the face!!','what is their name','best boy','give them a treat from me','I would die for this animal','chonk alert','so floofy','pet of the year','look at those eyes','they know they are cute','cat or dog? both. always both.'],
+ fit:['that jacket is fire','where is the jacket from','drip check passed','those shoes are clean','outfit of the year','tell me the brand','colour combo is risky and it worked','you ate that','I would wear all of it','fit check: 10 out of 10','hat game strong','the sneakers!!'],
+ stage:['I was there, it was unreal','the crowd was so loud','my ears are still ringing','what a night','that light show!!','take me to the next one','the energy in that room','encore was the best part','front row jealousy','sound was perfect from the back','the lights in the background are so good','legend behaviour'],
+ studio:['cannot wait to hear it','drop it already','the setup is clean','which mic is that','late night sessions hit different','the grind never stops','that desk is goals','new music soon?','take 19 is always the one','I need the beat tape'],
+ album:['instant classic','streaming it now','that cover is insane','track 3 for life','on repeat all week','album of the year already','a masterpiece, no notes','the whole thing is a vibe','I need a vinyl of this','who did the artwork']};
+const GEN2=['first','this is so good','wow','love this','need more of this','the vibe is right','you never miss','absolutely stunning','so good I am at a loss for words','okay, I am impressed','posting this to my friends','subscribed to your whole timeline','this made my day','this is the content I am here for','saving this one','fire','no notes','you really did that','so real','sheesh','best post today','is this real','speechless','obsessed','keep them coming','this deserves more likes','mood','that is wild','respect','this is peak Instagrime','how is this so good','I keep coming back to look at this','not me watching this on a loop','who else came here from the explore page','top tier','sending this to my group chat','absolute cinema','chef kiss','I cannot with this one','you are on a roll'];
+const SUF=['','',' fr',' honestly',' ngl',' tbh',' lol',' !!',' bro',' wow'],PRE=['','','','okay ','omg ','wait ','yo ','actually ','no way, ','lowkey '];
+const typo=(t,r)=>{if(r()<.8||t.length<7)return t;const i=1+Math.floor(r()*(t.length-3));return t.slice(0,i)+t[i+1]+t[i]+t.slice(i+2)};
+function bigComment(p,r){const k=(typeof kindOf=='function'?kindOf(p):p.kind)||'city',pool=r()<.7?(BIG[k]||BIG.city):r()<.5?GEN2:(CAC[k]||CAC.city);let t=pk(pool,r);
+ if(r()<.25)t=pk(PRE,r)+t;if(r()<.25)t+=pk(SUF,r);if(r()<.12)t='@'+p.u+' '+t;return typo(t,r)}
+{const c0=cmts;cmts=function(p){if(!p||CMT[p.id]||p.about||p.ev||p.rival||p.mine)return c0.apply(this,arguments);const out=c0.apply(this,arguments),r=rg('cm'+p.id),n=5+Math.floor(r()*5),add=[];
+ for(let g=0;add.length<n&&g<40;g++){const t=bigComment(p,r);if(add.some(c=>c.t==t)||out.some(c=>c.t==t))continue;add.push({u:igzFan(r),t,l:Math.floor(Math.pow(10,r()*2.6)),img:pf2(igzCf(r))})}
+ return CMT[p.id]=[...add,...out.slice(0,3)]}}
+/* after you like a post, a few comments mention it (not cached, because liking changes them; the list is just built again) */
+{const c1=cmts;cmts=function(p){const out=c1.apply(this,arguments);try{if(!p||!isL(p)||p.about&&p.ev)return out;const r=rg('lk'+p.id),me=S.artist||'you',who=()=>igzFan(r),
+ pool=[t=>t+' liked the vid, so did '+me,t=>'@'+me+' you liked this?? great taste',t=>t+' liked the vid',t=>'thanks for the like @'+me+', that means a lot',t=>'saw '+me+' liked this so I had to look',t=>t+' and 2 others liked the vid'];
+ const ex=[0,1,2].map(i=>{const u=i==0&&!p.mine?p.u:who(),cfg=u==p.u?p.cfg:igzCf(r),f=pk(pool,r);return{u,t:f(u),l:Math.floor(r()*40),img:pf2(cfg)}}).filter((c,i,A)=>A.findIndex(o=>o.t==c.t)==i);return[...out,...ex]}catch(e){return out}}}
 /* ---------- decorating the existing post markup ---------- */
 function ago(p){const m=p.tm!=null?p.tm:(p.about?(hsh(p.id)%90)+2:(hsh(p.id)%20)*60+30);return m<60?m+'m':m<1440?Math.floor(m/60)+'h':Math.floor(m/1440)+'d'}
 function deco(n){const on=n.querySelector('[onclick^="openPostId("]'),id=on&&+((on.getAttribute('onclick').match(/\d+/)||[])[0]);if(!id)return n;let p;try{p=findP(id)}catch(e){}if(!p)return n;
@@ -146,15 +168,47 @@ function css(){if(document.getElementById('igmcss'))return;const s=document.crea
 .ig .igmt{font:700 9px/1 system-ui;letter-spacing:.06em;text-transform:uppercase;font-style:normal;padding:3px 5px;border-radius:3px;background:#ffd54a;color:#1a1400}
 .ig .igmt.dm{background:#ff3b5c;color:#fff}.ig .igmt.sp{background:#444;color:#ddd}.ig .igmt.nw{background:#f5f1e8;color:#d6322b}
 .ig .igtg{color:#6fa8ff}
+.ig .igqw{padding:10px 12px 20px}.ig .igqi{width:100%;box-sizing:border-box;background:#161616;color:#fff;border:2px solid #333;border-radius:10px;padding:10px 12px;font:14px system-ui}
+.ig .igqh{font:700 11px/1 system-ui;letter-spacing:.08em;text-transform:uppercase;color:#8e8e8e;margin:16px 2px 8px}
+.ig .igqt{display:flex;flex-wrap:wrap;gap:6px}.ig .igqt button{all:unset;cursor:pointer;color:#6fa8ff;border:1px solid #333;border-radius:14px;padding:5px 10px;font-size:12px}
+.ig .igqa{display:flex;align-items:center;gap:10px;padding:6px 2px;cursor:pointer}.ig .igqa img{width:38px;height:38px;border-radius:50%}.ig .igqa span{display:flex;flex-direction:column}.ig .igqa small{color:#8e8e8e;font-size:11px}
+.ig .igqg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.ig .igqp{cursor:pointer;position:relative}.ig .igqp img{width:100%;aspect-ratio:1;object-fit:cover;display:block}.ig .igqp small{display:block;color:#aaa;font-size:10px;padding:2px 0}
+.ig .igqn{color:#8e8e8e;font-size:13px;text-align:center;padding:24px 0}
 .ig .pic[data-igl]{cursor:pointer;-webkit-user-select:none;user-select:none}.ig .igmh{position:absolute;left:50%;top:40%;width:96px;margin:-48px 0 0 -48px;pointer-events:none;animation:igmh .8s steps(8) forwards;image-rendering:pixelated}.ig .igmh svg{width:100%;filter:drop-shadow(3px 3px 0 #0007)}@keyframes igmh{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.15);opacity:1}60%{transform:scale(1);opacity:1}100%{transform:scale(1.1) translateY(-24px);opacity:0}}
 .ig .igmr{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;color:#9a9a9a;font-size:12px}
 .ig .igmr button{all:unset;cursor:pointer;color:#fff;font-weight:600;padding:5px 10px;border:1px solid #333;border-radius:14px}
 .ig .igmx{text-align:center;color:#777;font-size:12px;padding:18px 0 26px}`;document.head.appendChild(s)}
 /* ---------- the wrapper: slice the feed, decorate it, and add the infinite-scroll marker ---------- */
+/* ---------- search (replaces the Photo post button on the dock): accounts and posts from the feed, the influencers and the rivals ---------- */
+const SRCH='<svg viewBox="0 0 10 10" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><path d="M2 0h4v1h1v1h1v4H7v1H6v1H2V7H1V6H0V2h1V1h1zm1 2v1h1V2zM7 7h1v1h1v1h1v1H8V9H7z" transform="scale(1)"/></svg>';
+const swapCam=R=>{R.querySelectorAll('.igdock button').forEach(b=>{if(/^pxPostPick\(\)/.test(b.getAttribute('onclick')||'')){b.setAttribute('onclick',"igv='igsearch';pcR()");b.setAttribute('title','Search');b.setAttribute('aria-label','Search');b.removeAttribute('disabled');b.innerHTML=SRCH;if(typeof igv!='undefined'&&igv=='igsearch')b.classList.add('on')}})};
+const norm=q=>String(q||'').toLowerCase().replace(/[^a-z0-9# ]/g,'').trim();
+/* typo-tolerant match: substring, or the letters of the query in order, or one letter off */
+const hit=(t,q)=>{t=norm(t);if(!q)return 1;if(t.includes(q))return 3;let i=0;for(const c of t){if(c==q[i])i++;if(i==q.length)return q.length>=3?2:0}return 0};
+function accounts(){const m=new Map();const add=(u,cfg,sub)=>{if(u&&u!=S.artist&&!m.has(u))m.set(u,{u,cfg,sub})};
+ IGF.forEach(p=>add(p.u,p.cfg,p.inf?'Verified account':'Account'));(typeof IFL!='undefined'?IFL:[]).forEach(x=>add(x.u,x.c,'Verified account'));
+ ((S.rvl&&S.rvl.rv)||[]).forEach(x=>add(x.n,(typeof lk=='function'?lk(x.n):null),'Artist'));return[...m.values()]}
+function results(q){q=norm(q);fill(60);
+ const A=accounts().map(a=>({a,s:hit(a.u,q)})).filter(x=>x.s).sort((x,y)=>y.s-x.s).slice(0,q?8:5).map(x=>x.a);
+ const P=IGF.map(p=>({p,s:Math.max(hit(p.cap,q),hit(p.u,q))})).filter(x=>x.s&&!x.p.brandAd).sort((x,y)=>y.s-x.s).slice(0,q?12:0).map(x=>x.p);
+ let h='';
+ if(!q){const tags=[...new Set(Object.values(TAG).flat())].slice(0,12);h+='<div class=igqh>Trending</div><div class=igqt>'+tags.map(t=>'<button onclick="igmSearch(\''+t+'\',1)">'+t+'</button>').join('')+'</div>'}
+ if(A.length)h+='<div class=igqh>Accounts</div>'+A.map(a=>'<div class=igqa onclick="openProf(\''+esc(a.u).replace(/'/g,"\\'")+'\')"><img src="'+pf2(a.cfg||igzCf(rg(a.u)))+'"><span><b>'+esc(a.u)+'</b><small>'+a.sub+'</small></span></div>').join('');
+ if(P.length)h+='<div class=igqh>Posts</div><div class=igqg>'+P.map(p=>'<div class=igqp onclick="openPostId('+p.id+')"><img src="'+postPic(p)+'"><small>'+esc(p.cap).slice(0,60)+'</small></div>').join('')+'</div>';
+ if(q&&!A.length&&!P.length)h+='<p class=igqn>Nothing found for "'+esc(q)+'". Try another word or check the spelling.</p>';return h}
+let SQ='';
+window.igmSearch=(q,set)=>{SQ=q;const i=document.querySelector('.igqi');if(i&&set)i.value=q;const o=document.querySelector('.igqo');if(o)o.innerHTML=results(q)};
+function searchView(R){R.querySelectorAll('.post,.igmr,.igmx,.igh~div').forEach(e=>{if(!e.closest('.igdock'))e.remove()});
+ const dk=R.querySelector('.igdock'),w=document.createElement('div');w.className='igqw';
+ w.innerHTML='<input class=igqi type=search placeholder="Search accounts, songs, #tags" autocomplete=off oninput="igmSearch(this.value)" value="'+esc(SQ)+'"><div class=igqo>'+results(SQ)+'</div>';
+ dk?dk.before(w):R.querySelector('.ig').appendChild(w)}
 const ig1=PA.ig;
 function parse(h){const t=document.createElement('template');t.innerHTML=h;return t.content}
 function render(list){const all=IGF;IGF=list;let h;try{h=ig1()}finally{IGF=all}const R=parse(h);return[...R.querySelectorAll('.post')].map(deco)}
-PA.ig=function(){css();if(typeof igv=='undefined'||igv!='feed')return ig1.apply(this,arguments);
+PA.ig=function(){css();
+ if(typeof igv!='undefined'&&igv=='igsearch'){const all=IGF;if(!all.length)genFeed();IGF=IGF.slice(0,1);let h;try{h=ig1.apply(this,arguments)}finally{IGF=all}
+  try{const R=parse(h);searchView(R);swapCam(R);const d=document.createElement('div');d.appendChild(R);setTimeout(()=>{const i=document.querySelector('.igqi');if(i&&!SQ)i.focus()},50);return d.innerHTML}catch(e){console.error('instagrime search',e);return h}}
+ if(typeof igv=='undefined'||igv!='feed'){let h=ig1.apply(this,arguments);if(typeof h=='string'&&h.indexOf('igdock')>=0)try{const R=parse(h);swapCam(R);const d=document.createElement('div');d.appendChild(R);h=d.innerHTML}catch(e){}return h}
  if(!IGF.length)genFeed();fill(LIM+3);const all=IGF;let h;IGF=all.slice(0,LIM);try{h=ig1.apply(this,arguments)}finally{IGF=all}
  if(typeof h!='string'||!/class="?ig"?>/.test(h))return h;
  try{const R=parse(h),ps=[...R.querySelectorAll('.post')];ps.forEach(deco);
@@ -162,7 +216,7 @@ PA.ig=function(){css();if(typeof igv=='undefined'||igv!='feed')return ig1.apply(
   const last=ps[ps.length-1],bar=document.createElement('div');bar.className='igmr';bar.innerHTML='<span>Fresh posts for day '+S.day+'</span><button onclick="igmRefresh()">↻ Refresh</button>';
   const first=ps[0];if(first)first.parentNode.insertBefore(bar,first);
   if(last){const m=document.createElement('div');m.className='igmx';m.setAttribute('data-inf','igmMore');m.textContent='Loading more posts…';last.after(m)}
-  const d=document.createElement('div');d.appendChild(R);return d.innerHTML}catch(e){console.error('instagrime more',e)}return h};
+  swapCam(R);const d=document.createElement('div');d.appendChild(R);return d.innerHTML}catch(e){console.error('instagrime more',e)}return h};
 window.igmMore=()=>{const old=LIM;LIM+=STEP;fill(LIM+3);const list=IGF.slice(old,LIM);if(!list.length)return'';return render(list).map(n=>n.outerHTML).join('')};
 window.igmRefresh=()=>{IGF=[];LIM=START;pcR();try{const m=document.querySelector('#pc .mn');if(m)m.scrollTop=0;const p=document.querySelector('#ph .phx');if(p)p.scrollTop=0}catch(e){}};
 /* make the scan run after the phone and laptop draw (257 hooks pcR and phR, this covers the post studio and other re-draws) */
