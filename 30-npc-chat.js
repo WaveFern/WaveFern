@@ -41,8 +41,8 @@ const NPC_TAB=(()=>{const t=new Map(),strong=npcSet(NPC_LEX.no.strong);
  Object.keys(NPC_LEX.yes).forEach(g=>add('yes',NPC_LEX.yes[g]));
  Object.keys(NPC_LEX.no).forEach(g=>add('no',NPC_LEX.no[g],g=='strong'));
  return t})();
-/* lowercase, de-censor (f***, f---, sh*t), emoji to words, strip punctuation, squash yesss -> yes */
-function npcNorm(t){let s=String(t||'').toLowerCase();
+/* typo-tolerant when fix is set (fwFix in 20-wider-understanding.js); lowercase, de-censor (f***, f---, sh*t), emoji to words, strip punctuation, squash yesss -> yes */
+function npcNorm(t,fix){let s=String(t||'').toLowerCase();
  for(const e in NPC_LEX.emoji)if(s.includes(e))s=s.split(e).join(' '+NPC_LEX.emoji[e]+' ');
  s=s.replace(/[’'`]/g,'').replace(/100\s*%/g,' hundred percent ')
   .replace(/\bf[*\-_#@.]{1,}(?:ing|in|er|ed)?(?![a-z])/g,' fuck ')
@@ -50,13 +50,14 @@ function npcNorm(t){let s=String(t||'').toLowerCase();
   .replace(/\bf[ck]k?(?:ing|in)?(?![a-z])/g,' fuck ').replace(/\bphuck\w*/g,' fuck ').replace(/\beff(?:ing|in)?\b/g,' fuck ')
   .replace(/\bsh?[*\-_#@!.]{1,3}t\b/g,' shit ').replace(/\bs[*#@_]{2,}\b/g,' shit ').replace(/\bb[*\-_#@!.]{1,2}tch/g,' bitch ')
   .replace(/\ba[*#@_]{2,}(?:hole)?/g,' asshole ').replace(/\bd[*\-_#@]{1,2}ck/g,' dick ').replace(/\bc[*\-_#@]{2,}t/g,' cunt ')
-  .replace(/[^a-z0-9 ]+/g,' ').replace(/([a-z])\1{2,}/g,'$1');
+  .replace(/[^a-z0-9 ]+/g,' ');
+ if(fix)s=fwFix(s);s=s.replace(/([a-z])\1{2,}/g,'$1');
  return s.split(/\s+/).filter(Boolean)}
 const NPC_STRONG=npcSet(NPC_LEX.abuse.strongcurse),NPC_MILD=npcSet(NPC_LEX.abuse.mildcurse),NPC_INS=npcSet(NPC_LEX.abuse.insults.replace(/ /g,'_')),
  NPC_DIR=[...npcSet(NPC_LEX.abuse.directed)].map(p=>npcNorm(p).join(' ')),
  NPC_YOU=new Set('you u ur youre your ya yourself yo'.split(' '));
 /* returns {k:'yes'|'no'|'abuse'|'amb', why} */
-function npcIntent(text){const w=npcNorm(text),str=' '+w.join(' ')+' ',sq=w.map(npcSq);
+function npcIntent(text){const w=npcNorm(text,1),str=' '+w.join(' ')+' ',sq=w.map(npcSq);
  /* 1. abuse aimed at them */
  if(NPC_DIR.some(p=>str.includes(' '+p+' ')))return{k:'abuse',why:'directed'};
  const hasYou=w.some(x=>NPC_YOU.has(x));
@@ -76,7 +77,7 @@ function npcIntent(text){const w=npcNorm(text),str=' '+w.join(' ')+' ',sq=w.map(
  return{k:hit[hit.length-1].k,why:'last'}}
 /* "you hit me up" claims: you/u/ya + optional filler words + a claim phrase */
 const NPC_CLAIM=[...npcSet(NPC_LEX.claim)].map(p=>npcNorm(p).slice(1).join(' '));
-function npcClaim(text){const w=npcNorm(text).map(x=>/^(u|ya|yu|yo|youu)$/.test(x)?'you':x),str=' '+w.join(' ')+' ';
+function npcClaim(text){const w=npcNorm(text,1).map(x=>/^(u|ya|yu|yo|youu)$/.test(x)?'you':x),str=' '+w.join(' ')+' ';
  if(/ (didnt|never|not|dont|i) (hit|dm|message|text|reach|contact)/.test(str)&&!/ you (didnt|never)/.test(str)&&!/ it was you /.test(str))return false;
  if(/ it was you who /.test(str)||/ you were the one who /.test(str))return true;
  return w.some((x,i)=>x=='you'&&!/^(can|could|will|would|do|did|if)$/.test(w[i-1]||'')&&[0,1,2].some(g=>{const r=' '+w.slice(i+1+g).join(' ')+' ';return NPC_CLAIM.some(c=>r.startsWith(' '+c+' '))&&!w.slice(i+1,i+1+g).some(z=>NPC_NEG.has(z)||z=='didnt')}))}
