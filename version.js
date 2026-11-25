@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v55.52.43';
+const GAME_VERSION='v55.52.44';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v55.52.44',n:'Smoother walking held for /dev (FW_DEV): eased start/stop, smooth turning'},
  {v:'v55.52.43',n:'Smoother walking: eased start/stop, smooth turning, frame-rate independent camera follow'},
  {v:'v55.52.42',n:'Main menu Newsletter and Contact held behind FW_DEV (dev page only)'},
  {v:'v55.52.41',n:'Main menu: Newsletter opens /newsletter, Contact opens the wiki contact page'},
