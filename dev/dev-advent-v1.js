@@ -413,7 +413,7 @@
   W.querySelector('.x').onclick=()=>{sfx('click');close()};
   W.querySelector('.grid').addEventListener('click',e=>{const b=e.target.closest('.advd');if(b)tap(b,+b.dataset.d)});
   render()}
- function close(){if(REV){if(!REV.done&&!REV.view)return;return endReveal(1)}if(W){W.remove();W=null}if(typeof mode!='undefined'&&mode=='menu')mode='play'}
+ function close(){if(REV&&REV.gift)return endGift();if(REV){if(!REV.done&&!REV.view)return;return endReveal(1)}if(W){W.remove();W=null}if(typeof mode!='undefined'&&mode=='menu')mode='play'}
  function tip(b,t){if(!W)return;W.querySelectorAll('.tip').forEach(x=>x.remove());const r=b.getBoundingClientRect(),e=document.createElement('div');e.className='tip';e.textContent=t;
   e.style.left=(r.left+r.width/2)+'px';e.style.top=(r.top-6)+'px';W.appendChild(e);setTimeout(()=>e.remove(),1600)}
  function tap(b,d){
@@ -566,7 +566,51 @@
  /* anything else that clears the UI (pause, a modal, closeUI) also closes the calendar */
  setInterval(()=>{if(W&&typeof mode!='undefined'&&mode!='menu'){if(REV&&REV.v)REV.v.dispose();REV=null;W.remove();W=null}},300);
 
- window.FW_ADVENT={open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer,crate:{TIERS,pool,rollItem,WRAPS,tierOf}};
+ /* ---------- a free-standing present: used by Santa's Lodge. Same crate, same roll (rollItem with no door boost), same reveal as the calendar crates. ---------- */
+ function grant(r){const s=Sv();if(!s||!r)return;
+  if(r.t=='w'){s.wraps=s.wraps&&typeof s.wraps=='object'?s.wraps:{};s.wraps[r.pat]=1}
+  if(r.t=='k'){s.wr=s.wr||[];if(!s.wr.includes(r.id))s.wr.push(r.id);s.wc=s.wc||{};const g=GAR.find(x=>x.id==r.id);let c=null;safe(()=>{c=THC[r.id]},'thc');if(!s.wc[r.id])s.wc[r.id]=c||(g&&g.dc)}
+  if(r.t=='f'){s.inv=s.inv||{};s.inv[r.key]=(s.inv[r.key]||0)+1}
+  safe(()=>updateVersion(),'ver');safe(()=>autoSave(),'save');safe(()=>{if(typeof csPush=='function')csPush(1)},'cloud')}
+ function gift(cfg){
+  const s=Sv();if(!s||W||REV)return false;
+  safe(()=>{$('ui').innerHTML=''},'ui');mode='menu';
+  W=document.createElement('div');W.id='advw';W.setAttribute('role','dialog');W.setAttribute('aria-label',cfg.title||'Present');document.body.appendChild(W);
+  const r={t:'x',k:'x:crate',n:'Christmas Present',note:'Unwrap it to see what is inside: furniture, clothes or a car wrap. It is rolled the moment you open it and saved, exactly like the advent calendar presents.'};
+  const o=document.createElement('div');o.id='advr';
+  o.innerHTML=`<div class=card><div class=rib>${esc2(cfg.title||'PRESENT')}</div>
+   <div class=stage><canvas aria-label="3D view. Drag to spin."></canvas><div class=hint>&#8596; DRAG TO SPIN</div></div>
+   <h3></h3><div class=meta></div><p></p>
+   <button type=button class=cl>${cfg.prize?'OPEN PRESENT':'OPEN PRESENT'}</button><button type=button class="cl later" style="background:#262626;color:#8aa094;min-width:120px;padding:8px 18px">LATER</button></div>`;
+  REV={b:null,d:0,r,view:1,gift:cfg,o,pr:cfg.prize||null};
+  fillCard(o,r);W.appendChild(o);
+  const cv=o.querySelector('canvas');REV.v=safe(()=>Viewer(cv,r.k),'viewer');
+  const cb=o.querySelector('.cl'),lt=o.querySelector('.later');
+  sfx('whoosh');setTimeout(()=>jingle(),200);
+  cb.onclick=()=>{if(REV&&REV.claimable)giftClaim(cb);else giftOpen(cb,lt)};
+  lt.onclick=()=>{sfx('click');endGift()};
+  return true}
+ function giftOpen(cb,lt){
+  if(!REV||REV.opened)return;REV.opened=1;REV.busy=1;const s=Sv(),o=REV.o;
+  let pr=REV.pr;if(!pr){const it=rollItem(s,2);pr=prizeFrom(it);REV.pr=pr;safe(()=>REV.gift.onRoll&&REV.gift.onRoll(pr),'roll')}
+  cb.disabled=true;cb.textContent='OPENING...';lt.style.display='none';
+  const stage=o.querySelector('.stage');let cv=stage.querySelector('canvas');const h=stage.querySelector('.hint');
+  const fin=()=>{if(!REV||REV.o!==o)return;REV.r=pr;fillCard(o,pr);
+   const v3=document.createElement('button');v3.type='button';v3.className='v3';v3.textContent='VIEW 3D';stage.appendChild(v3);
+   v3.onclick=()=>{sfx('click');v3.remove();if(REV&&REV.strip){REV.strip.remove();REV.strip=null}stage.classList.remove('spin');
+    const nc=document.createElement('canvas');nc.setAttribute('aria-label','3D view. Drag to spin.');cv.replaceWith(nc);cv=nc;cv.style.display='';if(h){h.style.display='';h.classList.remove('gone')}REV.v=safe(()=>Viewer(cv,pr.k),'viewer')};
+   cb.disabled=false;cb.textContent='CLAIM';REV.claimable=1;REV.busy=0};
+  sfx('whoosh');shake(stage,6,260);flash(stage,'#ffffff',300);
+  setTimeout(()=>{if(!REV||REV.o!==o)return;if(REV.v){REV.v.dispose();REV.v=null}cv.style.display='none';if(h)h.style.display='none';try{spin(stage,pr,fin)}catch(e){fin()}},620)}
+ function giftClaim(cb){
+  if(!REV||REV.done||REV.busy)return;REV.busy=1;grant(REV.pr);safe(()=>REV.gift.onClaim&&REV.gift.onClaim(),'claim');REV.done=1;
+  cb.disabled=true;cb.innerHTML='&#10003; CLAIMED!';sfx('cash');setTimeout(()=>sfx('chime'),120);confetti(cb);
+  setTimeout(()=>{if(REV)REV.busy=0;endGift()},1500)}
+ function endGift(){
+  if(!REV||!REV.gift||REV.busy)return;const g=REV.gift,v=REV.v;REV=null;if(v)v.dispose();if(W){W.remove();W=null}
+  if(typeof mode!='undefined'&&mode=='menu')mode='play';safe(()=>g.onClose&&g.onClose(),'gclose')}
+
+ window.FW_ADVENT={gift,open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer,crate:{TIERS,pool,rollItem,WRAPS,tierOf}};
 
  /* ---------- dev panel: calendar-only test dates ---------- */
  if(DEV)safe(()=>{
