@@ -323,6 +323,7 @@
 #advr .cl:active{transform:translateY(1px)}
 #advr .cl:disabled{background:#262626;color:#8aa094;cursor:default}
 #advr .later{display:block;margin:10px auto 0}
+#advr .cl.later{min-width:140px;padding:8px 18px;background:#262626;color:#8aa094;font-size:12px}#advr .cl.later:hover{background:#333;color:#e8f3ec}
 .advfly{position:fixed;z-index:95;pointer-events:none;will-change:transform;image-rendering:pixelated}
 .advcf{position:fixed;z-index:96;width:8px;height:8px;pointer-events:none;will-change:transform,opacity}
 
@@ -437,7 +438,7 @@
   W.querySelector('.bdg').onclick=()=>{sfx('click');if(window.FW_PBORDER)window.FW_PBORDER.pick()};
   W.querySelector('.grid').addEventListener('click',e=>{const b=e.target.closest('.advd');if(b)tap(b,+b.dataset.d)});
   render()}
- function close(){if(REV){if(!REV.done&&!REV.view)return;return endReveal(1)}if(W){W.remove();W=null}if(typeof mode!='undefined'&&mode=='menu')mode='play'}
+ function close(){if(REV&&REV.gift){if(!REV.opened)endGift();return}if(REV){if(!REV.done&&!REV.view)return;return endReveal(1)}if(W){W.remove();W=null}if(typeof mode!='undefined'&&mode=='menu')mode='play'}
  function tip(b,t){if(!W)return;W.querySelectorAll('.tip').forEach(x=>x.remove());const r=b.getBoundingClientRect(),e=document.createElement('div');e.className='tip';e.textContent=t;
   e.style.left=(r.left+r.width/2)+'px';e.style.top=(r.top-6)+'px';W.appendChild(e);setTimeout(()=>e.remove(),1600)}
  function tap(b,d){
@@ -574,6 +575,9 @@
   if(!REV||REV.opened)return;REV.opened=1;REV.busy=1;const {d,o}=REV,s=Sv(),a=st();
   let pr=a&&a.p&&a.p[d];
   if(!pr){const it=rollItem(s,d);pr=prizeFrom(it);a.p[d]=pr;safe(()=>autoSave(),'save')}
+  windSpin(o,cb,pr)}
+ /* the crate opening itself, shared by calendar crates and free-standing presents (Santa's Lodge): wind-up, strip spin, landing, CLAIM */
+ function windSpin(o,cb,pr){
   cb.disabled=true;cb.textContent='OPENING...';
   const stage=o.querySelector('.stage');let cv=stage.querySelector('canvas');
   const h=stage.querySelector('.hint');
@@ -582,7 +586,7 @@
    const v3=document.createElement('button');v3.type='button';v3.className='v3';v3.textContent='VIEW 3D';stage.appendChild(v3);
    v3.onclick=()=>{sfx('click');v3.remove();if(REV&&REV.strip){REV.strip.remove();REV.strip=null}stage.classList.remove('spin');
     const nc=document.createElement('canvas');nc.setAttribute('aria-label','3D view. Drag to spin.');cv.replaceWith(nc);cv=nc;cv.style.display='';if(h){h.style.display='';h.classList.remove('gone')}REV.v=safe(()=>Viewer(cv,pr.k),'viewer')};
-   cb.disabled=false;cb.textContent='CLAIM';REV.busy=0};
+   cb.disabled=false;cb.textContent='CLAIM';REV.busy=0;REV.claimable=1};
   /* wind-up: the present shakes and flashes, then the strip starts */
   /* wind-up: the stage glows and shakes harder with each rising tone, a white flash, then the strip launches */
   const red=reduced(),WU=red?250:1050;
@@ -591,6 +595,7 @@
   setTimeout(()=>{if(REV&&REV.o===o)stage.classList.remove('chg');if(!REV||REV.o!==o)return;if(REV.v){REV.v.dispose();REV.v=null}cv.style.display='none';if(h)h.style.display='none';
    try{spin(stage,pr,fin)}catch(e){fin()}},WU)}
  function claim(cb){
+  if(REV&&REV.gift)return giftBtn(cb);
   if(!REV||REV.done||REV.view||REV.busy)return;const {d}=REV;
   if(REV.r.t=='x')return openCrate(cb);
   REV.busy=1;
@@ -630,9 +635,48 @@
  addEventListener('keydown',e=>{if(!W)return;if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();if(!(REV&&!REV.done&&!REV.view))close()}
   else if((e.key=='Enter'||e.key==' ')&&REV&&!REV.done&&!REV.view&&document.activeElement&&!document.activeElement.closest('#advr')){e.preventDefault();e.stopImmediatePropagation();claim(REV.o.querySelector('.cl'))}},true);
  /* anything else that clears the UI (pause, a modal, closeUI) also closes the calendar */
- setInterval(()=>{if(W&&typeof mode!='undefined'&&mode!='menu'){if(REV&&REV.v)REV.v.dispose();REV=null;W.remove();W=null}},300);
+ setInterval(()=>{if(W&&typeof mode!='undefined'&&mode!='menu'){const g=REV&&REV.gift;if(REV&&REV.v)REV.v.dispose();REV=null;W.remove();W=null;if(g)safe(()=>g.onClose&&g.onClose(false),'gclose')}},300);
 
- window.FW_ADVENT={open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer,crate:{TIERS,pool,rollItem,WRAPS,tierOf,prizeFrom,grant}};
+ /* ---------- a free-standing present (used by Santa's Lodge): the same crate model on the same spinning stand, the same wind-up,
+    strip spin and landing as a calendar crate. The prize is rolled and saved by the caller first (cfg.prize), so closing can never re-roll it.
+    cfg: {title, prize, note, onClaim(), onClose(claimed)}. Returns false if it cannot open now. ---------- */
+ function gift(cfg){
+  if(!Sv()||W||REV||!cfg||!cfg.prize)return false;
+  if(typeof mode!='undefined'&&mode!='play'&&mode!='menu')return false;
+  safe(()=>{$('ui').innerHTML=''},'ui');mode='menu';
+  W=document.createElement('div');W.id='advw';W.setAttribute('role','dialog');W.setAttribute('aria-label',cfg.title||'Present');document.body.appendChild(W);
+  const r={t:'x',k:'x:crate',n:cfg.name||'Christmas Present',note:cfg.note||'Unwrap it to see what is inside. It was rolled the moment it appeared, with the same roll as the advent calendar presents.'};
+  const o=document.createElement('div');o.id='advr';
+  o.innerHTML=`<div class=card><div class=rib>${esc2(cfg.title||'PRESENT')}</div>
+   <div class=stage><canvas aria-label="3D view. Drag to spin."></canvas><div class=hint>&#8596; DRAG TO SPIN</div></div>
+   <h3></h3><div class=meta></div><p></p>
+   <button type=button class=cl>OPEN PRESENT</button><button type=button class="cl later">LATER</button></div>`;
+  REV={b:null,d:0,r,view:0,gift:cfg,o,pr:cfg.prize};
+  fillCard(o,r);W.appendChild(o);
+  const cv=o.querySelector('canvas'),card=o.querySelector('.card');REV.v=safe(()=>Viewer(cv,r.k),'viewer');
+  card.animate([{transform:'scale(.6)',opacity:0},{transform:'scale(1.04)',opacity:1,offset:.7},{transform:'scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.8,.3,1)'});
+  const cb=o.querySelector('.cl'),lt=o.querySelector('.later');
+  sfx('whoosh');setTimeout(()=>jingle(),300);
+  cb.addEventListener('pointerup',e=>{if(e.button===0||e.pointerType=='touch'||e.pointerType=='pen')giftBtn(cb)});cb.addEventListener('click',()=>giftBtn(cb));
+  lt.onclick=()=>{sfx('click');endGift()};setTimeout(()=>cb.focus(),60);
+  return true}
+ function giftBtn(cb){
+  if(!REV||!REV.gift||REV.done||REV.busy)return;
+  if(REV.claimable)return giftClaim(cb);
+  if(REV.opened)return;REV.opened=1;REV.busy=1;const lt=REV.o.querySelector('.later');if(lt)lt.style.display='none';
+  windSpin(REV.o,cb,REV.pr)}
+ function giftClaim(cb){
+  if(!REV||REV.done||REV.busy)return;REV.busy=1;
+  if(!grant(REV.pr)){REV.busy=0;sfx('err');cb.textContent='TRY AGAIN';return}
+  REV.done=1;safe(()=>REV.gift.onClaim&&REV.gift.onClaim(),'claim');
+  cb.disabled=true;cb.innerHTML='&#10003; CLAIMED!';sfx('cash');setTimeout(()=>sfx('chime'),120);confetti(cb);
+  setTimeout(()=>{if(REV)REV.busy=0;endGift()},1500)}
+ function endGift(){
+  if(!REV||!REV.gift||REV.busy)return;const g=REV.gift,v=REV.v,done=!!REV.done,o=REV.o;REV=null;if(v)v.dispose();
+  const w=W;W=null;if(w){w.style.transition='opacity .25s';w.style.opacity='0';setTimeout(()=>w.remove(),260)}
+  if(typeof mode!='undefined'&&mode=='menu')mode='play';safe(()=>g.onClose&&g.onClose(done),'gclose')}
+
+ window.FW_ADVENT={gift,open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer,crate:{TIERS,pool,rollItem,WRAPS,tierOf,prizeFrom,grant}};
 
  /* ---------- dev panel: calendar-only test dates ---------- */
  if(DEV)safe(()=>{
