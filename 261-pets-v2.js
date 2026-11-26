@@ -11,7 +11,7 @@
    - The "Bring pets along" button is gone from the bodyguard page.
    Reused, not copied: 58-pets rigs and previews (pvc), 22f petUse/PETF (petUse is replaced here), 129 follow code, appointment shop flow. */
 (function(){
-const HELD=true;
+const HELD=false;
 if(HELD&&!window.FW_DEV)return;
 const MAX=3;
 /* the powerups come from dev/dev-pets.js (window.PET_PERK[k]=[name,text]); without that pack a pet only adds +1 song quality */

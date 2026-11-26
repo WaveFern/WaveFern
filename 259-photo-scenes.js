@@ -5,7 +5,7 @@
    160x120 canvas, drawn behind and in front of the 3D people. Helpers reused: igxF/igxGrad/igxDisc/igxTxt/igxMix, igxBrick, igxTree.
    Held: HELD=true keeps it dev-only (window.FW_DEV) until release day, then set HELD=false. */
 (function(){
-const HELD=true;
+const HELD=false;
 if(HELD&&!window.FW_DEV)return;
 if(typeof IGXS=='undefined'||!IGXS.city||!IGXS.city.V||typeof igxTree!='function'||typeof igxBrick!='function')return;
 const _S=IGXS,F=igxF,G=igxGrad,D=igxDisc,T=igxTxt,M=igxMix,hsl=(h,s,l)=>'hsl('+(((h%360)+360)%360)+','+s+'%,'+l+'%)';

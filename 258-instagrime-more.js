@@ -9,7 +9,7 @@
    the News app's story maker (FWNEWS) and the existing post renderer: the wrapper only slices IGF and decorates the HTML it returns.
    Nothing new is saved. Held behind the same dev gate as the News app. */
 (function(){
-const HELD=true;
+const HELD=false;
 if(HELD&&!window.FW_DEV)return;
 if(typeof PA=='undefined'||!PA.ig||typeof FWINF=='undefined'||typeof FWNEWS=='undefined')return;
 const rg=s=>igzRng(s),pk=igzPick,fm=n=>igzF(Math.max(0,Math.round(n)));

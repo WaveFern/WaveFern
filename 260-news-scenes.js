@@ -3,7 +3,7 @@
    observatory, town hall and tech expo. They are top-level IGXS scenes (not in the post studio's picker); the News app picks one per
    story from FWNEWS.sceneFor(story). Held with 259 (HELD=true + FW_DEV). */
 (function(){
-const HELD=true;
+const HELD=false;
 if(HELD&&!window.FW_DEV)return;
 if(typeof IGXS=='undefined'||!IGXS.city||typeof igxTree!='function')return;
 const _S=IGXS,F=igxF,G=igxGrad,D=igxDisc,T=igxTxt,M=igxMix,hsl=(h,s,l)=>'hsl('+(((h%360)+360)%360)+','+s+'%,'+l+'%)';
