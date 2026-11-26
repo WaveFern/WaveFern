@@ -192,8 +192,6 @@ function buildProps(){
  /* stone path and candy-cane lamps down to the meadow */
  for(let i=0;i<7;i++)X('yard',2.6+((i*3)%3)*.2,.1,1.5,i%2?C.stone2:C.stone3,((i*5)%3-1)*.15,.16,HD+7.2+i*1.7,((i*7)%5-2)*.04);
  [[-3.2,HD+7.5],[3.2,HD+7.5],[-3.2,HD+12],[3.2,HD+12]].forEach(([x,z])=>lamp('ext','glow',x,z,3.1));
- /* the sign at the bottom of the path */
- X('ext',.3,2.6,.3,C.logD,-3.4,1.3,HD+14.2);X('ext',.3,2.6,.3,C.logD,3.4,1.3,HD+14.2);X('ext',8.0,1.6,.3,C.log2,0,2.1,HD+14.2);X('ext',8.2,.2,.5,C.snow,0,3.0,HD+14.2);
  /* pines around the back and sides */
  [[-17,-12,1.1],[-13,-15,1.3],[-6,-17,1],[1,-16,1.2],[8,-17,1.05],[14,-14,1.3],[18,-9,1.1],[-19,-3,1.2],[-18,5,1],[19,0,1.15],[20,8,1.0],[-20,12,1.1]].forEach(([x,z,s])=>{pine('ext',x,z,s);solidC(x,z,.7*s)});
  /* a decorated tree beside the porch: lights are glow boxes, baubles in colours, a gold star */
@@ -218,12 +216,21 @@ function buildProps(){
 buildProps();
 
 /* ---------- inside: rug, fireplace, tree, shelf, window, armchair, table, toys, garland ---------- */
+const TRK={x:4.9,z:3.0,rx:2.3,rz:1.7};/* the toy train's oval track */
 function buildInside(){
- /* rugs: a big red round-ish rug in front of Santa with a white and gold border, and a runner from the door */
- const rugs=(w,d,x,z,c,c2,c3)=>{X('inn',w+.5,.04,d+.5,c3,x,.4,z);X('inn',w+.2,.05,d+.2,c2,x,.41,z);X('inn',w-.1,.06,d-.1,c,x,.42,z)};
- rugs(10.6,7.4,0,-3.9,C.red,C.white,C.gold);X('inn',8.4,.07,5.4,C.redD,0,.43,-3.9);X('inn',5.4,.08,3.8,C.red,0,.44,-3.9);
- for(let i=0;i<12;i++){const a=i/12*Math.PI*2;X('inn',.5,.09,.5,i%2?C.gold:C.white,Math.cos(a)*2.6,.45,-3.9+Math.sin(a)*1.7,a)}
- rugs(3.4,6.4,0,4.5,C.green,C.white,C.red);for(let i=0;i<5;i++)X('inn',2.6,.07,.5,C.greenD,0,.43,2.2+i*1.1);
+ /* Santa's round rug: stepped circles (gold rim, white ring, red field, a darker inner circle with a white snowflake), centred in front of him */
+ const disc=(cx,cz,r,y,h,col,step)=>{step=step||.36;for(let z=-r+step/2;z<r;z+=step){const w=2*Math.sqrt(Math.max(0,r*r-z*z));if(w>.2)X('inn',Math.round(w/step)*step,h,step+.01,col,cx,y,cz+z)}};
+ const RC=[0,-3.4];
+ disc(RC[0],RC[1],4.5,.41,.04,C.gold);disc(RC[0],RC[1],4.2,.425,.05,C.white);disc(RC[0],RC[1],3.85,.44,.06,C.red);disc(RC[0],RC[1],2.5,.45,.05,C.redD);
+ for(let i=0;i<16;i++){const a=i/16*Math.PI*2;X('inn',.34,.07,.34,i%2?C.goldL:C.white,RC[0]+Math.cos(a)*3.25,.45,RC[1]+Math.sin(a)*3.25,a)}
+ for(let i=0;i<6;i++){const a=i/6*Math.PI;X('inn',3.6,.06,.22,C.white,RC[0],.46,RC[1],a);X('inn',.5,.065,.5,C.white,RC[0]+Math.cos(a)*1.45,.46,RC[1]-Math.sin(a)*1.45,a+.785);X('inn',.5,.065,.5,C.white,RC[0]-Math.cos(a)*1.45,.46,RC[1]+Math.sin(a)*1.45,a+.785)}
+ X('inn',.7,.07,.7,C.goldL,RC[0],.465,RC[1],.785);
+ /* the runner from the door: red with white edges and gold diamonds */
+ X('inn',2.6,.04,7.4,C.white,0,.41,4.9);X('inn',2.2,.05,7.4,C.red,0,.42,4.9);for(let i=0;i<6;i++)X('inn',.42,.055,.42,C.goldL,0,.425,1.9+i*1.2,.785);for(let i=0;i<12;i++)X('inn',.18,.055,.18,C.white,i%2?-.75:.75,.425,1.6+i*.6,.785);
+ /* a white fur rug in front of the fire, with a sleeping cat on it */
+ disc(-7.6,-1.5,1.7,.41,.05,'#e9eef4',.3);disc(-7.6,-1.5,1.4,.42,.05,C.white,.3);
+ {const cx=-7.3,cz=-1.2;X('inn',.9,.36,.6,'#e08a3c',cx,.62,cz);X('inn',.5,.34,.48,'#e08a3c',cx+.55,.66,cz+.1);X('inn',.14,.14,.06,'#e08a3c',cx+.45,.88,cz+.1);X('inn',.14,.14,.06,'#e08a3c',cx+.68,.88,cz+.1);
+  X('inn',.5,.12,.12,'#c26f28',cx-.4,.5,cz+.36,.5);X('inn',.2,.06,.04,'#3a2214',cx+.6,.68,cz+.35);X('inn',.5,.06,.6,'#c26f28',cx-.1,.82,cz);X('inn',.12,.1,.04,'#f2c7a0',cx+.55,.6,cz+.35)}
  /* fireplace on the west wall: stone breast, firebox, hearth, mantel, logs */
  const fx=-HW+.4;X('inn',1.8,5.2,5.0,C.stone,fx+.9,2.6,-1.5);for(let i=0;i<10;i++)for(let j=0;j<5;j++)X('inn',1.84,.5,1.0,(i+j)%3?C.stone3:C.stone2,fx+.9,.35+i*.5,-3.5+j*1.0+(i%2)*.5);
  X('inn',1.2,2.0,2.8,'#17181b',fx+1.4,1.5,-1.5);X('inn',.1,2.0,2.8,'#0e0f11',fx+.4,1.5,-1.5);X('inn',1.6,.3,3.4,C.stone3,fx+1.6,.5,-1.5);X('inn',2.4,.5,5.4,C.stone2,fx+1.6,.42,-1.5);
@@ -249,16 +256,52 @@ function buildInside(){
   [[1.8,.4,.9,C.red],[-1.6,1.2,1.0,C.green],[.6,1.8,.8,'#3f6fd6'],[2.3,-1.0,.8,C.gold],[-2.0,-.2,.7,'#a63fb0']].forEach(([a,b,s2,c],i)=>{X('inn',s2,s2,s2,c,tx+a,.4+s2/2,tz+b,i*.4);X('inn',s2+.02,s2+.02,.16,C.white,tx+a,.4+s2/2,tz+b,i*.4);X('inn',.16,s2+.02,s2+.02,C.white,tx+a,.4+s2/2,tz+b,i*.4);X('inn',.34,.26,.34,C.goldL,tx+a,.4+s2+.12,tz+b,i*.4)});solidC(tx,tz,1.5)}
  /* bookshelf and a globe in the north-east, a grandfather clock, a toy shelf with a train and a rocking horse */
  {const bxx=7.4,bz=-HD+.9;X('inn',3.8,4.4,.8,C.wain,bxx,2.4,bz);for(let r=0;r<4;r++){X('inn',3.6,.12,.8,C.pineD,bxx,.8+r*1.05,bz+.02);let x=bxx-1.7;for(let i=0;i<9;i++){const w=.2+((i*7+r*3)%4)*.06,h=.6+((i*5+r)%4)*.14;X('inn',w,h,.55,['#c0392b','#2e6ea5','#e6b422','#2e8b4e','#7a3fb0','#e07a2c'][(i+r*2)%6],x+w/2,.86+r*1.05+h/2,bz+.05);x+=w+.03}}
-  solid(bxx-1.95,-HD+.3,bxx+1.95,-HD+1.4);
-  X('inn',.9,.1,.9,C.wain,3.6,.45,-HD+1.1);X('inn',.2,.5,.2,C.wain,3.6,.7,-HD+1.1);X('inn',.9,.9,.9,'#3d6fa8',3.6,1.4,-HD+1.1);X('inn',.95,.04,.95,C.goldL,3.6,1.4,-HD+1.1);X('inn',.95,.95,.04,C.goldL,3.6,1.4,-HD+1.1);solidC(3.6,-HD+1.1,.6)}
+  solid(bxx-1.95,-HD+.3,bxx+1.95,-HD+1.4);}
  /* the clock */
  {const cx=11.0,cz=-HD+1.0;X('inn',1.3,4.6,1.0,C.wain,cx,2.6,cz);X('inn',1.5,.3,1.2,C.pineD,cx,5.0,cz);X('inn',.9,.9,.1,C.cream,cx,3.8,cz+.55);X('inn',.08,.4,.06,C.iron,cx,3.9,cz+.6);X('inn',.3,.06,.06,C.iron,cx+.1,3.8,cz+.6);X('inn',.6,1.6,.1,C.pineD,cx,2.0,cz+.55);X('inn',.2,.2,.1,C.goldL,cx,1.7,cz+.6);solid(cx-.8,-HD+.3,cx+.8,-HD+1.6)}
- /* wooden toy shelf + sack of toys on the east side, a work table with a half-painted rocking horse */
- {const sx=8.6,sz=-.5;X('inn',2.8,.2,1.6,C.pineD,sx,1.5,sz);for(const [a,b] of[[-1.2,-.6],[1.2,-.6],[-1.2,.6],[1.2,.6]])X('inn',.2,1.4,.2,C.wain,sx+a,.8,sz+b);X('inn',2.6,.12,1.4,C.wain,sx,.5,sz);
-   X('inn',.5,.4,.5,C.red,sx-.9,1.8,sz);X('inn',.5,.4,.5,C.green,sx-.3,1.8,sz+.1);X('inn',.5,.7,.5,C.gold,sx+.4,1.95,sz-.1);X('inn',.3,.3,.3,'#fff',sx+1,1.75,sz+.1);
-   X('inn',1.8,.4,.7,C.green,sx-.2,.8,sz-.1);X('inn',.5,.3,.7,C.red,sx+.2,1.1,sz-.1);X('inn',.3,.2,.3,C.iron,sx-.8,1.1,sz-.1);
-   solid(sx-1.5,sz-.9,sx+1.5,sz+.9)}
- {const sx=10.2,sz=-6.2;X('inn',2.2,2.0,1.8,'#a87a3c',sx,1.35,sz);X('inn',1.6,.7,1.4,'#a87a3c',sx,2.7,sz);X('inn',1.0,.5,.9,'#8d6330',sx,3.15,sz);X('inn',1.7,.2,1.5,C.red,sx,2.45,sz);X('inn',.5,.3,.5,C.goldL,sx,3.5,sz);[[ -.6,2.9,.7,C.red],[.6,2.9,.6,C.green],[0,3.4,.7,'#3f6fd6']].forEach(([a,y,b,c])=>X('inn',.45,.45,.45,c,sx+a,y+.5,sz+b*.0));solid(sx-1.3,sz-1.1,sx+1.3,sz+1.1)}
+ /* Santa's arch: two big candy-cane pillars and a garland swag of lights framing him and the picture window */
+ {const px=4.7,pz=-7.9;[-1,1].forEach(s=>{for(let i=0;i<15;i++)X('inn',.6,.32,.6,i%2?C.white:C.red,s*px,.57+i*.31,pz,i*.12);X('inn',.8,.2,.8,C.gold,s*px,.5,pz);X('inn',.7,.16,.7,C.gold,s*px,5.0,pz);bx(B.glow,.5,.5,.5,C.goldL,s*px,5.3,pz,.785,.6,0);solidC(s*px,pz,.45)});
+  for(let i=0;i<=20;i++){const f=i/20,x=lerp(-px,px,f),y=4.9-Math.sin(f*Math.PI)*.75+Math.sin(f*Math.PI*4)**2*-.12;X('inn',.62,.36,.44,i%2?C.green:C.greenD,x,y,pz+.1);if(i%2==0)bx(B.glow,.18,.24,.18,[C.redL,C.goldL,'#4aa3ff','#7fe3a0'][(i/2)%4],x,y-.3,pz+.3)}
+  X('inn',.6,.6,.2,C.red,0,4.25,pz+.3);X('inn',.5,.3,.14,C.red,-.45,4.3,pz+.3,0,0,.4);X('inn',.5,.3,.14,C.red,.45,4.3,pz+.3,0,0,-.4);X('inn',.2,.5,.12,C.redD,-.18,3.85,pz+.32,0,0,.2);X('inn',.2,.5,.12,C.redD,.18,3.85,pz+.32,0,0,-.2);
+  /* presents stacked inside the arch, either side of Santa */
+  [[-3.4,-8.1],[3.4,-8.1]].forEach(([x,z],k)=>{[[0,0,1.0,k?C.green:C.red,C.goldL],[.15,1.0,.7,k?'#3f6fd6':C.gold,C.white],[-.05,1.7,.45,k?C.redL:'#a63fb0',C.goldL]].forEach(([dx,y,s2,c,rb],i)=>{X('inn',s2,s2,s2,c,x+dx,.41+y+s2/2,z,(i+k)*.35);X('inn',s2+.02,s2+.02,.14,rb,x+dx,.41+y+s2/2,z,(i+k)*.35);X('inn',.14,s2+.02,s2+.02,rb,x+dx,.41+y+s2/2,z,(i+k)*.35)});solidC(x,z,.6)})}
+ /* the elves' workbench along the east wall: tools, paint pots, a toy soldier, a half-painted rocking horse, a lamp */
+ {const bxx=10.7,bz=-.9,L=6.0;X('inn',1.6,.18,L,C.pine,bxx,1.45,bz);X('inn',1.5,.1,L-.2,C.pineD,bxx,.75,bz);[[-.65,-L/2+.2],[.65,-L/2+.2],[-.65,L/2-.2],[.65,L/2-.2]].forEach(([a,b])=>X('inn',.18,1.1,.18,C.wain,bxx+a,.95,bz+b));
+  X('inn',.5,.24,.4,C.iron,bxx-.2,1.66,bz-2.5);X('inn',.12,.34,.12,C.iron,bxx-.2,1.86,bz-2.5);
+  [[C.redL,-1.8],['#4aa3ff',-1.45],[C.goldL,-1.1],[C.greenL,-.75]].forEach(([c,z])=>{X('inn',.26,.3,.26,'#d9d9d9',bxx+.3,1.7,bz+z);X('inn',.22,.06,.22,c,bxx+.3,1.86,bz+z)});X('inn',.06,.5,.06,C.wain,bxx+.3,1.95,bz-1.45,0,0,.3);
+  /* toy soldier */
+  {const sx=bxx-.3,sz=bz+.2;X('inn',.24,.18,.18,C.navy,sx,1.63,sz);X('inn',.26,.3,.2,C.red,sx,1.87,sz);X('inn',.2,.2,.18,'#f0b48a',sx,2.12,sz);X('inn',.22,.3,.2,C.iron,sx,2.36,sz);X('inn',.06,.06,.06,C.goldL,sx,2.0,sz+.11)}
+  /* rocking horse, half painted */
+  {const hx=bxx-.1,hz=bz+1.6;X('inn',.2,.1,1.3,C.redD,hx,1.6,hz);X('inn',.34,.4,.9,C.white,hx,2.0,hz);X('inn',.34,.4,.4,C.cream,hx,2.0,hz+.25);X('inn',.3,.5,.3,C.white,hx,2.4,hz+.55);X('inn',.28,.26,.4,C.white,hx,2.6,hz+.75);X('inn',.12,.5,.12,C.red,hx,2.5,hz+.35);X('inn',.1,.4,.1,C.logD,hx,2.0,hz-.5);[[-.1,-.3],[-.1,.3]].forEach(([a,b])=>X('inn',.1,.3,.1,C.logD,hx+a,1.75,hz+b))}
+  /* a lamp with a warm glow, a wooden mallet, scattered blocks */
+  X('inn',.3,.06,.3,C.iron,bxx+.4,1.57,bz+2.5);X('inn',.06,.7,.06,C.iron,bxx+.4,1.9,bz+2.5);X('inn',.4,.24,.4,C.green,bxx+.25,2.25,bz+2.5);bx(B.glow,.24,.1,.24,'#ffe3a0',bxx+.25,2.12,bz+2.5);
+  X('inn',.5,.16,.16,C.logD,bxx-.4,1.62,bz-.9,.4);X('inn',.06,.06,.5,C.wain,bxx-.25,1.6,bz-1.1,.4);
+  [[C.red,-.3,.9],['#4aa3ff',.0,1.05],[C.goldL,-.15,1.15]].forEach(([c,a,y],i)=>X('inn',.22,.22,.22,c,bxx+a,1.65+i*.0+(i==2?.22:0),bz+.9+i*.18,i*.4));
+  /* a stool in front of it */
+  X('inn',.8,.14,.8,C.red,bxx-1.7,1.0,bz+.5);X('inn',.12,.6,.12,C.wain,bxx-1.95,.65,bz+.25);X('inn',.12,.6,.12,C.wain,bxx-1.45,.65,bz+.25);X('inn',.12,.6,.12,C.wain,bxx-1.95,.65,bz+.75);X('inn',.12,.6,.12,C.wain,bxx-1.45,.65,bz+.75);
+  solid(bxx-.85,bz-L/2,bxx+.9,bz+L/2);solidC(bxx-1.7,bz+.5,.45)}
+ /* the Naughty or Nice list: a lectern with a long scroll that unrolls across the floor */
+ {const lx=6.4,lz=-4.6;X('inn',.9,.16,.7,C.wain,lx,.5,lz);X('inn',.24,1.4,.24,C.wain,lx,1.25,lz);X('inn',1.2,.12,.9,C.pineD,lx,2.0,lz,0,-.35);X('inn',1.1,.06,.8,C.cream,lx,2.08,lz,0,-.35);
+  for(let i=0;i<5;i++)X('inn',.7,.03,.06,i==0?C.redD:'#6b5a48',lx,2.13,lz-.25+i*.12,0,-.35);
+  X('inn',.9,.04,.3,C.cream,lx,1.7,lz+.5,0,.9);X('inn',.9,.04,2.6,C.cream,lx,.43,lz+1.75);X('inn',.95,.18,.18,'#e8dcc0',lx,.5,lz+3.1);for(let i=0;i<9;i++){X('inn',.5+((i*3)%4)*.06,.02,.05,'#6b5a48',lx-.08,.46,lz+.7+i*.24);X('inn',.08,.02,.08,i%3?C.green:C.redL,lx+.32,.46,lz+.7+i*.24)}
+  solidC(lx,lz,.5)}
+ /* Santa's sack, bulging with toys, and a pile of presents in the south-east corner */
+ {const sx=9.6,sz=6.6;X('inn',2.0,1.2,1.8,'#a87a3c',sx,1.0,sz);X('inn',1.8,.7,1.6,'#a87a3c',sx,1.9,sz);X('inn',1.3,.4,1.2,'#956a32',sx,2.4,sz);X('inn',1.7,.14,1.5,C.red,sx,2.2,sz);for(let i=0;i<5;i++)X('inn',.22,.6,.22,'#956a32',sx-.8+i*.4,1.0,sz+.92);
+  X('inn',.5,.5,.4,'#b5733a',sx-.2,2.8,sz);X('inn',.18,.18,.1,'#b5733a',sx-.38,3.1,sz);X('inn',.18,.18,.1,'#b5733a',sx-.02,3.1,sz);X('inn',.08,.08,.04,'#1d1d22',sx-.28,2.85,sz+.22);X('inn',.08,.08,.04,'#1d1d22',sx-.12,2.85,sz+.22);
+  X('inn',.6,.4,.6,C.redL,sx+.4,2.75,sz-.1,.4);X('inn',.62,.06,.62,C.white,sx+.4,2.95,sz-.1,.4);for(let i=0;i<4;i++)X('inn',.12,.6,.12,i%2?C.white:C.red,sx-.6,2.7+i*.0,sz+.3,0,0,.4);
+  [[-1.9,.3,.9,C.green],[-1.6,1.1,.7,C.gold],[1.5,.5,.8,'#3f6fd6'],[1.2,-1.2,.7,C.red],[-1.3,-1.0,.6,'#a63fb0']].forEach(([a,b,s2,c],i)=>{X('inn',s2,s2,s2,c,sx+a,.41+s2/2,sz+b,i*.5);X('inn',s2+.02,s2+.02,.14,C.white,sx+a,.41+s2/2,sz+b,i*.5);X('inn',.34,.24,.34,C.goldL,sx+a,.41+s2+.1,sz+b,i*.5)});
+  solid(sx-2.5,sz-1.8,sx+2.2,sz+1.6)}
+ /* coat rack by the door with Santa's spare coat and hat, and a pair of boots */
+ {const cx=-4.0,cz=7.6;X('inn',.8,.12,.8,C.wain,cx,.47,cz);X('inn',.16,3.6,.16,C.wain,cx,2.2,cz);X('inn',1.0,.1,.1,C.wain,cx,3.8,cz,0,0,0);X('inn',.1,.1,1.0,C.wain,cx,3.8,cz);
+  X('inn',.9,1.6,.5,C.red,cx+.3,2.8,cz);X('inn',.95,.18,.55,C.white,cx+.3,2.05,cz);X('inn',.2,1.5,.08,C.white,cx+.3,2.8,cz+.27);X('inn',.95,.14,.55,'#1d1d22',cx+.3,2.5,cz);
+  X('inn',.6,.18,.6,C.white,cx-.35,3.95,cz);X('inn',.5,.4,.5,C.red,cx-.35,4.2,cz-.05);X('inn',.22,.22,.22,C.white,cx-.15,4.4,cz-.3);
+  X('inn',.3,.4,.5,'#1d1d22',cx+1.0,.6,cz+.2);X('inn',.3,.4,.5,'#1d1d22',cx+1.4,.6,cz+.2);X('inn',.34,.1,.54,C.white,cx+1.0,.82,cz+.2);X('inn',.34,.1,.54,C.white,cx+1.4,.82,cz+.2);
+  solidC(cx,cz,.45)}
+ /* a basket of firewood beside the fireplace */
+ {const fx=-10.6,fz=2.4;X('inn',1.2,.6,1.0,'#8d6330',fx,.7,fz);X('inn',1.25,.1,1.05,'#6e4a22',fx,1.0,fz);for(let i=0;i<5;i++)X('inn',.24,.24,1.1,LOGS[i%3],fx-.42+i*.21,1.12+(i%2)*.12,fz,0,0,0);solidC(fx,fz,.6)}
+ /* the toy train's track: an oval of ties and rails on the floor (the train runs round it, see stepTrain) */
+ for(let i=0;i<44;i++){const a=i/44*Math.PI*2,x=TRK.x+Math.cos(a)*TRK.rx,z=TRK.z+Math.sin(a)*TRK.rz,tx=-Math.sin(a)*TRK.rx,tz=Math.cos(a)*TRK.rz,tl=Math.hypot(tx,tz),nx=tz/tl,nz=-tx/tl;
+  X('inn',.72,.04,.16,C.logD,x,.42,z,Math.atan2(-nz,nx));[-1,1].forEach(s=>X('inn',.5,.05,.06,C.iron,x+nx*.22*s,.45,z+nz*.22*s,Math.atan2(-tz,tx)))}
  /* garland swags and warm bulbs along the north wall, round the window, across the fireplace wall */
  for(let i=0;i<=24;i++){const x=-HW+1+i*(HW*2-2)/24,y=WH-.5-Math.sin(i/24*Math.PI*4)**2*.45;X('inn',1.0,.26,.34,i%2?C.green:C.greenD,x,y,-HD+.36);if(i%3==0)X('inn',.22,.22,.22,C.redL,x,y-.1,-HD+.55)}
  /* progress baubles: five big ornaments hang over Santa and light up one per feeding (gold) */
@@ -287,10 +330,6 @@ const flat=(tex,w,h,x,y,z,ry,extra)=>{const m=new THREE.Mesh(new THREE.PlaneGeom
  const sign=canvasTex(6,1,(c,w,h)=>{c.fillStyle='#6b3b1f';c.fillRect(0,0,w,h);c.fillStyle='#8a5530';for(let i=0;i<8;i++)c.fillRect(0,i*h/8,w,2);c.strokeStyle='#f1e6c8';c.lineWidth=6;c.strokeRect(5,5,w-10,h-10);
   c.fillStyle='#000a';c.font='bold '+Math.round(h*.46)+'px '+FONT;c.textAlign='center';c.textBaseline='middle';c.fillText("SANTA'S LODGE",w/2+3,h*.53+3);c.fillStyle='#f6f8fb';c.fillText("SANTA'S LODGE",w/2,h*.53);c.fillStyle='#e04b3c';c.fillRect(w*.1,h*.82,w*.8,3);c.fillStyle='#46d17a';c.fillRect(w*.1,h*.12,w*.8,3)},60);
  cutG.add(flat(sign,6,1,0,4.5,HD+.51,0));
- /* the sign at the bottom of the path */
- const sg2=canvasTex(8,1.5,(c,w,h)=>{c.fillStyle='#5b3418';c.fillRect(0,0,w,h);c.strokeStyle='#e6b422';c.lineWidth=6;c.strokeRect(6,6,w-12,h-12);c.fillStyle='#f6f8fb';c.font='bold '+Math.round(h*.34)+'px '+FONT;c.textAlign='center';c.textBaseline='middle';c.fillText("SANTA'S LODGE",w/2,h*.38);c.fillStyle='#ffd75e';c.font=Math.round(h*.2)+'px '+FONT;c.fillText('Feed Santa: bring cookies & candy canes',w/2,h*.72)},50);
- stat.add(flat(sg2,8,1.5,0,2.1,HD+14.36,0));
- /* the sign is two-sided so it reads from the meadow side too */
 }
 
 /* ---------- flush the batches into meshes ---------- */
@@ -352,7 +391,7 @@ function part(par,w,h,d,c,x,y,z,o){const m=new THREE.Mesh(GBX,lm(c));m.scale.set
 const grp=(par,x,y,z)=>{const g=new THREE.Group();g.position.set(x||0,y||0,z||0);par.add(g);return g};
 const SK='#f3bd95',SKD='#dc9a72',FUR='#f8fafc',FURD='#dfe6ee',REDC='#cc2a22',REDD='#a01f19',REDL='#d6352c',BLK='#1d1d22',GLD='#e6b422';
 /* Santa's feet stand on the top of the rug under him; every pose keeps them there (the body pivots at the soles) */
-const FLOOR_S=.485,HATY=.7;
+const FLOOR_S=.48,HATY=.7;
 /* Santa: a chunky block figure in the game's style. Every moving piece hangs from its own pivot:
    body (squash and stretch at the soles) > belly (swells from its bottom) / chest / arms (shoulders) / head (neck) > jaw (beard) / hat > hat tip */
 const SANTA=(()=>{
@@ -576,17 +615,29 @@ INT.push({x:LX+PRES_AT[0],z:LZ+PRES_AT[1],get r(){return mode_()=='play'&&PRES.o
 let lastT=performance.now();
 const r0=renderer.render.bind(renderer);
 renderer.render=function(sc,c){if(c===cam){const n=performance.now(),dt=Math.min(.06,(n-lastT)/1000);lastT=n;if(!(typeof PAUSED!='undefined'&&PAUSED)){try{tick(dt)}catch(e){soft(e,'tick')}}}return r0(sc,c)};
+/* ---------- the toy train: an engine and two little wagons chuffing round the oval track ---------- */
+const TRAIN=(()=>{const cars=[];const mk=(i)=>{const g=grp(dynG,0,0,0);
+  if(i==0){part(g,.5,.12,.9,'#1d1d22',0,.53,0);part(g,.4,.34,.5,REDC,0,.76,.12);part(g,.34,.34,.34,'#2e2e36',0,.76,.12);part(g,.36,.36,.4,'#2e2e36',0,.78,.18);part(g,.44,.48,.38,REDC,0,.84,-.24);part(g,.5,.08,.46,'#1d1d22',0,1.1,-.24);
+   part(g,.12,.24,.12,'#1d1d22',0,1.06,.3);part(g,.18,.06,.18,'#1d1d22',0,1.2,.3);part(g,.38,.06,.06,GLD,0,.62,.47);part(g,.2,.16,.04,'#ffe3a0',0,.8,.4);part(g,.06,.12,.06,GLD,0,1.0,.06)}
+  else{part(g,.48,.1,.74,'#1d1d22',0,.53,0);part(g,.46,.26,.7,i==1?'#2e8b4e':'#3f6fd6',0,.71,0);part(g,.5,.06,.74,GLD,0,.86,0);
+   part(g,.26,.24,.26,i==1?REDC:GLD,-.06,.98,-.12);part(g,.28,.04,.06,'#f6f8fb',-.06,.98,-.12);part(g,.2,.2,.2,i==1?GLD:REDC,.08,.96,.18)}
+  [-1,1].forEach(s=>[-.25,.25].forEach(z=>part(g,.06,.16,.16,'#1d1d22',s*.26,.5,z)));return g};
+ for(let i=0;i<3;i++)cars.push(mk(i));return{cars,a:0,puff:0}})();
+function stepTrain(dt){const T=TRAIN;T.a=(T.a+dt*.32)%(Math.PI*2);
+ T.cars.forEach((g,i)=>{const a=T.a-i*.36,x=TRK.x+Math.cos(a)*TRK.rx,z=TRK.z+Math.sin(a)*TRK.rz,tx=-Math.sin(a)*TRK.rx,tz=Math.cos(a)*TRK.rz;
+  g.position.set(x,Math.abs(Math.sin(CLOCK*14+i))*.012,z);g.rotation.y=Math.atan2(tx,tz)});
+ T.puff-=dt;if(T.puff<0&&inK>.5){T.puff=.5;const g=T.cars[0],v=new THREE.Vector3(0,1.25,.3).applyMatrix4(g.matrixWorld);root.worldToLocal(v);emit(v.x,v.y,v.z,1,{colors:['#ffffff','#e8edf2'],speed:.2,up:.7,grav:-.4,life:1.3,size:.16,fade:.3,floor:-9,spread:.05})}}
 /* the floor is solid: inside the lodge, on the porch and on the steps you walk on top of the boards and rugs, not through them.
    23-v18 sets SY (the player's height) to 0 every tick; this runs after it and lifts you to the surface under your feet, easing over each step. */
 function floorAt(wx,wz){const x=wx-LX,z=wz-LZ,ax=Math.abs(x);
  if(ax<HW&&z>-HD&&z<HD+.45){if(z>HD-.45)return ax<1.8?.4:0;
-  if(ax<2.7&&z>-5.8&&z<-2)return .48;if(ax<4.2&&z>-6.6&&z<-1.2)return .465;if(ax<5.55&&z>-7.85&&z<.05)return .45;
-  if(ax<1.95&&z>1.05&&z<7.95)return .46;return .41}
+  const rr=Math.hypot(x,z+3.4);if(rr<2.5)return .475;if(rr<3.85)return .47;if(rr<4.2)return .45;if(rr<4.5)return .43;
+  if(ax<1.3&&z>1.2&&z<8.6)return .445;if(Math.hypot(x+7.6,z+1.5)<1.7)return .47;return .41}
  if(ax<4.5&&z>=HD+.45&&z<HD+4.75)return .3;if(ax<1.6&&z>=HD+4.75&&z<HD+5.7)return .21;if(ax<1.8&&z>=HD+5.7&&z<HD+6.6)return .15;return 0}
 let FLY=0;
 {const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{if(!away()&&!(P.sit)&&lodgeDist()<30){const h=floorAt(P.x,P.z);FLY+=(h-FLY)*Math.min(1,(dt||.016)*18);if(Math.abs(FLY-h)<.004)FLY=h;if(FLY>0||h>0)SY=FLY}else FLY=0}catch(e){soft(e,'floor')}return r}}
 let hudT=0;
-function tick(dt){if(!away()){stepAnims(dt);const near=stepPlace(dt);stepSpots(dt);stepParts(dt);if(near){santaIdle(dt);stepPresent(dt);stepBubble(dt);camFx(dt)}}hudT-=dt;if(hudT<0){hudT=.3;hudSync();if(mode_()!='play'&&hud.style.display!='none')hud.style.display='none'}}
+function tick(dt){if(!away()){stepAnims(dt);const near=stepPlace(dt);stepSpots(dt);stepParts(dt);if(near){santaIdle(dt);stepPresent(dt);stepTrain(dt);stepBubble(dt);camFx(dt)}}hudT-=dt;if(hudT<0){hudT=.3;hudSync();if(mode_()!='play'&&hud.style.display!='none')hud.style.display='none'}}
 
 /* =====================================================================================================================
    SANTA TALKS, YOU FEED HIM, HE GROWS, HE BURPS, A PRESENT FLIES OUT
@@ -746,7 +797,7 @@ const LIDY=(()=>{const it=window.FW_ADVENT.itemModel('x:crate',1.3),raw=it.child
 PRES.beam=[0,1].map(i=>{const b=new THREE.Mesh(beamGeo,beamMat.clone());b.material.userData.xms=1;b.position.y=2.6;b.rotation.y=i*Math.PI/2;PRES.g.add(b);return b});
 PRES.glow=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide}));PRES.glow.rotation.x=-Math.PI/2;PRES.glow.position.y=.06;PRES.g.add(PRES.glow);PRES.glow.scale.setScalar(1.8);
 function tintPresent(col){PRES.beam.forEach(b=>{b.material.map=beamTex;b.material.color.set(col);b.material.needsUpdate=true});PRES.glow.material.color.set(col)}
-const PREST=.47;/* floor height of the rug top under the present */
+const PREST=.48;/* floor height of the rug top under the present */
 function placePresent(rest,pr){PRES.on=true;PRES.g.visible=true;PRES.pr=pr;tintPresent('#ffd75e');PRES.g.position.set(PRES_AT[0],PREST,PRES_AT[1]);PRES.g.rotation.set(0,rest?.5:0,0);PRES.m.scale.setScalar(1);PRES.m.rotation.set(0,0,0);if(PRES.lid){PRES.lid.visible=true;PRES.lid.position.set(0,LIDY,0);PRES.lid.rotation.set(0,0,0)}
  PRES.phase=rest?'rest':'';PRES.ready=!!rest;PRES.beam.forEach(b=>{b.visible=!!rest;b.scale.y=1});PRES.glow.visible=!!rest}
 function launchPresent(pr,col,mo){placePresent(false,pr);PRES.beam.forEach(b=>b.visible=false);PRES.glow.visible=false;PRES.ready=false;PRES.phase='fly';PRES.t=0;PRES.bounces=0;
