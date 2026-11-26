@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.14';
+const GAME_VERSION='v56.0.15';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.15',n:'Main menu footer and sign-in debug line show the player version (v2.N) instead of the build id'},
  {v:'v56.0.14',n:'Footsteps on a bought carpet floor at home sound like carpet (CC0 Kenney sample)'},
  {v:'v56.0.13',n:'The computer mouse click is now a rounder, fuller real click with the harsh hiss removed. Saves still load.'},
  {v:'v56.0.12',n:'Version numbers: players see v2.N (build id stays internal); bump.js prints the player number; newsletter shows v2.378 for update day'},
