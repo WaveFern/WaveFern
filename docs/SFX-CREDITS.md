@@ -8,5 +8,6 @@ Each effect is layered from a noise transient, a tuned inharmonic body (bell, gl
 | Source | Licence | Files |
 |---|---|---|
 | WaveFern synthesis code (this repo) | same as the repo | none (no audio files) |
+| Kenney Interface Sounds (kenney.nl): click1, mouseclick1, mouserelease1 | CC0 1.0 | `audio/sfx/ui-click.mp3`, `pc-click.mp3`, `pc-release.mp3` |
 
 If a CC0 sample (Kenney, OpenGameArt CC0, freesound CC0) is ever added, list the file, author, URL and licence here.

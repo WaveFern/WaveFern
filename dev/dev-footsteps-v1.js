@@ -53,18 +53,13 @@
    sdNz(.02,2600+R(0,500),.02*v,{q:1.3,del:.03,pan:pn});
    if(Math.random()<.12)sdHit(310+R(0,90),.14,.012*v,[[1,1,1],[1.5,.3,.5]],{del:.04,bend:.25,jit:0,lp:900,pan:pn})}};
  /* ---------- real recordings: loaded once, decoded on first use, played through the game's master gain ---------- */
- const BUF={};
- function load(n){if(BUF[n]!==undefined)return;BUF[n]=null;try{ac();fetch('audio/sfx/'+n+'.mp3').then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status)).then(b=>new Promise((ok,no)=>AC.decodeAudioData(b,ok,no))).then(d=>{BUF[n]=d}).catch(e=>{BUF[n]=false;warn('load '+n,e)})}catch(e){BUF[n]=false}}
- function play(n,v,rate,pan){const b=BUF[n];if(!b){load(n);return false}
-  try{const s=AC.createBufferSource(),g=AC.createGain();s.buffer=b;s.playbackRate.value=rate;g.gain.value=v;
-   let o=g;if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=pan||0;g.connect(p);o=p}
-   s.connect(g);o.connect(MG);s.start();return true}catch(e){warn('play',e);return false}}
+ const {load,play}=window.FW_SMP||{load(){},play(){return false}};/* the shared sample player from 200-sfx-polish.js */
  const GAIN={concrete:.9,grass:.6,snow:.8,wood:.9};let last_={};
  function realStep(sf,v,pn,run){let i=Math.random()*5|0;if(i===last_[sf])i=(i+1)%5;last_[sf]=i;/* never the same take twice in a row */
   return play('step-'+sf+'-'+i,GAIN[sf]*v*(run?1.15:1),(run?1.08:1)*R(.93,1.07),pn)}
  /* the PC: a real mouse click on press and a lighter release, anywhere on the desktop screen */
  const pcOn=()=>{try{return mode=='pc'&&FX}catch(e){return false}};
- if(typeof SND=='object'&&SND.click){const c0=SND.click;SND.click=function(){if(pcOn()&&BUF['pc-click'])return;return c0.apply(this,arguments)}}/* the synthesised click stands down while the real one plays */
+ if(typeof SND=='object'&&SND.click){const c0=SND.click;SND.click=function(){if(pcOn()&&(window.FW_SMP&&FW_SMP.has('pc-click')))return;return c0.apply(this,arguments)}}/* the synthesised click stands down while the real one plays */
  document.addEventListener('pointerdown',e=>{if(!pcOn()||e.button>0)return;try{ac()}catch(x){}load('pc-click');load('pc-release');play('pc-click',.8,R(.97,1.03),0)},true);
  document.addEventListener('pointerup',e=>{if(!pcOn()||e.button>0)return;play('pc-release',.5,R(.97,1.03),0)},true);
  stepSnd=function(run){
