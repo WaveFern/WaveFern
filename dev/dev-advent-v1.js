@@ -84,7 +84,7 @@
   if(r.t=='k'){s.wr=s.wr||[];if(!s.wr.includes(r.id))s.wr.push(r.id);s.wc=s.wc||{};const g=GAR.find(x=>x.id==r.id);let c=null;safe(()=>{c=THC[r.id]},'thc');if(!s.wc[r.id])s.wc[r.id]=c||g.dc}
   if(r.t=='b'){if(!window.FW_PBORDER||!window.FW_PBORDER.give(r.bid))return false}
   if(r.t=='f'){s.inv=s.inv||{};s.inv[r.key]=(s.inv[r.key]||0)+1}
-  if(r.t=='p'){s.pets=s.pets||[];if(!s.pets.includes(r.i))s.pets.push(r.i);safe(()=>syncF(),'pet')}
+  if(r.t=='p'){s.pets=s.pets||[];if(Array.isArray(s.petOwn)&&!s.petOwn.includes(r.i))s.petOwn.push(r.i);if(!s.pets.includes(r.i)&&(!Array.isArray(s.petOwn)||s.pets.length<3))s.pets.push(r.i);safe(()=>syncF(),'pet')}
   if(r.t=='c'){s.cars=s.cars||[];if(!s.cars.includes(r.i))s.cars.push(r.i);if(!s.garage)s.garage=1;safe(()=>parkCars(),'car')}
   return true}
  function grant(r){if(!apply(r))return false;safe(()=>updateVersion(),'ver');safe(()=>autoSave(),'save');safe(()=>{if(typeof csPush=='function')csPush(1)},'cloud');return true}
@@ -348,6 +348,9 @@
 #advr .tl{flex:none;width:104px;height:168px;margin:0 3px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;background:#0c0c0c;border:2px solid #000;border-bottom:6px solid var(--rc);box-shadow:inset 0 0 0 2px #1a1a1a}
 #advr .tl img{width:84px;height:84px;image-rendering:pixelated}
 #advr .tl b{max-width:96px;font:700 10px ui-monospace,monospace;color:#e8f3ec;text-align:center;line-height:1.15;max-height:24px;overflow:hidden}
+#advr .tl.rt{background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--rc) 55%,#000) 0,#0c0c0c 72%)}
+#advr .tl.rt img{filter:drop-shadow(0 0 6px var(--rc))}
+#advr .tl.rt b{font:700 12px Silkscreen,ui-monospace,monospace;color:var(--rc);letter-spacing:1px;max-height:none}
 #advr .tl i{font:normal 9px Silkscreen,ui-monospace,monospace;letter-spacing:1px;color:var(--rc)}
 #advr .tl.won{background:#1a1a1a;box-shadow:inset 0 0 0 2px var(--rc),0 0 0 2px var(--rc)}
 #advr .mk{position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:#ffd23f;box-shadow:0 0 0 2px #000}
@@ -481,10 +484,12 @@
   else{/* claiming is the only way out: no backdrop click, no Esc. pointerup and click both claim (claim() ignores the second), so a tap never gets lost */
    cb.addEventListener('pointerup',e=>{if(e.button===0||e.pointerType=='touch'||e.pointerType=='pen')claim(cb)});cb.addEventListener('click',()=>claim(cb))}}
 
+ /* a tier's name on this card: a gift can rename them (Santa's Lodge: Rare, Epic, Legendary) */
+ const tnm=t=>(REV&&REV.gift&&REV.gift.tierNames&&REV.gift.tierNames[t])||TIERS[t].n;
  function fillCard(o,r){
   o.querySelector('h3').textContent=r.n;
   const T=r.rar!=null?TIERS[r.rar]:null;
-  o.querySelector('.meta').innerHTML=(T?`<span class=rar style="--rc:${T.c}">${T.n.toUpperCase()}</span>`:'')+`<span class=cat>${icon({k:'sock',f:'gift',p:'star',c:'bell',w:'bell',x:'gift',b:'star'}[r.t]||'gift')}${CAT[r.t]||''}</span>`;
+  o.querySelector('.meta').innerHTML=(T?`<span class=rar style="--rc:${T.c}">${tnm(r.rar).toUpperCase()}</span>`:'')+`<span class=cat>${icon({k:'sock',f:'gift',p:'star',c:'bell',w:'bell',x:'gift',b:'star'}[r.t]||'gift')}${CAT[r.t]||''}</span>`;
   o.querySelector('p').textContent=r.note||'';
   o.querySelector('.stage').style.setProperty('--rc',T?T.c:'#26302a')}
  /* the case opening: a strip of items slides past a marker, slows, and stops on your prize. The roll was made and saved before this starts. */
@@ -526,21 +531,23 @@
   if(t>=3&&!red){let n=0;const iv=setInterval(()=>{if(!REV||REV.o!==stage.closest('#advr')||++n>5){clearInterval(iv);return}sparkle(w,t==4?10:5)},520)}}
  /* the case opening: the strip starts fast and slows onto the prize (tick for every tile, pitched by its rarity, a heartbeat as it
     crawls, a small overshoot and settle), SKIP jumps to the end, and the landing celebrates by rarity. The roll was made and saved before this starts. */
- function spin(stage,pr,done){
+ /* o (optional): fill() gives a random filler tile, win the winning tile, tile(it) its html, dur the spin time, noTease, land(stage,w,T) */
+ function spin(stage,pr,done,o){o=o||{};
   const N=56,Wn=44+Math.floor(Math.random()*6),flat=()=>{let r=Math.random()*100;for(let i=0;i<TIERS.length;i++){if(r<TIERS[i].flat)return i;r-=TIERS[i].flat}return 0};
-  const items=[];for(let i=0;i<N;i++){const c=byTier(flat());items.push(c.length?pick(c):pick(pool()))}
-  const T=pr.rar;items[Wn]={k:pr.k,n:pr.n,tier:T};
+  const items=[];for(let i=0;i<N;i++){if(o.fill){items.push(o.fill());continue}const c=byTier(flat());items.push(c.length?pick(c):pick(pool()))}
+  const T=pr.rar;items[Wn]=o.win||{k:pr.k,n:pr.n,tier:T};
   /* tease: put the best rarity (or the next best) right beside the prize */
   const side=Math.random()<.5?1:-1;let teased=0;
-  if(T<4&&Math.random()<.4){items[Wn+side]=pick(byTier(4));teased=4}
+  if(o.noTease){}
+  else if(T<4&&Math.random()<.4){items[Wn+side]=pick(byTier(4));teased=4}
   else if(T<3&&Math.random()<.4){items[Wn+side]=pick(byTier(3));teased=3}
   else if(T==4&&Math.random()<.4){items[Wn+side]=pick(byTier(3));teased=3}
-  const tl=it=>`<div class=tl style="--rc:${TIERS[it.tier].c}"><img alt="" src="${pic(it.k)}"><b>${esc2(it.n)}</b><i>${TIERS[it.tier].n}</i></div>`;
+  const tl=o.tile||(it=>`<div class=tl style="--rc:${TIERS[it.tier].c}"><img alt="" src="${pic(it.k)}"><b>${esc2(it.n)}</b><i>${tnm(it.tier)}</i></div>`);
   const st0=document.createElement('div');st0.className='strip';
   st0.innerHTML=`<div class=rail>${items.map(tl).join('')}</div><div class=mk></div><div class=sh></div>`;
   stage.appendChild(st0);stage.classList.add('spin');REV.strip=st0;
   const rail=st0.querySelector('.rail'),tiles=rail.children,TW=tiles[0].offsetWidth+parseFloat(getComputedStyle(tiles[0]).marginRight||0)*2||110,SW=stage.clientWidth;
-  const red=reduced(),jit=(Math.random()-.5)*TW*.4,X=Wn*TW+TW/2-SW/2+jit,dur=red?1400:6400,os=red?0:Math.min(18,TW*.16);
+  const red=reduced(),jit=(Math.random()-.5)*TW*.4,X=Wn*TW+TW/2-SW/2+jit,dur=red?1400:(o.dur||6400),os=red?0:Math.min(18,TW*.16);
   /* fast start, long smooth slow-down, then a small overshoot that settles back: it stays in the same tile, so the stop says nothing about the prize */
   const kf=[{transform:'translateX(0)',easing:'cubic-bezier(.1,.5,.16,1)'},{transform:`translateX(${-X-os}px)`,offset:.93,easing:'ease-in-out'},{transform:`translateX(${-X}px)`}];
   const an=rail.animate(kf,{duration:dur,fill:'forwards'});
@@ -569,8 +576,8 @@
    w.classList.add('won');st0.classList.add('landed');stage.style.setProperty('--rc',TIERS[T].c);
    /* near miss: the better tile beside it wobbles and fades back */
    if(teased&&teased>T){const nb=tiles[Wn+side];if(nb&&!red)nb.animate([{transform:'translateY(0)'},{transform:'translateY(-10px)'},{transform:'translateY(0)'}],{duration:420,easing:'ease-out'});safe(()=>sdHit(180,.4,.12,WOOD,{jit:0,bend:-.3}),'nm')}
-   celebrate(stage,w,T,T);
-   setTimeout(done,350)}}
+   if(o.land)o.land(stage,w,T);else celebrate(stage,w,T,T);
+   setTimeout(done,o.hold||350)}}
  function openCrate(cb){
   if(!REV||REV.opened)return;REV.opened=1;REV.busy=1;const {d,o}=REV,s=Sv(),a=st();
   let pr=a&&a.p&&a.p[d];
@@ -593,7 +600,21 @@
   sfx('whoosh');if(!red){stage.classList.add('chg');[0,1,2].forEach(i=>setTimeout(()=>{if(!REV||REV.o!==o)return;charge(i);shake(stage,2+i*2,240);buzz(12+i*8)},i*300));
    setTimeout(()=>{if(!REV||REV.o!==o)return;flash(stage,'#ffffff',360);safe(()=>sdNz(.35,1800,.1,{q:2,f2:300}),'wh');buzz(40)},WU-130)}
   setTimeout(()=>{if(REV&&REV.o===o)stage.classList.remove('chg');if(!REV||REV.o!==o)return;if(REV.v){REV.v.dispose();REV.v=null}cv.style.display='none';if(h)h.style.display='none';
-   try{spin(stage,pr,fin)}catch(e){fin()}},WU)}
+   try{if(REV.gift&&REV.gift.rarity)spin2(stage,pr,fin,REV.gift);else spin(stage,pr,fin)}catch(e){fin()}},WU)}
+ /* a gift with cfg.rarity spins twice: first which rarity the present is (cfg.rarity = {tier: weight} for the filler tiles), then the item
+    inside, on a strip of that rarity's items only (cfg.pool(tier) lists them). The prize was rolled and saved before either spin. */
+ function spin2(stage,pr,done,g){const ts=Object.keys(g.rarity).map(Number),tot=ts.reduce((a,t)=>a+g.rarity[t],0),box=pic('x:crate');
+  const rpick=()=>{let r=Math.random()*tot;for(const t of ts){if(r<g.rarity[t])return t;r-=g.rarity[t]}return ts[0]};
+  const rt=it=>`<div class="tl rt" style="--rc:${TIERS[it.tier].c}"><img alt="" src="${box}"><b>${esc2(tnm(it.tier).toUpperCase())}</b><i>PRESENT</i></div>`;
+  const o=REV.o;
+  spin(stage,pr,()=>{if(!REV||REV.o!==o)return;
+   /* the rarity is in: say it big, then the strip swaps for the items of that rarity */
+   const T=pr.rar,b=document.createElement('div');b.className='advban';b.textContent=tnm(T).toUpperCase()+'!';b.style.color=TIERS[T].c;stage.appendChild(b);
+   b.animate([{transform:'translate(-50%,0) scale(2.6)',opacity:0},{transform:'translate(-50%,0) scale(.9)',opacity:1,offset:.25},{transform:'translate(-50%,0) scale(1)',opacity:1,offset:.35},{transform:'translate(-50%,0) scale(1)',opacity:1,offset:.85},{transform:'translate(-50%,-20px) scale(1)',opacity:0}],{duration:1500,easing:'ease-out'}).onfinish=()=>b.remove();
+   setTimeout(()=>{if(!REV||REV.o!==o)return;const s0=REV.strip;if(s0){s0.animate([{opacity:1},{opacity:0}],{duration:220,fill:'forwards'}).onfinish=()=>s0.remove();REV.strip=null}
+    setTimeout(()=>{if(!REV||REV.o!==o)return;stage.classList.remove('spin');safe(()=>sdNz(.3,1600,.08,{q:2,f2:400}),'wh');
+     const c=(g.pool&&g.pool(T))||[];spin(stage,pr,done,{fill:()=>c.length?pick(c):{k:pr.k,n:pr.n,tier:T},noTease:1,dur:5200})},240)},1350)},
+  {fill:()=>({tier:rpick()}),win:{tier:pr.rar},tile:rt,dur:4300,noTease:1,hold:200})}
  function claim(cb){
   if(REV&&REV.gift)return giftBtn(cb);
   if(!REV||REV.done||REV.view||REV.busy)return;const {d}=REV;
