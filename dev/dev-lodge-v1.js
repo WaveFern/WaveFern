@@ -788,7 +788,7 @@ function ring(c,col,rad,dur){const m=new THREE.Mesh(new THREE.RingGeometry(.9,1,
 function prizeOf(o){const r={t:o.t,k:o.k,n:o.n,rar:o.tier};
  if(o.t=='f'){r.key=o.key;const have=(S.inv&&S.inv[o.key])||0;r.note=(have?'Another one for your collection. ':'')+'Delivered to your Storage. Press F at home to place it.'}
  if(o.t=='c'){r.i=o.i;r.note='Top speed '+((CARS[o.i]&&CARS[o.i].mph)||80)+' mph. It is parked outside your house: walk up to it and press E.'+(S.garage?'':' Your garage is unlocked too.')}
- if(o.t=='p'){r.i=o.i;r.note=(S.pets||[]).length<3?'He follows you around now, skipping along behind you, and adds +1 song quality.':'He joined your pets. Press P to put him in one of your three pet slots.'}
+ if(o.t=='p'){r.i=o.i;r.note=(S.pets||[]).length<3?'Your new pet follows you around now and adds +1 song quality.':'A new pet for your crew. Press P to put it in one of your three pet slots.'}
  return r}
 function rollPrize(){
  const cr=window.FW_ADVENT.crate,LI=window.FW_LODGE_ITEMS,od=[2,3,4].map(t=>cr.TIERS[t].odds),tot=od.reduce((a,b)=>a+b,0);let r=Math.random()*tot,t=2;for(let i=0;i<3;i++){if(r<od[i]){t=2+i;break}r-=od[i];t=2+i}
@@ -953,10 +953,10 @@ safe(()=>{const box=document.getElementById('fwdvb');if(!box)return;const msg=t=
  [['Walk to the lodge door',()=>{FW_LODGE.go();msg('At the lodge')}],['Give me 5 cookies + 5 candy canes',()=>{FW_LODGE.give(5);msg('Added 5 of each')}],['Respawn all treats on the map',()=>{const s=st();s.cd={};spawnSpots();msg('Treats respawned')}],['Reset Santa and presents',()=>{FW_LODGE.reset();msg('Santa reset')}]]
  .forEach(([l,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=f;box.appendChild(b)})},'panel');
 /* /dev/ only (this whole file is): every save owns all of Santa's prizes, once, so they can be tried out. Placing or selling them later
-   does not bring them back; the dev panel button gives the full set again. Flag S.lodge.all. */
+   does not bring them back; the dev panel button gives the full set again. Flag S.lodge.all (2 = the set with the extra pets). */
 function giveAll(){const LI=window.FW_LODGE_ITEMS,g=window.FW_ADVENT.crate.grant;if(!LI||typeof S=='undefined'||!S)return 0;let n=0;
- LI.list.forEach(o=>{const r={t:o.t,k:o.k,n:o.n,rar:o.tier};if(o.t=='f')r.key=o.key;else r.i=o.i;if(safe(()=>g(r),'giveAll'))n++});st().all=1;sv();return n}
-setInterval(()=>{try{if(mode_()=='play'&&typeof S!='undefined'&&S&&!st().all)giveAll()}catch(e){soft(e,'giveAll')}},2000);
+ LI.list.forEach(o=>{const r={t:o.t,k:o.k,n:o.n,rar:o.tier};if(o.t=='f')r.key=o.key;else r.i=o.i;if(safe(()=>g(r),'giveAll'))n++});st().all=2;sv();return n}
+setInterval(()=>{try{if(mode_()=='play'&&typeof S!='undefined'&&S&&!(st().all>=2))giveAll()}catch(e){soft(e,'giveAll')}},2000);
 safe(()=>{const box=document.getElementById('fwdvb');if(!box)return;const b=document.createElement('button');b.textContent="Give me all of Santa's prizes";
  b.onclick=()=>{const n=giveAll(),e=document.getElementById('fwdvs');if(e)e.textContent=n+" Santa prizes given (cars by your house, Pip in your pets, the rest in Storage)"};box.appendChild(b)},'panel2');
 window.FW_LODGE.giveAll=giveAll;
