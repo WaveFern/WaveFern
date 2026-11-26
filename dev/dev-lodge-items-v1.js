@@ -2,10 +2,11 @@
 
    The items that only come out of Santa's presents in Santa's Lodge (dev-lodge-v1.js). Nothing here is sold anywhere:
    the cars and the pet are flagged xm like the advent ones, so the shops, the pet menu and the garage paint shop leave them out.
-   LEGENDARY  Sprocket Rocket (the elves' own race car), Gingerbread Cruiser (a car baked from gingerbread), Pip the Elf (a pet),
+   LEGENDARY  Sprocket Rocket (the elves' own race car), Gingerbread Cruiser (a car baked from gingerbread), Pip the Elf and
+              Aurora the Arctic Fox (pets),
               The North Pole, Santa's Golden Throne
-   EPIC       Reindeer Rocking Horse, Christmas Carousel, Elf Toy Workbench, Toy Soldier Drummer
-   RARE       Gumdrop Lamp, Peppermint Stool, Cookie Jar, Jingle Bell Wreath, Candy Cane Fence
+   EPIC       Waddles the Penguin, Ginger the Gingerbread Pup (pets), Reindeer Rocking Horse, Christmas Carousel, Elf Toy Workbench, Toy Soldier Drummer
+   RARE       Sprout the Snowman, Chestnut the Christmas Mouse (pets), Gumdrop Lamp, Peppermint Stool, Cookie Jar, Jingle Bell Wreath, Candy Cane Fence
    Cars are the game's own car bodies (39-car-models.js carGeo, styles 4 and 1) recoloured, with Christmas parts added as blocks, one mesh each. The elf is a rigged pet on the
    58-pets.js rig (ptGeo parts, petAnim) with his own walk, arm swing, hat sway, wave and twirl. Furniture is box lists in F (hidden from
    Amazoom like the advent furniture); the carousel and rocking horse move through fxAdd.
@@ -162,6 +163,100 @@ function elfSpec(){const S={},part=(n,par,p,f,eye)=>{const L=[];f(L);S[n]={n,par
  if(P.hat1){P.hat1.rotation.x=-.35*m+Math.sin(t*1.9+r.sd-.7)*.1-c*.12*m+hop*1.5;P.hat1.rotation.z=Math.sin(t*1.3+r.sd)*.12+s*.1*m}
  if(P.hat2){P.hat2.rotation.x=Math.sin(t*2.4+r.sd-1.3)*.2-c*.25*m+hop*2;P.hat2.rotation.z=Math.sin(t*1.7)*.15}}}
 
+/* ============================================================ MORE PETS ============================================================ */
+/* Five more pets from Santa's presents, on the same 58-pets.js rig (parts with pivots, ptGeo, blinking eyes and twitching ears from petAnim)
+   with their own moves on top. A part flagged as eyes is drawn unlit, which is how the fox's aurora tail glows. */
+const P5={};
+const mkPart=S=>(n,par,p,f,eye)=>{const L=[];f(L);S[n]={n,par,p,L,eye}};
+const QS=[[-1,1],[1,1],[-1,-1],[1,-1]];
+/* WADDLES THE PENGUIN (Epic): a round penguin in a red scarf and a little Santa hat. Waddles side to side, flaps when happy. */
+function penguin(){const S={},part=mkPart(S),D='#1d2430',D2='#2c3444',W='#f4f6f8',O='#f29a2e';
+ part('body','R',[0,.3,0],L=>{ptp(L,D,.36,.42,.32,0,.3,0,.27,.25);ptp(L,W,.26,.34,.04,0,.29,.15,.2,.03);pbx(L,D2,.3,.04,.28,0,.1,0);
+  pbx(L,RED,.31,.07,.29,0,.5,0);pbx(L,WHT,.315,.016,.295,0,.52,0);pbx(L,RED,.08,.18,.035,.1,.42,.16);pbx(L,WHT,.085,.02,.04,.1,.34,.16)});
+ part('head','R',[0,.53,0],L=>{pbx(L,D,.27,.2,.25,0,.64,0);pbx(L,W,.21,.12,.03,0,.62,.12);pbx(L,'#f6a8b8',.04,.025,.01,-.08,.6,.137);pbx(L,'#f6a8b8',.04,.025,.01,.08,.6,.137);
+  pseg(L,O,[0,.625,.13],[0,.605,.23],.08,.02,.05,.015);
+  pbx(L,WHT,.27,.05,.25,0,.745,0);ptp(L,RED,.24,.1,.22,0,.81,-.01,.15,.13,0,-.03);pseg(L,RED,[0,.86,-.03],[0,.9,-.14],.12,.06,.1,.05);pbx(L,WHT,.08,.08,.08,0,.89,-.17)});
+ part('eyes','head',[0,.66,.13],L=>[-1,1].forEach(s=>{pbx(L,'#ffffff',.05,.055,.008,s*.06,.665,.134);pbx(L,'#111111',.03,.04,.01,s*.062,.662,.138);pbx(L,'#ffffff',.012,.012,.011,s*.062+s*.008,.672,.142)}),1);
+ [-1,1].forEach((s,i)=>part('wing'+i,'R',[s*.17,.46,0],L=>{ptp(L,D,.045,.3,.15,s*.19,.32,-.01,.03,.08,0,0,0,0,-s*.12)}));
+ [-1,1].forEach((s,i)=>part('leg'+i,'R',[s*.075,.09,.02],L=>{pbx(L,O,.06,.08,.06,s*.075,.06,.02);pbx(L,O,.11,.025,.15,s*.075,.012,.06);[-1,0,1].forEach(t=>pbx(L,'#d9822a',.02,.026,.03,s*.075+t*.035,.012,.135))}));
+ return S}
+/* GINGER THE GINGERBREAD PUP (Epic): a puppy baked from gingerbread, with icing on its paws, ears and tail, gumdrop buttons and a bell collar */
+function gpup(){const S={},part=mkPart(S),C='#b86b30',CD='#8f4f1f',IC='#fbf7f0';
+ part('body','R',[0,.38,0],L=>{pbx(L,C,.3,.26,.6,0,.38,0);pbx(L,C,.31,.27,.18,0,.39,.22);pbx(L,C,.31,.25,.18,0,.38,-.22);
+  [-1,1].forEach(s=>{for(let i=0;i<7;i++)pbx(L,IC,.012,.03,.06,s*.157,.42+(i%2?.02:-.01),-.24+i*.08,i%2?.5:-.5)});
+  pbx(L,'#ff4b6e',.06,.06,.04,0,.44,.31);pbx(L,'#46e083',.06,.06,.04,0,.36,.31);pbx(L,'#c0392b',.24,.05,.16,0,.52,.32);pbx(L,GOLD,.06,.06,.06,0,.47,.41)});
+ part('head','R',[0,.55,.34],L=>{pbx(L,C,.26,.24,.24,0,.66,.42);pbx(L,C,.17,.12,.16,0,.6,.58);pbx(L,'#3a1e0c',.07,.05,.04,0,.64,.665);
+  pbx(L,IC,.1,.014,.01,0,.575,.662);[-1,1].forEach(s=>{pbx(L,IC,.014,.014,.01,s*.055,.585,.662);pbx(L,'#ff8fb1',.04,.03,.01,s*.09,.61,.545)});
+  pbx(L,IC,.16,.016,.01,0,.785,.545)});
+ part('eyes','head',[0,.7,.545],L=>[-1,1].forEach(s=>{pbx(L,'#2a1408',.05,.055,.01,s*.065,.7,.545);pbx(L,IC,.016,.016,.01,s*.065+s*.01,.715,.55)}),1);
+ [-1,1].forEach((s,i)=>part('ear'+i,'head',[s*.13,.74,.42],L=>{ptp(L,CD,.06,.2,.12,s*.15,.66,.42,.05,.1,0,0,0,0,s*.25);pbx(L,IC,.064,.012,.1,s*.17,.57,.42,0,0,s*.25)}));
+ part('tail0','R',[0,.46,-.3],L=>{pseg(L,C,[0,.46,-.3],[0,.62,-.42],.07,.05);pbx(L,IC,.075,.015,.075,0,.55,-.37,.7)});
+ QS.forEach(([s,f],i)=>part('leg'+i,'R',[s*.1,.28,f*.2],L=>{const x=s*.1,z=f*.2;pbx(L,C,.1,.28,.1,x,.14,z);pbx(L,IC,.105,.02,.105,x,.06,z);pbx(L,C,.11,.05,.13,x,.025,z+.015)}));
+ return S}
+/* SPROUT THE SNOWMAN (Rare): a tiny snowman who hops along on his bottom snowball, with twig arms, a scarf and a top hat */
+function snowman(){const S={},part=mkPart(S),W='#f4f8fb',W2='#dce6ee',K='#1a1a1a';
+ part('body','R',[0,.0,0],L=>{pbx(L,W,.36,.3,.34,0,.15,0);pbx(L,W2,.3,.03,.3,0,.3,0);pbx(L,W,.28,.24,.26,0,.42,0);[.36,.44,.52].forEach(y=>pbx(L,K,.035,.035,.02,0,y,.135));
+  pbx(L,'#2f9e4f',.3,.06,.28,0,.55,0);pbx(L,'#c0392b',.305,.02,.285,0,.55,0);pbx(L,'#2f9e4f',.07,.16,.03,.09,.46,.15)});
+ part('head','R',[0,.58,0],L=>{pbx(L,W,.24,.22,.22,0,.69,0);pseg(L,'#f08a24',[0,.68,.11],[0,.66,.22],.04,.01);
+  [-.06,-.03,0,.03,.06].forEach((x,i)=>pbx(L,K,.02,.02,.02,x,.63+Math.abs(x)*.5,.112));
+  pbx(L,K,.28,.03,.26,0,.81,0);pbx(L,K,.18,.16,.17,0,.9,0);pbx(L,'#c0392b',.185,.04,.175,0,.84,0);pbx(L,'#2f9e4f',.04,.04,.03,.07,.85,.09);pbx(L,'#c0392b',.03,.03,.03,.09,.86,.1)});
+ part('eyes','head',[0,.72,.112],L=>[-1,1].forEach(s=>{pbx(L,K,.035,.035,.01,s*.055,.725,.112);pbx(L,'#ffffff',.01,.01,.011,s*.055+s*.008,.735,.116)}),1);
+ [-1,1].forEach((s,i)=>part('arm'+i,'body',[s*.13,.45,0],L=>{pseg(L,'#6b4423',[s*.13,.45,0],[s*.32,.58,0],.025,.018);pseg(L,'#6b4423',[s*.25,.53,0],[s*.29,.62,.02],.015,.01);pseg(L,'#6b4423',[s*.3,.57,0],[s*.38,.56,0],.015,.01)}));
+ return S}
+/* CHESTNUT THE CHRISTMAS MOUSE (Rare): a little mouse in a Santa hat, with round ears and a long curly tail */
+function mouse(){const S={},part=mkPart(S),C='#9a8a7c',L2='#e7dccf',PK='#f0a0b0';
+ part('body','R',[0,.13,0],L=>{ptp(L,C,.18,.15,.3,0,.13,-.02,.14,.24);pbx(L,L2,.12,.03,.22,0,.06,0);pbx(L,'#c0392b',.15,.03,.08,0,.2,.1)});
+ part('head','R',[0,.16,.13],L=>{ptp(L,C,.15,.13,.16,0,.18,.18,.1,.1,0,.0);pseg(L,C,[0,.17,.25],[0,.15,.33],.09,.04,.08,.035);pbx(L,PK,.035,.03,.03,0,.155,.34);
+  [-1,1].forEach(s=>{pbx(L,'#ffffff',.08,.004,.004,s*.05,.16,.3,0,0,s*.15);pbx(L,'#ffffff',.08,.004,.004,s*.05,.148,.3,0,0,-s*.12)});
+  ptp(L,RED,.12,.06,.12,0,.27,.16,.07,.07);pseg(L,RED,[0,.3,.15],[0,.32,.06],.06,.03);pbx(L,WHT,.13,.025,.13,0,.24,.16);pbx(L,WHT,.04,.04,.04,0,.32,.04)});
+ part('eyes','head',[0,.2,.255],L=>[-1,1].forEach(s=>{pbx(L,'#111111',.03,.035,.01,s*.042,.2,.25);pbx(L,'#ffffff',.01,.01,.011,s*.042+s*.006,.21,.255)}),1);
+ [-1,1].forEach((s,i)=>part('ear'+i,'head',[s*.06,.24,.17],L=>{pbx(L,C,.1,.1,.02,s*.09,.27,.15,0,0,s*.3);pbx(L,PK,.07,.07,.01,s*.09,.27,.162,0,0,s*.3)}));
+ part('tail0','R',[0,.1,-.16],L=>pseg(L,'#c49aa0',[0,.1,-.16],[0,.1,-.3],.02,.017));
+ part('tail1','tail0',[0,.1,-.3],L=>pseg(L,'#c49aa0',[0,.1,-.3],[0,.16,-.42],.017,.013));
+ part('tail2','tail1',[0,.16,-.42],L=>pseg(L,'#c49aa0',[0,.16,-.42],[0,.25,-.44],.013,.008));
+ QS.forEach(([s,f],i)=>part('leg'+i,'R',[s*.06,.07,f*.09],L=>{const x=s*.06,z=f*.09;pbx(L,C,.04,.07,.04,x,.04,z);pbx(L,PK,.05,.015,.06,x,.008,z+.015)}));
+ return S}
+/* AURORA THE ARCTIC FOX (Legendary): a snow-white fox whose big tail glows with northern lights */
+function afox(){const S={},part=mkPart(S),W='#f2f5f8',W2='#d9e2ea',K='#1a1a22';
+ part('body','R',[0,.3,0],L=>{pbx(L,W,.24,.22,.5,0,.3,0);pbx(L,W,.25,.23,.16,0,.31,.18);pbx(L,W2,.2,.04,.42,0,.19,0);pbx(L,'#ffffff',.2,.16,.04,0,.3,.26)});
+ part('head','R',[0,.4,.26],L=>{pbx(L,W,.24,.2,.2,0,.48,.32);pseg(L,W,[0,.45,.4],[0,.42,.54],.13,.05,.11,.04);pbx(L,K,.05,.04,.03,0,.43,.55);
+  [-1,1].forEach(s=>pbx(L,W2,.06,.08,.02,s*.1,.44,.41))});
+ part('eyes','head',[0,.51,.42],L=>[-1,1].forEach(s=>{pbx(L,'#7fd8ff',.05,.04,.01,s*.065,.51,.42);pbx(L,K,.025,.035,.011,s*.066,.51,.424);pbx(L,'#ffffff',.01,.01,.012,s*.066+s*.01,.52,.428)}),1);
+ [-1,1].forEach((s,i)=>part('ear'+i,'head',[s*.08,.57,.3],L=>{ptp(L,W,.09,.14,.04,s*.08,.64,.3,.01,.02);ptp(L,'#c9d6e2',.05,.1,.01,s*.08,.63,.318,.006,.006)}));
+ part('tail0','R',[0,.34,-.25],L=>pseg(L,W,[0,.34,-.25],[0,.44,-.42],.12,.17,.12,.17));
+ part('tail1','tail0',[0,.44,-.42],L=>pseg(L,W,[0,.44,-.42],[0,.5,-.6],.17,.17,.17,.17));
+ part('tail2','tail1',[0,.5,-.6],L=>{});
+ part('glow','tail2',[0,.5,-.6],L=>{pseg(L,'#7dffd0',[0,.5,-.6],[0,.53,-.68],.175,.16,.175,.16);pseg(L,'#6fc7ff',[0,.53,-.68],[0,.55,-.76],.16,.12,.16,.12);pseg(L,'#b98cff',[0,.55,-.76],[0,.55,-.83],.12,.05,.12,.05)},1);
+ QS.forEach(([s,f],i)=>part('leg'+i,'R',[s*.08,.2,f*.17],L=>{const x=s*.08,z=f*.17;pbx(L,W,.08,.2,.08,x,.1,z);pbx(L,W2,.09,.04,.1,x,.02,z+.01)}));
+ return S}
+const NEWP=[['Waddles the Penguin','#1d2430',penguin,3,['Cool customer','A penguin from the North Pole. Adds +1 song quality like every pet.']],
+ ['Ginger the Gingerbread Pup','#b86b30',gpup,3,['Fresh from the oven','Smells like cookies. Adds +1 song quality like every pet.']],
+ ['Sprout the Snowman','#f4f8fb',snowman,2,['Never melts','A tiny snowman who hops after you. Adds +1 song quality like every pet.']],
+ ['Chestnut the Christmas Mouse','#9a8a7c',mouse,2,['Not a creature was stirring','Except this one. Adds +1 song quality like every pet.']],
+ ['Aurora the Arctic Fox','#f2f5f8',afox,4,['Northern lights','Her tail glows with the aurora. Adds +1 song quality like every pet.']]];
+NEWP.forEach(([n,c,fn,tier,perk])=>{const k=PETS.length;PETS.push([n,0]);PETC.push(c);if(window.PET_PERK)window.PET_PERK.push(perk);P5[k]={fn,tier,n}});
+{const g0=ptSpecGet;ptSpecGet=function(k){if(!P5[k])return g0(k);if(PTSP[k])return PTSP[k];const S=P5[k].fn();for(const n in S){const s=S[n];s.L=s.L.filter(r=>r[4]>0);s.geo=ptGeo(s.L,s.p)}return PTSP[k]=S}}
+{const a0=petAnim;petAnim=function(g,dt){a0.apply(this,arguments);const r=g.userData.pr;if(!r||!P5[r.k])return;const P=r.P,t=r.t,m=r.mv,s=Math.sin(r.ph),c=Math.cos(r.ph),q=1-m,f=P5[r.k].fn;
+ if(r.jt==null){r.jt=4+Math.random()*5;r.j=0}
+ if(m<.15){r.jt-=dt;if(r.jt<0&&r.j<=0){r.j=1;r.jt=6+Math.random()*7}}if(r.j>0)r.j=Math.max(0,r.j-dt*1.4);const jj=r.j>0?Math.sin((1-r.j)*Math.PI):0;
+ if(f===penguin){/* waddle: rock side to side, feet slap, wings out; a happy flap and hop now and then */
+  r.R.rotation.z=s*.16*m+Math.sin(t*1.6+r.sd)*.03*q;r.R.position.y=Math.abs(s)*.02*m+jj*.08;
+  if(P.leg0)P.leg0.rotation.x=s*.5*m;if(P.leg1)P.leg1.rotation.x=-s*.5*m;
+  [P.wing0,P.wing1].forEach((w,i)=>{if(w)w.rotation.z=(i?1:-1)*(.08+Math.abs(s)*.35*m+jj*(.9+Math.sin(t*28)*.3))})}
+ else if(f===snowman){/* he hops: up, a squash when he lands; his twig arms swing, and he waves when he stands still */
+  const h=Math.abs(Math.sin(r.ph*.5));r.R.position.y=h*.13*m+jj*.06;const sq=1-(1-h)*.12*m;if(P.body)P.body.scale.set(1+(1-sq)*.6,sq,1+(1-sq)*.6);
+  if(P.arm0)P.arm0.rotation.z=-.1+Math.sin(r.ph)*.25*m;if(P.arm1)P.arm1.rotation.z=.1-Math.sin(r.ph)*.25*m+jj*(1.2+Math.sin(t*14)*.35);
+  r.R.rotation.z=Math.sin(t*1.3+r.sd)*.04*q}
+ else if(f===mouse){/* quick scurry, whiskery sniffing, tail curls */
+  r.R.position.y=Math.abs(Math.cos(r.ph*2))*.012*m;if(P.head){P.head.rotation.x+=Math.sin(t*18)*.03*q*(Math.sin(t*.7+r.sd)>.3?1:0)}
+  r.legs.forEach((l,i)=>l.rotation.x=Math.sin(r.ph*2+(i%3?0:Math.PI))*.8*m);
+  const w=Math.sin(t*2.2+r.sd)*.3;if(P.tail0)P.tail0.rotation.y=w;if(P.tail1)P.tail1.rotation.y=w*1.2;if(P.tail2)P.tail2.rotation.y=w*1.4}
+ else{/* dog and fox: tail wags (fast for the pup, a slow sweep for the fox), a bounce in the trot, and a little jump for joy */
+  r.R.position.y+=jj*.1;const pup=f===gpup,w=pup?Math.sin(t*(12+m*4))*(.45+.2*m):Math.sin(t*1.8+r.sd)*.3+s*.12*m;
+  if(P.tail0){P.tail0.rotation.y=w;if(!pup)P.tail0.rotation.x=-.1-m*.1}if(P.tail1)P.tail1.rotation.y=w*.8;if(P.tail2)P.tail2.rotation.y=w*.9;
+  if(P.ear0&&pup){P.ear0.rotation.x=Math.sin(r.ph*2)*.25*m;P.ear1.rotation.x=Math.sin(r.ph*2+.5)*.25*m}
+  if(P.glow){const u=.9+Math.sin(t*3)*.1;P.glow.scale.set(u,u,1+Math.sin(t*2.2)*.08)}}}}
+
 /* ============================================================ FURNITURE ============================================================ */
 const defF=(k,n,w,d,b,fx)=>{Object.defineProperty(F,k,{value:{n,p:0,w,d,b,fx,xm:1,lodge:1},enumerable:false,writable:true,configurable:true})};
 /* move the item's meshes that pass test(mesh) into a pivot at (x,y,z), so fx can turn them */
@@ -250,7 +345,8 @@ const list=[
  ...['lx_gumlamp','lx_pepstool','lx_cookiejar','lx_bellwreath','lx_fence'].map(key=>({t:'f',key,k:'f:'+key,n:F[key].n,tier:2})),
  ...['lx_rockdeer','lx_carousel','lx_elfbench','lx_soldier'].map(key=>({t:'f',key,k:'f:'+key,n:F[key].n,tier:3})),
  {t:'c',i:CAR1,k:'c:'+CAR1,n:CARS[CAR1].n,tier:4},{t:'c',i:CAR2,k:'c:'+CAR2,n:CARS[CAR2].n,tier:4},{t:'p',i:ELF,k:'p:'+ELF,n:PETS[ELF][0],tier:4},
+ ...Object.keys(P5).map(k=>({t:'p',i:+k,k:'p:'+k,n:P5[k].n,tier:P5[k].tier})),
  ...['lx_northpole','lx_throne'].map(key=>({t:'f',key,k:'f:'+key,n:F[key].n,tier:4}))];
 const byTier=t=>list.filter(o=>o.tier==t);
-window.FW_LODGE_ITEMS={list,byTier,CAR1,CAR2,ELF};
+window.FW_LODGE_ITEMS={list,byTier,CAR1,CAR2,ELF,PETS:[ELF,...Object.keys(P5).map(Number)]};
 })();
