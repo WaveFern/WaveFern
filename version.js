@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.6';
+const GAME_VERSION='v56.0.7';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.7',n:'Front door: the hall side shows the same panels and handle again, and the door swings shut every time you walk through'},
  {v:'v56.0.6',n:'Santa\'s Lodge (dev only): new Santa model, cleaner animations, solid lodge floor, advent present crate and spin'},
  {v:'v56.0.5',n:'Front door only swings shut behind you, and its panels, handle and kick plate now move with it'},
  {v:'v56.0.4',n:'Santa\'s Lodge: feed Santa cookies and candy canes, dark behind FW_DEV'},
