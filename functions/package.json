@@ -1,0 +1,11 @@
+{
+  "name": "wavefern-functions",
+  "private": true,
+  "description": "WaveFern email sign-in: branded verification and password-reset emails sent through Resend.",
+  "main": "index.js",
+  "engines": { "node": "20" },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.1.0"
+  }
+}

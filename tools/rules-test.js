@@ -7,7 +7,7 @@
    Uses fake users only (demo project), never touches the real project. Ports: Firestore 8181, Database 9191. */
 const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
 const fs=require('fs');
-const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v55.52.27'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
+const RD=process.env.RULES_DIR||require('path').join(__dirname,'..','firebase-rules','v56.0.4'),FSR=RD+'/firestore.rules',DBR=RD+'/database.rules.json';
 const ADMIN='wE6oPZIHYifrqBFxzpPse6ripGY2';
 let pass=0,fail=0;
 const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fail++;console.log('FAIL ',name,'-',String(e.message).split('\n')[0])}};
@@ -134,6 +134,18 @@ const T=async(name,p)=>{try{await p;pass++;console.log('ok   ',name)}catch(e){fa
  await T('rtdb: host can remove a guest relay entry e/',assertSucceeds(dbA.ref('r/ABCDE/u/userBBBBBBBBBB2/e/k1').remove()));
  await T('rtdb: host can NOT replace room with guest data',assertFails(dbA.ref('r/ABCDE').set({h:{u:'userAAAAAAAAAA1',t:TS},u:{userBBBBBBBBBB2:{m:'forged'}}})));
  await T('rtdb: host can delete the room',assertSucceeds(dbA.ref('r/ABCDE').remove()));
+ // v56.0.4: email/password accounts. Verified = allowed like Google; unverified = refused everywhere; never admin.
+ const pw=(uid,ver)=>env.authenticatedContext(uid,{email_verified:ver,firebase:{sign_in_provider:'password'}});
+ const PV=pw('userPPPPPPPPPP4',true),PU=pw('userUUUUUUUUUU5',false),PVf=PV.firestore(),PUf=PU.firestore(),PVd=PV.database(),PUd=PU.database();
+ await T('email: verified account can write own save',assertSucceeds(PVf.doc('saves/userPPPPPPPPPP4').set({code:'FW4-abcdef',day:1,artist:'x',t:now})));
+ await T('email: UNVERIFIED account can NOT write own save',assertFails(PUf.doc('saves/userUUUUUUUUUU5').set({code:'FW4-abcdef',day:1,artist:'x',t:now})));
+ await T('email: verified account can NOT write another player\'s save',assertFails(PVf.doc('saves/userAAAAAAAAAA1').set({code:'FW4-abcdef',day:1,artist:'x',t:now})));
+ await T('email: verified account is NOT admin',assertFails(PVf.doc('saves/userAAAAAAAAAA1').get()));
+ await T('email: UNVERIFIED account can NOT read profiles',assertFails(PUf.doc('profiles/userAAAAAAAAAA1').get()));
+ await T('email: mailLimits has no player access',assertFails(PVf.doc('mailLimits/x').get()));
+ await T('rtdb: verified email account can write own presence stamp',assertSucceeds(PVd.ref('f/s/userPPPPPPPPPP4').set(TS)));
+ await T('rtdb: UNVERIFIED email account can NOT write presence',assertFails(PUd.ref('f/s/userUUUUUUUUUU5').set(TS)));
+ await T('rtdb: UNVERIFIED email account can NOT read friends data',assertFails(PUd.ref('f/l/userUUUUUUUUUU5').get()));
  console.log(`\n${pass} passed, ${fail} failed`);
  await env.cleanup();process.exit(fail?1:0);
 })().catch(e=>{console.error(e);process.exit(2)});

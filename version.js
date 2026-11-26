@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.3';
+const GAME_VERSION='v56.0.4';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.4',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent by a Cloud Function, and new security rules. Nothing changes for players yet.'},
  {v:'v56.0.3',n:'Amazoom now sells floors, pixel wallpaper and lots more furniture. Buy a floor style or wallpaper once, then press E in any room at home and pick Decorate this room to change the floor, the walls and the lower walls (the low walls under the window line). There are 26 floors (oak, walnut, herringbone, tiles, concrete, marble, carpet) and 22 pixel wallpapers (stripes, polka dots, hearts, music notes, brick, space invaders). New furniture: dining chairs and a dining set, a 65, 75 and 85 inch TV, a 32 inch TV and a retro CRT, loveseats, Chesterfield, corner and mid-century sofas, recliners, wingbacks, ottomans, school chairs, desks, lockers and a blackboard, plus office furniture. The Amazoom home page now shows only the best sellers; search or tick a category to see everything else.'},
  {v:'v56.0.2',n:'The front door now swings open when you walk up to it and shuts behind you'},
  {v:'v56.0.1',n:'Update notice is now a swipeable screenshot slideshow ending with a Newsletter link; newsletter gets the v56 update article and the weekly roundup moves to Thursday'},

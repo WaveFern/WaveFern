@@ -16,14 +16,14 @@ const FB_CFG={
  databaseURL:'https://waveferndata-default-rtdb.europe-west1.firebasedatabase.app'
 };
 /* ===== END FIREBASE CONFIG ===== */
-const FB_V='10.12.2',FB_RC='6Lcv_ycuAAAAAEB34hu7jkN3uogbbgyCDmun3DDm'/* v55.29.0: public reCAPTCHA Enterprise site key for Firebase App Check */,FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&!window.FW_DEV;
+const FB_V='10.12.2',FB_RC='6Lcv_ycuAAAAAEB34hu7jkN3uogbbgyCDmun3DDm'/* v55.29.0: public reCAPTCHA Enterprise site key for Firebase App Check */,FB_ON=!/^PASTE_/.test(FB_CFG.apiKey)&&!FW_TRL&&(!window.FW_DEV||!!window.FW_DEV_AUTH)/* v56.0.4: /dev?devauth=1 lets only sign-in through (dev/dev-shim.js); saves, rooms and friends stay blocked */;
 /* v55.29.0: App Check. Attaches a reCAPTCHA token to every Firebase request so Firebase can later reject calls that do not come from the real game. Best effort: if it cannot load, the game carries on without a token. */
 function fbAppCheck(ac,app){if(!ac)return;try{ac.initializeAppCheck(app,{provider:new ac.ReCaptchaEnterpriseProvider(FB_RC),isTokenAutoRefreshEnabled:true})}catch(e){}}
 let FBU=null,FBA=null,FBM=null,FBD=null,FBF=null;
 function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.resolve();
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
  return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js'),import(u+'app-check.js').catch(()=>null)]).then(([a,m,f,ac])=>{const app=a.initializeApp(FB_CFG);fbAppCheck(ac,app);FBM=m;FBF=f;FBA=m.getAuth(app);try{FBD=f.initializeFirestore(app,{experimentalAutoDetectLongPolling:true})}catch(e){FBD=f.getFirestore(app)}
-  m.onAuthStateChanged(FBA,usr=>{window.FW_AUTH_DONE=1;if(csAcct(usr))return;FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()});
+  m.onAuthStateChanged(FBA,fbAuthSet);
   return m.getRedirectResult(FBA).then(r=>{if(r&&r.user)fbSignedIn(r.user)},()=>{}).finally(()=>{if(CLD.signing&&!wiping){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}if(FBU)csCheck()}})})}
 /* v42.7.3: signing in to an account (or out) reloads into that account's own careers on this device, so one account's
    cloud save never lands on another account's or a guest's career. The first time after this update, careers this device
@@ -57,13 +57,50 @@ function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FB
   throw e})}).catch(e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
 /* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
 function fbSignInAsk(){snd('click');const prev=mode,fresh=prev=='creator'||(prev=='title'&&!TT.game);CLD.pre=prev;
- $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>Each Google account has its own careers. Signing in shows that account's careers, and signing out brings back the ones on this device, so nothing is replaced. A brand new account can bring your current career with it.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button><button onclick="fbSignInBack()">Cancel</button></div></div>`}
+ $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>Each account has its own careers. Signing in shows that account's careers, and signing out brings back the ones on this device, so nothing is replaced. A brand new account can bring your current career with it.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button>${FB_EMAIL?'<button onclick="fbEmailOpen(\'in\')">Use email instead</button>':''}<button onclick="fbSignInBack()">Cancel</button></div></div>`}
 function fbCopy(){const t=$('fbsc');t.value=saveCode();t.style.display='block';t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Save code copied'),()=>say('Copy the code from the box'))}catch(e){say('Copy the code from the box')}}
 function fbSignInBack(){const prev=CLD.pre;CLD.pre=null;if(prev=='title'){mode='title';titleUI()}else if(prev=='creator'){mode='creator';creatorUI()}else if(prev=='pause'){mode='pause';pauseUI()}else closeUI()}
 function fbSignInGo(){fbSignInBack();fbSignIn()}
+/* v56.0.4 (HELD behind FB_EMAIL): email + password sign-in next to Google. Same Firebase Auth, same cloud save and profile code: only the
+   way in differs. A password account that has not clicked its confirm link is kept OUT of the game (FBU stays null, FBP holds it), so
+   it can never reach saves, friends or band rooms; the rules also refuse it (firebase-rules/v56.0.4). Same address as a Google account =
+   one account: Firebase links them, and "Forgot password?" lets a Google player add a password. Emails come from the Cloud Functions in functions/. */
+const FB_EMAIL=!!window.FW_DEV/* HELD: /dev only. On release day set true */;/* before release: functions deployed, RESEND_API_KEY set, Email/Password enabled in Firebase Authentication, rules v56.0.4 published */;
+let FBP=null,FBFM=null;const FBE={v:'in',msg:'',bad:0,t:0,busy:0};
+const fbHold=u=>!!u&&!u.emailVerified&&u.providerData.length>0&&u.providerData.every(p=>p.providerId=='password');
+function fbAuthSet(usr){window.FW_AUTH_DONE=1;if(fbHold(usr)){FBP=usr;FBU=null;CLD.ok=0;fbRedraw();return}FBP=null;if(csAcct(usr))return;FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()}
+function fbCall(name,data){return fbLoad().then(()=>FBFM||import('https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-functions.js').then(m=>FBFM=m)).then(m=>m.httpsCallable(m.getFunctions(FBA.app,'europe-west1'),name)(data||{}))}
+const FB_ERR={'auth/invalid-email':'That email address does not look right.','auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.',
+ 'auth/email-already-in-use':'That email already has an account. Sign in, or use Forgot password (also works if you used Google before).','auth/weak-password':'Use a password with at least 8 characters.',
+ 'auth/too-many-requests':'Too many tries. Wait a few minutes.','auth/network-request-failed':'No connection. Try again.','auth/operation-not-allowed':'Email sign-in is not switched on yet.','functions/resource-exhausted':'Wait a minute, then try again.'};
+const fbErr=e=>FB_ERR[e&&e.code]||'Something went wrong. Try again.';
+function fbEmailOpen(v){if(!FB_EMAIL)return;snd('click');if(!CLD.pre&&mode=='title')CLD.pre='title';fbLoad().then(()=>{FBE.v=FBP?'verify':(v||'in');FBE.msg='';fbEmailUI()},()=>say('Sign-in is not available right now.'))}
+function fbEmailUI(msg,bad){clearInterval(FBE.t);if(msg!==undefined){FBE.msg=msg;FBE.bad=bad?1:0}const v=FBE.v,e=($('fbe_e')||{}).value||'',m=FBE.msg?`<p class=m style="color:${FBE.bad?'#ff9b9b':'#9dffc4'}">${esc(FBE.msg)}</p>`:'';
+ const inp=(id,t,ph,ac)=>`<input id=${id} type=${t} placeholder="${ph}" autocomplete=${ac} maxlength=128 style="margin:4px 0" onkeydown="if(event.key=='Enter')fbEmailGo()">`;
+ let h;
+ if(v=='verify'){const a=FBP?esc(FBP.email||''):'';h=`<h2>Check your email</h2><p>We sent a link to <b>${a}</b>. Open it to confirm your address, then come back and press the button.</p>${m}<div class=row2><button class=go onclick="fbEmailGo()">I confirmed it</button><button onclick="fbEmailResend()">Send it again</button></div><p class=m><small>Nothing there? Look in spam. Wrong address?</small></p><div class=row2><button onclick="fbEmailOther()">Use a different email</button><button onclick="fbEmailBack()">Close</button></div>`}
+ else if(v=='reset')h=`<h2>Reset password</h2><p>Enter your email and we will send a link to choose a new password.</p>${inp('fbe_e','email','Email','email')}${m}<div class=row2><button class=go onclick="fbEmailGo()">Send reset email</button><button onclick="FBE.v='in';fbEmailUI('')">Back</button></div>`;
+ else if(v=='up')h=`<h2>Create account</h2>${inp('fbe_e','email','Email','email')}${inp('fbe_p','password','Password (8+ characters)','new-password')}${m}<p class=m><small>By creating an account you agree to the <a href="terms/" target="_blank" rel="noopener">Terms</a> and <a href="privacy/" target="_blank" rel="noopener">Privacy Policy</a>. We email you once to confirm your address.</small></p><div class=row2><button class=go onclick="fbEmailGo()">Create account</button><button onclick="FBE.v='in';fbEmailUI('')">I have an account</button></div>`;
+ else h=`<h2>Sign in with email</h2>${inp('fbe_e','email','Email','email')}${inp('fbe_p','password','Password','current-password')}${m}<div class=row2><button class=go onclick="fbEmailGo()">Sign in</button><button onclick="FBE.v='reset';fbEmailUI('')">Forgot password?</button></div><div class=row2><button onclick="FBE.v='up';fbEmailUI('')">Create account</button><button onclick="fbEmailBack()">Cancel</button></div>`;
+ $('ui').innerHTML=`<div id=fbem class="box modal" style="width:min(420px,92vw)">${h}</div>`;
+ const i=$('fbe_e');if(i){i.value=e;i.focus()}
+ if(v=='verify')FBE.t=setInterval(()=>{if(!document.getElementById('fbem')||FBE.v!='verify')return clearInterval(FBE.t);fbVerifyCheck(1)},6000)}
+function fbEmailBack(){clearInterval(FBE.t);fbSignInBack()}
+function fbEmailOther(){if(!FBA)return;snd('click');clearInterval(FBE.t);FBM.signOut(FBA).then(()=>{FBP=null;FBE.v='up';fbEmailUI('')})}
+function fbVerifyCheck(quiet){const u=FBP;if(!u||FBE.busy)return;FBE.busy=1;return FBM.reload(u).then(()=>{if(u.emailVerified)return u.getIdToken(true).then(()=>{clearInterval(FBE.t);fbSignedIn(u);fbAuthSet(u)});if(!quiet){snd('err');fbEmailUI('Not confirmed yet. Open the link in the email first.',1)}}).catch(e=>{if(!quiet)fbEmailUI(fbErr(e),1)}).finally(()=>{FBE.busy=0})}
+function fbEmailResend(){if(!FBP)return;snd('click');fbCall('fwSendVerify').then(()=>fbEmailUI('Sent. It can take a minute.'),e=>fbEmailUI(fbErr(e),1))}
+function fbEmailGo(){if(FBE.busy&&FBE.v!='verify')return;const v=FBE.v;if(v=='verify')return fbVerifyCheck();
+ const em=(($('fbe_e')||{}).value||'').trim(),pw=($('fbe_p')||{}).value||'';
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))return fbEmailUI('Enter a valid email address.',1);
+ if(v=='reset'){FBE.busy=1;return fbCall('fwSendReset',{email:em}).then(()=>{FBE.v='in';fbEmailUI('If that email has an account, a reset link is on its way. Check spam too.')},e=>fbEmailUI(fbErr(e),1)).finally(()=>{FBE.busy=0})}
+ if(v=='up'&&pw.length<8)return fbEmailUI('Use a password with at least 8 characters.',1);
+ if(!pw)return fbEmailUI('Enter your password.',1);
+ FBE.busy=1;CLD.signing=1;
+ const go=v=='up'?FBM.createUserWithEmailAndPassword(FBA,em,pw).then(r=>{CLD.signing=0;FBP=r.user;FBE.v='verify';fbEmailUI('');return fbCall('fwSendVerify').catch(x=>fbEmailUI(fbErr(x),1))}):FBM.signInWithEmailAndPassword(FBA,em,pw).then(r=>{if(fbHold(r.user)){CLD.signing=0;FBP=r.user;FBE.v='verify';fbEmailUI('Confirm your email to finish signing in.');return fbCall('fwSendVerify').catch(()=>{})}fbSignedIn(r.user)});
+ go.catch(e=>{CLD.signing=0;snd('err');fbEmailUI(fbErr(e),1)}).finally(()=>{FBE.busy=0})}
 /* v49.95.0: "Sign out of Google" on the main menu. Asks first, saves the cloud career, then signs out. The auth change
    reloads into the signed-out set of careers. No save is deleted: cloud save and device careers stay where they are. */
-function fbSignOutAsk(){if(!FBA||!FBU)return;snd('click');if(!confirm('Sign out of Google? Your cloud save stays on your account, and the careers on this device are kept. You will go back to the signed-out menu.'))return;fbSignOut()}
+function fbSignOutAsk(){if(!FBA||!FBU)return;snd('click');if(!confirm('Sign out? Your cloud save stays on your account, and the careers on this device are kept. You will go back to the signed-out menu.'))return;fbSignOut()}
 function fbSignOut(){if(!FBA)return;snd('click');csPush(1).catch(()=>{}).then(()=>FBM.signOut(FBA)).catch(()=>say('Could not sign out. Try again.'))}
 function fbRedraw(){if(mode=='pause')pauseUI();else if(mode=='title'&&document.getElementById('ttl'))titleUI()}
 
@@ -122,12 +159,12 @@ const TT={on:0,game:0};
 {let on=0;Object.defineProperty(TT,'on',{get:()=>on,set(v){on=v;try{document.body.classList.toggle('ttitle',!!v)}catch(e){}},enumerable:true});const st=document.createElement('style');st.textContent='body.ttitle #hud,body.ttitle #swhud,body.ttitle #mpb,body.ttitle #ntags{display:none!important}';document.head.appendChild(st)}
 function titleMsg(){try{const m=sessionStorage.getItem('fw_msg');if(m){sessionStorage.removeItem('fw_msg');say(m)}}catch(e){}}
 function titleOpen(){titleMsg();TT.on=1;mode='title';PAUSED=1;for(const k in keys)delete keys[k];MU.hold=1;try{const a=MU.a[MU.cur];if(MU.pl&&a)a.pause()}catch(e){}pauseOverlay(1);menuMusic(1);titleUI()}
-function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Google user'):'';
+function titleUI(){if(!TT.on)return;const busy=FBU&&!CLD.ok&&!CLD.err,nm=FBU?(FBU.displayName||FBU.email||'Player'):'';
  const NI='<i class=ttni aria-label="Not signed in"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.6 3.8-7.5 8.5-7.5s8.5 2.9 8.5 7.5z"/></svg></i>';
- const pf=FBU?`<div class=ttpf title="${esc(nm)}">${fwPhoto()?`<img src="${esc(fwPhoto())}" referrerpolicy=no-referrer alt="Your Google profile picture" onerror="this.outerHTML=${esc(JSON.stringify(NI))}">`:NI}</div>`:`<div class=ttpf>${NI}</div>`;
+ const pf=FBU?`<div class=ttpf title="${esc(nm)}">${fwPhoto()?`<img src="${esc(fwPhoto())}" referrerpolicy=no-referrer alt="Your profile picture" onerror="this.outerHTML=${esc(JSON.stringify(NI))}">`:NI}</div>`:`<div class=ttpf>${NI}</div>`;
  $('ui').innerHTML=`<div id=ttl>${FB_ON?pf:''}<div class=ttm><h1>WAVEFERN</h1><div class=px>Music Career Sim</div><div class=ttbx>
   <button class=go onclick="ttWorlds()" ${busy?'disabled':''}>${busy?'Loading your save…':'Play'}</button>
-  <button onclick="ttSet()">Settings</button><button onclick="ttWiki()">Wiki</button><button onclick="ttLink('newsletter')">Newsletter</button>${FBU?`<button onclick="fbSignOutAsk()" ${busy?'disabled':''}>Sign out of Google</button>`:''}${FB_ON&&!FBU?`<button onclick="fbSignInAsk()">Sign in with Google</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · <a href="privacy/" target="_blank" rel="noopener">Privacy</a> · <a href="terms/" target="_blank" rel="noopener">Terms</a> · <a href="legal/" target="_blank" rel="noopener">Legal</a> · <a href="#" onclick="ttLink('contact');return false">Contact</a> · <a href="https://buymeacoffee.com/wavefern" target="_blank" rel="noopener">Buy me a coffee</a></div></div>`}
+  <button onclick="ttSet()">Settings</button><button onclick="ttWiki()">Wiki</button><button onclick="ttLink('newsletter')">Newsletter</button>${FBU?`<button onclick="fbSignOutAsk()" ${busy?'disabled':''}>Sign out${FBU.providerData&&FBU.providerData.some(x=>x.providerId=='google.com')?' of Google':''}</button>`:''}${FB_ON&&!FBU&&FBP?`<button class=go onclick="CLD.pre='title';fbEmailOpen('verify')">Confirm your email</button><p class=m><small>${esc(FBP.email||'')} is waiting to be confirmed.</small></p>`:''}${FB_ON&&!FBU&&!FBP?`<button onclick="fbSignInAsk()">${FB_EMAIL?'Sign in':'Sign in with Google'}</button><p class=m><small>Sign in to keep your game in the cloud and play on any device.</small></p>`:''}</div></div><div class=ttft>${typeof GAME_VERSION!='undefined'?GAME_VERSION+' · ':''}Fictional game · <a href="privacy/" target="_blank" rel="noopener">Privacy</a> · <a href="terms/" target="_blank" rel="noopener">Terms</a> · <a href="legal/" target="_blank" rel="noopener">Legal</a> · <a href="#" onclick="ttLink('contact');return false">Contact</a> · <a href="https://buymeacoffee.com/wavefern" target="_blank" rel="noopener">Buy me a coffee</a></div></div>`}
 /* Main menu Newsletter button + footer Contact link: both open a page of this site in a new tab. Live for everyone since v56.0.0. */
 const WF_LINKS={newsletter:'newsletter/',contact:'wiki/contact/'};
 function ttLink(k){snd('click');const v=WF_LINKS[k];const w=window.open(v,'_blank');if(w)w.opener=null;else location.href=v}
