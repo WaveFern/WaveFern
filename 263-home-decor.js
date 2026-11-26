@@ -143,6 +143,8 @@ function apply(){const rf=S.rf||{},rw=S.rw||{},rt=S.rt||{},rooms=PRM.filter(prHa
   X=m.position.x+(north?0:-.5),Z=m.position.z+(north?-.5:0),nb=rooms.find(q=>q!==r&&X>=q[2]&&X<q[4]&&Z>=q[3]&&Z<q[5]);
   paper(m,sty(r,tall),sty(nb,tall),north)}))}
 {const pr0=prRecolour;prRecolour=function(){restore();const r=pr0.apply(this,arguments);try{apply()}catch(e){console.error('home decor',e)}return r}}
+/* the kind of floor under the player at home ('carpet', 'planks', ...), '' when none was bought: the footsteps (dev/dev-footsteps-v1.js) play a carpet sound on carpet */
+window.FW_FLOORKIND=()=>{try{const r=prRoomAt(P.x,P.z),f=r&&DC.fl[(S.rf||{})[r[0]]];return f?f.k:''}catch(e){return ''}};
 /* a loaded save, a new career or a rebuilt wing changes what the rooms should show */
 {let sg='',n=0;const wt=worldTick;worldTick=function(dt){wt(dt);if(++n%15)return;try{const s=JSON.stringify([S.rf,S.rw,S.rt]);if(s!==sg){sg=s;PRSIG=''}}catch(e){}}}
 /* painting a room covers its wallpaper */
