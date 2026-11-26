@@ -1,10 +1,9 @@
 /* ===== dev only: two places on the island, the Sunset Beach Club and the Lighthouse (v54.5.0) =====
    Loaded after dev-island-v1.js (it needs the coast, window.FW_ISLAND). Add ?noisland to skip both.
-   - Sunset Beach Club: a fenced tiki bar, deck, sunbeds, a 16 m stage, fire pit and volleyball court on the south-east beach, all at real size (1 unit = 1 m) and all blocky. Gigs use a camera behind you on stage. Now and then (about every 2-4 days,
+   - Sunset Beach Club: a fenced tiki bar, deck, sunbeds, a 16 m stage, fire pit and volleyball court on the south-east beach, all at real size (1 unit = 1 m) and all blocky. The gig is the festival set itself (70c-festival-set.js): same stage view, crowd, crowd minigames, walking round the stage and autographs. Now and then (about every 2-4 days,
      once you have a released song) the club EMAILS you (Messages) a sunset gig: day, 18:00-21:00, a fee. Accept or Decline in the
      message. On the day, walk to the stage during the slot and press the prompt: pick up to 3 of your songs and play. The crowd
-     reacts to the song quality: fee (70% to 130% of the offer), followers, streams for the songs you played. It costs 20 energy and
-     about 2 hours of game time. Miss the slot and the offer lapses (nothing lost). The bar also sells a cheap smoothie.
+     pays per song like the festival (stage multiplier 2) and the club adds its fee (70% to 130% of the offer, by your crowd score). It costs 15 energy. Miss the slot and the offer lapses (nothing lost). The bar also sells a cheap smoothie.
    - Lighthouse: a striped tower on the north-east headland with a light that turns at night. Press E to climb it: a plain dialog, then first person on the gallery (WASD, mouse or arrow keys, labels for places on the map). The first climb each day gives
      +20 energy. It is also a map place, so you can set a guide marker on it.
    State (saved, old saves start empty): S.bcg={last,list:[{id,pay,exp,day,st}]} (st 0 offer, 1 booked, 2 declined, 3 played, 4 expired, 5 missed),
@@ -395,29 +394,37 @@ function setUI(o){const L=best().slice(0,8);
  <div class=pelist>${L.map(s=>`<button class=pesong style="${PICK.includes(s.id)?'outline:2px solid #ff7ab8':''}" onclick="bcPick(${s.id})"><b>${PICK.includes(s.id)?'✓ ':''}${E(s.title)}</b><small>${E(s.g)} · quality ${Math.round(s.q||0)} · ${fmt(s.streams||0)} streams</small></button>`).join('')}</div>
  <div class=row2><button class=go ${PICK.length?'':'disabled'} onclick="bcPlay()">Play ${PICK.length||''} song${PICK.length==1?'':'s'}</button><button onclick="closeUI()">Not now</button></div></div></div>`}
 window.bcPick=function(id){const o=booked();if(!o||mode!='menu')return;const i=PICK.indexOf(id);if(i>=0)PICK.splice(i,1);else if(PICK.length<3)PICK.push(id);else{sn('err');return}sn('pop');setUI(o)};
-window.bcPlay=function(){const o=booked();if(!o||!PICK.length)return;const L=PICK.map(id=>(S.songs||[]).find(x=>x.id==id)).filter(Boolean);if(!L.length)return;
- const q=L.reduce((a,s)=>a+(s.q||0),0)/L.length,r=Math.min(1,Math.max(.1,q/100+rnd(-.12,.12)+(L.length-1)*.03)),crowd=Math.round((60+r*240)*scale());
- const pay=Math.round(o.pay*(.7+.6*r)),fol=Math.max(0,Math.round(crowd*r*.5));
- S.money=+((S.money||0)+pay).toFixed(2);S.earn=(S.earn||0)+pay;S.followers=(S.followers||0)+FOLN(fol);
- L.forEach(s=>{const st2=Math.round(crowd*(1+r*3)/L.length);try{addSt(s,st2)}catch(e){s.streams=(s.streams||0)+st2;S.streams=(S.streams||0)+st2}if(S.hype&&S.hype[s.g]!=null)S.hype[s.g]=+Math.min(2,(S.hype[s.g]||1)+.1).toFixed(2)});
- S.energy=Math.max(0,(S.energy||0)-20);try{S.t=Math.min(599,(S.t||0)+43)}catch(e){}
- o.st=3;PICK=[];sv();sn('cash');try{updateVersion()}catch(e){}
- const line=r>.8?'The whole beach sang along as the sun went down.':r>.6?'Hands up all the way back to the bar.':r>.4?'A warm crowd, lots of phones out.':'A slow start, but people drifted over and stayed.';
- const fin=()=>{$('ui').innerHTML=`<div class="box modal pe" style="width:min(520px,94vw)"><div class=pehd><span class=pek>Sunset Beach Club</span><h2>What a sunset</h2></div><div class=pebd><div class=peres><h3>${line}</h3><p>About <b>${fmt(crowd)}</b> people came. You played ${L.map(s=>'<b>'+E(s.title)+'</b>').join(', ')}.</p><p>Fee <b>${fm(pay)}</b> · <b>+${fmt(fol)} followers</b> · more streams on the songs you played.</p></div><div class=row2><button class=go onclick="closeUI()">Nice</button></div></div></div>`;};
- note('Sunset Beach Club Bookings','Thank you for tonight, '+(S.artist||'')+'! '+fmt(crowd)+' people on the sand and a '+fm(pay)+' fee on its way to you. Come back anytime.');showGig(L,fin)};
+window.bcPlay=function(){const o=booked();if(!o||!PICK.length||mode!='menu')return;const L=PICK.map(id=>(S.songs||[]).find(x=>x.id==id)).filter(Boolean);if(!L.length)return;PICK=[];startSet(o,L)};
 
-/* ---------- the gig: the camera goes behind you on stage and looks out over the crowd ---------- */
-let BCV=null,bcCam=null;
-{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(BCV&&bcCam&&c===cam){bcCam.aspect=innerWidth/innerHeight;bcCam.updateProjectionMatrix();return r0(sc,bcCam)}if(LHV&&lhCam&&c===cam)return r0(sc,lhCam);return r0(sc,c)}}
-function showGig(L,fin){if(!club||away()||mode=='title'){fin();return}
- try{if(!bcCam)bcCam=new THREE.PerspectiveCamera(60,1,.1,600);
-  const perf=buildChar(ch);perf.g.position.set(CLUB_X+14,1.3,CLUB_Z-15.6);root.add(perf.g);
-  try{P.mesh.visible=false}catch(e){}document.body.classList.add('fston');
-  BCV={t:0,L,fin,perf,dur:L.length*7,k:-1};
-  $('ui').innerHTML='<div class="box pe" style="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:5;text-align:center;padding:6px 10px"><div id=bcnow style="padding:4px 14px;font-size:16px"></div><button onclick="bcSkip()">Skip</button></div>'}
- catch(e){console.error('beach club gig',e);if(BCV)endGig();else fin()}}
-function endGig(){const v=BCV;if(!v)return;BCV=null;try{root.remove(v.perf.g)}catch(e){}try{P.mesh.visible=true}catch(e){}document.body.classList.remove('fston');v.fin()}
-window.bcSkip=()=>{if(BCV)endGig()};
+/* ---------- the gig: the festival set itself (70c-festival-set.js: songs, crowd minigames, walking round the stage in 188, autographs in 233),
+   run on the club's stage, which is the size of The Pit. BCS is shaped like an FSTG entry but is not in FSTG, so the festival ground, board and map ignore it ---------- */
+const BCS={n:5,name:'Sunset Beach Club',req:0,mult:2,cx:CLUB_X+14,zb:CLUB_Z-21,w:16,d:9,h:1.3,H:8,base:140,cap:450,figs:260,col:'#ff7ab8',bc:1};
+BCS.zf=BCS.zb+BCS.d;BCS.x0=BCS.cx-BCS.w/2;BCS.x1=BCS.cx+BCS.w/2;BCS.oz=BCS.zf+2.4;BCS.ex=[];BCS.ix=CLUB_X+3.8;BCS.iz=CLUB_Z-15.7;BCS.area=[CLUB_X-3,BCS.zf,CLUB_X+36,CLUB_Z+4.5];
+FSLOT.bc=SLOT.slice();/* a named entry, so the festival's four slots and FSLOT.length stay as they are */
+const gig=()=>FEST.view===BCS;
+/* the festival crowd for this stage, parked in the club's group (festCrowdBuild adds to the festival group: a stand-in takes it, the real one is never created here) */
+function bcCrowd(){if(BCS.cr)return;const o=FEST.grp.fest,h=BCS.hold=new THREE.Group();root.add(h);FEST.grp.fest=h;
+ try{festCrowdBuild(BCS)}finally{if(o)FEST.grp.fest=o;else delete FEST.grp.fest}
+ const i=FEST.crowd.indexOf(BCS.cr);if(i>=0)FEST.crowd.splice(i,1);h.visible=false}
+function startSet(o,L){if(!club||away())return;bcCrowd();BCS.cr.C=festAmbient(BCS);
+ const bk={id:-5,day:S.day,n:5,slot:'bc',songs:L.map(s=>s.id),st:0,bc:o.id};
+ FSTG.push(BCS);try{festStartBooked(bk)}finally{FSTG.splice(FSTG.indexOf(BCS),1)}}
+/* festTick only runs a set on festival days: run it here for the beach, and pose this crowd (the festival loop does not know it) */
+{const f0=festTick;festTick=function(dt){const set=FEST.set,v=FEST.view3,mine=gig()&&set&&set.st===BCS;
+  if(BCS.hold)BCS.hold.visible=!!mine;
+  if(mine&&v){v.back.visible=false;/* the park tree line stands at the festival */
+   if(!(FEST.ph=='fest'&&FEST.grp.fest))festOnStage(dt,FEST.t);
+   const cr=BCS.cr;if(cr&&FEST.set===set)festCrowdPose(cr,FEST.t,cr.shown<0,v.cam)}
+  return f0.apply(this,arguments)}}
+/* the set is over: the club's fee, by the crowd's score and by how much of the set you played */
+{const e0=festEnd;festEnd=function(){const set=FEST.set,live=!!set&&set.st===BCS&&!set.end,r=e0.apply(this,arguments);if(live&&set.end)try{bcDone(set)}catch(e){console.error('beach club fee',e)}return r}}
+function bcDone(set){const o=find(set.bk.bc);if(!o)return;o.st=3;
+ const part=Math.min(1,set.done.reduce((a,d)=>a+d.f,0)/set.list.length),fee=Math.round(o.pay*(.7+.6*Math.min(1,set.avg||.5))*part);
+ S.money=+((S.money||0)+fee).toFixed(2);S.earn=(S.earn||0)+fee;set.pay=+(set.pay+fee).toFixed(2);sv();
+ note('Sunset Beach Club Bookings','Thank you for tonight, '+(S.artist||'')+'! About '+fmt(set.peak)+' people on the sand'+(fee?' and a '+fm(fee)+' fee on its way to you':'')+'. Come back anytime.');
+ festSumUI(set)}
+/* the lighthouse's first person camera (the gig renders through the festival's stage camera, see 70c) */
+{const r0=renderer.render.bind(renderer);renderer.render=function(sc,c){if(LHV&&lhCam&&c===cam)return r0(sc,lhCam);return r0(sc,c)}}
 
 /* ---------- the bar ---------- */
 function bar(){if(mode!='play'||away())return;if(S.bcBar===S.day){sn('err');return say('Mara says: one smoothie a day, you will float away!')}
@@ -474,14 +481,10 @@ function hy(h,dt){HY+=(h-HY)*Math.min(1,(dt||.016)*14);if(Math.abs(HY-h)<.01)HY=
   if(i.bc=='bar')i.l=S.bcBar===S.day?'Beach bar (smoothie taken today)':'Beach bar: smoothie $8';
   if(i.lh)i.l=S.lhDay===S.day?'Lighthouse (visited today)':'Climb the Lighthouse'});
  if(LHV)lhFrame(dt);
- if(BCV){const v=BCV,t=v.t+=dt||0,k=Math.min(v.L.length-1,Math.floor(t/7)),e=$('bcnow');if(e&&v.k!==k){v.k=k;e.textContent='\u266a '+v.L[k].title}
-  bcCam.position.set(CLUB_X+12.4+Math.sin(t*.37)*.35,4.7,CLUB_Z-19.6+Math.min(t,10)*.04);bcCam.lookAt(CLUB_X+14.6+Math.sin(t*.37)*.2,1.7,CLUB_Z+12);
-  v.perf.g.position.y=1.3+Math.abs(Math.sin(t*4))*.05;v.perf.arms[0].rotation.x=-.3+Math.sin(t*3)*.25;v.perf.arms[1].rotation.x=-1.1;
-  if(t>=v.dur)endGig()}
- if(club){const dd=Math.hypot(P.x-CLUB_X,P.z-CLUB_Z);club.visible=dd<450||!!BCV;if(club.visible){if(dd<260&&!ppG)buildPeople(club);
-  const lx=P.x-CLUB_X,lz=P.z-CLUB_Z,inside=!!BCV||(lx>-25&&lx<-11&&lz<-13&&lz>-22)||(lx>5&&lx<23&&lz<-11&&lz>-22),show=!!BCV||!!open;
+ if(club){const dd=Math.hypot(P.x-CLUB_X,P.z-CLUB_Z);club.visible=dd<450||gig();if(club.visible){if(dd<260&&!ppG)buildPeople(club);
+  const lx=P.x-CLUB_X,lz=P.z-CLUB_Z,inside=gig()||(lx>-25&&lx<-11&&lz<-13&&lz>-22)||(lx>5&&lx<23&&lz<-11&&lz>-22),show=gig()||!!open;
   RM.forEach(m=>{m.opacity+=((inside?.1:1)-m.opacity)*.18;m.depthWrite=m.opacity>.6});setGlow(night||show,show);
-  if(ppG)PPL.forEach(p=>{const g=p.o.g;if(p.k=='crowd'){g.visible=show;if(show){const up=!!BCV;g.position.y=p.y+Math.abs(Math.sin(spin*3+p.ph))*(up?.14:.03);p.o.arms.forEach((a,i)=>a.rotation.x=up?-2.7+Math.sin(spin*5+p.ph+i)*.4:-.1)}}
+  if(ppG)PPL.forEach(p=>{const g=p.o.g;if(p.k=='crowd'){g.visible=show&&!gig();if(show){const up=false;g.position.y=p.y+Math.abs(Math.sin(spin*3+p.ph))*(up?.14:.03);p.o.arms.forEach((a,i)=>a.rotation.x=up?-2.7+Math.sin(spin*5+p.ph+i)*.4:-.1)}}
    else if(p.k=='vb'){g.position.y=Math.abs(Math.sin(spin*2.2+p.ph))*.3;p.o.arms.forEach(a=>a.rotation.x=-1.8)}else if(p.k=='bar')p.o.arms[1].rotation.x=-.8+Math.sin(spin*3)*.25});
   club.userData.q1.concat(club.userData.q2).forEach(v=>{const bl=v.userData&&v.userData.ball;if(bl)bl.position.y=2.3+Math.abs(Math.sin(spin*2.2))*1.2})}}
  /* stand ON the deck, the stage and the steps (the ground is flat, so the walker is lifted to the height of what is under them) */

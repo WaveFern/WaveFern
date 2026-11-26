@@ -157,12 +157,14 @@ function festSumUI(set){const s=set.st,ttl=set.ttl,avg=set.avg,full=set.full,gai
 function festLeave(){const set=FEST.set;FEST.set=null;festViewOff();festHud();const s=set&&set.st;if(s){P.x=s.ix;P.z=s.iz+1.2;P.rot=0;camT.x=P.x;camT.z=P.z;s.cr.hype=.4;s.cr.C=festAmbient(s);s.cr.shown=-1}closeUI();festScreens()}
 
 /* ---- 10. every frame ---- */
+/* the set itself and you on stage (the performer's dance); also run by the Sunset Beach Club gig (dev/dev-island-places.js) */
+function festOnStage(dt,t){festSetTick(dt);const s=FEST.set&&FEST.set.st;if(s&&P.mesh&&FEST.view){const b=Math.max(0,Math.sin(t*2.1*Math.PI))*.05;P.mesh.position.set(P.x,s.h+b,P.z);P.mesh.rotation.y=Math.sin(t*.9)*.15;
+    P.arms[1].rotation.x=-2.2+Math.sin(t*4)*.12;P.arms[0].rotation.x=(FEST.set.hype>.7&&Math.sin(t*.7)>.2)?-2.9:-.3+Math.sin(t*2.1*Math.PI)*.3;P.legs[0].rotation.x=Math.sin(t*2.1*Math.PI)*.12;P.legs[1].rotation.x=-P.legs[0].rotation.x;
+    if(FEST.set.ft){const o=FEST.set.ft;o.g.rotation.y=Math.sin(t*.8+1)*.2;o.g.position.y=s.h+Math.max(0,Math.sin(t*2.1*Math.PI+.5))*.05;o.arms[0].rotation.x=-2.2+Math.sin(t*4+1)*.12;o.arms[1].rotation.x=(FEST.set.hype>.6&&Math.sin(t*.6+2)>.3)?-2.9:-.4}}}
 function festTick(dt){festSync();if(FEST.set&&FEST.set.end&&mode=='play')festLeave();const ph=FEST.ph;FEST.t+=dt;const t=FEST.t;
  const near=!IN&&!HIN&&P.x>FEST.X0-90&&P.x<FEST.X1+90&&P.z>FEST.Z0-90&&P.z<FEST.Z1+70;
  if(ph=='fest'&&FEST.grp.fest){FEST.grp.fest.visible=near||!!FEST.view;
-  if(FEST.set){festSetTick(dt);const s=FEST.set&&FEST.set.st;if(s&&P.mesh&&FEST.view){const b=Math.max(0,Math.sin(t*2.1*Math.PI))*.05;P.mesh.position.set(P.x,s.h+b,P.z);P.mesh.rotation.y=Math.sin(t*.9)*.15;
-    P.arms[1].rotation.x=-2.2+Math.sin(t*4)*.12;P.arms[0].rotation.x=(FEST.set.hype>.7&&Math.sin(t*.7)>.2)?-2.9:-.3+Math.sin(t*2.1*Math.PI)*.3;P.legs[0].rotation.x=Math.sin(t*2.1*Math.PI)*.12;P.legs[1].rotation.x=-P.legs[0].rotation.x;
-    if(FEST.set.ft){const o=FEST.set.ft;o.g.rotation.y=Math.sin(t*.8+1)*.2;o.g.position.y=s.h+Math.max(0,Math.sin(t*2.1*Math.PI+.5))*.05;o.arms[0].rotation.x=-2.2+Math.sin(t*4+1)*.12;o.arms[1].rotation.x=(FEST.set.hype>.6&&Math.sin(t*.6+2)>.3)?-2.9:-.4}}}
+  if(FEST.set)festOnStage(dt,t);
   if(FEST.grp.fest.visible){/* crowds: the one you play to every frame, the others nearby at a lower rate */
    FEST.crowd.forEach(cr=>{const live=FEST.view===cr.s,s=cr.s,d=Math.hypot(P.x-s.cx,P.z-(s.area[1]+s.area[3])/2);cr.grp.visible=live||!FEST.view&&d<110||!!FEST.view;
     if(!cr.grp.visible)return;cr.ft+=dt;if(live||cr.ft>(d<45?.033:.1)||cr.shown<0){festCrowdPose(cr,t,cr.shown<0,FEST.view?FEST.view3.cam:cam);cr.ft=0}});
