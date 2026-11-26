@@ -77,15 +77,21 @@
   return null}
  function fur(key){const f=typeof F!='undefined'&&F[key]?F[key]:null;if(!f)return{t:'f',k:'',key,n:key,note:''};return{t:'f',k:'f:'+key,key,n:f.n,note:'Delivered to your Storage. Press F at home to place it.'}}
 
- function give(d){
-  const s=Sv(),a=st();if(!s||!a||a.c[d]||!ready(d))return null;
-  const r=resolve(d);if(!r||r.t=='x')return null;
+ /* put a prize into the save (also used by Santa's Lodge presents through FW_ADVENT.crate.grant). false = could not be given. */
+ function apply(r){
+  const s=Sv();if(!s||!r)return false;
   if(r.t=='w'){s.wraps=s.wraps&&typeof s.wraps=='object'?s.wraps:{};s.wraps[r.pat]=1}
   if(r.t=='k'){s.wr=s.wr||[];if(!s.wr.includes(r.id))s.wr.push(r.id);s.wc=s.wc||{};const g=GAR.find(x=>x.id==r.id);let c=null;safe(()=>{c=THC[r.id]},'thc');if(!s.wc[r.id])s.wc[r.id]=c||g.dc}
-  if(r.t=='b'){if(!window.FW_PBORDER||!window.FW_PBORDER.give(r.bid))return null}
+  if(r.t=='b'){if(!window.FW_PBORDER||!window.FW_PBORDER.give(r.bid))return false}
   if(r.t=='f'){s.inv=s.inv||{};s.inv[r.key]=(s.inv[r.key]||0)+1}
   if(r.t=='p'){s.pets=s.pets||[];if(!s.pets.includes(r.i))s.pets.push(r.i);safe(()=>syncF(),'pet')}
   if(r.t=='c'){s.cars=s.cars||[];if(!s.cars.includes(r.i))s.cars.push(r.i);if(!s.garage)s.garage=1;safe(()=>parkCars(),'car')}
+  return true}
+ function grant(r){if(!apply(r))return false;safe(()=>updateVersion(),'ver');safe(()=>autoSave(),'save');safe(()=>{if(typeof csPush=='function')csPush(1)},'cloud');return true}
+ function give(d){
+  const s=Sv(),a=st();if(!s||!a||a.c[d]||!ready(d))return null;
+  const r=resolve(d);if(!r||r.t=='x')return null;
+  if(!apply(r))return null;
   a.c[d]={t:r.t,k:r.k,n:r.n};if(r.rar!=null)a.c[d].r=r.rar;if(a.p)delete a.p[d];
   safe(()=>updateVersion(),'ver');safe(()=>autoSave(),'save');safe(()=>{if(typeof csPush=='function')csPush(1)},'cloud');
   return r}
@@ -626,7 +632,7 @@
  /* anything else that clears the UI (pause, a modal, closeUI) also closes the calendar */
  setInterval(()=>{if(W&&typeof mode!='undefined'&&mode!='menu'){if(REV&&REV.v)REV.v.dispose();REV=null;W.remove();W=null}},300);
 
- window.FW_ADVENT={open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer,crate:{TIERS,pool,rollItem,WRAPS,tierOf}};
+ window.FW_ADVENT={open,close,now,ready,resolve,PLAN,ORDER,setTest,claimed,pic,itemModel,Viewer,crate:{TIERS,pool,rollItem,WRAPS,tierOf,prizeFrom,grant}};
 
  /* ---------- dev panel: calendar-only test dates ---------- */
  if(DEV)safe(()=>{
