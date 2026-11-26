@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.10';
+const GAME_VERSION='v56.0.11';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.11',n:'Click sound is now a clean real recording (CC0 Kenney sample, small file) instead of the synthesised tick; the PC mouse click is re-encoded at full quality. Volume peak-limited. Saves still load.'},
  {v:'v56.0.10',n:'Santa\'s Lodge (dev only): every /dev save gets all of Santa\'s prizes, plus a dev panel button'},
  {v:'v56.0.9',n:'Santa\'s Lodge (dev only): burp cutscene, rarity-then-item present spin, new Santa prizes (Sprocket Rocket, Gingerbread Cruiser, Pip the Elf and more), present no longer falls through the floor'},
  {v:'v56.0.8',n:'Santa\'s Lodge (dev only): new cabin interior with toy train, path sign removed'},
