@@ -14,6 +14,7 @@ const tryS=c=>{try{return sh(c)}catch(e){return null}};
 const VJ='version.js',IX='index.html';
 const verOf=t=>(t.match(/GAME_VERSION='v(\d+)\.(\d+)\.(\d+)'/)||[]).slice(1).map(Number);
 const fmt=v=>v.join('.');
+function shown(vj){const ids=[...vj.matchAll(/^ \{v:'([^']+)'/gm)].map(x=>x[1]),r=ids.indexOf((vj.match(/FW_RESET_BUILD\s*=\s*'([^']+)'/)||[])[1]);return r<0?'?':'2.'+r}
 function next(cur,kind){return kind=='drop'?[cur[0]+1,0,0]:[cur[0],cur[1],cur[2]+1]}
 function changedFiles(){const a=tryS('git diff --name-only origin/main...HEAD')||'',b=tryS('git diff --name-only HEAD')||'',c=tryS('git ls-files -o --exclude-standard')||'';
  return new Set((a+b+c).split('\n').filter(Boolean))}
@@ -27,7 +28,7 @@ function apply(kind,note,src){
  let ix=fs.readFileSync(IX,'utf8'),n=0;const ch=changedFiles();ch.add(VJ);
  ix=ix.replace(/(<(?:script|link)[^>]*?\s(?:src|href)=")([^"?]+)\?v=([^"]+)(")/g,(m,a,f,v,z)=>{if(!ch.has(f))return m;n++;return a+f+'?v='+s+z});
  fs.writeFileSync(IX,ix);
- console.log('v'+s+' written to version.js, '+n+' ?v= tag(s) in index.html set to '+s+(kind=='drop'?'\nRelease day: also add the top entry to news-data.js (WF_NEWS) and bump its ?v=.':''));
+ console.log('v'+s+' written to version.js, '+n+' ?v= tag(s) in index.html set to '+s+'\nPlayers see v'+shown(vj)+' (the build id is internal; use this number when talking to James and in PR titles)'+(kind=='drop'?'\nRelease day: also add the top entry to news-data.js (WF_NEWS) and bump its ?v=.':''));
 }
 function check(){
  const vj=fs.readFileSync(VJ,'utf8'),ix=fs.readFileSync(IX,'utf8'),cur=fmt(verOf(vj));let bad=0;
