@@ -35,6 +35,10 @@ A change that is not ready simply keeps its gate for next week.
 
 Previously: None. v56.0.0 (2026-11-26) released everything that was held: News app, post and News scenes, Pets overhaul, Instagrime feed upgrade and brand posts (`HELD=false`), smoother walking, and menu Newsletter/Contact (FW_DEV checks removed). The `HELD` flags stay in those files for the next hold.
 
+| Feature | File | Gate |
+|---|---|---|
+| Santa's Lodge (feed Santa treats, burp present) | `dev/dev-lodge-v1.js` | `FW_DEV` |
+
 ## Avoiding merge pain
 The old pain was never the numbers: every PR edited the same few lines (`GAME_VERSION`, the top history entry, the `?v=` tags), so any two open PRs conflicted and each was renumbered by hand (55 of the last 300 commits are "Merge main; renumber").
 - Before opening or merging a PR: `git fetch origin && node tools/bump.js trial` lists the files that would conflict.
