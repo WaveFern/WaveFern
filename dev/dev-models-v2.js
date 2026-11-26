@@ -91,8 +91,10 @@
   /* outside: siding lines on the front (z) and east (x) walls */
   for(let k=0;k<8;k++){const y=.5+k*.3,c='#c9b790';B(g,4.9,.04,.02,c,2.5,y,12.311);B(g,8.9,.04,.02,c,11.5,y,12.311);B(g,.02,.04,12,c,16.311,y,6)}
   /* front door panels, handle, kick plate, mat */
-  [[5.58,1.78,.75,.75],[6.42,1.78,.75,.75],[5.58,.7,.75,.8],[6.42,.7,.75,.8]].forEach(q=>B(g,q[2],q[3],.03,'#6b4a2e',q[0],q[1],12.235));
-  B(g,.1,.1,.08,'#d9b44a',6.8,1.15,12.27);B(g,1.8,.2,.03,'#9a8a60',6,.12,12.24);B(g,1.1,.02,.55,'#7a2f2f',6,.16,12.95);
+  /* v56: panels and handle hang on a hinge at the left edge (x 5) and swing with the door (dev-house-front-v1.js turns every pivot in FW_DOORP) */
+  const dp=new THREE.Group();dp.position.set(5,0,12.235);g.add(dp);(window.FW_DOORP=window.FW_DOORP||[]).push(dp);
+  [[5.58,1.78,.75,.75],[6.42,1.78,.75,.75],[5.58,.7,.75,.8],[6.42,.7,.75,.8]].forEach(q=>B(dp,q[2],q[3],.03,'#6b4a2e',q[0]-5,q[1],0));
+  B(dp,.1,.1,.08,'#d9b44a',1.8,1.15,.035);B(g,1.8,.2,.03,'#9a8a60',6,.12,12.24);B(g,1.1,.02,.55,'#7a2f2f',6,.16,12.95);
   /* shutters on the front and east windows, drainpipes */
   const shut=(x,z,f)=>{const sx=f?.07:.5,sz=f?.5:.07;B(g,sx,1.25,sz,'#3e6b57',x,1.7,z);for(let i=0;i<4;i++)B(g,f?.09:.4,.03,f?.4:.09,'#2f5545',x,1.35+i*.25,z)};
   [2.5,10.5,13.5].forEach(x=>[-1,1].forEach(s=>shut(x+s*1.5,12.42,0)));
