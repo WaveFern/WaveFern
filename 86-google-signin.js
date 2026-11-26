@@ -64,15 +64,18 @@ function fbSignInGo(){fbSignInBack();fbSignIn()}
 /* v56.0.4 (HELD behind FB_EMAIL): email + password sign-in next to Google. Same Firebase Auth, same cloud save and profile code: only the
    way in differs. A password account that has not clicked its confirm link is kept OUT of the game (FBU stays null, FBP holds it), so
    it can never reach saves, friends or band rooms; the rules also refuse it (firebase-rules/v56.0.4). Same address as a Google account =
-   one account: Firebase links them, and "Forgot password?" lets a Google player add a password. Emails come from the Cloud Functions in functions/. */
+   one account: Firebase links them, and "Forgot password?" lets a Google player add a password. Emails are sent by the Cloudflare Worker in worker/ through Resend; links open /account/. */
 const FB_EMAIL=!!window.FW_DEV/* HELD: /dev only. On release day set true */;/* before release: functions deployed, RESEND_API_KEY set, Email/Password enabled in Firebase Authentication, rules v56.0.4 published */;
 let FBP=null,FBFM=null;const FBE={v:'in',msg:'',bad:0,t:0,busy:0};
 const fbHold=u=>!!u&&!u.emailVerified&&u.providerData.length>0&&u.providerData.every(p=>p.providerId=='password');
 function fbAuthSet(usr){window.FW_AUTH_DONE=1;if(fbHold(usr)){FBP=usr;FBU=null;CLD.ok=0;fbRedraw();return}FBP=null;if(csAcct(usr))return;FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()}
-function fbCall(name,data){return fbLoad().then(()=>FBFM||import('https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-functions.js').then(m=>FBFM=m)).then(m=>m.httpsCallable(m.getFunctions(FBA.app,'europe-west1'),name)(data||{}))}
+const FB_MAIL_URL='https://wavefern-mail.PASTE_SUBDOMAIN.workers.dev'/* set to the Worker's address after deploy (worker/, docs/email-signin-setup.md) */;
+function fbMail(kind,email){const h={'Content-Type':'application/json'};
+ const go=()=>fetch(FB_MAIL_URL+(kind=='verify'?'/verify':'/reset'),{method:'POST',headers:h,body:JSON.stringify(kind=='verify'?{}:{email})}).then(r=>{if(!r.ok){const e=new Error('mail');e.code=r.status==429?'mail/busy':'mail/fail';throw e}return r.json()});
+ return fbLoad().then(()=>kind=='verify'?(FBP||FBA.currentUser).getIdToken().then(t=>{h.Authorization='Bearer '+t}):0).then(go)}
 const FB_ERR={'auth/invalid-email':'That email address does not look right.','auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.',
  'auth/email-already-in-use':'That email already has an account. Sign in, or use Forgot password (also works if you used Google before).','auth/weak-password':'Use a password with at least 8 characters.',
- 'auth/too-many-requests':'Too many tries. Wait a few minutes.','auth/network-request-failed':'No connection. Try again.','auth/operation-not-allowed':'Email sign-in is not switched on yet.','functions/resource-exhausted':'Wait a minute, then try again.'};
+ 'auth/too-many-requests':'Too many tries. Wait a few minutes.','auth/network-request-failed':'No connection. Try again.','auth/operation-not-allowed':'Email sign-in is not switched on yet.','mail/busy':'Wait a minute, then try again.'};
 const fbErr=e=>FB_ERR[e&&e.code]||'Something went wrong. Try again.';
 function fbEmailOpen(v){if(!FB_EMAIL)return;snd('click');if(!CLD.pre&&mode=='title')CLD.pre='title';fbLoad().then(()=>{FBE.v=FBP?'verify':(v||'in');FBE.msg='';fbEmailUI()},()=>say('Sign-in is not available right now.'))}
 function fbEmailUI(msg,bad){clearInterval(FBE.t);if(msg!==undefined){FBE.msg=msg;FBE.bad=bad?1:0}const v=FBE.v,e=($('fbe_e')||{}).value||'',m=FBE.msg?`<p class=m style="color:${FBE.bad?'#ff9b9b':'#9dffc4'}">${esc(FBE.msg)}</p>`:'';
@@ -88,15 +91,15 @@ function fbEmailUI(msg,bad){clearInterval(FBE.t);if(msg!==undefined){FBE.msg=msg
 function fbEmailBack(){clearInterval(FBE.t);fbSignInBack()}
 function fbEmailOther(){if(!FBA)return;snd('click');clearInterval(FBE.t);FBM.signOut(FBA).then(()=>{FBP=null;FBE.v='up';fbEmailUI('')})}
 function fbVerifyCheck(quiet){const u=FBP;if(!u||FBE.busy)return;FBE.busy=1;return FBM.reload(u).then(()=>{if(u.emailVerified)return u.getIdToken(true).then(()=>{clearInterval(FBE.t);fbSignedIn(u);fbAuthSet(u)});if(!quiet){snd('err');fbEmailUI('Not confirmed yet. Open the link in the email first.',1)}}).catch(e=>{if(!quiet)fbEmailUI(fbErr(e),1)}).finally(()=>{FBE.busy=0})}
-function fbEmailResend(){if(!FBP)return;snd('click');fbCall('fwSendVerify').then(()=>fbEmailUI('Sent. It can take a minute.'),e=>fbEmailUI(fbErr(e),1))}
+function fbEmailResend(){if(!FBP)return;snd('click');fbMail('verify').then(()=>fbEmailUI('Sent. It can take a minute.'),e=>fbEmailUI(fbErr(e),1))}
 function fbEmailGo(){if(FBE.busy&&FBE.v!='verify')return;const v=FBE.v;if(v=='verify')return fbVerifyCheck();
  const em=(($('fbe_e')||{}).value||'').trim(),pw=($('fbe_p')||{}).value||'';
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))return fbEmailUI('Enter a valid email address.',1);
- if(v=='reset'){FBE.busy=1;return fbCall('fwSendReset',{email:em}).then(()=>{FBE.v='in';fbEmailUI('If that email has an account, a reset link is on its way. Check spam too.')},e=>fbEmailUI(fbErr(e),1)).finally(()=>{FBE.busy=0})}
+ if(v=='reset'){FBE.busy=1;return fbMail('reset',em).then(()=>{FBE.v='in';fbEmailUI('If that email has an account, a reset link is on its way. Check spam too.')},e=>fbEmailUI(fbErr(e),1)).finally(()=>{FBE.busy=0})}
  if(v=='up'&&pw.length<8)return fbEmailUI('Use a password with at least 8 characters.',1);
  if(!pw)return fbEmailUI('Enter your password.',1);
  FBE.busy=1;CLD.signing=1;
- const go=v=='up'?FBM.createUserWithEmailAndPassword(FBA,em,pw).then(r=>{CLD.signing=0;FBP=r.user;FBE.v='verify';fbEmailUI('');return fbCall('fwSendVerify').catch(x=>fbEmailUI(fbErr(x),1))}):FBM.signInWithEmailAndPassword(FBA,em,pw).then(r=>{if(fbHold(r.user)){CLD.signing=0;FBP=r.user;FBE.v='verify';fbEmailUI('Confirm your email to finish signing in.');return fbCall('fwSendVerify').catch(()=>{})}fbSignedIn(r.user)});
+ const go=v=='up'?FBM.createUserWithEmailAndPassword(FBA,em,pw).then(r=>{CLD.signing=0;FBP=r.user;FBE.v='verify';fbEmailUI('');return fbMail('verify').catch(x=>fbEmailUI(fbErr(x),1))}):FBM.signInWithEmailAndPassword(FBA,em,pw).then(r=>{if(fbHold(r.user)){CLD.signing=0;FBP=r.user;FBE.v='verify';fbEmailUI('Confirm your email to finish signing in.');return fbMail('verify').catch(()=>{})}fbSignedIn(r.user)});
  go.catch(e=>{CLD.signing=0;snd('err');fbEmailUI(fbErr(e),1)}).finally(()=>{FBE.busy=0})}
 /* v49.95.0: "Sign out of Google" on the main menu. Asks first, saves the cloud career, then signs out. The auth change
    reloads into the signed-out set of careers. No save is deleted: cloud save and device careers stay where they are. */

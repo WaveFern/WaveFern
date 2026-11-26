@@ -27,7 +27,7 @@
  /* skip the one-time hop to the old-address save importer */
  api.setItem('fw_moved','1');
  /* no cloud from here */
- /* v56.0.4: /dev/?devauth=1 turns on email/password sign-in testing: only Auth (identitytoolkit, securetoken, installations) and the email functions are let through. Firestore, the database and analytics stay blocked, so no real save or room is touched. */
+ /* v56.0.4: /dev/?devauth=1 turns on email/password sign-in testing: only Auth (identitytoolkit, securetoken, installations) and the mail Worker are let through. Firestore, the database and analytics stay blocked, so no real save or room is touched. */
  window.FW_DEV_AUTH=/[?&]devauth=1\b/.test(location.search)?1:0;
  const BAD=new RegExp('('+(window.FW_DEV_AUTH?'':'identitytoolkit|securetoken|firebaseinstallations|')+'firestore|firebaseio|firebase\\.googleapis|google-analytics|googletagmanager|analytics\\.google)','i');
  const bad=u=>BAD.test(String(u&&u.url||u));

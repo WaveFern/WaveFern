@@ -46,4 +46,4 @@ function resetEmail(link) {
   return { subject: 'Reset your WaveFern password', html, text };
 }
 
-module.exports = { verifyEmail, resetEmail, esc };
+export { verifyEmail, resetEmail, esc };

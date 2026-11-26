@@ -31,7 +31,7 @@ Add one line per held feature to the table below (name, file, gate).
 A change that is not ready simply keeps its gate for next week.
 
 ## Held features
-- **Email sign-in** (`86-google-signin.js`, `FB_EMAIL=!!window.FW_DEV`, test at `/dev/?devauth=1`): needs James's setup steps in `docs/email-signin-setup.md` first. On release also set `FB_EMAIL=true` and add the email/Resend paragraph to `privacy/index.html`.
+- **Email sign-in** (`86-google-signin.js`, `FB_EMAIL=!!window.FW_DEV`, test at `/dev/?devauth=1`): needs James's console steps in `docs/email-signin-setup.md` first. On release also set `FB_EMAIL=true` and add the email/Resend paragraph to `privacy/index.html`.
 
 Previously: None. v56.0.0 (2026-11-26) released everything that was held: News app, post and News scenes, Pets overhaul, Instagrime feed upgrade and brand posts (`HELD=false`), smoother walking, and menu Newsletter/Contact (FW_DEV checks removed). The `HELD` flags stay in those files for the next hold.
 
