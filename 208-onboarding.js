@@ -84,7 +84,7 @@ const errWhy=e=>{const c=String(e&&e.code||'').replace('firestore/',''),m=String
 const errTxt=e=>String(e&&(e.code?e.code+': ':'')+(e&&e.message||e||'')).slice(0,200);
 function dlog(t){NM.log.push(new Date().toISOString().slice(11,19)+' '+t);if(NM.log.length>16)NM.log.shift();try{console.info('[names]',t)}catch(e){}}
 function diag(){const F=FR_()||{};let h='';try{h=new URL(FB_CFG.databaseURL).host}catch(e){}
- return ['WaveFern '+(typeof GAME_VERSION!='undefined'?GAME_VERSION:'?'),'state: '+NM.st,'signed in: '+(typeof FBU!='undefined'&&FBU?'yes uid '+FBU.uid:'NO'),'project: '+FB_CFG.projectId,'database host: '+h,
+ return ['WaveFern '+(typeof GAME_VERSION!='undefined'?fwShowVer(GAME_VERSION):'?'),'state: '+NM.st,'signed in: '+(typeof FBU!='undefined'&&FBU?'yes uid '+FBU.uid:'NO'),'project: '+FB_CFG.projectId,'database host: '+h,
   'friends database: '+(F.ok?'connected':'not connected'+(F.rerr?' ('+F.rerr+')':'')),'cached username: '+(uCached()||'none'),'online: '+navigator.onLine,'---'].concat(NM.log).join('\n')}
 async function fsClaim(nh,old){const uid=FBU.uid,F=FBF,b=F.writeBatch(FBD),now=Date.now();let bio='';
  try{const x=await F.getDoc(F.doc(FBD,'profiles',uid));if(x.exists()&&typeof x.data().bio=='string')bio=x.data().bio.slice(0,160)}catch(e){}

@@ -3,10 +3,13 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.14';
+const GAME_VERSION='v56.0.17';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.14',n:'Beach Club gig is now the festival set: walk round the stage, crowd minigames, autographs; gig reminder also fires after the start'},
+ {v:'v56.0.17',n:'Beach Club gig is now the festival set: walk round the stage, crowd minigames, autographs; gig reminder also fires after the start'},
+ {v:'v56.0.16',n:'Computer click sound files now reload when the game updates (the old one could stay cached, so the new click sounded the same). Unused extra click sample removed.'},
+ {v:'v56.0.15',n:'Main menu footer and sign-in debug line show the player version (v2.N) instead of the build id'},
+ {v:'v56.0.14',n:'Footsteps on a bought carpet floor at home sound like carpet (CC0 Kenney sample)'},
  {v:'v56.0.13',n:'The computer mouse click is now a rounder, fuller real click with the harsh hiss removed. Saves still load.'},
  {v:'v56.0.12',n:'Version numbers: players see v2.N (build id stays internal); bump.js prints the player number; newsletter shows v2.378 for update day'},
  {v:'v56.0.11',n:'Click sound is now a clean real recording (CC0 Kenney sample, small file) instead of the synthesised tick; the PC mouse click is re-encoded at full quality. Volume peak-limited. Saves still load.'},
