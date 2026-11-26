@@ -6,7 +6,7 @@
               The North Pole, Santa's Golden Throne
    EPIC       Reindeer Rocking Horse, Christmas Carousel, Elf Toy Workbench, Toy Soldier Drummer
    RARE       Gumdrop Lamp, Peppermint Stool, Cookie Jar, Jingle Bell Wreath, Candy Cane Fence
-   Cars are one merged mesh each on the shared car materials (same trick as 39-car-models.js carList). The elf is a rigged pet on the
+   Cars are the game's own car bodies (39-car-models.js carGeo, styles 4 and 1) recoloured, with Christmas parts added as blocks, one mesh each. The elf is a rigged pet on the
    58-pets.js rig (ptGeo parts, petAnim) with his own walk, arm swing, hat sway, wave and twirl. Furniture is box lists in F (hidden from
    Amazoom like the advent furniture); the carousel and rocking horse move through fxAdd.
    Saves: cars and the pet are indices in CARS / PETS (appended after the advent ones), furniture keys lx_* in S.inv. Never reorder.
@@ -36,94 +36,68 @@ function geoBuild(fn){const G=[[],[],[]],add=(g,c,grp)=>G[grp||0].push([g,c]);
  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(P,3));geo.setAttribute('normal',new THREE.BufferAttribute(N,3));geo.setAttribute('color',new THREE.BufferAttribute(C,3));
  groups.forEach(([s0,c,gi])=>{if(c)geo.addGroup(s0,c,gi)});geo.computeBoundingBox();geo.computeBoundingSphere();return geo}
 
-/* SPROCKET ROCKET: the elves' race car. A low emerald wedge whose nose curls up like an elf's shoe with a bell on the toe, candy-stripe
-   racing stripes, pointy elf-ear mirrors, a bubble canopy, an elf-hat rear wing with a pompom, jingle-bell exhausts, gold wheels and a
-   green underglow. Same size as the other cars (about 2.5 long, 1.1 wide; the game scales cars by 1.5). */
-function rocketGeo(){return geoBuild(({box,ext,cyl,wheel,sph,cone})=>{
- const G='#1c9a4c',GD='#127a3a',GL='#3fcf74',W=1.08,yb=.15,r=.2,fo=.8,ro=-.8,ra=r+.04;
- const arch=zc=>{const a=[];for(let i=0;i<=8;i++){const t=i/8*Math.PI;a.push([zc+Math.cos(t)*ra,yb+Math.sin(t)*ra])}return a};
- /* body: tall at the back, sweeping down to a low nose */
- ext([[-1.25,yb+.05],[-1.25,.56],[-1.18,.6],[-.55,.6],[.2,.5],[.95,.36],[1.2,.3],[1.26,.24],[1.26,yb+.06],[1.2,yb],...arch(fo),...arch(ro),[-1.19,yb]],-W/2,W/2,G);
- /* side pods with a gold trim line and darker lower skirt */
- [-1,1].forEach(s=>{box(.06,.03,2.1,s*(W/2+.005),.42,0,GOLD,0);box(.04,.08,1.0,s*(W/2+.01),yb+.08,0,GD,1)});
- /* the curled elf-shoe toe on the nose, with a bell */
- box(.5,.09,.26,0,.3,1.33,G,0,-.25);box(.4,.09,.18,0,.38,1.45,G,0,-.75);box(.3,.09,.14,0,.5,1.5,G,0,-1.25);box(.22,.08,.12,0,.6,1.47,G,0,-1.9);
- sph(.075,0,.66,1.4,GOLD,0);box(.09,.015,.02,0,.61,1.45,'#7a5a10',1);
- /* candy-cane racing stripes from nose to tail */
- for(let i=0;i<12;i++){const z=-1.1+i*.19,y=z<-.55?.605:z<.2?.6-(z+.55)*.135:.5-(z-.2)*.187;box(.16,.012,.17,0,y+.004,z,i%2?WHT:RED,0,-(z<-.55?0:z<.2?.13:.18))}
- /* the cockpit rim (the glass bubble is added in carList) */
- cyl(.4,.4,.05,0,.57,-.25,GOLD,0,16);
- /* elf-ear mirrors */
- [-1,1].forEach(s=>{cone(.05,.3,s*(W/2+.12),.66,.12,GL,0,0,0,-s*1.15,6);box(.03,.03,.06,s*(W/2+.02),.6,.12,GD,1)});
- /* rear wing: an elf hat lying back on two struts, with a white fur band and a pompom */
- [-1,1].forEach(s=>box(.05,.22,.06,s*.32,.7,-1.05,INK,1));
- box(.9,.08,.22,0,.83,-1.08,WHT,0);cone(.26,.6,0,.9,-1.3,RED,0,-1.25,0,0,12);cone(.13,.26,0,.97,-1.6,RED,0,-1.75,0,0,10);sph(.08,0,.9,-1.72,WHT,0);
- /* jingle-bell exhausts */
- [-1,1].forEach(s=>{sph(.09,s*.3,.25,-1.3,GOLD,0);box(.12,.018,.02,s*.3,.22,-1.385,'#5a4008',1);box(.025,.025,.025,s*.3,.18,-1.37,INK,1)});
- /* wheels: black tyres, gold rims, red hubs; a fat rear pair */
- [[fo,.17],[ro,.22]].forEach(([z,w])=>[-1,1].forEach(s=>{const x=s*(W/2-.06);wheel(r,w,x,r,z,'#141416',1,16);wheel(r*.66,w+.01,x,r,z,GOLD,0,10);wheel(r*.26,w+.02,x,r,z,RED,0,8);
-  for(let k=0;k<5;k++){const a=k/5*Math.PI*2;box(w+.015,.03,r*.9,x,r,z,'#b8901c',0,a)}}));
- /* lights: gold headlamps, green running strip, candy tail lights, underglow */
- [-1,1].forEach(s=>{box(.2,.06,.03,s*.32,.27,1.265,'#fff3c0',2);box(.12,.05,.03,s*.3,.55,-1.255,'#ff3b3b',2);box(.06,.05,.03,s*.42,.55,-1.255,WHT,2)});
- box(.5,.025,.02,0,.21,1.265,'#7dffb0',2);
- box(W*.7,.015,2.0,0,.06,0,'#4dff9a',2);
- /* little number plate and a wreath on the bonnet */
- box(.3,.08,.012,0,.2,1.27,WHT,1);box(.3,.08,.012,0,.4,-1.255,WHT,1);
- cyl(.11,.11,.03,0,.47,.7,DKG,1,12,-.5);sph(.035,.06,.5,.75,RED,0);sph(.035,-.05,.5,.76,RED,0);
- /* the seat inside the canopy */
- box(.4,.14,.36,0,.62,-.3,'#7a1a2a',1);box(.4,.26,.08,0,.72,-.5,'#7a1a2a',1);
-})}
-/* the canopy is a see-through glass dome added on top of the car mesh (carList below) */
+/* Both cars are the game's own car bodies (39-car-models.js carGeo: the same shaped shell, cabin, glass, wheels, lights and bumpers as every
+   other car), recoloured, with Christmas parts added as blocks in the same style. */
+/* a copy of a game car geometry with some vertex colours swapped */
+function recol(geo,map){const g=geo.clone(),c=g.attributes.color,a=c.array.slice(),M=Object.keys(map).map(k=>[new THREE.Color(k),new THREE.Color(map[k])]);
+ for(let q=0;q<a.length;q+=3)for(const[f,t]of M)if(Math.abs(a[q]-f.r)<.01&&Math.abs(a[q+1]-f.g)<.01&&Math.abs(a[q+2]-f.b)<.01){a[q]=t.r;a[q+1]=t.g;a[q+2]=t.b;break}
+ g.setAttribute('color',new THREE.BufferAttribute(a,3));return g}
+/* join two geometries that both use material groups 0 (paint), 1 (matte), 2 (lights) */
+function joinGeo(A,Bg){const P=[],N=[],C=[],grp=[];let n=0;
+ for(let gi=0;gi<3;gi++){const s0=n;[A,Bg].forEach(G=>G.groups.filter(g=>g.materialIndex===gi).forEach(g=>{for(const[src,dst]of[[G.attributes.position,P],[G.attributes.normal,N],[G.attributes.color,C]])for(let i=g.start*3;i<(g.start+g.count)*3;i++)dst.push(src.array[i]);n+=g.count}));grp.push([s0,n-s0,gi])}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));
+ grp.forEach(([s,c,i])=>{if(c)g.addGroup(s,c,i)});g.computeBoundingBox();g.computeBoundingSphere();return g}
 
-/* GINGERBREAD CRUISER: a big round retro cruiser baked from gingerbread. Icing drips along the roof and white squiggles on the body,
-   gumdrop headlights, candy-cane bumpers, peppermint wheels, sprinkles on the roof, a gingerbread-man badge and a cherry on top. */
-function gingerGeo(){return geoBuild(({box,ext,cyl,wheel,sph,cone})=>{
- const C='#b86b30',CD='#8f4f1f',IC='#fbf7f0',W=1.12,yb=.18,r=.21,fo=.82,ro=-.82,ra=r+.05;
- const arch=zc=>{const a=[];for(let i=0;i<=8;i++){const t=i/8*Math.PI;a.push([zc+Math.cos(t)*ra,yb+Math.sin(t)*ra])}return a};
- /* rounded body with a long bonnet and a round boot */
- ext([[-1.28,yb+.08],[-1.3,.5],[-1.24,.6],[-1.1,.66],[-.7,.68],[.55,.68],[1.05,.6],[1.24,.52],[1.3,.4],[1.28,yb+.08],[1.2,yb],...arch(fo),...arch(ro),[-1.2,yb]],-W/2,W/2,C);
- /* cabin: a rounded roof */
- ext([[-.72,.67],[-.62,.98],[-.5,1.06],[.25,1.06],[.38,.98],[.52,.67]],-W*.42,W*.42,C);
- /* sugar-glass windows */
- ext([[-.66,.72],[-.58,.96],[-.48,1.02],[.22,1.02],[.33,.96],[.46,.72]],-W*.42-.012,W*.42+.012,'#bfe6f2');
- box(W*.84+.03,.32,.06,0,.86,-.14,C,0);
- /* icing: a thick frosting cap on the roof with drips, and squiggle lines along the body */
- box(W*.86,.05,.84,0,1.08,-.12,IC,1);
- for(let i=0;i<9;i++){const z=-.5+i*.095,h=.05+((i*37)%5)*.02;[-1,1].forEach(s=>box(.03,h,.05,s*(W*.43),1.06-h/2,z,IC,1))}
- [.08,-.32].forEach(dz=>[-1,1].forEach(s=>box(.05,.04+.03*Math.abs(dz),.06,s*(W*.43),1.03,dz,IC,1)));
- [-1,1].forEach(s=>{for(let i=0;i<14;i++){const z=-1.15+i*.18;box(.02,.035,.1,s*(W/2+.006),.5+(i%2?.03:-.01),z,IC,1,i%2?.5:-.5)}});
- for(let i=0;i<7;i++)box(.1,.035,.02,-W/2+.15+i*.13,.54,1.25+(i%2?.02:0),IC,1,0,0,i%2?.5:-.5);
- /* sprinkles on the roof and a cherry on top */
- const SP=['#ff4b6e','#46e083','#3fa9ff','#ffd23d','#b57cff'];for(let i=0;i<22;i++){const x=((i*53)%17/17-.5)*W*.72,z=((i*29)%19/19-.5)*.74-.12;box(.06,.02,.02,x,1.115,z,SP[i%5],0,0,(i*1.3)%3)}
- sph(.07,0,1.18,-.12,'#d0142c',0);box(.012,.1,.012,.02,1.27,-.13,'#3d6b2a',1,0,0,.3);
- /* gumdrop headlights and tail lights */
- [-1,1].forEach(s=>{
-  box(.16,.12,.05,s*.34,.42,1.29,s<0?'#ffe066':'#ff8fb1',2);box(.12,.06,.05,s*.34,.5,1.29,'#fff6c8',2);
-  box(.12,.1,.04,s*.38,.46,-1.3,'#ff3b3b',2)});
- /* candy-cane bumpers front and back, with hooks curling up at the corners */
- [1.33,-1.33].forEach(z=>{for(let i=0;i<8;i++)box(.13,.07,.07,-W/2+.07+i*.138,.26,z,i%2?RED:WHT,0);
-  [-1,1].forEach(s=>{box(.07,.18,.07,s*(W/2+.02),.36,z,RED,0);box(.07,.07,.12,s*(W/2+.02),.48,z-Math.sign(z)*.04,WHT,0)})});
- /* peppermint wheels: white tyres with red swirl wedges and a gumdrop hub */
- [fo,ro].forEach(z=>[-1,1].forEach(s=>{const x=s*(W/2-.07);wheel(r,.16,x,r,z,'#efe9e2',1,16);wheel(r*.78,.17,x,r,z,WHT,0,16);
-  for(let k=0;k<6;k++){const a=k/6*Math.PI*2+.2;box(.175,.05,r*.7,x,r,z,RED,0,a)}wheel(r*.24,.18,x,r,z,'#46e083',0,8)}));
- /* gingerbread-man badge on the bonnet: head, body, arms, legs, two buttons */
- const gx=0,gy=.705,gz=.85;box(.1,.02,.1,gx,gy,gz+.12,CD,1);box(.1,.02,.13,gx,gy,gz,CD,1);box(.22,.02,.05,gx,gy,gz+.03,CD,1);box(.05,.02,.1,gx-.035,gy,gz-.1,CD,1);box(.05,.02,.1,gx+.035,gy,gz-.1,CD,1);
- sph(.014,gx,gy+.015,gz+.02,RED,0,6,4);sph(.014,gx,gy+.015,gz-.03,'#46e083',0,6,4);
- /* a dark chocolate grille and plates */
- box(.46,.14,.02,0,.34,1.305,'#3a1e0c',1);for(let i=0;i<4;i++)box(.44,.012,.025,0,.29+i*.035,1.31,'#5a3014',1);
- box(.3,.08,.012,0,.22,1.335,WHT,1);box(.3,.08,.012,0,.3,-1.335,WHT,1);
- /* door seams in darker baked edges */
- [-1,1].forEach(s=>{box(.012,.3,.012,s*(W/2+.004),.5,.32,CD,1);box(.012,.3,.012,s*(W/2+.004),.5,-.5,CD,1)});
-})}
+/* SPROCKET ROCKET: the elves' race car, on the Phantom GT body (style 4) in emerald with its gold stripes. Candy-cane side stripes, a toe
+   that curls up at the nose like an elf's shoe with a bell on the tip, stepped elf-ear mirrors, a rear wing shaped like an elf's hat with a
+   white fur band and pompom, jingle-bell exhausts, gold wheels and a green underglow. */
+function rocketGeo(){const S=CSPEC[4],G='#1c9a4c',{L,W,yh,cab}=S,zf0=cab[3],Wc=W*S.cw;
+ const base=recol(carGeo(4,G),{'#c9ced6':GOLD});
+ return joinGeo(base,geoBuild(({box})=>{
+  /* candy-cane stripes along both sides */
+  [-1,1].forEach(s=>{for(let i=0;i<14;i++)box(.02,.05,.15,s*(W/2+.012),yh-.12,-1.0+i*.15,i%2?WHT:RED,0)});
+  /* elf-shoe toe on the nose with a bell */
+  box(.34,.07,.16,0,.3,L/2+.06,G,0);box(.24,.08,.12,0,.37,L/2+.12,G,0);box(.16,.1,.1,0,.46,L/2+.15,G,0);box(.1,.1,.08,0,.56,L/2+.13,G,0);box(.1,.1,.1,0,.65,L/2+.1,GOLD,0);box(.11,.015,.02,0,.62,L/2+.155,'#7a5a10',1);
+  /* elf-ear mirrors */
+  [-1,1].forEach(s=>{box(.14,.05,.07,s*(Wc/2+.13),yh+.07,zf0-.06,G,0);box(.1,.05,.05,s*(Wc/2+.22),yh+.11,zf0-.07,G,0);box(.06,.05,.04,s*(Wc/2+.29),yh+.15,zf0-.08,G,0);box(.04,.05,.03,s*(Wc/2+.33),yh+.2,zf0-.09,'#3fcf74',0)});
+  /* rear wing: an elf hat lying back on two struts */
+  [-1,1].forEach(s=>box(.05,.18,.06,s*.32,.55,-L/2+.18,'#1b1b1d',1));
+  box(.92,.07,.24,0,.66,-L/2+.16,WHT,0);box(.64,.12,.3,0,.75,-L/2+.06,RED,0);box(.48,.12,.26,0,.85,-L/2-.06,RED,0);box(.34,.11,.22,0,.94,-L/2-.17,RED,0);box(.22,.1,.18,0,1.0,-L/2-.27,RED,0);box(.15,.15,.15,0,1.0,-L/2-.38,WHT,0);
+  /* jingle-bell exhausts */
+  [-1,1].forEach(s=>{box(.13,.13,.13,s*.28,.2,-L/2-.06,GOLD,0);box(.14,.02,.02,s*.28,.19,-L/2-.13,'#5a4008',1)});
+  /* wreath on the bonnet */
+  box(.2,.03,.2,0,(S.yhf+yh)/2+.02,.9,DKG,1);box(.1,.035,.1,0,(S.yhf+yh)/2+.025,.9,G,0);box(.05,.05,.05,.07,(S.yhf+yh)/2+.05,.97,RED,0);box(.05,.05,.05,-.07,(S.yhf+yh)/2+.05,.97,RED,0);
+  /* underglow and a green running light */
+  box(W*.7,.015,L*.8,0,.05,0,'#4dff9a',2);box(W*.4,.03,.02,0,S.yb+.2,L/2+.012,'#7dffb0',2)}))}
+
+/* GINGERBREAD CRUISER: a gingerbread sedan (style 1) with sugar-glass windows, a thick icing roof with drips, sprinkles and a cherry,
+   white icing squiggles along the sides, candy-cane bumpers, peppermint wheels, gumdrops and a gingerbread-man badge on the bonnet. */
+function gingerGeo(){const S=CSPEC[1],C='#b86b30',CD='#8f4f1f',IC='#fbf7f0',{L,W,r,yb,yh,yhf,fo,ro,cab}=S,[zr0,zr1,zf1,zf0,yt]=cab,Wc=W*S.cw;
+ const base=recol(carGeo(1,C),{'#5d8fa8':'#bfe6f2','#c9ced6':WHT,'#2b2c30':WHT});
+ return joinGeo(base,geoBuild(({box})=>{
+  /* icing on the roof, dripping down the edges */
+  box(Wc+.05,.05,zf1-zr1+.12,0,yt+.02,(zf1+zr1)/2,IC,1);
+  for(let i=0;i<8;i++){const z=zr1+.02+i*(zf1-zr1)/7.5,h=.05+((i*37)%4)*.025;[-1,1].forEach(s=>box(.03,h,.05,s*(Wc/2+.02),yt-h/2,z,IC,1))}
+  [zf1+.06,zr1-.06].forEach(z=>{for(let i=0;i<5;i++){const h=.04+((i*29)%3)*.025;box(.06,h,.03,-Wc/2+.12+i*(Wc-.24)/4,yt-h/2,z,IC,1)}});
+  /* sprinkles and a cherry */
+  const SP=['#ff4b6e','#46e083','#3fa9ff','#ffd23d','#b57cff'];for(let i=0;i<16;i++){const x=((i*53)%17/17-.5)*Wc*.8,z=zr1+.06+((i*29)%19/19)*(zf1-zr1-.12);box(.05,.02,.02,x,yt+.055,z,SP[i%5],0,0,(i*1.3)%3)}
+  box(.1,.1,.1,0,yt+.11,(zf1+zr1)/2,'#d0142c',0);box(.015,.1,.015,.02,yt+.2,(zf1+zr1)/2,'#3d6b2a',1);
+  /* icing squiggles along the sides */
+  [-1,1].forEach(s=>{for(let i=0;i<14;i++){const z=-L/2+.12+i*(L-.24)/13;box(.015,.03,.09,s*(W/2+.008),yh-.1+(i%2?.025:-.01),z,IC,1,i%2?.6:-.6)}});
+  /* candy-cane bumpers: red stripes over the white bumpers */
+  [L/2-.03,-L/2+.03].forEach(z=>{for(let i=0;i<6;i++)box(.07,.095,.105,-W/2+.08+i*(W-.16)/5,yb+.07,z,RED,0)});
+  /* peppermint wheels: red swirl wedges on the white rims, a gumdrop hub */
+  [fo,ro].forEach(z=>[-1,1].forEach(s=>{const x=s*(W/2-.075+.085);for(let k=0;k<5;k++)box(.012,.035,r*1.05,x,r,z,RED,0,k/5*Math.PI);box(.02,.05,.05,x+s*.004,r,z,'#46e083',0)}));
+  /* gumdrops on the bonnet corners and a gingerbread man in the middle */
+  [-1,1].forEach((s,i)=>box(.08,.06,.08,s*(W/2-.14),yhf+.03,L/2-.2,i?'#ff8fb1':'#ffe066',0));
+  const gy=(yhf+yh)/2+.015,gz=.78;box(.08,.02,.08,0,gy,gz+.1,CD,1);box(.09,.02,.11,0,gy,gz,CD,1);box(.2,.02,.04,0,gy,gz+.03,CD,1);box(.04,.02,.09,-.03,gy,gz-.09,CD,1);box(.04,.02,.09,.03,gy,gz-.09,CD,1);
+  box(.02,.01,.02,0,gy+.012,gz+.02,RED,0);box(.02,.01,.02,0,gy+.012,gz-.02,'#46e083',0)}))}
 
 const CAR1=CARS.length;CARS.push({n:'Sprocket Rocket',p:250000,c:'#1c9a4c',top:40,mph:120,xm:1,lodge:1});
 const CAR2=CARS.length;CARS.push({n:'Gingerbread Cruiser',p:120000,c:'#b86b30',top:34,mph:95,xm:1,lodge:1});
-const CG={},glassM=new THREE.MeshPhongMaterial({color:0xa8e6ff,transparent:true,opacity:.45,shininess:120,specular:0xffffff});
-const canopy=(()=>{const g=new THREE.SphereGeometry(.38,16,8,0,Math.PI*2,0,Math.PI/2);g.scale(1,.6,1.25);g.translate(0,.585,-.25);return g})();
-const MYC={[CAR1]:rocketGeo,[CAR2]:gingerGeo};
-{const c0=carList;carList=function(i,cc,fixed){if(MYC[i]&&cc===undefined){const S={W:1.1,L:2.5,h:.5},a=[[S.W,S.h,S.L,CARS[i].c,0,.4,0]];
-  a.forEach=function(cb){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=CG[i]||(CG[i]=MYC[i]());m.material=carMats();m.scale.set(.9,1,1);
-   if(i===CAR1){const gl=new THREE.Mesh(canopy,glassM);gl.userData.noCol=1;m.add(gl)}}};return a}
+const CG={},MYC={[CAR1]:rocketGeo,[CAR2]:gingerGeo};
+{const c0=carList;carList=function(i,cc,fixed){if(MYC[i]&&cc===undefined){const st=i===CAR1?4:1,S=CSPEC[st],a=[[S.W,S.yh-S.yb,S.L,CARS[i].c,0,(S.yh+S.yb)/2,0]];
+  a.forEach=function(cb){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=CG[i]||(CG[i]=MYC[i]());m.material=carMats();m.scale.set(1,1,1)}};return a}
  return c0.apply(this,arguments)}}
 
 /* ============================================================ PIP THE ELF (pet) ============================================================ */

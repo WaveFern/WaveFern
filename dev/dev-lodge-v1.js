@@ -671,7 +671,11 @@ const slowAt=t=>t>2.45&&t<2.9?.42:t>=2.9&&t<3.3?.3:1;
 /* world name labels are sprites drawn over everything: they are hidden just for the film frames */
 let LBLS=null;const LBLV=[];
 function filmRender(sc){if(!LBLS){LBLS=[];safe(()=>sc.traverse(o=>{if(o.isSprite&&o.material&&o.material.depthTest===false)LBLS.push(o)}),'sprites')}
- LBLS.forEach((o,i)=>{LBLV[i]=o.visible;o.visible=false});try{return r0(sc,PCAM)}finally{LBLS.forEach((o,i)=>o.visible=LBLV[i])}}
+ LBLS.forEach((o,i)=>{LBLV[i]=o.visible;o.visible=false});
+ /* the film shows the lodge whole: walls up and the roof on, whatever the walk-in cut-away is doing for the game camera */
+ const w0=[roofG.visible,roofG.position.y,roofMat.opacity,cutG.scale.y,BULBM.map(b=>b.opacity)];
+ roofG.visible=true;roofG.position.y=0;roofMat.opacity=1;cutG.scale.y=1;BULBM.forEach(b=>b.opacity=1);
+ try{return r0(sc,PCAM)}finally{LBLS.forEach((o,i)=>o.visible=LBLV[i]);roofG.visible=w0[0];roofG.position.y=w0[1];roofMat.opacity=w0[2];cutG.scale.y=w0[3];BULBM.forEach((b,i)=>b.opacity=w0[4][i])}}
 function cutStart(){if(CUT.on)return;CUT.on=1;CUT.t=0;CUT.done=0;CUT.w=0;LBLS=null;bars.classList.add('on');document.body.classList.add('lodgefilm')}
 function cutEnd(now){if(!CUT.on&&!now)return;CUT.on=0;CUT.ts=1;CUT.live=0;bars.classList.remove('on');if(now){TSC=1}cutRestore()}
 function cutRestore(){try{if(P.mesh)P.mesh.visible=true}catch(e){}CUT.hide=0;document.body.classList.remove('lodgefilm')}
