@@ -1,9 +1,10 @@
 /* WaveFern "What's new" data (v55.8.0). To announce a big update: add ONE entry at the TOP of WF_NEWS with the next id.
    Players see every entry newer than the last one they closed, once, as a pop-up (243-whats-new.js). Nothing else to edit.
-   id: whole number, always increasing. v: game version. t: title. d: date. tag: small label. items: short lines (HTML ok, keep it plain). */
+   id: whole number, always increasing. v: game version. t: title. d: date. tag: small label. items: short lines (HTML ok, keep it plain). Optional slides:[{img,c}] makes the newest card a swipeable screenshot slideshow; link:'<WF_LINKS key>' adds a button on its last slide (items are the last slide). */
 const WF_NEWS=[
  {id:10,v:'v56.0.0',d:'2026-11-26',tag:'NEW',t:'Update day',
-  items:['The <b>Fern Times</b> news app is on your laptop and phone, with new post and news backgrounds.','<b>Instagrime</b> gets endless scrolling, posts that react to your career and brand ads.','<b>Pets</b> overhaul: own every pet, equip three, name them and let them roam at home.','Smoother walking, plus Newsletter and Contact on the main menu.']},
+  items:['The <b>Fern Times</b> news app is on your laptop and phone, with new post and news backgrounds.','<b>Instagrime</b> gets endless scrolling, posts that react to your career and brand ads.','<b>Pets</b> overhaul: own every pet, equip three, name them and let them roam at home.','Smoother walking, plus Newsletter and Contact on the main menu.'],
+  slides:[{img:'assets/news/fern-times.webp',c:'<b>The Fern Times</b>: a news app on your laptop and phone, with stories about your career and your rivals.'},{img:'assets/news/instagrime.webp',c:'<b>Instagrime</b> upgrade: an endless feed, posts that react to your career, and brand ads.'},{img:'assets/news/city.webp',c:'Smoother walking and camera, and a pets overhaul: equip three and let them roam at home.'}],link:'newsletter'},
  {id:9,v:'v55.17.0',d:'2026-11-16',tag:'NEW',t:'Skate Park',
   items:['A full <b>skate park</b> south of town: bowl, half-pipe, rails, stairs, a big gap, murals and floodlights.','Hold and release Space to ollie, add flips, spins, grabs, grinds and manuals, and chain combos.','Free skate, a 2-minute Score Run, S-K-A-T-E against an NPC and unlocking challenges.','Slow-motion replay of your best trick, a coach, a board shop and Skate Mastery points.']},
  {id:8,v:'v55.16.0',d:'2026-11-16',tag:'NEW',t:'Pier Fishing',

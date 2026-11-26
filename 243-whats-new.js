@@ -12,6 +12,7 @@
  const top=Math.max.apply(null,WF_NEWS.map(n=>n.id));
  const mark=()=>{wr(KEY,top);if(uk())wr(uk(),top)};
  const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+ const txt=n=>'<h2>'+esc(n.t)+'</h2><div class=nt>'+esc(n.tag||'UPDATE')+' · '+esc(fwShowVer(n.v))+' · '+esc(n.d)+'</div><ul>'+n.items.map(i=>'<li>'+i+'</li>').join('')+'</ul>';
  function build(list){
   if(document.getElementById('wfnews'))return;
   const css=document.createElement('style');css.id='wfnewscss';
@@ -22,13 +23,24 @@
 #wfnews h2{font-size:18px;margin:2px 0 2px;color:#fff;text-shadow:3px 3px 0 #000}
 #wfnews .nt{font:10px Silkscreen,ui-monospace,monospace;color:#7ad7ff;margin-bottom:4px}
 #wfnews ul{margin:4px 0 12px;padding-left:18px}#wfnews li{margin:3px 0}
+#wfnews .sl{display:none}#wfnews .sl.on{display:block}#wfnews .sl img{width:100%;display:block;border:2px solid #000}#wfnews .sl p{margin:8px 0 0}
+#wfnews .dots{display:flex;gap:6px;justify-content:center;margin-top:8px}#wfnews .dots i{width:8px;height:8px;background:#2a352e}#wfnews .dots i.on{background:#2fe68a}
+#wfnews .nav{display:flex;gap:8px;justify-content:flex-end}#wfnews .nav button{margin-top:10px}
 #wfnews button{font-family:Silkscreen,ui-monospace,monospace;padding:10px 16px;margin-top:10px;align-self:flex-end}`;
   document.head.appendChild(css);
   const o=document.createElement('div');o.id='wfnews';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');
-  o.innerHTML='<div class=nb><small class=k>WHAT\'S NEW</small><div class=ns>'+list.map(n=>'<h2>'+esc(n.t)+'</h2><div class=nt>'+esc(n.tag||'UPDATE')+' · '+esc(fwShowVer(n.v))+' · '+esc(n.d)+'</div><ul>'+n.items.map(i=>'<li>'+i+'</li>').join('')+'</ul>').join('')+'</div><button class=go id=wfnok>Got it</button></div>';
+  const sl=list[0]&&list[0].slides&&list[0].slides.length?list[0]:null;
+  let slides=null,at=0;
+  if(sl){slides=sl.slides.map(x=>'<div class=sl><img src="'+esc(x.img)+'" alt=""><p>'+x.c+'</p></div>').concat(['<div class=sl>'+txt(sl)+(sl.link&&typeof WF_LINKS!='undefined'?'<button class=go id=wfnlink style="width:100%;margin:0 0 12px">Read the full newsletter</button>':'')+list.slice(1).map(txt).join('')+'</div>'])}
+  o.innerHTML='<div class=nb><small class=k>WHAT\'S NEW</small><div class=ns>'+(slides?slides.join('')+'</div><div class=dots>'+slides.map(()=>'<i></i>').join('')+'</div><div class=nav><button id=wfnprev>Back</button><button id=wfnnext>Next</button><button class=go id=wfnok>Got it</button></div></div>':list.map(txt).join('')+'</div><button class=go id=wfnok>Got it</button></div>');
   document.body.appendChild(o);
   const close=()=>{mark();try{snd('click')}catch(e){}o.remove();css.remove();document.removeEventListener('keydown',kd,true)};
-  const kd=e=>{if(e.key=='Escape'||e.key=='Enter'){e.stopPropagation();e.preventDefault();close()}else if(o.contains(e.target)||e.target===document.body)e.stopPropagation()};
+  const go=d=>{if(!slides)return;at=Math.max(0,Math.min(slides.length-1,at+d));o.querySelectorAll('.sl').forEach((e,i)=>e.classList.toggle('on',i==at));o.querySelectorAll('.dots i').forEach((e,i)=>e.classList.toggle('on',i==at));const L=at==slides.length-1;o.querySelector('#wfnprev').style.visibility=at?'visible':'hidden';o.querySelector('#wfnnext').style.display=L?'none':'';o.querySelector('#wfnok').style.display=L?'':'none'};
+  if(slides){go(0);o.querySelector('#wfnprev').onclick=()=>{try{snd('click')}catch(e){}go(-1)};o.querySelector('#wfnnext').onclick=()=>{try{snd('click')}catch(e){}go(1)};
+   const nl=o.querySelector('#wfnlink');if(nl)nl.onclick=()=>ttLink(sl.link);
+   let x0=null;o.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});o.addEventListener('touchend',e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40)go(dx<0?1:-1)},{passive:true})}
+  const kd=e=>{if(slides&&(e.key=='ArrowRight'||e.key=='ArrowLeft'||(e.key=='Enter'&&at<slides.length-1))){e.stopPropagation();e.preventDefault();go(e.key=='ArrowLeft'?-1:1);return}
+   if(e.key=='Escape'||e.key=='Enter'){e.stopPropagation();e.preventDefault();close()}else if(o.contains(e.target)||e.target===document.body)e.stopPropagation()};
   document.addEventListener('keydown',kd,true);
   o.querySelector('#wfnok').onclick=close;
  }
