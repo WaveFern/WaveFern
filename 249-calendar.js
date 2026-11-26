@@ -83,14 +83,15 @@ PA.cal=()=>page('pc');
 {const p0=pcR;pcR=function(){const r=p0.apply(this,arguments);try{const m=document.querySelector('#pc .mn');if(m)m.classList.toggle('calmn',app=='cal'&&!!m.querySelector('.cal'))}catch(e){}return r}}
 try{if(typeof GP_APPS!='undefined'&&!GP_APPS.some(a=>a[0]=='cal')){GP_APPS.push(['cal','Calendar',()=>IC.cal,'#ff3d81']);if(typeof GP_TITLE!='undefined')GP_TITLE.cal='Calendar'}
  if(typeof phBody=='function'){const b0=phBody;phBody=function(){if(typeof PH!='undefined'&&PH.app=='cal')return`<div class=phx>${page('ph')}</div>`;return b0.apply(this,arguments)}}}catch(e){console.error('calendar phone',e)}
-/* v55.52.x: every calendar event pops up like the festival set reminder (71 festBkCheck: say() toast an hour before).
+/* v56.0.13: a gig you slept or travelled past still gets its reminder for the first 2 hours of the slot.
+   v55.52.x: every calendar event pops up like the festival set reminder (71 festBkCheck: say() toast an hour before).
    Timed events: once, within 60 game minutes of the start. Untimed ones (brand deadlines, your own events without a time): once on the day.
    Festival sets keep their own reminder in 71, so 'fe' is skipped here. Done keys live in S.cal.rem. */
 function calRemind(){if(!S||!S.artist||typeof mode!='undefined'&&(mode=='load'||mode=='creator')||!window.TRAVEL)return;
  const c=st(),r=c.rem&&typeof c.rem=='object'?c.rem:(c.rem={}),now=TRAVEL.now(),today=S.day;
  all().forEach(e=>{if(e.k=='fe'||e.s||r[e.key+':'+e.d]||e.d<today)return;
   if(e.tm){const p=e.tm.split(':'),mn=(+p[0]||0)*60+(+p[1]||0),a=e.d*1440+mn+(mn<360?1440:0),dt=a-now;
-   if(dt>0&&dt<=60){r[e.key+':'+e.d]=1;say(TY[e.k][0]+' at '+e.tm+': '+e.t+' (in '+Math.max(1,Math.round(dt))+' min)')}}
+   if(dt<=60&&dt>(e.k=='bc'?-120:0)){r[e.key+':'+e.d]=1;say(dt>0?TY[e.k][0]+' at '+e.tm+': '+e.t+' (in '+Math.max(1,Math.round(dt))+' min)':e.t+' is on now! Head to the stage.')}}
   else if(e.d==today&&e.k!='fl'){r[e.key+':'+e.d]=1;say('Today: '+e.t)}});
  Object.keys(r).forEach(k=>{if(+k.split(':')[1]<today-2)delete r[k]})}
 setInterval(()=>{try{calRemind()}catch(e){}},1000);
