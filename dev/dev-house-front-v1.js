@@ -24,6 +24,9 @@
    const dp=new THREE.Group();dp.position.set(5,0,12.15);g.add(dp);DP.push(dp);const bd=(w,h,d,c,x,y,z)=>{const m=B(dp,w,h,d,c,x-5,y,z-12.15);m.material=m.material.clone();m.material.transparent=true;L.push(m);return m};
    bd(2,2.4,.15,'#5a3a22',6,1.2,12.15);b(.2,2.4,.2,'#3a2412',4.9,1.2,12.05);b(.2,2.4,.2,'#3a2412',7.1,1.2,12.05);b(2.4,.12,.2,'#3a2412',6,2.45,12.05);
    [[5.58,1.78,.75],[6.42,1.78,.75],[5.58,.7,.8],[6.42,.7,.8]].forEach(q=>bd(.75,q[2],.03,'#6b4a2e',q[0],q[1],12.06));bd(.1,.1,.08,'#d9b44a',6.8,1.15,12.03);
+   /* the outside panels, handle and kick plate (now on FW_DOORP hinges) are copied onto the inside door's hinge so the hall side keeps the same look and swings with it */
+   (window.FW_DOORP||[]).forEach(p=>p.children.forEach(c=>{if(!c.isMesh||!c.geometry.parameters||(Math.abs(c.geometry.parameters.width-2)<.01&&Math.abs(c.geometry.parameters.height-2.4)<.01))return;
+    const k=c.clone();k.material=c.material.clone();k.material.transparent=true;k.position.copy(c.position);k.position.z+=p.position.z-12.15;k.position.x+=p.position.x-5;dp.add(k);L.push(k)}));
    g.userData.nb=L.length;
    /* copy the outside detail on the front face (windows, frames, shutters, flower boxes, pipes, siding, door panels) */
    const v=new THREE.Vector3(),sk=new Set(L);HX.updateMatrixWorld(true);
@@ -38,9 +41,9 @@
   u.L.forEach((m,i)=>{const mt=m.material;if(mt.opacity!==u.o)mt.opacity=u.o;const dw=u.o>=.999;if(mt.depthWrite!==dw)mt.depthWrite=dw;if(!m.userData.ro){m.userData.ro=1;m.renderOrder=i<u.nb?-9:-8;mt.polygonOffset=true;mt.polygonOffsetFactor=i<u.nb?1:0;mt.polygonOffsetUnits=1}})}
  /* v56.0.5: the door never swings open on approach. It rests shut. When you walk through it (cross the door line from either side) it is knocked open
     and swings shut behind you. One angle drives the inside door (DP) and the outside slab, panels and handle (FW_DOORP, built in dev-models-v2.js and moved above). Looks only, collisions are untouched. */
- let da=0,pz=null;
- function swing(dt){if(typeof P=='undefined')return;const zone=Math.abs(P.x-6)<1.1,z=P.z;
-  if(zone&&pz!=null&&Math.abs(z-pz)<1.5&&(pz-12.15)*(z-12.15)<0)da=1.75;pz=zone&&z>9&&z<15.5?z:null;
+ let da=0,side=0;
+ function swing(dt){if(typeof P=='undefined')return;const z=P.z,ax=Math.abs(P.x-6);
+  if(ax>3||z<8||z>16.5)side=0;else if(ax<1.5){const sd=z<12.15?-1:z>12.15?1:side;if(side&&sd!=side)da=1.75;side=sd}
   if(da>0){da*=Math.exp(-(dt||.016)*7);if(da<.003)da=0}
   DP.concat(window.FW_DOORP||[]).forEach(p=>{if(p.rotation.y!==da)p.rotation.y=da});window.FW_DOORANG=da}
  let t0=0;(function loop(t){requestAnimationFrame(loop);const dt=t0?Math.min(.1,(t-t0)/1000):.016;t0=t;try{if(!canopy||!FW)build();fade(dt);swing(dt)}catch(e){}})(0);
