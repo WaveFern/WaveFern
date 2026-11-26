@@ -11,7 +11,12 @@
    if(p&&Math.abs(p.width-2.8)<.01&&Math.abs(p.height-.15)<.01&&Math.abs(p.depth-1)<.01&&Math.abs(m.position.x-6)<.05&&Math.abs(m.position.y-2.9)<.05){m.visible=false;canopy=true}});
   if(!door&&typeof HX!='undefined'){/* the outside door slab from 17-fixes.js moves onto a hinge so it swings with the inside door */
    const m=HX.children.find(m=>{const p=m.isMesh&&m.geometry&&m.geometry.parameters;return p&&Math.abs(p.width-2)<.01&&Math.abs(p.height-2.4)<.01&&Math.abs(p.depth-.15)<.01&&Math.abs(m.position.x-6)<.05&&Math.abs(m.position.z-12.15)<.05});
-   if(m){const dp=new THREE.Group();dp.position.set(5,0,12.15);HX.add(dp);dp.add(m);m.position.set(1,1.2,0);(window.FW_DOORP=window.FW_DOORP||[]).push(dp);door=true}}
+   if(m){const dp=new THREE.Group();dp.position.set(5,0,12.15);HX.add(dp);dp.add(m);m.position.set(1,1.2,0);(window.FW_DOORP=window.FW_DOORP||[]).push(dp);door=true;
+    /* the outside panels and handle from 29-v26.js hang on the same hinge so they swing with the slab (positions kept relative to the hinge) */
+    HX.children.slice().forEach(c=>{const q=c.isMesh&&c.geometry&&c.geometry.parameters;if(!q||c===m)return;
+     const pan=Math.abs(q.width-.7)<.01&&(Math.abs(q.height-.9)<.01||Math.abs(q.height-.7)<.01)&&Math.abs(q.depth-.03)<.01&&Math.abs(c.position.z-12.24)<.02&&(Math.abs(c.position.x-5.5)<.02||Math.abs(c.position.x-6.5)<.02),
+      hd=Math.abs(q.width-.1)<.01&&Math.abs(q.depth-.08)<.01&&Math.abs(c.position.x-6.75)<.02&&Math.abs(c.position.z-12.27)<.02;
+     if(pan||hd){dp.add(c);c.position.set(c.position.x-5,c.position.y,c.position.z-12.15)}})}}
   if(!FW&&typeof FRW!='undefined'&&FRW.visible&&typeof HXP!='undefined'&&HXP){FRW.children.forEach(c=>c.visible=false);const g=FW=new THREE.Group();FRW.add(g);const w='#d8c7a6',L=[];
    const b=(...a)=>{const m=B(g,...a);m.material=m.material.clone();m.material.transparent=true;L.push(m);return m};
    b(5,3,.3,w,2.5,1.5,12.15);b(9,3,.3,w,11.5,1.5,12.15);b(2,.6,.3,w,6,2.7,12.15);
@@ -31,11 +36,12 @@
  function fade(dt){if(!FW||!FRW.visible)return;const u=FW.userData,near=P.z>8.2&&P.x>-.5&&P.x<16.5,t=near?.22:1,k=Math.min(1,(dt||.016)*6);
   if(u.o==null)u.o=1;u.o+=(t-u.o)*k;if(Math.abs(u.o-t)<.004)u.o=t;
   u.L.forEach((m,i)=>{const mt=m.material;if(mt.opacity!==u.o)mt.opacity=u.o;const dw=u.o>=.999;if(mt.depthWrite!==dw)mt.depthWrite=dw;if(!m.userData.ro){m.userData.ro=1;m.renderOrder=i<u.nb?-9:-8;mt.polygonOffset=true;mt.polygonOffsetFactor=i<u.nb?1:0;mt.polygonOffsetUnits=1}})}
- /* v56: the front door swings open (into the hall, 100 degrees) when you walk up to it from either side and shuts again behind you.
-    One angle drives the inside door (DP) and the outside panels (FW_DOORP, built in dev-models-v2.js). Looks only, collisions are untouched. */
- let da=0,dc=0;
- function swing(dt){const near=typeof P!='undefined'&&Math.abs(P.x-6)<2.2&&P.z>10&&P.z<14.8;if(near)dc=0;else dc+=dt;
-  const t=near?1.75:0,k=1-Math.exp(-(dt||.016)*(near?9:6));if(!near&&dc<.5)return;da+=(t-da)*k;if(Math.abs(da-t)<.003)da=t;
-  const ps=DP.concat(window.FW_DOORP||[]);ps.forEach(p=>{if(p.rotation.y!==da)p.rotation.y=da});window.FW_DOORANG=da}
+ /* v56.0.5: the door never swings open on approach. It rests shut. When you walk through it (cross the door line from either side) it is knocked open
+    and swings shut behind you. One angle drives the inside door (DP) and the outside slab, panels and handle (FW_DOORP, built in dev-models-v2.js and moved above). Looks only, collisions are untouched. */
+ let da=0,pz=null;
+ function swing(dt){if(typeof P=='undefined')return;const zone=Math.abs(P.x-6)<1.1,z=P.z;
+  if(zone&&pz!=null&&Math.abs(z-pz)<1.5&&(pz-12.15)*(z-12.15)<0)da=1.75;pz=zone&&z>9&&z<15.5?z:null;
+  if(da>0){da*=Math.exp(-(dt||.016)*7);if(da<.003)da=0}
+  DP.concat(window.FW_DOORP||[]).forEach(p=>{if(p.rotation.y!==da)p.rotation.y=da});window.FW_DOORANG=da}
  let t0=0;(function loop(t){requestAnimationFrame(loop);const dt=t0?Math.min(.1,(t-t0)/1000):.016;t0=t;try{if(!canopy||!FW)build();fade(dt);swing(dt)}catch(e){}})(0);
 })();
