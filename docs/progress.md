@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v56.0.0 (2026-11-26, drop): released all held features: `HELD=false` in 257-262, smoother walking and camera (`07-input-loop.js`) and menu Newsletter/Contact (`86-google-signin.js`) no longer FW_DEV only; What's new card id 10.
 - v55.52.26 (2026-11-25): Big Vee reminds you to record a song after 2+ days without one (`songnag` tip in `72-tutorial.js`, repeatable via `rep`, respects Tips off).
 - v55.52.24 (2026-11-24, held dark): 24 new pixel-art post backgrounds (`259-photo-scenes.js`) and 8 news scenes matched to story topic (`260-news-scenes.js`). Release day: `HELD=false` in both.
 - v55.52.17 (2026-11-24, held dark): News app "Fern Times" (`257-news-app.js`, preinstalled on laptop and phone, music + world/sport/culture/tech/business/science, infinite scroll by day, album chart) and Instagrime feed upgrade (`258-instagrime-more.js`, infinite scroll, richer posts about you, time/place/tags). Shared `FWINF` infinite-scroll helper. Release day: set `HELD=false` in both files.

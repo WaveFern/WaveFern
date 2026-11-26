@@ -7,7 +7,7 @@
    the Calendar app's preinstalled-app and phone-app wiring. State: none saved (S.apps.news=1 like Calendar).
    Held: HELD=true keeps it dev-only (window.FW_DEV) until release day, then set HELD=false. */
 (function(){
-const HELD=true;
+const HELD=false;
 if(HELD&&!window.FW_DEV)return;
 const CATS=[['top','Top stories'],['music','Music'],['world','World'],['sport','Sport'],['culture','Culture'],['tech','Tech'],['biz','Business'],['sci','Science']],
  CN=Object.fromEntries(CATS),CC={music:'#d6322b',world:'#1f5fbf',sport:'#1c8a4c',culture:'#8a3fb0',tech:'#0f8a9a',biz:'#b87408',sci:'#4a5bd0'},

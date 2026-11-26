@@ -11,7 +11,7 @@
    pixel helpers of 178-instagrime-photos.js (igxF, igxTxt, igxTW, igxClip, igxDisc). New: the 18 product models, caption pools.
    Nothing is saved. Held behind the dev gate (/dev/ only) until release day: set HELD=false to ship. */
 (function(){
-const HELD=true;
+const HELD=false;
 if(HELD&&!window.FW_DEV)return;
 if(typeof BRD=='undefined'||!BRD.brands||!BRD.postProducts||typeof postPic=='undefined'||typeof igxF=='undefined'||typeof PICS=='undefined')return;
 
