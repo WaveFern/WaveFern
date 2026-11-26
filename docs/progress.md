@@ -2,6 +2,7 @@
 
 Newest first. One line per shipped change; details live in `version.js` (`VERSION_HISTORY`).
 
+- v56.0.3 (2026-11-26): Amazoom floors and pixel wallpaper (`263-home-decor.js`), 46 more furniture items and a best-seller home page (`264-amazoom-more-furniture.js`); saved `S.dcO`, `S.rf`, `S.rw`, `S.rt` (old saves load with none).
 - v56.0.0 (2026-11-26, drop): released all held features: `HELD=false` in 257-262, smoother walking and camera (`07-input-loop.js`) and menu Newsletter/Contact (`86-google-signin.js`) no longer FW_DEV only; What's new card id 10.
 - v55.52.26 (2026-11-25): Big Vee reminds you to record a song after 2+ days without one (`songnag` tip in `72-tutorial.js`, repeatable via `rep`, respects Tips off).
 - v55.52.24 (2026-11-24, held dark): 24 new pixel-art post backgrounds (`259-photo-scenes.js`) and 8 news scenes matched to story topic (`260-news-scenes.js`). Release day: `HELD=false` in both.

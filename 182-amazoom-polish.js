@@ -124,8 +124,10 @@ const NEW=[['neonnote','Neon music note sign',190,.9,.1,'Lighting',neonNote(),'P
  ['popcorn','Popcorn machine',290,.62,.52,'Appliances',popcorn(),'Cinema-style, warm light, real kettle'],
  ['bonsai','Bonsai tree',48,.54,.34,'Decor',bonsai(),'Fifteen years old, still tiny']];
 const BADGE={jukebox:'Best Seller',arcadecab:"Amazoom's Choice",lavalamp:'Best Seller',gamingpc:"Amazoom's Choice",synth:'New',eggchair:'New',fireplace:'New'};
-NEW.forEach(([k,n,p,w,d,cat,b,line],i)=>{if(F[k])return;F[k]={n,p,w,d,b,xd:1};const hh=typeof hs=='function'?hs(k):i*97;
- AZ[k]=[((typeof BR!='undefined'&&BR[hh%BR.length])||'Glowby')+' '+n,line,(4.3+(hh%7)/10).toFixed(1),(300+hh%5000).toLocaleString(),['100+','200+','500+','1K+'][hh%4],hh%3==0?Math.round(p*1.2):0,BADGE[k]||'',cat]});
+/* v56.1: the one way to add a shop item (a ninth entry is its badge); 264-amazoom-more-furniture.js reuses it */
+function azAdd(list){list.forEach(([k,n,p,w,d,cat,b,line,bd],i)=>{if(F[k])return;F[k]={n,p,w,d,b,xd:1};const hh=typeof hs=='function'?hs(k):i*97;
+ AZ[k]=[((typeof BR!='undefined'&&BR[hh%BR.length])||'Glowby')+' '+n,line,(4.3+(hh%7)/10).toFixed(1),(300+hh%5000).toLocaleString(),['100+','200+','500+','1K+'][hh%4],hh%3==0?Math.round(p*1.2):0,BADGE[k]||bd||'',cat]})}
+azAdd(NEW);window.azAdd=azAdd;
 
 /* moving parts */
 const GLOW=c=>new THREE.MeshBasicMaterial({color:c});
