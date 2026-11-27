@@ -133,7 +133,7 @@ body.pbhold #hud{opacity:0;transform:translateY(-14px);pointer-events:none}
 @keyframes pbin{from{opacity:.4;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .pb.pbanim{animation:pbin .22s ease-out}
 @media(prefers-reduced-motion:reduce){.pb.pbanim{animation:none}#hud{transition:none}}
-.pb{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 16px));max-height:52vh;overflow:auto;box-sizing:border-box;padding:10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pb{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 16px));max-height:46vh;overflow:auto;box-sizing:border-box;padding:10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .pb h3{margin:0;font-size:14px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pb button{min-height:40px;padding:6px 12px;font:inherit}
 .pb .pbr{display:flex;gap:6px;align-items:center;margin-bottom:8px}
@@ -155,14 +155,17 @@ body.pbhold #hud{opacity:0;transform:translateY(-14px);pointer-events:none}
 .pb .pbc{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
 .pb .pbc button{flex:0 0 auto;min-height:32px;padding:3px 10px;font-size:13px}
 .pb .pbc button small{opacity:.7;font-size:11px}
-.pb .pbl.pbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px;overflow:visible}
+.pb .pbl.pbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;overflow:visible}
+.pb .pbl .pbi{display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:6px;min-height:0;text-align:left}
+.pb .pbi .pbt{position:relative;display:block;aspect-ratio:1;width:100%;overflow:hidden}
+.pb .pbi .pbt img{width:100%;height:100%;object-fit:contain;image-rendering:auto;display:block}
+.pb .pbi .pbn{position:absolute;right:3px;top:3px;font-size:11px;padding:0 5px;background:#000a;color:#fff}
+.pb .pbi .pbm{font-size:13px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb .pbi small{font-size:10px;color:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb .pbi:hover,.pb .pbi:focus-visible{outline:2px solid var(--g)}
 .pb .pbg h4.pbg{grid-column:1/-1;margin:6px 0 0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--m);font-weight:normal;display:block}
 .pb .pbl.pbg h4.pbg:first-child{margin-top:0}
-.pb .pbl .pbi{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:6px;min-width:0!important;text-align:left;min-height:40px}
 .pb .pbg>.m{grid-column:1/-1}
-.pb .pbi i{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1px #0006}
-.pb .pbi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
-.pb .pbi small{margin:0}
 .pb .pbh{display:block;margin-top:4px;font-size:11px}
 @media(max-height:520px){.pb{max-height:62vh}.pb.act .pbf,.pb.act .pbl,.pb.act .pbh{display:none}}
 @media(pointer:coarse){.pb button{min-height:46px}.pb .pbact button{font-size:16px}}
@@ -177,13 +180,18 @@ const catOf=t=>{const f=F[t];if(!f)return'Other';if(f.wall||/^plq_/.test(t))retu
 const esc2=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const swatch=t=>{const b=F[t]&&F[t].b&&F[t].b[0];const c=b&&typeof b[3]=='string'?b[3].replace(/^\*/,'#'):'#556';return/^#[0-9a-f]{3,8}$/i.test(c)?c:'#556'};
 const stored=()=>Object.keys(S.inv).filter(x=>S.inv[x]>0&&F[x]&&x!='desk');
+/* v56.0.22: every item in Storage shows a picture (one shared preview renderer from 11, cached as a data URL) */
+const TH={};
+const thumb=t=>{if(TH[t])return TH[t];try{if(typeof PVR=='undefined'||!PVR)pvInit();const m=pvModel('f:'+t);PVS.add(m);m.rotation.y=.7;PVR.render(PVS,PVC);PVS.remove(m);return TH[t]=PVR.domElement.toDataURL('image/png')}catch(e){return'data:image/gif;base64,R0lGODlhAQABAAAAACw='}};
+const FI_ON=t=>{try{return!!(window.FI&&FI.rows&&FI.rows[t])}catch(e){return false}};
 function listHTML(){const k=stored(),q=SSQ.trim().toLowerCase();
  if(!k.length)return'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>';
  const L=k.filter(t=>(SCAT=='all'||catOf(t)==SCAT)&&(!q||(F[t].n+' '+catOf(t)).toLowerCase().includes(q))).sort((a,b)=>CATS.indexOf(catOf(a))-CATS.indexOf(catOf(b))||F[a].n.localeCompare(F[b].n,undefined,{numeric:true}));
  if(!L.length)return'<span class=m>Nothing matches. Try another word or category.</span>';
  let out='',cur='';
  L.forEach(t=>{const c=catOf(t);if(SCAT=='all'&&c!=cur){cur=c;out+=`<h4 class=pbg>${c}</h4>`}
-  out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(F[t].n)}"><i style="background:${swatch(t)}"></i><span>${esc2(F[t].n)}</span><small>×${S.inv[t]}</small></button>`});
+  const f=F[t],sz=(f.w&&f.d)?`${+f.w.toFixed(1)}×${+f.d.toFixed(1)}`:'',tg=f.wall?'Wall':(FI_ON(t)?'Use':'');
+  out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(f.n)}"><span class=pbt style="background:${swatch(t)}22"><img alt="" src="${thumb(t)}">${S.inv[t]>1?`<b class=pbn>×${S.inv[t]}</b>`:''}</span><span class=pbm>${esc2(f.n)}</span><small>${[sz,tg].filter(Boolean).join(' · ')}</small></button>`});
  return out}
 function catsHTML(){const k=stored(),n={};k.forEach(t=>{const c=catOf(t);n[c]=(n[c]||0)+1});
  const chip=(c,l,cnt)=>`<button class="${SCAT==c?'on':''}" onclick="PBcat('${c}')">${l} <small>${cnt}</small></button>`;
@@ -201,13 +209,13 @@ buildUI=function(){const s=PS();const wasAct=!!document.querySelector('#ui .pb.a
  const turn='<button onclick="PBdo(\'rl\')" aria-label="Turn left">↺</button><button onclick="PBdo(\'rr\')" aria-label="Turn right">↻</button>';
  const actRow=hold?`<div class="pbr pbact"><button class=on onclick="PBdo('place')">✔ Place</button>${turn}<button onclick="PBdo('store')">Store</button><button onclick="PBdo('cancel')">${moving?'Undo':'✕'}</button></div>`
   :q?`<div class="pbr pbact"><button class=on onclick="PBdo('move')">✥ Move</button>${turn}<button onclick="PBdo('store')">Store</button><button onclick="PBdo('cancel')">✕</button></div>`:'';
- const body=SGT=='p'?paintStoreHTML():SGT=='f'?(k.length&&!DEV()?`<div class=pbl>${k.map(t=>`<button onclick="holdItem('${t}')"><span>${F[t].n}</span><small>×${S.inv[t]} in storage</small></button>`).join('')}</div>`:k.length?`<div class=pbf><div class=pbsr><input id=pbq type=search placeholder="Search furniture" autocomplete=off spellcheck=false value="${esc2(SSQ)}" oninput="PBq(this.value)"><button id=pbclr class=pbx style="${SSQ?'':'display:none'}" onclick="PBclr()" aria-label="Clear search">✕</button></div><div class="pbc">${catsHTML()}</div><div class="pbl pbg" id=pbgrid>${listHTML()}</div></div>`:'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>')
+ const body=SGT=='p'?paintStoreHTML():SGT=='f'?(k.length?`<div class=pbf><div class=pbsr><input id=pbq type=search placeholder="Search furniture" autocomplete=off spellcheck=false value="${esc2(SSQ)}" oninput="PBq(this.value)"><button id=pbclr class=pbx style="${SSQ?'':'display:none'}" onclick="PBclr()" aria-label="Clear search">✕</button></div><div class="pbc">${catsHTML()}</div><div class="pbl pbg" id=pbgrid>${listHTML()}</div></div>`:'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>')
   :(fd.length?`<div class="pbl wrap">${fd.map(i=>`<button onclick="eatFood(${i})"><span>${FOOD[i][0]}</span><small>×${S.fd[i]} · +${FOOD[i][2]} energy</small></button>`).join('')}</div>`:'<span class=m>No food in storage. Order from Goober Eats (computer).</span>');
  const sets=setOpen?`<div class=pbs><b>Snap to walls and furniture</b>${tg('snap',1,'On')}${tg('snap',0,'Off')}<b>Turn back to the wall</b>${tg('turn',1,'On')}${tg('turn',0,'Off')}<b>Grid size</b>${tg('grid',.25,'¼')}${tg('grid',.5,'½')}${tg('grid',1,'1')}${tg('grid',0,'Free')}</div>`:'';
- const hint=SGT=='p'?'Paint tins are used in any room at home: press E in the room to paint it.':SGT!='f'?'Tap food to eat it and restore energy.':touch()?(act?'Drag in the room to move it. Green means it fits.':'Tap an item below to place it, or tap a placed item to move it.'+(DEV()?' Search or pick a category to find things faster.':'')):(act?'Click to place · R or right-click: turn · E: store · Enter: place':'Pick an item below, or click a placed item. Drag to move it.');
+ const hint=SGT=='p'?'Paint tins are used in any room at home: press E in the room to paint it.':SGT!='f'?'Tap food to eat it and restore energy.':touch()?(act?'Drag in the room to move it. Green means it fits.':'Tap an item below to place it, or tap a placed item to move it.'+' Search or pick a category to find things faster.'):(act?'Click to place · R or right-click: turn · E: store · Enter: place':'Pick an item below, or click a placed item. Drag to move it.');
  $('ui').innerHTML=`<div class="box pb ${act?'act':''}"><div class=pbr><h3>Storage${name?' · '+name:''}</h3>${tab('f','Furniture ('+k.reduce((a,t)=>a+S.inv[t],0)+')')}${tab('d','Food ('+fdN()+')')}${tab('p','Paint ('+(S.tins||0)+')')}<button class="${setOpen?'on':''}" onclick="PBgear()" aria-label="Placement settings">${pxIcon('gear')}</button><button class=go onclick="exitBuild()">Done</button></div>${actRow}${sets}${body}<small class="m pbh">${hint}${hasBed()?'':' · The room needs a bed'}</small></div>`;
  const n=document.querySelector('#ui .pb');if(n&&oldH&&wasAct!=act&&n.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches){/* panel slides out to a slim bar while you hold an item, and back when you let go */const nh=n.offsetHeight;if(nh!=oldH){try{n.animate([{height:oldH+'px'},{height:nh+'px'}],{duration:240,easing:'ease'})}catch(e){}}n.classList.add('pbanim');setTimeout(()=>n.classList.remove('pbanim'),260)}
- if(n)n.scrollTop=sl;const n2=document.querySelector('#ui .pbl');if(n2&&!DEV())n2.scrollLeft=sl2;if(wasQ){const i=document.getElementById('pbq');if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}}};
+ if(n)n.scrollTop=sl;const n2=document.querySelector('#ui .pbl');if(n2&&!n2.classList.contains('pbg'))n2.scrollLeft=sl2;if(wasQ){const i=document.getElementById('pbq');if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}}};
 window.PBdo=a=>{if(mode!='build')return;if(a=='place')place();else if(a=='rl'){rot(-1);buildUI()}else if(a=='rr'){rot(1);buildUI()}else if(a=='store')store();else if(a=='cancel')cancel();else if(a=='move'&&sel>=0)pickUp(sel)};
 window.PBset=(k,v)=>{PS()[k]=v;snd('click');buildUI()};
 window.PBgear=()=>{setOpen=!setOpen;snd('click');buildUI()};
