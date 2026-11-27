@@ -3,13 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.27';
+const GAME_VERSION='v56.0.25';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.27',n:'Sign-in emails use the game\'s exact WaveFern green and panel colours (dev only, not live yet)'},
- {v:'v56.0.26',n:'Sign-in emails: black WAVEFERN logo in a white box and a main-menu style button (dev only, not live yet)'},
- {v:'v56.0.25',n:'Sign-in emails: light and dark versions that follow the mail app\'s theme (dev only, not live yet)'},
- {v:'v56.0.24',n:'Sign-in emails restyled: cleaner verify and reset emails with the WaveFern logo (dev only, not live yet)'},
+ {v:'v56.0.25',n:'Sign-in emails restyled in the game\'s look: WAVEFERN logo, WaveFern green button, light and dark versions (dev only, not live yet)'},
+ {v:'v56.0.24',n:'Santa\'s Lodge (dev): a festive new talk box with Santa\'s live 3D face that talks and blinks'},
  {v:'v56.0.23',n:'Santa\'s Lodge (dev): no more flicker in the burp cutscene, a longer close-up on Santa\'s red face, and the present now tumbles and rolls with real physics'},
  {v:'v56.0.22',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent through a Cloudflare Worker and Resend, and new security rules. Nothing changes for players yet'},
  {v:'v56.0.21',n:'Santa\'s Lodge (dev): real recorded cutscene sounds, a bigger burp cutscene, a festive present card, and Santa\'s beard no longer glitches when he talks'},
