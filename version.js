@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.20';
+const GAME_VERSION='v56.0.21';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.20',n:'Santa\'s Lodge (dev): real recorded cutscene sounds, a bigger burp cutscene, a festive present card, and Santa\'s beard no longer glitches when he talks'},
+ {v:'v56.0.21',n:'Santa\'s Lodge (dev): real recorded cutscene sounds, a bigger burp cutscene, a festive present card, and Santa\'s beard no longer glitches when he talks'},
+ {v:'v56.0.20',n:'Admin gifts can now carry several clothing items plus money, streams and listeners in one gift'},
  {v:'v56.0.19',n:'Santa\'s Lodge (dev only): five more pets in Santa\'s presents (penguin, gingerbread pup, snowman, Christmas mouse, arctic fox)'},
  {v:'v56.0.18',n:'Santa\'s Lodge (dev only): Santa\'s cars rebuilt on the game\'s car bodies, lodge walls and roof stay up in the burp cutscene'},
  {v:'v56.0.17',n:'Beach Club gig is now the festival set: walk round the stage, crowd minigames, autographs; gig reminder also fires after the start'},
