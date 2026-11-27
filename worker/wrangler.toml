@@ -1,0 +1,14 @@
+name = "wavefern-mail"
+main = "index.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+PROJECT_ID = "waveferndata"
+SITE = "https://wavefern.com"
+MAIL_FROM = "WaveFern <no-reply@wavefern.com>"
+DAILY_CAP = "90"   # Resend free plan = 100 mails/day
+
+# create with: npx wrangler kv namespace create RL   then paste the id here
+[[kv_namespaces]]
+binding = "RL"
+id = "PASTE_KV_ID_HERE"
