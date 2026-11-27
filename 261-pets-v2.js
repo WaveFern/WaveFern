@@ -86,7 +86,7 @@ const tex=(w,h,fn)=>{const c=document.createElement('canvas');c.width=w;c.height
 function tagOf(f){const g=f.m;let T=g.userData.p2t;if(!T){/* the name is a crisp page tag from 56-name-tags (NTAG), anchored to an invisible point above the head */
   const zz=new THREE.Sprite(new THREE.SpriteMaterial({map:tex(64,64,(c)=>{c.font='bold 40px monospace';c.fillStyle='#d6c8ff';c.strokeStyle='#241a44';c.lineWidth=6;c.strokeText('Z',20,44);c.fillText('Z',20,44)}),transparent:true,depthWrite:false})),hold=new THREE.Group(),pt=new THREE.Object3D();
   pt.position.set(0,SMALL?1.1:1.3,0);pt.userData.lt=nm(f.k);hold.add(pt);hold.visible=false;zz.scale.set(.5,.5,1);zz.visible=false;g.add(hold,zz);
-  const el=document.createElement('div');el.className=SMALL?'nt pt sm':'nt pt';el.textContent=nm(f.k);ntBox().appendChild(el);NTAG.list.push({s:pt,el,on:false,gone:0});T=g.userData.p2t={sp:hold,pt,zz,el,n:nm(f.k)}}
+  const el=document.createElement('div');el.className=SMALL?'nt ptag ptq':'nt ptag';if(SMALL)el.style.marginTop=(-(S.pets.indexOf(f.k)%3)*11)+'px';el.textContent=nm(f.k);ntBox().appendChild(el);NTAG.list.push({s:pt,el,on:false,gone:0});T=g.userData.p2t={sp:hold,pt,zz,el,n:nm(f.k)}}
  const n=nm(f.k);if(T.n!==n){T.n=n;T.el.textContent=n;T.pt.userData.lt=n}return T}
 function post(dt){
  const mv=Math.hypot(P.x-ST.lx,P.z-ST.lz);ST.lx=P.x;ST.lz=P.z;ST.still=mv>.002||mode!='play'?0:ST.still+dt;
@@ -171,7 +171,7 @@ const st=document.createElement('style');st.textContent=`
 @keyframes pt2in{from{transform:translate(-50%,24px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 @media(max-width:640px){.pt2-slots{gap:6px}.pt2-slot{padding:6px}.pt2-slot canvas.pv{width:72px!important;height:72px!important}.pt2-perk{font-size:11px}}`;
 st.textContent+=`
-#ntags .nt.pt{font-size:14px;padding:4px 9px 3px;color:#fff;background:#2b2118;box-shadow:inset 0 0 0 2px #7a5a3c,3px 3px 0 #0009}#ntags .nt.pt.sm{font-size:10px;letter-spacing:.5px;padding:2px 6px 1px;background:#000a;border:1px solid #0008;box-shadow:none;opacity:.85}#ntags .nt.pt.sm:after{display:none}
+#ntags .nt.ptag{font-size:14px;padding:4px 9px 3px;color:#fff;background:#2b2118;box-shadow:inset 0 0 0 2px #7a5a3c,3px 3px 0 #0009}#ntags .nt.ptag.ptq{font-size:9px;letter-spacing:.3px;padding:0;background:none;border:0;box-shadow:none;opacity:.9;color:#fff;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000,0 2px 3px #0008}#ntags .nt.ptag.ptq:after{display:none}
 #ui>.box.modal.pm{--ink:#3b2a20;--paper:#fff4e0;--card:#fffaf0;--line:#e3cfae;--coral:#ff6b57;--teal:#1fa6a0;width:min(1060px,96vw);max-height:92vh;overflow:auto;background:var(--paper);background-image:radial-gradient(#f0dcb8 1.2px,transparent 1.4px);background-size:18px 18px;color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 #0007;padding:20px 22px 22px;font-family:ui-rounded,"Nunito","Trebuchet MS",Verdana,sans-serif;display:flex;flex-direction:column;gap:14px;animation:pmin .28s cubic-bezier(.2,1.3,.4,1)}
 .pm *{box-sizing:border-box}
 .pm-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.pm-ttl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
