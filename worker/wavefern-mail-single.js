@@ -1,15 +1,13 @@
 /* WaveFern email templates. Two emails: verify the address, reset the password.
-   Look: no page background, so the mail app's own light or dark shows through. Light is the main design: a white card, the pixel WAVEFERN logo in a
-   dark badge (readable on any background), pixel heading, sans-serif body, a green button. A dark card switches on in apps that support
-   prefers-color-scheme (Apple Mail, iPhone Mail, Outlook Mac). Gmail ignores that rule, so it shows the light design (its apps may darken it themselves).
-   Email-safe: table layout and inline styles carry the light design. The <style> block adds the dark theme, hover, web font and mobile padding.
+   Look (James's Photoshop mockup): no card and no page background, so the mail app's own light or dark shows through. Green pixel WAVEFERN logo with a dark-green
+   hard shadow, a pixel heading, sans-serif body, and a black "main menu" button with a white pixel label and a green offset shadow. Light is the main design;
+   a dark theme (white heading and text) switches on in apps that support prefers-color-scheme (Apple Mail, iPhone Mail, Outlook Mac). Gmail ignores that rule and
+   shows the light design (its apps may darken it themselves). Colours are the game's tokens (docs/THEMES.md): --g #2fe68a, --gat #04120a, --m #8aa094.
+   Email-safe: table layout and inline styles carry the light design; the <style> block adds the dark theme, hover, web font and mobile padding.
    Every value that goes into the HTML is escaped. The link is always the one the Worker made; nothing here is hardcoded. */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-/* light (inline) */
-const CARD = '#ffffff', LINE = '#dfe6e2', HEAD = '#1fa864', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#178f55';
-/* brand, same in both: WaveFern green --g #2fe68a and its on-green text --gat #04120a (docs/THEMES.md). Dark theme uses the game's --p, --t, --m, --line. */
-const GREEN = '#2fe68a', INKG = '#04120a';
+const GREEN = '#2fe68a', SHADOW = '#1d4a37', INK = '#161616', LINE = '#dfe6e2', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#178f55';
 const PIX = "Silkscreen,'Courier New',Courier,monospace";
 const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
 const SITE = 'https://wavefern.com';
@@ -27,54 +25,51 @@ function shell({ preheader, title, intro, button, link, outro }) {
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark;}
 body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
-a.wf-btn:hover{background:#5df0a6 !important;}
+a.wf-btn:hover{background:#2a2a2a !important;}
 @media (prefers-color-scheme:dark){
- .wf-card{background:#161b18 !important;border-color:#2a352e !important;}
- .wf-h{color:#2fe68a !important;}
+ .wf-h{color:#ffffff !important;}
  .wf-body{color:#e8f3ec !important;}
  .wf-mute{color:#8aa094 !important;}
  .wf-line{border-top-color:#2a352e !important;}
  .wf-link{color:#2fe68a !important;}
  .wf-foot a{color:#8aa094 !important;}
+ .wf-btn-td{border-top:1px solid #2a352e !important;border-left:1px solid #2a352e !important;}
 }
 @media (max-width:620px){
- .wf-pad{padding-left:24px !important;padding-right:24px !important;}
- .wf-logo{font-size:24px !important;letter-spacing:3px !important;}
+ .wf-pad{padding-left:20px !important;padding-right:20px !important;}
+ .wf-logo{font-size:30px !important;letter-spacing:3px !important;}
  .wf-title{font-size:16px !important;}
- .wf-btn-wrap{width:100% !important;}
+ .wf-btn-wrap{width:92% !important;}
+ a.wf-btn{letter-spacing:2px !important;font-size:15px !important;padding-left:12px !important;padding-right:12px !important;}
 }
 </style>
 </head>
 <body style="margin:0;padding:0;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${esc(preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td align="center" style="padding:40px 16px;">
-<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+<tr><td align="center" style="padding:44px 16px;">
+<!--[if mso]><table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
 
-<tr><td align="center" style="padding:0 0 28px;">
-<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td class="wf-badge" align="center" style="background:#ffffff;border:1px solid #dfe6e2;border-radius:8px;padding:16px 28px;"><a href="${SITE}/" class="wf-logo" style="font:700 30px/1 ${PIX};letter-spacing:4px;color:#000000;text-decoration:none;">WAVEFERN</a></td></tr></table>
-</td></tr>
+<tr><td class="wf-pad" align="center" style="padding:0 0 44px;"><a href="${SITE}/" class="wf-logo" style="font:700 40px/1 ${PIX};letter-spacing:5px;color:${GREEN};text-shadow:3px 3px 0 ${SHADOW};text-decoration:none;">WAVEFERN</a></td></tr>
 
-<tr><td class="wf-card" style="background:${CARD};border:1px solid ${LINE};border-radius:12px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td class="wf-pad wf-h wf-title" align="center" style="padding:40px 48px 0;font:700 20px/1.3 ${PIX};letter-spacing:1px;color:${HEAD};">${esc(title)}</td></tr>
-<tr><td class="wf-pad wf-body" align="center" style="padding:16px 48px 0;font:16px/1.65 ${SANS};color:${BODY};">${intro}</td></tr>
-<tr><td class="wf-pad" align="center" style="padding:28px 48px 0;">
-<!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="${L}" style="height:50px;v-text-anchor:middle;width:400px;" arcsize="0%" stroke="f" fillcolor="${GREEN}"><w:anchorlock/><center style="color:${INKG};font-family:'Courier New',monospace;font-size:16px;font-weight:bold;letter-spacing:3px;">${esc(button).toUpperCase()}</center></v:roundrect><![endif]-->
+<tr><td class="wf-pad wf-h wf-title" align="center" style="padding:0 32px;font:700 22px/1.35 ${PIX};letter-spacing:2px;color:${INK};">${esc(title)}</td></tr>
+<tr><td class="wf-pad wf-body" align="center" style="padding:20px 32px 0;font:16px/1.65 ${SANS};color:${BODY};">${intro}</td></tr>
+
+<tr><td class="wf-pad" align="center" style="padding:36px 32px 0;">
+<!--[if mso]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" href="${L}" style="height:56px;v-text-anchor:middle;width:280px;" stroke="f" fillcolor="${INK}"><w:anchorlock/><center style="color:#ffffff;font-family:'Courier New',monospace;font-size:16px;font-weight:bold;letter-spacing:3px;">${esc(button).toUpperCase()}</center></v:rect><![endif]-->
 <!--[if !mso]><!-->
-<table role="presentation" class="wf-btn-wrap" width="80%" cellpadding="0" cellspacing="0" border="0" style="width:80%;max-width:400px;"><tr><td align="center" style="background:${GREEN};">
-<a href="${L}" class="wf-btn" style="display:block;padding:22px 24px 20px;background:${GREEN};font:700 16px/1.2 ${PIX};letter-spacing:3px;text-transform:uppercase;color:${INKG};text-decoration:none;text-align:center;">${esc(button)}</a>
+<table role="presentation" class="wf-btn-wrap" width="60%" cellpadding="0" cellspacing="0" border="0" style="width:60%;max-width:280px;"><tr><td class="wf-btn-td" align="center" style="background:${INK};border-right:5px solid ${GREEN};border-bottom:5px solid ${GREEN};">
+<a href="${L}" class="wf-btn" style="display:block;padding:20px 24px 18px;background:${INK};font:700 17px/1.2 ${PIX};letter-spacing:3px;text-transform:uppercase;color:#ffffff;text-decoration:none;text-align:center;">${esc(button)}</a>
 </td></tr></table>
 <!--<![endif]-->
 </td></tr>
-<tr><td class="wf-pad wf-mute" align="center" style="padding:24px 48px 32px;font:13px/1.6 ${SANS};color:${MUTE};">${outro}</td></tr>
-<tr><td class="wf-pad" style="padding:0 48px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="wf-line" style="border-top:1px solid ${LINE};font-size:0;line-height:0;height:1px;">&nbsp;</td></tr></table></td></tr>
-<tr><td class="wf-pad wf-mute" align="center" style="padding:20px 48px 32px;font:12px/1.6 ${SANS};color:${MUTE};">Button not working? Paste this link into your browser:<br><a href="${L}" class="wf-link" style="color:${LINKG};text-decoration:none;word-break:break-all;">${L}</a></td></tr>
-</table>
-</td></tr>
 
-<tr><td class="wf-foot wf-mute" align="center" style="padding:28px 16px 0;font:12px/1.8 ${SANS};color:${MUTE};">
+<tr><td class="wf-pad wf-mute" align="center" style="padding:32px 32px 36px;font:13px/1.6 ${SANS};color:${MUTE};">${outro}</td></tr>
+<tr><td class="wf-pad" style="padding:0 32px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="wf-line" style="border-top:1px solid ${LINE};font-size:0;line-height:0;height:1px;">&nbsp;</td></tr></table></td></tr>
+<tr><td class="wf-pad wf-mute" align="center" style="padding:24px 32px 0;font:12px/1.6 ${SANS};color:${MUTE};">Button not working? Paste this link into your browser:<br><a href="${L}" class="wf-link" style="color:${LINKG};text-decoration:none;word-break:break-all;">${L}</a></td></tr>
+
+<tr><td class="wf-foot wf-mute" align="center" style="padding:36px 16px 0;font:12px/1.8 ${SANS};color:${MUTE};">
 <a href="${SITE}/terms/" style="${a}">Terms of Service</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${SITE}/privacy/" style="${a}">Privacy Policy</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${SITE}/legal/" style="${a}">Legal</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${SITE}/wiki/contact/" style="${a}">Contact</a>
 </td></tr>
 <tr><td class="wf-mute" align="center" style="padding:12px 16px 0;font:11px/1.7 ${SANS};color:${MUTE};">This is an automated message, so please do not reply.<br>You received it because this address was used on wavefern.com.<br>WaveFern is a fictional music career game. &copy; 2026 WaveFern.</td></tr>
@@ -90,7 +85,7 @@ function verifyEmail(link) {
     preheader: 'One tap to finish setting up your WaveFern account.',
     title: 'Verify your email',
     intro: 'Welcome to WaveFern. Confirm this email address to unlock your cloud save, friends and band rooms.',
-    button: 'Verify email', link,
+    button: 'Verify', link,
     outro: 'If you did not create a WaveFern account, you can safely ignore this email.',
   });
   const text = `Welcome to WaveFern.\n\nConfirm your email address by opening this link:\n${link}\n\nIf you did not create a WaveFern account, ignore this email.`;
@@ -102,7 +97,7 @@ function resetEmail(link) {
     preheader: 'Choose a new WaveFern password.',
     title: 'Reset your password',
     intro: 'We received a request to set a new password for your WaveFern account. If you signed in with Google before, this also lets you sign in with this email and a password.',
-    button: 'Choose new password', link,
+    button: 'Reset password', link,
     outro: 'If you did not ask for this, ignore this email and your password stays the same. The link works once and expires after about an hour.',
   });
   const text = `We received a request to set a new password for your WaveFern account.\n\nChoose a new password:\n${link}\n\nIf you did not ask for this, ignore this email. The link works once and expires after about an hour.`;
