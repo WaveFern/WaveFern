@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.23';
+const GAME_VERSION='v56.0.24';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.23',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.24',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.23',n:'Santa\'s Lodge (dev): no more flicker in the burp cutscene, a longer close-up on Santa\'s red face, and the present now tumbles and rolls with real physics'},
  {v:'v56.0.22',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent through a Cloudflare Worker and Resend, and new security rules. Nothing changes for players yet'},
  {v:'v56.0.21',n:'Santa\'s Lodge (dev): real recorded cutscene sounds, a bigger burp cutscene, a festive present card, and Santa\'s beard no longer glitches when he talks'},
  {v:'v56.0.20',n:'Admin gifts can now carry several clothing items plus money, streams and listeners in one gift'},
