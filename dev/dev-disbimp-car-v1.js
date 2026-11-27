@@ -1,7 +1,7 @@
 /* WaveFern dev: THE DISBIMP. Only runs on /dev/ (window.FW_DEV). Add ?nodisbimp to skip it.
 
    A detailed hypercar with DISBIMP written along both doors, across the tail and on the number plates. Sold in the Cars shop
-   ($140,000, 150 mph) and kept in the garage like any other car. The body is one merged mesh on the shared car materials
+   ($140,000, 150 mph); on /dev/ every career is given one, parked outside the garage door. The body is one merged mesh on the shared car materials
    (carBuild in 39-car-models.js: group 0 glossy paint, 1 matte, 2 unlit lights): a shaped wedge body with a shoulder step,
    teardrop canopy, splitter, intakes, LED light bars, hood vents, twin stripes, side intakes with fins, swan-neck rear wing,
    diffuser fins, quad exhausts, ten-spoke rims with discs and calipers, shark fin and underglow.
@@ -123,6 +123,16 @@ if(typeof PA=='object'&&PA&&PA.cars&&typeof cardOf=='function'){const p0=PA.cars
  try{if(h.includes("book('car',"+I+")")||h.includes('data-pv="c:'+I+'"'))return h;const c=CARS[I],own=(S.cars||[]).includes(I);
   const card=cardOf('c:'+I,c.n,'Top speed '+c.mph+' mph · DISBIMP livery',own?'<small class=m>Owned</small>':`<button class=go ${S.money<c.p?'disabled':''} onclick="book('car',${I})">Book · ${$$(c.p)}</button>`);
   const k=h.indexOf('<div class=cards>');return k<0?h+card:h.slice(0,k+17)+card+h.slice(k+17)}catch(e){console.warn('disbimp shop',e);return h}}}
+
+/* dev: every career owns the Disbimp, and it waits outside the garage door (the garage is unlocked for it). Checked every 3 s,
+   once per loaded career; a Disbimp you drove somewhere else stays where you left it. */
+const DONE=new WeakSet();
+function place(){try{if(typeof S!='object'||!S||DONE.has(S)||typeof mode=='undefined'||mode=='title'||mode=='drive'||typeof pcSpawn!='function')return;
+ if(!Array.isArray(S.cars))S.cars=[];if(!S.cars.includes(I))S.cars.push(I);if(!S.garage)S.garage=1;
+ const j=S.cars.indexOf(I);if(!S.cpk||typeof S.cpk!='object'||Array.isArray(S.cpk))S.cpk={};
+ if(!S.cpk[j]){const c=pcSpawn(j);if(c)S.cpk[j]=[c.x,c.z,0]}
+ parkCars();DONE.add(S)}catch(e){console.warn('disbimp place',e)}}
+setInterval(place,3000);
 
 window.FW_DISBIMP={i:I,geo:geoOf,decals,spec:SP};
 })();
