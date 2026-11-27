@@ -192,8 +192,6 @@ function buildProps(){
  /* stone path and candy-cane lamps down to the meadow */
  for(let i=0;i<7;i++)X('yard',2.6+((i*3)%3)*.2,.1,1.5,i%2?C.stone2:C.stone3,((i*5)%3-1)*.15,.16,HD+7.2+i*1.7,((i*7)%5-2)*.04);
  [[-3.2,HD+7.5],[3.2,HD+7.5],[-3.2,HD+12],[3.2,HD+12]].forEach(([x,z])=>lamp('ext','glow',x,z,3.1));
- /* the sign at the bottom of the path */
- X('ext',.3,2.6,.3,C.logD,-3.4,1.3,HD+14.2);X('ext',.3,2.6,.3,C.logD,3.4,1.3,HD+14.2);X('ext',8.0,1.6,.3,C.log2,0,2.1,HD+14.2);X('ext',8.2,.2,.5,C.snow,0,3.0,HD+14.2);
  /* pines around the back and sides */
  [[-17,-12,1.1],[-13,-15,1.3],[-6,-17,1],[1,-16,1.2],[8,-17,1.05],[14,-14,1.3],[18,-9,1.1],[-19,-3,1.2],[-18,5,1],[19,0,1.15],[20,8,1.0],[-20,12,1.1]].forEach(([x,z,s])=>{pine('ext',x,z,s);solidC(x,z,.7*s)});
  /* a decorated tree beside the porch: lights are glow boxes, baubles in colours, a gold star */
@@ -218,12 +216,21 @@ function buildProps(){
 buildProps();
 
 /* ---------- inside: rug, fireplace, tree, shelf, window, armchair, table, toys, garland ---------- */
+const TRK={x:4.9,z:3.0,rx:2.3,rz:1.7};/* the toy train's oval track */
 function buildInside(){
- /* rugs: a big red round-ish rug in front of Santa with a white and gold border, and a runner from the door */
- const rugs=(w,d,x,z,c,c2,c3)=>{X('inn',w+.5,.04,d+.5,c3,x,.4,z);X('inn',w+.2,.05,d+.2,c2,x,.41,z);X('inn',w-.1,.06,d-.1,c,x,.42,z)};
- rugs(10.6,7.4,0,-3.9,C.red,C.white,C.gold);X('inn',8.4,.07,5.4,C.redD,0,.43,-3.9);X('inn',5.4,.08,3.8,C.red,0,.44,-3.9);
- for(let i=0;i<12;i++){const a=i/12*Math.PI*2;X('inn',.5,.09,.5,i%2?C.gold:C.white,Math.cos(a)*2.6,.45,-3.9+Math.sin(a)*1.7,a)}
- rugs(3.4,6.4,0,4.5,C.green,C.white,C.red);for(let i=0;i<5;i++)X('inn',2.6,.07,.5,C.greenD,0,.43,2.2+i*1.1);
+ /* Santa's round rug: stepped circles (gold rim, white ring, red field, a darker inner circle with a white snowflake), centred in front of him */
+ const disc=(cx,cz,r,y,h,col,step)=>{step=step||.36;for(let z=-r+step/2;z<r;z+=step){const w=2*Math.sqrt(Math.max(0,r*r-z*z));if(w>.2)X('inn',Math.round(w/step)*step,h,step+.01,col,cx,y,cz+z)}};
+ const RC=[0,-3.4];
+ disc(RC[0],RC[1],4.5,.41,.04,C.gold);disc(RC[0],RC[1],4.2,.425,.05,C.white);disc(RC[0],RC[1],3.85,.44,.06,C.red);disc(RC[0],RC[1],2.5,.45,.05,C.redD);
+ for(let i=0;i<16;i++){const a=i/16*Math.PI*2;X('inn',.34,.07,.34,i%2?C.goldL:C.white,RC[0]+Math.cos(a)*3.25,.45,RC[1]+Math.sin(a)*3.25,a)}
+ for(let i=0;i<6;i++){const a=i/6*Math.PI;X('inn',3.6,.06,.22,C.white,RC[0],.46,RC[1],a);X('inn',.5,.065,.5,C.white,RC[0]+Math.cos(a)*1.45,.46,RC[1]-Math.sin(a)*1.45,a+.785);X('inn',.5,.065,.5,C.white,RC[0]-Math.cos(a)*1.45,.46,RC[1]+Math.sin(a)*1.45,a+.785)}
+ X('inn',.7,.07,.7,C.goldL,RC[0],.465,RC[1],.785);
+ /* the runner from the door: red with white edges and gold diamonds */
+ X('inn',2.6,.04,7.4,C.white,0,.41,4.9);X('inn',2.2,.05,7.4,C.red,0,.42,4.9);for(let i=0;i<6;i++)X('inn',.42,.055,.42,C.goldL,0,.425,1.9+i*1.2,.785);for(let i=0;i<12;i++)X('inn',.18,.055,.18,C.white,i%2?-.75:.75,.425,1.6+i*.6,.785);
+ /* a white fur rug in front of the fire, with a sleeping cat on it */
+ disc(-7.6,-1.5,1.7,.41,.05,'#e9eef4',.3);disc(-7.6,-1.5,1.4,.42,.05,C.white,.3);
+ {const cx=-7.3,cz=-1.2;X('inn',.9,.36,.6,'#e08a3c',cx,.62,cz);X('inn',.5,.34,.48,'#e08a3c',cx+.55,.66,cz+.1);X('inn',.14,.14,.06,'#e08a3c',cx+.45,.88,cz+.1);X('inn',.14,.14,.06,'#e08a3c',cx+.68,.88,cz+.1);
+  X('inn',.5,.12,.12,'#c26f28',cx-.4,.5,cz+.36,.5);X('inn',.2,.06,.04,'#3a2214',cx+.6,.68,cz+.35);X('inn',.5,.06,.6,'#c26f28',cx-.1,.82,cz);X('inn',.12,.1,.04,'#f2c7a0',cx+.55,.6,cz+.35)}
  /* fireplace on the west wall: stone breast, firebox, hearth, mantel, logs */
  const fx=-HW+.4;X('inn',1.8,5.2,5.0,C.stone,fx+.9,2.6,-1.5);for(let i=0;i<10;i++)for(let j=0;j<5;j++)X('inn',1.84,.5,1.0,(i+j)%3?C.stone3:C.stone2,fx+.9,.35+i*.5,-3.5+j*1.0+(i%2)*.5);
  X('inn',1.2,2.0,2.8,'#17181b',fx+1.4,1.5,-1.5);X('inn',.1,2.0,2.8,'#0e0f11',fx+.4,1.5,-1.5);X('inn',1.6,.3,3.4,C.stone3,fx+1.6,.5,-1.5);X('inn',2.4,.5,5.4,C.stone2,fx+1.6,.42,-1.5);
@@ -249,16 +256,52 @@ function buildInside(){
   [[1.8,.4,.9,C.red],[-1.6,1.2,1.0,C.green],[.6,1.8,.8,'#3f6fd6'],[2.3,-1.0,.8,C.gold],[-2.0,-.2,.7,'#a63fb0']].forEach(([a,b,s2,c],i)=>{X('inn',s2,s2,s2,c,tx+a,.4+s2/2,tz+b,i*.4);X('inn',s2+.02,s2+.02,.16,C.white,tx+a,.4+s2/2,tz+b,i*.4);X('inn',.16,s2+.02,s2+.02,C.white,tx+a,.4+s2/2,tz+b,i*.4);X('inn',.34,.26,.34,C.goldL,tx+a,.4+s2+.12,tz+b,i*.4)});solidC(tx,tz,1.5)}
  /* bookshelf and a globe in the north-east, a grandfather clock, a toy shelf with a train and a rocking horse */
  {const bxx=7.4,bz=-HD+.9;X('inn',3.8,4.4,.8,C.wain,bxx,2.4,bz);for(let r=0;r<4;r++){X('inn',3.6,.12,.8,C.pineD,bxx,.8+r*1.05,bz+.02);let x=bxx-1.7;for(let i=0;i<9;i++){const w=.2+((i*7+r*3)%4)*.06,h=.6+((i*5+r)%4)*.14;X('inn',w,h,.55,['#c0392b','#2e6ea5','#e6b422','#2e8b4e','#7a3fb0','#e07a2c'][(i+r*2)%6],x+w/2,.86+r*1.05+h/2,bz+.05);x+=w+.03}}
-  solid(bxx-1.95,-HD+.3,bxx+1.95,-HD+1.4);
-  X('inn',.9,.1,.9,C.wain,3.6,.45,-HD+1.1);X('inn',.2,.5,.2,C.wain,3.6,.7,-HD+1.1);X('inn',.9,.9,.9,'#3d6fa8',3.6,1.4,-HD+1.1);X('inn',.95,.04,.95,C.goldL,3.6,1.4,-HD+1.1);X('inn',.95,.95,.04,C.goldL,3.6,1.4,-HD+1.1);solidC(3.6,-HD+1.1,.6)}
+  solid(bxx-1.95,-HD+.3,bxx+1.95,-HD+1.4);}
  /* the clock */
  {const cx=11.0,cz=-HD+1.0;X('inn',1.3,4.6,1.0,C.wain,cx,2.6,cz);X('inn',1.5,.3,1.2,C.pineD,cx,5.0,cz);X('inn',.9,.9,.1,C.cream,cx,3.8,cz+.55);X('inn',.08,.4,.06,C.iron,cx,3.9,cz+.6);X('inn',.3,.06,.06,C.iron,cx+.1,3.8,cz+.6);X('inn',.6,1.6,.1,C.pineD,cx,2.0,cz+.55);X('inn',.2,.2,.1,C.goldL,cx,1.7,cz+.6);solid(cx-.8,-HD+.3,cx+.8,-HD+1.6)}
- /* wooden toy shelf + sack of toys on the east side, a work table with a half-painted rocking horse */
- {const sx=8.6,sz=-.5;X('inn',2.8,.2,1.6,C.pineD,sx,1.5,sz);for(const [a,b] of[[-1.2,-.6],[1.2,-.6],[-1.2,.6],[1.2,.6]])X('inn',.2,1.4,.2,C.wain,sx+a,.8,sz+b);X('inn',2.6,.12,1.4,C.wain,sx,.5,sz);
-   X('inn',.5,.4,.5,C.red,sx-.9,1.8,sz);X('inn',.5,.4,.5,C.green,sx-.3,1.8,sz+.1);X('inn',.5,.7,.5,C.gold,sx+.4,1.95,sz-.1);X('inn',.3,.3,.3,'#fff',sx+1,1.75,sz+.1);
-   X('inn',1.8,.4,.7,C.green,sx-.2,.8,sz-.1);X('inn',.5,.3,.7,C.red,sx+.2,1.1,sz-.1);X('inn',.3,.2,.3,C.iron,sx-.8,1.1,sz-.1);
-   solid(sx-1.5,sz-.9,sx+1.5,sz+.9)}
- {const sx=10.2,sz=-6.2;X('inn',2.2,2.0,1.8,'#a87a3c',sx,1.35,sz);X('inn',1.6,.7,1.4,'#a87a3c',sx,2.7,sz);X('inn',1.0,.5,.9,'#8d6330',sx,3.15,sz);X('inn',1.7,.2,1.5,C.red,sx,2.45,sz);X('inn',.5,.3,.5,C.goldL,sx,3.5,sz);[[ -.6,2.9,.7,C.red],[.6,2.9,.6,C.green],[0,3.4,.7,'#3f6fd6']].forEach(([a,y,b,c])=>X('inn',.45,.45,.45,c,sx+a,y+.5,sz+b*.0));solid(sx-1.3,sz-1.1,sx+1.3,sz+1.1)}
+ /* Santa's arch: two big candy-cane pillars and a garland swag of lights framing him and the picture window */
+ {const px=4.7,pz=-7.9;[-1,1].forEach(s=>{for(let i=0;i<15;i++)X('inn',.6,.32,.6,i%2?C.white:C.red,s*px,.57+i*.31,pz,i*.12);X('inn',.8,.2,.8,C.gold,s*px,.5,pz);X('inn',.7,.16,.7,C.gold,s*px,5.0,pz);bx(B.glow,.5,.5,.5,C.goldL,s*px,5.3,pz,.785,.6,0);solidC(s*px,pz,.45)});
+  for(let i=0;i<=20;i++){const f=i/20,x=lerp(-px,px,f),y=4.9-Math.sin(f*Math.PI)*.75+Math.sin(f*Math.PI*4)**2*-.12;X('inn',.62,.36,.44,i%2?C.green:C.greenD,x,y,pz+.1);if(i%2==0)bx(B.glow,.18,.24,.18,[C.redL,C.goldL,'#4aa3ff','#7fe3a0'][(i/2)%4],x,y-.3,pz+.3)}
+  X('inn',.6,.6,.2,C.red,0,4.25,pz+.3);X('inn',.5,.3,.14,C.red,-.45,4.3,pz+.3,0,0,.4);X('inn',.5,.3,.14,C.red,.45,4.3,pz+.3,0,0,-.4);X('inn',.2,.5,.12,C.redD,-.18,3.85,pz+.32,0,0,.2);X('inn',.2,.5,.12,C.redD,.18,3.85,pz+.32,0,0,-.2);
+  /* presents stacked inside the arch, either side of Santa */
+  [[-3.4,-8.1],[3.4,-8.1]].forEach(([x,z],k)=>{[[0,0,1.0,k?C.green:C.red,C.goldL],[.15,1.0,.7,k?'#3f6fd6':C.gold,C.white],[-.05,1.7,.45,k?C.redL:'#a63fb0',C.goldL]].forEach(([dx,y,s2,c,rb],i)=>{X('inn',s2,s2,s2,c,x+dx,.41+y+s2/2,z,(i+k)*.35);X('inn',s2+.02,s2+.02,.14,rb,x+dx,.41+y+s2/2,z,(i+k)*.35);X('inn',.14,s2+.02,s2+.02,rb,x+dx,.41+y+s2/2,z,(i+k)*.35)});solidC(x,z,.6)})}
+ /* the elves' workbench along the east wall: tools, paint pots, a toy soldier, a half-painted rocking horse, a lamp */
+ {const bxx=10.7,bz=-.9,L=6.0;X('inn',1.6,.18,L,C.pine,bxx,1.45,bz);X('inn',1.5,.1,L-.2,C.pineD,bxx,.75,bz);[[-.65,-L/2+.2],[.65,-L/2+.2],[-.65,L/2-.2],[.65,L/2-.2]].forEach(([a,b])=>X('inn',.18,1.1,.18,C.wain,bxx+a,.95,bz+b));
+  X('inn',.5,.24,.4,C.iron,bxx-.2,1.66,bz-2.5);X('inn',.12,.34,.12,C.iron,bxx-.2,1.86,bz-2.5);
+  [[C.redL,-1.8],['#4aa3ff',-1.45],[C.goldL,-1.1],[C.greenL,-.75]].forEach(([c,z])=>{X('inn',.26,.3,.26,'#d9d9d9',bxx+.3,1.7,bz+z);X('inn',.22,.06,.22,c,bxx+.3,1.86,bz+z)});X('inn',.06,.5,.06,C.wain,bxx+.3,1.95,bz-1.45,0,0,.3);
+  /* toy soldier */
+  {const sx=bxx-.3,sz=bz+.2;X('inn',.24,.18,.18,C.navy,sx,1.63,sz);X('inn',.26,.3,.2,C.red,sx,1.87,sz);X('inn',.2,.2,.18,'#f0b48a',sx,2.12,sz);X('inn',.22,.3,.2,C.iron,sx,2.36,sz);X('inn',.06,.06,.06,C.goldL,sx,2.0,sz+.11)}
+  /* rocking horse, half painted */
+  {const hx=bxx-.1,hz=bz+1.6;X('inn',.2,.1,1.3,C.redD,hx,1.6,hz);X('inn',.34,.4,.9,C.white,hx,2.0,hz);X('inn',.34,.4,.4,C.cream,hx,2.0,hz+.25);X('inn',.3,.5,.3,C.white,hx,2.4,hz+.55);X('inn',.28,.26,.4,C.white,hx,2.6,hz+.75);X('inn',.12,.5,.12,C.red,hx,2.5,hz+.35);X('inn',.1,.4,.1,C.logD,hx,2.0,hz-.5);[[-.1,-.3],[-.1,.3]].forEach(([a,b])=>X('inn',.1,.3,.1,C.logD,hx+a,1.75,hz+b))}
+  /* a lamp with a warm glow, a wooden mallet, scattered blocks */
+  X('inn',.3,.06,.3,C.iron,bxx+.4,1.57,bz+2.5);X('inn',.06,.7,.06,C.iron,bxx+.4,1.9,bz+2.5);X('inn',.4,.24,.4,C.green,bxx+.25,2.25,bz+2.5);bx(B.glow,.24,.1,.24,'#ffe3a0',bxx+.25,2.12,bz+2.5);
+  X('inn',.5,.16,.16,C.logD,bxx-.4,1.62,bz-.9,.4);X('inn',.06,.06,.5,C.wain,bxx-.25,1.6,bz-1.1,.4);
+  [[C.red,-.3,.9],['#4aa3ff',.0,1.05],[C.goldL,-.15,1.15]].forEach(([c,a,y],i)=>X('inn',.22,.22,.22,c,bxx+a,1.65+i*.0+(i==2?.22:0),bz+.9+i*.18,i*.4));
+  /* a stool in front of it */
+  X('inn',.8,.14,.8,C.red,bxx-1.7,1.0,bz+.5);X('inn',.12,.6,.12,C.wain,bxx-1.95,.65,bz+.25);X('inn',.12,.6,.12,C.wain,bxx-1.45,.65,bz+.25);X('inn',.12,.6,.12,C.wain,bxx-1.95,.65,bz+.75);X('inn',.12,.6,.12,C.wain,bxx-1.45,.65,bz+.75);
+  solid(bxx-.85,bz-L/2,bxx+.9,bz+L/2);solidC(bxx-1.7,bz+.5,.45)}
+ /* the Naughty or Nice list: a lectern with a long scroll that unrolls across the floor */
+ {const lx=6.4,lz=-4.6;X('inn',.9,.16,.7,C.wain,lx,.5,lz);X('inn',.24,1.4,.24,C.wain,lx,1.25,lz);X('inn',1.2,.12,.9,C.pineD,lx,2.0,lz,0,-.35);X('inn',1.1,.06,.8,C.cream,lx,2.08,lz,0,-.35);
+  for(let i=0;i<5;i++)X('inn',.7,.03,.06,i==0?C.redD:'#6b5a48',lx,2.13,lz-.25+i*.12,0,-.35);
+  X('inn',.9,.04,.3,C.cream,lx,1.7,lz+.5,0,.9);X('inn',.9,.04,2.6,C.cream,lx,.43,lz+1.75);X('inn',.95,.18,.18,'#e8dcc0',lx,.5,lz+3.1);for(let i=0;i<9;i++){X('inn',.5+((i*3)%4)*.06,.02,.05,'#6b5a48',lx-.08,.46,lz+.7+i*.24);X('inn',.08,.02,.08,i%3?C.green:C.redL,lx+.32,.46,lz+.7+i*.24)}
+  solidC(lx,lz,.5)}
+ /* Santa's sack, bulging with toys, and a pile of presents in the south-east corner */
+ {const sx=9.6,sz=6.6;X('inn',2.0,1.2,1.8,'#a87a3c',sx,1.0,sz);X('inn',1.8,.7,1.6,'#a87a3c',sx,1.9,sz);X('inn',1.3,.4,1.2,'#956a32',sx,2.4,sz);X('inn',1.7,.14,1.5,C.red,sx,2.2,sz);for(let i=0;i<5;i++)X('inn',.22,.6,.22,'#956a32',sx-.8+i*.4,1.0,sz+.92);
+  X('inn',.5,.5,.4,'#b5733a',sx-.2,2.8,sz);X('inn',.18,.18,.1,'#b5733a',sx-.38,3.1,sz);X('inn',.18,.18,.1,'#b5733a',sx-.02,3.1,sz);X('inn',.08,.08,.04,'#1d1d22',sx-.28,2.85,sz+.22);X('inn',.08,.08,.04,'#1d1d22',sx-.12,2.85,sz+.22);
+  X('inn',.6,.4,.6,C.redL,sx+.4,2.75,sz-.1,.4);X('inn',.62,.06,.62,C.white,sx+.4,2.95,sz-.1,.4);for(let i=0;i<4;i++)X('inn',.12,.6,.12,i%2?C.white:C.red,sx-.6,2.7+i*.0,sz+.3,0,0,.4);
+  [[-1.9,.3,.9,C.green],[-1.6,1.1,.7,C.gold],[1.5,.5,.8,'#3f6fd6'],[1.2,-1.2,.7,C.red],[-1.3,-1.0,.6,'#a63fb0']].forEach(([a,b,s2,c],i)=>{X('inn',s2,s2,s2,c,sx+a,.41+s2/2,sz+b,i*.5);X('inn',s2+.02,s2+.02,.14,C.white,sx+a,.41+s2/2,sz+b,i*.5);X('inn',.34,.24,.34,C.goldL,sx+a,.41+s2+.1,sz+b,i*.5)});
+  solid(sx-2.5,sz-1.8,sx+2.2,sz+1.6)}
+ /* coat rack by the door with Santa's spare coat and hat, and a pair of boots */
+ {const cx=-4.0,cz=7.6;X('inn',.8,.12,.8,C.wain,cx,.47,cz);X('inn',.16,3.6,.16,C.wain,cx,2.2,cz);X('inn',1.0,.1,.1,C.wain,cx,3.8,cz,0,0,0);X('inn',.1,.1,1.0,C.wain,cx,3.8,cz);
+  X('inn',.9,1.6,.5,C.red,cx+.3,2.8,cz);X('inn',.95,.18,.55,C.white,cx+.3,2.05,cz);X('inn',.2,1.5,.08,C.white,cx+.3,2.8,cz+.27);X('inn',.95,.14,.55,'#1d1d22',cx+.3,2.5,cz);
+  X('inn',.6,.18,.6,C.white,cx-.35,3.95,cz);X('inn',.5,.4,.5,C.red,cx-.35,4.2,cz-.05);X('inn',.22,.22,.22,C.white,cx-.15,4.4,cz-.3);
+  X('inn',.3,.4,.5,'#1d1d22',cx+1.0,.6,cz+.2);X('inn',.3,.4,.5,'#1d1d22',cx+1.4,.6,cz+.2);X('inn',.34,.1,.54,C.white,cx+1.0,.82,cz+.2);X('inn',.34,.1,.54,C.white,cx+1.4,.82,cz+.2);
+  solidC(cx,cz,.45)}
+ /* a basket of firewood beside the fireplace */
+ {const fx=-10.6,fz=2.4;X('inn',1.2,.6,1.0,'#8d6330',fx,.7,fz);X('inn',1.25,.1,1.05,'#6e4a22',fx,1.0,fz);for(let i=0;i<5;i++)X('inn',.24,.24,1.1,LOGS[i%3],fx-.42+i*.21,1.12+(i%2)*.12,fz,0,0,0);solidC(fx,fz,.6)}
+ /* the toy train's track: an oval of ties and rails on the floor (the train runs round it, see stepTrain) */
+ for(let i=0;i<44;i++){const a=i/44*Math.PI*2,x=TRK.x+Math.cos(a)*TRK.rx,z=TRK.z+Math.sin(a)*TRK.rz,tx=-Math.sin(a)*TRK.rx,tz=Math.cos(a)*TRK.rz,tl=Math.hypot(tx,tz),nx=tz/tl,nz=-tx/tl;
+  X('inn',.72,.04,.16,C.logD,x,.42,z,Math.atan2(-nz,nx));[-1,1].forEach(s=>X('inn',.5,.05,.06,C.iron,x+nx*.22*s,.45,z+nz*.22*s,Math.atan2(-tz,tx)))}
  /* garland swags and warm bulbs along the north wall, round the window, across the fireplace wall */
  for(let i=0;i<=24;i++){const x=-HW+1+i*(HW*2-2)/24,y=WH-.5-Math.sin(i/24*Math.PI*4)**2*.45;X('inn',1.0,.26,.34,i%2?C.green:C.greenD,x,y,-HD+.36);if(i%3==0)X('inn',.22,.22,.22,C.redL,x,y-.1,-HD+.55)}
  /* progress baubles: five big ornaments hang over Santa and light up one per feeding (gold) */
@@ -287,10 +330,6 @@ const flat=(tex,w,h,x,y,z,ry,extra)=>{const m=new THREE.Mesh(new THREE.PlaneGeom
  const sign=canvasTex(6,1,(c,w,h)=>{c.fillStyle='#6b3b1f';c.fillRect(0,0,w,h);c.fillStyle='#8a5530';for(let i=0;i<8;i++)c.fillRect(0,i*h/8,w,2);c.strokeStyle='#f1e6c8';c.lineWidth=6;c.strokeRect(5,5,w-10,h-10);
   c.fillStyle='#000a';c.font='bold '+Math.round(h*.46)+'px '+FONT;c.textAlign='center';c.textBaseline='middle';c.fillText("SANTA'S LODGE",w/2+3,h*.53+3);c.fillStyle='#f6f8fb';c.fillText("SANTA'S LODGE",w/2,h*.53);c.fillStyle='#e04b3c';c.fillRect(w*.1,h*.82,w*.8,3);c.fillStyle='#46d17a';c.fillRect(w*.1,h*.12,w*.8,3)},60);
  cutG.add(flat(sign,6,1,0,4.5,HD+.51,0));
- /* the sign at the bottom of the path */
- const sg2=canvasTex(8,1.5,(c,w,h)=>{c.fillStyle='#5b3418';c.fillRect(0,0,w,h);c.strokeStyle='#e6b422';c.lineWidth=6;c.strokeRect(6,6,w-12,h-12);c.fillStyle='#f6f8fb';c.font='bold '+Math.round(h*.34)+'px '+FONT;c.textAlign='center';c.textBaseline='middle';c.fillText("SANTA'S LODGE",w/2,h*.38);c.fillStyle='#ffd75e';c.font=Math.round(h*.2)+'px '+FONT;c.fillText('Feed Santa: bring cookies & candy canes',w/2,h*.72)},50);
- stat.add(flat(sg2,8,1.5,0,2.1,HD+14.36,0));
- /* the sign is two-sided so it reads from the meadow side too */
 }
 
 /* ---------- flush the batches into meshes ---------- */
@@ -322,20 +361,22 @@ function stepParts(dt){for(let i=PARTS.length-1;i>=0;i--){const p=PARTS[i];p.age
   p.m.rotation.x+=p.spin*dt;p.m.rotation.y+=p.spin*dt*.7;p.m.scale.setScalar(p.sz*(k<p.fade?1:1-(k-p.fade)/(1-p.fade)))}}
 
 /* ---------- sound: everything is synthesised with the game's own audio helpers ---------- */
+/* real recordings and a modelled voice live in dev-lodge-sfx-v1.js; each cue below falls back to the old synth if that file is missing */
+const LS=(n,...a)=>{try{return !!(window.FW_LSFX&&window.FW_LSFX.cue(n,...a))}catch(e){return false}};
 const AUD=()=>{try{ac();return AC&&AC.state!='closed'}catch(e){return false}};
 function voice(f,d,v,o){/* a soft vowel-ish blip: saw through a low-pass, for Santa's speech */
  if(typeof FX=='undefined'||!FX||!AUD())return;o=o||{};try{const t=AC.currentTime,s=AC.createOscillator(),g=AC.createGain(),l=AC.createBiquadFilter();s.type=o.ty||'sawtooth';s.frequency.setValueAtTime(f*(o.bend||1),t);s.frequency.exponentialRampToValueAtTime(f,t+d*.4);l.type='lowpass';l.frequency.value=o.lp||520;l.Q.value=2;
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*FX,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(l);l.connect(g);g.connect(MG);s.start(t);s.stop(t+d+.03)}catch(e){}}
 const hoho=n=>{for(let i=0;i<n;i++)voice(150+i*0,.28,.16,{bend:1.5,lp:480,ty:'sawtooth'}),0};
-function laugh(n){n=n||3;for(let i=0;i<n;i++)after(i*.34,()=>{voice(135,.26,.2,{bend:1.55,lp:470});voice(270,.2,.07,{ty:'triangle',bend:1.4,lp:700});bellyBounce(.05+(i==n-1?.03:0))})}
-function burpSound(big){if(typeof FX=='undefined'||!FX||!AUD())return;try{const t=AC.currentTime,d=big?1.35:.5,o=AC.createOscillator(),o2=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain(),g=AC.createGain(),l=AC.createBiquadFilter();
+function laugh(n){n=n||3;for(let i=0;i<n;i++)after(i*.34,()=>{if(!LS('ho1',i)){voice(135,.26,.2,{bend:1.55,lp:470});voice(270,.2,.07,{ty:'triangle',bend:1.4,lp:700})}bellyBounce(.05+(i==n-1?.03:0))})}
+function burpSound(big){if(LS('burp',big))return;if(typeof FX=='undefined'||!FX||!AUD())return;try{const t=AC.currentTime,d=big?1.35:.5,o=AC.createOscillator(),o2=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain(),g=AC.createGain(),l=AC.createBiquadFilter();
   o.type='sawtooth';o2.type='square';o.frequency.setValueAtTime(big?120:150,t);o.frequency.exponentialRampToValueAtTime(big?46:70,t+d);o2.frequency.setValueAtTime((big?120:150)*.5,t);o2.frequency.exponentialRampToValueAtTime(big?23:35,t+d);
   lfo.frequency.value=big?26:34;lg.gain.value=big?34:24;lfo.connect(lg);lg.connect(o.frequency);l.type='lowpass';l.frequency.setValueAtTime(big?900:700,t);l.frequency.exponentialRampToValueAtTime(180,t+d);l.Q.value=5;
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(FX*(big?.55:.3),t+.06);g.gain.setValueAtTime(FX*(big?.5:.28),t+d*.55);g.gain.exponentialRampToValueAtTime(.0001,t+d);
   o.connect(l);o2.connect(l);l.connect(g);g.connect(MG);[o,o2,lfo].forEach(x=>{x.start(t);x.stop(t+d+.05)})}catch(e){}
  if(big)safe(()=>sdNz(.6,300,.35,{q:1.2,f2:90}),'bn')}
-function rumble(d,v,f){safe(()=>sdNz(d,f||110,v||.3,{q:3,f2:(f||110)*.7,sw:.8}),'rum');safe(()=>sdHit(48,d*.8,v*.5,[[1,1,1],[2,.3,.5]],{jit:0}),'rum2')}
-const crunch=()=>{safe(()=>{sdNz(.07,2600,.3,{q:2,f2:900});sdHit(180,.1,.18,[[1,1,1],[2.6,.3,.5]],{bend:.3})},'cr')};
+function rumble(d,v,f){if(LS('rumble',d,v))return;safe(()=>sdNz(d,f||110,v||.3,{q:3,f2:(f||110)*.7,sw:.8}),'rum');safe(()=>sdHit(48,d*.8,v*.5,[[1,1,1],[2,.3,.5]],{jit:0}),'rum2')}
+const crunch=()=>{if(!LS('crunch'))safe(()=>{sdNz(.07,2600,.3,{q:2,f2:900});sdHit(180,.1,.18,[[1,1,1],[2.6,.3,.5]],{bend:.3})},'cr')};
 const boing=(k)=>safe(()=>sdHit(160+(k||0)*30,.5,.22,[[1,1,1],[2,.3,.5]],{bend:.9,rev:.15}),'bo');
 const chimeUp=()=>{[0,1,2,3].forEach(i=>safe(()=>sdHit([523,659,784,1047][i],.6,.12,[[1,1,1],[2,.16,.45],[5.4,.05,.18]],{del:i*.08,rev:.25,jit:0}),'ch'))};
 const sparkSnd=()=>safe(()=>sdHit(1568+Math.random()*400,.25,.07,[[1,1,1],[2,.16,.45]],{jit:0,rev:.2}),'sp');
@@ -352,7 +393,7 @@ function part(par,w,h,d,c,x,y,z,o){const m=new THREE.Mesh(GBX,lm(c));m.scale.set
 const grp=(par,x,y,z)=>{const g=new THREE.Group();g.position.set(x||0,y||0,z||0);par.add(g);return g};
 const SK='#f3bd95',SKD='#dc9a72',FUR='#f8fafc',FURD='#dfe6ee',REDC='#cc2a22',REDD='#a01f19',REDL='#d6352c',BLK='#1d1d22',GLD='#e6b422';
 /* Santa's feet stand on the top of the rug under him; every pose keeps them there (the body pivots at the soles) */
-const FLOOR_S=.485,HATY=.7;
+const FLOOR_S=.48,HATY=.7;
 /* Santa: a chunky block figure in the game's style. Every moving piece hangs from its own pivot:
    body (squash and stretch at the soles) > belly (swells from its bottom) / chest / arms (shoulders) / head (neck) > jaw (beard) / hat > hat tip */
 const SANTA=(()=>{
@@ -393,10 +434,14 @@ const SANTA=(()=>{
  /* upper beard round the cheeks (fixed) */
  part(head,.86,.24,.58,FUR,0,.1,.07);part(head,.14,.34,.5,FUR,-.42,.16,.06);part(head,.14,.34,.5,FUR,.42,.16,.06);
  /* the lower beard is the jaw: it drops open when he eats and burps, and it rides forward on a growing belly */
+ /* the jaw is only the chin (it swings open); the long beard hangs from its own pivot and just drops a little, so talking never
+    swings the whole beard into his belly. Widths differ from the upper beard so no two faces sit in the same plane (no flicker). */
  const jaw=A.jaw=grp(head,0,.06,.16);
- /* it flows forward over the chest and rests on the belly */
- part(jaw,.86,.3,.5,FUR,0,-.12,.1);part(jaw,.8,.28,.64,FUR,0,-.38,.3);part(jaw,.66,.26,.52,FUR,0,-.6,.5);part(jaw,.48,.22,.38,FUR,0,-.8,.62);part(jaw,.28,.16,.24,FUR,0,-.95,.68);
- part(jaw,.3,.06,.04,FURD,-.14,-.36,.63);part(jaw,.24,.06,.04,FURD,.12,-.58,.77);part(jaw,.16,.05,.04,FURD,-.06,-.78,.82);part(jaw,.22,.05,.1,'#e06a78',0,-.0,.3);
+ part(jaw,.82,.3,.5,FUR,0,-.12,.1);part(jaw,.22,.05,.1,'#e06a78',0,-.0,.3);
+ /* the beard flows forward over the chest and rests on the belly */
+ const brd=A.beard=grp(head,0,.06,.16);
+ part(brd,.78,.28,.64,FUR,0,-.38,.3);part(brd,.66,.26,.52,FUR,0,-.6,.5);part(brd,.48,.22,.38,FUR,0,-.8,.62);part(brd,.28,.16,.24,FUR,0,-.95,.68);
+ part(brd,.3,.06,.04,FURD,-.14,-.36,.63);part(brd,.24,.06,.04,FURD,.12,-.58,.77);part(brd,.16,.05,.04,FURD,-.06,-.78,.82);
  /* hat: fur brim, a red cone that flops back and to the side, a pom-pom on a wobbly tip */
  const hat=A.hat=grp(head,0,HATY,0);part(hat,.92,.22,.86,FUR,0,0,0);part(hat,.74,.26,.68,REDC,0,.22,-.02);part(hat,.62,.24,.56,REDC,0,.44,-.07);part(hat,.5,.22,.46,REDD,0,.63,-.13);
  const tip=A.tip=grp(hat,.02,.72,-.18);part(tip,.4,.2,.36,REDD,.04,.04,-.06);part(tip,.32,.18,.3,REDD,.12,.08,-.24);part(tip,.26,.18,.24,REDD,.2,.04,-.4);A.pom=part(tip,.3,.3,.3,FUR,.28,-.1,-.54);
@@ -414,10 +459,10 @@ function applySanta(){const A=SANTA,k=A.g*SB,b=A.bw;
  const sq=clamp(A.sq,-.5,.5);A.body.scale.set(1+sq*.14,1-sq*.16,1+sq*.14);A.body.rotation.x=A.lean;
  A.belly.scale.set(b*(1+A.breath*.015),1+(b-1)*.5+A.breath*.02,b*.96);
  /* a big belly pushes the chest and head up a little and the beard forward */
- const lift=(b-1)*.3;A.chest.position.y=1.62+lift;A.head.position.y=1.86+lift;A.head.position.z=.04+(b-1)*.14;A.jaw.position.z=.16+(b-1)*.6;
+ const lift=(b-1)*.3;A.chest.position.y=1.62+lift;A.head.position.y=1.86+lift;A.head.position.z=.04+(b-1)*.14;A.jaw.position.z=A.beard.position.z=.16+(b-1)*.6;
  A.arm.forEach((a,i)=>{const s=i?1:-1;a.position.x=s*(.7+(b-1)*.66);a.position.y=1.78+lift;
   a.rotation.x=A.armOv?A.armOv[i]:A.swing[i];a.rotation.z=s*(.06+(b-1)*.42)+(A.armZ?A.armZ[i]:0)});
- A.jaw.rotation.x=A.open*.6;A.mouth.scale.set(.28+A.open*.14,.06+A.open*.4,.05);A.mouth.position.y=.11-A.open*.13;A.tongue.visible=A.open>.3;A.tongue.position.y=.03-A.open*.12;A.tongue.scale.set(.2,.04+A.open*.08,.05);
+ const op=clamp(A.open,0,1.2);A.jaw.rotation.x=op*.5;A.jaw.position.y=.06-op*.05;A.beard.rotation.x=op*.1;A.beard.position.y=.06-op*.09;A.mouth.scale.set(.28+A.open*.14,.06+A.open*.4,.05);A.mouth.position.y=.11-A.open*.13;A.tongue.visible=A.open>.3;A.tongue.position.y=.03-A.open*.12;A.tongue.scale.set(.2,.04+A.open*.08,.05);
  A.head.rotation.x=A.tilt;A.head.rotation.y=A.look;A.head.rotation.z=A.sway;A.head.scale.setScalar(1+A.cheek*.1);
  A.cheekM.forEach(c=>c.scale.set(.16+A.cheek*.08,.1+A.cheek*.06,.03));
  A.hat.rotation.x=A.hatLift;A.tip.rotation.x=-A.hatLift*1.6;
@@ -440,7 +485,9 @@ function setStage(i,dur){/* grow: a quick crouch, then he stretches up into the 
 function santaIdle(dt){const A=SANTA,t=CLOCK;if(A.busy)return;
  A.nextBlink-=dt;if(A.nextBlink<0){A.nextBlink=2+Math.random()*3;tween(.16,k=>{A.blink=Math.sin(k*Math.PI);applySanta()},()=>{A.blink=0})}
  const dx=P.x-(LX+SNX),dz=P.z-(LZ+SNZ),near=Math.hypot(dx,dz)<12&&inside(P.x,P.z);const want=near?clamp(Math.atan2(dx,dz),-.75,.75):0;A.look+=(want-A.look)*Math.min(1,dt*4);
- A.tilt=Math.sin(t*.7)*.025;A.sway=Math.sin(t*.5)*.02;A.breath=Math.sin(t*1.6);A.swing=[Math.sin(t*1.3)*.05,Math.sin(t*1.3+2)*.05];A.tip.rotation.z=Math.sin(t*1.1)*.08;applySanta()}
+ A.tilt=Math.sin(t*.7)*.025;A.sway=Math.sin(t*.5)*.02;A.breath=Math.sin(t*1.6);A.swing=[Math.sin(t*1.3)*.05,Math.sin(t*1.3+2)*.05];A.tip.rotation.z=Math.sin(t*1.1)*.08;
+ /* the talking jaw eases toward its target every frame, so lines read as speech and not as a flicker */
+ A.open+=((A.talk||0)-A.open)*Math.min(1,dt*16);applySanta()}
 
 /* ---------- collectible models: a chocolate-chip cookie and a candy cane, in the game's block style ---------- */
 function bakeMesh(fn,mat){const b=mkB();fn(b);return flush(b,mat||lam())}
@@ -548,7 +595,7 @@ function stepPlace(dt){const d=lodgeDist();if(d>85){if(FIRE.intensity)FIRE.inten
  inK+=((here?1:0)-inK)*(1-Math.exp(-dt*(here?5:7)));if(Math.abs(inK-(here?1:0))<.003)inK=here?1:0;
  const ro=1-sm(.05,.8,inK);roofMat.opacity=ro;roofG.visible=ro>.02;roofG.position.y=sm(0,1,inK)*1.2;BULBM.forEach(b=>b.opacity=ro);
  cutG.scale.y=lerp(1,.2,sm(.1,.95,inK));cutG.visible=true;
- if(here&&!wasIn){if(!GREETED||CLOCK-GREETED>90){GREETED=CLOCK;greet()}safe(()=>sdHit(1047,.9,.1,[[1,1,1],[2.7,.25,.4],[5.1,.1,.2]],{rev:.4,jit:0}),'bell');safe(()=>sdHit(1319,.8,.08,[[1,1,1],[2.7,.25,.4]],{del:.12,rev:.4,jit:0}),'bell2')}
+ if(here&&!wasIn){safe(()=>window.FW_LSFX&&window.FW_LSFX.preload(),'pre');if(!GREETED||CLOCK-GREETED>90){GREETED=CLOCK;greet()}safe(()=>sdHit(1047,.9,.1,[[1,1,1],[2.7,.25,.4],[5.1,.1,.2]],{rev:.4,jit:0}),'bell');safe(()=>sdHit(1319,.8,.08,[[1,1,1],[2.7,.25,.4]],{del:.12,rev:.4,jit:0}),'bell2')}
  wasIn=here;
  /* firelight: warm, flickers; stronger at night and when you are inside */
  const fl=.85+Math.sin(CLOCK*11)*.08+Math.sin(CLOCK*23+1)*.07,nk=nightF();FIRE.intensity=(.3+nk*.9)*fl*(.35+inK*.65)*(d<60?1:0);
@@ -575,18 +622,30 @@ INT.push({x:LX+PRES_AT[0],z:LZ+PRES_AT[1],get r(){return mode_()=='play'&&PRES.o
 /* the main tick, run once per frame just before the main camera draws */
 let lastT=performance.now();
 const r0=renderer.render.bind(renderer);
-renderer.render=function(sc,c){if(c===cam){const n=performance.now(),dt=Math.min(.06,(n-lastT)/1000);lastT=n;if(!(typeof PAUSED!='undefined'&&PAUSED)){try{tick(dt)}catch(e){soft(e,'tick')}}}return r0(sc,c)};
+renderer.render=function(sc,c){if(c===cam){const n=performance.now(),dt=Math.min(.06,(n-lastT)/1000);lastT=n;if(!(typeof PAUSED!='undefined'&&PAUSED)){try{tick(dt)}catch(e){soft(e,'tick')}}if(CUT.live)return filmRender(sc)}return r0(sc,c)};
+/* ---------- the toy train: an engine and two little wagons chuffing round the oval track ---------- */
+const TRAIN=(()=>{const cars=[];const mk=(i)=>{const g=grp(dynG,0,0,0);
+  if(i==0){part(g,.5,.12,.9,'#1d1d22',0,.53,0);part(g,.4,.34,.5,REDC,0,.76,.12);part(g,.34,.34,.34,'#2e2e36',0,.76,.12);part(g,.36,.36,.4,'#2e2e36',0,.78,.18);part(g,.44,.48,.38,REDC,0,.84,-.24);part(g,.5,.08,.46,'#1d1d22',0,1.1,-.24);
+   part(g,.12,.24,.12,'#1d1d22',0,1.06,.3);part(g,.18,.06,.18,'#1d1d22',0,1.2,.3);part(g,.38,.06,.06,GLD,0,.62,.47);part(g,.2,.16,.04,'#ffe3a0',0,.8,.4);part(g,.06,.12,.06,GLD,0,1.0,.06)}
+  else{part(g,.48,.1,.74,'#1d1d22',0,.53,0);part(g,.46,.26,.7,i==1?'#2e8b4e':'#3f6fd6',0,.71,0);part(g,.5,.06,.74,GLD,0,.86,0);
+   part(g,.26,.24,.26,i==1?REDC:GLD,-.06,.98,-.12);part(g,.28,.04,.06,'#f6f8fb',-.06,.98,-.12);part(g,.2,.2,.2,i==1?GLD:REDC,.08,.96,.18)}
+  [-1,1].forEach(s=>[-.25,.25].forEach(z=>part(g,.06,.16,.16,'#1d1d22',s*.26,.5,z)));return g};
+ for(let i=0;i<3;i++)cars.push(mk(i));return{cars,a:0,puff:0}})();
+function stepTrain(dt){const T=TRAIN;T.a=(T.a+dt*.32)%(Math.PI*2);
+ T.cars.forEach((g,i)=>{const a=T.a-i*.36,x=TRK.x+Math.cos(a)*TRK.rx,z=TRK.z+Math.sin(a)*TRK.rz,tx=-Math.sin(a)*TRK.rx,tz=Math.cos(a)*TRK.rz;
+  g.position.set(x,Math.abs(Math.sin(CLOCK*14+i))*.012,z);g.rotation.y=Math.atan2(tx,tz)});
+ T.puff-=dt;if(T.puff<0&&inK>.5){T.puff=.5;const g=T.cars[0],v=new THREE.Vector3(0,1.25,.3).applyMatrix4(g.matrixWorld);root.worldToLocal(v);emit(v.x,v.y,v.z,1,{colors:['#ffffff','#e8edf2'],speed:.2,up:.7,grav:-.4,life:1.3,size:.16,fade:.3,floor:-9,spread:.05})}}
 /* the floor is solid: inside the lodge, on the porch and on the steps you walk on top of the boards and rugs, not through them.
    23-v18 sets SY (the player's height) to 0 every tick; this runs after it and lifts you to the surface under your feet, easing over each step. */
 function floorAt(wx,wz){const x=wx-LX,z=wz-LZ,ax=Math.abs(x);
  if(ax<HW&&z>-HD&&z<HD+.45){if(z>HD-.45)return ax<1.8?.4:0;
-  if(ax<2.7&&z>-5.8&&z<-2)return .48;if(ax<4.2&&z>-6.6&&z<-1.2)return .465;if(ax<5.55&&z>-7.85&&z<.05)return .45;
-  if(ax<1.95&&z>1.05&&z<7.95)return .46;return .41}
+  const rr=Math.hypot(x,z+3.4);if(rr<2.5)return .475;if(rr<3.85)return .47;if(rr<4.2)return .45;if(rr<4.5)return .43;
+  if(ax<1.3&&z>1.2&&z<8.6)return .445;if(Math.hypot(x+7.6,z+1.5)<1.7)return .47;return .41}
  if(ax<4.5&&z>=HD+.45&&z<HD+4.75)return .3;if(ax<1.6&&z>=HD+4.75&&z<HD+5.7)return .21;if(ax<1.8&&z>=HD+5.7&&z<HD+6.6)return .15;return 0}
 let FLY=0;
 {const w0=worldTick;worldTick=function(dt){const r=w0.apply(this,arguments);try{if(!away()&&!(P.sit)&&lodgeDist()<30){const h=floorAt(P.x,P.z);FLY+=(h-FLY)*Math.min(1,(dt||.016)*18);if(Math.abs(FLY-h)<.004)FLY=h;if(FLY>0||h>0)SY=FLY}else FLY=0}catch(e){soft(e,'floor')}return r}}
 let hudT=0;
-function tick(dt){if(!away()){stepAnims(dt);const near=stepPlace(dt);stepSpots(dt);stepParts(dt);if(near){santaIdle(dt);stepPresent(dt);stepBubble(dt);camFx(dt)}}hudT-=dt;if(hudT<0){hudT=.3;hudSync();if(mode_()!='play'&&hud.style.display!='none')hud.style.display='none'}}
+function tick(dt){if(!away()){TSC+=(CUT.ts-TSC)*Math.min(1,dt*12);const ds=dt*TSC;stepAnims(ds);const near=stepPlace(dt);stepSpots(dt);stepParts(ds);if(near){santaIdle(ds);stepPresent(ds);stepTrain(dt);stepBubble(dt);camFx(dt)}}hudT-=dt;if(hudT<0){hudT=.3;hudSync();if(mode_()!='play'&&hud.style.display!='none')hud.style.display='none'}}
 
 /* =====================================================================================================================
    SANTA TALKS, YOU FEED HIM, HE GROWS, HE BURPS, A PRESENT FLIES OUT
@@ -594,14 +653,83 @@ function tick(dt){if(!away()){stepAnims(dt);const near=stepPlace(dt);stepSpots(d
 const CINE={view:0,ox:0,oz:0,tx:0,tz:0};/* camera help: a zoom and a nudge toward Santa during the show */
 let SHK=0;const shake=a=>{SHK=Math.max(SHK,a)};
 function camFx(dt){const k=1-Math.exp(-dt*4);CINE.ox+=(CINE.tx-CINE.ox)*k;CINE.oz+=(CINE.tz-CINE.oz)*k;
+ if(CUT.on)return cutCam(dt);
  if(Math.abs(CINE.ox)<.002&&Math.abs(CINE.oz)<.002&&SHK<.002)return;
  SHK*=Math.pow(.03,dt);const sx=(Math.random()-.5)*SHK,sy=(Math.random()-.5)*SHK;
  cam.position.x+=CINE.ox;cam.position.z+=CINE.oz;cam.lookAt(camT.x+CINE.ox,.8,camT.z+CINE.oz);cam.translateX(sx);cam.translateY(sy)}
 
+/* ---------- THE BURP CUTSCENE: the camera leaves the player and films it. Letterbox bars, a push-in on the inhale, a dolly zoom as he
+   swells, an extreme close-up while he holds his breath (in slow motion), a low wide shot for the BURP with the present flying at the lens
+   (slow motion again), then the camera follows the present to the rug and hands back to the player. Shots are in lodge space and aim at
+   his head and mouth read from the model, so they frame him at any size. Time runs on the scene clock, so slow motion slows the shots too. */
+let TSC=1;
+const CUT={on:0,w:0,t:0,ts:1,hide:0,done:0,live:0};
+/* the game camera is orthographic, so the film is shot on its own perspective camera; the bars slide in, then it cuts over */
+const PCAM=new THREE.PerspectiveCamera(50,1,.1,240);
+const V3=(x,y,z)=>new THREE.Vector3(x,y,z),CQ=new THREE.Quaternion(),CP=new THREE.Vector3(),CO=new THREE.Object3D();
+const bars=document.createElement('div');bars.id='lodgecut';bars.innerHTML='<i></i><b></b><s></s><em></em><q></q><u></u>';document.body.appendChild(bars);
+/* film lighting, used only for the film frames (filmRender sets it, then puts the game's lights back): the room dims, a warm key light
+   picks Santa out, a red light behind him throbs with his heartbeat, and his face goes red while he holds his breath */
+const KEY=new THREE.SpotLight(0xffe0b0,0,34,.42,.7,1.1);KEY.position.set(LX+SNX+2.6,8.2,LZ+SNZ+6.5);KEY.target.position.set(LX+SNX,2.2,LZ+SNZ);scene.add(KEY,KEY.target);
+const RIM=new THREE.PointLight(0xff3a22,0,14,1.6);RIM.position.set(LX+SNX,3.4,LZ+SNZ-2.2);scene.add(RIM);
+const FACE=[SK,SKD].map(c=>({m:lm(c),c0:new THREE.Color(c)})),HOT=new THREE.Color('#e2463a');
+function faceHeat(h){FACE.forEach(f=>f.m.color.copy(f.c0).lerp(HOT,clamp(h,0,1)*.6))}
+/* subtitles in the bottom bar while the film runs (the speech bubble follows the game camera, so it would float in the wrong place) */
+const SUB=bars.querySelector('u');let subT=0;
+function say(t,sec){if(!CUT.on)return bubble(t,sec);SUB.innerHTML='<span>SANTA</span>'+t.replace(/[<>&]/g,'');SUB.classList.add('on');clearTimeout(subT);subT=setTimeout(()=>SUB.classList.remove('on'),(sec||2)*1000)}
+/* speed lines that burst out of the middle of the frame */
+function speedLines(ms){const q=bars.querySelector('q');q.animate([{opacity:0,transform:'scale(1.25) rotate(0deg)'},{opacity:1,offset:.15},{opacity:.85,offset:.6},{opacity:0,transform:'scale(1) rotate(6deg)'}],{duration:ms||700,easing:'ease-out'})}
+/* dust shaken from the rafters */
+function dust(n){for(let i=0;i<(n||14);i++)emit(SNX+(Math.random()-.5)*10,4.9+Math.random()*.3,SNZ+1.5+(Math.random()-.5)*8,1,{colors:['#ffffff','#e8eef5','#cfd8e0','#d9c7a8'],speed:.15,up:0,grav:2.2+Math.random()*1.5,size:.05+Math.random()*.05,life:2.2,floor:.47,fade:.8})}
+/* air streams into his mouth as he breathes in */
+function wisps(n){const mo=santaMouth();for(let i=0;i<n;i++){const a=(Math.random()-.5)*2.4,r=2.2+Math.random()*1.6,x=mo.x+Math.sin(a)*r,z=mo.z+Math.cos(a)*r,y=mo.y+(Math.random()-.4)*1.6,life=.45+Math.random()*.25;
+ const m=new THREE.Mesh(PG,pmat(pk(['#e9f6ff','#ffffff','#cfe8ff'])));m.position.set(x,y,z);const sz=.07+Math.random()*.06;m.scale.setScalar(sz);root.add(m);
+ PARTS.push({m,vx:(mo.x-x)/life,vy:(mo.y-y)/life,vz:(mo.z+.15-z)/life,g:0,life,age:0,sz,spin:6,fade:.75,floor:-9})}}
+function shotAt(t){const h=santaHead(),mo=santaMouth();
+ if(t<1.3){const k=sm(0,1.3,t);return{id:0,p:V3(SNX+lerp(3.2,1.8,k),lerp(1.9,2.4,k),SNZ+lerp(8,6.2,k)),l:V3(SNX,h.y-.9,SNZ),f:lerp(50,44,k),r:0,hide:1}}
+ if(t<2.45){const k=sm(1.3,2.45,t);return{p:V3(SNX-lerp(.3,.6,k),h.y+lerp(.1,.35,k),h.z+lerp(5,11,k)),l:V3(h.x,h.y-.15,h.z),f:lerp(50,20,k),r:.07*k,hide:1,id:1}}
+ if(t<2.9){const k=sm(2.45,2.9,t);return{p:V3(SNX+.3,h.y+.4,h.z+lerp(7.5,6.8,k)),l:V3(h.x,h.y-.05,h.z),f:20,r:-.03,hide:1,id:2}}
+ if(t<3.55||!PRES.on||PRES.phase=='fly'&&PRES.bounces<1){const k=sm(2.9,3.6,t);return{p:V3(SNX+lerp(1.4,2.0,k),lerp(.85,1.05,k),SNZ+lerp(6.4,7.0,k)),l:V3(mo.x*.6,mo.y-.6,mo.z),f:60,r:0,hide:1,id:3}}
+ /* follow the present down, then a slow hero orbit round it once it rests */
+ const g=PRES.g.position,ob=CUT.rest?(CUT.t-CUT.rest)*.55:0,ca=Math.atan2(3.2,2.8)+ob,cr=Math.hypot(3.2,2.8)-Math.min(.9,ob*1.2);
+ return{id:4,p:V3(g.x+Math.sin(ca)*cr,1.75-Math.min(.4,ob*.5),g.z+Math.cos(ca)*cr),l:V3(g.x,g.y+.35,g.z),f:44,r:0,hide:1}}
+/* slow motion: while he holds his breath, and for the first instant of the burp */
+const slowAt=t=>t>2.45&&t<2.9?.42:t>=2.9&&t<3.3?.3:1;
+/* world name labels are sprites drawn over everything: they are hidden just for the film frames */
+let LBLS=null;const LBLV=[];
+function filmRender(sc){if(!LBLS){LBLS=[];safe(()=>sc.traverse(o=>{if(o.isSprite&&o.material&&o.material.depthTest===false)LBLS.push(o)}),'sprites')}
+ LBLS.forEach((o,i)=>{LBLV[i]=o.visible;o.visible=false});
+ /* the film shows the lodge whole: walls up and the roof on, whatever the walk-in cut-away is doing for the game camera */
+ const w0=[roofG.visible,roofG.position.y,roofMat.opacity,cutG.scale.y,BULBM.map(b=>b.opacity)];
+ roofG.visible=true;roofG.position.y=0;roofMat.opacity=1;cutG.scale.y=1;BULBM.forEach(b=>b.opacity=1);
+ const L0=[amb.intensity,sun.intensity,FIRE.intensity],dm=CUT.dim||0;amb.intensity*=1-.6*dm;sun.intensity*=1-.8*dm;FIRE.intensity=Math.max(FIRE.intensity,.6)*(1+dm*.4);KEY.intensity=.3+dm*2.1;RIM.intensity=(CUT.red||0)*1.8;faceHeat(CUT.heat||0);
+ try{return r0(sc,PCAM)}finally{amb.intensity=L0[0];sun.intensity=L0[1];FIRE.intensity=L0[2];KEY.intensity=RIM.intensity=0;faceHeat(0);LBLS.forEach((o,i)=>o.visible=LBLV[i]);roofG.visible=w0[0];roofG.position.y=w0[1];roofMat.opacity=w0[2];cutG.scale.y=w0[3];BULBM.forEach((b,i)=>b.opacity=w0[4][i])}}
+function cutStart(){if(CUT.on)return;CUT.on=1;CUT.t=0;CUT.done=0;CUT.w=0;CUT.rest=0;CUT.id=-1;CUT.dim=0;CUT.red=0;CUT.heat=0;CUT.kick=0;LBLS=null;bars.classList.add('on');document.body.classList.add('lodgefilm')}
+function cutEnd(now){if(!CUT.on&&!now)return;CUT.on=0;CUT.ts=1;CUT.live=0;bars.classList.remove('on');if(now){TSC=1}cutRestore()}
+function cutRestore(){try{if(P.mesh)P.mesh.visible=true}catch(e){}CUT.hide=0;faceHeat(0);KEY.intensity=RIM.intensity=0;SUB.classList.remove('on');document.body.classList.remove('lodgefilm')}
+function cutCam(dt){
+ if(!CUT.on){CUT.w=0;return}
+ CUT.t+=dt*TSC;CUT.ts=slowAt(CUT.t);CUT.w+=dt;if(CUT.w>.4)CUT.live=1;
+ /* the present is down and resting: hand the camera back */
+ if(CUT.t>3.6&&PRES.phase=='rest'&&!CUT.done){CUT.done=1;CUT.rest=CUT.t;say('A present, just for you! Ho ho ho!',2);after(1.7,()=>cutEnd())}
+ const T=CUT.t,S0=shotAt(T);
+ /* a cut to the present is a whip pan: a quick blur across the frame */
+ if(S0.id!==CUT.id){if(CUT.id==3&&S0.id==4)safe(()=>renderer.domElement.animate([{filter:'blur(7px) brightness(1.25)'},{filter:'blur(0) brightness(1)'}],{duration:280,easing:'ease-out'}),'whip');CUT.id=S0.id}
+ /* light: the room dims as the tension builds, comes back with the burp; the heartbeat throb fades; his face reddens while he holds his breath */
+ const dimW=T<1.3?.3*sm(0,1.3,T):T<2.9?.3+.5*sm(1.3,2.5,T):T<3.5?.1:0,heatW=T<2.9?sm(1.2,2.8,T):0;
+ CUT.dim+=(dimW-CUT.dim)*Math.min(1,dt*(T<2.9?3:9));CUT.heat+=(heatW-CUT.heat)*Math.min(1,dt*(T<2.9?2.5:4));CUT.red*=Math.pow(.04,dt);CUT.kick*=Math.pow(.02,dt);
+ PCAM.position.copy(S0.p).add(root.position);PCAM.up.set(0,1,0);PCAM.lookAt(S0.l.x+root.position.x,S0.l.y+root.position.y,S0.l.z+root.position.z);PCAM.rotateZ(S0.r);
+ /* a hand-held drift, so it never looks like a locked-off game camera */
+ PCAM.rotateX(Math.sin(T*1.31)*.006+Math.sin(T*2.7)*.003);PCAM.rotateY(Math.sin(T*.93+1)*.008);PCAM.translateY(Math.sin(T*1.7+2)*.02);
+ const asp=innerWidth/Math.max(1,innerHeight),fv=S0.f+CUT.kick*18;if(PCAM.fov!==fv||PCAM.aspect!==asp){PCAM.fov=fv;PCAM.aspect=asp;PCAM.updateProjectionMatrix()}
+ SHK*=Math.pow(.03,dt);if(SHK>.002){PCAM.translateX((Math.random()-.5)*SHK*1.4);PCAM.translateY((Math.random()-.5)*SHK*1.4)}
+ const hide=CUT.on&&S0.hide;if(hide!==CUT.hide){CUT.hide=hide;try{if(P.mesh)P.mesh.visible=!hide}catch(e){}}
+ bars.style.setProperty('--vg',(CUT.on&&CUT.t>1.3&&CUT.t<2.9?.55:.25).toFixed(2))}
+
 /* ---------- speech bubble over his head (greetings, mutters) ---------- */
 const bub=document.createElement('div');bub.id='lodgebub';document.body.appendChild(bub);let bubT=0;
 function bubble(t,sec){bub.textContent=t;bub.classList.add('on');bubT=sec||3.2}
-function toScreen(v3){const v=v3.clone();v.project(cam);return[(v.x*.5+.5)*innerWidth,(-v.y*.5+.5)*innerHeight]}
+function toScreen(v3){const v=v3.clone();v.project(CUT.live?PCAM:cam);return[(v.x*.5+.5)*innerWidth,(-v.y*.5+.5)*innerHeight]}
 function stepBubble(dt){if(bubT>0){bubT-=dt;if(bubT<=0)bub.classList.remove('on')}
  if(bub.classList.contains('on')){const h=santaHead().add(new THREE.Vector3(LX,.55*SANTA.g,LZ)),[x,y]=toScreen(h);bub.style.left=clamp(x,90,innerWidth-90)+'px';bub.style.top=Math.max(20,y-18)+'px'}
  if(FLOATS.length)stepFloats(dt)}
@@ -623,15 +751,15 @@ function ensureDlg(){if(DLG.el)return DLG.el;const e=document.createElement('div
  e.innerHTML=`<div class=lcard><div class=lhd><canvas class=lpt width=16 height=16></canvas><div class=lnm><b>SANTA</b><small>Santa's Lodge</small></div><div class=lpips title="Treats fed this round">${pips()}</div></div><div class=ltx></div><div class=lbt></div><div class=lhint>Click or press Enter to continue &middot; Esc to leave</div></div>`;
  document.body.appendChild(e);portrait(e.querySelector('.lpt'));e.addEventListener('click',ev=>{if(ev.target.closest('button'))return;skipText()});return DLG.el=e}
 function openDlg(){const m=mode_();if(!(m=='play'||m=='menu'))return false;if(m=='play'){DLG.mode0='play';try{$('ui').innerHTML=''}catch(e){}mode='menu'}ensureDlg();DLG.open=true;DLG.el.classList.add('on');DLG.el.querySelector('.lpips').innerHTML=pips();CINE.tx=(LX+SNX-P.x)*.35;CINE.tz=(LZ+SNZ-P.z)*.35;return true}
-function closeDlg(keepMode){if(!DLG.open)return;DLG.open=false;DLG.token=(DLG.token||0)+1;if(DLG.el)DLG.el.classList.remove('on');SANTA.open=0;applySanta();if(!keepMode){CINE.tx=CINE.tz=0;if(mode_()=='menu')mode='play'}}
+function closeDlg(keepMode){if(!DLG.open)return;DLG.open=false;DLG.token=(DLG.token||0)+1;if(DLG.el)DLG.el.classList.remove('on');SANTA.open=0;SANTA.talk=0;applySanta();if(!keepMode){CINE.tx=CINE.tz=0;if(mode_()=='menu')mode='play'}}
 /* say lines one by one (a click moves on), each typed out with little voice blips and a flapping jaw; then call done */
 function sayLines(lines,done,btnsFn){const tok=DLG.token=(DLG.token||0)+1;let i=0;const el=DLG.el,tx=el.querySelector('.ltx'),bt=el.querySelector('.lbt');bt.innerHTML='';
  const next=()=>{if(tok!=DLG.token||!DLG.open)return;if(i>=lines.length){DLG.advance=null;if(btnsFn)btnsFn(bt);else done&&done();return}typeLine(lines[i++],tx,el)};DLG.advance=next;next()}
 function typeLine(text,tx,el){DLG.text=text;DLG.n=0;DLG.full=false;tx.textContent='';el.querySelector('.lhint').style.visibility='visible';const tok=DLG.token,A=SANTA;
- const step=()=>{if(tok!=DLG.token||!DLG.open)return;if(DLG.n>=text.length){DLG.full=true;A.open=0;applySanta();return}
-  const ch=text[DLG.n++];tx.textContent=text.slice(0,DLG.n);if(/[a-z]/i.test(ch)&&DLG.n%2){voice(115+Math.random()*60,.09,.12,{bend:1.25,lp:420});A.open=.18+Math.random()*.25;applySanta()}else if(ch==' '){A.open=.05;applySanta()}
+ const step=()=>{if(tok!=DLG.token||!DLG.open)return;if(DLG.n>=text.length){DLG.full=true;A.talk=0;return}
+  const ch=text[DLG.n++];tx.textContent=text.slice(0,DLG.n);if(/[a-z]/i.test(ch)&&DLG.n%2){if(!LS('syl'))voice(115+Math.random()*60,.09,.12,{bend:1.25,lp:420});A.talk=.16+Math.random()*.16}else if(ch==' '||/[.,!?]/.test(ch)){A.talk=.02}
   DLG.timer=setTimeout(step,/[.!?]/.test(ch)?170:/,/.test(ch)?90:26)};step()}
-function skipText(){if(!DLG.open)return;if(!DLG.full){clearTimeout(DLG.timer);DLG.n=DLG.text.length;DLG.el.querySelector('.ltx').textContent=DLG.text;DLG.full=true;SANTA.open=0;applySanta();return}if(DLG.advance)DLG.advance()}
+function skipText(){if(!DLG.open)return;if(!DLG.full){clearTimeout(DLG.timer);DLG.n=DLG.text.length;DLG.el.querySelector('.ltx').textContent=DLG.text;DLG.full=true;SANTA.talk=0;return}if(DLG.advance)DLG.advance()}
 function btn(bt,label,fn,cls,img,dis){const b=document.createElement('button');b.type='button';b.className=cls||'';b.disabled=!!dis;b.innerHTML=(img?`<img src="${img}" alt="">`:'')+label;b.onclick=()=>{sn('click');fn()};bt.appendChild(b);return b}
 function menu(first,pre){const s=st(),f=s.f,el=ensureDlg(),carry=s.c.cookie+s.c.cane;el.querySelector('.lhint').style.visibility='hidden';el.querySelector('.lpips').innerHTML=pips();
  let line;if(pre)line=pre;else if(s.pr&&!s.pr.done)line="Your present is waiting for you on the rug! Go on, open it. Ho ho ho!";
@@ -649,7 +777,7 @@ addEventListener('keydown',e=>{if(!DLG.open)return;
  if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();if(!SANTA.busy)closeDlg()}
  else if((e.key=='Enter'||e.key==' ')&&DLG.open){e.preventDefault();e.stopImmediatePropagation();skipText()}},true);
 setInterval(()=>{if((DLG.open||SANTA.busy)&&mode_()!='menu'){/* paused or something else took over: end the scene cleanly */abortScene()}},400);
-function abortScene(){if(DLG.open){DLG.open=false;DLG.token++;if(DLG.el)DLG.el.classList.remove('on')}CINE.tx=CINE.tz=0;CINE.view=0;TWN.length=0;SCH.length=0;SANTA.busy=0;SANTA.armOv=SANTA.armZ=null;SANTA.open=0;SANTA.blink=0;SANTA.eyeW=1;SANTA.cheek=0;SANTA.hatLift=0;SANTA.sq=0;SANTA.sway=0;SANTA.brows=0;SANTA.hat.position.y=HATY;SANTA.root.position.x=SNX;syncSanta(true);if(PRES.on&&PRES.phase=='opening')presentClosed()}
+function abortScene(){cutEnd(1);if(DLG.open){DLG.open=false;DLG.token++;if(DLG.el)DLG.el.classList.remove('on')}CINE.tx=CINE.tz=0;CINE.view=0;TWN.length=0;SCH.length=0;SANTA.busy=0;SANTA.armOv=SANTA.armZ=null;SANTA.open=0;SANTA.blink=0;SANTA.eyeW=1;SANTA.cheek=0;SANTA.hatLift=0;SANTA.sq=0;SANTA.sway=0;SANTA.brows=0;SANTA.hat.position.y=HATY;SANTA.root.position.x=SNX;syncSanta(true);if(PRES.on&&PRES.phase=='opening')presentClosed()}
 
 /* ---------- feeding ---------- */
 function syncSanta(now){const n=clamp(st().f,0,4);SANTA.g=STAGE[n];SANTA.bw=BELLY[n];applySanta();lightPips(st().f)}
@@ -673,8 +801,8 @@ function chew(kind,f){const A=SANTA,crumbs=kind=='cookie'?['#d99a48','#ecb868','
  const mo=()=>santaMouth();const bite=(n)=>{crunch();A.cheek=.8;tween(.2,k=>{A.open=lerp(.6,.04,easeOutSine(k))*(1-.0);A.cheek=lerp(.8,0,k);applySanta()});const p=mo();emit(p.x,p.y-.1,p.z+.1,10,{colors:crumbs,speed:1.8,up:1.6,size:.09,life:1.1,dir:[0,1,-.3],grav:9});shake(.03);belly(.04);boing(n)};
  bite(0);after(.34,()=>{A.open=.5;tween(.14,k=>{A.open=lerp(.5,.5,k);applySanta()})});after(.4,()=>bite(1));after(.78,()=>{A.open=.4});after(.84,()=>bite(2));
  /* mmm: rising happy hum */
- [0,.2,.4].forEach((d,i)=>after(.5+d,()=>voice(150+i*24,.2,.14,{bend:1.1,lp:460})));
- after(1.25,()=>{A.open=0;A.tilt=-.12;applySanta();/* the gulp */ safe(()=>sdHit(95,.2,.3,[[1,1,1]],{bend:.8}),'gulp');tween(.3,k=>{A.tilt=lerp(-.12,0,k);A.eyeW=lerp(1.25,1,k);applySanta()});
+ if(!LS('mmm'))[0,.2,.4].forEach((d,i)=>after(.5+d,()=>voice(150+i*24,.2,.14,{bend:1.1,lp:460})));
+ after(1.25,()=>{A.open=0;A.tilt=-.12;applySanta();/* the gulp */ if(!LS('gulp'))safe(()=>sdHit(95,.2,.3,[[1,1,1]],{bend:.8}),'gulp');tween(.3,k=>{A.tilt=lerp(-.12,0,k);A.eyeW=lerp(1.25,1,k);applySanta()});
   if(f>=5)burp();else grow(f)})}
 function belly(a){const A=SANTA,b=A.bw;tween(.22,k=>{A.bw=b*(1+Math.sin(k*Math.PI)*a);applySanta()},()=>{})}
 function grow(f){const A=SANTA;
@@ -690,31 +818,44 @@ function ring(c,col,rad,dur){const m=new THREE.Mesh(new THREE.RingGeometry(.9,1,
  tween(dur||.8,k=>{const s=.4+k*rad;m.scale.set(s,s,1);m.material.opacity=.8*(1-k)},()=>{root.remove(m);m.geometry.dispose();m.material.dispose()},easeOutSine)}
 
 /* ---------- the big moment: 5th treat. He inhales, swells, shakes, holds his breath ... BURP ---------- */
-function rollPrize(){/* the advent calendar's own crate roll, restricted to its top three tiers: Rare, Epic, Legendary (same pool, same odds ratio 13:6:1, same neighbouring-tier fallback) */
- const cr=window.FW_ADVENT.crate,od=[2,3,4].map(t=>cr.TIERS[t].odds),tot=od.reduce((a,b)=>a+b,0);let r=Math.random()*tot,t=2;for(let i=0;i<3;i++){if(r<od[i]){t=2+i;break}r-=od[i];t=2+i}
+/* the prize: Rare, Epic or Legendary at the advent calendar's odds ratio for its top three tiers (13:6:1), then any of Santa's own prizes
+   of that rarity (dev-lodge-items-v1.js). A car or the elf you already own is skipped; if you own all of them, a piece of furniture of that rarity. */
+function prizeOf(o){const r={t:o.t,k:o.k,n:o.n,rar:o.tier};
+ if(o.t=='f'){r.key=o.key;const have=(S.inv&&S.inv[o.key])||0;r.note=(have?'Another one for your collection. ':'')+'Delivered to your Storage. Press F at home to place it.'}
+ if(o.t=='c'){r.i=o.i;r.note='Top speed '+((CARS[o.i]&&CARS[o.i].mph)||80)+' mph. It is parked outside your house: walk up to it and press E.'+(S.garage?'':' Your garage is unlocked too.')}
+ if(o.t=='p'){r.i=o.i;r.note=(S.pets||[]).length<3?'Your new pet follows you around now and adds +1 song quality.':'A new pet for your crew. Press P to put it in one of your three pet slots.'}
+ return r}
+function rollPrize(){
+ const cr=window.FW_ADVENT.crate,LI=window.FW_LODGE_ITEMS,od=[2,3,4].map(t=>cr.TIERS[t].odds),tot=od.reduce((a,b)=>a+b,0);let r=Math.random()*tot,t=2;for(let i=0;i<3;i++){if(r<od[i]){t=2+i;break}r-=od[i];t=2+i}
+ if(LI){const own=o=>o.t=='c'?(S.cars||[]).includes(o.i):o.t=='p'?((S.petOwn||[]).includes(o.i)||(S.pets||[]).includes(o.i)):false;
+  let c=LI.byTier(t).filter(o=>!own(o));if(!c.length)c=LI.byTier(t).filter(o=>o.t=='f');if(c.length)return prizeOf(pk(c))}
  for(let d=0;d<5;d++)for(const tt of[t-d,t+d]){if(tt<2||tt>4)continue;const c=cr.pool().filter(o=>o.tier==tt);if(c.length)return cr.prizeFrom(pk(c))}
  return cr.prizeFrom(pk(cr.pool()))}
 const tierCol=t=>window.FW_ADVENT.crate.TIERS[clamp(t,0,4)].c;
-function burp(){const s=st(),A=SANTA;
+function burp(){const s=st(),A=SANTA;cutStart();
  /* decide the present now, and save it, so closing the tab can never lose or re-roll it */
  const pr=rollPrize();s.pr=Object.assign({},pr,{done:0});s.f=0;sv();
  const col='#ffd75e';/* gold for every tier: the advent spin is where you find out */A.busy=1;CINE.view=9.6;CINE.tx=(LX+SNX-P.x)*.9;CINE.tz=(LZ+SNZ-P.z)*.9;
  lightPips(5);
  /* 1. inhale: the belly swells, he goes wide-eyed, the hat starts to rattle */
- bubble('Uh oh...',1.6);rumble(1.2,.3,100);A.cheek=.5;
+ say('Uh oh...',1.6);rumble(1.2,.3,100);A.cheek=.5;LS('inhale',1.3);dust(10);
+ for(let i=0;i<12;i++)after(i*.1,()=>wisps(3));
  const g0=A.g,b0=A.bw;
  tween(1.3,k=>{const e=sm(0,1,k);A.g=lerp(g0,1.92,e);A.bw=lerp(b0,1.95,e);A.sq=-.08*e;A.brows=e;A.eyeW=1+.45*e;A.tilt=-.12*e;A.hatLift=Math.sin(k*60)*.1*k;A.cheek=.5+.5*e;A.armOv=[-.4*e,-.4*e];A.armZ=[.5*e,-.5*e];applySanta()});
  shake(.06);
  /* 2. second swell, louder, he trembles */
- after(1.3,()=>{bubble('Hold on...',1.4);rumble(1.2,.4,90);shake(.1);boing(3);
+ after(1.3,()=>{say('Hold on... HOLD ON...',1.6);rumble(1.2,.4,90);shake(.1);if(!LS('inhale',.9))boing(3);dust(22);after(.5,()=>dust(14));
   const g1=A.g,b1=A.bw;tween(1.1,k=>{const e=sm(0,1,k);A.g=lerp(g1,2.04,e);A.bw=lerp(b1,2.3,e);A.sq=-.08+Math.sin(k*38)*.05*k;A.sway=Math.sin(k*52)*.05*k;A.root.position.x=SNX+Math.sin(k*46)*.03*k;A.hatLift=Math.sin(k*70)*.18*k;A.eyeW=1.45+.25*k;A.cheek=1;applySanta()},()=>{A.root.position.x=SNX});
-  [0,.2,.4,.6,.8,1.0].forEach(d=>after(d,()=>shake(.05+d*.06)))});
+  [0,.2,.4,.6,.8,1.0].forEach(d=>after(d,()=>shake(.05+d*.06)));
+  [.3,.6,.9].forEach(d=>after(d,()=>{const h=santaHead();emit(h.x,h.y+.1,h.z+.2,5,{colors:['#bfe6ff','#ffffff'],speed:2.2,up:2,size:.07,life:.7,grav:9,floor:-9,spread:.4})}))});
  /* 3. he holds his breath for a heartbeat, eyes squeezed shut */
- after(2.45,()=>{A.hatLift=0;A.blink=.9;A.tilt=-.34;applySanta();safe(()=>sdHit(60,.5,.25,[[1,1,1]],{jit:0}),'hb');shake(.02)});
+ after(2.2,()=>LS('choir',1.5));
+ after(2.45,()=>{A.hatLift=0;A.blink=.9;A.tilt=-.34;applySanta();if(!LS('beat',.8))safe(()=>sdHit(60,.5,.25,[[1,1,1]],{jit:0}),'hb');CUT.red=1;shake(.02);flash('#3a0000',.25,.5)});
+ after(2.68,()=>{if(!LS('beat',1))safe(()=>sdHit(55,.5,.3,[[1,1,1]],{jit:0}),'hb2');CUT.red=1;flash('#3a0000',.3,.4)});
  /* 4. BURP */
  after(2.9,()=>doBurp(pr,col))}
 function doBurp(pr,col){const A=SANTA;const mo=santaMouth();
- burpSound(true);shake(.55);A.blink=0;A.eyeW=1.2;
+ burpSound(true);shake(.55);A.blink=0;A.eyeW=1.2;CUT.kick=1;CUT.heat=0;speedLines(900);dust(30);
  tween(.14,k=>{A.open=lerp(0,1,k);A.tilt=lerp(-.34,.22,easeOutSine(k));applySanta()});
  /* the air goes out of him in one squashed snap, then he settles at his last size */
  const g1=A.g,b1=A.bw,ao=(A.armOv||[0,0])[0];tween(.6,k=>{const e=1-Math.pow(1-k,3);A.bw=lerp(b1,BELLY[4],e);A.g=lerp(g1,STAGE[4],e);A.sq=-Math.sin(Math.min(1,k*1.6)*Math.PI)*.32;A.sway=0;A.cheek=lerp(1,0,k);A.brows=1-k;A.armZ=[lerp(.5,-.35,e),lerp(-.5,.35,e)];const v=lerp(ao,-.5,e);A.armOv=[v,v];applySanta()},()=>{A.sq=0;applySanta()});
@@ -729,10 +870,11 @@ function doBurp(pr,col){const A=SANTA;const mo=santaMouth();
  after(.12,()=>launchPresent(pr,col,mo));
  after(.15,()=>{boing(0);sn('pop')});
  /* mouth closes, he blushes, shrinks back with a long squeaky sigh */
- after(1.0,()=>{tween(.35,k=>{A.open=lerp(1,.1,k);A.tilt=lerp(.22,0,k);applySanta()});bubble('Excuse me!',1.8)});
+ after(1.0,()=>{tween(.35,k=>{A.open=lerp(1,.1,k);A.tilt=lerp(.22,0,k);const v=lerp(-.5,-2.1,sm(0,1,k));A.armOv=[v,-.5];A.armZ=[lerp(-.35,.35,k),.35];A.cheek=k;applySanta()});say('Oh! Excuse me!',1.8);
+  after(1.0,()=>tween(.4,k=>{const v=lerp(-2.1,-.5,sm(0,1,k));A.armOv=[v,-.5];A.armZ=[lerp(.35,-.35,k),.35];A.cheek=1-k;applySanta()}))});
  after(1.6,()=>{lightPips(0);laugh(3)});
  after(2.3,()=>deflate())}
-function deflate(){const A=SANTA;safe(()=>{sdNz(1.0,2400,.2,{q:3,f2:500});},'air');const g0=A.g,b0=A.bw;
+function deflate(){const A=SANTA;if(!LS('sigh'))safe(()=>{sdNz(1.0,2400,.2,{q:3,f2:500});},'air');const g0=A.g,b0=A.bw;
  const z0=A.armZ?A.armZ[0]:0,o0=(A.armOv||[0,0])[0];
  tween(1.7,k=>{const e=1-Math.pow(1-k,3);A.g=lerp(g0,STAGE[0],e);A.bw=lerp(b0,BELLY[0],e);A.sq=Math.sin(k*16)*.1*(1-k);A.armZ=[lerp(z0,0,e),lerp(-z0,0,e)];const v=lerp(o0,0,e);A.armOv=[v,v];applySanta()},()=>{A.g=STAGE[0];A.bw=BELLY[0];A.sq=0;A.armOv=null;A.armZ=null;applySanta()})}
 
@@ -743,25 +885,29 @@ PRES.g.visible=false;dynG.add(PRES.g);
 PRES.m=new THREE.Group();PRES.g.add(PRES.m);PRES.body=new THREE.Group();PRES.m.add(PRES.body);
 const LIDY=(()=>{const it=window.FW_ADVENT.itemModel('x:crate',1.3),raw=it.children[0],LY=.76,lid=new THREE.Group();lid.name='lid';lid.position.y=LY;
  raw.children.slice().forEach(c=>{if(c.position.y>=.8){raw.remove(c);c.position.y-=LY;lid.add(c)}});raw.add(lid);it.traverse(o=>{if(o.isMesh)o._gdyn=1});PRES.body.add(it);PRES.lid=lid;return LY})();
+/* pivot the crate at its centre so tumbling never dips a corner through the floor */
+const PC=(()=>{const bb=new THREE.Box3().setFromObject(PRES.body);return (bb.max.y+bb.min.y)/2})();PRES.body.position.y=-PC;PRES.m.position.y=PC;
+const PBB=new THREE.Box3();function presLow(){PRES.g.updateMatrixWorld(true);PBB.setFromObject(PRES.m);return PBB.min.y-root.position.y}
 PRES.beam=[0,1].map(i=>{const b=new THREE.Mesh(beamGeo,beamMat.clone());b.material.userData.xms=1;b.position.y=2.6;b.rotation.y=i*Math.PI/2;PRES.g.add(b);return b});
 PRES.glow=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide}));PRES.glow.rotation.x=-Math.PI/2;PRES.glow.position.y=.06;PRES.g.add(PRES.glow);PRES.glow.scale.setScalar(1.8);
 function tintPresent(col){PRES.beam.forEach(b=>{b.material.map=beamTex;b.material.color.set(col);b.material.needsUpdate=true});PRES.glow.material.color.set(col)}
-const PREST=.47;/* floor height of the rug top under the present */
-function placePresent(rest,pr){PRES.on=true;PRES.g.visible=true;PRES.pr=pr;tintPresent('#ffd75e');PRES.g.position.set(PRES_AT[0],PREST,PRES_AT[1]);PRES.g.rotation.set(0,rest?.5:0,0);PRES.m.scale.setScalar(1);PRES.m.rotation.set(0,0,0);if(PRES.lid){PRES.lid.visible=true;PRES.lid.position.set(0,LIDY,0);PRES.lid.rotation.set(0,0,0)}
+const PREST=.48;/* floor height of the rug top under the present */
+function placePresent(rest,pr){PRES.on=true;PRES.g.visible=true;PRES.pr=pr;tintPresent('#ffd75e');PRES.g.position.set(PRES_AT[0],PREST,PRES_AT[1]);PRES.g.rotation.set(0,rest?.5:0,0);PRES.m.scale.setScalar(1);PRES.m.rotation.set(0,0,0);PRES.m.position.y=PC;if(PRES.lid){PRES.lid.visible=true;PRES.lid.position.set(0,LIDY,0);PRES.lid.rotation.set(0,0,0)}
  PRES.phase=rest?'rest':'';PRES.ready=!!rest;PRES.beam.forEach(b=>{b.visible=!!rest;b.scale.y=1});PRES.glow.visible=!!rest}
 function launchPresent(pr,col,mo){placePresent(false,pr);PRES.beam.forEach(b=>b.visible=false);PRES.glow.visible=false;PRES.ready=false;PRES.phase='fly';PRES.t=0;PRES.bounces=0;
  const T=.95,gv=17,x0=mo.x,y0=mo.y,z0=mo.z+.3,xL=PRES_AT[0],zL=PRES_AT[1],yL=PREST;
- PRES.vx=(xL-x0)/T;PRES.vz=(zL-z0)/T;PRES.vy=(yL-y0+.5*gv*T*T)/T;PRES.gv=gv;PRES.g.position.set(x0,y0-.35,z0);PRES.spin=new THREE.Vector3(7,9,4);PRES.m.scale.setScalar(.05);PRES.col=col;PRES.sq=0}
+ LS('whoosh',.6);PRES.vx=(xL-x0)/T;PRES.vz=(zL-z0)/T;PRES.vy=(yL-y0+.5*gv*T*T)/T;PRES.gv=gv;PRES.g.position.set(x0,y0-.35,z0);PRES.spin=new THREE.Vector3(7,9,4);PRES.m.scale.setScalar(.05);PRES.col=col;PRES.sq=0}
 function stepPresent(dt){if(!PRES.on)return;const g=PRES.g;
  if(PRES.phase=='fly'){PRES.t+=dt;PRES.m.scale.setScalar(Math.min(1,PRES.m.scale.x+dt*7));PRES.vy-=PRES.gv*dt;g.position.x+=PRES.vx*dt;g.position.z+=PRES.vz*dt;g.position.y+=PRES.vy*dt;PRES.m.rotation.x+=PRES.spin.x*dt;PRES.m.rotation.y+=PRES.spin.y*dt;PRES.m.rotation.z+=PRES.spin.z*dt;
   if(Math.random()<.85)emit(g.position.x,g.position.y+.3,g.position.z,1,{colors:[PRES.col,'#ffffff','#fff6c8'],speed:.4,up:.2,grav:1,life:.7,size:.13,floor:-9});
-  if(g.position.y<=PREST&&PRES.vy<0){g.position.y=PREST;const sp=-PRES.vy;PRES.bounces++;shake(Math.min(.3,sp*.02));sn('pop');safe(()=>sdHit(90+Math.random()*20,.25,.3,[[1,1,1],[2.4,.3,.4]],{bend:.5}),'thud');
+  const low=presLow();if(low<PREST)g.position.y+=PREST-low;
+  if(low<=PREST&&PRES.vy<0){const sp=-PRES.vy;PRES.bounces++;shake(Math.min(.3,sp*.02));if(!LS('bounce',PRES.bounces-1)){sn('pop');safe(()=>sdHit(90+Math.random()*20,.25,.3,[[1,1,1],[2.4,.3,.4]],{bend:.5}),'thud')}
    emit(g.position.x,PREST+.1,g.position.z,10,{colors:['#e9f0f6','#ffffff',PRES.col],speed:1.6,up:1.4,size:.12,life:.7,grav:9});PRES.sq=1;
    PRES.vy=sp*.44;PRES.vx*=.45;PRES.vz*=.45;PRES.spin.multiplyScalar(.45);if(PRES.bounces>=4||PRES.vy<1.6){PRES.vy=0;PRES.phase='settle';PRES.t=0}}}
- else if(PRES.phase=='settle'){PRES.t+=dt;const k=clamp(PRES.t/.5,0,1);PRES.m.rotation.x*=1-k*.4;PRES.m.rotation.z*=1-k*.4;PRES.m.rotation.y+=(Math.round(PRES.m.rotation.y/(Math.PI/2))*Math.PI/2-PRES.m.rotation.y)*Math.min(1,dt*8);g.position.x+=PRES.vx*dt;g.position.z+=PRES.vz*dt;PRES.vx*=.9;PRES.vz*=.9;
-  if(k>=1){PRES.phase='rest';PRES.ready=true;PRES.m.rotation.set(0,0,0);g.rotation.y=PRES.m.rotation.y;PRES.beam.forEach(b=>{b.visible=true;b.scale.y=.01});PRES.glow.visible=true;chimeUp();floatText('A PRESENT!',PRES.col,false,new THREE.Vector3(LX+PRES_AT[0],2.2,LZ+PRES_AT[1]));
-   after(.9,()=>{if(!DLG.open&&PRES.on&&PRES.phase=='rest'&&SANTA.busy)presentTalk()})}}
- else if(PRES.phase=='rest'){const t=CLOCK;PRES.beam.forEach(b=>{b.scale.y=Math.min(1,b.scale.y+dt*1.6);b.scale.x=.9+Math.sin(t*2.4)*.15});PRES.glow.scale.setScalar(1.8+Math.sin(t*3)*.18);PRES.m.scale.setScalar(1+Math.sin(t*2.8)*.025);if(Math.random()<dt*3)emit(PRES_AT[0],PREST+.8,PRES_AT[1],1,{colors:[PRES.col,'#ffffff'],speed:.5,up:1.2,grav:-.2,life:1.4,size:.1,floor:-9,spread:.8})}
+ else if(PRES.phase=='settle'){PRES.t+=dt;const k=clamp(PRES.t/.5,0,1),fl=a=>a-Math.round(a/(Math.PI*2))*Math.PI*2,e=Math.min(1,dt*9);PRES.m.rotation.x=fl(PRES.m.rotation.x)*(1-e);PRES.m.rotation.z=fl(PRES.m.rotation.z)*(1-e);g.position.y+=(PREST-g.position.y)*e;{const low=presLow();if(low<PREST)g.position.y+=PREST-low}PRES.m.rotation.y+=(Math.round(PRES.m.rotation.y/(Math.PI/2))*Math.PI/2-PRES.m.rotation.y)*Math.min(1,dt*8);g.position.x+=PRES.vx*dt;g.position.z+=PRES.vz*dt;PRES.vx*=.9;PRES.vz*=.9;
+  if(k>=1){PRES.phase='rest';PRES.ready=true;PRES.m.rotation.set(0,0,0);g.rotation.y=PRES.m.rotation.y;PRES.beam.forEach(b=>{b.visible=true;b.scale.y=.01});PRES.glow.visible=true;if(!LS('present'))chimeUp();floatText('A PRESENT!',PRES.col,false,new THREE.Vector3(LX+PRES_AT[0],2.2,LZ+PRES_AT[1]));
+   after(CUT.on?2.1:.9,()=>{if(!DLG.open&&PRES.on&&PRES.phase=='rest'&&SANTA.busy)presentTalk()})}}
+ else if(PRES.phase=='rest'){const t=CLOCK;PRES.beam.forEach(b=>{b.scale.y=Math.min(1,b.scale.y+dt*1.6);b.scale.x=.9+Math.sin(t*2.4)*.15});PRES.glow.scale.setScalar(1.8+Math.sin(t*3)*.18);{const sc=1+Math.sin(t*2.8)*.025;PRES.m.scale.setScalar(sc);PRES.m.position.y=PC*sc}if(Math.random()<dt*3)emit(PRES_AT[0],PREST+.8,PRES_AT[1],1,{colors:[PRES.col,'#ffffff'],speed:.5,up:1.2,grav:-.2,life:1.4,size:.1,floor:-9,spread:.8})}
  /* squash on landing */
  if(PRES.sq>0){PRES.sq=Math.max(0,PRES.sq-dt*5);const s=PRES.sq;PRES.body.scale.set(1+s*.28,1-s*.3,1+s*.28);if(PRES.lid)PRES.lid.position.y=LIDY-s*.18}else if(PRES.body.scale.y!=1){PRES.body.scale.set(1,1,1);if(PRES.lid&&PRES.phase!='opening')PRES.lid.position.y=LIDY}}
 /* after he burps and the present has landed, Santa speaks and offers it */
@@ -772,19 +918,23 @@ function openPresent(){const s=st();if(!(s.pr&&!s.pr.done)||!PRES.on||!PRES.read
  if(mode_()=='play'){try{$('ui').innerHTML=''}catch(e){}mode='menu'}/* menu while it plays out, so nothing else grabs the keys */
  SANTA.busy=1;PRES.phase='opening';PRES.ready=false;CINE.view=7;CINE.tx=(LX+PRES_AT[0]-P.x)*.5;CINE.tz=(LZ+PRES_AT[1]-P.z)*.5;P.rot=Math.atan2(LX+PRES_AT[0]-P.x,LZ+PRES_AT[1]-P.z);
  /* it rattles on the rug, the lid jumps, sparkles pop... then the advent calendar's present card takes over */
- tween(.75,k=>{const a=sm(0,1,k);PRES.m.rotation.z=Math.sin(k*62)*.1*a;PRES.m.rotation.x=Math.cos(k*55)*.07*a;PRES.m.position.y=Math.abs(Math.sin(k*24))*.06*a;if(PRES.lid)PRES.lid.position.y=LIDY+Math.abs(Math.sin(k*31))*.08*a;PRES.glow.scale.setScalar(1.8+a*.8)},
-  ()=>{PRES.m.rotation.set(0,0,0);PRES.m.position.y=0;if(PRES.lid)PRES.lid.position.y=LIDY});
- for(let i=0;i<5;i++)after(i*.14,()=>safe(()=>sdHit(520*Math.pow(1.12,i),.12,.14,[[1,1,1],[2,.2,.4]],{jit:0}),'tick'));shake(.03);
+ tween(.75,k=>{const a=sm(0,1,k);PRES.m.rotation.z=Math.sin(k*62)*.1*a;PRES.m.rotation.x=Math.cos(k*55)*.07*a;PRES.m.position.y=PC+Math.abs(Math.sin(k*24))*.06*a;if(PRES.lid)PRES.lid.position.y=LIDY+Math.abs(Math.sin(k*31))*.08*a;PRES.glow.scale.setScalar(1.8+a*.8)},
+  ()=>{PRES.m.rotation.set(0,0,0);PRES.m.position.y=PC;if(PRES.lid)PRES.lid.position.y=LIDY});
+ for(let i=0;i<5;i++)after(i*.14,()=>{if(!LS('bounce',3+i))safe(()=>sdHit(520*Math.pow(1.12,i),.12,.14,[[1,1,1],[2,.2,.4]],{jit:0}),'tick')});shake(.03);
  after(.8,()=>{emit(PRES_AT[0],PREST+.9,PRES_AT[1],26,{colors:['#ffd75e','#ffffff','#fff6c8'],speed:3,up:3.4,size:.14,life:1,grav:6,floor:PREST+.02});sn('pop');
   const ok=safe(()=>AD.gift({title:"SANTA'S PRESENT",name:"Santa's Present",prize:s.pr,
-   note:"Santa burped this up just for you! Unwrap it for a Rare, Epic or Legendary prize, rolled like the advent calendar presents.",
+   note:"Santa burped this up just for you! The first spin shows how rare it is (Rare, Epic or Legendary), the second what is inside.",
+   tierNames:{2:'Rare',3:'Epic',4:'Legendary'},rarity:{2:55,3:32,4:13},theme:'xm',
+   /* the card's sounds come from the lodge's recorded set (dev-lodge-sfx-v1.js); each returns false to fall back to the card's own */
+   snd:{tick:(t,sl)=>LS('tick',t,sl),hb:v=>LS('hb',v),charge:i=>LS('charge',i),land:t=>LS('land',t),rarity:t=>LS('rarity',t),claim:()=>LS('claim'),open:()=>LS('sparkle',4)},
+   pool:t=>{const LI=window.FW_LODGE_ITEMS;return LI?LI.byTier(t).map(o=>({k:o.k,n:o.n,tier:o.tier})):window.FW_ADVENT.crate.pool().filter(o=>o.tier==t)},
    onClaim:()=>{const q=st();if(q.pr){q.pr.done=1;q.n++;sv()}},onClose:presentClosed}),'gift');
   if(!ok)presentClosed(false)})}
 /* the present card closed: claimed, the present goes with a puff and Santa cheers; not yet, it waits on the rug */
 function presentClosed(){const s=st();SANTA.busy=0;CINE.view=0;CINE.tx=CINE.tz=0;if(mode_()=='menu')mode='play';
  if(s.pr&&s.pr.done){emit(PRES_AT[0],PREST+.5,PRES_AT[1],26,{colors:['#ffffff','#ffd75e',tierCol(s.pr.rar)],speed:3,up:3,size:.16,life:1,grav:5,floor:PREST});PRES.g.visible=false;PRES.on=false;s.pr=null;sv();
   laugh(3);bubble('Merry Christmas! Come back with more treats!',3.4);wave(1.6)}
- else if(PRES.on){PRES.phase='rest';PRES.ready=true;PRES.m.rotation.set(0,0,0);PRES.m.position.y=0;if(PRES.lid){PRES.lid.visible=true;PRES.lid.position.set(0,LIDY,0);PRES.lid.rotation.set(0,0,0)}}}
+ else if(PRES.on){PRES.phase='rest';PRES.ready=true;PRES.m.rotation.set(0,0,0);PRES.m.position.y=PC;if(PRES.lid){PRES.lid.visible=true;PRES.lid.position.set(0,LIDY,0);PRES.lid.rotation.set(0,0,0)}}}
 
 /* ---------- on-screen bits: a screen flash (the present card itself is the advent calendar's) ---------- */
 function flash(col,a,sec){const f=document.createElement('div');f.className='lodgeflash';f.style.background=col;document.body.appendChild(f);f.animate([{opacity:a},{opacity:0}],{duration:(sec||.4)*1000,easing:'ease-out'}).onfinish=()=>f.remove()}
@@ -814,6 +964,17 @@ const css2=document.createElement('style');css2.textContent=`
 .lodgefl{position:fixed;z-index:63;pointer-events:none;font:700 15px Silkscreen,ui-monospace,monospace;letter-spacing:2px;text-shadow:2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;white-space:nowrap;transform:translate(-50%,-50%)}
 .lodgefl.big{font-size:44px;letter-spacing:3px;text-shadow:4px 4px 0 #000,-3px -3px 0 #000,3px -3px 0 #000,-3px 3px 0 #000}
 .lodgeflash{position:fixed;inset:0;z-index:95;pointer-events:none}
+#lodgecut{position:fixed;inset:0;z-index:94;pointer-events:none;--vg:.25}
+#lodgecut i,#lodgecut b{position:absolute;left:0;right:0;height:11vh;background:#000;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+#lodgecut i{top:0;transform:translateY(-100%)}#lodgecut b{bottom:0;transform:translateY(100%)}
+#lodgecut.on i,#lodgecut.on b{transform:none}
+body.lodgefilm #hud,body.lodgefilm #fsgoal,body.lodgefilm #khint,body.lodgefilm #ntags,body.lodgefilm #lodgehud{visibility:hidden}
+#lodgecut s{position:absolute;inset:0;opacity:0;transition:opacity .5s;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,var(--vg)) 100%)}#lodgecut.on s{opacity:1}
+#lodgecut em{position:absolute;inset:0;opacity:0;transition:opacity .6s;mix-blend-mode:overlay;background:linear-gradient(#ffb86a22,#0b1c3a44)}#lodgecut.on em{opacity:1}
+#lodgecut q{position:absolute;inset:-25%;opacity:0;background:repeating-conic-gradient(from 0deg at 50% 50%,#fff0 0deg 4deg,#ffffff55 4deg 5deg,#fff0 5deg 9deg,#e8ffd033 9deg 10deg);-webkit-mask:radial-gradient(circle at 50% 50%,#0000 18%,#000 55%);mask:radial-gradient(circle at 50% 50%,#0000 18%,#000 55%)}
+#lodgecut q:before,#lodgecut q:after{content:none}
+#lodgecut u{position:absolute;left:0;right:0;bottom:0;height:11vh;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 16px;box-sizing:border-box;text-decoration:none;color:#fff;font:700 clamp(13px,2.1vw,22px) Silkscreen,ui-monospace,monospace;letter-spacing:1px;text-shadow:2px 2px 0 #000;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s}
+#lodgecut u.on{opacity:1;transform:none}#lodgecut u span{color:#ffd75e;font-size:.7em;letter-spacing:3px;padding:2px 8px;border:2px solid #ffd75e}
 @keyframes lodgefade{from{opacity:0}to{opacity:1}}@keyframes lodgepop{from{transform:translateY(14px) scale(.94);opacity:0}to{transform:none;opacity:1}}
 `;document.head.appendChild(css2);
 
@@ -835,5 +996,13 @@ safe(()=>{const box=document.getElementById('fwdvb');if(!box)return;const msg=t=
  const h=document.createElement('h5');h.textContent="Santa's Lodge (cookies and candy canes, feed Santa)";box.appendChild(h);
  [['Walk to the lodge door',()=>{FW_LODGE.go();msg('At the lodge')}],['Give me 5 cookies + 5 candy canes',()=>{FW_LODGE.give(5);msg('Added 5 of each')}],['Respawn all treats on the map',()=>{const s=st();s.cd={};spawnSpots();msg('Treats respawned')}],['Reset Santa and presents',()=>{FW_LODGE.reset();msg('Santa reset')}]]
  .forEach(([l,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=f;box.appendChild(b)})},'panel');
+/* /dev/ only (this whole file is): every save owns all of Santa's prizes, once, so they can be tried out. Placing or selling them later
+   does not bring them back; the dev panel button gives the full set again. Flag S.lodge.all (2 = the set with the extra pets). */
+function giveAll(){const LI=window.FW_LODGE_ITEMS,g=window.FW_ADVENT.crate.grant;if(!LI||typeof S=='undefined'||!S)return 0;let n=0;
+ LI.list.forEach(o=>{const r={t:o.t,k:o.k,n:o.n,rar:o.tier};if(o.t=='f')r.key=o.key;else r.i=o.i;if(safe(()=>g(r),'giveAll'))n++});st().all=2;sv();return n}
+setInterval(()=>{try{if(mode_()=='play'&&typeof S!='undefined'&&S&&!(st().all>=2))giveAll()}catch(e){soft(e,'giveAll')}},2000);
+safe(()=>{const box=document.getElementById('fwdvb');if(!box)return;const b=document.createElement('button');b.textContent="Give me all of Santa's prizes";
+ b.onclick=()=>{const n=giveAll(),e=document.getElementById('fwdvs');if(e)e.textContent=n+" Santa prizes given (cars by your house, Pip in your pets, the rest in Storage)"};box.appendChild(b)},'panel2');
+window.FW_LODGE.giveAll=giveAll;
 /*END*/
 })();

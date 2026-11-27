@@ -3,10 +3,24 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.8';
+const GAME_VERSION='v56.0.22';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.8',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent by a Cloud Function, and new security rules. Nothing changes for players yet.'},
+ {v:'v56.0.22',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent through a Cloudflare Worker and Resend, and new security rules. Nothing changes for players yet'},
+ {v:'v56.0.21',n:'Santa\'s Lodge (dev): real recorded cutscene sounds, a bigger burp cutscene, a festive present card, and Santa\'s beard no longer glitches when he talks'},
+ {v:'v56.0.20',n:'Admin gifts can now carry several clothing items plus money, streams and listeners in one gift'},
+ {v:'v56.0.19',n:'Santa\'s Lodge (dev only): five more pets in Santa\'s presents (penguin, gingerbread pup, snowman, Christmas mouse, arctic fox)'},
+ {v:'v56.0.18',n:'Santa\'s Lodge (dev only): Santa\'s cars rebuilt on the game\'s car bodies, lodge walls and roof stay up in the burp cutscene'},
+ {v:'v56.0.17',n:'Beach Club gig is now the festival set: walk round the stage, crowd minigames, autographs; gig reminder also fires after the start'},
+ {v:'v56.0.16',n:'Computer click sound files now reload when the game updates (the old one could stay cached, so the new click sounded the same). Unused extra click sample removed.'},
+ {v:'v56.0.15',n:'Main menu footer and sign-in debug line show the player version (v2.N) instead of the build id'},
+ {v:'v56.0.14',n:'Footsteps on a bought carpet floor at home sound like carpet (CC0 Kenney sample)'},
+ {v:'v56.0.13',n:'The computer mouse click is now a rounder, fuller real click with the harsh hiss removed. Saves still load.'},
+ {v:'v56.0.12',n:'Version numbers: players see v2.N (build id stays internal); bump.js prints the player number; newsletter shows v2.378 for update day'},
+ {v:'v56.0.11',n:'Click sound is now a clean real recording (CC0 Kenney sample, small file) instead of the synthesised tick; the PC mouse click is re-encoded at full quality. Volume peak-limited. Saves still load.'},
+ {v:'v56.0.10',n:'Santa\'s Lodge (dev only): every /dev save gets all of Santa\'s prizes, plus a dev panel button'},
+ {v:'v56.0.9',n:'Santa\'s Lodge (dev only): burp cutscene, rarity-then-item present spin, new Santa prizes (Sprocket Rocket, Gingerbread Cruiser, Pip the Elf and more), present no longer falls through the floor'},
+ {v:'v56.0.8',n:'Santa\'s Lodge (dev only): new cabin interior with toy train, path sign removed'},
  {v:'v56.0.7',n:'Front door: the hall side shows the same panels and handle again, and the door swings shut every time you walk through'},
  {v:'v56.0.6',n:'Santa\'s Lodge (dev only): new Santa model, cleaner animations, solid lodge floor, advent present crate and spin'},
  {v:'v56.0.5',n:'Front door only swings shut behind you, and its panels, handle and kick plate now move with it'},

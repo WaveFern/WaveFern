@@ -4,6 +4,15 @@
 (()=>{
 const BELL=[[1,1,1],[2.76,.32,.55],[5.4,.12,.3],[8.9,.04,.18]],GLASS=[[1,1,1],[2.4,.22,.5],[4.1,.1,.3]],MARIMBA=[[1,1,1],[3.9,.35,.18],[9.2,.05,.1]],SUB=[[1,1,1]];
 const pan=()=>R(-.15,.15);
+/* real CC0 samples (Kenney, see audio/sfx/LICENSE.txt); the URL carries the game version so a replaced file is never served from the browser cache, loaded once, decoded on first use, played through the master gain MG.
+   One shared player: window.FW_SMP is also used by dev/dev-footsteps-v1.js. The synthesised sound stays as the fallback while a file loads or is missing. */
+const SMP=window.FW_SMP=(()=>{const BUF={};
+ function load(n){if(BUF[n]!==undefined)return;BUF[n]=null;try{ac();fetch('audio/sfx/'+n+'.mp3?v='+(typeof GAME_VERSION=='string'?GAME_VERSION:'')).then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status)).then(b=>new Promise((ok,no)=>AC.decodeAudioData(b,ok,no))).then(d=>{BUF[n]=d}).catch(e=>{BUF[n]=false;console.warn('sfx load '+n,e)})}catch(e){BUF[n]=false}}
+ function play(n,v,rate,pan){if(!FX)return true;const b=BUF[n];if(!b){load(n);return false}
+  try{ac();const s=AC.createBufferSource(),g=AC.createGain();s.buffer=b;s.playbackRate.value=rate||1;g.gain.value=v;
+   let o=g;if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=pan||0;g.connect(p);o=p}
+   s.connect(g);o.connect(MG);s.start();return true}catch(e){return false}}
+ return{load,play,has:n=>!!BUF[n]}})();
 Object.assign(SND,{
  /* click: a crisp little tick with a body, like pressing a good mechanical key */
  click:()=>{sdNz(.01,4200,.14,{q:1.4,ty:'highpass',pan:pan()});sdHit(2100,.035,.07,MARIMBA,{jit:.04,bend:.04});sdHit(260,.03,.06,SUB,{bend:.3,lp:900})},
