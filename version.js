@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.22';
+const GAME_VERSION='v56.0.23';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.22',n:'Storage (F) shows a picture, size and tag for every item, with search and categories for everyone'},
+ {v:'v56.0.23',n:'Storage (F) shows a picture, size and tag for every item, with search and categories for everyone'},
+ {v:'v56.0.22',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent through a Cloudflare Worker and Resend, and new security rules. Nothing changes for players yet'},
  {v:'v56.0.21',n:'Santa\'s Lodge (dev): real recorded cutscene sounds, a bigger burp cutscene, a festive present card, and Santa\'s beard no longer glitches when he talks'},
  {v:'v56.0.20',n:'Admin gifts can now carry several clothing items plus money, streams and listeners in one gift'},
  {v:'v56.0.19',n:'Santa\'s Lodge (dev only): five more pets in Santa\'s presents (penguin, gingerbread pup, snowman, Christmas mouse, arctic fox)'},
