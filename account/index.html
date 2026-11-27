@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your WaveFern account</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" href="/favicon.png">
+<style>
+:root{--bg:#0b1020;--card:#141b33;--line:#26305a;--t:#e9edff;--m:#9aa6d6;--g:#4be39a}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px;background:var(--bg);color:var(--t);font:16px/1.55 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.logo{font:700 26px/1 "Courier New",monospace;letter-spacing:6px;color:var(--g);text-decoration:none}
+main{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px}
+h1{margin:0 0 10px;font-size:21px}p{margin:0 0 16px}.m{color:var(--m);font-size:13px}
+input{width:100%;font:inherit;padding:11px;margin:0 0 12px;border-radius:8px;border:1px solid var(--line);background:#0b1020;color:var(--t)}
+.btn{display:inline-block;border:0;border-radius:10px;padding:13px 24px;font:700 16px/1 inherit;background:var(--g);color:#0b1020;text-decoration:none;cursor:pointer}
+.bad{color:#ff9b9b}.ok{color:#9dffc4}
+</style></head><body>
+<a class="logo" href="/">WAVEFERN</a>
+<main id="m"><h1>One moment…</h1><p class="m">Checking your link.</p></main>
+<script type="module">
+/* v56.0.4: the page the emails link to. Same Firebase project and public web config as the game (86-google-signin.js). Reads the one-time code
+   from the URL and confirms the email address or sets the new password. No secrets here. */
+const FB_V='10.12.2',CFG={apiKey:'AIzaSyBK_7wiX2SEtEhacUsFrgt8URcG1DyHdmA',authDomain:'waveferndata.firebaseapp.com',projectId:'waveferndata',appId:'1:729312399087:web:09d5d134ce654e223ed51a'};
+const q=new URLSearchParams(location.search),mode=q.get('mode'),code=q.get('oobCode'),box=document.getElementById('m');
+history.replaceState(null,'',location.pathname);/* keep the one-time code out of the address bar and history */
+const show=(h,t,cls)=>{box.innerHTML='';const e=document.createElement('h1');e.textContent=h;box.append(e);if(t){const p=document.createElement('p');p.textContent=t;if(cls)p.className=cls;box.append(p)}};
+const play=()=>{const a=document.createElement('a');a.className='btn';a.href='/';a.textContent='Back to WaveFern';box.append(a)};
+const bad=()=>{show('This link does not work','It may have been used already or it expired. Go back to the game and ask for a new email.','bad');play()};
+(async()=>{
+ if(!code||!/^(verifyEmail|resetPassword)$/.test(mode||''))return bad();
+ const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
+ const [a,m,ac]=await Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'app-check.js').catch(()=>null)]);
+ const app=a.initializeApp(CFG);try{ac&&ac.initializeAppCheck(app,{provider:new ac.ReCaptchaEnterpriseProvider('6Lcv_ycuAAAAAEB34hu7jkN3uogbbgyCDmun3DDm'),isTokenAutoRefreshEnabled:true})}catch(e){}
+ const auth=m.getAuth(app);
+ if(mode=='verifyEmail'){
+  try{await m.applyActionCode(auth,code);show('Email confirmed','You are all set. Go back to WaveFern and press "I confirmed it" (or just reopen the game).','ok');play()}catch(e){bad()}
+  return}
+ let email;try{email=await m.verifyPasswordResetCode(auth,code)}catch(e){return bad()}
+ show('Choose a new password');
+ const who=document.createElement('p');who.className='m';who.textContent=email;
+ const pw=document.createElement('input');pw.type='password';pw.autocomplete='new-password';pw.placeholder='New password (8+ characters)';pw.maxLength=128;
+ const err=document.createElement('p');err.className='bad';
+ const b=document.createElement('button');b.className='btn';b.textContent='Save password';
+ const go=async()=>{err.textContent='';if(pw.value.length<8){err.textContent='Use at least 8 characters.';return}b.disabled=true;
+  try{await m.confirmPasswordReset(auth,code,pw.value);show('Password saved','You can sign in to WaveFern with this email and your new password.','ok');play()}catch(e){b.disabled=false;if(e&&e.code=='auth/weak-password')err.textContent='Pick a stronger password.';else bad()}};
+ b.onclick=go;pw.onkeydown=e=>{if(e.key=='Enter')go()};box.append(who,pw,err,b);pw.focus();
+})().catch(bad);
+</script></body></html>
