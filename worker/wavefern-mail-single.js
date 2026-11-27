@@ -9,7 +9,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 /* light (inline) */
 const CARD = '#ffffff', LINE = '#dfe6e2', HEAD = '#0f9d58', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#0f9d58';
 /* brand, same in both */
-const GREEN = '#2fe68a', INKG = '#04120a', BADGE = '#0d1511';
+const GREEN = '#71e392', INKG = '#000000';
 const PIX = "Silkscreen,'Courier New',Courier,monospace";
 const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
 const SITE = 'https://wavefern.com';
@@ -27,7 +27,7 @@ function shell({ preheader, title, intro, button, link, outro }) {
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark;}
 body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
-a.wf-btn:hover{background:#4ff0a0 !important;}
+a.wf-btn:hover{background:#8aeda6 !important;}
 @media (prefers-color-scheme:dark){
  .wf-card{background:#0d1511 !important;border-color:#1c2b23 !important;}
  .wf-h{color:#2fe68a !important;}
@@ -36,7 +36,6 @@ a.wf-btn:hover{background:#4ff0a0 !important;}
  .wf-line{border-top-color:#1c2b23 !important;}
  .wf-link{color:#2fe68a !important;}
  .wf-foot a{color:#7f8f86 !important;}
- .wf-badge{border:1px solid #1c2b23 !important;}
 }
 @media (max-width:620px){
  .wf-pad{padding-left:24px !important;padding-right:24px !important;}
@@ -54,7 +53,7 @@ a.wf-btn:hover{background:#4ff0a0 !important;}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
 
 <tr><td align="center" style="padding:0 0 28px;">
-<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td class="wf-badge" align="center" style="background:${BADGE};border-radius:10px;padding:16px 28px;"><a href="${SITE}/" class="wf-logo" style="font:700 30px/1 ${PIX};letter-spacing:4px;color:#ffffff;text-decoration:none;">WAVEFERN</a></td></tr></table>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td class="wf-badge" align="center" style="background:#ffffff;border:1px solid #dfe6e2;border-radius:8px;padding:16px 28px;"><a href="${SITE}/" class="wf-logo" style="font:700 30px/1 ${PIX};letter-spacing:4px;color:#000000;text-decoration:none;">WAVEFERN</a></td></tr></table>
 </td></tr>
 
 <tr><td class="wf-card" style="background:${CARD};border:1px solid ${LINE};border-radius:12px;">
@@ -62,10 +61,10 @@ a.wf-btn:hover{background:#4ff0a0 !important;}
 <tr><td class="wf-pad wf-h wf-title" align="center" style="padding:40px 48px 0;font:700 20px/1.3 ${PIX};letter-spacing:1px;color:${HEAD};">${esc(title)}</td></tr>
 <tr><td class="wf-pad wf-body" align="center" style="padding:16px 48px 0;font:16px/1.65 ${SANS};color:${BODY};">${intro}</td></tr>
 <tr><td class="wf-pad" align="center" style="padding:28px 48px 0;">
-<!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="${L}" style="height:50px;v-text-anchor:middle;width:400px;" arcsize="16%" stroke="f" fillcolor="${GREEN}"><w:anchorlock/><center style="color:${INKG};font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">${esc(button)}</center></v:roundrect><![endif]-->
+<!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="${L}" style="height:50px;v-text-anchor:middle;width:400px;" arcsize="0%" stroke="f" fillcolor="${GREEN}"><w:anchorlock/><center style="color:${INKG};font-family:'Courier New',monospace;font-size:16px;font-weight:bold;letter-spacing:3px;">${esc(button).toUpperCase()}</center></v:roundrect><![endif]-->
 <!--[if !mso]><!-->
-<table role="presentation" class="wf-btn-wrap" width="80%" cellpadding="0" cellspacing="0" border="0" style="width:80%;max-width:400px;"><tr><td align="center" style="background:${GREEN};border-radius:8px;">
-<a href="${L}" class="wf-btn" style="display:block;padding:15px 24px;border-radius:8px;background:${GREEN};font:600 16px/1.2 ${SANS};color:${INKG};text-decoration:none;text-align:center;">${esc(button)}</a>
+<table role="presentation" class="wf-btn-wrap" width="80%" cellpadding="0" cellspacing="0" border="0" style="width:80%;max-width:400px;"><tr><td align="center" style="background:${GREEN};">
+<a href="${L}" class="wf-btn" style="display:block;padding:22px 24px 20px;background:${GREEN};font:700 16px/1.2 ${PIX};letter-spacing:3px;text-transform:uppercase;color:${INKG};text-decoration:none;text-align:center;">${esc(button)}</a>
 </td></tr></table>
 <!--<![endif]-->
 </td></tr>
