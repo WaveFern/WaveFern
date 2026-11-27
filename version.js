@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.35';
+const GAME_VERSION='v56.0.36';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.35',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.36',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.35',n:'Dev: Disbimp lettering bigger on a black band, also across the bonnet'},
  {v:'v56.0.34',n:'Dev: the Disbimp waits outside the garage in every dev career'},
  {v:'v56.0.33',n:'Dev: Disbimp car repainted red with black trim'},
  {v:'v56.0.32',n:'Dev: Disbimp car, a detailed hypercar with DISBIMP lettering (held behind FW_DEV)'},
