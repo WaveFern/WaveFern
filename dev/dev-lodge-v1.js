@@ -219,14 +219,15 @@ buildProps();
 const TRK={x:4.9,z:3.0,rx:2.3,rz:1.7};/* the toy train's oval track */
 function buildInside(){
  /* Santa's round rug: stepped circles (gold rim, white ring, red field, a darker inner circle with a white snowflake), centred in front of him */
- const disc=(cx,cz,r,y,h,col,step)=>{step=step||.36;for(let z=-r+step/2;z<r;z+=step){const w=2*Math.sqrt(Math.max(0,r*r-z*z));if(w>.2)X('inn',Math.round(w/step)*step,h,step+.01,col,cx,y,cz+z)}};
+ /* smaller rings are inset a little more, so the sides of two layers never sit in the same plane (they flickered) */
+ const disc=(cx,cz,r,y,h,col,step)=>{step=step||.36;const ins=Math.max(0,(6-r)*.04);for(let z=-r+step/2;z<r;z+=step){const w=2*Math.sqrt(Math.max(0,r*r-z*z));if(w>.2)X('inn',Math.round(w/step)*step-ins,h,step+.01-ins*.25,col,cx,y,cz+z)}};
  const RC=[0,-3.4];
  disc(RC[0],RC[1],4.5,.41,.04,C.gold);disc(RC[0],RC[1],4.2,.425,.05,C.white);disc(RC[0],RC[1],3.85,.44,.06,C.red);disc(RC[0],RC[1],2.5,.45,.05,C.redD);
  for(let i=0;i<16;i++){const a=i/16*Math.PI*2;X('inn',.34,.07,.34,i%2?C.goldL:C.white,RC[0]+Math.cos(a)*3.25,.45,RC[1]+Math.sin(a)*3.25,a)}
  for(let i=0;i<6;i++){const a=i/6*Math.PI;X('inn',3.6,.06,.22,C.white,RC[0],.46,RC[1],a);X('inn',.5,.065,.5,C.white,RC[0]+Math.cos(a)*1.45,.46,RC[1]-Math.sin(a)*1.45,a+.785);X('inn',.5,.065,.5,C.white,RC[0]-Math.cos(a)*1.45,.46,RC[1]+Math.sin(a)*1.45,a+.785)}
  X('inn',.7,.07,.7,C.goldL,RC[0],.465,RC[1],.785);
  /* the runner from the door: red with white edges and gold diamonds */
- X('inn',2.6,.04,7.4,C.white,0,.41,4.9);X('inn',2.2,.05,7.4,C.red,0,.42,4.9);for(let i=0;i<6;i++)X('inn',.42,.055,.42,C.goldL,0,.425,1.9+i*1.2,.785);for(let i=0;i<12;i++)X('inn',.18,.055,.18,C.white,i%2?-.75:.75,.425,1.6+i*.6,.785);
+ X('inn',2.6,.04,7.4,C.white,0,.41,4.9);X('inn',2.2,.05,7.32,C.red,0,.42,4.9);for(let i=0;i<6;i++)X('inn',.42,.055,.42,C.goldL,0,.425,1.9+i*1.2,.785);for(let i=0;i<12;i++)X('inn',.18,.055,.18,C.white,i%2?-.75:.75,.425,1.6+i*.6,.785);
  /* a white fur rug in front of the fire, with a sleeping cat on it */
  disc(-7.6,-1.5,1.7,.41,.05,'#e9eef4',.3);disc(-7.6,-1.5,1.4,.42,.05,C.white,.3);
  {const cx=-7.3,cz=-1.2;X('inn',.9,.36,.6,'#e08a3c',cx,.62,cz);X('inn',.5,.34,.48,'#e08a3c',cx+.55,.66,cz+.1);X('inn',.14,.14,.06,'#e08a3c',cx+.45,.88,cz+.1);X('inn',.14,.14,.06,'#e08a3c',cx+.68,.88,cz+.1);
@@ -419,7 +420,7 @@ const SANTA=(()=>{
   part(a,.3,.26,.32,BLK,0,-.87,.04);part(a,.1,.15,.12,BLK,-s*.13,-.82,.18);return a});
  /* head: a big friendly face */
  const head=A.head=grp(body,0,1.86,.04);part(head,.8,.74,.74,SK,0,.37,0);
- part(head,.1,.2,.16,SKD,-.44,.36,0);part(head,.1,.2,.16,SKD,.44,.36,0);
+ part(head,.1,.2,.16,SKD,-.455,.36,0);part(head,.1,.2,.16,SKD,.455,.36,0);
  /* hair at the sides and back */
  part(head,.12,.34,.56,FUR,-.43,.32,-.06);part(head,.12,.34,.56,FUR,.43,.32,-.06);part(head,.84,.42,.14,FUR,0,.34,-.38);
  /* eyes with a glint, bushy brows, round nose, rosy cheeks */
@@ -616,13 +617,13 @@ try{if(!POIS.some(q=>q[2]=="Santa's Lodge"))POIS.push([LX+2,LZ+14,"Santa's Lodge
   x.restore()}catch(e){try{x.restore()}catch(e2){}}return r}}
 
 /* ---------- interactions: E near Santa; E on the present on the rug ---------- */
-const PRES_AT=[SNX,SNZ+3.8];
+const PRES_AT=[SNX,SNZ+3.8],PRES_HOME=PRES_AT.slice();/* where the present rests; after a burp it is wherever it rolled to (near home) */
 INT.push({x:LX+SNX,z:LZ+SNZ+1.6,get r(){return mode_()=='play'&&!SANTA.busy&&inside(P.x,P.z)?4.6:0},get l(){const s=st();return s.pr&&!s.pr.done?'Santa has a present for you':'Talk to Santa'},a:()=>talk()});
-INT.push({x:LX+PRES_AT[0],z:LZ+PRES_AT[1],get r(){return mode_()=='play'&&PRES.on&&PRES.ready&&!SANTA.busy?2.8:0},l:'Open the present',a:()=>openPresent()});
+INT.push({get x(){return LX+PRES_AT[0]},get z(){return LZ+PRES_AT[1]},get r(){return mode_()=='play'&&PRES.on&&PRES.ready&&!SANTA.busy?2.8:0},l:'Open the present',a:()=>openPresent()});
 /* the main tick, run once per frame just before the main camera draws */
 let lastT=performance.now();
 const r0=renderer.render.bind(renderer);
-renderer.render=function(sc,c){if(c===cam){const n=performance.now(),dt=Math.min(.06,(n-lastT)/1000);lastT=n;if(!(typeof PAUSED!='undefined'&&PAUSED)){try{tick(dt)}catch(e){soft(e,'tick')}}if(CUT.live)return filmRender(sc)}return r0(sc,c)};
+renderer.render=function(sc,c){if(c===cam){const n=performance.now(),dt=Math.min(.06,(n-lastT)/1000);lastT=n;if(!(typeof PAUSED!='undefined'&&PAUSED)){try{tick(dt)}catch(e){soft(e,'tick')}}if(CUT.live)return filmRender(sc)}const out=r0(sc,c);if(c===cam&&DLG.open&&!CUT.live)facePort();return out};
 /* ---------- the toy train: an engine and two little wagons chuffing round the oval track ---------- */
 const TRAIN=(()=>{const cars=[];const mk=(i)=>{const g=grp(dynG,0,0,0);
   if(i==0){part(g,.5,.12,.9,'#1d1d22',0,.53,0);part(g,.4,.34,.5,REDC,0,.76,.12);part(g,.34,.34,.34,'#2e2e36',0,.76,.12);part(g,.36,.36,.4,'#2e2e36',0,.78,.18);part(g,.44,.48,.38,REDC,0,.84,-.24);part(g,.5,.08,.46,'#1d1d22',0,1.1,-.24);
@@ -665,15 +666,16 @@ function camFx(dt){const k=1-Math.exp(-dt*4);CINE.ox+=(CINE.tx-CINE.ox)*k;CINE.o
 let TSC=1;
 const CUT={on:0,w:0,t:0,ts:1,hide:0,done:0,live:0};
 /* the game camera is orthographic, so the film is shot on its own perspective camera; the bars slide in, then it cuts over */
-const PCAM=new THREE.PerspectiveCamera(50,1,.1,240);
+/* near .5 / far 140: with a near plane of .1 the depth buffer had too little precision and layered things (rug rings, beard, frames) flickered through each other */
+const PCAM=new THREE.PerspectiveCamera(50,1,.5,140);
 const V3=(x,y,z)=>new THREE.Vector3(x,y,z),CQ=new THREE.Quaternion(),CP=new THREE.Vector3(),CO=new THREE.Object3D();
 const bars=document.createElement('div');bars.id='lodgecut';bars.innerHTML='<i></i><b></b><s></s><em></em><q></q><u></u>';document.body.appendChild(bars);
 /* film lighting, used only for the film frames (filmRender sets it, then puts the game's lights back): the room dims, a warm key light
    picks Santa out, a red light behind him throbs with his heartbeat, and his face goes red while he holds his breath */
 const KEY=new THREE.SpotLight(0xffe0b0,0,34,.42,.7,1.1);KEY.position.set(LX+SNX+2.6,8.2,LZ+SNZ+6.5);KEY.target.position.set(LX+SNX,2.2,LZ+SNZ);scene.add(KEY,KEY.target);
 const RIM=new THREE.PointLight(0xff3a22,0,14,1.6);RIM.position.set(LX+SNX,3.4,LZ+SNZ-2.2);scene.add(RIM);
-const FACE=[SK,SKD].map(c=>({m:lm(c),c0:new THREE.Color(c)})),HOT=new THREE.Color('#e2463a');
-function faceHeat(h){FACE.forEach(f=>f.m.color.copy(f.c0).lerp(HOT,clamp(h,0,1)*.6))}
+const FACE=[SK,SKD].map(c=>({m:lm(c),c0:new THREE.Color(c)})),HOT=new THREE.Color('#e0342c');
+function faceHeat(h){FACE.forEach(f=>f.m.color.copy(f.c0).lerp(HOT,clamp(h,0,1.15)*.82))}
 /* subtitles in the bottom bar while the film runs (the speech bubble follows the game camera, so it would float in the wrong place) */
 const SUB=bars.querySelector('u');let subT=0;
 function say(t,sec){if(!CUT.on)return bubble(t,sec);SUB.innerHTML='<span>SANTA</span>'+t.replace(/[<>&]/g,'');SUB.classList.add('on');clearTimeout(subT);subT=setTimeout(()=>SUB.classList.remove('on'),(sec||2)*1000)}
@@ -688,13 +690,15 @@ function wisps(n){const mo=santaMouth();for(let i=0;i<n;i++){const a=(Math.rando
 function shotAt(t){const h=santaHead(),mo=santaMouth();
  if(t<1.3){const k=sm(0,1.3,t);return{id:0,p:V3(SNX+lerp(3.2,1.8,k),lerp(1.9,2.4,k),SNZ+lerp(8,6.2,k)),l:V3(SNX,h.y-.9,SNZ),f:lerp(50,44,k),r:0,hide:1}}
  if(t<2.45){const k=sm(1.3,2.45,t);return{p:V3(SNX-lerp(.3,.6,k),h.y+lerp(.1,.35,k),h.z+lerp(5,11,k)),l:V3(h.x,h.y-.15,h.z),f:lerp(50,20,k),r:.07*k,hide:1,id:1}}
- if(t<2.9){const k=sm(2.45,2.9,t);return{p:V3(SNX+.3,h.y+.4,h.z+lerp(7.5,6.8,k)),l:V3(h.x,h.y-.05,h.z),f:20,r:-.03,hide:1,id:2}}
- if(t<3.55||!PRES.on||PRES.phase=='fly'&&PRES.bounces<1){const k=sm(2.9,3.6,t);return{p:V3(SNX+lerp(1.4,2.0,k),lerp(.85,1.05,k),SNZ+lerp(6.4,7.0,k)),l:V3(mo.x*.6,mo.y-.6,mo.z),f:60,r:0,hide:1,id:3}}
+ /* the long hold on his red face: framed on the face itself, a slow push in, the heartbeat nudging the lens */
+ if(t<BURPT){const k=sm(2.45,BURPT,t),th=CUT.thump||0;return{p:V3(SNX+lerp(.5,.2,k),h.y+lerp(.05,0,k),h.z+lerp(10,8.2,k)-th*.3),l:V3(h.x,h.y-.05,h.z),f:lerp(24,20,k)-th*.8,r:lerp(-.03,.02,k),hide:1,id:2}}
+ if(t<BURPT+.65||!PRES.on||PRES.phase=='fly'&&PRES.bounces<1){const k=sm(BURPT,BURPT+.7,t);return{p:V3(SNX+lerp(1.4,2.0,k),lerp(.85,1.05,k),SNZ+lerp(6.4,7.0,k)),l:V3(mo.x*.6,mo.y-.25,mo.z),f:60,r:0,hide:1,id:3}}
  /* follow the present down, then a slow hero orbit round it once it rests */
- const g=PRES.g.position,ob=CUT.rest?(CUT.t-CUT.rest)*.55:0,ca=Math.atan2(3.2,2.8)+ob,cr=Math.hypot(3.2,2.8)-Math.min(.9,ob*1.2);
+ const g=PRES.g.position,ob=CUT.rest?(CUT.t-CUT.rest)*.35:0,ca=Math.atan2(3.2,2.8)+ob,cr=Math.hypot(3.2,2.8)-Math.min(.9,ob*1.2);
  return{id:4,p:V3(g.x+Math.sin(ca)*cr,1.75-Math.min(.4,ob*.5),g.z+Math.cos(ca)*cr),l:V3(g.x,g.y+.35,g.z),f:44,r:0,hide:1}}
 /* slow motion: while he holds his breath, and for the first instant of the burp */
-const slowAt=t=>t>2.45&&t<2.9?.42:t>=2.9&&t<3.3?.3:1;
+const BURPT=4.0,HOLDB=[2.5,2.95,3.3,3.58,3.8];/* when he burps, and the heartbeats while he holds his breath (scene time) */
+const slowAt=t=>t>2.45&&t<BURPT?.62:t>=BURPT&&t<BURPT+.4?.3:1;
 /* world name labels are sprites drawn over everything: they are hidden just for the film frames */
 let LBLS=null;const LBLV=[];
 function filmRender(sc){if(!LBLS){LBLS=[];safe(()=>sc.traverse(o=>{if(o.isSprite&&o.material&&o.material.depthTest===false)LBLS.push(o)}),'sprites')}
@@ -704,27 +708,42 @@ function filmRender(sc){if(!LBLS){LBLS=[];safe(()=>sc.traverse(o=>{if(o.isSprite
  roofG.visible=true;roofG.position.y=0;roofMat.opacity=1;cutG.scale.y=1;BULBM.forEach(b=>b.opacity=1);
  const L0=[amb.intensity,sun.intensity,FIRE.intensity],dm=CUT.dim||0;amb.intensity*=1-.6*dm;sun.intensity*=1-.8*dm;FIRE.intensity=Math.max(FIRE.intensity,.6)*(1+dm*.4);KEY.intensity=.3+dm*2.1;RIM.intensity=(CUT.red||0)*1.8;faceHeat(CUT.heat||0);
  try{return r0(sc,PCAM)}finally{amb.intensity=L0[0];sun.intensity=L0[1];FIRE.intensity=L0[2];KEY.intensity=RIM.intensity=0;faceHeat(0);LBLS.forEach((o,i)=>o.visible=LBLV[i]);roofG.visible=w0[0];roofG.position.y=w0[1];roofMat.opacity=w0[2];cutG.scale.y=w0[3];BULBM.forEach((b,i)=>b.opacity=w0[4][i])}}
+/* ---------- Santa's live face in the talk box: his real model, filmed close up by its own small renderer on the portrait's own
+   canvas (the game draws at a low resolution, so the face gets its own), so the portrait talks, blinks and looks just like him.
+   Only his model is drawn there, with two lights hung on him for that render alone. ---------- */
+const FCAM=new THREE.PerspectiveCamera(20,1,.2,40);let FR=null,faceN=0,faceBad=0;
+const FL=[new THREE.AmbientLight(0xfff2e0,.8),new THREE.DirectionalLight(0xfff0dc,.9),new THREE.DirectionalLight(0xffb070,.35)];FL[1].position.set(1.6,2.6,3.2);FL[2].position.set(-2.4,1.2,-1);
+function facePort(){if(faceBad>3||!DLG.el)return;const cv=DLG.el.querySelector('.lpg');if(!cv||!cv.offsetWidth)return;if((faceN++)&1)return;
+ const A=SANTA;try{if(!FR){FR=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:false});FR.setPixelRatio(1);FR.setClearColor(0,0);['outputEncoding','toneMapping','toneMappingExposure','physicallyCorrectLights'].forEach(q=>{if(q in renderer)FR[q]=renderer[q]})}
+  const S=Math.min(160,Math.round(cv.offsetWidth));if(FR.getSize(new THREE.Vector2()).x!==S)FR.setSize(S,S,false);
+  const k=A.g*SB,h=new THREE.Vector3(0,.62,0);A.root.updateMatrixWorld(true);A.head.localToWorld(h);const yaw=(A.look||0)*.6+.08;
+  FCAM.position.set(h.x+Math.sin(yaw)*5.6*k,h.y+.15*k,h.z+Math.cos(yaw)*5.6*k);FCAM.lookAt(h.x,h.y-.05*k,h.z);FCAM.aspect=1;FCAM.updateProjectionMatrix();
+  const bl=A.blob.visible;A.blob.visible=false;FL.forEach(l=>{A.root.add(l);if(l.target){A.root.add(l.target);l.target.position.set(0,1.9,0)}});
+  try{FR.render(A.root,FCAM)}finally{FL.forEach(l=>{A.root.remove(l);if(l.target)A.root.remove(l.target)});A.blob.visible=bl}
+  if(!cv.classList.contains('on'))cv.classList.add('on')}catch(e){faceBad++;soft(e,'face')}}
 function cutStart(){if(CUT.on)return;CUT.on=1;CUT.t=0;CUT.done=0;CUT.w=0;CUT.rest=0;CUT.id=-1;CUT.dim=0;CUT.red=0;CUT.heat=0;CUT.kick=0;LBLS=null;bars.classList.add('on');document.body.classList.add('lodgefilm')}
-function cutEnd(now){if(!CUT.on&&!now)return;CUT.on=0;CUT.ts=1;CUT.live=0;bars.classList.remove('on');if(now){TSC=1}cutRestore()}
+function cutEnd(now){if(!CUT.on&&!now)return;
+ /* the present may have rolled to where you stand: step back from it so you are never inside it */
+ safe(()=>{if(PRES.on){const dx=P.x-(LX+PRES_AT[0]),dz=P.z-(LZ+PRES_AT[1]),d=Math.hypot(dx,dz);if(d<1.9){const k=d>.01?1.9/d:0;P.x=LX+PRES_AT[0]+(k?dx*k:0);P.z=LZ+PRES_AT[1]+(k?dz*k:1.9)}}},'stepback');CUT.on=0;CUT.ts=1;CUT.live=0;bars.classList.remove('on');if(now){TSC=1}cutRestore()}
 function cutRestore(){try{if(P.mesh)P.mesh.visible=true}catch(e){}CUT.hide=0;faceHeat(0);KEY.intensity=RIM.intensity=0;SUB.classList.remove('on');document.body.classList.remove('lodgefilm')}
 function cutCam(dt){
  if(!CUT.on){CUT.w=0;return}
  CUT.t+=dt*TSC;CUT.ts=slowAt(CUT.t);CUT.w+=dt;if(CUT.w>.4)CUT.live=1;
  /* the present is down and resting: hand the camera back */
- if(CUT.t>3.6&&PRES.phase=='rest'&&!CUT.done){CUT.done=1;CUT.rest=CUT.t;say('A present, just for you! Ho ho ho!',2);after(1.7,()=>cutEnd())}
+ if(CUT.t>BURPT+.7&&PRES.phase=='rest'&&!CUT.done){CUT.done=1;CUT.rest=CUT.t;say('A present, just for you! Ho ho ho!',2);after(1.7,()=>cutEnd())}
  const T=CUT.t,S0=shotAt(T);
  /* a cut to the present is a whip pan: a quick blur across the frame */
  if(S0.id!==CUT.id){if(CUT.id==3&&S0.id==4)safe(()=>renderer.domElement.animate([{filter:'blur(7px) brightness(1.25)'},{filter:'blur(0) brightness(1)'}],{duration:280,easing:'ease-out'}),'whip');CUT.id=S0.id}
  /* light: the room dims as the tension builds, comes back with the burp; the heartbeat throb fades; his face reddens while he holds his breath */
- const dimW=T<1.3?.3*sm(0,1.3,T):T<2.9?.3+.5*sm(1.3,2.5,T):T<3.5?.1:0,heatW=T<2.9?sm(1.2,2.8,T):0;
- CUT.dim+=(dimW-CUT.dim)*Math.min(1,dt*(T<2.9?3:9));CUT.heat+=(heatW-CUT.heat)*Math.min(1,dt*(T<2.9?2.5:4));CUT.red*=Math.pow(.04,dt);CUT.kick*=Math.pow(.02,dt);
+ const dimW=T<1.3?.3*sm(0,1.3,T):T<BURPT?.3+.5*sm(1.3,2.5,T):T<BURPT+.6?.1:0,heatW=T<BURPT?sm(1.2,2.7,T)*(1+.15*(CUT.thump||0)):0;
+ CUT.dim+=(dimW-CUT.dim)*Math.min(1,dt*(T<BURPT?3:9));CUT.heat+=(heatW-CUT.heat)*Math.min(1,dt*(T<BURPT?2.5:4));CUT.red*=Math.pow(.04,dt);CUT.kick*=Math.pow(.02,dt);CUT.thump=(CUT.thump||0)*Math.pow(.002,dt);
  PCAM.position.copy(S0.p).add(root.position);PCAM.up.set(0,1,0);PCAM.lookAt(S0.l.x+root.position.x,S0.l.y+root.position.y,S0.l.z+root.position.z);PCAM.rotateZ(S0.r);
  /* a hand-held drift, so it never looks like a locked-off game camera */
  PCAM.rotateX(Math.sin(T*1.31)*.006+Math.sin(T*2.7)*.003);PCAM.rotateY(Math.sin(T*.93+1)*.008);PCAM.translateY(Math.sin(T*1.7+2)*.02);
  const asp=innerWidth/Math.max(1,innerHeight),fv=S0.f+CUT.kick*18;if(PCAM.fov!==fv||PCAM.aspect!==asp){PCAM.fov=fv;PCAM.aspect=asp;PCAM.updateProjectionMatrix()}
  SHK*=Math.pow(.03,dt);if(SHK>.002){PCAM.translateX((Math.random()-.5)*SHK*1.4);PCAM.translateY((Math.random()-.5)*SHK*1.4)}
  const hide=CUT.on&&S0.hide;if(hide!==CUT.hide){CUT.hide=hide;try{if(P.mesh)P.mesh.visible=!hide}catch(e){}}
- bars.style.setProperty('--vg',(CUT.on&&CUT.t>1.3&&CUT.t<2.9?.55:.25).toFixed(2))}
+ bars.style.setProperty('--vg',(CUT.on&&CUT.t>1.3&&CUT.t<BURPT?.55+(CUT.t>2.45?.15:0):.25).toFixed(2))}
 
 /* ---------- speech bubble over his head (greetings, mutters) ---------- */
 const bub=document.createElement('div');bub.id='lodgebub';document.body.appendChild(bub);let bubT=0;
@@ -748,18 +767,18 @@ const PCOL={R:'#c8261f',W:'#f8fafc',S:'#f0b48a',K:'#1d1d22',N:'#e98a80',P:'#ee8a
 function portrait(cv){const c=cv.getContext('2d');c.clearRect(0,0,16,16);PORT.forEach((r,y)=>[...r].forEach((ch,x)=>{if(PCOL[ch]){c.fillStyle=PCOL[ch];c.fillRect(x,y,1,1)}}))}
 function pips(){const f=st().f;return Array.from({length:5},(_,i)=>`<i class="${i<f?'on':''}"></i>`).join('')}
 function ensureDlg(){if(DLG.el)return DLG.el;const e=document.createElement('div');e.id='lodged';e.setAttribute('role','dialog');e.setAttribute('aria-label','Santa');
- e.innerHTML=`<div class=lcard><div class=lhd><canvas class=lpt width=16 height=16></canvas><div class=lnm><b>SANTA</b><small>Santa's Lodge</small></div><div class=lpips title="Treats fed this round">${pips()}</div></div><div class=ltx></div><div class=lbt></div><div class=lhint>Click or press Enter to continue &middot; Esc to leave</div></div>`;
+ e.innerHTML=`<div class=lcard><div class=lhd><div class=lpf><canvas class=lpt width=16 height=16></canvas><canvas class=lpg></canvas></div><div class=lnm><b>SANTA</b><small>Santa's Lodge</small></div><div class=lpips title="Treats fed this round">${pips()}</div></div><div class=ltx></div><div class=lbt></div><div class=lhint>Click or press Enter to continue &middot; Esc to leave</div></div>`;
  document.body.appendChild(e);portrait(e.querySelector('.lpt'));e.addEventListener('click',ev=>{if(ev.target.closest('button'))return;skipText()});return DLG.el=e}
 function openDlg(){const m=mode_();if(!(m=='play'||m=='menu'))return false;if(m=='play'){DLG.mode0='play';try{$('ui').innerHTML=''}catch(e){}mode='menu'}ensureDlg();DLG.open=true;DLG.el.classList.add('on');DLG.el.querySelector('.lpips').innerHTML=pips();CINE.tx=(LX+SNX-P.x)*.35;CINE.tz=(LZ+SNZ-P.z)*.35;return true}
 function closeDlg(keepMode){if(!DLG.open)return;DLG.open=false;DLG.token=(DLG.token||0)+1;if(DLG.el)DLG.el.classList.remove('on');SANTA.open=0;SANTA.talk=0;applySanta();if(!keepMode){CINE.tx=CINE.tz=0;if(mode_()=='menu')mode='play'}}
 /* say lines one by one (a click moves on), each typed out with little voice blips and a flapping jaw; then call done */
 function sayLines(lines,done,btnsFn){const tok=DLG.token=(DLG.token||0)+1;let i=0;const el=DLG.el,tx=el.querySelector('.ltx'),bt=el.querySelector('.lbt');bt.innerHTML='';
  const next=()=>{if(tok!=DLG.token||!DLG.open)return;if(i>=lines.length){DLG.advance=null;if(btnsFn)btnsFn(bt);else done&&done();return}typeLine(lines[i++],tx,el)};DLG.advance=next;next()}
-function typeLine(text,tx,el){DLG.text=text;DLG.n=0;DLG.full=false;tx.textContent='';el.querySelector('.lhint').style.visibility='visible';const tok=DLG.token,A=SANTA;
- const step=()=>{if(tok!=DLG.token||!DLG.open)return;if(DLG.n>=text.length){DLG.full=true;A.talk=0;return}
+function typeLine(text,tx,el){el.classList.add('talk');DLG.text=text;DLG.n=0;DLG.full=false;tx.textContent='';el.querySelector('.lhint').style.visibility='visible';const tok=DLG.token,A=SANTA;
+ const step=()=>{if(tok!=DLG.token||!DLG.open)return;if(DLG.n>=text.length){DLG.full=true;A.talk=0;el.classList.remove('talk');return}
   const ch=text[DLG.n++];tx.textContent=text.slice(0,DLG.n);if(/[a-z]/i.test(ch)&&DLG.n%2){if(!LS('syl'))voice(115+Math.random()*60,.09,.12,{bend:1.25,lp:420});A.talk=.16+Math.random()*.16}else if(ch==' '||/[.,!?]/.test(ch)){A.talk=.02}
   DLG.timer=setTimeout(step,/[.!?]/.test(ch)?170:/,/.test(ch)?90:26)};step()}
-function skipText(){if(!DLG.open)return;if(!DLG.full){clearTimeout(DLG.timer);DLG.n=DLG.text.length;DLG.el.querySelector('.ltx').textContent=DLG.text;DLG.full=true;SANTA.talk=0;return}if(DLG.advance)DLG.advance()}
+function skipText(){if(!DLG.open)return;if(!DLG.full){clearTimeout(DLG.timer);DLG.n=DLG.text.length;DLG.el.querySelector('.ltx').textContent=DLG.text;DLG.full=true;SANTA.talk=0;DLG.el.classList.remove('talk');return}if(DLG.advance)DLG.advance()}
 function btn(bt,label,fn,cls,img,dis){const b=document.createElement('button');b.type='button';b.className=cls||'';b.disabled=!!dis;b.innerHTML=(img?`<img src="${img}" alt="">`:'')+label;b.onclick=()=>{sn('click');fn()};bt.appendChild(b);return b}
 function menu(first,pre){const s=st(),f=s.f,el=ensureDlg(),carry=s.c.cookie+s.c.cane;el.querySelector('.lhint').style.visibility='hidden';el.querySelector('.lpips').innerHTML=pips();
  let line;if(pre)line=pre;else if(s.pr&&!s.pr.done)line="Your present is waiting for you on the rug! Go on, open it. Ho ho ho!";
@@ -848,12 +867,16 @@ function burp(){const s=st(),A=SANTA;cutStart();
   const g1=A.g,b1=A.bw;tween(1.1,k=>{const e=sm(0,1,k);A.g=lerp(g1,2.04,e);A.bw=lerp(b1,2.3,e);A.sq=-.08+Math.sin(k*38)*.05*k;A.sway=Math.sin(k*52)*.05*k;A.root.position.x=SNX+Math.sin(k*46)*.03*k;A.hatLift=Math.sin(k*70)*.18*k;A.eyeW=1.45+.25*k;A.cheek=1;applySanta()},()=>{A.root.position.x=SNX});
   [0,.2,.4,.6,.8,1.0].forEach(d=>after(d,()=>shake(.05+d*.06)));
   [.3,.6,.9].forEach(d=>after(d,()=>{const h=santaHead();emit(h.x,h.y+.1,h.z+.2,5,{colors:['#bfe6ff','#ffffff'],speed:2.2,up:2,size:.07,life:.7,grav:9,floor:-9,spread:.4})}))});
- /* 3. he holds his breath for a heartbeat, eyes squeezed shut */
- after(2.2,()=>LS('choir',1.5));
- after(2.45,()=>{A.hatLift=0;A.blink=.9;A.tilt=-.34;applySanta();if(!LS('beat',.8))safe(()=>sdHit(60,.5,.25,[[1,1,1]],{jit:0}),'hb');CUT.red=1;shake(.02);flash('#3a0000',.25,.5)});
- after(2.68,()=>{if(!LS('beat',1))safe(()=>sdHit(55,.5,.3,[[1,1,1]],{jit:0}),'hb2');CUT.red=1;flash('#3a0000',.3,.4)});
+ /* 3. he holds his breath: a long close-up on his face going redder and redder, cheeks puffed, eyes squeezed, sweating,
+    the heartbeat speeding up, then a last tip back of the head... */
+ after(2.2,()=>LS('choir',2.4));
+ after(2.45,()=>{A.hatLift=0;A.blink=.9;A.tilt=-.08;A.cheek=1;applySanta();say('Mmmmph...',1.6);
+  tween(BURPT-2.6,k=>{A.cheek=1+Math.sin(k*40)*.12*k;A.blink=.75+.25*Math.abs(Math.sin(k*9));A.sway=Math.sin(k*70)*.018*(.4+k);A.root.position.x=SNX+Math.sin(k*90)*.012*k;A.eyeW=1.5+.2*k;applySanta()},()=>{A.root.position.x=SNX})});
+ HOLDB.forEach((d,i)=>after(d,()=>{const v=.7+i*.08;if(!LS('beat',v))safe(()=>sdHit(60-i*2,.5,.25,[[1,1,1]],{jit:0}),'hb');CUT.red=1;CUT.thump=1;shake(.015+i*.006);flash('#3a0000',.2+i*.03,.4)}));
+ [2.7,3.1,3.5].forEach(d=>after(d,()=>{const h=santaHead();emit(h.x+(Math.random()<.5?-.45:.45)*SANTA.g*SB,h.y+.25,h.z+.25,2,{colors:['#bfe6ff','#ffffff'],speed:.6,up:.4,size:.08,life:.9,grav:5,floor:-9})}));
+ after(BURPT-.16,()=>{tween(.14,k=>{A.tilt=lerp(-.08,-.34,sm(0,1,k));applySanta()})});
  /* 4. BURP */
- after(2.9,()=>doBurp(pr,col))}
+ after(BURPT,()=>doBurp(pr,col))}
 function doBurp(pr,col){const A=SANTA;const mo=santaMouth();
  burpSound(true);shake(.55);A.blink=0;A.eyeW=1.2;CUT.kick=1;CUT.heat=0;speedLines(900);dust(30);
  tween(.14,k=>{A.open=lerp(0,1,k);A.tilt=lerp(-.34,.22,easeOutSine(k));applySanta()});
@@ -892,20 +915,60 @@ PRES.beam=[0,1].map(i=>{const b=new THREE.Mesh(beamGeo,beamMat.clone());b.materi
 PRES.glow=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide}));PRES.glow.rotation.x=-Math.PI/2;PRES.glow.position.y=.06;PRES.g.add(PRES.glow);PRES.glow.scale.setScalar(1.8);
 function tintPresent(col){PRES.beam.forEach(b=>{b.material.map=beamTex;b.material.color.set(col);b.material.needsUpdate=true});PRES.glow.material.color.set(col)}
 const PREST=.48;/* floor height of the rug top under the present */
-function placePresent(rest,pr){PRES.on=true;PRES.g.visible=true;PRES.pr=pr;tintPresent('#ffd75e');PRES.g.position.set(PRES_AT[0],PREST,PRES_AT[1]);PRES.g.rotation.set(0,rest?.5:0,0);PRES.m.scale.setScalar(1);PRES.m.rotation.set(0,0,0);PRES.m.position.y=PC;if(PRES.lid){PRES.lid.visible=true;PRES.lid.position.set(0,LIDY,0);PRES.lid.rotation.set(0,0,0)}
+function placePresent(rest,pr){if(rest){PRES_AT[0]=PRES_HOME[0];PRES_AT[1]=PRES_HOME[1]}PRES.on=true;PRES.g.visible=true;PRES.pr=pr;tintPresent('#ffd75e');PRES.g.position.set(PRES_AT[0],PREST,PRES_AT[1]);PRES.g.rotation.set(0,rest?.5:0,0);PRES.m.scale.setScalar(1);PRES.m.rotation.set(0,0,0);PRES.m.position.y=PC;if(PRES.lid){PRES.lid.visible=true;PRES.lid.position.set(0,LIDY,0);PRES.lid.rotation.set(0,0,0)}
  PRES.phase=rest?'rest':'';PRES.ready=!!rest;PRES.beam.forEach(b=>{b.visible=!!rest;b.scale.y=1});PRES.glow.visible=!!rest}
 function launchPresent(pr,col,mo){placePresent(false,pr);PRES.beam.forEach(b=>b.visible=false);PRES.glow.visible=false;PRES.ready=false;PRES.phase='fly';PRES.t=0;PRES.bounces=0;
- const T=.95,gv=17,x0=mo.x,y0=mo.y,z0=mo.z+.3,xL=PRES_AT[0],zL=PRES_AT[1],yL=PREST;
- LS('whoosh',.6);PRES.vx=(xL-x0)/T;PRES.vz=(zL-z0)/T;PRES.vy=(yL-y0+.5*gv*T*T)/T;PRES.gv=gv;PRES.g.position.set(x0,y0-.35,z0);PRES.spin=new THREE.Vector3(7,9,4);PRES.m.scale.setScalar(.05);PRES.col=col;PRES.sq=0}
+ /* thrown in a real arc at a spot a little short of home, so it lands, tumbles over and rolls to a stop near it */
+ const T=.8,gv=17,x0=mo.x,y0=mo.y,z0=mo.z+.3,xL=PRES_HOME[0]+(Math.random()-.5)*.4,zL=PRES_HOME[1]-.8,yL=PREST+PHE.y+.1;
+ LS('whoosh',.6);PRES.gv=gv;PRES.g.rotation.set(0,0,0);PRES.g.position.set(x0,y0-.35-PC,z0);
+ PRES.c=new THREE.Vector3(x0,y0-.35,z0);PRES.v=new THREE.Vector3((xL-x0)/T,(yL-(y0-.35)+.5*gv*T*T)/T,(zL-z0)/T);
+ /* spin mostly end over end toward the player, with a little wobble */
+ PRES.w=new THREE.Vector3(7+Math.random()*2,(Math.random()-.5)*3,(Math.random()-.5)*3);PRES.q=new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.random()*.6,Math.random()*Math.PI*2,Math.random()*.6));
+ PRES.m.quaternion.copy(PRES.q);PRES.m.position.y=PC;PRES.m.scale.setScalar(.05);PRES.col=col;PRES.sq=0;PRES.still=0;PRES.lastHit=0}
+/* the present as a rigid box: gravity, then every corner below the rug pushes back with an impulse (bounce + friction) that
+   also spins it, so it tumbles, rolls over its edges and comes to rest flat on a face. Sub-stepped so a slow frame never tunnels. */
+const PHE=(()=>{const bb=new THREE.Box3().setFromObject(PRES.body);return new THREE.Vector3((bb.max.x-bb.min.x)/2,(bb.max.y-bb.min.y)/2,(bb.max.z-bb.min.z)/2)})();
+const PCN=[];for(let i=0;i<8;i++)PCN.push(new THREE.Vector3(i&1?PHE.x:-PHE.x,i&2?PHE.y:-PHE.y,i&4?PHE.z:-PHE.z));
+const PINV=3/((PHE.x*PHE.x+PHE.y*PHE.y+PHE.z*PHE.z)*4/3);/* 1/I for a unit-mass box, averaged over the axes */
+const _r=new THREE.Vector3(),_vp=new THREE.Vector3(),_t=new THREE.Vector3(),_dq=new THREE.Quaternion(),_ax=new THREE.Vector3();
+function presPhys(h){const c=PRES.c,v=PRES.v,w=PRES.w,q=PRES.q;
+ v.y-=PRES.gv*h;c.addScaledVector(v,h);
+ const wl=w.length();if(wl>1e-5){_dq.setFromAxisAngle(_ax.copy(w).divideScalar(wl),wl*h);q.premultiply(_dq).normalize()}
+ let low=0,touch=0,hit=0;
+ for(const k of PCN){_r.copy(k).applyQuaternion(q);const py=c.y+_r.y;if(py<PREST){low=Math.max(low,PREST-py);touch++;
+  _vp.copy(w).cross(_r).add(v);
+  if(_vp.y<0){const rn=_t.set(-_r.z,0,_r.x);/* r x n with n = up */const jn=-(1+(-_vp.y>2?.32:0))*_vp.y/(1+PINV*rn.lengthSq());
+   v.y+=jn;w.addScaledVector(rn,PINV*jn);hit=Math.max(hit,-_vp.y);
+   /* friction against the slide at that corner */
+   _vp.copy(w).cross(_r).add(v);const vx=_vp.x,vz=_vp.z,vt=Math.hypot(vx,vz);
+   if(vt>1e-4){const tx=vx/vt,tz=vz/vt,rt=_t.set(_r.y*tz,_r.z*tx-_r.x*tz,-_r.y*tx);const jt=Math.min(vt/(1+PINV*rt.lengthSq()),.7*jn);
+    v.x-=tx*jt;v.z-=tz*jt;w.addScaledVector(rt,-PINV*jt)}}}}
+ if(low>0)c.y+=low;
+ if(touch){w.multiplyScalar(Math.pow(.25,h));v.x*=Math.pow(.6,h);v.z*=Math.pow(.6,h)}else w.multiplyScalar(Math.pow(.9,h));
+ return{touch,hit}}
+function presUp(){/* which way up it lies: its local axis that points most nearly up, and the yaw of the box about that axis */
+ const ax=[new THREE.Vector3(1,0,0),new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1)];let best=1,bd=0,sg=1;ax.forEach((a,i)=>{const d=a.clone().applyQuaternion(PRES.q).y;if(Math.abs(d)>bd){bd=Math.abs(d);best=i;sg=Math.sign(d)}});
+ const fwd=new THREE.Vector3(0,0,1).applyQuaternion(PRES.q);if(best==2)fwd.set(1,0,0).applyQuaternion(PRES.q);return{upright:best==1&&sg>0,yaw:Math.atan2(fwd.x,fwd.z)}}
 function stepPresent(dt){if(!PRES.on)return;const g=PRES.g;
- if(PRES.phase=='fly'){PRES.t+=dt;PRES.m.scale.setScalar(Math.min(1,PRES.m.scale.x+dt*7));PRES.vy-=PRES.gv*dt;g.position.x+=PRES.vx*dt;g.position.z+=PRES.vz*dt;g.position.y+=PRES.vy*dt;PRES.m.rotation.x+=PRES.spin.x*dt;PRES.m.rotation.y+=PRES.spin.y*dt;PRES.m.rotation.z+=PRES.spin.z*dt;
-  if(Math.random()<.85)emit(g.position.x,g.position.y+.3,g.position.z,1,{colors:[PRES.col,'#ffffff','#fff6c8'],speed:.4,up:.2,grav:1,life:.7,size:.13,floor:-9});
-  const low=presLow();if(low<PREST)g.position.y+=PREST-low;
-  if(low<=PREST&&PRES.vy<0){const sp=-PRES.vy;PRES.bounces++;shake(Math.min(.3,sp*.02));if(!LS('bounce',PRES.bounces-1)){sn('pop');safe(()=>sdHit(90+Math.random()*20,.25,.3,[[1,1,1],[2.4,.3,.4]],{bend:.5}),'thud')}
-   emit(g.position.x,PREST+.1,g.position.z,10,{colors:['#e9f0f6','#ffffff',PRES.col],speed:1.6,up:1.4,size:.12,life:.7,grav:9});PRES.sq=1;
-   PRES.vy=sp*.44;PRES.vx*=.45;PRES.vz*=.45;PRES.spin.multiplyScalar(.45);if(PRES.bounces>=4||PRES.vy<1.6){PRES.vy=0;PRES.phase='settle';PRES.t=0}}}
- else if(PRES.phase=='settle'){PRES.t+=dt;const k=clamp(PRES.t/.5,0,1),fl=a=>a-Math.round(a/(Math.PI*2))*Math.PI*2,e=Math.min(1,dt*9);PRES.m.rotation.x=fl(PRES.m.rotation.x)*(1-e);PRES.m.rotation.z=fl(PRES.m.rotation.z)*(1-e);g.position.y+=(PREST-g.position.y)*e;{const low=presLow();if(low<PREST)g.position.y+=PREST-low}PRES.m.rotation.y+=(Math.round(PRES.m.rotation.y/(Math.PI/2))*Math.PI/2-PRES.m.rotation.y)*Math.min(1,dt*8);g.position.x+=PRES.vx*dt;g.position.z+=PRES.vz*dt;PRES.vx*=.9;PRES.vz*=.9;
-  if(k>=1){PRES.phase='rest';PRES.ready=true;PRES.m.rotation.set(0,0,0);g.rotation.y=PRES.m.rotation.y;PRES.beam.forEach(b=>{b.visible=true;b.scale.y=.01});PRES.glow.visible=true;if(!LS('present'))chimeUp();floatText('A PRESENT!',PRES.col,false,new THREE.Vector3(LX+PRES_AT[0],2.2,LZ+PRES_AT[1]));
+ if(PRES.phase=='fly'){PRES.t+=dt;PRES.m.scale.setScalar(Math.min(1,PRES.m.scale.x+dt*7));
+  const n=Math.min(40,Math.ceil(dt/.004)),h=dt/n;let hit=0,touch=0;for(let i=0;i<n;i++){const r=presPhys(h);hit=Math.max(hit,r.hit);touch+=r.touch}
+  /* keep it on the rug: a soft wall round home so a wild bounce never ends up under Santa or by the door */
+  const dx=PRES.c.x-PRES_HOME[0],dz=PRES.c.z-PRES_HOME[1],dd=Math.hypot(dx,dz);if(dd>.9&&PRES.bounces){const f=Math.min(30,(dd-.9)*40)*dt;PRES.v.x-=dx/dd*f;PRES.v.z-=dz/dd*f}
+  g.position.set(PRES.c.x,PRES.c.y-PC,PRES.c.z);PRES.m.quaternion.copy(PRES.q);PRES.m.position.y=PC;
+  if(!PRES.bounces&&Math.random()<.85)emit(PRES.c.x,PRES.c.y,PRES.c.z,1,{colors:[PRES.col,'#ffffff','#fff6c8'],speed:.4,up:.2,grav:1,life:.7,size:.13,floor:-9});
+  if(hit>1.2&&PRES.t-PRES.lastHit>.1){PRES.lastHit=PRES.t;const n0=PRES.bounces++;shake(Math.min(.3,hit*.025));if(!LS('bounce',Math.min(3,n0))){sn('pop');safe(()=>sdHit(90+Math.random()*20,.25,.3,[[1,1,1],[2.4,.3,.4]],{bend:.5}),'thud')}
+   emit(PRES.c.x,PREST+.1,PRES.c.z,Math.round(4+hit*1.2),{colors:['#e9f0f6','#ffffff',PRES.col],speed:Math.min(2.4,.6+hit*.2),up:1.2,size:.11,life:.7,grav:9});if(hit>3)PRES.sq=Math.min(1,hit/8)}
+  /* asleep: slow and touching for a moment */
+  if(touch&&PRES.v.length()<.25&&PRES.w.length()<.8)PRES.still+=dt;else PRES.still=0;
+  if(PRES.still>.18||PRES.t>6){const u=presUp();PRES.phase='settle';PRES.t=0;PRES.s0=PRES.q.clone();PRES.s1=new THREE.Quaternion().setFromEuler(new THREE.Euler(0,u.yaw,0));PRES.sy0=PRES.c.y;PRES.hop=!u.upright;
+   if(PRES.hop){/* landed on its side: it gives a little magic hop and lands the right way up */LS('sparkle',3);emit(PRES.c.x,PREST+.3,PRES.c.z,12,{colors:['#ffd75e','#ffffff'],speed:1.6,up:2,size:.1,life:.8,grav:6})}}}
+ else if(PRES.phase=='settle'){PRES.t+=dt;const D=PRES.hop?.5:.18,k=clamp(PRES.t/D,0,1),e=sm(0,1,k);
+  PRES.q.slerpQuaternions(PRES.s0,PRES.s1,e);PRES.m.quaternion.copy(PRES.q);
+  const yR=PREST+PHE.y;PRES.c.y=lerp(PRES.sy0,yR,e)+(PRES.hop?Math.sin(k*Math.PI)*.7:0);g.position.set(PRES.c.x,PRES.c.y-PC,PRES.c.z);
+  if(k>=1){if(PRES.hop){LS('bounce',2);PRES.sq=.6}
+   /* it rests where it rolled to: that is now where you open it */
+   PRES_AT[0]=PRES.c.x;PRES_AT[1]=PRES.c.z;const yw=new THREE.Euler().setFromQuaternion(PRES.s1,'YXZ').y;
+   PRES.phase='rest';PRES.ready=true;PRES.m.rotation.set(0,0,0);PRES.m.position.y=PC;g.rotation.y=yw;g.position.set(PRES_AT[0],PREST+PHE.y-PC,PRES_AT[1]);PRES.beam.forEach(b=>{b.visible=true;b.scale.y=.01});PRES.glow.visible=true;if(!LS('present'))chimeUp();floatText('A PRESENT!',PRES.col,false,new THREE.Vector3(LX+PRES_AT[0],2.2,LZ+PRES_AT[1]));
    after(CUT.on?2.1:.9,()=>{if(!DLG.open&&PRES.on&&PRES.phase=='rest'&&SANTA.busy)presentTalk()})}}
  else if(PRES.phase=='rest'){const t=CLOCK;PRES.beam.forEach(b=>{b.scale.y=Math.min(1,b.scale.y+dt*1.6);b.scale.x=.9+Math.sin(t*2.4)*.15});PRES.glow.scale.setScalar(1.8+Math.sin(t*3)*.18);{const sc=1+Math.sin(t*2.8)*.025;PRES.m.scale.setScalar(sc);PRES.m.position.y=PC*sc}if(Math.random()<dt*3)emit(PRES_AT[0],PREST+.8,PRES_AT[1],1,{colors:[PRES.col,'#ffffff'],speed:.5,up:1.2,grav:-.2,life:1.4,size:.1,floor:-9,spread:.8})}
  /* squash on landing */
@@ -943,21 +1006,36 @@ function flash(col,a,sec){const f=document.createElement('div');f.className='lod
 
 /* ---------- styles ---------- */
 const css2=document.createElement('style');css2.textContent=`
-#lodged{position:fixed;left:50%;bottom:22px;z-index:90;width:min(720px,94vw);transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s;font:14px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec}
+#lodged{position:fixed;left:50%;bottom:22px;z-index:90;width:min(760px,95vw);transform:translate(-50%,24px) scale(.97);opacity:0;pointer-events:none;transition:opacity .2s,transform .3s cubic-bezier(.2,.9,.3,1.2);font:14px/1.45 ui-monospace,Menlo,Consolas,monospace;color:#fff}
 #lodged.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-#lodged .lcard{position:relative;padding:16px 16px 10px;background:#0c0c0c;border:3px solid #000;box-shadow:inset 0 0 0 2px #262626,6px 6px 0 #000a}
-#lodged .lcard:before{content:'';position:absolute;left:0;right:0;top:0;height:7px;background:repeating-linear-gradient(135deg,#c0392b 0 8px,#f4f4f4 8px 16px);border-bottom:3px solid #000}
-#lodged .lhd{display:flex;align-items:center;gap:12px;margin:6px 0 8px}
-#lodged .lpt{width:56px;height:56px;image-rendering:pixelated;background:#1b2a3f;border:3px solid #000;box-shadow:inset 0 0 0 2px #3d5a80}
-#lodged .lnm{flex:1}#lodged .lnm b{display:block;font:700 15px Silkscreen,ui-monospace,monospace;letter-spacing:2px;color:#ffd75e}#lodged .lnm small{color:#8aa094;font-size:11px}
-#lodged .lpips{display:flex;gap:4px}#lodged .lpips i{width:14px;height:14px;background:#262626;border:2px solid #000;transform:rotate(45deg)}#lodged .lpips i.on{background:#ffd75e;box-shadow:0 0 6px #ffd75e}
-#lodged .ltx{min-height:46px;font-size:15px;color:#fff}
-#lodged .lbt{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-#lodged .lbt button{display:flex;align-items:center;gap:7px;padding:9px 14px;background:#1a1a1a;color:#e8f3ec;border:3px solid #000;box-shadow:inset 0 -3px #0008;font:700 12px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer}
-#lodged .lbt button b{color:#ffd75e}#lodged .lbt button img{width:26px;height:26px;image-rendering:pixelated}
-#lodged .lbt button.go{background:#2e8b4e;color:#fff}#lodged .lbt button:hover:not(:disabled){filter:brightness(1.25)}#lodged .lbt button:active:not(:disabled){transform:translateY(1px)}
-#lodged .lbt button:disabled{opacity:.4;cursor:not-allowed}
-#lodged .lhint{margin-top:8px;color:#5f7568;font-size:10px;text-align:right}
+/* a red wrapped card with a gold edge and a holly garland, like Santa's present card */
+#lodged .lcard{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr auto auto;column-gap:16px;padding:20px 18px 12px;background:repeating-linear-gradient(135deg,#0000 0 14px,#ffffff07 14px 28px),linear-gradient(#8e1420,#560a13);border:3px solid #000;box-shadow:inset 0 0 0 3px #e6b422,inset 0 0 0 6px #6d0e18,inset 0 0 0 8px #e6b42255,0 0 40px #ff5a3a33,7px 7px 0 #000b}
+#lodged .lcard:before{content:'';position:absolute;left:0;right:0;top:0;height:12px;background:radial-gradient(circle at 8px 6px,#ff3b3b 0 3px,#0000 3.5px) 0 0/34px 12px,radial-gradient(circle at 22px 8px,#ffd75e 0 2px,#0000 2.5px) 0 0/34px 12px,repeating-linear-gradient(135deg,#1f6e36 0 7px,#2f9e4f 7px 14px);border-bottom:3px solid #000}
+#lodged .lhd{display:contents}
+/* his live face in a gold frame */
+#lodged .lpf{grid-row:1/5;align-self:start;position:relative;width:132px;height:132px;margin-top:2px;border:3px solid #000;box-shadow:inset 0 0 0 3px #e6b422,0 0 0 2px #6d0e18,0 0 18px #ffd75e44;background:radial-gradient(circle at 50% 40%,#2c4a7a,#0d1a33);overflow:hidden}
+#lodged .lpf:after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 0 3px #e6b422,inset 0 0 18px #0008;pointer-events:none}
+#lodged .lpt,#lodged .lpg{position:absolute;inset:0;display:block;width:100%;height:100%;image-rendering:pixelated}#lodged .lpg{opacity:0;transition:opacity .25s}#lodged .lpg.on{opacity:1}#lodged .lpg.on~.lpt,#lodged .lpf:has(.lpg.on) .lpt{visibility:hidden}
+#lodged.talk .lpf{animation:lodgebob .28s ease-in-out infinite alternate}
+@keyframes lodgebob{to{transform:translateY(-2px)}}
+#lodged .lnm{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}#lodged .lnm b{font:700 17px Silkscreen,ui-monospace,monospace;letter-spacing:3px;color:#ffd75e;text-shadow:2px 2px 0 #000}#lodged .lnm small{color:#f6c9bf;font-size:11px;letter-spacing:1px}
+#lodged .lpips{position:absolute;right:16px;top:20px;display:flex;gap:6px}
+#lodged .lpips i{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7a2a2a,#2a0a0e);border:2px solid #000;position:relative}
+#lodged .lpips i:before{content:'';position:absolute;left:4px;top:-5px;width:4px;height:3px;background:#b08a3a;border:1px solid #000}
+#lodged .lpips i.on{background:radial-gradient(circle at 35% 30%,#fff6c8,#ffd75e 45%,#c8921a);box-shadow:0 0 8px #ffd75e}
+#lodged .ltx{grid-column:2;min-height:62px;padding:10px 12px;background:#0007;border:2px solid #000;box-shadow:inset 0 0 0 1px #ffffff14;font-size:16px;color:#fff;text-shadow:1px 1px 0 #000}
+#lodged .ltx:after{content:'';display:inline-block;width:8px;height:14px;margin-left:3px;vertical-align:-2px;background:#ffd75e;animation:lodgecur .7s steps(2,jump-none) infinite}
+#lodged:not(.talk) .ltx:after{animation:lodgecur .7s steps(2,jump-none) infinite}
+@keyframes lodgecur{to{opacity:0}}
+#lodged .lbt{grid-column:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#lodged .lbt:empty{display:none}
+#lodged .lbt button{display:flex;align-items:center;gap:7px;padding:9px 14px;background:#3a0a10;color:#f6e6e0;border:3px solid #000;box-shadow:inset 0 -4px 0 #200408,inset 0 0 0 1px #e6b42233;font:700 12px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer;transition:transform .08s,filter .12s}
+#lodged .lbt button b{color:#ffd75e}#lodged .lbt button img{width:26px;height:26px;image-rendering:pixelated;filter:drop-shadow(1px 1px 0 #000)}
+#lodged .lbt button.go{background:linear-gradient(#3fb565,#24814a);color:#fff;box-shadow:inset 0 -4px 0 #14502c,inset 0 0 0 1px #b8ffd055}
+#lodged .lbt button:hover:not(:disabled){filter:brightness(1.2);transform:translateY(-2px)}#lodged .lbt button:active:not(:disabled){transform:translateY(1px)}
+#lodged .lbt button:disabled{opacity:.45;cursor:not-allowed}
+#lodged .lhint{grid-column:2;margin-top:8px;color:#f0b8ad99;font-size:10px;text-align:right}
+@media (max-width:560px){#lodged .lpf{width:84px;height:84px}#lodged .lcard{column-gap:10px;padding:18px 12px 10px}#lodged .ltx{font-size:14px}#lodged .lpips{display:none}}
 #lodgebub{position:fixed;z-index:62;max-width:220px;padding:6px 10px;background:#fff;color:#1a1a1a;border:3px solid #000;box-shadow:3px 3px 0 #0006;font:700 12px/1.3 Silkscreen,ui-monospace,monospace;text-align:center;opacity:0;pointer-events:none;transform:translate(-50%,-100%) scale(.85);transition:opacity .15s,transform .15s}
 #lodgebub.on{opacity:1;transform:translate(-50%,-100%) scale(1)}
 #lodgebub:after{content:'';position:absolute;left:50%;bottom:-11px;width:10px;height:10px;background:#fff;border-right:3px solid #000;border-bottom:3px solid #000;transform:translateX(-50%) rotate(45deg)}

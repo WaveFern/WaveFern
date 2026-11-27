@@ -155,14 +155,22 @@ body.pbhold #hud{opacity:0;transform:translateY(-14px);pointer-events:none}
 .pb .pbc{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
 .pb .pbc button{flex:0 0 auto;min-height:32px;padding:3px 10px;font-size:13px}
 .pb .pbc button small{opacity:.7;font-size:11px}
-.pb .pbl.pbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px;overflow:visible}
+.pb .pbl.pbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;overflow:visible}
+.pb .pbl .pbi{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:6px;min-width:0!important;text-align:left;min-height:40px}
+.pb .pbi i{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1px #0006}
+.pb .pbi>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.pb .pbi>small{margin:0}
+.pb .pbl .pbi:has(.pbt){display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:6px;min-height:0}
+.pb .pbi>.pbt{position:relative;display:block;aspect-ratio:1;width:100%;overflow:hidden}
+.pb .pbi .pbt img{width:100%;height:100%;object-fit:contain;image-rendering:auto;display:block}
+.pb .pbi .pbn{position:absolute;right:3px;top:3px;font-size:11px;padding:0 5px;background:#000a;color:#fff}
+.pb .pbi>.pbm{font-size:13px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb .pbi small{font-size:10px;color:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb .pbi:hover,.pb .pbi:focus-visible{outline:2px solid var(--g)}
+.pb:has(.pbt){max-height:46vh}
 .pb .pbg h4.pbg{grid-column:1/-1;margin:6px 0 0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--m);font-weight:normal;display:block}
 .pb .pbl.pbg h4.pbg:first-child{margin-top:0}
-.pb .pbl .pbi{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:6px;min-width:0!important;text-align:left;min-height:40px}
 .pb .pbg>.m{grid-column:1/-1}
-.pb .pbi i{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1px #0006}
-.pb .pbi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
-.pb .pbi small{margin:0}
 .pb .pbh{display:block;margin-top:4px;font-size:11px}
 @media(max-height:520px){.pb{max-height:62vh}.pb.act .pbf,.pb.act .pbl,.pb.act .pbh{display:none}}
 @media(pointer:coarse){.pb button{min-height:46px}.pb .pbact button{font-size:16px}}
@@ -177,13 +185,19 @@ const catOf=t=>{const f=F[t];if(!f)return'Other';if(f.wall||/^plq_/.test(t))retu
 const esc2=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const swatch=t=>{const b=F[t]&&F[t].b&&F[t].b[0];const c=b&&typeof b[3]=='string'?b[3].replace(/^\*/,'#'):'#556';return/^#[0-9a-f]{3,8}$/i.test(c)?c:'#556'};
 const stored=()=>Object.keys(S.inv).filter(x=>S.inv[x]>0&&F[x]&&x!='desk');
+/* v56.0.22: every item in Storage shows a picture (one shared preview renderer from 11, cached as a data URL) */
+const TH={};
+const thumb=t=>{if(TH[t])return TH[t];try{if(typeof PVR=='undefined'||!PVR)pvInit();const m=pvModel('f:'+t);PVS.add(m);m.rotation.y=.7;PVR.render(PVS,PVC);PVS.remove(m);return TH[t]=PVR.domElement.toDataURL('image/png')}catch(e){return'data:image/gif;base64,R0lGODlhAQABAAAAACw='}};
+const FI_ON=t=>{try{return!!(window.FI&&FI.rows&&FI.rows[t])}catch(e){return false}};
 function listHTML(){const k=stored(),q=SSQ.trim().toLowerCase();
  if(!k.length)return'<span class=m>No furniture in storage. Buy furniture on Amazoom (computer).</span>';
  const L=k.filter(t=>(SCAT=='all'||catOf(t)==SCAT)&&(!q||(F[t].n+' '+catOf(t)).toLowerCase().includes(q))).sort((a,b)=>CATS.indexOf(catOf(a))-CATS.indexOf(catOf(b))||F[a].n.localeCompare(F[b].n,undefined,{numeric:true}));
  if(!L.length)return'<span class=m>Nothing matches. Try another word or category.</span>';
  let out='',cur='';
  L.forEach(t=>{const c=catOf(t);if(SCAT=='all'&&c!=cur){cur=c;out+=`<h4 class=pbg>${c}</h4>`}
-  out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(F[t].n)}"><i style="background:${swatch(t)}"></i><span>${esc2(F[t].n)}</span><small>×${S.inv[t]}</small></button>`});
+  if(!window.FW_DEV){out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(F[t].n)}"><i style="background:${swatch(t)}"></i><span>${esc2(F[t].n)}</span><small>×${S.inv[t]}</small></button>`;return}
+  const f=F[t],sz=(f.w&&f.d)?`${+f.w.toFixed(1)}×${+f.d.toFixed(1)}`:'',tg=f.wall?'Wall':(FI_ON(t)?'Use':'');
+  out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(f.n)}"><span class=pbt style="background:${swatch(t)}22"><img alt="" src="${thumb(t)}">${S.inv[t]>1?`<b class=pbn>×${S.inv[t]}</b>`:''}</span><span class=pbm>${esc2(f.n)}</span><small>${[sz,tg].filter(Boolean).join(' · ')}</small></button>`});
  return out}
 function catsHTML(){const k=stored(),n={};k.forEach(t=>{const c=catOf(t);n[c]=(n[c]||0)+1});
  const chip=(c,l,cnt)=>`<button class="${SCAT==c?'on':''}" onclick="PBcat('${c}')">${l} <small>${cnt}</small></button>`;
