@@ -156,14 +156,18 @@ body.pbhold #hud{opacity:0;transform:translateY(-14px);pointer-events:none}
 .pb .pbc button{flex:0 0 auto;min-height:32px;padding:3px 10px;font-size:13px}
 .pb .pbc button small{opacity:.7;font-size:11px}
 .pb .pbl.pbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;overflow:visible}
-.pb .pbl .pbi{display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:6px;min-height:0;text-align:left}
-.pb .pbi .pbt{position:relative;display:block;aspect-ratio:1;width:100%;overflow:hidden}
+.pb .pbl .pbi{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:6px;min-width:0!important;text-align:left;min-height:40px}
+.pb .pbi i{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1px #0006}
+.pb .pbi>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.pb .pbi>small{margin:0}
+.pb .pbl .pbi:has(.pbt){display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:6px;min-height:0}
+.pb .pbi>.pbt{position:relative;display:block;aspect-ratio:1;width:100%;overflow:hidden}
 .pb .pbi .pbt img{width:100%;height:100%;object-fit:contain;image-rendering:auto;display:block}
 .pb .pbi .pbn{position:absolute;right:3px;top:3px;font-size:11px;padding:0 5px;background:#000a;color:#fff}
-.pb .pbi .pbm{font-size:13px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb .pbi>.pbm{font-size:13px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pb .pbi small{font-size:10px;color:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pb .pbi:hover,.pb .pbi:focus-visible{outline:2px solid var(--g)}
-.pb:has(.pbg){max-height:46vh}
+.pb:has(.pbt){max-height:46vh}
 .pb .pbg h4.pbg{grid-column:1/-1;margin:6px 0 0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--m);font-weight:normal;display:block}
 .pb .pbl.pbg h4.pbg:first-child{margin-top:0}
 .pb .pbg>.m{grid-column:1/-1}
@@ -191,6 +195,7 @@ function listHTML(){const k=stored(),q=SSQ.trim().toLowerCase();
  if(!L.length)return'<span class=m>Nothing matches. Try another word or category.</span>';
  let out='',cur='';
  L.forEach(t=>{const c=catOf(t);if(SCAT=='all'&&c!=cur){cur=c;out+=`<h4 class=pbg>${c}</h4>`}
+  if(!window.FW_DEV){out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(F[t].n)}"><i style="background:${swatch(t)}"></i><span>${esc2(F[t].n)}</span><small>×${S.inv[t]}</small></button>`;return}
   const f=F[t],sz=(f.w&&f.d)?`${+f.w.toFixed(1)}×${+f.d.toFixed(1)}`:'',tg=f.wall?'Wall':(FI_ON(t)?'Use':'');
   out+=`<button class=pbi onclick="holdItem('${t}')" title="${esc2(f.n)}"><span class=pbt style="background:${swatch(t)}22"><img alt="" src="${thumb(t)}">${S.inv[t]>1?`<b class=pbn>×${S.inv[t]}</b>`:''}</span><span class=pbm>${esc2(f.n)}</span><small>${[sz,tg].filter(Boolean).join(' · ')}</small></button>`});
  return out}

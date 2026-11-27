@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.25';
+const GAME_VERSION='v56.0.26';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.26',n:'Storage picture cards now really dev-only (FW_DEV gate)'},
  {v:'v56.0.25',n:'Storage (F) picture cards with size and tag (dev build only for now)'},
  {v:'v56.0.24',n:'Santa\'s Lodge (dev): a festive new talk box with Santa\'s live 3D face that talks and blinks'},
  {v:'v56.0.23',n:'Santa\'s Lodge (dev): no more flicker in the burp cutscene, a longer close-up on Santa\'s red face, and the present now tumbles and rolls with real physics'},
