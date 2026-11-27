@@ -3,9 +3,9 @@
    A detailed hypercar with DISBIMP written along both doors, across the tail and on the number plates. Sold in the Cars shop
    ($140,000, 150 mph); on /dev/ every career is given one, parked outside the garage door. The body is one merged mesh on the shared car materials
    (carBuild in 39-car-models.js: group 0 glossy paint, 1 matte, 2 unlit lights): a shaped wedge body with a shoulder step,
-   teardrop canopy, splitter, intakes, LED light bars, hood vents, twin stripes, side intakes with fins, swan-neck rear wing,
+   teardrop canopy, splitter, intakes, LED light bars, twin stripes, swan-neck rear wing,
    diffuser fins, quad exhausts, ten-spoke rims with discs and calipers, shark fin and underglow.
-   The lettering is crisp canvas text (the game's Silkscreen pixel font, redrawn once the font loads) on thin decal planes added
+   The lettering (doors, bonnet, tail, plates) is crisp canvas text (the game's Silkscreen pixel font, redrawn once the font loads) on thin decal planes added
    as children of the car mesh, so every caller (garage, parked cars, driving, shop preview) gets it.
    The paint shop's body colour is used (geometry cached per colour); patterns are not, the livery stays.
    Save: the car is an index in CARS, appended after the lodge cars. Never reorder.
@@ -42,18 +42,17 @@ function disGeo(col){const {L,W,r,yb,yh,fo,ro,Wc}=SP,ra=r+.035,dkc=dk(col,.55),d
    box(.07,.008,zf1-zr1,x,yt+.02,(zr1+zf1)/2,ACC,0);
    box(.07,.008,zr0+L/2-.18,x,.515,(zr0-L/2+.18)/2,ACC,0)});
   /* hood vents */
-  [-1,1].forEach(s=>{for(let k=0;k<4;k++)box(.16,.012,.025,s*.3,yh+.02-k*.005,.66+k*.05,INK,1,-.08)});
+  /* (no hood vents: the bonnet carries the DISBIMP band, see decals) */
   /* front: splitter, three intakes with mesh bars, LED headlight slits and black DRL hooks, badge */
   box(W+.06,.025,.16,0,yb+.01,L/2-.03,INK,1);box(W+.06,.012,.02,0,yb+.03,L/2+.05,ACC,0);
   box(W*.36,.1,.02,0,yb+.1,L/2+.004,'#0b0c0f',1);[-1,1].forEach(s=>box(W*.2,.09,.02,s*W*.34,yb+.09,L/2+.004,'#0b0c0f',1));
   for(let k=0;k<3;k++)box(W*.34,.008,.024,0,yb+.07+k*.03,L/2+.006,CARB,1);
   [-1,1].forEach(s=>{box(.26,.03,.06,s*W*.33,.255,L/2-.04,'#e8fbff',2,-.35);box(.04,.08,.03,s*W*.46,.22,L/2-.005,LED,2);box(.2,.015,.03,s*W*.34,.22,L/2+.004,LED,2)});
   box(.1,.06,.012,0,.2,L/2+.006,'#f2f2f2',2);box(.07,.035,.014,0,.2,L/2+.007,INK,1);
-  /* sides: side skirt with black edge, intakes with fins behind the doors, door seam, flush handle, mirrors on stalks */
+  /* sides: side skirt with black edge, door seams, mirrors on stalks */
   box(W+.03,.05,fo-ro-2*ra-.06,0,yb+.03,(fo+ro)/2,INK,1);box(W+.035,.012,fo-ro-2*ra-.06,0,yb+.06,(fo+ro)/2,ACC,0);
   [-1,1].forEach(s=>{const x=s*(W/2+.004);
-   box(.014,.16,.11,x,yb+.2,-.53,'#0b0c0f',1);for(let k=0;k<4;k++)box(.02,.012,.11,x+s*.004,yb+.14+k*.035,-.53,CARB,1);
-   box(.012,yh-yb-.1,.012,x,(yh+yb)/2,.52,dkc,1);box(.012,yh-yb-.1,.012,x,(yh+yb)/2,-.45,dkc,1);
+      box(.012,yh-yb-.1,.012,x,(yh+yb)/2,.52,dkc,1);box(.012,yh-yb-.1,.012,x,(yh+yb)/2,-.45,dkc,1);
    box(.04,.02,.08,s*(Wc/2+.03),.5,zf0-.07,INK,1);box(.1,.06,.12,s*(Wc/2+.1),.55,zf0-.06,col,0);box(.015,.045,.1,s*(Wc/2+.15),.55,zf0-.06,'#ffab2e',2)});
   /* rear: ducktail, full-width light bar, diffuser fins, quad exhausts */
   box(W-.1,.03,.1,0,.53,-L/2+.06,dk2,0);
@@ -77,16 +76,15 @@ function disGeo(col){const {L,W,r,yb,yh,fo,ro,Wc}=SP,ra=r+.035,dkc=dk(col,.55),d
 
 /* ---------- the lettering: canvas text on decal planes ---------- */
 const FONT='"Silkscreen", ui-monospace, monospace';
-function sideCanvas(){const c=document.createElement('canvas');c.width=1024;c.height=176;const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);
- /* black speed slash under the word, with three pixel dashes in front of it */
- x.fillStyle=ACC;x.beginPath();x.moveTo(120,168);x.lineTo(1020,140);x.lineTo(1020,160);x.lineTo(110,176);x.closePath();x.fill();
- [[20,60],[50,30],[70,14]].forEach(([a,w],k)=>x.fillRect(a,150+k*8,w,6));
- /* the word, sized to fill the panel: black outline, dark red drop shadow, white letters */
- let fs=150;x.font='700 '+fs+'px '+FONT;const w=x.measureText('DISBIMP').width;if(w>940){fs=Math.floor(fs*940/w);x.font='700 '+fs+'px '+FONT}
- x.textAlign='center';x.textBaseline='middle';x.lineJoin='miter';
- x.fillStyle='#5a0a10';x.fillText('DISBIMP',520,80);
- x.lineWidth=14;x.strokeStyle='#0c0d10';x.strokeText('DISBIMP',512,72);
- x.fillStyle='#ffffff';x.fillText('DISBIMP',512,72);
+/* side and tail lettering: big white DISBIMP on a solid black band with a thin white pinline, sized to fill the band, so it
+   still reads after the game's pixel filter */
+const SCW=1024,SCH=200;
+function sideCanvas(){const c=document.createElement('canvas');c.width=SCW;c.height=SCH;const x=c.getContext('2d');x.clearRect(0,0,SCW,SCH);
+ x.fillStyle='#0c0d10';x.beginPath();x.moveTo(24,0);x.lineTo(SCW,0);x.lineTo(SCW-24,SCH);x.lineTo(0,SCH);x.closePath();x.fill();
+ x.fillStyle='#ffffff';x.fillRect(40,10,SCW-60,6);x.fillRect(20,SCH-16,SCW-60,6);
+ let fs=200;x.font='700 '+fs+'px '+FONT;const w=x.measureText('DISBIMP').width;fs=Math.floor(fs*Math.min(1,930/w,1));x.font='700 '+fs+'px '+FONT;
+ x.textAlign='center';x.textBaseline='middle';x.fillStyle='#ffffff';x.strokeStyle='#ffffff';x.lineWidth=4;x.lineJoin='miter';
+ x.fillText('DISBIMP',SCW/2,SCH/2+4);x.strokeText('DISBIMP',SCW/2,SCH/2+4);
  return c}
 function plateCanvas(){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
  x.fillStyle='#f4f4f0';x.fillRect(0,0,256,64);x.strokeStyle='#121318';x.lineWidth=6;x.strokeRect(3,3,250,58);
@@ -101,9 +99,11 @@ function decalMats(){if(DM)return DM;const m=t=>new THREE.MeshBasicMaterial({map
  return DM={side:m(texOf('side',sideCanvas).t),plate:new THREE.MeshBasicMaterial({map:texOf('plate',plateCanvas).t})}}
 const PG={};
 function decals(){const {L,W,yb,yh,fo,ro,r}=SP,M=decalMats(),g=new THREE.Group();g.name='disbimp-decals';
- const sideLen=1.0,sh=sideLen*176/1024,rw=W*.55;
- PG.side=PG.side||new THREE.PlaneGeometry(sideLen,sh);PG.rear=PG.rear||new THREE.PlaneGeometry(rw,rw*176/1024);PG.plate=PG.plate||new THREE.PlaneGeometry(.3,.075);
- [-1,1].forEach(s=>{const p=new THREE.Mesh(PG.side,M.side);p.position.set(s*(W/2+.006),.3,.06);p.rotation.y=s*Math.PI/2;g.add(p)});
+ const sideLen=1.16,sh=sideLen*SCH/SCW,rw=W*.6;
+ PG.side=PG.side||new THREE.PlaneGeometry(sideLen,sh);PG.rear=PG.rear||new THREE.PlaneGeometry(rw,rw*SCH/SCW);PG.plate=PG.plate||new THREE.PlaneGeometry(.3,.075);
+ [-1,1].forEach(s=>{const p=new THREE.Mesh(PG.side,M.side);p.position.set(s*(W/2+.014),.315,.01);p.rotation.y=s*Math.PI/2;g.add(p)});
+ /* across the bonnet, reading from the front: this is the face the game's high camera sees best */
+ PG.hood=PG.hood||new THREE.PlaneGeometry(.94,.94*SCH/SCW);const hd=new THREE.Mesh(PG.hood,M.side);hd.position.set(0,.472,.76);hd.rotation.x=-Math.PI/2+.122;g.add(hd);
  const rr=new THREE.Mesh(PG.rear,M.side);rr.position.set(0,.45,-L/2-.008);rr.rotation.y=Math.PI;g.add(rr);
  const pf=new THREE.Mesh(PG.plate,M.plate);pf.position.set(0,yb+.11,L/2+.017);g.add(pf);
  const pr=new THREE.Mesh(PG.plate,M.plate);pr.position.set(0,yb+.2,-L/2-.012);pr.rotation.y=Math.PI;g.add(pr);
