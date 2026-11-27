@@ -88,7 +88,9 @@
  function cleanGeo(st,col){if(st!=4)return carGeo(st,col);const k=st+col;if(cleanCache[k])return cleanCache[k];const g=carGeo(st,col).clone(),c=g.attributes.color,ca=c.array.slice(),b=new THREE.Color(col),gold=new THREE.Color('#e6b422');
   for(let q=0;q<ca.length;q+=3)if(Math.abs(ca[q]-gold.r)<.01&&Math.abs(ca[q+1]-gold.g)<.01&&Math.abs(ca[q+2]-gold.b)<.01){ca[q]=b.r;ca[q+1]=b.g;ca[q+2]=b.b}
   g.setAttribute('color',new THREE.BufferAttribute(ca,3));return cleanCache[k]=g}
- function looked(i,cu){const col=cu&&okHex(cu.c)?cu.c:CARS[i].c,a=carList0(i,col,1),pat=cu&&patOk(cu.p)&&cu.p>0?cu.p:0;
+ /* the Disbimp (dev-disbimp-car-v1.js) has its own model: only its body colour changes, the livery and lettering stay */
+ function lookedOwn(i,col){const D=window.FW_DISBIMP,a=[[1,1,1,col,0,0,0]];a.forEach=function(cb){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=D.geo(col);m.material=carMats();m.scale.set(1,1,1);m.add(D.decals())}};return a}
+ function looked(i,cu){if(window.FW_DISBIMP&&i===FW_DISBIMP.i)return lookedOwn(i,cu&&okHex(cu.c)?cu.c:CARS[i].c);const col=cu&&okHex(cu.c)?cu.c:CARS[i].c,a=carList0(i,col,1),pat=cu&&patOk(cu.p)&&cu.p>0?cu.p:0;
   const c2=okHex(cu&&cu.c2)?cu.c2:'#f2f2f2';
   a.forEach=function(cb){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=cleanGeo(i,col);const M=carMats();m.material=pat?[patMat(i,col,pat,c2),M[1],M[2]]:M;m.scale.set(1,1,1)}};return a}
  /* your own cars (no traffic colour given) wear their saved look everywhere; traffic and shop cars are untouched */
@@ -139,8 +141,10 @@
  function pvStop(){cancelAnimationFrame(pvRaf);if(pvM&&pvS)pvS.remove(pvM);pvM=null;try{if(pvR&&pvR.domElement.parentNode)pvR.domElement.parentNode.removeChild(pvR.domElement)}catch(e){}}
  /* a still picture of a car in its current paint for the list (cached) */
  const thumbs={};
+ /* cars past the five shop bodies (event prizes, the Disbimp) have their own models: their pictures come from the current carList */
+ const BASE=5;
  function thumb(i){const cu=cust(i),k=pxN()+'|'+i+JSON.stringify(cu||0);if(thumbs[k])return thumbs[k];if(!pvInit())return'';
-  try{pxSize(pvR,PW,PH);const hold=pvM;if(hold)pvS.remove(hold);const m=mkS(looked(i,cu));m.scale.setScalar(1.5);m.rotation.y=.7;pvS.add(m);pvR.render(pvS,pvC);const u=pvR.domElement.toDataURL('image/png');pvS.remove(m);if(hold)pvS.add(hold);return thumbs[k]=u}catch(e){return''}}
+  try{pxSize(pvR,PW,PH);const hold=pvM;if(hold)pvS.remove(hold);const m=mkS(i<BASE?looked(i,cu):carList(i));m.scale.setScalar(1.5);m.rotation.y=.7;pvS.add(m);pvR.render(pvS,pvC);const u=pvR.domElement.toDataURL('image/png');pvS.remove(m);if(hold)pvS.add(hold);return thumbs[k]=u}catch(e){return''}}
 
  /* ---------- look: the game's own pixel style (Silkscreen font, chunky black borders, flat colours, square corners) ---------- */
  function css(){if(document.getElementById('gcss'))return;const s=document.createElement('style');s.id='gcss';s.textContent=`
@@ -205,11 +209,16 @@
    <div class=gb><span>Wallet <b>${mny(S.money)}</b></span><span>Preview is free</span></div>
    <p class=gm><b>Tom:</b> "Pick a car. Looking is free, paint costs."</p>
    ${own.length?'':'<p class=gm>You do not own a car yet. Book one on the Cars website on your PC.</p>'}
-   <div class=gl>${CARS.map((c,i)=>{if(c.xm)return'';const o=own.includes(i),cu=cust(i),img=o?thumb(i):'';return`<div class="gc ${o?'':'lk'}">${o?`<span class=tag>BAY ${i+1}</span>`:''}
-     ${img?`<img src="${img}" alt="${c.n}">`:`<div class=gi>${o?'':'NOT OWNED'}</div>`}
+   <div class=gl>${CARS.map((c,i)=>{const o=own.includes(i),cu=cust(i),img=thumb(i);if(c.xm)return xmCard(c,i,o,img);return`<div class="gc ${o?'':'lk'}">${o?`<span class=tag>BAY ${i+1}</span>`:''}
+     ${img?`<img src="${img}" alt="${c.n}" style="${o?'':'filter:grayscale(1) brightness(.7)'}">`:`<div class=gi>${o?'':'NOT OWNED'}</div>`}
      <h3>${c.n}</h3><p><span class=dot style="background:${o&&cu&&okHex(cu.c)?cu.c:c.c}"></span>${o?(cu&&patOk(cu.p)&&cu.p?PATS[cu.p]:cu?'Custom paint':'Stock paint'):'Not owned'}</p>
      <button class=go ${o?'':'disabled'} onclick="gcOpen(${i})">${o?'Customise':'Locked'}</button>${o?`<button style="margin-top:6px" ${window.pcIsOut&&pcIsOut(own.indexOf(i))?'disabled':''} onclick="gcDrive(${i})">${window.pcIsOut&&pcIsOut(own.indexOf(i))?'Parked outside':'Drive'}</button>`:''}</div>`}).join('')}</div>
    <div class=gf>${mechBtn()}<button onclick="closeUI()">Leave garage</button></div></div>`}
+ /* event cars (xm: Christmas prizes) are shown with their picture; they keep their own livery and stand outside by the house */
+ function xmCard(c,i,o,img){return`<div class="gc ${o?'':'lk'}"><span class=tag>${o?'EVENT':'EVENT PRIZE'}</span>
+     ${img?`<img src="${img}" alt="${c.n}" style="${o?'':'filter:grayscale(1) brightness(.7)'}">`:`<div class=gi>EVENT</div>`}
+     <h3>${c.n}</h3><p><span class=dot style="background:${c.c}"></span>${o?'Event livery':'Win it at an event'}</p>
+     <button class=go disabled>${o?'Parked by your house':'Locked'}</button></div>`}
  function mechBtn(){try{const m=window.mechanicInfo&&mechanicInfo();return m&&m.n?`<button class=go ${S.money<m.fee?'disabled':''} onclick="mechanicPay()">Mechanic: bring ${m.n>1?'all '+m.n+' cars':'car'} home · ${mny(m.fee)}</button>`:''}catch(e){return''}}
  function carUI(i){css();if(!DR||DR.i!=i)DR=Object.assign({i:i},savedLook(i));const cu=DR,cn=n=>(COLS.concat(PCOLS).find(x=>x[1]==n)||[n,n])[0],pn=patOk(cu.p)?cu.p:0;
   const tot=cost(i,cu),can=S.money>=tot,sv=savedLook(i),dirty=!same(cu,sv);
