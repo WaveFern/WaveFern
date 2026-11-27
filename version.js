@@ -6,7 +6,7 @@
 const GAME_VERSION='v56.0.25';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.25',n:'Storage (F) shows a picture, size and tag for every item, with search and categories for everyone'},
+ {v:'v56.0.25',n:'Storage (F) picture cards with size and tag (dev build only for now)'},
  {v:'v56.0.24',n:'Santa\'s Lodge (dev): a festive new talk box with Santa\'s live 3D face that talks and blinks'},
  {v:'v56.0.23',n:'Santa\'s Lodge (dev): no more flicker in the burp cutscene, a longer close-up on Santa\'s red face, and the present now tumbles and rolls with real physics'},
  {v:'v56.0.22',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent through a Cloudflare Worker and Resend, and new security rules. Nothing changes for players yet'},
