@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.40';
+const GAME_VERSION='v56.0.41';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.40',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.41',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.40',n:'Dev: garage room shows every owned car, shrinking to fit; event cars live in the garage'},
  {v:'v56.0.39',n:'Tom\'s garage shows every car with a picture, event cars included'},
  {v:'v56.0.38',n:'Dev: no car models inside the garage room'},
  {v:'v56.0.37',n:'Dev: the Disbimp now shows outside the garage on careers loaded from a save'},
