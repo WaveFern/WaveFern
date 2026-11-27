@@ -124,14 +124,14 @@ if(typeof PA=='object'&&PA&&PA.cars&&typeof cardOf=='function'){const p0=PA.cars
   const card=cardOf('c:'+I,c.n,'Top speed '+c.mph+' mph · DISBIMP livery',own?'<small class=m>Owned</small>':`<button class=go ${S.money<c.p?'disabled':''} onclick="book('car',${I})">Book · ${$$(c.p)}</button>`);
   const k=h.indexOf('<div class=cards>');return k<0?h+card:h.slice(0,k+17)+card+h.slice(k+17)}catch(e){console.warn('disbimp shop',e);return h}}}
 
-/* dev: every career owns the Disbimp, and it waits outside the garage door (the garage is unlocked for it). Checked every 3 s,
-   once per loaded career; a Disbimp you drove somewhere else stays where you left it. */
-const DONE=new WeakSet();
-function place(){try{if(typeof S!='object'||!S||DONE.has(S)||typeof mode=='undefined'||mode=='title'||mode=='drive'||typeof pcSpawn!='function')return;
- if(!Array.isArray(S.cars))S.cars=[];if(!S.cars.includes(I))S.cars.push(I);if(!S.garage)S.garage=1;
+/* dev: every career owns the Disbimp, and whenever it is in the garage it waits outside the garage door instead (the garage is
+   unlocked for it). Checked every 3 s while you play; a Disbimp you drove somewhere else stays where you left it.
+   Only runs in mode 'play': during boot (mode 'load') S is still the default state that the save is then loaded into. */
+function place(){try{if(typeof S!='object'||!S||typeof mode=='undefined'||mode!='play'||typeof pcSpawn!='function')return;
+ if(!Array.isArray(S.cars))S.cars=[];let ch=0;if(!S.cars.includes(I)){S.cars.push(I);ch=1}if(!S.garage){S.garage=1;ch=1}
  const j=S.cars.indexOf(I);if(!S.cpk||typeof S.cpk!='object'||Array.isArray(S.cpk))S.cpk={};
- if(!S.cpk[j]){const c=pcSpawn(j);if(c)S.cpk[j]=[c.x,c.z,0]}
- parkCars();DONE.add(S)}catch(e){console.warn('disbimp place',e)}}
+ if(!S.cpk[j]){const c=pcSpawn(j);if(c){S.cpk[j]=[c.x,c.z,0];ch=1}}
+ if(ch)parkCars()}catch(e){console.warn('disbimp place',e)}}
 setInterval(place,3000);
 
 window.FW_DISBIMP={i:I,geo:geoOf,decals,spec:SP};
