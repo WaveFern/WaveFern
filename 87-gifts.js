@@ -9,12 +9,16 @@ const GIFTS=[
 ];
 const GFT={busy:0,next:0};
 const gNum=v=>Math.max(0,Math.min(1e12,Math.floor(+v||0)));
-function giftApply(g){const m=gNum(g.money),st=gNum(g.streams),ls=gNum(g.listeners);
+/* v55.53: a gift can also carry clothing (items = garment ids from GAR). Owned through the same S.wr / S.wc the shop uses (buyG in 22c). */
+function giftItems(g){return(Array.isArray(g.items)?g.items:[]).filter(id=>typeof GM!='undefined'&&GM[id]).slice(0,40)}
+function giftApply(g){const m=gNum(g.money),st=gNum(g.streams),ls=gNum(g.listeners),it=giftItems(g);
  if(m){S.money=+(S.money+m).toFixed(2);S.gm=(S.gm||0)+m}/* gm = total gifted, so the save check allows for it (12-save-seal.js) */
  if(st||ls){try{if(typeof mlInit=='function')mlInit()}catch(e){}}
  if(st){S.streams=(S.streams||0)+st;S.monthStreams=(S.monthStreams||0)+st}
  if(ls){S.monthStreams=(S.monthStreams||0)+ls*(S.mlDiv||3);S.listeners=(S.listeners||0)+ls}
+ if(it.length){S.wr=S.wr||[];S.wc=S.wc||{};it.forEach(id=>{if(!S.wr.includes(id))S.wr.push(id);if(!S.wc[id])S.wc[id]=GM[id].dc})}
  const p=[];if(m)p.push('<b>$'+m.toLocaleString()+'</b>');if(st)p.push('<b>+'+st.toLocaleString()+'</b> streams');if(ls)p.push('<b>+'+ls.toLocaleString()+'</b> monthly listeners');
+ if(it.length)p.push('new clothes in your wardrobe: '+it.map(id=>'<b>'+esc(GM[id].n)+'</b>').join(', '));
  return`<div style="margin:8px 0"><h3>A gift from ${esc(g.from||'WaveFern')}!</h3>${g.msg?`<p>“${esc(g.msg)}”</p>`:''}<p>${p.join(' · ')||'A little something'}</p></div>`}
 function giftShow(html){mode='menu';snd('chime');$('ui').innerHTML=`<div id=gift class="box modal" style="width:min(400px,92vw);text-align:center;max-height:80vh;overflow:auto">${html}<button class=go onclick="closeUI()">Thanks!</button></div>`}
 function giftCheck(){if(typeof FBU=='undefined'||typeof CLD=='undefined'||!FBU||!CLD.ok||mode!='play'||PAUSED||GFT.busy)return;S.gifts=S.gifts||[];const uid=FBU.uid;
