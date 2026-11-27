@@ -88,7 +88,9 @@
  function cleanGeo(st,col){if(st!=4)return carGeo(st,col);const k=st+col;if(cleanCache[k])return cleanCache[k];const g=carGeo(st,col).clone(),c=g.attributes.color,ca=c.array.slice(),b=new THREE.Color(col),gold=new THREE.Color('#e6b422');
   for(let q=0;q<ca.length;q+=3)if(Math.abs(ca[q]-gold.r)<.01&&Math.abs(ca[q+1]-gold.g)<.01&&Math.abs(ca[q+2]-gold.b)<.01){ca[q]=b.r;ca[q+1]=b.g;ca[q+2]=b.b}
   g.setAttribute('color',new THREE.BufferAttribute(ca,3));return cleanCache[k]=g}
- function looked(i,cu){const col=cu&&okHex(cu.c)?cu.c:CARS[i].c,a=carList0(i,col,1),pat=cu&&patOk(cu.p)&&cu.p>0?cu.p:0;
+ /* the Disbimp (dev-disbimp-car-v1.js) has its own model: only its body colour changes, the livery and lettering stay */
+ function lookedOwn(i,col){const D=window.FW_DISBIMP,a=[[1,1,1,col,0,0,0]];a.forEach=function(cb){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=D.geo(col);m.material=carMats();m.scale.set(1,1,1);m.add(D.decals())}};return a}
+ function looked(i,cu){if(window.FW_DISBIMP&&i===FW_DISBIMP.i)return lookedOwn(i,cu&&okHex(cu.c)?cu.c:CARS[i].c);const col=cu&&okHex(cu.c)?cu.c:CARS[i].c,a=carList0(i,col,1),pat=cu&&patOk(cu.p)&&cu.p>0?cu.p:0;
   const c2=okHex(cu&&cu.c2)?cu.c2:'#f2f2f2';
   a.forEach=function(cb){const m=cb([1,1,1,'#fff',0,0,0]);if(m&&m.isMesh){m.geometry=cleanGeo(i,col);const M=carMats();m.material=pat?[patMat(i,col,pat,c2),M[1],M[2]]:M;m.scale.set(1,1,1)}};return a}
  /* your own cars (no traffic colour given) wear their saved look everywhere; traffic and shop cars are untouched */
@@ -139,8 +141,10 @@
  function pvStop(){cancelAnimationFrame(pvRaf);if(pvM&&pvS)pvS.remove(pvM);pvM=null;try{if(pvR&&pvR.domElement.parentNode)pvR.domElement.parentNode.removeChild(pvR.domElement)}catch(e){}}
  /* a still picture of a car in its current paint for the list (cached) */
  const thumbs={};
+ /* cars past the five shop bodies (event prizes, the Disbimp) have their own models: their pictures come from the current carList */
+ const BASE=5;
  function thumb(i){const cu=cust(i),k=pxN()+'|'+i+JSON.stringify(cu||0);if(thumbs[k])return thumbs[k];if(!pvInit())return'';
-  try{pxSize(pvR,PW,PH);const hold=pvM;if(hold)pvS.remove(hold);const m=mkS(looked(i,cu));m.scale.setScalar(1.5);m.rotation.y=.7;pvS.add(m);pvR.render(pvS,pvC);const u=pvR.domElement.toDataURL('image/png');pvS.remove(m);if(hold)pvS.add(hold);return thumbs[k]=u}catch(e){return''}}
+  try{pxSize(pvR,PW,PH);const hold=pvM;if(hold)pvS.remove(hold);const m=mkS(i<BASE?looked(i,cu):carList(i));m.scale.setScalar(1.5);m.rotation.y=.7;pvS.add(m);pvR.render(pvS,pvC);const u=pvR.domElement.toDataURL('image/png');pvS.remove(m);if(hold)pvS.add(hold);return thumbs[k]=u}catch(e){return''}}
 
  /* ---------- look: the game's own pixel style (Silkscreen font, chunky black borders, flat colours, square corners) ---------- */
  function css(){if(document.getElementById('gcss'))return;const s=document.createElement('style');s.id='gcss';s.textContent=`
@@ -205,11 +209,16 @@
    <div class=gb><span>Wallet <b>${mny(S.money)}</b></span><span>Preview is free</span></div>
    <p class=gm><b>Tom:</b> "Pick a car. Looking is free, paint costs."</p>
    ${own.length?'':'<p class=gm>You do not own a car yet. Book one on the Cars website on your PC.</p>'}
-   <div class=gl>${CARS.map((c,i)=>{if(c.xm)return'';const o=own.includes(i),cu=cust(i),img=o?thumb(i):'';return`<div class="gc ${o?'':'lk'}">${o?`<span class=tag>BAY ${i+1}</span>`:''}
-     ${img?`<img src="${img}" alt="${c.n}">`:`<div class=gi>${o?'':'NOT OWNED'}</div>`}
+   <div class=gl>${CARS.map((c,i)=>{const o=own.includes(i),cu=cust(i),img=thumb(i);if(c.xm)return xmCard(c,i,o,img);return`<div class="gc ${o?'':'lk'}">${o?`<span class=tag>BAY ${i+1}</span>`:''}
+     ${img?`<img src="${img}" alt="${c.n}" style="${o?'':'filter:grayscale(1) brightness(.7)'}">`:`<div class=gi>${o?'':'NOT OWNED'}</div>`}
      <h3>${c.n}</h3><p><span class=dot style="background:${o&&cu&&okHex(cu.c)?cu.c:c.c}"></span>${o?(cu&&patOk(cu.p)&&cu.p?PATS[cu.p]:cu?'Custom paint':'Stock paint'):'Not owned'}</p>
      <button class=go ${o?'':'disabled'} onclick="gcOpen(${i})">${o?'Customise':'Locked'}</button>${o?`<button style="margin-top:6px" ${window.pcIsOut&&pcIsOut(own.indexOf(i))?'disabled':''} onclick="gcDrive(${i})">${window.pcIsOut&&pcIsOut(own.indexOf(i))?'Parked outside':'Drive'}</button>`:''}</div>`}).join('')}</div>
    <div class=gf>${mechBtn()}<button onclick="closeUI()">Leave garage</button></div></div>`}
+ /* event cars (xm: Christmas prizes) are shown with their picture; they keep their own livery. Live: they stand outside by the house; /dev/: they live in the garage and Drive takes them out */
+ function xmCard(c,i,o,img){return`<div class="gc ${o?'':'lk'}"><span class=tag>${o?'EVENT':'EVENT PRIZE'}</span>
+     ${img?`<img src="${img}" alt="${c.n}" style="${o?'':'filter:grayscale(1) brightness(.7)'}">`:`<div class=gi>EVENT</div>`}
+     <h3>${c.n}</h3><p><span class=dot style="background:${c.c}"></span>${o?'Event livery':'Win it at an event'}</p>
+     ${o&&window.FW_DEV?(()=>{const out=window.pcIsOut&&pcIsOut((S.cars||[]).indexOf(i));return`<button class=go ${out?'disabled':''} onclick="gcDrive(${i})">${out?'Parked outside':'Drive'}</button>`})():`<button class=go disabled>${o?'Parked by your house':'Locked'}</button>`}</div>`}
  function mechBtn(){try{const m=window.mechanicInfo&&mechanicInfo();return m&&m.n?`<button class=go ${S.money<m.fee?'disabled':''} onclick="mechanicPay()">Mechanic: bring ${m.n>1?'all '+m.n+' cars':'car'} home · ${mny(m.fee)}</button>`:''}catch(e){return''}}
  function carUI(i){css();if(!DR||DR.i!=i)DR=Object.assign({i:i},savedLook(i));const cu=DR,cn=n=>(COLS.concat(PCOLS).find(x=>x[1]==n)||[n,n])[0],pn=patOk(cu.p)?cu.p:0;
   const tot=cost(i,cu),can=S.money>=tot,sv=savedLook(i),dirty=!same(cu,sv);
@@ -227,7 +236,7 @@
  window.gcOpen=i=>{if(!(S.cars||[]).includes(i)||CARS[i].xm)return snd('err');DR=null;snd('ping');carUI(i)};
  window.gcList=()=>{snd('ping');listUI()};
  /* Drive: take the car out of the garage onto the street and drive. When you get out it stays where you left it. */
- window.gcDrive=i=>{if(!(S.cars||[]).includes(i)||CARS[i].xm)return snd('err');const j=(S.cars||[]).indexOf(i);if(window.pcIsOut&&pcIsOut(j)){snd('err');return say('That car is parked outside. Find it on the map, or pay the mechanic to bring your cars home.')}
+ window.gcDrive=i=>{if(!(S.cars||[]).includes(i)||(CARS[i].xm&&!window.FW_DEV))return snd('err');const j=(S.cars||[]).indexOf(i);if(window.pcIsOut&&pcIsOut(j)){snd('err');return say('That car is parked outside. Find it on the map, or pay the mechanic to bring your cars home.')}
   snd('ping');pvStop();DR=null;closeUI();
   const go=()=>{try{IN=null}catch(e){}if(typeof exitDrive=='function'&&mode=='drive'&&dr)try{exitDrive()}catch(e){}
    const c=window.pcSpawn&&pcSpawn(j);if(!c)return;
@@ -235,6 +244,17 @@
   if(typeof fade=='function')fade(go,'');else go()};
  /* cars stand outside only when you have left them there (218-parked-cars.js); the sleigh stands by the house until it is moved */
   {const fg=fillGarage;fillGarage=function(){const r=fg.apply(this,arguments);try{GCM=GCM.filter((m,j)=>{const c=CARS[(S.cars||[])[j]];if(c&&c.xm){IG[6].remove(m);return false}return true})}catch(e){}return r}}
+ /* /dev/ only: the garage room shows a small model of EVERY car you own (event cars too). The more cars you own, the smaller they get,
+    laid out in a grid on the garage floor (x 85.2-92.8, z 322.9-327.3) so they all fit. */
+  if(window.FW_DEV){const fg=fillGarage;
+   const grid=n=>{let best=null;for(let r=1;r<=6;r++){const c=Math.ceil(n/r),sc=Math.min(1.1,7.6/(1.55*c),4.4/(2.75*r));if(!best||sc>best.sc+1e-6)best={r,c,sc}}return best};
+   fillGarage=function(){const r=fg.apply(this,arguments);try{if(!IG[6])return r;(GCM||[]).forEach(m=>{if(m)IG[6].remove(m)});GCM=[];
+    const k=S.cpk||{},own=S.garage?(S.cars||[]).filter((ci,j)=>CARS[ci]&&!k[j]):[];if(!own.length)return r;const G=grid(own.length),dx=7.6/G.c,dz=4.4/G.r;
+    own.forEach((ci,j)=>{const col=j%G.c,row=Math.floor(j/G.c),inRow=Math.min(G.c,own.length-row*G.c),x0=89-(inRow-1)*dx/2;
+     const m=mkS(carb(ci));m.scale.setScalar(G.sc);m.position.set(x0+col*dx,0,327.3-dz/2-row*dz);m.rotation.y=Math.PI;IG[6].add(m);GCM.push(m)})}catch(e){console.warn('garage cars',e)}return r}}
+ /* /dev/ only: event cars live in the garage like any other car (no longer parked by the house); Drive takes them out */
+  if(window.FW_DEV&&typeof parkCars=='function'){const pk0=parkCars;parkCars=function(){const r=pk0.apply(this,arguments);try{const k=S.cpk||{};
+    PK=PK.filter(c=>{if(c.fxk||!CARS[c.i]||!CARS[c.i].xm||k[c.j]||(mode=='drive'&&dr===c))return true;scene.remove(c.m);return false})}catch(e){}return r}}
  /* choosing only changes the preview: nothing is saved or paid until Pay and apply */
  window.gcSet=(i,k,v)=>{if(!(S.cars||[]).includes(i)||!DR||DR.i!=i)return;if((k=='c'||k=='c2')&&!okHex(v))return;if(k=='p'&&(!patOk(v)||!wrapOwned(v)))return;DR[k]=v;snd('ping');carUI(i)};
  window.gcReset=i=>{if(!DR||DR.i!=i)return;Object.assign(DR,stockLook(i));snd('ping');carUI(i)};

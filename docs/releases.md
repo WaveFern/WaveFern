@@ -38,6 +38,7 @@ Previously: None. v56.0.0 (2026-11-26) released everything that was held: News a
 | Feature | File | Gate |
 |---|---|---|
 | Santa's Lodge (feed Santa treats, burp present) | `dev/dev-lodge-v1.js` | `FW_DEV` |
+| Disbimp car (detailed hypercar, DISBIMP livery, Cars shop) | `dev/dev-disbimp-car-v1.js` | `FW_DEV` |
 
 ## Avoiding merge pain
 The old pain was never the numbers: every PR edited the same few lines (`GAME_VERSION`, the top history entry, the `?v=` tags), so any two open PRs conflicted and each was renumbered by hand (55 of the last 300 commits are "Merge main; renumber").

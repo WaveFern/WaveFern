@@ -3,10 +3,24 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.27';
+const GAME_VERSION='v56.0.41';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.27',n:'Sign-in emails restyled in the game\'s look: green pixel logo, black button with a green drop shadow, light and dark versions (dev only, not live yet)'},
+ {v:'v56.0.41',n:'Sign-in emails restyled in the game\'s look: green pixel logo, black button with a green drop shadow, light and dark versions (dev only, not live yet)'},
+ {v:'v56.0.40',n:'Dev: garage room shows every owned car, shrinking to fit; event cars live in the garage'},
+ {v:'v56.0.39',n:'Tom\'s garage shows every car with a picture, event cars included'},
+ {v:'v56.0.38',n:'Dev: no car models inside the garage room'},
+ {v:'v56.0.37',n:'Dev: the Disbimp now shows outside the garage on careers loaded from a save'},
+ {v:'v56.0.36',n:'Dev: Disbimp side lettering back to the first style, bigger and sharper'},
+ {v:'v56.0.35',n:'Dev: Disbimp lettering bigger on a black band, also across the bonnet'},
+ {v:'v56.0.34',n:'Dev: the Disbimp waits outside the garage in every dev career'},
+ {v:'v56.0.33',n:'Dev: Disbimp car repainted red with black trim'},
+ {v:'v56.0.32',n:'Dev: Disbimp car, a detailed hypercar with DISBIMP lettering (held behind FW_DEV)'},
+ {v:'v56.0.31',n:'Pets: pet name tags on /dev smaller still'},
+ {v:'v56.0.30',n:'Pets: fixed dark boxes around pet names on /dev (a CSS class clashed with the start menu)'},
+ {v:'v56.0.29',n:'Pets: name tags on /dev are plain outlined text, staggered so they never stack'},
+ {v:'v56.0.28',n:'Pets: smaller name tags on /dev only'},
+ {v:'v56.0.27',n:'Pets: smaller, quieter name tags (held)'},
  {v:'v56.0.26',n:'Storage picture cards now really dev-only (FW_DEV gate)'},
  {v:'v56.0.25',n:'Storage (F) picture cards with size and tag (dev build only for now)'},
  {v:'v56.0.24',n:'Santa\'s Lodge (dev): a festive new talk box with Santa\'s live 3D face that talks and blinks'},
