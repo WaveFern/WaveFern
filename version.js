@@ -3,9 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.28';
+const GAME_VERSION='v56.0.30';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.30',n:'Pets: fixed dark boxes around pet names on /dev (a CSS class clashed with the start menu)'},
+ {v:'v56.0.29',n:'Pets: name tags on /dev are plain outlined text, staggered so they never stack'},
  {v:'v56.0.28',n:'Pets: smaller name tags on /dev only'},
  {v:'v56.0.27',n:'Pets: smaller, quieter name tags (held)'},
  {v:'v56.0.26',n:'Storage picture cards now really dev-only (FW_DEV gate)'},
