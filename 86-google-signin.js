@@ -24,7 +24,7 @@ function fbLoad(){if(!FB_ON)return Promise.reject('off');if(FBA)return Promise.r
  const u='https://www.gstatic.com/firebasejs/'+FB_V+'/firebase-';
  return Promise.all([import(u+'app.js'),import(u+'auth.js'),import(u+'firestore.js'),import(u+'app-check.js').catch(()=>null)]).then(([a,m,f,ac])=>{const app=a.initializeApp(FB_CFG);fbAppCheck(ac,app);FBM=m;FBF=f;FBA=m.getAuth(app);try{FBD=f.initializeFirestore(app,{experimentalAutoDetectLongPolling:true})}catch(e){FBD=f.getFirestore(app)}
   m.onAuthStateChanged(FBA,fbAuthSet);
-  return m.getRedirectResult(FBA).then(r=>{if(r&&r.user)fbSignedIn(r.user)},()=>{}).finally(()=>{if(CLD.signing&&!wiping){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}if(FBU)csCheck()}})})}
+  return m.getRedirectResult(FBA).then(r=>{if(r&&r.user)fbSignedIn(r.user)},e=>{if(CLD.signing)fbSignErr(e)}).finally(()=>{if(CLD.signing&&!wiping){CLD.signing=0;try{sessionStorage.removeItem('fw_signing')}catch(e){}if(FBU)csCheck();else if(!FBA.currentUser)setTimeout(()=>say('Sign-in did not finish. Allow pop-ups for this site and try again.'),1500)}})})}
 /* v42.7.3: signing in to an account (or out) reloads into that account's own careers on this device, so one account's
    cloud save never lands on another account's or a guest's career. The first time after this update, careers this device
    already synced with the signed-in account move into its slots. */
@@ -50,11 +50,16 @@ function csPick(k){const uid=FBU&&FBU.uid;if(!uid)return;snd('click');CLD.asking
  location.reload()}
 function csWipe(uid,msg){if(!bakKeep(localStorage.getItem(slotKey()),'Kept before a new career started'))return;wiping=true;try{localStorage.removeItem(slotKey());localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
 const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem(CS_KEY,JSON.stringify({uid,t}))}catch(e){}};
-function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
+/* v56.0.1: one sign-in at a time (a second click used to cancel the open popup), clear messages for the usual failures, and a notice
+   when the redirect fallback comes back signed out (it silently did nothing before) */
+let fbBusy=0;
+const fbInApp=()=>/FBAN|FBAV|Instagram|TikTok|musical_ly|Snapchat|\bLine\/|MicroMessenger|; wv\)/i.test(navigator.userAgent||'');
+function fbSignErr(e){const c=e&&e.code;snd('err');say(c=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':c=='auth/network-request-failed'?'No connection. Check your internet and try again.':c=='auth/web-storage-unsupported'||c=='auth/operation-not-supported-in-this-environment'?'This browser blocks sign-in. Open wavefern.com in Chrome or Safari.':fbInApp()?'Google blocks sign-in inside this app. Open wavefern.com in Chrome or Safari.':'Could not sign in. Try again.')}
+function fbSignIn(){if(fbBusy)return;fbBusy=1;snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
  return FBM.signInWithPopup(FBA,p).then(r=>fbSignedIn(r.user),e=>{
-  if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment')){try{sessionStorage.setItem('fw_signing','1')}catch(x){}return FBM.signInWithRedirect(FBA,p)}
+  if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment')&&!fbInApp()){try{sessionStorage.setItem('fw_signing','1')}catch(x){}return FBM.signInWithRedirect(FBA,p)}
   CLD.signing=0;if(e&&(e.code=='auth/popup-closed-by-user'||e.code=='auth/cancelled-popup-request'))return;
-  throw e})}).catch(e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
+  throw e})}).catch(e=>{CLD.signing=0;fbSignErr(e)}).finally(()=>{fbBusy=0})}
 /* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
 function fbSignInAsk(){snd('click');const prev=mode,fresh=prev=='creator'||(prev=='title'&&!TT.game);CLD.pre=prev;
  $('ui').innerHTML=`<div id=fbq class="box modal" style="width:min(420px,92vw)"><h2>Before you sign in</h2><p>${fresh?'Have a save code from another device? Keep a copy somewhere safe before you sign in.':'You may need your save code, so copy it and keep it somewhere safe before you sign in.'}</p><p class=m><small>Each account has its own careers. Signing in shows that account's careers, and signing out brings back the ones on this device, so nothing is replaced. A brand new account can bring your current career with it.</small></p>${fresh?'':`<textarea id=fbsc rows=3 readonly style="width:100%;display:none"></textarea><button onclick="fbCopy()">Copy save code</button>`}<div class=row2><button class=go onclick="fbSignInGo()">Continue to Google</button>${FB_EMAIL?'<button onclick="fbEmailOpen(\'in\')">Use email instead</button>':''}<button onclick="fbSignInBack()">Cancel</button></div></div>`}
