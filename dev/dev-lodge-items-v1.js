@@ -19,42 +19,16 @@ const safe=(f,t)=>{try{return f()}catch(e){if(!safe[t]){safe[t]=1;console.warn('
 const RED='#d23a3a',WHT='#f6f6f6',GRN='#2f9e4f',DKG='#1f6e36',GOLD='#e8b923',BRN='#8d5a2b',INK='#1a1a1a';
 
 /* ============================================================ CARS ============================================================ */
-/* build one merged geometry on the car materials: group 0 glossy paint, 1 matte, 2 unlit lights */
-const EU=new THREE.Euler(),MX=new THREE.Matrix4();
-function geoBuild(fn){const G=[[],[],[]],add=(g,c,grp)=>G[grp||0].push([g,c]);
- const rot=(g,rx,ry,rz)=>{if(rx||ry||rz)g.applyMatrix4(MX.makeRotationFromEuler(EU.set(rx||0,ry||0,rz||0)))};
- const box=(w,h,d,x,y,z,c,grp,rx,ry,rz)=>{const g=new THREE.BoxGeometry(w,h,d);rot(g,rx,ry,rz);g.translate(x,y,z);add(g,c,grp)};
- /* a side profile [[z,y],...] extruded across from x0 to x1 */
- const ext=(pts,x0,x1,c,grp)=>{const g=new THREE.ExtrudeGeometry(new THREE.Shape(pts.map(p=>new THREE.Vector2(-p[0],p[1]))),{depth:x1-x0,bevelEnabled:false,curveSegments:5});g.rotateY(Math.PI/2);g.translate(x0,0,0);add(g,c,grp)};
- const cyl=(r0,r1,h,x,y,z,c,grp,seg,rx,ry,rz)=>{const g=new THREE.CylinderGeometry(r0,r1,h,seg||12);rot(g,rx,ry,rz);g.translate(x,y,z);add(g,c,grp)};
- const wheel=(r,w,x,y,z,c,grp,seg)=>cyl(r,r,w,x,y,z,c,grp,seg||14,0,0,Math.PI/2);
- const sph=(r,x,y,z,c,grp,ws,hs)=>{const g=new THREE.SphereGeometry(r,ws||10,hs||7);g.translate(x,y,z);add(g,c,grp)};
- const cone=(r,h,x,y,z,c,grp,rx,ry,rz,seg)=>{const g=new THREE.ConeGeometry(r,h,seg||10);rot(g,rx,ry,rz);g.translate(x,y,z);add(g,c,grp)};
- fn({box,ext,cyl,wheel,sph,cone});
- const parts=[],groups=[];let n=0;G.forEach((Lp,gi)=>{const s0=n;Lp.forEach(([g,c])=>{const q=g.index?g.toNonIndexed():g,cnt=q.attributes.position.count;parts.push([q,new THREE.Color(c),cnt]);if(q!==g)g.dispose();n+=cnt});groups.push([s0,n-s0,gi])});
- const P=new Float32Array(n*3),N=new Float32Array(n*3),C=new Float32Array(n*3);let o=0;
- parts.forEach(([q,cc,cnt])=>{P.set(q.attributes.position.array,o*3);N.set(q.attributes.normal.array,o*3);for(let i=0;i<cnt;i++){const j=(o+i)*3;C[j]=cc.r;C[j+1]=cc.g;C[j+2]=cc.b}o+=cnt;q.dispose()});
- const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(P,3));geo.setAttribute('normal',new THREE.BufferAttribute(N,3));geo.setAttribute('color',new THREE.BufferAttribute(C,3));
- groups.forEach(([s0,c,gi])=>{if(c)geo.addGroup(s0,c,gi)});geo.computeBoundingBox();geo.computeBoundingSphere();return geo}
+/* carBuild, carRecol and carJoin live in 39-car-models.js (shared with dev-disbimp-car-v1.js) */
 
 /* Both cars are the game's own car bodies (39-car-models.js carGeo: the same shaped shell, cabin, glass, wheels, lights and bumpers as every
    other car), recoloured, with Christmas parts added as blocks in the same style. */
-/* a copy of a game car geometry with some vertex colours swapped */
-function recol(geo,map){const g=geo.clone(),c=g.attributes.color,a=c.array.slice(),M=Object.keys(map).map(k=>[new THREE.Color(k),new THREE.Color(map[k])]);
- for(let q=0;q<a.length;q+=3)for(const[f,t]of M)if(Math.abs(a[q]-f.r)<.01&&Math.abs(a[q+1]-f.g)<.01&&Math.abs(a[q+2]-f.b)<.01){a[q]=t.r;a[q+1]=t.g;a[q+2]=t.b;break}
- g.setAttribute('color',new THREE.BufferAttribute(a,3));return g}
-/* join two geometries that both use material groups 0 (paint), 1 (matte), 2 (lights) */
-function joinGeo(A,Bg){const P=[],N=[],C=[],grp=[];let n=0;
- for(let gi=0;gi<3;gi++){const s0=n;[A,Bg].forEach(G=>G.groups.filter(g=>g.materialIndex===gi).forEach(g=>{for(const[src,dst]of[[G.attributes.position,P],[G.attributes.normal,N],[G.attributes.color,C]])for(let i=g.start*3;i<(g.start+g.count)*3;i++)dst.push(src.array[i]);n+=g.count}));grp.push([s0,n-s0,gi])}
- const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));
- grp.forEach(([s,c,i])=>{if(c)g.addGroup(s,c,i)});g.computeBoundingBox();g.computeBoundingSphere();return g}
-
 /* SPROCKET ROCKET: the elves' race car, on the Phantom GT body (style 4) in emerald with its gold stripes. Candy-cane side stripes, a toe
    that curls up at the nose like an elf's shoe with a bell on the tip, stepped elf-ear mirrors, a rear wing shaped like an elf's hat with a
    white fur band and pompom, jingle-bell exhausts, gold wheels and a green underglow. */
 function rocketGeo(){const S=CSPEC[4],G='#1c9a4c',{L,W,yh,cab}=S,zf0=cab[3],Wc=W*S.cw;
- const base=recol(carGeo(4,G),{'#c9ced6':GOLD});
- return joinGeo(base,geoBuild(({box})=>{
+ const base=carRecol(carGeo(4,G),{'#c9ced6':GOLD});
+ return carJoin(base,carBuild(({box})=>{
   /* candy-cane stripes along both sides */
   [-1,1].forEach(s=>{for(let i=0;i<14;i++)box(.02,.05,.15,s*(W/2+.012),yh-.12,-1.0+i*.15,i%2?WHT:RED,0)});
   /* elf-shoe toe on the nose with a bell */
@@ -74,8 +48,8 @@ function rocketGeo(){const S=CSPEC[4],G='#1c9a4c',{L,W,yh,cab}=S,zf0=cab[3],Wc=W
 /* GINGERBREAD CRUISER: a gingerbread sedan (style 1) with sugar-glass windows, a thick icing roof with drips, sprinkles and a cherry,
    white icing squiggles along the sides, candy-cane bumpers, peppermint wheels, gumdrops and a gingerbread-man badge on the bonnet. */
 function gingerGeo(){const S=CSPEC[1],C='#b86b30',CD='#8f4f1f',IC='#fbf7f0',{L,W,r,yb,yh,yhf,fo,ro,cab}=S,[zr0,zr1,zf1,zf0,yt]=cab,Wc=W*S.cw;
- const base=recol(carGeo(1,C),{'#5d8fa8':'#bfe6f2','#c9ced6':WHT,'#2b2c30':WHT});
- return joinGeo(base,geoBuild(({box})=>{
+ const base=carRecol(carGeo(1,C),{'#5d8fa8':'#bfe6f2','#c9ced6':WHT,'#2b2c30':WHT});
+ return carJoin(base,carBuild(({box})=>{
   /* icing on the roof, dripping down the edges */
   box(Wc+.05,.05,zf1-zr1+.12,0,yt+.02,(zf1+zr1)/2,IC,1);
   for(let i=0;i<8;i++){const z=zr1+.02+i*(zf1-zr1)/7.5,h=.05+((i*37)%4)*.025;[-1,1].forEach(s=>box(.03,h,.05,s*(Wc/2+.02),yt-h/2,z,IC,1))}

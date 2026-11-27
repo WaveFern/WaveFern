@@ -55,12 +55,37 @@ function carGeo(st,col){const key=st+col;if(CARM.geo[key])return CARM.geo[key];
  if(st==5){box(W+.008,.5,.014,0,(yh+yt)/2-.05,-.3,dkc,1);box(.014,yt-yb-.15,.012,0,(yt+yb)/2,-L/2-.007,dkc,1)}
  if(st==6){[-1,1].forEach(s=>box(.04,.04,zf1-zr1,s*Wc*.4,yt+.03,(zr1+zf1)/2,'#2b2c30',1));const g=new THREE.CylinderGeometry(r*.95,r*.95,.12,12);g.rotateX(Math.PI/2);g.translate(0,ytr-.12,-L/2-.06);add(g,'#1b1b1d',1)}
  if(st==7){box(.34,.11,.16,0,yt+.065,-.1,'#fff6c8',2);box(.38,.03,.2,0,yt+.01,-.1,'#2b2c30',1);for(let z=-.72,i=0;z<.66;z+=.1,i++)box(W+.01,.05,.1,0,yh-.14,z+.05,i%2?'#f2f2f2':'#1c1d20',1)}
- /* merge: one non-indexed buffer, groups in material order */
- const parts=[],groups=[];let n=0;G.forEach((Lp,gi)=>{const s0=n;Lp.forEach(([g,c])=>{const q=g.index?g.toNonIndexed():g,cnt=q.attributes.position.count;parts.push([q,new THREE.Color(c),cnt]);if(q!==g)g.dispose();n+=cnt});groups.push([s0,n-s0,gi])});
+ return CARM.geo[key]=carMerge(G)}
+/* carMerge(G): G = [paint parts, matte parts, light parts], each [geometry, colour]; returns one non-indexed buffer, groups in material order */
+function carMerge(G){const parts=[],groups=[];let n=0;G.forEach((Lp,gi)=>{const s0=n;Lp.forEach(([g,c])=>{const q=g.index?g.toNonIndexed():g,cnt=q.attributes.position.count;parts.push([q,new THREE.Color(c),cnt]);if(q!==g)g.dispose();n+=cnt});groups.push([s0,n-s0,gi])});
  const P=new Float32Array(n*3),N=new Float32Array(n*3),C=new Float32Array(n*3);let o=0;
  parts.forEach(([q,cc,cnt])=>{P.set(q.attributes.position.array,o*3);N.set(q.attributes.normal.array,o*3);for(let i=0;i<cnt;i++){const j=(o+i)*3;C[j]=cc.r;C[j+1]=cc.g;C[j+2]=cc.b}o+=cnt;q.dispose()});
  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(P,3));geo.setAttribute('normal',new THREE.BufferAttribute(N,3));geo.setAttribute('color',new THREE.BufferAttribute(C,3));
- groups.forEach(([s0,c,gi])=>{if(c)geo.addGroup(s0,c,gi)});geo.computeBoundingBox();geo.computeBoundingSphere();return CARM.geo[key]=geo}
+ groups.forEach(([s0,c,gi])=>{if(c)geo.addGroup(s0,c,gi)});geo.computeBoundingBox();geo.computeBoundingSphere();return geo}
+/* carBuild(fn): build one merged car geometry on the car materials (group 0 glossy paint, 1 matte, 2 unlit lights).
+   fn gets {box,ext,cyl,wheel,sph,cone}; every helper takes a colour and a group. */
+const CARM_EU=new THREE.Euler(),CARM_MX=new THREE.Matrix4();
+function carBuild(fn){const G=[[],[],[]],add=(g,c,grp)=>G[grp||0].push([g,c]);
+ const rot=(g,rx,ry,rz)=>{if(rx||ry||rz)g.applyMatrix4(CARM_MX.makeRotationFromEuler(CARM_EU.set(rx||0,ry||0,rz||0)))};
+ const box=(w,h,d,x,y,z,c,grp,rx,ry,rz)=>{const g=new THREE.BoxGeometry(w,h,d);rot(g,rx,ry,rz);g.translate(x,y,z);add(g,c,grp)};
+ /* a side profile [[z,y],...] extruded across from x0 to x1 */
+ const ext=(pts,x0,x1,c,grp)=>{const g=new THREE.ExtrudeGeometry(new THREE.Shape(pts.map(p=>new THREE.Vector2(-p[0],p[1]))),{depth:x1-x0,bevelEnabled:false,curveSegments:5});g.rotateY(Math.PI/2);g.translate(x0,0,0);add(g,c,grp)};
+ const cyl=(r0,r1,h,x,y,z,c,grp,seg,rx,ry,rz)=>{const g=new THREE.CylinderGeometry(r0,r1,h,seg||12);rot(g,rx,ry,rz);g.translate(x,y,z);add(g,c,grp)};
+ const wheel=(r,w,x,y,z,c,grp,seg)=>cyl(r,r,w,x,y,z,c,grp,seg||14,0,0,Math.PI/2);
+ const sph=(r,x,y,z,c,grp,ws,hs)=>{const g=new THREE.SphereGeometry(r,ws||10,hs||7);g.translate(x,y,z);add(g,c,grp)};
+ const cone=(r,h,x,y,z,c,grp,rx,ry,rz,seg)=>{const g=new THREE.ConeGeometry(r,h,seg||10);rot(g,rx,ry,rz);g.translate(x,y,z);add(g,c,grp)};
+ fn({box,ext,cyl,wheel,sph,cone});return carMerge(G)}
+/* a copy of a game car geometry with some vertex colours swapped */
+function carRecol(geo,map){const g=geo.clone(),c=g.attributes.color,a=c.array.slice(),M=Object.keys(map).map(k=>[new THREE.Color(k),new THREE.Color(map[k])]);
+ for(let q=0;q<a.length;q+=3)for(const[f,t]of M)if(Math.abs(a[q]-f.r)<.01&&Math.abs(a[q+1]-f.g)<.01&&Math.abs(a[q+2]-f.b)<.01){a[q]=t.r;a[q+1]=t.g;a[q+2]=t.b;break}
+ g.setAttribute('color',new THREE.BufferAttribute(a,3));return g}
+/* join two geometries that both use material groups 0 (paint), 1 (matte), 2 (lights) */
+function carJoin(A,Bg){const P=[],N=[],C=[],grp=[];let n=0;
+ for(let gi=0;gi<3;gi++){const s0=n;[A,Bg].forEach(G=>G.groups.filter(g=>g.materialIndex===gi).forEach(g=>{for(const[src,dst]of[[G.attributes.position,P],[G.attributes.normal,N],[G.attributes.color,C]])for(let i=g.start*3;i<(g.start+g.count)*3;i++)dst.push(src.array[i]);n+=g.count}));grp.push([s0,n-s0,gi])}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));
+ grp.forEach(([s,c,i])=>{if(c)g.addGroup(s,c,i)});g.computeBoundingBox();g.computeBoundingSphere();return g}
+
+
 /* carb(i, colour): a car model "list" (see the note at the top). A colour means a traffic car, which can also be a van, SUV or taxi */
 function carList(i,cc,fixed){let st=i,col=cc||CARS[i].c;if(cc&&!fixed&&Math.random()<.35){st=pick([5,5,6,6,7]);if(st==7)col='#f2c418'}
  const S=CSPEC[st],a=[[S.W,S.yh-S.yb,S.L,col,0,(S.yh+S.yb)/2,0]];
