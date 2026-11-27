@@ -69,7 +69,7 @@ const FB_EMAIL=!!window.FW_DEV/* HELD: /dev only. On release day set true */;/* 
 let FBP=null,FBFM=null;const FBE={v:'in',msg:'',bad:0,t:0,busy:0};
 const fbHold=u=>!!u&&!u.emailVerified&&u.providerData.length>0&&u.providerData.every(p=>p.providerId=='password');
 function fbAuthSet(usr){window.FW_AUTH_DONE=1;if(fbHold(usr)){FBP=usr;FBU=null;CLD.ok=0;fbRedraw();return}FBP=null;if(csAcct(usr))return;FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()}
-const FB_MAIL_URL='https://wavefern-mail.PASTE_SUBDOMAIN.workers.dev'/* set to the Worker's address after deploy (worker/, docs/email-signin-setup.md) */;
+const FB_MAIL_URL='https://wavefern-mail.wavefernfirebase.workers.dev'/* set to the Worker's address after deploy (worker/, docs/email-signin-setup.md) */;
 function fbMail(kind,email){const h={'Content-Type':'application/json'};
  const go=()=>fetch(FB_MAIL_URL+(kind=='verify'?'/verify':'/reset'),{method:'POST',headers:h,body:JSON.stringify(kind=='verify'?{}:{email})}).then(r=>{if(!r.ok){const e=new Error('mail');e.code=r.status==429?'mail/busy':'mail/fail';throw e}return r.json()});
  return fbLoad().then(()=>kind=='verify'?(FBP||FBA.currentUser).getIdToken().then(t=>{h.Authorization='Bearer '+t}):0).then(go)}
