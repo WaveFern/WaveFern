@@ -14,7 +14,7 @@
 if(!window.FW_DEV||/[?&]nodisbimp/.test(location.search))return;
 if(typeof THREE=='undefined'||typeof CARS=='undefined'||typeof carList!='function'||typeof carBuild!='function')return;
 
-const BODY='#6a2cf0',ACC='#19e6c1',INK='#121318',CARB='#24262c',CHR='#c9ced6',RUB='#17171a',DISC='#7d828a';
+const BODY='#d3202c',ACC='#141519',LED='#fff3e8',GLOW='#ff3b47',INK='#121318',CARB='#24262c',CHR='#c9ced6',RUB='#17171a',DISC='#7d828a';
 /* L,W: length and width; r: wheel radius; yb: body bottom; yh: shoulder; fo/ro: axles; Wc: cabin width */
 const SP={L:2.62,W:1.18,r:.19,yb:.11,yh:.43,fo:.84,ro:-.82,Wc:.92};
 
@@ -43,48 +43,48 @@ function disGeo(col){const {L,W,r,yb,yh,fo,ro,Wc}=SP,ra=r+.035,dkc=dk(col,.55),d
    box(.07,.008,zr0+L/2-.18,x,.515,(zr0-L/2+.18)/2,ACC,0)});
   /* hood vents */
   [-1,1].forEach(s=>{for(let k=0;k<4;k++)box(.16,.012,.025,s*.3,yh+.02-k*.005,.66+k*.05,INK,1,-.08)});
-  /* front: splitter, three intakes with mesh bars, LED headlight slits and teal DRL hooks, badge */
+  /* front: splitter, three intakes with mesh bars, LED headlight slits and black DRL hooks, badge */
   box(W+.06,.025,.16,0,yb+.01,L/2-.03,INK,1);box(W+.06,.012,.02,0,yb+.03,L/2+.05,ACC,0);
   box(W*.36,.1,.02,0,yb+.1,L/2+.004,'#0b0c0f',1);[-1,1].forEach(s=>box(W*.2,.09,.02,s*W*.34,yb+.09,L/2+.004,'#0b0c0f',1));
   for(let k=0;k<3;k++)box(W*.34,.008,.024,0,yb+.07+k*.03,L/2+.006,CARB,1);
-  [-1,1].forEach(s=>{box(.26,.03,.06,s*W*.33,.255,L/2-.04,'#e8fbff',2,-.35);box(.04,.08,.03,s*W*.46,.22,L/2-.005,ACC,2);box(.2,.015,.03,s*W*.34,.22,L/2+.004,ACC,2)});
-  box(.1,.06,.012,0,.2,L/2+.006,ACC,2);box(.07,.035,.014,0,.2,L/2+.007,INK,1);
-  /* sides: side skirt with teal edge, intakes with fins behind the doors, door seam, flush handle, mirrors on stalks */
+  [-1,1].forEach(s=>{box(.26,.03,.06,s*W*.33,.255,L/2-.04,'#e8fbff',2,-.35);box(.04,.08,.03,s*W*.46,.22,L/2-.005,LED,2);box(.2,.015,.03,s*W*.34,.22,L/2+.004,LED,2)});
+  box(.1,.06,.012,0,.2,L/2+.006,'#f2f2f2',2);box(.07,.035,.014,0,.2,L/2+.007,INK,1);
+  /* sides: side skirt with black edge, intakes with fins behind the doors, door seam, flush handle, mirrors on stalks */
   box(W+.03,.05,fo-ro-2*ra-.06,0,yb+.03,(fo+ro)/2,INK,1);box(W+.035,.012,fo-ro-2*ra-.06,0,yb+.06,(fo+ro)/2,ACC,0);
   [-1,1].forEach(s=>{const x=s*(W/2+.004);
    box(.014,.16,.11,x,yb+.2,-.53,'#0b0c0f',1);for(let k=0;k<4;k++)box(.02,.012,.11,x+s*.004,yb+.14+k*.035,-.53,CARB,1);
    box(.012,yh-yb-.1,.012,x,(yh+yb)/2,.52,dkc,1);box(.012,yh-yb-.1,.012,x,(yh+yb)/2,-.45,dkc,1);
-   box(.04,.02,.08,s*(Wc/2+.03),.5,zf0-.07,INK,1);box(.1,.06,.12,s*(Wc/2+.1),.55,zf0-.06,col,0);box(.015,.045,.1,s*(Wc/2+.15),.55,zf0-.06,ACC,2)});
+   box(.04,.02,.08,s*(Wc/2+.03),.5,zf0-.07,INK,1);box(.1,.06,.12,s*(Wc/2+.1),.55,zf0-.06,col,0);box(.015,.045,.1,s*(Wc/2+.15),.55,zf0-.06,'#ffab2e',2)});
   /* rear: ducktail, full-width light bar, diffuser fins, quad exhausts */
   box(W-.1,.03,.1,0,.53,-L/2+.06,dk2,0);
-  box(W*.94,.035,.02,0,.375,-L/2-.006,'#ff2a3a',2);[-1,1].forEach(s=>{box(.12,.07,.02,s*W*.42,.37,-L/2-.007,'#ff2a3a',2);box(.08,.03,.015,s*W*.25,.33,-L/2-.007,'#f2f2f2',2)});
+  box(W*.98,.12,.012,0,.345,-L/2-.002,INK,1);box(W*.94,.035,.02,0,.375,-L/2-.006,'#ff2a3a',2);[-1,1].forEach(s=>{box(.12,.07,.02,s*W*.42,.37,-L/2-.007,'#ff2a3a',2);box(.08,.03,.015,s*W*.25,.33,-L/2-.007,'#f2f2f2',2)});
   box(W+.02,.09,.12,0,yb+.06,-L/2+.03,INK,1);for(let k=-3;k<=3;k++)box(.012,.08,.16,k*.13,yb+.05,-L/2-.02,CARB,1);
   [-1,1].forEach(s=>[.36,.47].forEach(x=>{cyl(.04,.04,.1,s*x,yb+.12,-L/2-.03,CHR,0,10,Math.PI/2);cyl(.028,.028,.105,s*x,yb+.12,-L/2-.03,'#0a0a0c',1,10,Math.PI/2)}));
-  /* swan-neck wing: two pylons from the deck, a wide blade with teal trailing edge, endplates */
+  /* swan-neck wing: two pylons from the deck, a wide blade with black trailing edge, endplates */
   [-1,1].forEach(s=>{box(.03,.2,.05,s*.3,.62,-L/2+.18,INK,1);box(.03,.05,.12,s*.3,.72,-L/2+.13,INK,1)});
   box(W+.04,.03,.24,0,.75,-L/2+.1,INK,1,.08);box(W+.04,.012,.03,0,.765,-L/2-.02,ACC,0);
   [-1,1].forEach(s=>box(.02,.14,.28,s*(W/2+.03),.73,-L/2+.1,col,0));
-  /* wheels: tyre, dark rim face, five spokes, brake disc, teal caliper, centre cap */
+  /* wheels: tyre, dark rim face, five spokes, brake disc, black caliper, centre cap */
   [fo,ro].forEach(z=>[-1,1].forEach(s=>{const x=s*(W/2-.08),xo=s*(W/2-.0);
-   /* tyre (outer face at W/2-.01), then layered outwards: dark rim well, brake disc, chrome rim, teal caliper, spokes, centre cap */
+   /* tyre (outer face at W/2-.01), then layered outwards: dark rim well, brake disc, chrome rim, black caliper, spokes, centre cap */
    wheel(r,.14,x,r,z,RUB,1,20);wheel(r*.8,.01,s*(W/2-.006),r,z,'#2a2d33',1,18);wheel(r*.88,.006,s*(W/2-.008),r,z,CARB,1,20);
    wheel(r*.58,.008,s*(W/2-.0),r,z,DISC,0,16);
    wheel(r*.8,.008,s*(W/2+.01),r,z,CHR,0,20);wheel(r*.7,.009,s*(W/2+.0105),r,z,'#2a2d33',1,18);box(.006,.07,.05,s*(W/2+.0112),r+.075,z-.04,ACC,0,.6);
    for(let k=0;k<5;k++)box(.014,r*1.46,.036,s*(W/2+.012),r,z,CHR,0,k/5*Math.PI);
    wheel(r*.18,.016,s*(W/2+.018),r,z,ACC,0,10);wheel(r*.08,.02,s*(W/2+.02),r,z,INK,1,6)}));
   /* underglow */
-  box(W*.8,.01,L*.7,0,.03,0,ACC,2)})}
+  box(W*.8,.01,L*.7,0,.03,0,GLOW,2)})}
 
 /* ---------- the lettering: canvas text on decal planes ---------- */
 const FONT='"Silkscreen", ui-monospace, monospace';
 function sideCanvas(){const c=document.createElement('canvas');c.width=1024;c.height=176;const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);
- /* teal speed slash under the word, with three pixel dashes in front of it */
+ /* black speed slash under the word, with three pixel dashes in front of it */
  x.fillStyle=ACC;x.beginPath();x.moveTo(120,168);x.lineTo(1020,140);x.lineTo(1020,160);x.lineTo(110,176);x.closePath();x.fill();
  [[20,60],[50,30],[70,14]].forEach(([a,w],k)=>x.fillRect(a,150+k*8,w,6));
- /* the word, sized to fill the panel: black outline, teal drop shadow, white letters */
+ /* the word, sized to fill the panel: black outline, dark red drop shadow, white letters */
  let fs=150;x.font='700 '+fs+'px '+FONT;const w=x.measureText('DISBIMP').width;if(w>940){fs=Math.floor(fs*940/w);x.font='700 '+fs+'px '+FONT}
  x.textAlign='center';x.textBaseline='middle';x.lineJoin='miter';
- x.fillStyle=ACC;x.fillText('DISBIMP',520,80);
+ x.fillStyle='#5a0a10';x.fillText('DISBIMP',520,80);
  x.lineWidth=14;x.strokeStyle='#0c0d10';x.strokeText('DISBIMP',512,72);
  x.fillStyle='#ffffff';x.fillText('DISBIMP',512,72);
  return c}
