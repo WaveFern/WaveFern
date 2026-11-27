@@ -3,13 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.28';
+const GAME_VERSION='v56.0.26';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.28',n:'Sign-in emails: real offset drop shadow on the button, green button with black shadow in dark mode (dev only, not live yet)'},
- {v:'v56.0.27',n:'Sign-in emails: only the game\'s two fonts (Silkscreen and monospace) and plainer wording (dev only, not live yet)'},
- {v:'v56.0.26',n:'Sign-in emails follow James\'s mockup: green pixel logo, black Verify button with a green shadow (dev only, not live yet)'},
- {v:'v56.0.25',n:'Sign-in emails restyled in the game\'s look: WAVEFERN logo, WaveFern green button, light and dark versions (dev only, not live yet)'},
+ {v:'v56.0.26',n:'Sign-in emails restyled in the game\'s look: green pixel logo, black button with a green drop shadow, light and dark versions (dev only, not live yet)'},
+ {v:'v56.0.25',n:'Storage (F) picture cards with size and tag (dev build only for now)'},
  {v:'v56.0.24',n:'Santa\'s Lodge (dev): a festive new talk box with Santa\'s live 3D face that talks and blinks'},
  {v:'v56.0.23',n:'Santa\'s Lodge (dev): no more flicker in the burp cutscene, a longer close-up on Santa\'s red face, and the present now tumbles and rolls with real physics'},
  {v:'v56.0.22',n:'Email sign-in groundwork (held, dev only): email and password accounts with a confirmed-address check, branded emails sent through a Cloudflare Worker and Resend, and new security rules. Nothing changes for players yet'},
