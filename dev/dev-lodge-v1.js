@@ -623,7 +623,7 @@ INT.push({get x(){return LX+PRES_AT[0]},get z(){return LZ+PRES_AT[1]},get r(){re
 /* the main tick, run once per frame just before the main camera draws */
 let lastT=performance.now();
 const r0=renderer.render.bind(renderer);
-renderer.render=function(sc,c){if(c===cam){const n=performance.now(),dt=Math.min(.06,(n-lastT)/1000);lastT=n;if(!(typeof PAUSED!='undefined'&&PAUSED)){try{tick(dt)}catch(e){soft(e,'tick')}}if(CUT.live)return filmRender(sc)}return r0(sc,c)};
+renderer.render=function(sc,c){if(c===cam){const n=performance.now(),dt=Math.min(.06,(n-lastT)/1000);lastT=n;if(!(typeof PAUSED!='undefined'&&PAUSED)){try{tick(dt)}catch(e){soft(e,'tick')}}if(CUT.live)return filmRender(sc)}const out=r0(sc,c);if(c===cam&&DLG.open&&!CUT.live)facePort();return out};
 /* ---------- the toy train: an engine and two little wagons chuffing round the oval track ---------- */
 const TRAIN=(()=>{const cars=[];const mk=(i)=>{const g=grp(dynG,0,0,0);
   if(i==0){part(g,.5,.12,.9,'#1d1d22',0,.53,0);part(g,.4,.34,.5,REDC,0,.76,.12);part(g,.34,.34,.34,'#2e2e36',0,.76,.12);part(g,.36,.36,.4,'#2e2e36',0,.78,.18);part(g,.44,.48,.38,REDC,0,.84,-.24);part(g,.5,.08,.46,'#1d1d22',0,1.1,-.24);
@@ -708,6 +708,19 @@ function filmRender(sc){if(!LBLS){LBLS=[];safe(()=>sc.traverse(o=>{if(o.isSprite
  roofG.visible=true;roofG.position.y=0;roofMat.opacity=1;cutG.scale.y=1;BULBM.forEach(b=>b.opacity=1);
  const L0=[amb.intensity,sun.intensity,FIRE.intensity],dm=CUT.dim||0;amb.intensity*=1-.6*dm;sun.intensity*=1-.8*dm;FIRE.intensity=Math.max(FIRE.intensity,.6)*(1+dm*.4);KEY.intensity=.3+dm*2.1;RIM.intensity=(CUT.red||0)*1.8;faceHeat(CUT.heat||0);
  try{return r0(sc,PCAM)}finally{amb.intensity=L0[0];sun.intensity=L0[1];FIRE.intensity=L0[2];KEY.intensity=RIM.intensity=0;faceHeat(0);LBLS.forEach((o,i)=>o.visible=LBLV[i]);roofG.visible=w0[0];roofG.position.y=w0[1];roofMat.opacity=w0[2];cutG.scale.y=w0[3];BULBM.forEach((b,i)=>b.opacity=w0[4][i])}}
+/* ---------- Santa's live face in the talk box: his real model, filmed close up by its own small renderer on the portrait's own
+   canvas (the game draws at a low resolution, so the face gets its own), so the portrait talks, blinks and looks just like him.
+   Only his model is drawn there, with two lights hung on him for that render alone. ---------- */
+const FCAM=new THREE.PerspectiveCamera(20,1,.2,40);let FR=null,faceN=0,faceBad=0;
+const FL=[new THREE.AmbientLight(0xfff2e0,.8),new THREE.DirectionalLight(0xfff0dc,.9),new THREE.DirectionalLight(0xffb070,.35)];FL[1].position.set(1.6,2.6,3.2);FL[2].position.set(-2.4,1.2,-1);
+function facePort(){if(faceBad>3||!DLG.el)return;const cv=DLG.el.querySelector('.lpg');if(!cv||!cv.offsetWidth)return;if((faceN++)&1)return;
+ const A=SANTA;try{if(!FR){FR=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:false});FR.setPixelRatio(1);FR.setClearColor(0,0);['outputEncoding','toneMapping','toneMappingExposure','physicallyCorrectLights'].forEach(q=>{if(q in renderer)FR[q]=renderer[q]})}
+  const S=Math.min(160,Math.round(cv.offsetWidth));if(FR.getSize(new THREE.Vector2()).x!==S)FR.setSize(S,S,false);
+  const k=A.g*SB,h=new THREE.Vector3(0,.62,0);A.root.updateMatrixWorld(true);A.head.localToWorld(h);const yaw=(A.look||0)*.6+.08;
+  FCAM.position.set(h.x+Math.sin(yaw)*5.6*k,h.y+.15*k,h.z+Math.cos(yaw)*5.6*k);FCAM.lookAt(h.x,h.y-.05*k,h.z);FCAM.aspect=1;FCAM.updateProjectionMatrix();
+  const bl=A.blob.visible;A.blob.visible=false;FL.forEach(l=>{A.root.add(l);if(l.target){A.root.add(l.target);l.target.position.set(0,1.9,0)}});
+  try{FR.render(A.root,FCAM)}finally{FL.forEach(l=>{A.root.remove(l);if(l.target)A.root.remove(l.target)});A.blob.visible=bl}
+  if(!cv.classList.contains('on'))cv.classList.add('on')}catch(e){faceBad++;soft(e,'face')}}
 function cutStart(){if(CUT.on)return;CUT.on=1;CUT.t=0;CUT.done=0;CUT.w=0;CUT.rest=0;CUT.id=-1;CUT.dim=0;CUT.red=0;CUT.heat=0;CUT.kick=0;LBLS=null;bars.classList.add('on');document.body.classList.add('lodgefilm')}
 function cutEnd(now){if(!CUT.on&&!now)return;
  /* the present may have rolled to where you stand: step back from it so you are never inside it */
@@ -754,18 +767,18 @@ const PCOL={R:'#c8261f',W:'#f8fafc',S:'#f0b48a',K:'#1d1d22',N:'#e98a80',P:'#ee8a
 function portrait(cv){const c=cv.getContext('2d');c.clearRect(0,0,16,16);PORT.forEach((r,y)=>[...r].forEach((ch,x)=>{if(PCOL[ch]){c.fillStyle=PCOL[ch];c.fillRect(x,y,1,1)}}))}
 function pips(){const f=st().f;return Array.from({length:5},(_,i)=>`<i class="${i<f?'on':''}"></i>`).join('')}
 function ensureDlg(){if(DLG.el)return DLG.el;const e=document.createElement('div');e.id='lodged';e.setAttribute('role','dialog');e.setAttribute('aria-label','Santa');
- e.innerHTML=`<div class=lcard><div class=lhd><canvas class=lpt width=16 height=16></canvas><div class=lnm><b>SANTA</b><small>Santa's Lodge</small></div><div class=lpips title="Treats fed this round">${pips()}</div></div><div class=ltx></div><div class=lbt></div><div class=lhint>Click or press Enter to continue &middot; Esc to leave</div></div>`;
+ e.innerHTML=`<div class=lcard><div class=lhd><div class=lpf><canvas class=lpt width=16 height=16></canvas><canvas class=lpg></canvas></div><div class=lnm><b>SANTA</b><small>Santa's Lodge</small></div><div class=lpips title="Treats fed this round">${pips()}</div></div><div class=ltx></div><div class=lbt></div><div class=lhint>Click or press Enter to continue &middot; Esc to leave</div></div>`;
  document.body.appendChild(e);portrait(e.querySelector('.lpt'));e.addEventListener('click',ev=>{if(ev.target.closest('button'))return;skipText()});return DLG.el=e}
 function openDlg(){const m=mode_();if(!(m=='play'||m=='menu'))return false;if(m=='play'){DLG.mode0='play';try{$('ui').innerHTML=''}catch(e){}mode='menu'}ensureDlg();DLG.open=true;DLG.el.classList.add('on');DLG.el.querySelector('.lpips').innerHTML=pips();CINE.tx=(LX+SNX-P.x)*.35;CINE.tz=(LZ+SNZ-P.z)*.35;return true}
 function closeDlg(keepMode){if(!DLG.open)return;DLG.open=false;DLG.token=(DLG.token||0)+1;if(DLG.el)DLG.el.classList.remove('on');SANTA.open=0;SANTA.talk=0;applySanta();if(!keepMode){CINE.tx=CINE.tz=0;if(mode_()=='menu')mode='play'}}
 /* say lines one by one (a click moves on), each typed out with little voice blips and a flapping jaw; then call done */
 function sayLines(lines,done,btnsFn){const tok=DLG.token=(DLG.token||0)+1;let i=0;const el=DLG.el,tx=el.querySelector('.ltx'),bt=el.querySelector('.lbt');bt.innerHTML='';
  const next=()=>{if(tok!=DLG.token||!DLG.open)return;if(i>=lines.length){DLG.advance=null;if(btnsFn)btnsFn(bt);else done&&done();return}typeLine(lines[i++],tx,el)};DLG.advance=next;next()}
-function typeLine(text,tx,el){DLG.text=text;DLG.n=0;DLG.full=false;tx.textContent='';el.querySelector('.lhint').style.visibility='visible';const tok=DLG.token,A=SANTA;
- const step=()=>{if(tok!=DLG.token||!DLG.open)return;if(DLG.n>=text.length){DLG.full=true;A.talk=0;return}
+function typeLine(text,tx,el){el.classList.add('talk');DLG.text=text;DLG.n=0;DLG.full=false;tx.textContent='';el.querySelector('.lhint').style.visibility='visible';const tok=DLG.token,A=SANTA;
+ const step=()=>{if(tok!=DLG.token||!DLG.open)return;if(DLG.n>=text.length){DLG.full=true;A.talk=0;el.classList.remove('talk');return}
   const ch=text[DLG.n++];tx.textContent=text.slice(0,DLG.n);if(/[a-z]/i.test(ch)&&DLG.n%2){if(!LS('syl'))voice(115+Math.random()*60,.09,.12,{bend:1.25,lp:420});A.talk=.16+Math.random()*.16}else if(ch==' '||/[.,!?]/.test(ch)){A.talk=.02}
   DLG.timer=setTimeout(step,/[.!?]/.test(ch)?170:/,/.test(ch)?90:26)};step()}
-function skipText(){if(!DLG.open)return;if(!DLG.full){clearTimeout(DLG.timer);DLG.n=DLG.text.length;DLG.el.querySelector('.ltx').textContent=DLG.text;DLG.full=true;SANTA.talk=0;return}if(DLG.advance)DLG.advance()}
+function skipText(){if(!DLG.open)return;if(!DLG.full){clearTimeout(DLG.timer);DLG.n=DLG.text.length;DLG.el.querySelector('.ltx').textContent=DLG.text;DLG.full=true;SANTA.talk=0;DLG.el.classList.remove('talk');return}if(DLG.advance)DLG.advance()}
 function btn(bt,label,fn,cls,img,dis){const b=document.createElement('button');b.type='button';b.className=cls||'';b.disabled=!!dis;b.innerHTML=(img?`<img src="${img}" alt="">`:'')+label;b.onclick=()=>{sn('click');fn()};bt.appendChild(b);return b}
 function menu(first,pre){const s=st(),f=s.f,el=ensureDlg(),carry=s.c.cookie+s.c.cane;el.querySelector('.lhint').style.visibility='hidden';el.querySelector('.lpips').innerHTML=pips();
  let line;if(pre)line=pre;else if(s.pr&&!s.pr.done)line="Your present is waiting for you on the rug! Go on, open it. Ho ho ho!";
@@ -993,21 +1006,36 @@ function flash(col,a,sec){const f=document.createElement('div');f.className='lod
 
 /* ---------- styles ---------- */
 const css2=document.createElement('style');css2.textContent=`
-#lodged{position:fixed;left:50%;bottom:22px;z-index:90;width:min(720px,94vw);transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s;font:14px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#e8f3ec}
+#lodged{position:fixed;left:50%;bottom:22px;z-index:90;width:min(760px,95vw);transform:translate(-50%,24px) scale(.97);opacity:0;pointer-events:none;transition:opacity .2s,transform .3s cubic-bezier(.2,.9,.3,1.2);font:14px/1.45 ui-monospace,Menlo,Consolas,monospace;color:#fff}
 #lodged.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-#lodged .lcard{position:relative;padding:16px 16px 10px;background:#0c0c0c;border:3px solid #000;box-shadow:inset 0 0 0 2px #262626,6px 6px 0 #000a}
-#lodged .lcard:before{content:'';position:absolute;left:0;right:0;top:0;height:7px;background:repeating-linear-gradient(135deg,#c0392b 0 8px,#f4f4f4 8px 16px);border-bottom:3px solid #000}
-#lodged .lhd{display:flex;align-items:center;gap:12px;margin:6px 0 8px}
-#lodged .lpt{width:56px;height:56px;image-rendering:pixelated;background:#1b2a3f;border:3px solid #000;box-shadow:inset 0 0 0 2px #3d5a80}
-#lodged .lnm{flex:1}#lodged .lnm b{display:block;font:700 15px Silkscreen,ui-monospace,monospace;letter-spacing:2px;color:#ffd75e}#lodged .lnm small{color:#8aa094;font-size:11px}
-#lodged .lpips{display:flex;gap:4px}#lodged .lpips i{width:14px;height:14px;background:#262626;border:2px solid #000;transform:rotate(45deg)}#lodged .lpips i.on{background:#ffd75e;box-shadow:0 0 6px #ffd75e}
-#lodged .ltx{min-height:46px;font-size:15px;color:#fff}
-#lodged .lbt{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-#lodged .lbt button{display:flex;align-items:center;gap:7px;padding:9px 14px;background:#1a1a1a;color:#e8f3ec;border:3px solid #000;box-shadow:inset 0 -3px #0008;font:700 12px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer}
-#lodged .lbt button b{color:#ffd75e}#lodged .lbt button img{width:26px;height:26px;image-rendering:pixelated}
-#lodged .lbt button.go{background:#2e8b4e;color:#fff}#lodged .lbt button:hover:not(:disabled){filter:brightness(1.25)}#lodged .lbt button:active:not(:disabled){transform:translateY(1px)}
-#lodged .lbt button:disabled{opacity:.4;cursor:not-allowed}
-#lodged .lhint{margin-top:8px;color:#5f7568;font-size:10px;text-align:right}
+/* a red wrapped card with a gold edge and a holly garland, like Santa's present card */
+#lodged .lcard{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr auto auto;column-gap:16px;padding:20px 18px 12px;background:repeating-linear-gradient(135deg,#0000 0 14px,#ffffff07 14px 28px),linear-gradient(#8e1420,#560a13);border:3px solid #000;box-shadow:inset 0 0 0 3px #e6b422,inset 0 0 0 6px #6d0e18,inset 0 0 0 8px #e6b42255,0 0 40px #ff5a3a33,7px 7px 0 #000b}
+#lodged .lcard:before{content:'';position:absolute;left:0;right:0;top:0;height:12px;background:radial-gradient(circle at 8px 6px,#ff3b3b 0 3px,#0000 3.5px) 0 0/34px 12px,radial-gradient(circle at 22px 8px,#ffd75e 0 2px,#0000 2.5px) 0 0/34px 12px,repeating-linear-gradient(135deg,#1f6e36 0 7px,#2f9e4f 7px 14px);border-bottom:3px solid #000}
+#lodged .lhd{display:contents}
+/* his live face in a gold frame */
+#lodged .lpf{grid-row:1/5;align-self:start;position:relative;width:132px;height:132px;margin-top:2px;border:3px solid #000;box-shadow:inset 0 0 0 3px #e6b422,0 0 0 2px #6d0e18,0 0 18px #ffd75e44;background:radial-gradient(circle at 50% 40%,#2c4a7a,#0d1a33);overflow:hidden}
+#lodged .lpf:after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 0 3px #e6b422,inset 0 0 18px #0008;pointer-events:none}
+#lodged .lpt,#lodged .lpg{position:absolute;inset:0;display:block;width:100%;height:100%;image-rendering:pixelated}#lodged .lpg{opacity:0;transition:opacity .25s}#lodged .lpg.on{opacity:1}#lodged .lpg.on~.lpt,#lodged .lpf:has(.lpg.on) .lpt{visibility:hidden}
+#lodged.talk .lpf{animation:lodgebob .28s ease-in-out infinite alternate}
+@keyframes lodgebob{to{transform:translateY(-2px)}}
+#lodged .lnm{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}#lodged .lnm b{font:700 17px Silkscreen,ui-monospace,monospace;letter-spacing:3px;color:#ffd75e;text-shadow:2px 2px 0 #000}#lodged .lnm small{color:#f6c9bf;font-size:11px;letter-spacing:1px}
+#lodged .lpips{position:absolute;right:16px;top:20px;display:flex;gap:6px}
+#lodged .lpips i{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7a2a2a,#2a0a0e);border:2px solid #000;position:relative}
+#lodged .lpips i:before{content:'';position:absolute;left:4px;top:-5px;width:4px;height:3px;background:#b08a3a;border:1px solid #000}
+#lodged .lpips i.on{background:radial-gradient(circle at 35% 30%,#fff6c8,#ffd75e 45%,#c8921a);box-shadow:0 0 8px #ffd75e}
+#lodged .ltx{grid-column:2;min-height:62px;padding:10px 12px;background:#0007;border:2px solid #000;box-shadow:inset 0 0 0 1px #ffffff14;font-size:16px;color:#fff;text-shadow:1px 1px 0 #000}
+#lodged .ltx:after{content:'';display:inline-block;width:8px;height:14px;margin-left:3px;vertical-align:-2px;background:#ffd75e;animation:lodgecur .7s steps(2,jump-none) infinite}
+#lodged:not(.talk) .ltx:after{animation:lodgecur .7s steps(2,jump-none) infinite}
+@keyframes lodgecur{to{opacity:0}}
+#lodged .lbt{grid-column:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#lodged .lbt:empty{display:none}
+#lodged .lbt button{display:flex;align-items:center;gap:7px;padding:9px 14px;background:#3a0a10;color:#f6e6e0;border:3px solid #000;box-shadow:inset 0 -4px 0 #200408,inset 0 0 0 1px #e6b42233;font:700 12px Silkscreen,ui-monospace,monospace;letter-spacing:1px;cursor:pointer;transition:transform .08s,filter .12s}
+#lodged .lbt button b{color:#ffd75e}#lodged .lbt button img{width:26px;height:26px;image-rendering:pixelated;filter:drop-shadow(1px 1px 0 #000)}
+#lodged .lbt button.go{background:linear-gradient(#3fb565,#24814a);color:#fff;box-shadow:inset 0 -4px 0 #14502c,inset 0 0 0 1px #b8ffd055}
+#lodged .lbt button:hover:not(:disabled){filter:brightness(1.2);transform:translateY(-2px)}#lodged .lbt button:active:not(:disabled){transform:translateY(1px)}
+#lodged .lbt button:disabled{opacity:.45;cursor:not-allowed}
+#lodged .lhint{grid-column:2;margin-top:8px;color:#f0b8ad99;font-size:10px;text-align:right}
+@media (max-width:560px){#lodged .lpf{width:84px;height:84px}#lodged .lcard{column-gap:10px;padding:18px 12px 10px}#lodged .ltx{font-size:14px}#lodged .lpips{display:none}}
 #lodgebub{position:fixed;z-index:62;max-width:220px;padding:6px 10px;background:#fff;color:#1a1a1a;border:3px solid #000;box-shadow:3px 3px 0 #0006;font:700 12px/1.3 Silkscreen,ui-monospace,monospace;text-align:center;opacity:0;pointer-events:none;transform:translate(-50%,-100%) scale(.85);transition:opacity .15s,transform .15s}
 #lodgebub.on{opacity:1;transform:translate(-50%,-100%) scale(1)}
 #lodgebub:after{content:'';position:absolute;left:50%;bottom:-11px;width:10px;height:10px;background:#fff;border-right:3px solid #000;border-bottom:3px solid #000;transform:translateX(-50%) rotate(45deg)}
