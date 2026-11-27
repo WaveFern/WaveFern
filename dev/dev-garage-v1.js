@@ -235,6 +235,8 @@
   if(typeof fade=='function')fade(go,'');else go()};
  /* cars stand outside only when you have left them there (218-parked-cars.js); the sleigh stands by the house until it is moved */
   {const fg=fillGarage;fillGarage=function(){const r=fg.apply(this,arguments);try{GCM=GCM.filter((m,j)=>{const c=CARS[(S.cars||[])[j]];if(c&&c.xm){IG[6].remove(m);return false}return true})}catch(e){}return r}}
+ /* /dev/ only: the garage room is empty, no car models stand inside it; Tom's paint shop already lists every car you own */
+  if(window.FW_DEV){const fg=fillGarage;fillGarage=function(){const r=fg.apply(this,arguments);try{(GCM||[]).forEach(m=>{if(m&&IG[6])IG[6].remove(m)});GCM=[]}catch(e){}return r}}
  /* choosing only changes the preview: nothing is saved or paid until Pay and apply */
  window.gcSet=(i,k,v)=>{if(!(S.cars||[]).includes(i)||!DR||DR.i!=i)return;if((k=='c'||k=='c2')&&!okHex(v))return;if(k=='p'&&(!patOk(v)||!wrapOwned(v)))return;DR[k]=v;snd('ping');carUI(i)};
  window.gcReset=i=>{if(!DR||DR.i!=i)return;Object.assign(DR,stockLook(i));snd('ping');carUI(i)};
