@@ -14,6 +14,7 @@
 const HELD=false;
 if(HELD&&!window.FW_DEV)return;
 const MAX=3;
+const SMALL=!!window.FW_DEV;/* the smaller, quieter pet name tags are on /dev/ only for now */
 /* the powerups come from dev/dev-pets.js (window.PET_PERK[k]=[name,text]); without that pack a pet only adds +1 song quality */
 const PERK0=['+1 song quality','Every equipped pet adds a little to songs you record.'];
 const pk=k=>(window.PET_PERK&&window.PET_PERK[k])||PERK0;
@@ -84,12 +85,12 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 const tex=(w,h,fn)=>{const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);return t};
 function tagOf(f){const g=f.m;let T=g.userData.p2t;if(!T){/* the name is a crisp page tag from 56-name-tags (NTAG), anchored to an invisible point above the head */
   const zz=new THREE.Sprite(new THREE.SpriteMaterial({map:tex(64,64,(c)=>{c.font='bold 40px monospace';c.fillStyle='#d6c8ff';c.strokeStyle='#241a44';c.lineWidth=6;c.strokeText('Z',20,44);c.fillText('Z',20,44)}),transparent:true,depthWrite:false})),hold=new THREE.Group(),pt=new THREE.Object3D();
-  pt.position.set(0,1.3,0);pt.userData.lt=nm(f.k);hold.add(pt);hold.visible=false;zz.scale.set(.5,.5,1);zz.visible=false;g.add(hold,zz);
-  const el=document.createElement('div');el.className='nt pt';el.textContent=nm(f.k);ntBox().appendChild(el);NTAG.list.push({s:pt,el,on:false,gone:0});T=g.userData.p2t={sp:hold,pt,zz,el,n:nm(f.k)}}
+  pt.position.set(0,SMALL?1.1:1.3,0);pt.userData.lt=nm(f.k);hold.add(pt);hold.visible=false;zz.scale.set(.5,.5,1);zz.visible=false;g.add(hold,zz);
+  const el=document.createElement('div');el.className=SMALL?'nt pt sm':'nt pt';el.textContent=nm(f.k);ntBox().appendChild(el);NTAG.list.push({s:pt,el,on:false,gone:0});T=g.userData.p2t={sp:hold,pt,zz,el,n:nm(f.k)}}
  const n=nm(f.k);if(T.n!==n){T.n=n;T.el.textContent=n;T.pt.userData.lt=n}return T}
 function post(dt){
  const mv=Math.hypot(P.x-ST.lx,P.z-ST.lz);ST.lx=P.x;ST.lz=P.z;ST.still=mv>.002||mode!='play'?0:ST.still+dt;
- const z=zone();FOL.forEach(f=>{if(!f.pet||!f.m)return;const g=f.m,T=tagOf(f),near=g.visible&&mode=='play'&&Math.hypot(g.position.x-P.x,g.position.z-P.z)<6;T.sp.visible=near;
+ const z=zone();FOL.forEach(f=>{if(!f.pet||!f.m)return;const g=f.m,T=tagOf(f),near=g.visible&&mode=='play'&&Math.hypot(g.position.x-P.x,g.position.z-P.z)<(SMALL?3.5:6);T.sp.visible=near;
   if(z=='out')g.userData.p2=ST.still>14&&!BIRD(f.k)?'lie':null;
   const sl=g.userData.p2=='sleep';T.zz.visible=sl&&near;if(sl){const k=(ST.T*.5+f.k*.3)%1;T.zz.position.set(.25+k*.2,.7+k*.6,0);T.zz.material.opacity=1-k;T.zz.scale.setScalar(.35+k*.3)}})}
 /* ---------- bodyguards stay outside your home ---------- */
@@ -170,7 +171,7 @@ const st=document.createElement('style');st.textContent=`
 @keyframes pt2in{from{transform:translate(-50%,24px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 @media(max-width:640px){.pt2-slots{gap:6px}.pt2-slot{padding:6px}.pt2-slot canvas.pv{width:72px!important;height:72px!important}.pt2-perk{font-size:11px}}`;
 st.textContent+=`
-#ntags .nt.pt{font-size:14px;padding:4px 9px 3px;color:#fff;background:#2b2118;box-shadow:inset 0 0 0 2px #7a5a3c,3px 3px 0 #0009}
+#ntags .nt.pt{font-size:14px;padding:4px 9px 3px;color:#fff;background:#2b2118;box-shadow:inset 0 0 0 2px #7a5a3c,3px 3px 0 #0009}#ntags .nt.pt.sm{font-size:10px;letter-spacing:.5px;padding:2px 6px 1px;background:#000a;border:1px solid #0008;box-shadow:none;opacity:.85}#ntags .nt.pt.sm:after{display:none}
 #ui>.box.modal.pm{--ink:#3b2a20;--paper:#fff4e0;--card:#fffaf0;--line:#e3cfae;--coral:#ff6b57;--teal:#1fa6a0;width:min(1060px,96vw);max-height:92vh;overflow:auto;background:var(--paper);background-image:radial-gradient(#f0dcb8 1.2px,transparent 1.4px);background-size:18px 18px;color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 #0007;padding:20px 22px 22px;font-family:ui-rounded,"Nunito","Trebuchet MS",Verdana,sans-serif;display:flex;flex-direction:column;gap:14px;animation:pmin .28s cubic-bezier(.2,1.3,.4,1)}
 .pm *{box-sizing:border-box}
 .pm-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.pm-ttl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
