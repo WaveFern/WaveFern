@@ -378,6 +378,54 @@
 #advr .advrays{position:absolute;left:50%;top:50%;width:760px;height:760px;pointer-events:none;z-index:0;opacity:0;background:repeating-conic-gradient(from 0deg,var(--rc) 0 8deg,transparent 8deg 24deg);-webkit-mask:radial-gradient(circle,#000 0,#0000 68%);mask:radial-gradient(circle,#000 0,#0000 68%)}
 #advr .strip{z-index:1}
 #advr .strip.landed{background:transparent}
+/* ---- Santa's present card (gift cfg.theme 'xm'): a night of falling snow, a red wrapped card with a gold edge and a bow,
+   gift-tag tiles on a snowy stage, a candy-cane marker and a gold button ---- */
+#advr.xm{background:radial-gradient(ellipse at 50% 35%,#1c3a66e6 0,#081226f2 62%,#03060cf7 100%);overflow:hidden}
+#advr.xm .snw{position:absolute;inset:-200px 0 0;pointer-events:none;z-index:0;opacity:.85;background-image:radial-gradient(3px 3px at 20px 30px,#fff,#0000),radial-gradient(2px 2px at 120px 80px,#fff,#0000),radial-gradient(3px 3px at 60px 150px,#dfefff,#0000),radial-gradient(2px 2px at 170px 170px,#fff,#0000),radial-gradient(2px 2px at 90px 10px,#fff,#0000);background-size:200px 200px;animation:advsnow 9s linear infinite}
+#advr.xm .snw.s2{opacity:.45;background-size:130px 130px;animation-duration:14s;filter:blur(1px)}
+@keyframes advsnow{from{transform:translateY(0)}to{transform:translateY(200px)}}
+#advr.xm .card{z-index:1;overflow:visible;margin-top:18px;background:repeating-linear-gradient(135deg,#0000 0 14px,#ffffff08 14px 28px),linear-gradient(#8e1420,#5b0b14);border:3px solid #000;box-shadow:inset 0 0 0 3px #e6b422,inset 0 0 0 6px #6d0e18,inset 0 0 0 8px #e6b42266,0 0 70px #ff5a3a40,8px 8px 0 #000b;animation:advxmin .5s cubic-bezier(.2,.9,.3,1.25)}
+@keyframes advxmin{from{transform:translateY(40px) scale(.85);opacity:0}to{transform:none;opacity:1}}
+#advr.xm .card:before{height:14px;background:radial-gradient(circle at 8px 7px,#ff3b3b 0 3px,#0000 3.5px) 0 0/34px 14px,radial-gradient(circle at 22px 9px,#ffd75e 0 2px,#0000 2.5px) 0 0/34px 14px,repeating-linear-gradient(135deg,#1f6e36 0 7px,#2f9e4f 7px 14px);border-bottom:3px solid #000}
+#advr.xm .bow{position:absolute;left:50%;top:-30px;width:84px;height:44px;margin-left:-42px;z-index:3;pointer-events:none;filter:drop-shadow(3px 3px 0 #000a);
+ background:radial-gradient(circle at 50% 55%,#fff0b8 0 4px,#e6b422 4px 9px,#000 9px 12px,#0000 12.5px)}
+#advr.xm .bow:before,#advr.xm .bow:after{content:'';position:absolute;z-index:-1;top:6px;width:36px;height:30px;background:linear-gradient(#ffd75e,#c8921a);border:3px solid #000;box-sizing:border-box;border-radius:50% 10% 50% 10%}
+#advr.xm .bow:before{left:2px;transform:rotate(-14deg)}#advr.xm .bow:after{right:2px;transform:scaleX(-1) rotate(-14deg)}
+#advr.xm .rib{margin:18px 0 0;font:700 15px Silkscreen,ui-monospace,monospace;letter-spacing:5px;color:#ffd75e;text-shadow:2px 2px 0 #000}
+#advr.xm .rib:before,#advr.xm .rib:after{content:'✦';margin:0 10px;color:#fff6c8}
+#advr.xm .stage{position:relative;background:radial-gradient(ellipse at 50% 108%,#ffd27a66 0,#0000 55%),linear-gradient(#0a1631,#1b3561);border:3px solid #000;box-shadow:inset 0 0 0 2px #e6b42299,inset 0 -5px 0 var(--rc,#e6b422)}
+#advr.xm .stage canvas{position:relative;z-index:1}
+#advr.xm .stage .snw.s3{inset:-200px 0 0;opacity:.55;background-size:110px 110px;animation-duration:7s;z-index:0}
+#advr.xm .stage .glw{position:absolute;left:50%;bottom:-40px;width:340px;height:160px;margin-left:-170px;border-radius:50%;background:radial-gradient(ellipse,var(--rc,#ffd75e) 0,#0000 70%);opacity:.28;z-index:0;pointer-events:none;animation:advglw 2.4s ease-in-out infinite alternate}
+@keyframes advglw{to{opacity:.5;transform:scale(1.15)}}
+#advr.xm .strip{background:#0a1631cc}
+#advr.xm .strip.landed{background:#0a163155}
+#advr.xm .sh{background:linear-gradient(90deg,#0a1631 0,#0000 20%,#0000 80%,#0a1631 100%)}
+#advr.xm .tl{position:relative;background:linear-gradient(#fff9ec,#efe0bf);border:3px solid #000;border-bottom:8px solid var(--rc);box-shadow:inset 0 0 0 2px #fff,0 4px 0 #0006;clip-path:polygon(18% 0,82% 0,100% 9%,100% 100%,0 100%,0 9%)}
+#advr.xm .tl:before{content:'';position:absolute;left:50%;top:7px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#0a1631;box-shadow:0 0 0 2px #b08a3a}
+#advr.xm .tl img{width:92px;height:92px;margin-top:8px;filter:drop-shadow(2px 3px 0 #0003)}
+#advr.xm .tl b{color:#3a1a0a}
+#advr.xm .tl i{padding:1px 6px;background:var(--rc);color:#120800;font-weight:700;border:2px solid #000}
+#advr.xm .tl.rt{background:linear-gradient(90deg,#0000 41%,#fff6 41% 59%,#0000 59%),linear-gradient(#0000 46%,#fff6 46% 60%,#0000 60%),linear-gradient(color-mix(in srgb,var(--rc) 85%,#fff),color-mix(in srgb,var(--rc) 70%,#000))}
+#advr.xm .tl.rt img{filter:drop-shadow(0 0 8px #fff)}
+#advr.xm .tl.rt b{color:#fff;text-shadow:2px 2px 0 #000;font-size:13px}
+#advr.xm .tl.rt i{background:#000;color:#fff}
+#advr.xm .tl.hot{transform:translateY(-8px) rotate(-2deg)}
+#advr.xm .strip.landed .tl.won{transform:scale(1.22);filter:drop-shadow(0 0 14px var(--rc)) drop-shadow(0 0 4px #fff)}
+#advr.xm .mk{width:8px;margin-left:-4px;background:repeating-linear-gradient(45deg,#fff 0 6px,#e8262b 6px 12px);box-shadow:0 0 0 2px #000,0 0 14px #fff8}
+#advr.xm .mk:before{border-top-color:#ffd75e}#advr.xm .mk:after{border-bottom-color:#ffd75e}
+#advr.xm h3{font-size:24px;color:#ffe08a;text-shadow:3px 3px 0 #000}
+#advr.xm p{color:#f6d6cf}
+#advr.xm .cat{background:#0007;border-color:#000;color:#9ff0c0}
+#advr.xm .cl{position:relative;overflow:hidden;background:linear-gradient(#ffe07a,#e6a91a);color:#3a1500;border:3px solid #000;box-shadow:inset 0 -5px 0 #a8700a,0 0 22px #ffd75e55;font-size:18px;letter-spacing:3px}
+#advr.xm .cl:after{content:'';position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(90deg,#fff0,#fff9,#fff0);transform:skewX(-20deg);animation:advshine 2.6s ease-in-out infinite}
+@keyframes advshine{0%,55%{left:-40%}100%{left:130%}}
+#advr.xm .cl:hover{background:linear-gradient(#fff0a8,#f0b82a)}
+#advr.xm .cl:disabled{background:#3a0a10;color:#e6b42299;box-shadow:inset 0 -5px 0 #200408}#advr.xm .cl:disabled:after{display:none}
+#advr.xm .cl.later{background:#3a0a10;color:#f6d6cf;font-size:12px;box-shadow:inset 0 -4px 0 #200408}#advr.xm .cl.later:after{display:none}#advr.xm .cl.later:hover{background:#56101a;color:#fff}
+#advr.xm .skip,#advr.xm .v3{background:#0a1631;border-color:#e6b42288;color:#ffe08a}
+#advr.xm .advban{font-size:34px;top:14px}
+@media (prefers-reduced-motion:reduce){#advr.xm .snw,#advr.xm .cl:after,#advr.xm .glw{animation:none}}
 #advr .advban{position:absolute;left:50%;top:10px;z-index:7;pointer-events:none;font:700 28px Silkscreen,ui-monospace,monospace;letter-spacing:3px;text-shadow:3px 3px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){#advw *,#advr *{animation-duration:.01s!important}.advd .lf{transition-duration:.2s}}
 `;
@@ -486,6 +534,8 @@
 
  /* a tier's name on this card: a gift can rename them (Santa's Lodge: Rare, Epic, Legendary) */
  const tnm=t=>(REV&&REV.gift&&REV.gift.tierNames&&REV.gift.tierNames[t])||TIERS[t].n;
+ /* a gift can bring its own sounds (cfg.snd.{tick,hb,charge,land,rarity,claim,open}); each returns true when it played, else the card's own synth plays */
+ const gsnd=(n,...a)=>{const g=REV&&REV.gift&&REV.gift.snd;if(!g||!g[n])return false;try{return !!g[n](...a)}catch(e){return false}};
  function fillCard(o,r){
   o.querySelector('h3').textContent=r.n;
   const T=r.rar!=null?TIERS[r.rar]:null;
@@ -518,14 +568,15 @@
   const col=TIERS[t].c,red=reduced(),card=stage.closest('.card');
   ring(stage,col,t>=3);
   burst(w,col,[14,28,46,80,130][t]);
-  if(t>=1)banner(stage,TIERS[t],t);
+  /* a gift that names its own tiers (Santa's Lodge) says the rarity in its own banner, so the calendar's NICE!/GREAT! would only cover it */
+  if(t>=1&&!(REV&&REV.gift&&REV.gift.tierNames))banner(stage,TIERS[t],t);
   if(t>=2)flash(stage,col,[0,0,380,560,820][t]);
   if(t>=3){rays(stage,col);sparkle(w,[0,0,0,16,34][t])}
   if(!red){if(t>=1)shake(stage,[0,3,5,8,12][t],[0,300,360,460,640][t]);if(t>=3&&card)shake(card,t==4?6:3,520)}
   /* sound: a rising run of bell notes, longer the rarer it is, then the full jingle for the top tier */
   const f=TFREQ[t],run=[[1,1.5],[1,1.25,1.5],[1,1.25,1.5,2],[1,1.25,1.5,2,2.5],[1,1.25,1.5,2,2.5,3]][t];
-  safe(()=>{run.forEach((m,i)=>sdHit(f*m,.9,.1,TINE,{del:i*.075,jit:0,rev:.35}));sdHit(f/2,.6,.14,WOOD,{jit:0});if(t>=2)sdNz(.5,3000,.05,{q:2,f2:800})},'fan');
-  if(t==4)setTimeout(()=>jingle(),500);
+  if(!gsnd('land',t)){safe(()=>{run.forEach((m,i)=>sdHit(f*m,.9,.1,TINE,{del:i*.075,jit:0,rev:.35}));sdHit(f/2,.6,.14,WOOD,{jit:0});if(t>=2)sdNz(.5,3000,.05,{q:2,f2:800})},'fan');
+  if(t==4)setTimeout(()=>jingle(),500)}
   buzz([[20],[25,40,25],[30,50,30,50,40],[40,60,40,60,40,60,80],[50,60,50,60,50,60,50,60,160]][t]);
   /* sparkles keep falling on a big win */
   if(t>=3&&!red){let n=0;const iv=setInterval(()=>{if(!REV||REV.o!==stage.closest('#advr')||++n>5){clearInterval(iv);return}sparkle(w,t==4?10:5)},520)}}
@@ -561,10 +612,10 @@
     if(hot)hot.classList.remove('hot');hot=tiles[idx];hot.classList.add('hot');
     /* slow ticks are fuller and louder; rare tiles ring in their own pitch */
     const slow=Math.min(1,dt/200);
-    if(dt>34)safe(()=>{if(it.tier>=2)sdHit(TFREQ[it.tier]*2,.18+.2*slow,.05+.07*slow,TINE,{jit:0,rev:.15});sdHit(520+it.tier*60,.05+.05*slow,.05+.1*slow,WOOD,{jit:.01})},'tk');
+    if(dt>34&&!gsnd('tick',it.tier,slow))safe(()=>{if(it.tier>=2)sdHit(TFREQ[it.tier]*2,.18+.2*slow,.05+.07*slow,TINE,{jit:0,rev:.15});sdHit(520+it.tier*60,.05+.05*slow,.05+.1*slow,WOOD,{jit:.01})},'tk');
     if(slow>.6)buzz(8)}
    /* heartbeat while it crawls to a stop: the closer to the end, the heavier */
-   if(p>.72&&p<.99&&now-hb>Math.max(260,620-(p-.72)*900)){hb=now;safe(()=>sdHit(70,.22,.22,WOOD,{jit:0,bend:.5}),'hb');stage.style.setProperty('--vg',(.25+(p-.72)).toFixed(2));
+   if(p>.72&&p<.99&&now-hb>Math.max(260,620-(p-.72)*900)){hb=now;if(!gsnd('hb',.35+(p-.72)*1.6))safe(()=>sdHit(70,.22,.22,WOOD,{jit:0,bend:.5}),'hb');stage.style.setProperty('--vg',(.25+(p-.72)).toFixed(2));
     st0.animate([{boxShadow:'inset 0 0 0 0 #0000'},{boxShadow:`inset 0 0 40px 6px ${TIERS[teased||T].c}66`},{boxShadow:'inset 0 0 0 0 #0000'}],{duration:360})}
    raf=requestAnimationFrame(tick)};tick();
   an.onfinish=()=>{cancelAnimationFrame(raf);if(!REV)return;sk.remove();
@@ -597,7 +648,7 @@
   /* wind-up: the present shakes and flashes, then the strip starts */
   /* wind-up: the stage glows and shakes harder with each rising tone, a white flash, then the strip launches */
   const red=reduced(),WU=red?250:1050;
-  sfx('whoosh');if(!red){stage.classList.add('chg');[0,1,2].forEach(i=>setTimeout(()=>{if(!REV||REV.o!==o)return;charge(i);shake(stage,2+i*2,240);buzz(12+i*8)},i*300));
+  sfx('whoosh');if(!red){stage.classList.add('chg');[0,1,2].forEach(i=>setTimeout(()=>{if(!REV||REV.o!==o)return;if(!gsnd('charge',i))charge(i);shake(stage,2+i*2,240);buzz(12+i*8)},i*300));
    setTimeout(()=>{if(!REV||REV.o!==o)return;flash(stage,'#ffffff',360);safe(()=>sdNz(.35,1800,.1,{q:2,f2:300}),'wh');buzz(40)},WU-130)}
   setTimeout(()=>{if(REV&&REV.o===o)stage.classList.remove('chg');if(!REV||REV.o!==o)return;if(REV.v){REV.v.dispose();REV.v=null}cv.style.display='none';if(h)h.style.display='none';
    try{if(REV.gift&&REV.gift.rarity)spin2(stage,pr,fin,REV.gift);else spin(stage,pr,fin)}catch(e){fin()}},WU)}
@@ -609,7 +660,7 @@
   const o=REV.o;
   spin(stage,pr,()=>{if(!REV||REV.o!==o)return;
    /* the rarity is in: say it big, then the strip swaps for the items of that rarity */
-   const T=pr.rar,b=document.createElement('div');b.className='advban';b.textContent=tnm(T).toUpperCase()+'!';b.style.color=TIERS[T].c;stage.appendChild(b);
+   const T=pr.rar,b=document.createElement('div');gsnd('rarity',T);b.className='advban';b.textContent=tnm(T).toUpperCase()+'!';b.style.color=TIERS[T].c;stage.appendChild(b);
    b.animate([{transform:'translate(-50%,0) scale(2.6)',opacity:0},{transform:'translate(-50%,0) scale(.9)',opacity:1,offset:.25},{transform:'translate(-50%,0) scale(1)',opacity:1,offset:.35},{transform:'translate(-50%,0) scale(1)',opacity:1,offset:.85},{transform:'translate(-50%,-20px) scale(1)',opacity:0}],{duration:1500,easing:'ease-out'}).onfinish=()=>b.remove();
    setTimeout(()=>{if(!REV||REV.o!==o)return;const s0=REV.strip;if(s0){s0.animate([{opacity:1},{opacity:0}],{duration:220,fill:'forwards'}).onfinish=()=>s0.remove();REV.strip=null}
     setTimeout(()=>{if(!REV||REV.o!==o)return;stage.classList.remove('spin');safe(()=>sdNz(.3,1600,.08,{q:2,f2:400}),'wh');
@@ -673,11 +724,13 @@
    <h3></h3><div class=meta></div><p></p>
    <button type=button class=cl>OPEN PRESENT</button><button type=button class="cl later">LATER</button></div>`;
   REV={b:null,d:0,r,view:0,gift:cfg,o,pr:cfg.prize};
+  /* a themed gift (Santa's Lodge: 'xm') gets its own dress: snow, a bow on the card, gift-tag tiles (CSS #advr.xm below) */
+  if(cfg.theme){o.classList.add(cfg.theme);o.insertAdjacentHTML('afterbegin','<div class=snw></div><div class="snw s2"></div>');o.querySelector('.card').insertAdjacentHTML('afterbegin','<div class=bow></div>');o.querySelector('.stage').insertAdjacentHTML('afterbegin','<div class="snw s3"></div><div class=glw></div>')}
   fillCard(o,r);W.appendChild(o);
   const cv=o.querySelector('canvas'),card=o.querySelector('.card');REV.v=safe(()=>Viewer(cv,r.k),'viewer');
   card.animate([{transform:'scale(.6)',opacity:0},{transform:'scale(1.04)',opacity:1,offset:.7},{transform:'scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.8,.3,1)'});
   const cb=o.querySelector('.cl'),lt=o.querySelector('.later');
-  sfx('whoosh');setTimeout(()=>jingle(),300);
+  sfx('whoosh');if(!gsnd('open'))setTimeout(()=>jingle(),300);
   cb.addEventListener('pointerup',e=>{if(e.button===0||e.pointerType=='touch'||e.pointerType=='pen')giftBtn(cb)});cb.addEventListener('click',()=>giftBtn(cb));
   lt.onclick=()=>{sfx('click');endGift()};setTimeout(()=>cb.focus(),60);
   return true}
@@ -690,7 +743,7 @@
   if(!REV||REV.done||REV.busy)return;REV.busy=1;
   if(!grant(REV.pr)){REV.busy=0;sfx('err');cb.textContent='TRY AGAIN';return}
   REV.done=1;safe(()=>REV.gift.onClaim&&REV.gift.onClaim(),'claim');
-  cb.disabled=true;cb.innerHTML='&#10003; CLAIMED!';sfx('cash');setTimeout(()=>sfx('chime'),120);confetti(cb);
+  cb.disabled=true;cb.innerHTML='&#10003; CLAIMED!';if(!gsnd('claim')){sfx('cash');setTimeout(()=>sfx('chime'),120)}confetti(cb);
   setTimeout(()=>{if(REV)REV.busy=0;endGift()},1500)}
  function endGift(){
   if(!REV||!REV.gift||REV.busy)return;const g=REV.gift,v=REV.v,done=!!REV.done,o=REV.o;REV=null;if(v)v.dispose();
