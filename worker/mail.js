@@ -13,7 +13,7 @@ const MONO = "ui-monospace,Menlo,Consolas,'Courier New',monospace"; /* the game'
 const SITE = 'https://wavefern.com';
 
 function shell({ preheader, title, intro, button, link, outro }) {
-  const L = esc(link), a = `color:${MUTE};text-decoration:underline;`;
+  const L = esc(link), a = `color:${MUTE};text-decoration:underline;white-space:nowrap;`;
   return `<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -26,6 +26,7 @@ function shell({ preheader, title, intro, button, link, outro }) {
 :root{color-scheme:light dark;supported-color-schemes:light dark;}
 body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
 a.wf-btn:hover{background:#2a2a2a !important;}
+@media (prefers-color-scheme:dark){a.wf-btn:hover{background:#5df0a6 !important;}}
 @media (prefers-color-scheme:dark){
  .wf-h{color:#ffffff !important;}
  .wf-body{color:#e8f3ec !important;}
@@ -33,7 +34,9 @@ a.wf-btn:hover{background:#2a2a2a !important;}
  .wf-line{border-top-color:#2a352e !important;}
  .wf-link{color:#2fe68a !important;}
  .wf-foot a{color:#8aa094 !important;}
- .wf-btn-td{border-top:1px solid #2a352e !important;border-left:1px solid #2a352e !important;}
+ .wf-bface{background:#2fe68a !important;}
+ a.wf-btn{background:#2fe68a !important;color:#000000 !important;}
+ .wf-bsh{background:#000000 !important;}
 }
 @media (max-width:620px){
  .wf-pad{padding-left:20px !important;padding-right:20px !important;}
@@ -59,9 +62,11 @@ a.wf-btn:hover{background:#2a2a2a !important;}
 <tr><td class="wf-pad" align="center" style="padding:36px 32px 0;">
 <!--[if mso]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" href="${L}" style="height:56px;v-text-anchor:middle;width:280px;" stroke="f" fillcolor="${INK}"><w:anchorlock/><center style="color:#ffffff;font-family:'Courier New',monospace;font-size:16px;font-weight:bold;letter-spacing:3px;">${esc(button).toUpperCase()}</center></v:rect><![endif]-->
 <!--[if !mso]><!-->
-<table role="presentation" class="wf-btn-wrap" width="60%" cellpadding="0" cellspacing="0" border="0" style="width:60%;max-width:280px;"><tr><td class="wf-btn-td" align="center" style="background:${INK};border-right:5px solid ${GREEN};border-bottom:5px solid ${GREEN};">
-<a href="${L}" class="wf-btn" style="display:block;padding:20px 24px 18px;background:${INK};font:700 17px/1.2 ${PIX};letter-spacing:3px;text-transform:uppercase;color:#ffffff;text-decoration:none;text-align:center;">${esc(button)}</a>
-</td></tr></table>
+<table role="presentation" class="wf-btn-wrap" cellpadding="0" cellspacing="0" border="0" style="width:280px;max-width:100%;border-collapse:collapse;">
+<tr><td class="wf-bface" colspan="2" rowspan="2" height="58" align="center" style="height:58px;background:${INK};"><a href="${L}" class="wf-btn" style="display:block;padding:20px 24px 18px;background:${INK};font:700 17px/20px ${PIX};letter-spacing:3px;text-transform:uppercase;color:#ffffff;text-decoration:none;text-align:center;">${esc(button)}</a></td><td width="5" style="width:5px;height:5px;font-size:0;line-height:0;">&nbsp;</td></tr>
+<tr><td class="wf-bsh" width="5" height="53" style="width:5px;height:53px;background:${GREEN};font-size:0;line-height:0;">&nbsp;</td></tr>
+<tr><td width="5" style="width:5px;height:5px;font-size:0;line-height:0;">&nbsp;</td><td class="wf-bsh" colspan="2" style="height:5px;background:${GREEN};font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
 <!--<![endif]-->
 </td></tr>
 
