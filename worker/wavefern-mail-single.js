@@ -7,9 +7,9 @@
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /* light (inline) */
-const CARD = '#ffffff', LINE = '#dfe6e2', HEAD = '#0f9d58', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#0f9d58';
-/* brand, same in both */
-const GREEN = '#71e392', INKG = '#000000';
+const CARD = '#ffffff', LINE = '#dfe6e2', HEAD = '#1fa864', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#178f55';
+/* brand, same in both: WaveFern green --g #2fe68a and its on-green text --gat #04120a (docs/THEMES.md). Dark theme uses the game's --p, --t, --m, --line. */
+const GREEN = '#2fe68a', INKG = '#04120a';
 const PIX = "Silkscreen,'Courier New',Courier,monospace";
 const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
 const SITE = 'https://wavefern.com';
@@ -27,15 +27,15 @@ function shell({ preheader, title, intro, button, link, outro }) {
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark;}
 body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
-a.wf-btn:hover{background:#8aeda6 !important;}
+a.wf-btn:hover{background:#5df0a6 !important;}
 @media (prefers-color-scheme:dark){
- .wf-card{background:#0d1511 !important;border-color:#1c2b23 !important;}
+ .wf-card{background:#161b18 !important;border-color:#2a352e !important;}
  .wf-h{color:#2fe68a !important;}
- .wf-body{color:#c9d4ce !important;}
- .wf-mute{color:#7f8f86 !important;}
- .wf-line{border-top-color:#1c2b23 !important;}
+ .wf-body{color:#e8f3ec !important;}
+ .wf-mute{color:#8aa094 !important;}
+ .wf-line{border-top-color:#2a352e !important;}
  .wf-link{color:#2fe68a !important;}
- .wf-foot a{color:#7f8f86 !important;}
+ .wf-foot a{color:#8aa094 !important;}
 }
 @media (max-width:620px){
  .wf-pad{padding-left:24px !important;padding-right:24px !important;}

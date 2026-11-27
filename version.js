@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.26';
+const GAME_VERSION='v56.0.27';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.27',n:'Sign-in emails use the game\'s exact WaveFern green and panel colours (dev only, not live yet)'},
  {v:'v56.0.26',n:'Sign-in emails: black WAVEFERN logo in a white box and a main-menu style button (dev only, not live yet)'},
  {v:'v56.0.25',n:'Sign-in emails: light and dark versions that follow the mail app\'s theme (dev only, not live yet)'},
  {v:'v56.0.24',n:'Sign-in emails restyled: cleaner verify and reset emails with the WaveFern logo (dev only, not live yet)'},
