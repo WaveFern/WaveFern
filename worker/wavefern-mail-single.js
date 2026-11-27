@@ -1,6 +1,6 @@
 /* WaveFern email templates. Two emails: verify the address, reset the password.
    Look (James's Photoshop mockup): no card and no page background, so the mail app's own light or dark shows through. Green pixel WAVEFERN logo with a dark-green
-   hard shadow, a pixel heading, sans-serif body, and a black "main menu" button with a white pixel label and a green offset shadow. Light is the main design;
+   hard shadow, a pixel heading, monospace body, and a black "main menu" button with a white pixel label and a green offset shadow. Light is the main design;
    a dark theme (white heading and text) switches on in apps that support prefers-color-scheme (Apple Mail, iPhone Mail, Outlook Mac). Gmail ignores that rule and
    shows the light design (its apps may darken it themselves). Colours are the game's tokens (docs/THEMES.md): --g #2fe68a, --gat #04120a, --m #8aa094.
    Email-safe: table layout and inline styles carry the light design; the <style> block adds the dark theme, hover, web font and mobile padding.
@@ -9,7 +9,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 
 const GREEN = '#2fe68a', SHADOW = '#1d4a37', INK = '#161616', LINE = '#dfe6e2', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#178f55';
 const PIX = "Silkscreen,'Courier New',Courier,monospace";
-const SANS = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
+const MONO = "ui-monospace,Menlo,Consolas,'Courier New',monospace"; /* the game's body font; the only other font is Silkscreen */
 const SITE = 'https://wavefern.com';
 
 function shell({ preheader, title, intro, button, link, outro }) {
@@ -54,7 +54,7 @@ a.wf-btn:hover{background:#2a2a2a !important;}
 <tr><td class="wf-pad" align="center" style="padding:0 0 44px;"><a href="${SITE}/" class="wf-logo" style="font:700 40px/1 ${PIX};letter-spacing:5px;color:${GREEN};text-shadow:3px 3px 0 ${SHADOW};text-decoration:none;">WAVEFERN</a></td></tr>
 
 <tr><td class="wf-pad wf-h wf-title" align="center" style="padding:0 32px;font:700 22px/1.35 ${PIX};letter-spacing:2px;color:${INK};">${esc(title)}</td></tr>
-<tr><td class="wf-pad wf-body" align="center" style="padding:20px 32px 0;font:16px/1.65 ${SANS};color:${BODY};">${intro}</td></tr>
+<tr><td class="wf-pad wf-body" align="center" style="padding:20px 32px 0;font:14px/1.75 ${MONO};color:${BODY};">${intro}</td></tr>
 
 <tr><td class="wf-pad" align="center" style="padding:36px 32px 0;">
 <!--[if mso]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" href="${L}" style="height:56px;v-text-anchor:middle;width:280px;" stroke="f" fillcolor="${INK}"><w:anchorlock/><center style="color:#ffffff;font-family:'Courier New',monospace;font-size:16px;font-weight:bold;letter-spacing:3px;">${esc(button).toUpperCase()}</center></v:rect><![endif]-->
@@ -65,14 +65,13 @@ a.wf-btn:hover{background:#2a2a2a !important;}
 <!--<![endif]-->
 </td></tr>
 
-<tr><td class="wf-pad wf-mute" align="center" style="padding:32px 32px 36px;font:13px/1.6 ${SANS};color:${MUTE};">${outro}</td></tr>
-<tr><td class="wf-pad" style="padding:0 32px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="wf-line" style="border-top:1px solid ${LINE};font-size:0;line-height:0;height:1px;">&nbsp;</td></tr></table></td></tr>
-<tr><td class="wf-pad wf-mute" align="center" style="padding:24px 32px 0;font:12px/1.6 ${SANS};color:${MUTE};">Button not working? Paste this link into your browser:<br><a href="${L}" class="wf-link" style="color:${LINKG};text-decoration:none;word-break:break-all;">${L}</a></td></tr>
+<tr><td class="wf-pad wf-mute" align="center" style="padding:28px 32px 0;font:12px/1.7 ${MONO};color:${MUTE};">${outro}</td></tr>
+<tr><td class="wf-pad wf-mute" align="center" style="padding:20px 32px 0;font:11px/1.6 ${MONO};color:${MUTE};">Or paste this link:<br><a href="${L}" class="wf-link" style="color:${LINKG};text-decoration:none;word-break:break-all;">${L}</a></td></tr>
 
-<tr><td class="wf-foot wf-mute" align="center" style="padding:36px 16px 0;font:12px/1.8 ${SANS};color:${MUTE};">
+<tr><td class="wf-foot wf-mute" align="center" style="padding:36px 16px 0;font:12px/1.8 ${MONO};color:${MUTE};">
 <a href="${SITE}/terms/" style="${a}">Terms of Service</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${SITE}/privacy/" style="${a}">Privacy Policy</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${SITE}/legal/" style="${a}">Legal</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${SITE}/wiki/contact/" style="${a}">Contact</a>
 </td></tr>
-<tr><td class="wf-mute" align="center" style="padding:12px 16px 0;font:11px/1.7 ${SANS};color:${MUTE};">This is an automated message, so please do not reply.<br>You received it because this address was used on wavefern.com.<br>WaveFern is a fictional music career game. &copy; 2026 WaveFern.</td></tr>
+<tr><td class="wf-mute" align="center" style="padding:12px 16px 0;font:11px/1.7 ${MONO};color:${MUTE};">Sent because this address was used on wavefern.com. Please don't reply.<br>WaveFern is a fictional music career game. &copy; 2026 WaveFern.</td></tr>
 
 </table>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -84,11 +83,11 @@ function verifyEmail(link) {
   const html = shell({
     preheader: 'One tap to finish setting up your WaveFern account.',
     title: 'Verify your email',
-    intro: 'Welcome to WaveFern. Confirm this email address to unlock your cloud save, friends and band rooms.',
+    intro: 'Press the button to confirm this email and finish setting up your WaveFern account.',
     button: 'Verify', link,
-    outro: 'If you did not create a WaveFern account, you can safely ignore this email.',
+    outro: 'Didn\'t sign up? Ignore this email and nothing happens.',
   });
-  const text = `Welcome to WaveFern.\n\nConfirm your email address by opening this link:\n${link}\n\nIf you did not create a WaveFern account, ignore this email.`;
+  const text = `Confirm your email for WaveFern by opening this link:\n${link}\n\nDidn't sign up? Ignore this email.`;
   return { subject: 'Verify your WaveFern email', html, text };
 }
 
@@ -96,11 +95,11 @@ function resetEmail(link) {
   const html = shell({
     preheader: 'Choose a new WaveFern password.',
     title: 'Reset your password',
-    intro: 'We received a request to set a new password for your WaveFern account. If you signed in with Google before, this also lets you sign in with this email and a password.',
+    intro: 'Press the button to pick a new password for your WaveFern account. If you used Google before, this also lets you sign in with this email and a password.',
     button: 'Reset password', link,
-    outro: 'If you did not ask for this, ignore this email and your password stays the same. The link works once and expires after about an hour.',
+    outro: 'Didn\'t ask for this? Ignore it and nothing changes. The link works once and runs out after about an hour.',
   });
-  const text = `We received a request to set a new password for your WaveFern account.\n\nChoose a new password:\n${link}\n\nIf you did not ask for this, ignore this email. The link works once and expires after about an hour.`;
+  const text = `Pick a new password for your WaveFern account.\n\nChoose a new password:\n${link}\n\nIf you did not ask for this, ignore this email. The link works once and expires after about an hour.`;
   return { subject: 'Reset your WaveFern password', html, text };
 }
 
