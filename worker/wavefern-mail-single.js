@@ -8,8 +8,8 @@
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const GREEN = '#2fe68a', SHADOW = '#1d4a37', INK = '#161616', LINE = '#dfe6e2', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#178f55';
-const PIX = "Silkscreen,'Courier New',Courier,monospace";
-const MONO = "ui-monospace,Menlo,Consolas,'Courier New',monospace"; /* the game's body font; the only other font is Silkscreen */
+const PIX = "Silkscreen,Menlo,'SF Mono',Consolas,'Courier New',monospace";
+const MONO = "Menlo,'SF Mono',ui-monospace,Consolas,'Courier New',monospace"; /* the game's body font; the only other font is Silkscreen */
 const SITE = 'https://wavefern.com';
 
 function shell({ preheader, title, intro, button, link, outro }) {
