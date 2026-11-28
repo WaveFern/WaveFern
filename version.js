@@ -3,10 +3,11 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.51';
+const GAME_VERSION='v56.0.52';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
- {v:'v56.0.51',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.52',n:'Rage beats now vary more: 4 modes, 5 kick patterns, claps, hats, pad sounds and lead sounds, wider tempo'},
+ {v:'v56.0.51',n:'Santa\'s Lodge (dev): a warmer, friendlier voice on recorded choir notes'},
  {v:'v56.0.50',n:'Santa\'s Lodge (dev): new voice and burp played on recorded trombone and bass notes'},
  {v:'v56.0.49',n:'Santa\'s Lodge (dev): treats can never stay missing (they respawn on their own), and pickup, belly, sparkle and bell sounds are real recordings'},
  {v:'v56.0.48',n:'Google sign-in opens its popup in the same tick as the click so Safari does not block it'},
