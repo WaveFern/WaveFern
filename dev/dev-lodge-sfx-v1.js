@@ -5,7 +5,9 @@
              shoots out, the cookie crunch, the heartbeat (a floor thump pitched down) and a coin shimmer like sleigh bells;
              recorded instrument notes already in the repo (audio/inst/glock, celesta, choir; docs/MUSIC-CREDITS.md) for the chimes,
              the reveal run and the choir swell while Santa holds his breath.
-   VOICE     Santa's voice, his laugh, the gulp and the BURP are built like a real throat, sample by sample: an irregular train of
+   VOICE     Santa talks like a talking trombone and the BURP is a real low trombone and bass note sliding down under a throat flutter (the
+             recorded notes in audio/inst/tbone and upright, through moving formant filters). Until those notes have loaded, and if they fail, the
+             older modelled voice plays: his voice, his laugh, the gulp and the burp are built like a real throat, sample by sample: an irregular train of
              pulses (pitch and loudness wobble on every pulse, the burp breaks into a creaky rattle at the end) through three mouth
              resonances (formants) that move as the mouth shapes the vowel, plus breath noise. Each is rendered once into a buffer.
    Everything plays through the game's master gain MG (so the effects volume applies) and its room reverb RV, and does nothing
@@ -22,6 +24,7 @@ const VQ=()=>'?v='+(typeof GAME_VERSION=='string'?GAME_VERSION:'');
 function load(p){if(BUF[p]!==undefined)return;BUF[p]=null;try{ac();fetch(p+VQ()).then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status)).then(b=>new Promise((ok,no)=>AC.decodeAudioData(b,ok,no))).then(d=>{BUF[p]=d}).catch(e=>{BUF[p]=false})}catch(e){BUF[p]=false}}
 const S={thud:'audio/sfx/lodge-impact.mp3',land:'audio/sfx/lodge-land.mp3',hit:'audio/sfx/lodge-hit.mp3',crunch:'audio/sfx/lodge-kill.mp3',boom:'audio/sfx/lodge-big_kill.mp3',coin:'audio/sfx/lodge-coin.mp3',step:'audio/sfx/lodge-step.mp3',
  g72:'audio/inst/glock/72.mp3',g79:'audio/inst/glock/79.mp3',g84:'audio/inst/glock/84.mp3',g91:'audio/inst/glock/91.mp3',g96:'audio/inst/glock/96.mp3',
+ t43:'audio/inst/tbone/43.mp3',t47:'audio/inst/tbone/47.mp3',t51:'audio/inst/tbone/51.mp3',t55:'audio/inst/tbone/55.mp3',u28:'audio/inst/upright/28.mp3',u32:'audio/inst/upright/32.mp3',u36:'audio/inst/upright/36.mp3',
  c80:'audio/inst/celesta/80.mp3',c90:'audio/inst/celesta/90.mp3',ch48:'audio/inst/choir/48.mp3',ch56:'audio/inst/choir/56.mp3',ch60:'audio/inst/choir/60.mp3',ch64:'audio/inst/choir/64.mp3',ch68:'audio/inst/choir/68.mp3'};
 function preload(){if(!on())return;Object.values(S).forEach(load);VOX.length||safe(buildVox,'vox')}
 /* play a buffer: o = {v level, rate, del, lp, hp, pan, rev, att, dur (cut off with a fade), fadeIn} */
@@ -91,15 +94,35 @@ function gurgle(d){if(!on())return;if(!GURG){const sr=AC.sampleRate,N=Math.floor
   let m=0;for(let i=0;i<N;i++)m=Math.max(m,Math.abs(y[i]));for(let i=0;i<N;i++)y[i]=y[i]/m*.8}
  playBuf(GURG,{v:.32,rate:rnd(.8,1.1),lp:700,dur:Math.min(2.3,d),fadeIn:.15,rev:.15,off:Math.random()*.2})}
 
+/* ---------- Santa's voice and burp played on RECORDED trombone and double-bass notes (audio/inst, see docs/MUSIC-CREDITS.md) ----------
+   A talking trombone: a real recorded note is pushed through two moving band-pass filters (the vowel's formants, so it says
+   "wah", "ho", "mm") with a short breathy start; the burp is a real low note sliding down in pitch while a fast throat flutter
+   chops it, a growl of low formants moving o -> u, and a puff of air. Each returns false until its sample file has loaded. */
+const TB=[[43,'t43'],[47,'t47'],[51,'t51'],[55,'t55']],UB=[[28,'u28'],[32,'u32'],[36,'u36']];
+const near=(L,m)=>L.reduce((b,c)=>Math.abs(c[0]-m)<Math.abs(b[0]-m)?c:b);
+const FV={a:[[700,1150],[1,.55]],o:[[450,800],[1,.6]],e:[[530,1840],[1,.35]],u:[[325,700],[1,.4]],m:[[260,1100],[1,.08]],aw:[[570,860],[1,.65]]};
+/* play note `midi` of a set, rate-bent, through two formants f1,f2 (each can glide to f1b,f2b) for d seconds. o: v, del, bend (end/start pitch), g (formant gain), rev, lfo (flutter Hz), lfoD (depth), att */
+function inVox(set,midi,d,o){o=o||{};const [rt,key]=near(set,midi),b=BUF[S[key]];if(!b){load(S[key]);return false}if(!on())return false;
+ try{const t=AC.currentTime+(o.del||0),s=AC.createBufferSource(),g=out(t,o),env=AC.createGain(),att=o.att||.02,v=(o.v==null?.6:o.v);
+  s.buffer=b;const r0=Math.pow(2,(midi-rt)/12);s.playbackRate.setValueAtTime(r0,t);if(o.bend&&o.bend!==1)s.playbackRate.exponentialRampToValueAtTime(Math.max(.05,r0*o.bend),t+d);
+  env.gain.setValueAtTime(0,t);env.gain.linearRampToValueAtTime(v,t+att);env.gain.setValueAtTime(v,t+Math.max(att,d*(o.hold==null?.45:o.hold)));env.gain.linearRampToValueAtTime(0,t+d);
+  /* the throat flutter: the level is chopped by a low-frequency wobble */
+  if(o.lfo){const lf=AC.createOscillator(),lg=AC.createGain(),mod=AC.createGain();mod.gain.value=1-(o.lfoD||.5)/2;lf.type='sawtooth';lf.frequency.setValueAtTime(o.lfo,t);if(o.lfo2)lf.frequency.linearRampToValueAtTime(o.lfo2,t+d);lg.gain.value=(o.lfoD||.5)/2;lf.connect(lg);lg.connect(mod.gain);env.connect(mod);mod.connect(g);lf.start(t);lf.stop(t+d+.05)}else env.connect(g);
+  const F=o.f||FV.o,F2=o.f2||F,mk=(i)=>{const f=AC.createBiquadFilter();f.type='bandpass';f.Q.value=o.q||4.5;f.frequency.setValueAtTime(F[0][i],t);f.frequency.linearRampToValueAtTime(F2[0][i],t+d);const fg=AC.createGain();fg.gain.value=(o.g||1)*F[1][i]*1.6;s.connect(f);f.connect(fg);fg.connect(env);return f};
+  mk(0);mk(1);
+  /* a little of the raw note underneath keeps the body */
+  const raw=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=o.lp||900;raw.gain.value=o.raw==null?.35:o.raw;s.connect(lp);lp.connect(raw);raw.connect(env);
+  s.start(t,o.off||.04);s.stop(t+d+.05);return true}catch(e){return false}}
+const breath=(d,del,v)=>noise(d,{f:2600,f2:1400,q:.7,v:v||.12,up:.2,del:del||0,ty:'bandpass'});
 /* ---------- the cues ---------- */
 const C={
  /* Santa's talking mumble, one syllable */
- syl:()=>{if(!VOX.length)safe(buildVox,'vox');const b=VOX[Math.floor(Math.random()*VOX.length)];return playBuf(b,{v:.42,rate:rnd(.96,1.06),lp:3200,rev:.06})},
+ syl:()=>{if(C.vsyl())return true;if(!VOX.length)safe(buildVox,'vox');const b=VOX[Math.floor(Math.random()*VOX.length)];return playBuf(b,{v:.42,rate:rnd(.96,1.06),lp:3200,rev:.06})},
  /* "ho ho ho" */
- ho:(n)=>{if(!HO)safe(buildVox,'vox');for(let i=0;i<(n||3);i++)playBuf(HO[Math.min(2,i)],{v:.55,del:i*.3,rate:rnd(.98,1.03),rev:.12})},
- ho1:(i)=>{if(!HO)safe(buildVox,'vox');return playBuf(HO[Math.min(2,i||0)],{v:.55,rate:rnd(.98,1.03),rev:.12})},
- mmm:()=>{if(!MMM)safe(buildVox,'vox');playBuf(MMM,{v:.4,rev:.08})},
- gulp:()=>{if(!GULP)safe(buildVox,'vox');playBuf(GULP,{v:.5,lp:1800});smp('land',{v:.25,rate:1.3,lp:500,del:.05})},
+ ho:(n)=>{if(C.vho(0)){for(let i=1;i<(n||3);i++)setTimeout(()=>C.vho(i),i*300);return true}if(!HO)safe(buildVox,'vox');for(let i=0;i<(n||3);i++)playBuf(HO[Math.min(2,i)],{v:.55,del:i*.3,rate:rnd(.98,1.03),rev:.12})},
+ ho1:(i)=>{if(C.vho(i))return true;if(!HO)safe(buildVox,'vox');return playBuf(HO[Math.min(2,i||0)],{v:.55,rate:rnd(.98,1.03),rev:.12})},
+ mmm:()=>{if(C.vmmm())return true;if(!MMM)safe(buildVox,'vox');playBuf(MMM,{v:.4,rev:.08})},
+ gulp:()=>{if(C.vgulp())return true;if(!GULP)safe(buildVox,'vox');playBuf(GULP,{v:.5,lp:1800});smp('land',{v:.25,rate:1.3,lp:500,del:.05})},
  /* a cookie bite: a real crunch, pitched a little each time */
  crunch:()=>{if(!smp('crunch',{v:.5,rate:rnd(1.25,1.5),hp:500}))return false;smp('hit',{v:.15,rate:rnd(1.6,1.9),hp:900,del:.02});return true},
  /* his belly growls */
@@ -110,7 +133,7 @@ const C={
  beat:(v)=>{v=v||1;smp('land',{v:.9*v,rate:.42,lp:180});smp('land',{v:.55*v,rate:.38,lp:150,del:.17});smp('boom',{v:.18*v,rate:.6,lp:120,dur:.3})},
  /* the choir holds a low chord while he holds his breath */
  choir:(d)=>{smp('ch48',{v:.22,fadeIn:.35,dur:d||1,rev:.4});smp('ch56',{v:.14,fadeIn:.4,dur:d||1,rev:.4,rate:Math.pow(2,-1/12)});smp('ch60',{v:.12,fadeIn:.45,dur:d||1,rev:.4})},
- burp:(big)=>{if(!BURP)safe(buildVox,'vox');playBuf(big?BURP:BURPS,{v:big?1:.7,rate:big?1:rnd(.95,1.05),rev:big?.35:.15,lp:big?2600:3000});
+ burp:(big)=>{if(C.vburp(big))return true;if(!BURP)safe(buildVox,'vox');playBuf(big?BURP:BURPS,{v:big?1:.7,rate:big?1:rnd(.95,1.05),rev:big?.35:.15,lp:big?2600:3000});
   if(big){smp('boom',{v:.55,rate:.7,lp:900});noise(.6,{f:400,f2:120,q:.8,v:.18,up:.05})}},
  /* the present shoots out of his mouth: a whoosh past the lens */
  whoosh:(d)=>{noise(d||.55,{f:500,f2:2600,q:1.1,v:.26,up:.55,rev:.1,pan:-.4});noise(d||.55,{f:5000,f2:1400,q:.6,v:.06,up:.6,pan:.4})},
@@ -138,6 +161,16 @@ const C={
  rarity:(t)=>{smp('boom',{v:.3,rate:1.1,lp:1500});['g79','g84','g91'].forEach((k,i)=>smp(k,{v:.22,del:i*.07,rev:.35}));if(t>=3)smp('ch60',{v:.18,fadeIn:.1,dur:1.2,rev:.5});return true},
  claim:()=>{smp('coin',{v:.4,rate:1.15,rev:.25});['g84','g91','g96'].forEach((k,i)=>smp(k,{v:.22,del:.06+i*.07,rev:.35}));return true}
 };
+C.vsyl=()=>{const m=rnd(40,49),v=pickV();return inVox(TB,m,rnd(.09,.14),{v:.5,f:FV[v],f2:FV[pickV()],att:.012,hold:.3,bend:rnd(.94,1.04),rev:.06})};
+const pickV=()=>['a','o','e','u','aw','o'][Math.floor(Math.random()*6)];
+C.vho=(i)=>{i=i||0;const ok=inVox(TB,50-i*2.2,.3,{v:.62,f:FV.o,f2:FV.u,bend:.9,att:.03,hold:.5,q:4,rev:.12,g:1.2});if(ok)breath(.09,0,.1);return ok};
+C.vmmm=()=>{const ok=inVox(TB,49,.55,{v:.5,f:FV.m,f2:FV.o,bend:1.03,att:.08,hold:.7,lfo:5.5,lfoD:.12,q:5,rev:.08});return ok};
+C.vgulp=()=>{const ok=inVox(UB,40,.16,{v:.5,f:FV.u,f2:FV.m,bend:.55,att:.01,hold:.2,q:3,lp:600});if(ok)smp('land',{v:.25,rate:1.25,lp:500,del:.04});return ok};
+/* the BURP: big = the cutscene one. Low note falling, flutter slowing down (a rattle that loosens as the air runs out), formants o -> u, a pop at the start and a puff of air. */
+C.vburp=(big)=>{const d=big?1.45:.55,m=big?36:42;const a=inVox(TB.slice(0,2),m,d,{v:big?.95:.65,f:FV.aw,f2:FV.u,bend:big?.55:.7,att:.02,hold:.55,q:2.6,g:1.3,raw:.7,lp:700,lfo:big?34:40,lfo2:big?11:18,lfoD:.85,rev:big?.3:.12});
+ const b=inVox(UB,m-12,d*.9,{v:big?.8:.5,f:FV.o,f2:FV.u,bend:big?.5:.65,att:.03,hold:.5,q:2,g:.8,raw:1,lp:500,lfo:big?30:36,lfo2:big?9:16,lfoD:.8,del:.015,rev:.15});
+ if(!a&&!b)return false;
+ smp('hit',{v:.3,rate:.6,lp:700});noise(big?.7:.3,{f:900,f2:200,q:.8,v:big?.16:.08,up:.05,rev:.1});if(big)smp('boom',{v:.35,rate:.6,lp:600});return true};
 function cue(n,...a){if(!on())return false;const f=C[n];if(!f)return false;return safe(()=>f(...a),'cue '+n)}
 window.FW_LSFX={cue,preload,vox,has:k=>!!BUF[S[k]],S,BUF};
 })();
