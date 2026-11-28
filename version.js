@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.43';
+const GAME_VERSION='v56.0.44';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.44',n:'Sign up panel (dev): buttons, divider and links in Silkscreen like the main menu'},
  {v:'v56.0.43',n:'Sign-in emails get their own solid background so text is readable in Outlook on the web (dev only, not live yet)'},
  {v:'v56.0.42',n:'Sign in now goes straight to Google (the Before you sign in screen is gone). Dev only: a new sign up panel with Google, or email, and an Already have an account link'},
  {v:'v56.0.41',n:'Sign-in emails restyled in the game\'s look: green pixel logo, black button with a green drop shadow, light and dark versions (dev only, not live yet)'},

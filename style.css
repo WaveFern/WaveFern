@@ -344,3 +344,5 @@ body.tch #ui>.box.modal .cards~button.go{position:sticky;bottom:0;z-index:2;widt
 #fbem a{color:var(--g);text-decoration:none}#fbem a:hover{text-decoration:underline}
 #fbem .fbsw,#fbem .fbfp{margin:14px 0 0;font-size:13px}#fbem .fbfp{margin-top:10px;font-size:12px}
 #fbem .fbtc,#fbem .fbnote{margin:12px 0 0;text-align:center}#fbem .fbnote{padding-top:12px;border-top:1px solid #2a352e}
+#fbem button,#fbem .fbor span,#fbem .fbsw a,#fbem .fbfp a{font-family:'Silkscreen',ui-monospace,monospace;letter-spacing:1px;text-transform:uppercase}
+#fbem button.fbx{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:0;text-transform:none}#fbem .fbor span{font-size:11px}#fbem .fbsw a,#fbem .fbfp a{font-size:12px}
