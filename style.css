@@ -331,3 +331,16 @@ body.tch #ui>.box.modal .cards .card{padding:8px}
 body.tch #ui>.box.modal .cards .card b{font-size:15px}
 body.tch #ui>.box.modal .cards~button.go{position:sticky;bottom:0;z-index:2;width:100%;box-shadow:0 10px 0 #0b0f0d,0 -10px 8px -2px #0b0f0d}
 @media(max-height:560px){body.tch #ui>.box.modal .cards{grid-template-columns:repeat(4,1fr)!important}}
+
+/* v56.0.28: email sign-up / sign-in panel (86-google-signin.js, dev only until release). One centred panel, the title scene keeps playing behind it. */
+#fbem{width:min(400px,92vw);padding:28px 26px 22px;text-align:center}
+#fbem h2{text-align:center;color:var(--g);margin:0 0 6px}
+#fbem .fbsub{margin:0 0 18px}
+#fbem button{width:100%}#fbem .fbx{position:absolute;top:8px;right:8px;width:32px;padding:2px 0 4px;font-size:20px;line-height:1}
+#fbem input{margin:0 0 10px;padding:11px}
+#fbem .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;padding:11px}
+#fbem button.go{margin-top:6px}
+#fbem .fbor{display:flex;align-items:center;gap:12px;margin:16px 0 14px;color:var(--m);font-size:12px}#fbem .fbor i{flex:1;height:1px;background:#2a352e}
+#fbem a{color:var(--g);text-decoration:none}#fbem a:hover{text-decoration:underline}
+#fbem .fbsw,#fbem .fbfp{margin:14px 0 0;font-size:13px}#fbem .fbfp{margin-top:10px;font-size:12px}
+#fbem .fbtc,#fbem .fbnote{margin:12px 0 0;text-align:center}#fbem .fbnote{padding-top:12px;border-top:1px solid #2a352e}
