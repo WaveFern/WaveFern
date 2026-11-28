@@ -63,11 +63,11 @@ function fbSignInAsk(){snd('click');const prev=mode;CLD.pre=prev;
 }
 function fbSignInBack(){const prev=CLD.pre;CLD.pre=null;if(prev=='title'){mode='title';titleUI()}else if(prev=='creator'){mode='creator';creatorUI()}else if(prev=='pause'){mode='pause';pauseUI()}else closeUI()}
 function fbSignInGo(){fbSignInBack();fbSignIn()}
-/* v56.0.4 (HELD behind FB_EMAIL): email + password sign-in next to Google. Same Firebase Auth, same cloud save and profile code: only the
+/* v56.0.4 (behind FB_EMAIL, live): email + password sign-in next to Google. Same Firebase Auth, same cloud save and profile code: only the
    way in differs. A password account that has not clicked its confirm link is kept OUT of the game (FBU stays null, FBP holds it), so
    it can never reach saves, friends or band rooms; the rules also refuse it (firebase-rules/v56.0.4). Same address as a Google account =
    one account: Firebase links them, and "Forgot password?" lets a Google player add a password. Emails are sent by the Cloudflare Worker in worker/ through Resend; links open /account/. */
-const FB_EMAIL=!!window.FW_DEV/* HELD: /dev only. On release day set true */;/* before release: functions deployed, RESEND_API_KEY set, Email/Password enabled in Firebase Authentication, rules v56.0.4 published */;
+const FB_EMAIL=true/* LIVE v56.0.45 (was dev only). Needs: the mail Worker deployed (worker/), RESEND_API_KEY and SA_JSON secrets set, Email/Password enabled in Firebase Authentication, rules v56.0.4 published. If any is missing, email sign-up shows an error but Google still works. */;
 let FBP=null,FBFM=null;const FBE={v:'in',msg:'',bad:0,t:0,busy:0};
 const fbHold=u=>!!u&&!u.emailVerified&&u.providerData.length>0&&u.providerData.every(p=>p.providerId=='password');
 function fbAuthSet(usr){window.FW_AUTH_DONE=1;if(fbHold(usr)){FBP=usr;FBU=null;CLD.ok=0;fbRedraw();return}FBP=null;if(csAcct(usr))return;FBU=usr;CLD.ok=0;CLD.last='';if(usr&&!CLD.signing)csCheck();fbRedraw()}
