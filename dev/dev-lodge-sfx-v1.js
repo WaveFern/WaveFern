@@ -25,7 +25,7 @@ function load(p){if(BUF[p]!==undefined)return;BUF[p]=null;try{ac();fetch(p+VQ())
 const S={thud:'audio/sfx/lodge-impact.mp3',land:'audio/sfx/lodge-land.mp3',hit:'audio/sfx/lodge-hit.mp3',crunch:'audio/sfx/lodge-kill.mp3',boom:'audio/sfx/lodge-big_kill.mp3',coin:'audio/sfx/lodge-coin.mp3',step:'audio/sfx/lodge-step.mp3',
  g72:'audio/inst/glock/72.mp3',g79:'audio/inst/glock/79.mp3',g84:'audio/inst/glock/84.mp3',g91:'audio/inst/glock/91.mp3',g96:'audio/inst/glock/96.mp3',
  ch52:'audio/inst/choir/52.mp3',ch72:'audio/inst/choir/72.mp3',t43:'audio/inst/tbone/43.mp3',t47:'audio/inst/tbone/47.mp3',t51:'audio/inst/tbone/51.mp3',t55:'audio/inst/tbone/55.mp3',u28:'audio/inst/upright/28.mp3',u32:'audio/inst/upright/32.mp3',u36:'audio/inst/upright/36.mp3',
- c80:'audio/inst/celesta/80.mp3',c90:'audio/inst/celesta/90.mp3',ch48:'audio/inst/choir/48.mp3',ch56:'audio/inst/choir/56.mp3',ch60:'audio/inst/choir/60.mp3',ch64:'audio/inst/choir/64.mp3',ch68:'audio/inst/choir/68.mp3'};
+ c80:'audio/inst/celesta/80.mp3',c90:'audio/inst/celesta/90.mp3',ch48:'audio/inst/choir/48.mp3',fl72:'audio/inst/flute/72.mp3',fl76:'audio/inst/flute/76.mp3',fl80:'audio/inst/flute/80.mp3',mr67:'audio/inst/marimba/67.mp3',mr71:'audio/inst/marimba/71.mp3',mr77:'audio/inst/marimba/77.mp3',mr84:'audio/inst/marimba/84.mp3',ch56:'audio/inst/choir/56.mp3',ch60:'audio/inst/choir/60.mp3',ch64:'audio/inst/choir/64.mp3',ch68:'audio/inst/choir/68.mp3'};
 function preload(){if(!on())return;Object.values(S).forEach(load);VOX.length||safe(buildVox,'vox')}
 /* play a buffer: o = {v level, rate, del, lp, hp, pan, rev, att, dur (cut off with a fade), fadeIn} */
 function out(t,o){const g=AC.createGain();let n=g;if(o.pan&&AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=Math.max(-1,Math.min(1,o.pan));g.connect(p);n=p}
@@ -99,6 +99,7 @@ function gurgle(d){if(!on())return;if(!GURG){const sr=AC.sampleRate,N=Math.floor
    "wah", "ho", "mm") with a short breathy start; the burp is a real low note sliding down in pitch while a fast throat flutter
    chops it, a growl of low formants moving o -> u, and a puff of air. Each returns false until its sample file has loaded. */
 const CH=[[48,'ch48'],[52,'ch52'],[56,'ch56'],[60,'ch60'],[64,'ch64']],TB=[[43,'t43'],[47,'t47'],[51,'t51'],[55,'t55']],UB=[[28,'u28'],[32,'u32'],[36,'u36']];
+const FL=[[72,'fl72'],[76,'fl76'],[80,'fl80']],MR=[[67,'mr67'],[71,'mr71'],[77,'mr77'],[84,'mr84']],PENT=[72,74,76,79,81,84];
 const near=(L,m)=>L.reduce((b,c)=>Math.abs(c[0]-m)<Math.abs(b[0]-m)?c:b);
 const FV={a:[[700,1150],[1,.55]],o:[[450,800],[1,.6]],e:[[530,1840],[1,.35]],u:[[325,700],[1,.4]],m:[[260,1100],[1,.08]],aw:[[570,860],[1,.65]]};
 /* play note `midi` of a set, rate-bent, through two formants f1,f2 (each can glide to f1b,f2b) for d seconds. o: v, del, bend (end/start pitch), g (formant gain), rev, lfo (flutter Hz), lfoD (depth), att */
@@ -162,10 +163,10 @@ const C={
  claim:()=>{smp('coin',{v:.4,rate:1.15,rev:.25});['g84','g91','g96'].forEach((k,i)=>smp(k,{v:.22,del:.06+i*.07,rev:.35}));return true}
 };
 /* Santa's speaking voice: recorded choir "aah" notes (warm and human) in a jolly mid pitch, broad soft formants, a gentle vibrato, no growl */
-C.vsyl=()=>{const m=rnd(55,62),v=pickV();return inVox(CH,m,rnd(.1,.15),{v:.42,f:FV[v],f2:FV[pickV()],att:.025,hold:.3,bend:rnd(.96,1.04),q:2.4,raw:.55,lp:2800,g:.9,lfo:5.5,lfoD:.1,rev:.08})};
+C.vsyl=()=>inVox(MR,PENT[Math.floor(Math.random()*PENT.length)]+(Math.random()<.3?-12:0),rnd(.13,.2),{v:.5,g:0,raw:1,lp:5200,att:.004,hold:.12,bend:rnd(1,1.04),rev:.1})
 const pickV=()=>['a','o','e','u','aw','o'][Math.floor(Math.random()*6)];
-C.vho=(i)=>{i=i||0;const ok=inVox(CH,62-i*2.5,.34,{v:.5,f:FV.o,f2:FV.o,bend:.93,att:.05,hold:.45,q:2.4,raw:.6,lp:3000,g:1,lfo:6,lfoD:.12,rev:.14});if(ok)breath(.07,0,.05);return ok};
-C.vmmm=()=>inVox(CH,58,.6,{v:.4,f:FV.m,f2:FV.o,bend:1.02,att:.1,hold:.7,lfo:5.5,lfoD:.14,q:3,raw:.7,lp:1900,rev:.1});
+C.vho=(i)=>{i=i||0;return inVox(FL,[79,76,76,74][Math.min(3,i)]+(i?0:2),.3,{v:.5,g:0,raw:1,lp:5200,att:.04,hold:.4,bend:i?.99:1.03,lfo:5,lfoD:.08,rev:.18})}
+C.vmmm=()=>{const a=inVox(FL,72,.5,{v:.4,g:0,raw:1,lp:3200,att:.08,hold:.6,bend:1.04,lfo:5,lfoD:.1,rev:.14});return a}
 C.vgulp=()=>{const ok=inVox(UB,40,.16,{v:.5,f:FV.u,f2:FV.m,bend:.55,att:.01,hold:.2,q:3,lp:600});if(ok)smp('land',{v:.25,rate:1.25,lp:500,del:.04});return ok};
 /* the BURP: big = the cutscene one. Low note falling, flutter slowing down (a rattle that loosens as the air runs out), formants o -> u, a pop at the start and a puff of air. */
 C.vburp=(big)=>{const d=big?1.45:.55,m=big?36:42;const a=inVox(TB.slice(0,2),m,d,{v:big?.95:.65,f:FV.aw,f2:FV.u,bend:big?.55:.7,att:.02,hold:.55,q:2.6,g:1.3,raw:.7,lp:700,lfo:big?34:40,lfo2:big?11:18,lfoD:.85,rev:big?.3:.12});
