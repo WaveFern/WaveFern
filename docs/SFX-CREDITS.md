@@ -12,6 +12,6 @@ Each effect is layered from a noise transient, a tuned inharmonic body (bell, gl
 | Kenney Impact Sounds (kenney.nl): footstep_carpet_000-004 | CC0 1.0 | `audio/sfx/step-carpet-0..4.mp3` |
 | Kenney Impact Sounds, RPG Audio, Digital Audio, Interface Sounds (kenney.nl), via the npm package @netforge/asset-library-files 0.2.0 | CC0 1.0 | `audio/sfx/lodge-*.mp3` (Santa's Lodge, dev/dev-lodge-sfx-v1.js) |
 
-Santa's Lodge also plays recorded instrument notes already in the repo (`audio/inst/glock`, `celesta`, `choir`; credits in docs/MUSIC-CREDITS.md). Santa's voice, laugh, gulp and burp are modelled in code (glottal pulses through formant filters), no recording.
+Santa's Lodge also plays recorded instrument notes already in the repo (`audio/inst/glock`, `celesta`, `choir`; credits in docs/MUSIC-CREDITS.md). Santa's voice, laugh, gulp and burp are played on the recorded trombone (`audio/inst/tbone`) and double-bass (`audio/inst/upright`) notes (Fluid R3, CC BY 3.0, credited in docs/MUSIC-CREDITS.md), pushed through moving formant filters and a throat-flutter wobble. A modelled voice (glottal pulses through formants) is the fallback while the notes load.
 
 If a CC0 sample (Kenney, OpenGameArt CC0, freesound CC0) is ever added, list the file, author, URL and licence here.
