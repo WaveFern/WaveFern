@@ -3,9 +3,10 @@
    - MAJOR.0.0: the weekly DROP (release day). Held features go live together and a What's new card is added to news-data.js.
    - PATCH: everything else, shipped straight away: bug fixes, small tweaks, dev-only work (quiet numbers).
    - MINOR: no longer bumped (old entries below used it for features). */
-const GAME_VERSION='v56.0.48';
+const GAME_VERSION='v56.0.49';
 const FOLN=x=>Math.round((+x||0)/4); /* v49.87.0: every follower reward is divided by 4 */
 const VERSION_HISTORY=[
+ {v:'v56.0.49',n:'Santa\'s Lodge (dev): treats can never stay missing (they respawn on their own), and pickup, belly, sparkle and bell sounds are real recordings'},
  {v:'v56.0.48',n:'Google sign-in opens its popup in the same tick as the click so Safari does not block it'},
  {v:'v56.0.47',n:'Google sign-in shows a message when the popup closes without finishing, and the error code on failure'},
  {v:'v56.0.46',n:'Email sign-in panel no longer auto-focuses the email box on phones'},
