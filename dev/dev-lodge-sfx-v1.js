@@ -119,6 +119,13 @@ const C={
  /* it settles and glows: a recorded glockenspiel run and a shimmer of bells */
  present:()=>{['g72','g79','g84','g91'].forEach((k,i)=>smp(k,{v:.32-i*.03,del:i*.085,rev:.35}));smp('coin',{v:.28,rate:1.35,hp:2500,del:.25,rev:.3});smp('c90',{v:.2,del:.4,rev:.4})},
  /* his air goes out: a long squeaky sigh */
+ /* picking up a treat: a real coin and a celesta note, higher for a candy cane */
+ pickup:(kind)=>{if(!smp('coin',{v:.34,rate:kind=='cane'?1.3:1.05,hp:1800,rev:.2}))return false;smp(kind=='cane'?'g91':'g84',{v:.22,del:.05,rev:.35});return true},
+ /* a belly bounce: a real thump, a little higher for each treat */
+ belly:(k)=>{if(!smp('land',{v:.55,rate:.5+(k||0)*.05,lp:800}))return false;smp('hit',{v:.18,rate:.55,lp:700,del:.01});return true},
+ spark:()=>{const g=['g84','g91','g96'];return smp(g[Math.floor(Math.random()*3)],{v:.09+Math.random()*.05,rate:rnd(.99,1.01),rev:.3,dur:.5})},
+ bell:()=>{if(!smp('c90',{v:.3,rev:.4}))return false;smp('g91',{v:.14,del:.1,rev:.4});return true},
+ pop:()=>smp('hit',{v:.34,rate:1.5,hp:300,rev:.1})&&(smp('coin',{v:.12,rate:1.6,hp:2500,del:.02}),true),
  sigh:()=>{noise(1.1,{f:1800,f2:500,q:3,v:.14,up:.15,rev:.15});vb(HO&&HO[2],{v:.25,rate:.8,del:.05})},
  /* the present card */
  sparkle:(n)=>{const g=['g84','g91','g96'];for(let i=0;i<(n||3);i++)smp(g[i%3],{v:.13,del:i*.06,rate:rnd(.99,1.01),rev:.3})},

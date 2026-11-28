@@ -378,9 +378,9 @@ function burpSound(big){if(LS('burp',big))return;if(typeof FX=='undefined'||!FX|
  if(big)safe(()=>sdNz(.6,300,.35,{q:1.2,f2:90}),'bn')}
 function rumble(d,v,f){if(LS('rumble',d,v))return;safe(()=>sdNz(d,f||110,v||.3,{q:3,f2:(f||110)*.7,sw:.8}),'rum');safe(()=>sdHit(48,d*.8,v*.5,[[1,1,1],[2,.3,.5]],{jit:0}),'rum2')}
 const crunch=()=>{if(!LS('crunch'))safe(()=>{sdNz(.07,2600,.3,{q:2,f2:900});sdHit(180,.1,.18,[[1,1,1],[2.6,.3,.5]],{bend:.3})},'cr')};
-const boing=(k)=>safe(()=>sdHit(160+(k||0)*30,.5,.22,[[1,1,1],[2,.3,.5]],{bend:.9,rev:.15}),'bo');
+const boing=(k)=>LS('belly',k)||safe(()=>sdHit(160+(k||0)*30,.5,.22,[[1,1,1],[2,.3,.5]],{bend:.9,rev:.15}),'bo');
 const chimeUp=()=>{[0,1,2,3].forEach(i=>safe(()=>sdHit([523,659,784,1047][i],.6,.12,[[1,1,1],[2,.16,.45],[5.4,.05,.18]],{del:i*.08,rev:.25,jit:0}),'ch'))};
-const sparkSnd=()=>safe(()=>sdHit(1568+Math.random()*400,.25,.07,[[1,1,1],[2,.16,.45]],{jit:0,rev:.2}),'sp');
+const sparkSnd=()=>LS('spark')||safe(()=>sdHit(1568+Math.random()*400,.25,.07,[[1,1,1],[2,.16,.45]],{jit:0,rev:.2}),'sp');
 
 /* ---------- player helpers ---------- */
 const mode_=()=>typeof mode!='undefined'?mode:'';
@@ -541,9 +541,9 @@ function spawnSpots(){COLL.children.slice().forEach(o=>COLL.remove(o));ACTIVE=[]
   const sh=new THREE.Mesh(shGeo,shMat);sh.rotation.x=-Math.PI/2;sh.position.y=.03;g.add(sh);
   COLL.add(g);ACTIVE.push({id:i,kind,x:p[0],z:p[1],g,it,ring,sh,beams:[b1,b2],ph:Math.random()*6,state:'idle',t:0})});
  refreshSpots()}
-function refreshSpots(){const s=st(),now=Date.now();ACTIVE.forEach(a=>{const rd=(s.cd[a.id]||0)<=now;if(rd&&a.state=='gone'){a.state='idle';a.g.visible=true;a.it.scale.setScalar(.01);a.t=0;a.pop=1;a.beams.forEach(b=>b.visible=true)}else if(!rd&&a.state=='idle'){a.state='gone';a.g.visible=false}})}
+function refreshSpots(){const s=st(),now=Date.now();ACTIVE.forEach(a=>{/* a cooldown further away than the cooldown itself (a clock that was set wrong when it was saved) counts as ready */if((s.cd[a.id]||0)>now+COOLDOWN*1000+5000)s.cd[a.id]=0;const rd=(s.cd[a.id]||0)<=now;if(rd&&a.state=='gone'){a.state='idle';a.g.visible=true;a.it.scale.setScalar(.01);a.t=0;a.pop=1;a.beams.forEach(b=>b.visible=true)}else if(!rd&&a.state=='idle'){a.state='gone';a.g.visible=false}})}
 function collect(a){if(a.state!='idle')return;const s=st();a.state='fly';a.t=0;s.c[a.kind]=(s.c[a.kind]||0)+1;s.cd[a.id]=Date.now()+COOLDOWN*1000;sv();
- emit(a.x-LX,.9,a.z-LZ,16,{colors:a.kind=='cookie'?['#d99a48','#ecb868','#fff6c8']:['#ffffff','#d8322c','#fff6c8'],speed:2.6,up:3,size:.14,life:.8,floor:0});sn('chime');safe(()=>sdHit(1175,.3,.1,[[1,1,1],[2,.2,.4]],{del:.06,jit:0}),'pk');
+ emit(a.x-LX,.9,a.z-LZ,16,{colors:a.kind=='cookie'?['#d99a48','#ecb868','#fff6c8']:['#ffffff','#d8322c','#fff6c8'],speed:2.6,up:3,size:.14,life:.8,floor:0});if(!LS('pickup',a.kind)){sn('chime');safe(()=>sdHit(1175,.3,.1,[[1,1,1],[2,.2,.4]],{del:.06,jit:0}),'pk')}
  a.beams.forEach(b=>b.visible=false);toast(a.kind);hudSync(1)}
 const NAMES={cookie:['Cookie','Cookies'],cane:['Candy cane','Candy canes']};
 let TOASTE=null,TOASTT=0;
@@ -596,7 +596,7 @@ function stepPlace(dt){const d=lodgeDist();if(d>85){if(FIRE.intensity)FIRE.inten
  inK+=((here?1:0)-inK)*(1-Math.exp(-dt*(here?5:7)));if(Math.abs(inK-(here?1:0))<.003)inK=here?1:0;
  const ro=1-sm(.05,.8,inK);roofMat.opacity=ro;roofG.visible=ro>.02;roofG.position.y=sm(0,1,inK)*1.2;BULBM.forEach(b=>b.opacity=ro);
  cutG.scale.y=lerp(1,.2,sm(.1,.95,inK));cutG.visible=true;
- if(here&&!wasIn){safe(()=>window.FW_LSFX&&window.FW_LSFX.preload(),'pre');if(!GREETED||CLOCK-GREETED>90){GREETED=CLOCK;greet()}safe(()=>sdHit(1047,.9,.1,[[1,1,1],[2.7,.25,.4],[5.1,.1,.2]],{rev:.4,jit:0}),'bell');safe(()=>sdHit(1319,.8,.08,[[1,1,1],[2.7,.25,.4]],{del:.12,rev:.4,jit:0}),'bell2')}
+ if(here&&!wasIn){safe(()=>window.FW_LSFX&&window.FW_LSFX.preload(),'pre');if(!GREETED||CLOCK-GREETED>90){GREETED=CLOCK;greet()}if(!LS('bell')){safe(()=>sdHit(1047,.9,.1,[[1,1,1],[2.7,.25,.4],[5.1,.1,.2]],{rev:.4,jit:0}),'bell');safe(()=>sdHit(1319,.8,.08,[[1,1,1],[2.7,.25,.4]],{del:.12,rev:.4,jit:0}),'bell2')}}
  wasIn=here;
  /* firelight: warm, flickers; stronger at night and when you are inside */
  const fl=.85+Math.sin(CLOCK*11)*.08+Math.sin(CLOCK*23+1)*.07,nk=nightF();FIRE.intensity=(.3+nk*.9)*fl*(.35+inK*.65)*(d<60?1:0);
@@ -810,7 +810,7 @@ function feed(kind){const s=st();if(SANTA.busy||s.c[kind]<1)return;s.c[kind]--;s
  const m=newModel(kind),it=new THREE.Group();it.add(m);root.add(it);const sc0=kind=='cookie'?.85:.75;it.scale.setScalar(sc0);
  const st0=new THREE.Vector3(P.x-LX,1.35,P.z-LZ),mouth0=santaMouth();
  A.open=0;tween(.5,k=>{A.open=sm(0,1,k)*.8;A.tilt=-.22*sm(0,1,k);A.eyeW=1+.25*sm(0,1,k);A.armOv=[-.5*sm(0,1,k),-.5*sm(0,1,k)];applySanta()});
- sn('whoosh');safe(()=>P.arms[1].rotation.x=-2.4,'arm');
+ if(!LS('whoosh',.45))sn('whoosh');safe(()=>P.arms[1].rotation.x=-2.4,'arm');
  const T=.85;let trail=0;
  tween(T,k=>{const e=easeOutSine(k),mo=mouthW();const x=lerp(st0.x,mo.x,e),z=lerp(st0.z,mo.z,e),y=lerp(st0.y,mo.y,e)+Math.sin(k*Math.PI)*1.5;it.position.set(x,y,z);it.rotation.set(k*9,k*7,k*3);it.scale.setScalar(sc0*(1-k*.35));
   trail+=1;if(trail%3==0)emit(x,y,z,1,{colors:['#ffe9a0','#ffffff'],speed:.3,up:.2,grav:0,life:.5,size:.1,floor:-9});try{P.arms[1].rotation.x=lerp(-2.4,0,sm(.4,1,k))}catch(e){}},()=>{root.remove(it);chew(kind,f)},x=>x);
@@ -825,7 +825,7 @@ function chew(kind,f){const A=SANTA,crumbs=kind=='cookie'?['#d99a48','#ecb868','
   if(f>=5)burp();else grow(f)})}
 function belly(a){const A=SANTA,b=A.bw;tween(.22,k=>{A.bw=b*(1+Math.sin(k*Math.PI)*a);applySanta()},()=>{})}
 function grow(f){const A=SANTA;
- sn('pop');boing(f);setStage(f,1.15,true);shake(.2);rumble(.4,.18,90);
+ if(!LS('pop'))sn('pop');boing(f);setStage(f,1.15,true);shake(.2);rumble(.4,.18,90);
  floatText('+1  '+f+'/5','#ffd75e',false);lightPips(f);const a0=(A.armOv||[0,0])[0];tween(.35,k=>{const v=lerp(a0,-1.15,easeOutSine(k));A.armOv=[v,v];A.brows=k;applySanta()});
  const base=new THREE.Vector3(SNX,.5,SNZ);ring(base,'#ffd75e',3+f*.5,.9);emit(SNX,.6+A.g*1.5,SNZ+.3,28,{colors:['#ffd75e','#fff6c8','#ffffff','#ff7a7a'],speed:3.4,up:3.2,size:.15,life:1,grav:5,floor:-9,spread:.6});
  [0,1,2,3,4].forEach(i=>after(i*.07,()=>sparkSnd()));
@@ -891,7 +891,7 @@ function doBurp(pr,col){const A=SANTA;const mo=santaMouth();
  flash('#ffffff',.5,.3);floatText('BUUURP!','#bff08a',true,santaHead().add(new THREE.Vector3(LX,.7,LZ+1.1)));
  /* the present shoots out */
  after(.12,()=>launchPresent(pr,col,mo));
- after(.15,()=>{boing(0);sn('pop')});
+ after(.15,()=>{boing(0);if(!LS('pop'))sn('pop')});
  /* mouth closes, he blushes, shrinks back with a long squeaky sigh */
  after(1.0,()=>{tween(.35,k=>{A.open=lerp(1,.1,k);A.tilt=lerp(.22,0,k);const v=lerp(-.5,-2.1,sm(0,1,k));A.armOv=[v,-.5];A.armZ=[lerp(-.35,.35,k),.35];A.cheek=k;applySanta()});say('Oh! Excuse me!',1.8);
   after(1.0,()=>tween(.4,k=>{const v=lerp(-2.1,-.5,sm(0,1,k));A.armOv=[v,-.5];A.armZ=[lerp(.35,-.35,k),.35];A.cheek=1-k;applySanta()}))});
@@ -1057,11 +1057,13 @@ body.lodgefilm #hud,body.lodgefilm #fsgoal,body.lodgefilm #khint,body.lodgefilm 
 `;document.head.appendChild(css2);
 
 /* ---------- start-up, save changes, test hook, dev panel ---------- */
-let SPAWNED=false,lastS=null,sec1=0;
+let SPAWNED=false,lastS=null,sec1=0,HEAL=0;
 function sync(){syncSanta(true);const s=st();if(s.pr&&!s.pr.done)placePresent(true,s.pr);else{PRES.on=false;PRES.g.visible=false}}
 {const t0=tick;tick=function(dt){if(S!==lastS&&S&&S.day!==undefined){lastS=S;safe(sync,'sync');safe(()=>{if(SPAWNED)spawnSpots()},'respawn')}
  if(!SPAWNED&&CLOCK>1.5&&lastS){SPAWNED=true;safe(spawnSpots,'spawn')}
- sec1-=dt;if(sec1<0){sec1=1;safe(refreshSpots,'refresh')}
+ sec1-=dt;if(sec1<0){sec1=1;safe(refreshSpots,'refresh');
+  /* the treats are never allowed to stay missing: if the spawn found fewer than half the spots (the world was still loading, or a save swapped in) or the group lost its place in the world, put them back */
+  if(SPAWNED&&lastS&&(ACTIVE.length<SPOTS.length*.5||!COLL.parent)){if(++HEAL<=6||HEAL%20==0)safe(()=>{if(!COLL.parent)WORLD.add(COLL);spawnSpots()},'heal')}else HEAL=0}
  return t0(dt)}}
 function testFeed(kind){const s=st();if((s.c[kind]||0)<1)s.c[kind]=1;feed(kind)}
 Object.assign(window.FW_LODGE,{icon,newModel,applySanta,SANTA,PRES,ACTIVE:()=>ACTIVE,SPOTS,st,feed,testFeed,talk,openPresent,burp,deflate,setStage,syncSanta,collect,spawnSpots,rollPrize,inside,presentTalk,presentClosed,floorAt,sync,
