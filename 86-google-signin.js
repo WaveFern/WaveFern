@@ -50,11 +50,12 @@ function csPick(k){const uid=FBU&&FBU.uid;if(!uid)return;snd('click');CLD.asking
  location.reload()}
 function csWipe(uid,msg){if(!bakKeep(localStorage.getItem(slotKey()),'Kept before a new career started'))return;wiping=true;try{localStorage.removeItem(slotKey());localStorage.setItem(CS_KEY,JSON.stringify({uid,t:0}));if(msg)sessionStorage.setItem('fw_msg',msg)}catch(e){}location.reload()}
 const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem(CS_KEY,JSON.stringify({uid,t}))}catch(e){}};
-function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
+function fbSignIn(){snd('click');CLD.signing=1;/* v56.0.48: when Firebase is already loaded (the sign-in panel loads it) open the Google popup in the same tick as the click: Safari blocks a popup opened after a wait, which made the click do nothing */const run=()=>{const p=new FBM.GoogleAuthProvider();
  return FBM.signInWithPopup(FBA,p).then(r=>fbSignedIn(r.user),e=>{
   if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment')){try{sessionStorage.setItem('fw_signing','1')}catch(x){}return FBM.signInWithRedirect(FBA,p)}
   CLD.signing=0;if(e&&e.code=='auth/cancelled-popup-request')return;if(e&&e.code=='auth/popup-closed-by-user'){snd('err');return say('Sign-in did not finish. If you picked an account, your browser may be blocking it: allow third-party cookies for this site and try again.')}
-  throw e})}).catch(e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in ('+((e&&e.code)||'error')+'). Try again.')})}
+  throw e})},bad=e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in ('+((e&&e.code)||'error')+'). Try again.')};
+ if(FBA&&FBM)try{run().catch(bad)}catch(e){bad(e)}else fbLoad().then(run).catch(bad)}
 /* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
 function fbSignInAsk(){snd('click');const prev=mode;CLD.pre=prev;
  /* v56.0.28: the "Before you sign in" screen is gone. With email on (dev only until release) sign up opens in one centred panel; otherwise Sign in goes straight to Google. */
