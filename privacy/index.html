@@ -12,20 +12,21 @@
 <header id="top"><a id="logo" href="/" class="px">WAVEFERN<small>Music career sim</small></a><a class="btn go play" href="/">Play free</a></header>
 <div id="wrap"><main id="main"><article class="panel">
 <h1>Privacy Policy</h1>
-<p class="upd">Last updated 30 October 2026</p>
+<p class="upd">Last updated 28 November 2026</p>
 <p class="lead">WaveFern is a free browser game made by James Hutchinson and Rowan Burton ("we", "us"). This page explains what information the game and this website use, why, and the choices you have. We keep it short because we collect very little.</p>
-<div class="note"><b>The short version.</b> You can play without an account, and then your game is saved only in your own browser. Signing in with Google is optional and is used for cloud saves and band rooms. Google Analytics only runs if you allow it, and you can turn it off any time in Settings &gt; Game. We never sell your data and there are no ads.</div>
+<div class="note"><b>The short version.</b> You can play without an account, and then your game is saved only in your own browser. Signing in, with Google or with an email and password, is optional and is used for cloud saves and band rooms. Google Analytics only runs if you allow it, and you can turn it off any time in Settings &gt; Game. We never sell your data and there are no ads.</div>
 
 <h2 id="collect">What we collect and why</h2>
 <h3>Playing as a guest</h3>
 <p>Your careers, settings and backups are saved in your browser's local storage on your device. They are not sent to us. Clearing your browser's site data deletes them.</p>
 
-<h3>Google sign-in and cloud saves (optional)</h3>
+<h3>Sign-in (Google or email) and cloud saves (optional)</h3>
 <p>If you choose <b>Sign in with Google</b>, sign-in is handled by Google through Firebase Authentication. We receive your Google account's name, email address, profile picture and a user ID. Your name and picture are shown on the title screen.</p>
+<p>If you choose to create an account with an <b>email address and password</b>, we receive the email address and password you type. Firebase Authentication keeps the password only in scrambled (hashed) form, so we cannot read it. We send you a confirmation email, and a password-reset email if you ask for one, from no-reply@wavefern.com. These emails are made by a small service we run on Cloudflare Workers and delivered by Resend, so both of them process your email address to send the message. Until you confirm your address the account has no access to cloud saves, friends or band rooms. You can ignore the email and nothing is created that you can use.</p>
 <p>Your cloud save is stored in Google Cloud Firestore and contains your saved game, your in-game day, your artist name and the time it was saved. The game's admin (one of the makers) can view saves to help with problems and to send in-game gifts. Other players cannot see your save.</p>
 
 <h3>Band rooms (multiplayer)</h3>
-<p>Band rooms need a Google sign-in. To run a room we use the room code, the band name, the player name you type, your instrument and the game updates that go between band members (such as songs, chats with in-game artists and positions). These are sent through Firebase Realtime Database (hosted by Google in Europe) and through PeerJS, which helps browsers connect to each other directly. When browsers connect directly, the other players' browsers can see your IP address. A small room record (room code, band name, player count and the host's user ID) is used to show your rooms list. Only play in rooms with people you know.</p>
+<p>Band rooms need a sign-in (Google, or an email account you have confirmed). To run a room we use the room code, the band name, the player name you type, your instrument and the game updates that go between band members (such as songs, chats with in-game artists and positions). These are sent through Firebase Realtime Database (hosted by Google in Europe) and through PeerJS, which helps browsers connect to each other directly. When browsers connect directly, the other players' browsers can see your IP address. A small room record (room code, band name, player count and the host's user ID) is used to show your rooms list. Only play in rooms with people you know.</p>
 
 <h3>Analytics (only if you allow it)</h3>
 <p>When you first open the game we ask whether you allow anonymous usage stats. If you say yes, Google Analytics for Firebase counts visits and a few game events: starting a career, recording or releasing a song, releasing an album, signing to a label and reaching day milestones, along with the game version and in-game day. We do not send names, emails, save data or account IDs. Google will still receive standard technical information such as your IP address (used for an approximate location), device and browser type, and will store an identifier in a cookie or local storage. You can change your choice any time in <b>Settings &gt; Game &gt; Analytics</b>. If you say no, Google Analytics is not loaded at all.</p>
@@ -41,7 +42,7 @@
 <table class="t"><tr><th>What</th><th>Why</th><th>Needed?</th></tr>
 <tr><td>Local storage (keys starting <code>fw_</code>)</td><td>Your careers, backups, settings and choices, including your analytics choice</td><td>Yes, the game needs this to save</td></tr>
 <tr><td>Session storage</td><td>Remembers things for the current tab only, such as which band room you are in</td><td>Yes</td></tr>
-<tr><td>Firebase sign-in storage (IndexedDB)</td><td>Keeps you signed in, only if you sign in with Google</td><td>Only with sign-in</td></tr>
+<tr><td>Firebase sign-in storage (IndexedDB)</td><td>Keeps you signed in, only if you sign in</td><td>Only with sign-in</td></tr>
 <tr><td>Google Analytics cookies (such as <code>_ga</code>)</td><td>Counting visits and game events</td><td>No, only if you allow analytics</td></tr>
 </table>
 
@@ -49,7 +50,7 @@
 <p>If you are in the UK or the EU, we rely on: <b>providing the game you asked for</b> for saves, sign-in and band rooms; <b>your consent</b> for analytics (which you can withdraw any time); and <b>our legitimate interests</b> for keeping the game secure and replying to messages.</p>
 
 <h2 id="share">Who we share it with</h2>
-<p>We do not sell or rent personal information and there is no advertising in WaveFern. Information is handled by the services that run the game for us: Google (Firebase Authentication, Firestore, Realtime Database and Analytics), PeerJS, Web3Forms, GitHub and the font and code providers above. Some of them process data outside your country, including in the United States, under their own safeguards. We may also share information if the law requires it.</p>
+<p>We do not sell or rent personal information and there is no advertising in WaveFern. Information is handled by the services that run the game for us: Google (Firebase Authentication, Firestore, Realtime Database and Analytics), Cloudflare (Workers) and Resend for sign-in emails, PeerJS, Web3Forms, GitHub and the font and code providers above. Some of them process data outside your country, including in the United States, under their own safeguards. We may also share information if the law requires it.</p>
 
 <h2 id="keep">How long we keep it</h2>
 <ul>

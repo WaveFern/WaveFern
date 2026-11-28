@@ -2,18 +2,27 @@
 <title>Your WaveFern account</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<meta name="color-scheme" content="light dark">
 <style>
-:root{--bg:#0b1020;--card:#141b33;--line:#26305a;--t:#e9edff;--m:#9aa6d6;--g:#4be39a}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px;background:var(--bg);color:var(--t);font:16px/1.55 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-.logo{font:700 26px/1 "Courier New",monospace;letter-spacing:6px;color:var(--g);text-decoration:none}
-main{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px}
-h1{margin:0 0 10px;font-size:21px}p{margin:0 0 16px}.m{color:var(--m);font-size:13px}
-input{width:100%;font:inherit;padding:11px;margin:0 0 12px;border-radius:8px;border:1px solid var(--line);background:#0b1020;color:var(--t)}
-.btn{display:inline-block;border:0;border-radius:10px;padding:13px 24px;font:700 16px/1 inherit;background:var(--g);color:#0b1020;text-decoration:none;cursor:pointer}
-.bad{color:#ff9b9b}.ok{color:#9dffc4}
+/* v56.0.45: matches the sign-in emails (worker/mail.js): green pixel logo, Silkscreen heading and button, game monospace body, black button with a green offset shadow (green with a black one in dark mode). Only two fonts. Own solid background so text is always readable. */
+:root{color-scheme:light dark;--bg:#fff;--ink:#161616;--t:#3a4540;--m:#6b7a72;--g:#2fe68a;--gs:#1d4a37;--lk:#178f55;--ln:#161616;--bad:#c0392b;--ok:#178f55;--bf:#161616;--bt:#fff;--bs:#2fe68a}
+@media (prefers-color-scheme:dark){:root{--bg:#0c0f0d;--ink:#fff;--t:#e8f3ec;--m:#8aa094;--lk:#2fe68a;--ln:#444;--bad:#ff9b9b;--ok:#9dffc4;--bf:#2fe68a;--bt:#000;--bs:#000}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:40px 16px;background:var(--bg);color:var(--t);font:14px/1.75 ui-monospace,Menlo,Consolas,'Courier New',monospace;text-align:center}
+.logo{font:700 40px/1 Silkscreen,'Courier New',monospace;letter-spacing:5px;color:var(--g);text-shadow:3px 3px 0 var(--gs);text-decoration:none}
+main{width:100%;max-width:520px}
+h1{margin:0 0 18px;font:700 22px/1.35 Silkscreen,'Courier New',monospace;letter-spacing:2px;color:var(--ink)}
+p{margin:0 0 16px}.m{color:var(--m);font-size:12px}.bad{color:var(--bad)}.ok{color:var(--ok)}
+input{width:100%;max-width:340px;margin:0 0 14px;padding:12px;font:inherit;color:var(--ink);background:transparent;border:2px solid var(--ln);border-radius:0}
+input:focus{outline:2px solid var(--g);outline-offset:1px}
+.btn{display:inline-block;min-width:240px;max-width:100%;margin:12px 5px 5px 0;padding:19px 24px 17px;font:700 17px/20px Silkscreen,'Courier New',monospace;letter-spacing:3px;text-transform:uppercase;text-align:center;text-decoration:none;color:var(--bt);background:var(--bf);border:0;border-radius:0;box-shadow:5px 5px 0 var(--bs);cursor:pointer}
+.btn:hover{filter:brightness(1.15)}.btn:disabled{opacity:.5;cursor:default}
+footer{font-size:11px;color:var(--m)}footer a{color:var(--m);white-space:nowrap}footer p{margin:8px 0 0}
 </style></head><body>
 <a class="logo" href="/">WAVEFERN</a>
 <main id="m"><h1>One moment…</h1><p class="m">Checking your link.</p></main>
+<footer><a href="/terms/">Terms of Service</a> &middot; <a href="/privacy/">Privacy Policy</a> &middot; <a href="/legal/">Legal</a> &middot; <a href="/wiki/contact/">Contact</a><p>WaveFern is a fictional music career game. &copy; 2026 WaveFern.</p></footer>
 <script type="module">
 /* v56.0.4: the page the emails link to. Same Firebase project and public web config as the game (86-google-signin.js). Reads the one-time code
    from the URL and confirms the email address or sets the new password. No secrets here. */
