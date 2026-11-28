@@ -1,5 +1,5 @@
 /* WaveFern email templates. Two emails: verify the address, reset the password.
-   Look (James's Photoshop mockup): no card and no page background, so the mail app's own light or dark shows through. Green pixel WAVEFERN logo with a dark-green
+   Look (James's Photoshop mockup): no card. The page has its own solid background (white, or the game's #0c0f0d in dark mode) so the text is always readable: with no background, Outlook on the web showed white dark-mode text on its white reading pane. Green pixel WAVEFERN logo with a dark-green
    hard shadow, a pixel heading, monospace body, and a black "main menu" button with a white pixel label and a green offset shadow. Light is the main design;
    a dark theme (white heading and text) switches on in apps that support prefers-color-scheme (Apple Mail, iPhone Mail, Outlook Mac). Gmail ignores that rule and
    shows the light design (its apps may darken it themselves). Colours are the game's tokens (docs/THEMES.md): --g #2fe68a, --gat #04120a, --m #8aa094.
@@ -24,10 +24,11 @@ function shell({ preheader, title, intro, button, link, outro }) {
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark;}
-body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
+body{margin:0;padding:0;-webkit-text-size-adjust:100%;background:#ffffff;}
 a.wf-btn:hover{background:#2a2a2a !important;}
 @media (prefers-color-scheme:dark){a.wf-btn:hover{background:#5df0a6 !important;}}
 @media (prefers-color-scheme:dark){
+ body,.wf-bg{background:#0c0f0d !important;}
  .wf-h{color:#ffffff !important;}
  .wf-body{color:#e8f3ec !important;}
  .wf-mute{color:#8aa094 !important;}
@@ -47,10 +48,10 @@ a.wf-btn:hover{background:#2a2a2a !important;}
 }
 </style>
 </head>
-<body style="margin:0;padding:0;">
+<body class="wf-bg" style="margin:0;padding:0;background:#ffffff;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${esc(preheader)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td align="center" style="padding:44px 16px;">
+<table role="presentation" class="wf-bg" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background:#ffffff;">
+<tr><td class="wf-bg" align="center" bgcolor="#ffffff" style="padding:44px 16px;background:#ffffff;">
 <!--[if mso]><table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
 
