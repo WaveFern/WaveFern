@@ -8,8 +8,8 @@
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const GREEN = '#2fe68a', SHADOW = '#1d4a37', INK = '#161616', LINE = '#dfe6e2', BODY = '#3a4540', MUTE = '#6b7a72', LINKG = '#178f55';
-const PIX = "Silkscreen,'Courier New',Courier,monospace";
-const MONO = "ui-monospace,Menlo,Consolas,'Courier New',monospace"; /* the game's body font; the only other font is Silkscreen */
+const PIX = "Silkscreen,Menlo,'SF Mono',Consolas,'Courier New',monospace";
+const MONO = "Menlo,'SF Mono',ui-monospace,Consolas,'Courier New',monospace"; /* the game's body font; the only other font is Silkscreen */
 const SITE = 'https://wavefern.com';
 
 function shell({ preheader, title, intro, button, link, outro }) {
@@ -39,6 +39,16 @@ a.wf-btn:hover{background:#2a2a2a !important;}
  a.wf-btn{background:#2fe68a !important;color:#000000 !important;}
  .wf-bsh{background:#000000 !important;}
 }
+/* Outlook (phone, Android, web) darkens on its own and ignores prefers-color-scheme; it tags elements with data-ogsc (text) and data-ogsb (background). Force the game colours. */
+[data-ogsb] body,[data-ogsb] .wf-bg{background:#0c0f0d !important;background-color:#0c0f0d !important;}
+[data-ogsc] .wf-h{color:#ffffff !important;}
+[data-ogsc] .wf-body{color:#e8f3ec !important;}
+[data-ogsc] .wf-mute{color:#8aa094 !important;}
+[data-ogsc] .wf-link{color:#2fe68a !important;}
+[data-ogsc] .wf-foot a{color:#8aa094 !important;}
+[data-ogsb] .wf-bface,[data-ogsb] a.wf-btn{background:#2fe68a !important;background-color:#2fe68a !important;}
+[data-ogsc] a.wf-btn{color:#000000 !important;}
+[data-ogsb] .wf-bsh{background:#000000 !important;background-color:#000000 !important;}
 @media (max-width:620px){
  .wf-pad{padding-left:20px !important;padding-right:20px !important;}
  .wf-logo{font-size:30px !important;letter-spacing:3px !important;}

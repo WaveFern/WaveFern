@@ -53,8 +53,8 @@ const csSetMarkFor=(uid,t)=>{CLD.t=t;try{localStorage.setItem(CS_KEY,JSON.string
 function fbSignIn(){snd('click');CLD.signing=1;fbLoad().then(()=>{const p=new FBM.GoogleAuthProvider();
  return FBM.signInWithPopup(FBA,p).then(r=>fbSignedIn(r.user),e=>{
   if(e&&(e.code=='auth/popup-blocked'||e.code=='auth/operation-not-supported-in-this-environment')){try{sessionStorage.setItem('fw_signing','1')}catch(x){}return FBM.signInWithRedirect(FBA,p)}
-  CLD.signing=0;if(e&&(e.code=='auth/popup-closed-by-user'||e.code=='auth/cancelled-popup-request'))return;
-  throw e})}).catch(e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in. Try again.')})}
+  CLD.signing=0;if(e&&e.code=='auth/cancelled-popup-request')return;if(e&&e.code=='auth/popup-closed-by-user'){snd('err');return say('Sign-in did not finish. If you picked an account, your browser may be blocking it: allow third-party cookies for this site and try again.')}
+  throw e})}).catch(e=>{CLD.signing=0;snd('err');say(e&&e.code=='auth/unauthorized-domain'?'Sign-in is not allowed on this website yet.':'Could not sign in ('+((e&&e.code)||'error')+'). Try again.')})}
 /* v26.85: in-game notice before Google sign-in: back up the save code first, since a cloud save can replace it */
 function fbSignInAsk(){snd('click');const prev=mode;CLD.pre=prev;
  /* v56.0.28: the "Before you sign in" screen is gone. With email on (dev only until release) sign up opens in one centred panel; otherwise Sign in goes straight to Google. */
